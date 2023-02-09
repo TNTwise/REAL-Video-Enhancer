@@ -1,0 +1,13 @@
+testresources
+PyQt5==5.13
+requests
+opencv-python-headless
+pypresence
+pyuic5-tool
+cx-Freeze==6.15.16
+psutil
+pillow
+scenedetect
+pyinstaller
+numpy<2.0.0
+sympy
