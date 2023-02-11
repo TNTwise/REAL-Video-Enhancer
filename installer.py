@@ -27,7 +27,7 @@ class InstallerWindow(qtw.QMainWindow):
         self.setLayout(qtw.QVBoxLayout())
         self.setWindowTitle("Installer")
         self.UI()
-        self.setGeometry(200, 200, 300, 200) 
+        self.setFixedSize(280, 200) 
         #Show the app
         self.show()
 
@@ -49,10 +49,21 @@ class InstallerWindow(qtw.QMainWindow):
         self.install_all_checkbox.stateChanged.connect(self.next_button_install)
 
     def next_button_install(self):
+        
         self.is_dynamic_checkbox.setChecked(False)
+        
+        # Create new next button
+        self.next_install_button = qtw.QPushButton("Next", self)
+        self.layout().addWidget(self.next_install_button)
+        self.next_install_button.setGeometry(200,150,60,40)
+
+        #try:
+        #    self.next_dynamic_button
     def next_button_dynamic(self):
         self.install_all_checkbox.setChecked(False)
-
+        self.next_dynamic_button = qtw.QPushButton("Next", self)
+        self.layout().addWidget(self.next_dynamic_button)
+        self.next_dynamic_button.setGeometry(200,150,60,40)
 app = qtw.QApplication([])
 iw = InstallerWindow()
 app.exec_()
