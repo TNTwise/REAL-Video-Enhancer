@@ -4,7 +4,7 @@ import PyQt5.QtGui as qtg
 import requests
 import os 
 import threading
-
+from install_dependencies import dependencies
 
 class wget:
     def __init__(self, url, filename):
@@ -64,6 +64,9 @@ class InstallerWindow(qtw.QMainWindow):
         self.next_dynamic_button = qtw.QPushButton("Next", self)
         self.layout().addWidget(self.next_dynamic_button)
         self.next_dynamic_button.setGeometry(200,150,60,40)
+        self.next_dynamic_button.clicked.connect(self.next_command)
+    def next_command(self):
+        dependencies.install_dependencies()
 app = qtw.QApplication([])
 iw = InstallerWindow()
 app.exec_()
