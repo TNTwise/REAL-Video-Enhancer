@@ -20,7 +20,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="verticalTabWidgetPage1" native="true">
+      <widget class="QWidget" name="verticalTabWidgetPage1">
        <attribute name="title">
         <string/>
        </attribute>
@@ -67,17 +67,17 @@
                <widget class="QComboBox" name="comboBox">
                 <item>
                  <property name="text">
-                  <string>New Item</string>
+                  <string>2X</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>New Item</string>
+                  <string>4X</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>New Item</string>
+                  <string>8X</string>
                  </property>
                 </item>
                </widget>
