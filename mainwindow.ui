@@ -28,7 +28,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <attribute name="title">
-        <string/>
+        <string>Rife</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -125,7 +125,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <attribute name="title">
-        <string/>
+        <string>Real-ESRGAN</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
