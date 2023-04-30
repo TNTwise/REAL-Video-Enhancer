@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Rife">
        <property name="toolTip">
@@ -34,9 +34,12 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
             <item>
-             <widget class="QGraphicsView" name="putpreviewhere"/>
+             <widget class="QGraphicsView" name="Preview_2"/>
+            </item>
+            <item>
+             <widget class="QTextBrowser" name="textBrowser"/>
             </item>
            </layout>
           </item>
@@ -129,14 +132,17 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <widget class="QGraphicsView" name="putpreviewhere"/>
-            </item>
-           </layout>
+           <widget class="QGraphicsView" name="Preview"/>
           </item>
+          <item>
+           <widget class="QTextBrowser" name="Logs"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
