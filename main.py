@@ -3,7 +3,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog
 import mainwindow
 import os
-import start
+import src.start as start
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -12,6 +12,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
+
+        #Define Variables
+        self.input_file = ''
+        self.output_folder = ''
+
         self.pin_functions()
         self.show()
 
@@ -20,11 +25,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
         self.ui.Rife_Model.setCurrentIndex(5)
+        self.ui.RifeStart.clicked.connect(lambda: start.start_rife(0,0,self.input_file,self.output_folder))
 
     def openFileNameDialog(self):
 
-        self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")
-    
+        self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

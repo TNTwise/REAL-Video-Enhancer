@@ -48,7 +48,7 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_4">
               <item>
-               <widget class="QPushButton" name="pushButton_4">
+               <widget class="QPushButton" name="RifeStart">
                 <property name="text">
                  <string>Start</string>
                 </property>
