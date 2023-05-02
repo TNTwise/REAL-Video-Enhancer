@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Rife">
        <property name="toolTip">
@@ -59,35 +59,80 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QPushButton" name="pushButton">
+               <widget class="QPushButton" name="Input_video_rife">
                 <property name="text">
                  <string>Input Video</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="pushButton_3">
+               <widget class="QPushButton" name="Output_folder_rife">
                 <property name="text">
                  <string>Output folder</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox_3">
+               <widget class="QComboBox" name="Rife_Model">
                 <item>
                  <property name="text">
-                  <string>Default</string>
+                  <string>Rife</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Animation</string>
+                  <string>Rife-Anime</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-HD</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-UHD</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V2</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V2.3</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V2.4</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V3.0</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V3.1</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V4</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Rife-V4.6</string>
                  </property>
                 </item>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="comboBox">
+               <widget class="QComboBox" name="Rife_Times">
                 <item>
                  <property name="text">
                   <string>2X</string>
