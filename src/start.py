@@ -20,7 +20,7 @@ def start(renderdir,videoName,videopath):
 def end(renderdir,videoName,videopath,times,outputpath):
         
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 {outputpath}/{videoName}_60fps.mp4') #ye we gonna have to add settings up in this bish
+        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 {outputpath}/{videoName}_{fps*2}fps.mp4') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}/"')
 
 def start_rife(model,times,videopath,outputpath,renderdir=thisdir):
