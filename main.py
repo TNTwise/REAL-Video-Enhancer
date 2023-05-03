@@ -5,6 +5,8 @@ import mainwindow
 import os
 from threading import *
 import src.start as start
+import src.get_models as get_models
+from src.settings import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -27,8 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
         self.ui.Rife_Model.setCurrentIndex(5)
-        
-        self.ui.RifeStart.clicked.connect(lambda: Thread(target=lambda: start.start_rife((self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder)).start())
+        self.ui.RifeStart.clicked.connect(lambda: Thread(target=lambda: start.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder)).start())
 
     def openFileNameDialog(self):
 
@@ -38,6 +39,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
 
 if __name__ == '__main__':
+    settings = Settings()
+    
+    if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
+        
+        get_models.get_all_models()
+        
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec_())

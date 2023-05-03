@@ -8,4 +8,19 @@ class Fps:
 class VideoName:
     def return_video_name(videopath):
         return os.path.basename(videopath)
-        
+
+class ManageFiles:
+    
+    def create_folder(folderpath):
+        if os.path.exists(folderpath) == False:
+            os.mkdir(folderpath)
+
+    def create_file(filepath):
+        if os.path.isfile(filepath) == False:
+            os.mknod(filepath)
+
+    def isfile(filepath):
+        return os.path.isfile(filepath)
+            
+    def isfolder(folderpath):
+        return os.path.exists(folderpath)
