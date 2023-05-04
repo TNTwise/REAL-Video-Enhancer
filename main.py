@@ -6,7 +6,7 @@ import mainwindow
 import os
 from threading import *
 import src.start as start
-import src.get_models as get_models
+#import src.get_models as get_models # Forgor to upload this file to github
 from src.settings import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
@@ -42,7 +42,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def endRife(self):
         self.rifeThread.join()
         self.ui.RifeStart.setDisabled(False)
-        self.ui.RifeStart.setStyleSheet('color: white;')
+        current_palette = app.style().standardPalette()
+        if current_palette.color(current_palette.WindowText).lightness() > 127:
+            self.ui.RifeStart.setStyleSheet(f'color: black;')
+        else:
+            self.ui.RifeStart.setStyleSheet(f'color: black;')
+
     def startRife(self):
 
         if self.input_file != '':
@@ -67,7 +72,8 @@ if __name__ == '__main__':
     
     if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
         
-        get_models.get_all_models()
+        #get_models.get_all_models()
+        pass 
         
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
