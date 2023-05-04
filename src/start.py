@@ -3,6 +3,8 @@ import src.return_data as return_data
 import os
 import src.settings as settings
 import glob
+import main
+import mainwindow
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -20,15 +22,21 @@ def start(renderdir,videoName,videopath):
 def end(renderdir,videoName,videopath,times,outputpath):
         
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 {outputpath}/{videoName}_{fps*2}fps.mp4') #ye we gonna have to add settings up in this bish
+        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps.mp4') == False:
+                output_video_file = f'{outputpath}/{videoName}_{fps*2}fps.mp4'
+        else:
+               output_video_file = f'{outputpath}/{videoName}_{fps*2}fps-%03d.mp4' 
+        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 {output_video_file}') #ye we gonna have to add settings up in this bish
+                
         os.system(f'rm -rf "{renderdir}/{videoName}/"')
-
+        
 def start_rife(model,times,videopath,outputpath,renderdir=thisdir):
         
-        if videopath != '':
-                videoName = return_data.VideoName.return_video_name(fr'{videopath}')
-                start(renderdir,videoName,videopath)
+        videoName = return_data.VideoName.return_video_name(fr'{videopath}')
+        start(renderdir,videoName,videopath)
 
-                os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}/input_frames/ -o {renderdir}/{videoName}/output_frames/')
+        os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}/input_frames/ -o {renderdir}/{videoName}/output_frames/')
 
-                end(renderdir,videoName,videopath,times,outputpath)
+        end(renderdir,videoName,videopath,times,outputpath)
+        
+                
