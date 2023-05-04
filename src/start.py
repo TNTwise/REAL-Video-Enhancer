@@ -22,11 +22,16 @@ def start(renderdir,videoName,videopath):
 def end(renderdir,videoName,videopath,times,outputpath):
         
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps.mp4') == False:
-                output_video_file = f'{outputpath}/{videoName}_{fps*2}fps.mp4'
+        
+        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps.mp4') == True:
+                i=1
+                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}({i})fps.mp4') == True:
+                        i+=1
+                output_video_file = f'{outputpath}/{videoName}_{fps*2}({i})fps.mp4'
+
         else:
-               output_video_file = f'{outputpath}/{videoName}_{fps*2}fps-%03d.mp4' 
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 {output_video_file}') #ye we gonna have to add settings up in this bish
+               output_video_file = f'"{outputpath}/{videoName}_{fps*2}fps.mp4"' 
+        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}/output_frames/%08d.png" -crf 18 -c:a copy "{output_video_file}"') #ye we gonna have to add settings up in this bish
                 
         os.system(f'rm -rf "{renderdir}/{videoName}/"')
         

@@ -6,7 +6,6 @@ homedir = os.path.expanduser(r"~")
 
 class Settings:
     def __init__(self) -> None:
-        print('h')
 
         ManageFiles.create_folder(f"{thisdir}/files")
         if ManageFiles.isfile(f"{thisdir}/files/settings.txt") == False:
