@@ -39,20 +39,36 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+    
+    def _setStyle(self,color):
+        self.ui.RifeStart.setStyleSheet(f'color: {color};')
+        self.ui.Input_video_rife.setStyleSheet(f'color: {color};')
+        self.ui.Output_folder_rife.setStyleSheet(f'color: {color};')
+        self.ui.Rife_Model.setStyleSheet(f"QComboBox {{ color: {color}; }}")
+        self.ui.Rife_Times.setStyleSheet(f"QComboBox {{ color: {color}; }}")
+
+    def setDisableEnable(self,mode):
+        self.ui.RifeStart.setDisabled(mode)
+        self.ui.Input_video_rife.setDisabled(mode)
+        self.ui.Output_folder_rife.setDisabled(mode)
+        self.ui.Rife_Model.setDisabled(mode)
+        self.ui.Rife_Times.setDisabled(mode)
+
     def endRife(self):
         self.rifeThread.join()
-        self.ui.RifeStart.setDisabled(False)
+        
         current_palette = app.style().standardPalette()
+        self.setDisableEnable(False)
         if current_palette.color(current_palette.WindowText).lightness() > 127:
-            self.ui.RifeStart.setStyleSheet(f'color: black;')
+            self._setStyle('white')
         else:
-            self.ui.RifeStart.setStyleSheet(f'color: black;')
+            self._setStyle('black')
 
     def startRife(self):
 
         if self.input_file != '':
-            self.ui.RifeStart.setEnabled(False)
-            self.ui.RifeStart.setStyleSheet('color: gray;')
+            self.setDisableEnable(True)
+            self._setStyle('gray')
             self.rifeThread = Thread(target=lambda: start.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder))
             self.rifeThread.start()
             Thread(target=self.endRife).start()
