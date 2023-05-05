@@ -4,7 +4,33 @@ import sys
 import requests
 import re
 from zipfile import ZipFile
+from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout
 from src.settings import *
+
+class PopUpProgressB(QWidget):
+
+    def progressBar(self,model):
+        self.pbar = QProgressBar(self)
+        self.pbar.setGeometry(30, 40, 500, 75)
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.pbar)
+        self.setLayout(self.layout)
+        self.setGeometry(300, 300, 550, 100)
+        self.setWindowTitle(f'{model}')
+        self.show()
+
+       
+
+    def on_count_changed(self, value):
+        self.pbar.setValue(value)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    main_window = PopUpProgressB()
+    
+    sys.exit(app.exec_())
+
 class get_all_models:
     def __init__(self):
          self.get_rife()
@@ -18,13 +44,9 @@ class get_all_models:
         latest = re.findall(r'[\d]*$', latest)
         latest = latest[0]
         print(latest)
-        return(latest)     
+        return(latest)
+    
     def show_loading_window(self, model):
-        '''self.loading_window = Tk()
-        self.loading_window.geometry("400x100")
-        self.loading_window.title('Downloading Models')
-        self.loading_window.resizable(False, False)
-        self.loading_window.config(bg=bg)'''
         
         
         
