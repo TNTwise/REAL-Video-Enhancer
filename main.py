@@ -6,7 +6,7 @@ import mainwindow
 import os
 from threading import *
 import src.start as start
-#import src.get_models as get_models # Forgor to upload this file to github
+import src.get_models as get_models 
 from src.settings import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
@@ -88,8 +88,7 @@ if __name__ == '__main__':
     
     if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
         
-        #get_models.get_all_models()
-        pass 
+        get_models.get_all_models()
         
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
