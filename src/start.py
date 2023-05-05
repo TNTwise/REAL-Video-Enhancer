@@ -1,4 +1,5 @@
 #This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
+# hz
 import src.return_data as return_data
 import os
 import src.settings as settings
@@ -23,8 +24,8 @@ def end(renderdir,videoName,videopath,times,outputpath):
         
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
         
-        if return_data.ManageFiles.isfile(f'{outputpath}/{videoNam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e}_{fps*2}fps.mp4') == True:
-                i=1
+        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps.mp4') == True:
+                i=1 
                 while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps({i}).mp4') == True:
                         i+=1
                 output_video_file = f'{outputpath}/{videoName}_{fps*2}fps({i}).mp4' 
