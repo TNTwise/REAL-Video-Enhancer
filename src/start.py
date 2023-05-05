@@ -25,7 +25,7 @@ def end(renderdir,videoName,videopath,times,outputpath):
         
         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps.mp4') == True:
                 i=1
-                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}({i})fps.mp4') == True:
+                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{fps*2}fps({i}).mp4') == True:
                         i+=1
                 output_video_file = f'{outputpath}/{videoName}_{fps*2}({i})fps.mp4'
 
