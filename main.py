@@ -6,7 +6,7 @@ import mainwindow
 import os
 from threading import *
 import src.start as start
-import src.get_models as get_models 
+import src.get_rife_models as get_rife_models 
 from src.settings import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
@@ -86,10 +86,12 @@ class MainWindow(QtWidgets.QMainWindow):
 if __name__ == '__main__':
     settings = Settings()
     
-    if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
+    if  os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
         
-        get_models.get_all_models()
-        
+        get_rife_models.StartRife()
+
+    if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
+        pass # put link to get_realesrgan_models here
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     sys.exit(app.exec_())
