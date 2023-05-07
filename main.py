@@ -5,9 +5,14 @@ from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFil
 import mainwindow
 import os
 from threading import *
+from src.settings import *
+ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
 import src.get_rife_models as get_rife_models 
-from src.settings import *
+import src.get_realsr_models as get_realsr_models
+
+
+
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -82,16 +87,15 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.setWindowTitle(" ")
         msg.setText(f"{message}")
         msg.exec_()
-
-if __name__ == '__main__':
-    settings = Settings()
     
-    if  os.path.exists(f"{thisdir}/rife-vulkan-models/") == False:
-        
-        get_rife_models.StartRife()
 
-    if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
-        pass # put link to get_realesrgan_models here
-    app = QtWidgets.QApplication(sys.argv)
-    window = MainWindow()
-    sys.exit(app.exec_())
+
+settings = Settings()
+
+
+    
+app = QtWidgets.QApplication(sys.argv)
+window = MainWindow()
+sys.exit(app.exec_())
+    
+
