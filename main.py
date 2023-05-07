@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
-
+import cv2
 import mainwindow
 import os
 from threading import *
@@ -10,7 +10,7 @@ ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
 import src.get_rife_models as get_rife_models 
 import src.get_realsr_models as get_realsr_models
-
+from time import sleep
 
 
 thisdir = os.getcwd()
@@ -45,6 +45,30 @@ class MainWindow(QtWidgets.QMainWindow):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
+
+    def updateRifeProgressBar(self,times):
+        videoName = VideoName.return_video_name(f'{self.input_file}')
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/output_frames/') == False:
+            print(1)
+            sleep(1)
+        
+
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}/input_frames/'))
+        total_output_files = total_input_files * times
+        self.ui.RifePB.setMaximum(total_output_files)
+        print(total_output_files)
+        print(videoName)
+        sleep(1)
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/') == True:
+                
+                
+                files_processed = len(os.listdir(f'{settings.RenderDir}/{videoName}/output_frames/'))
+                print(files_processed/total_output_files)
+                self.ui.RifePB.setValue(files_processed)
+                sleep(1)
+        self.ui.RifePB.setValue(total_output_files)
+        return 0
+
     def _setStyle(self,color):
         self.ui.RifeStart.setStyleSheet(f'color: {color};')
         self.ui.Input_video_rife.setStyleSheet(f'color: {color};')
@@ -54,7 +78,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
-        self.ui.Input_video_rife.setDisabled(mode)
+        self.ui.Input_video_rife.setDisabled(mode) 
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
@@ -74,8 +98,10 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.input_file != '':
             self.setDisableEnable(True)
             self._setStyle('gray')
+            
             self.rifeThread = Thread(target=lambda: start.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder))
             self.rifeThread.start()
+            Thread(target=lambda: self.updateRifeProgressBar(int(self.ui.Rife_Times.currentText()[0]))).start()
             Thread(target=self.endRife).start()
         else:
             self.showDialogBox("No input file selected.")

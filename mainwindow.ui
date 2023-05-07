@@ -155,7 +155,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QProgressBar" name="progressBar">
+           <widget class="QProgressBar" name="RifePB">
             <property name="value">
              <number>0</number>
             </property>

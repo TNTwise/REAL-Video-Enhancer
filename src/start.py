@@ -4,8 +4,7 @@ import src.return_data as return_data
 import os
 import src.settings as settings
 import glob
-import main
-import mainwindow
+
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -15,11 +14,11 @@ def start(renderdir,videoName,videopath):
         
         os.mkdir(f'{renderdir}/{videoName}/')
         os.mkdir(f'{renderdir}/{videoName}/input_frames')
-        os.mkdir(f'{renderdir}/{videoName}/output_frames')
+       
         os.mkdir(f'{renderdir}/{videoName}/transitions')
         os.system(f'ffmpeg -i "{videopath}" "{renderdir}/{videoName}/input_frames/%08d.png" ') # Add image extraction setting here, also add ffmpeg command here as if its compiled or not
         os.system(f'ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}/audio.m4a" -y') # do same here i think maybe
-
+        os.mkdir(f'{renderdir}/{videoName}/output_frames')
 def end(renderdir,videoName,videopath,times,outputpath):
         
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
