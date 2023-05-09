@@ -17,9 +17,7 @@ class MainWindow(QtWidgets.QMainWindow):
             msg.setWindowTitle(" ")
             msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
             
-            
-            pbapp.closeAllWindows()
-            QApplication.closeAllWindows() 
+       
         
 
         
