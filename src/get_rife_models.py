@@ -4,11 +4,29 @@ import sys
 import requests
 import re
 import zipfile
+from PyQt5 import QtWidgets, uic
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout, QMessageBox
 from src.settings import *
 from src.return_data import *
 from threading import Thread
 import src.get_realsr_models as get_realsr_models
+class MainWindow(QtWidgets.QMainWindow):
+    def __init__(self):
+        msg = QMessageBox()
+        msg.setWindowTitle(" ")
+        msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
+        
+        exit()
+        pbapp.closeAllWindows()
+        QApplication.closeAllWindows() 
+        
+
+        
+
+popupapp = QtWidgets.QApplication(sys.argv)
+window = MainWindow()
+
+
 class PopUpProgressB(QWidget):
     def __init__(self):
 
@@ -70,10 +88,8 @@ class PopUpProgressB(QWidget):
                 self.close()
 
         except:
-            msg = QMessageBox()
-            msg.setWindowTitle(" ")
-            msg.setText(f"You are offline, please download the offline binary or reconnect to the internet.")
-            msg.exec_()
+            
+            sys.exit(popupapp.exec_())
 
 
     def get_rife(self):
@@ -99,7 +115,8 @@ class PopUpProgressB(QWidget):
                 import main as main
 class StartRife:
     if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
-        app = QApplication(sys.argv)
+        global pbapp
+        pbapp = QApplication(sys.argv)
         main_window = PopUpProgressB()
 
-        sys.exit(app.exec_())
+        sys.exit(pbapp.exec_())
