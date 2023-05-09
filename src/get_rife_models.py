@@ -12,13 +12,14 @@ from threading import Thread
 import src.get_realsr_models as get_realsr_models
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        msg = QMessageBox()
-        msg.setWindowTitle(" ")
-        msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
-        
-        exit()
-        pbapp.closeAllWindows()
-        QApplication.closeAllWindows() 
+        if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
+            msg = QMessageBox()
+            msg.setWindowTitle(" ")
+            msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
+            
+            
+            pbapp.closeAllWindows()
+            QApplication.closeAllWindows() 
         
 
         
