@@ -21,14 +21,14 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
 
                 super(PopUpProgressB, self).__init__()
 
-                self.progressBarRife()
+                self.progressBarRealSR()
             except:
                 msg = QMessageBox()
                 msg.setWindowTitle(" ")
                 msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
                 sys.exit(msg.exec_())
                 
-        def progressBarRife(self):
+        def progressBarRealSR(self):
             
             self.pbar = QProgressBar(self)
             self.pbar.setGeometry(30, 40, 500, 75)
@@ -94,7 +94,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
             if ManageFiles.isfolder(f'{thisdir}/rife-vulkan-models/') == False:
                 import src.get_rife_models as get_rife_models
             import main as main
-                
+    
     class StartRealSR:
         
             app = QApplication(sys.argv)
