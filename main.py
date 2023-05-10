@@ -7,8 +7,9 @@ from threading import *
 from src.settings import *
 ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
-import src.get_rife_models as get_rife_models 
 import src.get_realsr_models as get_realsr_models
+
+import src.get_rife_models as get_rife_models 
 from time import sleep
 
 thisdir = os.getcwd()

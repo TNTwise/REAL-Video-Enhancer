@@ -4,20 +4,29 @@ import sys
 import requests
 import re
 from zipfile import ZipFile
+from PyQt5 import QtWidgets, uic
+
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout, QMessageBox
 from src.settings import *
 from src.return_data import *
 from threading import Thread
+import src.get_rife_models as get_rife_models
+
 if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
-    class PopUpProgressB(QWidget):
+    class PopUpProgressB(QtWidgets.QMainWindow):
         def __init__(self):
-            
-            
-            super(PopUpProgressB, self).__init__()
-            
-            self.progressBarRife()
-            
-                
+
+            try:
+                requests.get('https://www.github.com')
+
+                super(PopUpProgressB, self).__init__()
+
+                self.progressBarRife()
+            except:
+                msg = QMessageBox()
+                msg.setWindowTitle(" ")
+                msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
+                sys.exit(msg.exec_())
                 
         def progressBarRife(self):
             

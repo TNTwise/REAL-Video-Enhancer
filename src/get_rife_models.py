@@ -5,35 +5,27 @@ import requests
 import re
 import zipfile
 from PyQt5 import QtWidgets, uic
+
 from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout, QMessageBox
 from src.settings import *
 from src.return_data import *
 from threading import Thread
-import src.get_realsr_models as get_realsr_models
-if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
-    class MainWindow(QtWidgets.QMainWindow):
+if os.path.exists(f'{thisdir}/rife-vulkan-models/') == False:
+
+    class PopUpProgressB(QtWidgets.QMainWindow):
         def __init__(self):
-            
+
+            try:
+                requests.get('https://www.github.com')
+
+                super(PopUpProgressB, self).__init__()
+
+                self.progressBarRife()
+            except:
                 msg = QMessageBox()
                 msg.setWindowTitle(" ")
                 msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
-                
-        
-            
-
-            
-
-
-
-    class PopUpProgressB(QWidget):
-        def __init__(self):
-
-
-            super(PopUpProgressB, self).__init__()
-
-            self.progressBarRife()
-
-
+                sys.exit(msg.exec_())
 
         def progressBarRife(self):
 
@@ -63,32 +55,31 @@ if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
 
             version = self.latest_rife() # calls latest function which gets the latest version release of rife and returns the latest and the current, if the version file doesnt exist, it updates and creates the file
             latest_ver = version
-            try:
+            
 
-                file=f"rife-ncnn-vulkan-{latest_ver}-ubuntu.zip"
-                response = requests.get(f"https://github.com/nihui/rife-ncnn-vulkan/releases/download/{latest_ver}/rife-ncnn-vulkan-{latest_ver}-ubuntu.zip", stream=True)
+            file=f"rife-ncnn-vulkan-{latest_ver}-ubuntu.zip"
+            response = requests.get(f"https://github.com/nihui/rife-ncnn-vulkan/releases/download/{latest_ver}/rife-ncnn-vulkan-{latest_ver}-ubuntu.zip", stream=True)
 
-                total_size_in_bytes= int(response.headers.get('content-length', 0))
-                block_size = 1024 #1 Kibibyte
+            total_size_in_bytes= int(response.headers.get('content-length', 0))
+            block_size = 1024 #1 Kibibyte
 
-                self.pbar.setMaximum(total_size_in_bytes)
+            self.pbar.setMaximum(total_size_in_bytes)
 
-                total_block_size = 0
-                with open(file, 'wb') as f:
-                    for data in response.iter_content(block_size):
-                        total_block_size += block_size
-                        self.pbar.setValue(total_block_size)
+            total_block_size = 0
+            with open(file, 'wb') as f:
+                for data in response.iter_content(block_size):
+                    total_block_size += block_size
+                    self.pbar.setValue(total_block_size)
 
-                        f.write(data)
+                    f.write(data)
 
-                    Thread(target=self.get_rife).start()
+                Thread(target=self.get_rife).start()
 
-                    self.close()
+                self.close()
 
-            except:
+            
                 
-                sys.exit(popupapp.exec_())
-
+                
 
         def get_rife(self):
 
@@ -108,13 +99,12 @@ if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
                 os.system(f'chmod +x "{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"')
 
                 if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
-                    get_realsr_models.StartRealSR()
+                    import src.get_realsr_models as get_realsr_models
                 else:
                     import main as main
     class StartRife:
         if ManageFiles.isfolder(f"{thisdir}/rife-vulkan-models") == False:
-            global pbapp
-            pbapp = QApplication(sys.argv)
+            app = QApplication(sys.argv)
             main_window = PopUpProgressB()
 
-            sys.exit(pbapp.exec_())
+            sys.exit(app.exec_())
