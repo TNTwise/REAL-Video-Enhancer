@@ -1,7 +1,6 @@
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
-import cv2
 import mainwindow
 import os
 from threading import *
@@ -11,7 +10,6 @@ import src.start as start
 import src.get_rife_models as get_rife_models 
 import src.get_realsr_models as get_realsr_models
 from time import sleep
-
 
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
