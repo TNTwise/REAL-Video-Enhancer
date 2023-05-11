@@ -73,63 +73,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="Rife_Model">
-                <item>
-                 <property name="text">
-                  <string>Rife</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-Anime</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-HD</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-UHD</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V2</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V2.3</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V2.4</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V3.0</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V3.1</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V4</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Rife-V4.6</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QComboBox" name="Rife_Model"/>
               </item>
               <item>
                <widget class="QComboBox" name="Rife_Times">

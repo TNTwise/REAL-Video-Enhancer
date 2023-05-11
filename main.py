@@ -5,6 +5,7 @@ import mainwindow
 import os
 from threading import *
 from src.settings import *
+from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
 #import src.get_realsr_models as get_realsr_models
@@ -21,7 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
-
+        
         #Define Variables
         self.input_file = ''
         self.output_folder = ''
@@ -34,9 +35,19 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-        self.ui.Rife_Model.setCurrentIndex(5)
+        
         self.ui.RifeStart.clicked.connect(self.startRife)
 
+        # list every model downloaded, and add them to the list
+        for folders in os.walk(f'{thisdir}/rife-vulkan-models/'):
+            
+            for model in folders[1]:
+                model = model.replace('r',"R")
+                model = model.replace('v','V')
+                
+                self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
+                if model == 'Rife-V2.3':
+                    self.ui.Rife_Model.setCurrentText(f'{model}')
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
@@ -49,7 +60,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def updateRifeProgressBar(self,times):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/output_frames/') == False:
-            print(1)
             sleep(1)
         
 
