@@ -40,16 +40,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # list every model downloaded, and add them to the list
        
-        folders = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
-           
-        for model in folders:
-            if len(model) < 11:
-                model = model.replace('r',"R")
-                model = model.replace('v','V')
-                self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-                if model == 'Rife-V2.3':
-                    self.ui.Rife_Model.setCurrentText(f'{model}')
+        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
+        models = []
+        for model_filepath in model_filepaths:
+            if 'rife' in model_filepath:
+                models.append(os.path.basename(model_filepath))
+        
+        
+        for model in models:
 
+            
+            model = model.replace('r',"R")
+            model = model.replace('v','V')
+            
+            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
+            if model == 'Rife-V2.3':
+                self.ui.Rife_Model.setCurrentText(f'{model}')
+            
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
