@@ -8,9 +8,7 @@ from src.settings import *
 from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
-#import src.get_realsr_models as get_realsr_models
 
-#import src.get_rife_models as get_rife_models 
 import src.get_models as get_models
 from time import sleep
 
@@ -43,7 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
         model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
         models = []
         for model_filepath in model_filepaths:
-            if 'rife' in model_filepath:
+            if 'rife' in os.path.basename(model_filepath):
                 models.append(os.path.basename(model_filepath))
         
         
@@ -52,7 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
             model = model.replace('r',"R")
             model = model.replace('v','V')
-            
+            model = model.replace('a','A')
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
             if model == 'Rife-V2.3':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
