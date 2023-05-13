@@ -4,7 +4,6 @@ import src.return_data as return_data
 import os
 import src.settings as settings
 import glob
-
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 

@@ -12,6 +12,7 @@ from src.return_data import *
 from threading import Thread
 
 if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisdir}/rife-vulkan-models/') == False:
+    
     class PopUpProgressB(QtWidgets.QMainWindow):
         def __init__(self,model):
 
@@ -123,14 +124,16 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
                 sleep(1) #need sleep otherwise core dump :\ this is probably not a good idea....
                     
                 import main as main
+    
     class StartRife:
-        app1 = QApplication(sys.argv)
-        if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
-            main_window = PopUpProgressB('Real-ESRGAN')
-        if os.path.exists(f'{thisdir}/rife-vulkan-models/') == False:
-            main_window = PopUpProgressB('Rife')
+        if os.path.isfile(f'{thisdir}/src/rife_models.txt') == True:
+            app1 = QApplication(sys.argv)
+            if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False:
+                main_window = PopUpProgressB('Real-ESRGAN')
+            if os.path.exists(f'{thisdir}/rife-vulkan-models/') == False:
+                main_window = PopUpProgressB('Rife')
         
-        sys.exit(app1.exec_())
+            sys.exit(app1.exec_())
 
         
         
