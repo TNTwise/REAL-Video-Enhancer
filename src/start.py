@@ -4,10 +4,9 @@ import src.return_data as return_data
 import os
 import src.settings as settings
 import glob
+from threading import Thread
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
-
-
 def start(renderdir,videoName,videopath):
         os.system(f'rm -rf "{renderdir}/{videoName}/"')
         
@@ -34,13 +33,6 @@ def end(renderdir,videoName,videopath,times,outputpath):
                 
         os.system(f'rm -rf "{renderdir}/{videoName}/"')
         
-def start_rife(model,times,videopath,outputpath,renderdir=thisdir):
-        
-        videoName = return_data.VideoName.return_video_name(fr'{videopath}')
-        start(renderdir,videoName,videopath)
 
-        os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}/input_frames/ -o {renderdir}/{videoName}/output_frames/')
-
-        end(renderdir,videoName,videopath,times,outputpath)
         
                 

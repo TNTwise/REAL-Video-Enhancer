@@ -64,7 +64,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
 
-    def updateRifeProgressBar(self,times):
+    def updateRifeProgressBar(self,times,start_value):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/output_frames/') == False:
             sleep(1)
@@ -80,7 +80,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
                 files_processed = len(os.listdir(f'{settings.RenderDir}/{videoName}/output_frames/'))
-                print(files_processed/total_output_files)
+                
                 self.ui.RifePB.setValue(files_processed)
                 sleep(1)
         self.ui.RifePB.setValue(total_output_files)
@@ -116,14 +116,29 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setDisableEnable(True)
             self._setStyle('gray')
             
-            self.rifeThread = Thread(target=lambda: start.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder))
+           
+           
+            self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder,0,0))
             self.rifeThread.start()
-            Thread(target=lambda: self.updateRifeProgressBar(int(self.ui.Rife_Times.currentText()[0]))).start()
+                
             Thread(target=self.endRife).start()
         else:
             self.showDialogBox("No input file selected.")
 
     
+    def start_rife(self,model,times,videopath,outputpath,iteration,end_iteration,renderdir=thisdir):
+        
+        videoName = VideoName.return_video_name(fr'{videopath}')
+        Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+        start.start(renderdir,videoName,videopath)
+        
+                #change progressbar value
+    
+        
+        os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}/input_frames/ -o {renderdir}/{videoName}/output_frames/')
+        
+        
+        start.end(renderdir,videoName,videopath,times,outputpath)
 
     def showDialogBox(self,message):
         msg = QMessageBox()
