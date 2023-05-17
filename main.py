@@ -66,20 +66,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def updateRifeProgressBar(self,times,start_value):
         videoName = VideoName.return_video_name(f'{self.input_file}')
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/output_frames/') == False:
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/output_frames/') == False:
             sleep(1)
         
 
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}/input_frames/'))
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
         total_output_files = total_input_files * times
         self.ui.RifePB.setMaximum(total_output_files)
         print(total_output_files)
         print(videoName)
         sleep(1)
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}/') == True:
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/') == True:
                 
                 
-                files_processed = len(os.listdir(f'{settings.RenderDir}/{videoName}/output_frames/'))
+                files_processed = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/output_frames/'))
                 
                 self.ui.RifePB.setValue(files_processed)
                 sleep(1)
@@ -122,7 +122,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if int(self.ui.Rife_Times.currentText()[0]) == 4:
                 self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
             if int(self.ui.Rife_Times.currentText()[0]) == 8:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,3))
+                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
                 
             Thread(target=self.endRife).start()
@@ -133,14 +133,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_rife(self,model,times,videopath,outputpath,end_iteration,renderdir=thisdir):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
-        
+        print(f'\n\n\n\n{times}')
+        if times == 2:# Have to put this before otherwise it will error out ???? idk im not good at using qt.....
+                Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
         start.start(renderdir,videoName,videopath)
         
                 #change progressbar value
     
         for i in range(end_iteration):
-            if times == 2:
-                Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+            
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}_temp/input_frames/ -o {renderdir}/{videoName}_temp/output_frames/')
         
         
