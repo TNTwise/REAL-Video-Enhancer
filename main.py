@@ -110,15 +110,19 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self._setStyle('black')
 
-    def startRife(self):
+    def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
 
         if self.input_file != '':
             self.setDisableEnable(True)
             self._setStyle('gray')
             
            
-           
-            self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),int(self.ui.Rife_Times.currentText()[0]),self.input_file,self.output_folder,0,0))
+            if int(self.ui.Rife_Times.currentText()[0]) == 2:
+                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
+            if int(self.ui.Rife_Times.currentText()[0]) == 4:
+                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
+            if int(self.ui.Rife_Times.currentText()[0]) == 8:
+                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,3))
             self.rifeThread.start()
                 
             Thread(target=self.endRife).start()
@@ -126,16 +130,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.showDialogBox("No input file selected.")
 
     
-    def start_rife(self,model,times,videopath,outputpath,iteration,end_iteration,renderdir=thisdir):
+    def start_rife(self,model,times,videopath,outputpath,end_iteration,renderdir=thisdir):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
-        Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+        
         start.start(renderdir,videoName,videopath)
         
                 #change progressbar value
     
-        
-        os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}/input_frames/ -o {renderdir}/{videoName}/output_frames/')
+        for i in range(end_iteration):
+            if times == 2:
+                Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}_temp/input_frames/ -o {renderdir}/{videoName}_temp/output_frames/')
         
         
         start.end(renderdir,videoName,videopath,times,outputpath)
