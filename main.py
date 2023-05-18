@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
@@ -30,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def pin_functions(self):
-
+        self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
         
@@ -64,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
 
-    def updateRifeProgressBar(self,times,start_value):
+    def updateRifeProgressBar(self,times,start_value,iteration):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/output_frames/') == False:
             sleep(1)
@@ -141,7 +143,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 #change progressbar value
     
         for i in range(end_iteration):
-            
+            if i != 0:
+                os.system(fr'rm -rf "{renderdir}/{videoName}_temp/input_frames/"  &&  mv "{renderdir}/{videoName}_temp/output_frames/" "{renderdir}/{videoName}_temp/input_frames" && mkdir -p "{renderdir}/{videoName}_temp/output_frames"')
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}_temp/input_frames/ -o {renderdir}/{videoName}_temp/output_frames/')
         
         

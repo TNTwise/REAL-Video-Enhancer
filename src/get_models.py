@@ -68,18 +68,19 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
             self.pbar.setMaximum(total_size_in_bytes)
             
             total_block_size = 0
-            with open(file, 'wb') as f:
+            with open(f'{thisdir}/files/{file}', 'wb') as f:
                 for data in response.iter_content(block_size):
                     total_block_size += block_size
                     self.pbar.setValue(total_block_size)
                     
                     f.write(data)
+                os.chdir(f'{thisdir}')
+                    
                 if model == 'Real-ESRGAN':
                     Thread(target=self.get_realesrgan).start()
                 else:
                     Thread(target=self.get_rife).start()
                 
-                    
             
                 
 
@@ -95,7 +96,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
             
             
             os.system(f'chmod +x "{thisdir}/Real-ESRGAN/realesrgan-ncnn-vulkan" && rm -rf "{thisdir}/files/realesrgan-ncnn-vulkan-20220424-ubuntu" && rm -rf "{thisdir}/files/realesrgan-ncnn-vulkan-20220424-ubuntu.zip" && rm -rf "{thisdir}/Real-ESRGAN/input.jpg" && rm -rf  "{thisdir}/Real-ESRGAN/input2.jpg" && rm -rf "{thisdir}/Real-ESRGAN/onepiece_demo.mp4"')
-            os.chdir(f'{thisdir}')
+            
             self.close()
             if os.path.isfile(f'{thisdir}/files/rife-ncnn-vulkan-{self.latest_rife()}-ubuntu.zip') == False:
                 sleep(1)
@@ -109,8 +110,11 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
 
 
                 os.chdir(f"{thisdir}")
+                
                 with ZipFile(f'{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu.zip', 'r') as zip_ref:
                     zip_ref.extractall(f'{thisdir}/files/')
+            
+                
                 os.system(f'mkdir -p "{thisdir}/rife-vulkan-models"')
                 os.system(f'mv "{thisdir}/rife-ncnn-vulkan-{latest_ver}-ubuntu" "{thisdir}/files/"')
                 os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu/"* "{thisdir}/rife-vulkan-models/"')
@@ -124,7 +128,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
                 sleep(1) #need sleep otherwise core dump :\ this is probably not a good idea....
                     
                 import main as main
-    
+        
     class StartRife:
         if os.path.isfile(f'{thisdir}/src/rife_models.txt') == True:
             app1 = QApplication(sys.argv)
