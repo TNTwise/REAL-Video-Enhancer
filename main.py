@@ -66,7 +66,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
 
-    def updateRifeProgressBar(self,times,start_value,iteration):
+    def updateRifeProgressBar(self,times,start_value):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/output_frames/') == False:
             sleep(1)
