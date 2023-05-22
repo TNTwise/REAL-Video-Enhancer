@@ -13,7 +13,7 @@ class Settings:
             self.write_defaults()
         self.write_temp()
         self.readSettings()
-    def write_to_settings_file(self,description, option):
+    def write_to_settings_file(description, option):
     
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")
@@ -23,7 +23,7 @@ class Settings:
         self.write_to_settings_file("Repository", "stable")
         self.write_to_settings_file("rifeversion", "20221029")
         self.write_to_settings_file("esrganversion", "0.2.0")
-        self.write_to_settings_file("videoQuality", "14")
+        self.write_to_settings_file("videoQuality", "18")
         self.write_to_settings_file("Theme", "Dark")
         self.write_to_settings_file("OutputDir", f"{homedir}")
         self.write_to_settings_file("Interpolation_Option", f"2X")
@@ -75,7 +75,15 @@ class Settings:
             for key,value in original_settings.items():
                 with open(f'{thisdir}/files/settings.txt', 'a') as f:
                     f.write(key + ',' + value+'\n')
+        self.readSettings()
+    def is_setting(setting):
         
+        with open(f'{thisdir}/files/settings.txt', 'r') as f:
+            f = csv.reader(f)
+            for row in f:
+                if row[0] == setting:
+                    return True
+            return False
     def write_temp(self):
         self.change_setting("Interpolation_Option", f"2X")
         self.change_setting("Rife_Option", f"2.3")

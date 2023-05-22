@@ -27,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ''
         self.output_folder = ''
         self.output_folder = settings.OutputDir 
-
+        self.videoQuality = settings.videoQuality
         self.pin_functions()
         self.show()
     def settings_menu(self):
@@ -39,13 +39,23 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
     def pin_functions(self):
+        if self.videoQuality == '10':
+            self.ui.VidQualityCombo.setCurrentText('Lossless')
+        if self.videoQuality == '14':
+            self.ui.VidQualityCombo.setCurrentText('High')
+        if self.videoQuality == '18':
+            self.ui.VidQualityCombo.setCurrentText('Medium')
+        if self.videoQuality == '22':
+            self.ui.VidQualityCombo.setCurrentText('Low')
+        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+        self.ui.RenderDirButton.clicked.connect(self.selRenderDir)
         self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
         self.ui.VideoOptionsFrame.hide()
         self.ui.RenderOptionsFrame.hide()
         self.ui.RifeStart.clicked.connect(self.startRife)
-
+        self.ui.VidQualityCombo.currentIndexChanged.connect(self.selVidQuality)
         # list every model downloaded, and add them to the list
         
         model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
@@ -64,7 +74,30 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
             if model == 'Rife-V2.3':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
-            
+    
+    def selRenderDir(self):
+
+        self.render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+        settings.change_setting("RenderDir",f"{self.render_folder}")
+        
+        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+
+    def selEncoder(self):
+        pass
+    def selVidQuality(self):
+        if self.ui.VidQualityCombo.currentText() == 'Lossless':
+            settings.change_setting('videoQuality', '10')
+            self.videoQuality = settings.videoQuality
+        if self.ui.VidQualityCombo.currentText() == 'High':
+            settings.change_setting('videoQuality', '14')
+            self.videoQuality = settings.videoQuality
+        if self.ui.VidQualityCombo.currentText() == 'Medium':
+            settings.change_setting('videoQuality', '18')
+            self.videoQuality = settings.videoQuality
+        if self.ui.VidQualityCombo.currentText() == 'Low':
+            settings.change_setting('videoQuality', '22')
+            self.videoQuality = settings.videoQuality
+        
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]

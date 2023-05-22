@@ -253,17 +253,55 @@
                <string>false</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
-               <item row="0" column="1">
-                <widget class="QPushButton" name="pushButton_2">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
                  <property name="text">
-                  <string>PushButton</string>
+                  <string>Video Quality</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="pushButton_7">
+               <item row="0" column="1">
+                <widget class="QComboBox" name="VidQualityCombo">
+                 <item>
+                  <property name="text">
+                   <string>Low</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Medium</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>High</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Lossless</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QComboBox" name="EncoderCombo">
+                 <item>
+                  <property name="text">
+                   <string>.264 (Higher file size, more standardized)</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>.265 (Lower file size, less standardized)</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_2">
                  <property name="text">
-                  <string>PushButton</string>
+                  <string>Encoder</string>
                  </property>
                 </widget>
                </item>
@@ -279,24 +317,17 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="0" column="2">
-                <widget class="QPushButton" name="pushButton_6">
+               <item row="1" column="3">
+                <widget class="QLabel" name="RenderPathLabel">
                  <property name="text">
-                  <string>PushButton</string>
+                  <string>TextLabel</string>
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="pushButton_5">
+               <item row="1" column="4">
+                <widget class="QPushButton" name="RenderDirButton">
                  <property name="text">
-                  <string>PushButton</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="pushButton_8">
-                 <property name="text">
-                  <string>PushButton</string>
+                  <string>Render Directory</string>
                  </property>
                 </widget>
                </item>
