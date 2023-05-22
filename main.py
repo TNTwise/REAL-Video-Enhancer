@@ -2,7 +2,7 @@
 
 from PyQt5 import QtWidgets, uic
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
 import mainwindow
 import os
 from threading import *
@@ -22,7 +22,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
-        
+        self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         #Define Variables
         self.input_file = ''
         self.output_folder = ''
@@ -30,16 +30,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.pin_functions()
         self.show()
-
+    def settings_menu(self):
+        item = self.ui.SettingsMenus.currentItem()
+        if item.text() == "Video Options":
+            self.ui.RenderOptionsFrame.hide()
+            self.ui.VideoOptionsFrame.show()
+        if item.text() == "Render Options":
+            self.ui.RenderOptionsFrame.show()
+            self.ui.VideoOptionsFrame.hide()
     def pin_functions(self):
         self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-        
+        self.ui.VideoOptionsFrame.hide()
+        self.ui.RenderOptionsFrame.hide()
         self.ui.RifeStart.clicked.connect(self.startRife)
 
         # list every model downloaded, and add them to the list
-       
+        
         model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
         models = []
         for model_filepath in model_filepaths:
