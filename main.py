@@ -28,6 +28,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = ''
         self.output_folder = settings.OutputDir 
         self.videoQuality = settings.videoQuality
+        self.encoder = settings.Encoder
         self.pin_functions()
         self.show()
     def settings_menu(self):
@@ -39,6 +40,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
     def pin_functions(self):
+        if self.encoder == '264':
+            self.ui.EncoderCombo.setCurrentIndex(0)
+        if self.encoder == '265':
+            self.ui.EncoderCombo.setCurrentIndex(1)
         if self.videoQuality == '10':
             self.ui.VidQualityCombo.setCurrentText('Lossless')
         if self.videoQuality == '14':
@@ -55,7 +60,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.VideoOptionsFrame.hide()
         self.ui.RenderOptionsFrame.hide()
         self.ui.RifeStart.clicked.connect(self.startRife)
+
+        self.ui.EncoderCombo.currentIndexChanged.connect(self.selEncoder)
+        #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
+        sleep(0.01)
         self.ui.VidQualityCombo.currentIndexChanged.connect(self.selVidQuality)
+
         # list every model downloaded, and add them to the list
         
         model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
@@ -83,20 +93,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
 
     def selEncoder(self):
-        pass
+        if '.264' in self.ui.EncoderCombo.currentText():
+            
+            settings.change_setting('Encoder','264')
+        if '.265' in self.ui.EncoderCombo.currentText():
+            settings.change_setting('Encoder','265')
+        self.encoder = settings.Encoder
+    
     def selVidQuality(self):
         if self.ui.VidQualityCombo.currentText() == 'Lossless':
             settings.change_setting('videoQuality', '10')
-            self.videoQuality = settings.videoQuality
         if self.ui.VidQualityCombo.currentText() == 'High':
             settings.change_setting('videoQuality', '14')
-            self.videoQuality = settings.videoQuality
         if self.ui.VidQualityCombo.currentText() == 'Medium':
             settings.change_setting('videoQuality', '18')
-            self.videoQuality = settings.videoQuality
         if self.ui.VidQualityCombo.currentText() == 'Low':
             settings.change_setting('videoQuality', '22')
-            self.videoQuality = settings.videoQuality
+        self.videoQuality = settings.videoQuality
         
     def openFileNameDialog(self):
 
@@ -189,7 +202,7 @@ class MainWindow(QtWidgets.QMainWindow):
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}_temp/input_frames/ -o {renderdir}/{videoName}_temp/output_frames/')
         
         
-        start.end(renderdir,videoName,videopath,times,outputpath)
+        start.end(renderdir,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
 
     def showDialogBox(self,message):
         msg = QMessageBox()
