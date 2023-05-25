@@ -33,6 +33,8 @@ class Settings:
         self.write_to_settings_file("RenderDir" ,f"{thisdir}")
         self.write_to_settings_file("ExtractionImageType" ,"jpg")
         self.write_to_settings_file('SceneChangeDetection','0.3')
+        self.write_to_settings_file('Encoder','264')
+
         self.readSettings()
 
     def readSettings(self):
@@ -60,6 +62,7 @@ class Settings:
             self.RenderDir = settings_dict['RenderDir']
             self.ExtractionImageType=settings_dict['ExtractionImageType']
             self.SceneChangeDetection=settings_dict['SceneChangeDetection']
+            self.Encoder=settings_dict['Encoder']
         except:
             self.write_defaults()
         
