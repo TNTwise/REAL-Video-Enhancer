@@ -13,7 +13,7 @@ class Settings:
             self.write_defaults()
         self.write_temp()
         self.readSettings()
-    def write_to_settings_file(description, option):
+    def write_to_settings_file(self,description, option):
     
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")

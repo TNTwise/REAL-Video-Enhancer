@@ -34,6 +34,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = settings.OutputDir 
         self.videoQuality = settings.videoQuality
         self.encoder = settings.Encoder
+        if os.path.exists(f"{settings.RenderDir}") == False:
+            settings.change_setting('RenderDir',f'{thisdir}')
         self.render_folder = settings.RenderDir
     def settings_menu(self):
         item = self.ui.SettingsMenus.currentItem()
@@ -206,8 +208,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 os.system(fr'rm -rf "{self.render_folder}/{videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{videoName}_temp/output_frames/" "{self.render_folder}/{videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{videoName}_temp/output_frames"')
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {self.render_folder}/{videoName}_temp/input_frames/ -o {self.render_folder}/{videoName}_temp/output_frames/')
         
-        
-        start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+        if os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{videoName}_temp/audio.m4a') == False:
+            self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
+        else:
+            start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
 
     def showDialogBox(self,message):
         msg = QMessageBox()
