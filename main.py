@@ -11,7 +11,7 @@ from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
 
-import src.get_models as get_models
+#import src.get_models as get_models
 from time import sleep
 
 thisdir = os.getcwd()
@@ -23,14 +23,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
+        
+        self.def_var()
+        self.pin_functions()
+        self.show()
+    def def_var(self):
         #Define Variables
         self.input_file = ''
         self.output_folder = ''
         self.output_folder = settings.OutputDir 
         self.videoQuality = settings.videoQuality
         self.encoder = settings.Encoder
-        self.pin_functions()
-        self.show()
+        self.render_folder = settings.RenderDir
     def settings_menu(self):
         item = self.ui.SettingsMenus.currentItem()
         if item.text() == "Video Options":
@@ -39,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if item.text() == "Render Options":
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
+    
     def pin_functions(self):
         if self.encoder == '264':
             self.ui.EncoderCombo.setCurrentIndex(0)
@@ -186,32 +191,35 @@ class MainWindow(QtWidgets.QMainWindow):
             self.showDialogBox("No input file selected.")
 
     
-    def start_rife(self,model,times,videopath,outputpath,end_iteration,renderdir=thisdir):
+    def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
         print(f'\n\n\n\n{times}')
         if times == 2:# Have to put this before otherwise it will error out ???? idk im not good at using qt.....
                 Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
-        start.start(renderdir,videoName,videopath)
+        start.start(self.render_folder,videoName,videopath)
         
                 #change progressbar value
     
         for i in range(end_iteration):
             if i != 0:
-                os.system(fr'rm -rf "{renderdir}/{videoName}_temp/input_frames/"  &&  mv "{renderdir}/{videoName}_temp/output_frames/" "{renderdir}/{videoName}_temp/input_frames" && mkdir -p "{renderdir}/{videoName}_temp/output_frames"')
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {renderdir}/{videoName}_temp/input_frames/ -o {renderdir}/{videoName}_temp/output_frames/')
+                os.system(fr'rm -rf "{self.render_folder}/{videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{videoName}_temp/output_frames/" "{self.render_folder}/{videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{videoName}_temp/output_frames"')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {self.render_folder}/{videoName}_temp/input_frames/ -o {self.render_folder}/{videoName}_temp/output_frames/')
         
         
-        start.end(renderdir,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+        start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
 
     def showDialogBox(self,message):
         msg = QMessageBox()
         msg.setWindowTitle(" ")
         msg.setText(f"{message}")
         msg.exec_()
-    
+    def addLinetoLogs(self,line):
+        self.ui.logsPreview.insertPlainText(f'{line}')
 
-
+if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
+    ManageFiles.create_folder(f'{thisdir}/files')
+    ManageFiles.create_file(f'{thisdir}/files/settings.txt')
 settings = Settings()
 
 
