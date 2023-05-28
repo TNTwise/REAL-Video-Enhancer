@@ -149,13 +149,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RifePB.setValue(total_output_files)
         return 0
 
-    def _setStyle(self,color):
-        self.ui.RifeStart.setStyleSheet(f'color: {color};')
-        self.ui.Input_video_rife.setStyleSheet(f'color: {color};')
-        self.ui.Output_folder_rife.setStyleSheet(f'color: {color};')
-        self.ui.Rife_Model.setStyleSheet(f"QComboBox {{ color: {color}; }}")
-        self.ui.Rife_Times.setStyleSheet(f"QComboBox {{ color: {color}; }}")
-
+    
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 
@@ -165,19 +159,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def endRife(self):
         self.rifeThread.join()
-        
-        current_palette = app.style().standardPalette()
         self.setDisableEnable(False)
-        if current_palette.color(current_palette.WindowText).lightness() > 127:
-            self._setStyle('white')
-        else:
-            self._setStyle('black')
+        
+        self.show()
 
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
 
         if self.input_file != '':
+            
             self.setDisableEnable(True)
-            self._setStyle('gray')
+            
             
            
             if int(self.ui.Rife_Times.currentText()[0]) == 2:
