@@ -2,6 +2,8 @@
 
 from PyQt5 import QtWidgets, uic
 import sys
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
 from PyQt5.QtGui import QTextCursor
 import mainwindow
@@ -17,6 +19,38 @@ from time import sleep
 
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
+class Worker(QObject):
+    finished = pyqtSignal()
+    progress = pyqtSignal(int)
+    def __init__(self,parent, videoName):
+        QThread.__init__(self, parent)
+        self.videoName = videoName
+    def run(self):
+        """Long-running task."""
+        
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
+            sleep(1)
+        
+
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
+        total_output_files = total_input_files * 2
+        
+        print(total_output_files)
+        print(self.videoName)
+        
+        
+        
+        while ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/') == True:
+                if ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/') == True:
+                
+                    files_processed = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/'))
+                    
+                    
+                    sleep(0.01)
+                    
+            
+                    self.progress.emit(files_processed)
+        self.finished.emit()
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -29,6 +63,33 @@ class MainWindow(QtWidgets.QMainWindow):
         self.def_var()
         self.pin_functions()
         self.show()
+    def reportProgress(self, n):
+        self.ui.RifePB.setValue(n)
+    def runLongTask(self,videoName,times):
+        
+        # Step 2: Create a QThread object
+        self.thread = QThread()
+        # Step 3: Create a worker object
+        self.worker = Worker(self,videoName)
+        # Step 4: Move worker to the thread
+        self.worker.moveToThread(self.thread)
+        # Step 5: Connect signals and slots
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.worker.progress.connect(self.reportProgress)
+        # Step 6: Start the thread
+        
+        self.thread.start()
+
+        # Final resets
+        self.worker.finished.connect(
+            self.endRife
+        )
+        self.worker.finished.connect(
+            lambda: self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+        )
     def def_var(self):
         #Define Variables
         self.input_file = ''
@@ -129,31 +190,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
 
-    def updateRifeProgressBar(self,times,start_value):
-        videoName = VideoName.return_video_name(f'{self.input_file}')
-        
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/output_frames/') == False:
-            sleep(1)
-        
-
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * times
-        self.ui.RifePB.setMaximum(total_output_files)
-        print(total_output_files)
-        print(videoName)
-        
-        sleep(1)
-        
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/') == True:
-                
-                
-                files_processed = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/output_frames/'))
-                
-                self.ui.RifePB.setValue(files_processed)
-                sleep(1)
-                
-        self.ui.RifePB.setValue(total_output_files)
-        return 0
+   
 
     
     def setDisableEnable(self,mode):
@@ -164,7 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Rife_Times.setDisabled(mode)
 
     def endRife(self):
-        self.rifeThread.join()
+        
         self.setDisableEnable(False)
         
         self.show()
@@ -188,7 +225,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
                 
-            Thread(target=self.endRife).start()
         else:
             self.showDialogBox("No input file selected.")
 
@@ -200,10 +236,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if times == 2:# Have to put this before otherwise it will error out ???? idk im not good at using qt.....
                 
                 Thread(target=lambda: self.extract_frames_Logs(2)).start()
-                Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+                self.runLongTask(videoName,times)
         
         start.start(self.render_folder,videoName,videopath)
-        
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
+        total_output_files = total_input_files * times
+        self.ui.RifePB.setMaximum(total_output_files)
                 #change progressbar value
     
         for i in range(end_iteration):
