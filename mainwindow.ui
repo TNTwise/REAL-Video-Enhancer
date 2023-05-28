@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Rife">
        <property name="toolTip">
@@ -39,7 +39,11 @@
              <widget class="QGraphicsView" name="Preview_2"/>
             </item>
             <item>
-             <widget class="QTextBrowser" name="textBrowser"/>
+             <widget class="QTextEdit" name="logsPreview">
+              <property name="readOnly">
+               <bool>true</bool>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>

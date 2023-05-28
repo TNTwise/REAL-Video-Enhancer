@@ -3,6 +3,7 @@
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
+from PyQt5.QtGui import QTextCursor
 import mainwindow
 import os
 from threading import *
@@ -23,7 +24,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
-        
+        self.addLinetoLogs('h')
+        self.removeLastLineInLogs()
         self.def_var()
         self.pin_functions()
         self.show()
@@ -129,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def updateRifeProgressBar(self,times,start_value):
         videoName = VideoName.return_video_name(f'{self.input_file}')
+        
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/output_frames/') == False:
             sleep(1)
         
@@ -138,7 +141,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RifePB.setMaximum(total_output_files)
         print(total_output_files)
         print(videoName)
+        
         sleep(1)
+        
         while ManageFiles.isfolder(f'{settings.RenderDir}/{videoName}_temp/') == True:
                 
                 
@@ -146,6 +151,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 self.ui.RifePB.setValue(files_processed)
                 sleep(1)
+                
         self.ui.RifePB.setValue(total_output_files)
         return 0
 
@@ -162,7 +168,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setDisableEnable(False)
         
         self.show()
-
+    def extract_frames_Logs(self, times):
+        
+        
+        return 0
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
 
         if self.input_file != '':
@@ -187,9 +196,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
-        print(f'\n\n\n\n{times}')
+        
         if times == 2:# Have to put this before otherwise it will error out ???? idk im not good at using qt.....
+                
+                Thread(target=lambda: self.extract_frames_Logs(2)).start()
                 Thread(target=lambda: self.updateRifeProgressBar(2,0)).start()
+        
         start.start(self.render_folder,videoName,videopath)
         
                 #change progressbar value
@@ -209,9 +221,23 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.setWindowTitle(" ")
         msg.setText(f"{message}")
         msg.exec_()
+    
+    
     def addLinetoLogs(self,line):
-        self.ui.logsPreview.insertPlainText(f'{line}')
+        self.ui.logsPreview.append(f'{line}\n')
+    def removeLastLineInLogs(self):
+        cursor = self.ui.logsPreview.textCursor()
+        cursor.movePosition(QTextCursor.End)
 
+        # Move the cursor to the beginning of the last line
+        cursor.movePosition(QTextCursor.StartOfLine, QTextCursor.MoveAnchor)
+        cursor.movePosition(QTextCursor.PreviousBlock, QTextCursor.KeepAnchor)
+
+        # Remove the selected text (the last line)
+        cursor.removeSelectedText()
+
+        # Set the updated cursor position
+        self.ui.logsPreview.setTextCursor(cursor)
 if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
     ManageFiles.create_folder(f'{thisdir}/files')
     ManageFiles.create_file(f'{thisdir}/files/settings.txt')

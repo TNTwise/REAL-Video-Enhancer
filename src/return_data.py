@@ -8,7 +8,12 @@ class Fps:
 class VideoName:
     def return_video_name(videopath):
         return os.path.basename(videopath)
-
+    def return_video_framerate(videopath):
+        video = cv2.VideoCapture(videopath)
+        return video.get(cv2.CAP_PROP_FPS)
+    def return_video_frame_count(videopath):
+        video = cv2.VideoCapture(videopath)
+        return video.get(cv2.CAP_PROP_FRAME_COUNT)
 class ManageFiles:
     
     def create_folder(folderpath):
