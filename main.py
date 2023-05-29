@@ -3,7 +3,7 @@
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
-
+import cv2
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
 from PyQt5.QtGui import QTextCursor
 import mainwindow
@@ -17,7 +17,7 @@ import src.workers as workers
 import time
 #import src.get_models as get_models
 from time import sleep
-
+import src.get_models as get_models
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
