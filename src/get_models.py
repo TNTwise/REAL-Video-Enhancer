@@ -15,7 +15,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
     
     class PopUpProgressB(QtWidgets.QMainWindow):
         def __init__(self,model):
-
+            settings = Settings()
             try:
                 requests.get('https://www.github.com')
 
@@ -54,13 +54,13 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
             os.chdir(f"{thisdir}/files/")
             
         
-            
+            latest_rife = self.latest_rife()
             if model == 'Real-ESRGAN':
                 file=f"realesrgan-ncnn-vulkan-20220424-ubuntu.zip"
                 response = requests.get(f"https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-ubuntu.zip", stream=True)
             else:
-                file=f"rife-ncnn-vulkan-{self.latest_rife()}-ubuntu.zip"
-                response = requests.get(f"https://github.com/nihui/rife-ncnn-vulkan/releases/download/{self.latest_rife()}/rife-ncnn-vulkan-{self.latest_rife()}-ubuntu.zip", stream=True)
+                file=f"rife-ncnn-vulkan-{latest_rife}-ubuntu.zip"
+                response = requests.get(f"https://github.com/nihui/rife-ncnn-vulkan/releases/download/{latest_rife}/rife-ncnn-vulkan-{latest_rife}-ubuntu.zip", stream=True)
 
             total_size_in_bytes= int(response.headers.get('content-length', 0))
             block_size = 1024 #1 Kibibyte
@@ -117,11 +117,12 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
                 
                 os.system(f'mkdir -p "{thisdir}/rife-vulkan-models"')
                 os.system(f'mv "{thisdir}/rife-ncnn-vulkan-{latest_ver}-ubuntu" "{thisdir}/files/"')
+                os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu/rife-ncnn-vulkan"')
                 os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu/"* "{thisdir}/rife-vulkan-models/"')
-                Settings.change_setting(0,'rifeversion', f'{latest_ver}')
+                
+
                 os.system(f'rm -rf "{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu.zip"')
                 os.system(f'rm -rf "{thisdir}/files/rife-ncnn-vulkan-{latest_ver}-ubuntu"')
-                os.system(f'chmod +x "{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"')
 
                 
                 self.close()
