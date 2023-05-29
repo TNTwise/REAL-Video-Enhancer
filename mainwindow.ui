@@ -39,11 +39,25 @@
              <widget class="QGraphicsView" name="Preview_2"/>
             </item>
             <item>
-             <widget class="QTextEdit" name="logsPreview">
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
+             <layout class="QVBoxLayout" name="verticalLayout_8">
+              <item>
+               <widget class="QTextEdit" name="logsPreview"/>
+              </item>
+              <item>
+               <widget class="QLabel" name="processedPreview">
+                <property name="text">
+                 <string>Files Processed: </string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="ETAPreview">
+                <property name="text">
+                 <string>ETA: </string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </item>

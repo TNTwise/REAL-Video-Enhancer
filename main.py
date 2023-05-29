@@ -13,44 +13,14 @@ from src.settings import *
 from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
 import src.start as start
-
+import src.workers as workers
+import time
 #import src.get_models as get_models
 from time import sleep
 
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
-class Worker(QObject):
-    finished = pyqtSignal()
-    progress = pyqtSignal(int)
-    def __init__(self,parent, videoName):
-        QThread.__init__(self, parent)
-        self.videoName = videoName
-    def run(self):
-        """Long-running task."""
-        
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-            sleep(1)
-        
 
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * 2
-        
-        print(total_output_files)
-        print(self.videoName)
-        
-        
-        
-        while ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/') == True:
-                if ManageFiles.isfolder(f'{settings.RenderDir}/{self.videoName}_temp/') == True:
-                
-                    files_processed = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                    
-                    
-                    sleep(0.01)
-                    
-            
-                    self.progress.emit(files_processed)
-        self.finished.emit()
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -58,19 +28,75 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
-        self.addLinetoLogs('h')
-        self.removeLastLineInLogs()
+        
         self.def_var()
         self.pin_functions()
         self.show()
+    def calculateETA(self):
+        videoName = VideoName.return_video_name(f'{self.input_file}')
+        self.ETA=None
+        while os.path.exists(f'{self.render_folder}/{videoName}_temp/input_frames/'):
+            
+            total_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/input_frames/')) * self.times
+        
+            start_time = time.time()
+            
+            sleep(1)
+            for i in range(total_iterations):
+                # Do some work for each iteration
+                
+                try:
+                    
+                        
+                        
+                    completed_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/'))
+                    
+                    # Increment the completed iterations counter
+                    sleep(1)
+
+                    # Estimate the remaining time
+                    elapsed_time = time.time() - start_time
+                    time_per_iteration = elapsed_time / completed_iterations
+                    remaining_iterations = total_iterations - completed_iterations
+                    remaining_time = remaining_iterations * time_per_iteration
+                    remaining_time = int(remaining_time) 
+                    # Print the estimated time remaining
+                    #convert to hours, minutes, and seconds
+                    hours = remaining_time // 3600
+                    remaining_time-= 3600*hours
+                    minutes = remaining_time // 60
+                    remaining_time -= minutes * 60
+                    seconds = remaining_time
+                    if minutes < 10:
+                        minutes = str(f'0{minutes}')
+                    if seconds < 10:
+                        seconds = str(f'0{seconds}')
+                    self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
+                except:
+                    self.ETA = None
     def reportProgress(self, n):
         self.ui.RifePB.setValue(n)
-    def runLongTask(self,videoName,times):
+        fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+        self.ui.processedPreview.setText(f'Files Processed: {n} / {fc}')
         
+        
+        if self.ETA != None:
+            self.ui.ETAPreview.setText(self.ETA)
+
+    def runPB(self,videoName,times):
+        
+
         # Step 2: Create a QThread object
         self.thread = QThread()
         # Step 3: Create a worker object
-        self.worker = Worker(self,videoName)
+        if times == 2:
+            self.worker = workers.pb2X(self,videoName)
+        if times == 4:
+            self.worker = workers.pb4X(self,videoName)
+        if times == 8:
+            self.worker = workers.pb8X(self,videoName)
+        self.times = times
+        Thread(target=self.calculateETA).start()
         # Step 4: Move worker to the thread
         self.worker.moveToThread(self.thread)
         # Step 5: Connect signals and slots
@@ -80,7 +106,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.progress.connect(self.reportProgress)
         # Step 6: Start the thread
-        
         self.thread.start()
 
         # Final resets
@@ -90,6 +115,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker.finished.connect(
             lambda: self.ui.RifePB.setValue(self.ui.RifePB.maximum())
         )
+        
+        
+    
+        
     def def_var(self):
         #Define Variables
         self.input_file = ''
@@ -232,15 +261,17 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
-        
-        if times == 2:# Have to put this before otherwise it will error out ???? idk im not good at using qt.....
+        self.ui.ETAPreview.setText('ETA:')
+        self.ui.processedPreview.setText('Files Processed:')
+        # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
                 
-                Thread(target=lambda: self.extract_frames_Logs(2)).start()
-                self.runLongTask(videoName,times)
-        
+                
+        #self.runLogs(videoName,times)
         start.start(self.render_folder,videoName,videopath)
         total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
         total_output_files = total_input_files * times
+        self.runPB(videoName,times)
+        
         self.ui.RifePB.setMaximum(total_output_files)
                 #change progressbar value
     
@@ -261,10 +292,16 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.exec_()
     
     
-    def addLinetoLogs(self,line):
-        self.ui.logsPreview.append(f'{line}\n')
-    def removeLastLineInLogs(self):
-        cursor = self.ui.logsPreview.textCursor()
+    def addLinetoLogs(self,line,info):
+        if info == 'processed':
+            self.ui.processedPreview.append(f'{line}\n')
+        if info == 'ETA':
+            self.ui.ETAPreview.append(f'{line}\n')
+    def removeLastLineInLogs(self,info):
+        if info == 'processed':
+            cursor = self.ui.processedPreview.textCursor()
+        if info == 'ETA':
+            cursor = self.ui.ETAPreview.textCursor()
         cursor.movePosition(QTextCursor.End)
 
         # Move the cursor to the beginning of the last line
@@ -273,9 +310,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Remove the selected text (the last line)
         cursor.removeSelectedText()
-
+        if info == 'processed':
         # Set the updated cursor position
-        self.ui.logsPreview.setTextCursor(cursor)
+            self.ui.processedPreview.setTextCursor(cursor)
+        if info == 'ETA':
+           self.ui.ETAPreview.setTextCursor(cursor)
 if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
     ManageFiles.create_folder(f'{thisdir}/files')
     ManageFiles.create_file(f'{thisdir}/files/settings.txt')
