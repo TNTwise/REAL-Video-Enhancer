@@ -46,45 +46,6 @@ class pb2X(QObject):
                     self.progress.emit(files_processed)
         self.finished.emit()
 
-class pb4X(QObject):
-    finished = pyqtSignal()
-    progress = pyqtSignal(int)
-    def __init__(self,parent, videoName):
-        QThread.__init__(self, parent)
-        self.videoName = videoName
-        self.settings = Settings()
-    def run(self):
-        """Long-running task."""
-        
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-            sleep(1)
-        
-
-        total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * 4
-        
-        print(total_output_files)
-        print(self.videoName)
-        
-        
-        
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                files = 0
-                files_processed = 0
-                files_processed_save = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                if files_processed > files_processed_save:
-                    print('\n\n\nhere')
-                    files = files_processed_save
-                if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                
-                    files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/')) + files
-                    
-                    
-                    sleep(0.1)
-                    
-            
-                    self.progress.emit(files_processed)
-        self.finished.emit()
 
 class showLogs(QObject):
     finished = pyqtSignal()

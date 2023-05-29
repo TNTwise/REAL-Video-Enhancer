@@ -111,12 +111,9 @@ class MainWindow(QtWidgets.QMainWindow):
         # Step 2: Create a QThread object
         self.thread = QThread()
         # Step 3: Create a worker object
-        if times == 2:
-            self.worker = workers.pb2X(self,videoName)
-        if times == 4:
-            self.worker = workers.pb4X(self,videoName)
-        if times == 8:
-            self.worker = workers.pb8X(self,videoName)
+       
+        self.worker = workers.pb2X(self,videoName)
+        
         self.times = times
         Thread(target=self.calculateETA).start()
         # Step 4: Move worker to the thread
@@ -138,7 +135,7 @@ class MainWindow(QtWidgets.QMainWindow):
             lambda: self.ui.RifePB.setValue(self.ui.RifePB.maximum())
         )
         self.worker.finished.connect(
-            lambda: self.ui.ETAPreview.setText('ETA: 0:0:0')
+            lambda: self.ui.ETAPreview.setText('ETA: 00:00:00')
         )
         
     
