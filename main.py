@@ -75,17 +75,39 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     self.ETA = None
     def reportProgress(self, n):
-        self.ui.RifePB.setValue(n)
+        
+        videoName = VideoName.return_video_name(f'{self.input_file}')
+        # fc is the total file count after interpolation
         fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+        if self.i==1:
+            self.addLinetoLogs(f'Starting {self.times}X Render')
+            self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
+            self.i=2
+        if self.times == 4:
+            fc += (fc/2) #This line adds in to the total file count the previous 2x interpolation for total file count
+        if self.times == 8:
+            fc += (fc)
+            fc += (fc/2)
+        
+        if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
+            n+=self.original_fc*2
+            
+        n=int(n)
+        fc = int(fc)
+        self.ui.RifePB.setValue(n*int(self.times/2))
         self.ui.processedPreview.setText(f'Files Processed: {n} / {fc}')
         
         
-        if self.ETA != None:
-            self.ui.ETAPreview.setText(self.ETA)
-
-    def runPB(self,videoName,times):
         
 
+        if self.ETA != None:
+            self.ui.ETAPreview.setText(self.ETA)
+        if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
+            self.ui.logsPreview.append(f'Starting {self.times}X Render')
+            self.i = 2
+    def runPB(self,videoName,times):
+        self.addLast=False
+        self.i=1
         # Step 2: Create a QThread object
         self.thread = QThread()
         # Step 3: Create a worker object
@@ -115,7 +137,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker.finished.connect(
             lambda: self.ui.RifePB.setValue(self.ui.RifePB.maximum())
         )
-        
+        self.worker.finished.connect(
+            lambda: self.ui.ETAPreview.setText('ETA: 0:0:0')
+        )
         
     
         
@@ -232,12 +256,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def endRife(self):
         
         self.setDisableEnable(False)
-        
         self.show()
-    def extract_frames_Logs(self, times):
-        
-        
-        return 0
+    #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
 
         if self.input_file != '':
@@ -245,7 +265,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setDisableEnable(True)
             
             
-           
+            self.ui.logsPreview.append(f'Extracting Frames')
+
             if int(self.ui.Rife_Times.currentText()[0]) == 2:
                 self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
             if int(self.ui.Rife_Times.currentText()[0]) == 4:
@@ -267,9 +288,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
         #self.runLogs(videoName,times)
+       
         start.start(self.render_folder,videoName,videopath)
         total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * times
+        total_output_files = total_input_files * times 
+        if times == 4:
+            total_output_files += (total_output_files*2)
+        if times == 8:
+            total_output_files += (total_output_files*4)
+            total_output_files += (total_output_files*2)
         self.runPB(videoName,times)
         
         self.ui.RifePB.setMaximum(total_output_files)
@@ -277,14 +304,19 @@ class MainWindow(QtWidgets.QMainWindow):
     
         for i in range(end_iteration):
             if i != 0:
+                if times == 4: 
+                    self.addLast=True
+                    self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/'))))
                 os.system(fr'rm -rf "{self.render_folder}/{videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{videoName}_temp/output_frames/" "{self.render_folder}/{videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{videoName}_temp/output_frames"')
+                
+                
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {self.render_folder}/{videoName}_temp/input_frames/ -o {self.render_folder}/{videoName}_temp/output_frames/')
         
         if os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{videoName}_temp/audio.m4a') == False:
             self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
         else:
             start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
-
+            
     def showDialogBox(self,message):
         msg = QMessageBox()
         msg.setWindowTitle(" ")
@@ -292,16 +324,12 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.exec_()
     
     
-    def addLinetoLogs(self,line,info):
-        if info == 'processed':
-            self.ui.processedPreview.append(f'{line}\n')
-        if info == 'ETA':
-            self.ui.ETAPreview.append(f'{line}\n')
-    def removeLastLineInLogs(self,info):
-        if info == 'processed':
-            cursor = self.ui.processedPreview.textCursor()
-        if info == 'ETA':
-            cursor = self.ui.ETAPreview.textCursor()
+    def addLinetoLogs(self,line):
+        
+        self.ui.logsPreview.append(f'{line}')
+    def removeLastLineInLogs(self):
+        
+        cursor = self.ui.logsPreview.textCursor()
         cursor.movePosition(QTextCursor.End)
 
         # Move the cursor to the beginning of the last line
@@ -310,11 +338,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Remove the selected text (the last line)
         cursor.removeSelectedText()
-        if info == 'processed':
-        # Set the updated cursor position
-            self.ui.processedPreview.setTextCursor(cursor)
-        if info == 'ETA':
-           self.ui.ETAPreview.setTextCursor(cursor)
+        
+        self.ui.logsPreview.setTextCursor(cursor)
+        
 if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
     ManageFiles.create_folder(f'{thisdir}/files')
     ManageFiles.create_file(f'{thisdir}/files/settings.txt')

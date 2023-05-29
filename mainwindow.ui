@@ -41,7 +41,11 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
-               <widget class="QTextEdit" name="logsPreview"/>
+               <widget class="QTextEdit" name="logsPreview">
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+               </widget>
               </item>
               <item>
                <widget class="QLabel" name="processedPreview">
