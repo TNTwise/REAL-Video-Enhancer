@@ -75,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     self.ETA = None
     def reportProgress(self, n):
-        
+        fp = n[0]
         videoName = VideoName.return_video_name(f'{self.input_file}')
         # fc is the total file count after interpolation
         fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
@@ -90,12 +90,14 @@ class MainWindow(QtWidgets.QMainWindow):
             fc += (fc/2)
         
         if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
-            n+=self.original_fc*2
+            fp+=self.original_fc*2
             
-        n=int(n)
+        fp=int(fp)
         fc = int(fc)
-        self.ui.RifePB.setValue(n*int(self.times/2))
-        self.ui.processedPreview.setText(f'Files Processed: {n} / {fc}')
+
+        #Update GUI values
+        self.ui.RifePB.setValue(fp*int(self.times/2))
+        self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
         
         
         
@@ -131,13 +133,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker.finished.connect(
             self.endRife
         )
-        self.worker.finished.connect(
-            lambda: self.ui.RifePB.setValue(self.ui.RifePB.maximum())
-        )
-        self.worker.finished.connect(
-            lambda: self.ui.ETAPreview.setText('ETA: 00:00:00')
-        )
         
+       
     
         
     def def_var(self):
@@ -249,10 +246,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
-
-    def endRife(self):
+        self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
+            
+    def endRife(self):
+        self.addLinetoLogs('Finished!\n')
         self.setDisableEnable(False)
+        self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+        self.ui.ETAPreview.setText('ETA: 00:00:00')
         self.show()
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
@@ -281,6 +282,7 @@ class MainWindow(QtWidgets.QMainWindow):
         videoName = VideoName.return_video_name(fr'{videopath}')
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
+        
         # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
                 
                 
