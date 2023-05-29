@@ -307,7 +307,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 os.system(fr'rm -rf "{self.render_folder}/{videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{videoName}_temp/output_frames/" "{self.render_folder}/{videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{videoName}_temp/output_frames"')
                 
                 
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i {self.render_folder}/{videoName}_temp/input_frames/ -o {self.render_folder}/{videoName}_temp/output_frames/')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{videoName}_temp/input_frames/" -o "{self.render_folder}/{videoName}_temp/output_frames/"')
         
         if os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{videoName}_temp/audio.m4a') == False:
             self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
