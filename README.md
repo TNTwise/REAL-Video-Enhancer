@@ -8,3 +8,6 @@ Add frames to new video output as rendered, and delete rendered frames???(might 
 split script up by removing circular imports, and importing maineindow from main script, this alloes me to control everythign i need to in different ecripts. makes it more clean and easy to manage when different parts of gui code are easily accessabe and readable<br/>
 maybe use a function ina different script to return progressbar percentage from specific values, could prove better than current implementation 
 
+IMPORTANT<br/>
+
+Implement a system where if a setting does not exist, append that setting with its default value to the settings file instead of resetting the entire settings file
