@@ -118,7 +118,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         if self.imageDisplay != None:
+
             try:
+                self.ui.imageSpacerFrame.hide()
                 pixMap = QPixmap(self.imageDisplay)
                 width = self.width()
                 height = self.height()
@@ -129,6 +131,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
             except:
+                self.ui.imageSpacerFrame.show()
                 self.ui.imagePreview.clear()
         if self.ETA != None:
             self.ui.ETAPreview.setText(self.ETA)
@@ -287,6 +290,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.ETAPreview.setText('ETA: 00:00:00')
         self.ui.imagePreview.clear()
         self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
+        self.ui.imageSpacerFrame.show()
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
