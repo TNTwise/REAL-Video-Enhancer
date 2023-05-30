@@ -271,7 +271,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
-    
+        print(self.output_folder)
 
    
 
