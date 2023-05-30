@@ -27,6 +27,7 @@ homedir = os.path.expanduser(r"~")
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.setMinimumSize(400, 300)
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
@@ -122,6 +123,7 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 self.ui.imageSpacerFrame.hide()
                 pixMap = QPixmap(self.imageDisplay)
+                
                 width = self.width()
                 height = self.height()
                 
