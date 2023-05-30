@@ -261,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
-        #self.ui.verticalTabWidget.tabBar().setDisabled(mode)
+        self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
             
     def endRife(self):
