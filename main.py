@@ -18,6 +18,8 @@ import time
 #import src.get_models as get_models
 from time import sleep
 import src.get_models as get_models
+import re
+
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -78,16 +80,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     files = os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/')
                     files.sort()
-            
-            
-                    self.imageDisplay = f"{self.render_folder}/{videoName}_temp/output_frames/{files[-1]}"
+                    frame_num =re.findall(r'[\d]*',files[-1])
+                    
+                    frame_num = int(int(frame_num[0])/self.times)
+                    frame_num = str(frame_num).zfill(8)
+                    self.imageDisplay = f"{self.render_folder}/{videoName}_temp/input_frames/{frame_num}.png"
                 except:
-                    self.imageDisplay = None
+                    self.ui.imagePreview.clear()
+                
+    
     def reportProgress(self, n):
         fp = n
         videoName = VideoName.return_video_name(f'{self.input_file}')
         # fc is the total file count after interpolation
         fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+        self.fileCount = fc
         if self.i==1:
             self.addLinetoLogs(f'Starting {self.times}X Render')
             self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
@@ -111,15 +118,24 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         if self.imageDisplay != None:
-            print(self.imageDisplay)
-            self.imagePixMap = QPixmap(self.imageDisplay)
-            
-            self.ui.imagePreview.setPixmap(self.imagePixMap) # sets image preview image
+            try:
+                pixMap = QPixmap(self.imageDisplay)
+                width = self.width()
+                height = self.height()
+                
+                width=int(width/1.4)
+                height=int(height/1.4)
+                pixMap = pixMap.scaled(width,height)
+                
+                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+            except:
+                self.ui.imagePreview.clear()
         if self.ETA != None:
             self.ui.ETAPreview.setText(self.ETA)
         if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
             self.ui.logsPreview.append(f'Starting {self.times}X Render')
             self.i = 2
+    
     def runPB(self,videoName,times):
         self.addLast=False
         self.i=1
@@ -269,7 +285,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
         self.ui.ETAPreview.setText('ETA: 00:00:00')
-        self.show()
+        self.ui.imagePreview.clear()
+        self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
+        
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
 

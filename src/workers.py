@@ -30,8 +30,7 @@ class pb2X(QObject):
         total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * 2
         
-        print(total_output_files)
-        print(self.videoName)
+        
         
         
         
@@ -46,7 +45,6 @@ class pb2X(QObject):
 
                     sleep(0.5)
                     
-                    print(latest_image)
                     self.progress.emit(files_processed)
         self.finished.emit()
 
