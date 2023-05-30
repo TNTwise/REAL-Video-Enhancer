@@ -4,8 +4,8 @@ from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import cv2
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
+from PyQt5.QtGui import QTextCursor, QPixmap
 import mainwindow
 import os
 from threading import *
@@ -35,6 +35,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def calculateETA(self):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         self.ETA=None
+        self.imageDisplay=None
         while os.path.exists(f'{self.render_folder}/{videoName}_temp/input_frames/'):
             
             total_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/input_frames/')) * self.times
@@ -74,8 +75,16 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
                 except:
                     self.ETA = None
+                try:
+                    files = os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/')
+                    files.sort()
+            
+            
+                    self.imageDisplay = f"{self.render_folder}/{videoName}_temp/output_frames/{files[-1]}"
+                except:
+                    self.imageDisplay = None
     def reportProgress(self, n):
-        fp = n[0]
+        fp = n
         videoName = VideoName.return_video_name(f'{self.input_file}')
         # fc is the total file count after interpolation
         fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
@@ -101,7 +110,11 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         
-
+        if self.imageDisplay != None:
+            print(self.imageDisplay)
+            self.imagePixMap = QPixmap(self.imageDisplay)
+            
+            self.ui.imagePreview.setPixmap(self.imagePixMap) # sets image preview image
         if self.ETA != None:
             self.ui.ETAPreview.setText(self.ETA)
         if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
@@ -117,7 +130,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker = workers.pb2X(self,videoName)
         
         self.times = times
+
         Thread(target=self.calculateETA).start()
+
         # Step 4: Move worker to the thread
         self.worker.moveToThread(self.thread)
         # Step 5: Connect signals and slots
@@ -246,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
-        self.ui.verticalTabWidget.tabBar().setDisabled(mode)
+        #self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
             
     def endRife(self):
