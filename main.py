@@ -286,7 +286,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self):
-        self.addLinetoLogs('Finished!\n')
+        
+        self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
         self.ui.ETAPreview.setText('ETA: 00:00:00')
@@ -319,6 +320,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
         videoName = VideoName.return_video_name(fr'{videopath}')
+        self.videoName = videoName
+        self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
         
@@ -353,7 +356,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{videoName}_temp/audio.m4a') == False:
             self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
         else:
-            start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+            self.output_file = start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
     def showDialogBox(self,message):
         msg = QMessageBox()
