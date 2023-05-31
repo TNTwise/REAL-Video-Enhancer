@@ -19,7 +19,7 @@ import time
 from time import sleep
 import src.get_models as get_models
 import re
-
+import src.transition_detection
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -297,11 +297,13 @@ class MainWindow(QtWidgets.QMainWindow):
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
-
+        videoName = VideoName.return_video_name(fr'{self.input_file}')
+        self.videoName = videoName
         if self.input_file != '':
             
             self.setDisableEnable(True)
-            
+            os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+            self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
             
             self.ui.logsPreview.append(f'Extracting Frames')
 
@@ -319,8 +321,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
-        videoName = VideoName.return_video_name(fr'{videopath}')
-        self.videoName = videoName
+        
         self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
@@ -329,16 +330,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
         #self.runLogs(videoName,times)
-       
-        start.start(self.render_folder,videoName,videopath)
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{videoName}_temp/input_frames/'))
+        self.transitionDetection.find_timestamps()
+        self.transitionDetection.get_frame_num()
+        start.start(self.render_folder,self.videoName,videopath)
+        
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * times 
         if times == 4:
             total_output_files += (total_output_files*2)
         if times == 8:
             total_output_files += (total_output_files*4)
             total_output_files += (total_output_files*2)
-        self.runPB(videoName,times)
+        self.runPB(self.videoName,times)
         
         self.ui.RifePB.setMaximum(total_output_files)
                 #change progressbar value
@@ -347,16 +350,18 @@ class MainWindow(QtWidgets.QMainWindow):
             if i != 0:
                 if times == 4: 
                     self.addLast=True
-                    self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/'))))
-                os.system(fr'rm -rf "{self.render_folder}/{videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{videoName}_temp/output_frames/" "{self.render_folder}/{videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{videoName}_temp/output_frames"')
+                    self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))))
+                os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
                 
                 
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{videoName}_temp/input_frames/" -o "{self.render_folder}/{videoName}_temp/output_frames/"')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/"')
         
-        if os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{videoName}_temp/audio.m4a') == False:
+        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
         else:
-            self.output_file = start.end(self.render_folder,videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+            self.transitionDetection.merge_frames()
+            
+            self.output_file = start.end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
     def showDialogBox(self,message):
         msg = QMessageBox()
