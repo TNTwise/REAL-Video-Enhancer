@@ -236,7 +236,7 @@ class MainWindow(QtWidgets.QMainWindow):
             model = model.replace('v','V')
             model = model.replace('a','A')
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-            if model == 'Rife-V2.3':
+            if model == 'Rife-V4.6':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
     
     def selRenderDir(self):
