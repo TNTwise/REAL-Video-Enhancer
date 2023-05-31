@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="Rife">
        <property name="toolTip">
@@ -304,6 +304,13 @@
                <string>false</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Encoder</string>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
@@ -311,7 +318,30 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>15</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Scene Change Detection Sensativity</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QPlainTextEdit" name="plainTextEdit">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>15</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
                 <widget class="QComboBox" name="VidQualityCombo">
                  <item>
                   <property name="text">
@@ -335,24 +365,34 @@
                  </item>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="2">
                 <widget class="QComboBox" name="EncoderCombo">
                  <item>
                   <property name="text">
-                   <string>.264 (Higher file size, more standardized)</string>
+                   <string>.264</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>.265 (Lower file size, less standardized)</string>
+                   <string>.265</string>
                   </property>
                  </item>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_2">
+               <item row="1" column="1">
+                <widget class="QPushButton" name="sceneChangeSensativityButton">
                  <property name="text">
-                  <string>Encoder</string>
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="dialog-information"/>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QPushButton" name="encoderHelpButton">
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>

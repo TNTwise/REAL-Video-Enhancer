@@ -5,7 +5,7 @@ import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import cv2
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
-from PyQt5.QtGui import QTextCursor, QPixmap
+from PyQt5.QtGui import QTextCursor, QPixmap,QIcon
 import mainwindow
 import os
 from threading import *
@@ -21,6 +21,7 @@ import src.get_models as get_models
 import re
 import src.transition_detection
 from multiprocessing import cpu_count
+from src.messages import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -184,6 +185,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if os.path.exists(f"{settings.RenderDir}") == False:
             settings.change_setting('RenderDir',f'{thisdir}')
         self.render_folder = settings.RenderDir
+        self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+        self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+        
     def settings_menu(self):
         item = self.ui.SettingsMenus.currentItem()
         if item.text() == "Video Options":
@@ -206,6 +210,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.VidQualityCombo.setCurrentText('Medium')
         if self.videoQuality == '22':
             self.ui.VidQualityCombo.setCurrentText('Low')
+        
+        self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
         self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
         self.ui.RenderDirButton.clicked.connect(self.selRenderDir)
         self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
@@ -317,7 +323,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.rifeThread.start()
                 
         else:
-            self.showDialogBox("No input file selected.")
+            no_input_file(self)
 
     
     def start_rife(self,model,times,videopath,outputpath,end_iteration):
@@ -358,7 +364,7 @@ class MainWindow(QtWidgets.QMainWindow):
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
         
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
-            self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
+            show_on_no_output_files(self)
         else:
             self.transitionDetection.merge_frames()
             
