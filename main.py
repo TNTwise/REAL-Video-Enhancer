@@ -20,6 +20,7 @@ from time import sleep
 import src.get_models as get_models
 import re
 import src.transition_detection
+from multiprocessing import cpu_count
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -354,7 +355,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
                 
                 
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/"')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
         
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
