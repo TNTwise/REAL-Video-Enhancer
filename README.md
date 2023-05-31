@@ -10,4 +10,5 @@ maybe use a function ina different script to return progressbar percentage from 
 
 IMPORTANT<br/>
 
-Implement a system where if a setting does not exist, append that setting with its default value to the settings file instead of resetting the entire settings file
+Implement a system where if a setting does not exist, append that setting with its default value to the settings file instead of resetting the entire settings file<br />
+add vs rife support as it implements better with app
