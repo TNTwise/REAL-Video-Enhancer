@@ -47,24 +47,52 @@ class Settings:
                 except:
                     pass
         try:
-            self.Rife_Option = settings_dict['Rife_Option']
-            self.Interpolation_Option = settings_dict['Interpolation_Option']
-            self.Repository = settings_dict['Repository']
+            
             self.Image_Type = settings_dict['Image_Type']
-            self.IsAnime = settings_dict['IsAnime']
-            self.rifeversion = settings_dict['rifeversion']
-            self.esrganversion = settings_dict['esrganversion']
+        except:
+            self.write_to_settings_file("Image_Type", "png")
+            self.readSettings()
+        try:
             self.videoQuality = settings_dict['videoQuality']
-            self.Theme = settings_dict['Theme']
+        except:
+            self.write_to_settings_file("videoQuality", "18")
+            self.readSettings()
+        try:
             self.OutputDir = settings_dict['OutputDir']
+            if os.path.exists(f'{self.OutputDir}') == False:
+                self.write_to_settings_file("OutputDir" ,f"{homedir}")
+        except:
+            self.write_to_settings_file("OutputDir", f"{homedir}")
+            self.readSettings()
+        try:
             self.GPUUsage = settings_dict['GPUUsage']
-            self.RenderDevice = settings_dict['RenderDevice']
+        except:
+            self.write_to_settings_file("GPUUsage" ,'Default')
+            self.readSettings()
+        try:
             self.RenderDir = settings_dict['RenderDir']
+            if os.path.exists(f'{self.RenderDir}') == False:
+                self.write_to_settings_file("RenderDir" ,f"{thisdir}")
+            
+        except:
+            self.write_to_settings_file("RenderDir" ,f"{thisdir}")
+            self.readSettings()
+        try:
             self.ExtractionImageType=settings_dict['ExtractionImageType']
+        except:
+            self.write_to_settings_file("ExtractionImageType" ,"jpg")
+            self.readSettings()
+        try: 
             self.SceneChangeDetection=settings_dict['SceneChangeDetection']
+        except:
+            self.write_to_settings_file('SceneChangeDetection','0.3')
+            self.readSettings()
+        try:
             self.Encoder=settings_dict['Encoder']
         except:
-            self.write_defaults()
+            self.write_to_settings_file('Encoder','264')
+            self.readSettings()
+        
         
     def change_setting(self,setting,svalue):
         original_settings = {}

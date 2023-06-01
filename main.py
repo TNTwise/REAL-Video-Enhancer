@@ -225,6 +225,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.VidQualityCombo.setCurrentText('Low')
         
         self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
+        self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
         self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
         self.ui.RenderDirButton.clicked.connect(self.selRenderDir)
         self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))

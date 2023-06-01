@@ -4,5 +4,9 @@ def show_scene_change_help(self):
 
 def show_on_no_output_files(self):
     self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?')
+
 def no_input_file(self):
     self.showDialogBox("No input file selected.")
+
+def encoder_help(self):
+    self.showDialogBox(".h264 is more standardized, but has worse quality. (shorter render time) \n.h265 is less standardized, but retains more visual quality. (longer render time)")
