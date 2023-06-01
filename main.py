@@ -201,9 +201,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         onlyInt = QIntValidator()
         onlyInt.setRange(0, 9)
-        self.ui.lineEdit.setValidator(onlyInt)
-        self.ui.lineEdit.textChanged.connect(self.changeSceneDetection)
-        self.ui.lineEdit.setText(settings.SceneChangeDetection[2])
+        self.ui.sceneChangeLineEdit.setValidator(onlyInt)
+        self.ui.sceneChangeLineEdit.textChanged.connect(self.changeSceneDetection)
+        self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
         if self.encoder == '264':
             self.ui.EncoderCombo.setCurrentIndex(0)
         if self.encoder == '265':
@@ -254,8 +254,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if model == 'Rife-V4.6':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
     def changeSceneDetection(self):
-        if len(self.ui.lineEdit.text()) > 0 and int(self.ui.lineEdit.text()) != 0:
-            settings.change_setting('SceneChangeDetection', f'0.{self.ui.lineEdit.text()}')
+        if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
+            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
     def selRenderDir(self):
 
         self.render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

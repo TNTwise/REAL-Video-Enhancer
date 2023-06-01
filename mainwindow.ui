@@ -304,33 +304,6 @@
                <string>false</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Encoder</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Video Quality</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>18</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Scene Change Detection Sensativity</string>
-                 </property>
-                </widget>
-               </item>
                <item row="0" column="2">
                 <widget class="QComboBox" name="VidQualityCombo">
                  <item>
@@ -369,14 +342,16 @@
                  </item>
                 </widget>
                </item>
-               <item row="1" column="1">
-                <widget class="QPushButton" name="sceneChangeSensativityButton">
-                 <property name="text">
-                  <string/>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>18</height>
+                  </size>
                  </property>
-                 <property name="icon">
-                  <iconset theme="dialog-information">
-                   <normaloff>.</normaloff>.</iconset>
+                 <property name="text">
+                  <string>Scene Change Detection Sensativity</string>
                  </property>
                 </widget>
                </item>
@@ -388,12 +363,37 @@
                 </widget>
                </item>
                <item row="1" column="2">
-                <widget class="QLineEdit" name="lineEdit">
+                <widget class="QLineEdit" name="sceneChangeLineEdit">
                  <property name="text">
                   <string/>
                  </property>
                  <property name="maxLength">
                   <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPushButton" name="sceneChangeSensativityButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="dialog-information">
+                   <normaloff>.</normaloff>.</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Encoder</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Video Quality</string>
                  </property>
                 </widget>
                </item>
