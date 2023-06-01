@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def calculateETA(self):
         videoName = VideoName.return_video_name(f'{self.input_file}')
         self.ETA=None
-        self.imageDisplay=None
+        
         while os.path.exists(f'{self.render_folder}/{videoName}_temp/input_frames/'):
             
             total_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/input_frames/')) * self.times
@@ -80,16 +80,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
                 except:
                     self.ETA = None
-                try:
-                    files = os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/')
-                    files.sort()
-                    frame_num =re.findall(r'[\d]*',files[-1])
-                    
-                    frame_num = int(int(frame_num[0])/self.times)
-                    frame_num = str(frame_num).zfill(8)
-                    self.imageDisplay = f"{self.render_folder}/{videoName}_temp/input_frames/{frame_num}.png"
-                except:
-                    self.ui.imagePreview.clear()
+    def updateImage(self):
+                self.imageDisplay=None
+                while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
+                    try:
+                        files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
+                        files.sort()
+                        frame_num =re.findall(r'[\d]*',files[-1])
+                        
+                        frame_num = int(int(frame_num[0])/self.times)
+                        frame_num = str(frame_num).zfill(8)
+                        self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/input_frames/{frame_num}.png"
+                    except:
+                        self.ui.imagePreview.clear()
                 
     
     def reportProgress(self, n):
@@ -119,21 +122,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
         
         
-        
+    
         if self.imageDisplay != None:
 
             try:
                 self.ui.imageSpacerFrame.hide()
-                pixMap = QPixmap(self.imageDisplay)
+                self.displayImagePixMap = QPixmap(self.imageDisplay)
                 
                 width = self.width()
                 height = self.height()
                 
                 width=int(width/1.4)
                 height=int(height/1.4)
-                pixMap = pixMap.scaled(width,height)
+
+                self.displayImagePixMap = self.displayImagePixMap.scaled(width,height)
                 
-                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                self.ui.imagePreview.setPixmap(self.displayImagePixMap) # sets image preview image
             except:
                 self.ui.imageSpacerFrame.show()
                 self.ui.imagePreview.clear()
@@ -143,7 +147,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.logsPreview.append(f'Starting {self.times}X Render')
             self.i = 2
     
-    def runPB(self,videoName,times):
+    def runPB(self,videoName):
         self.addLast=False
         self.i=1
         # Step 2: Create a QThread object
@@ -152,8 +156,17 @@ class MainWindow(QtWidgets.QMainWindow):
        
         self.worker = workers.pb2X(self,videoName)
         
-        self.times = times
-
+        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
+        total_output_files = total_input_files * self.times 
+        if self.times == 4:
+            total_output_files += (total_output_files*2)
+        if self.times == 8:
+            total_output_files += (total_output_files*4)
+            total_output_files += (total_output_files*2)
+        
+        
+        self.ui.RifePB.setMaximum(total_output_files)
+        Thread(target=self.updateImage).start()
         Thread(target=self.calculateETA).start()
 
         # Step 4: Move worker to the thread
@@ -304,8 +317,10 @@ class MainWindow(QtWidgets.QMainWindow):
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
+        #Define global variables
         videoName = VideoName.return_video_name(fr'{self.input_file}')
         self.videoName = videoName
+        self.times=int(self.ui.Rife_Times.currentText()[0])
         if self.input_file != '':
             
             self.setDisableEnable(True)
@@ -313,25 +328,22 @@ class MainWindow(QtWidgets.QMainWindow):
             self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
             
             self.ui.logsPreview.append(f'Extracting Frames')
-
-            if int(self.ui.Rife_Times.currentText()[0]) == 2:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
-            if int(self.ui.Rife_Times.currentText()[0]) == 4:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
-            if int(self.ui.Rife_Times.currentText()[0]) == 8:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
-            self.rifeThread.start()
+            Thread(target=self.start_rife).start()
+            
+           
                 
         else:
             no_input_file(self)
 
     
-    def start_rife(self,model,times,videopath,outputpath,end_iteration):
+    def start_rife(self):
         
         
         self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
+        
+        model = self.ui.Rife_Model.currentText().lower()
         
         # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
                 
@@ -339,23 +351,20 @@ class MainWindow(QtWidgets.QMainWindow):
         #self.runLogs(videoName,times)
         self.transitionDetection.find_timestamps()
         self.transitionDetection.get_frame_num()
-        start.start(self.render_folder,self.videoName,videopath)
+        start.start(self.render_folder,self.videoName,self.input_file)
         
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * times 
-        if times == 4:
-            total_output_files += (total_output_files*2)
-        if times == 8:
-            total_output_files += (total_output_files*4)
-            total_output_files += (total_output_files*2)
-        self.runPB(self.videoName,times)
         
-        self.ui.RifePB.setMaximum(total_output_files)
+        self.runPB(self.videoName)
+        
                 #change progressbar value
-    
-        for i in range(end_iteration):
+        if self.times != 8:
+            end_iteration = self.times/2
+        else:
+            end_iteration=3
+        
+        for i in range(int(end_iteration)):
             if i != 0:
-                if times == 4: 
+                if self.times == 4: 
                     self.addLast=True
                     self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))))
                 os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
@@ -368,7 +377,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.transitionDetection.merge_frames()
             
-            self.output_file = start.end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+            self.output_file = start.end(self.render_folder,self.videoName,self.input_file,self.times,self.output_folder, self.videoQuality,self.encoder)
             
     def showDialogBox(self,message):
         msg = QMessageBox()
