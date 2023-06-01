@@ -11,4 +11,8 @@ maybe use a function ina different script to return progressbar percentage from 
 IMPORTANT<br/>
 
 Implement a system where if a setting does not exist, append that setting with its default value to the settings file instead of resetting the entire settings file<br />
-add vs rife support as it implements better with app
+add vs rife support as it implements better with app<br/>
+
+var cmd = `${inject_env} && "${vspipe}" --arg "tmp=${path.join(cache, "tmp.json")}" -c y4m "${engine}" - -p | "${ffmpeg}" -y -loglevel error -i pipe: ${params} "${tmpOutPath}"`; 
+
+this should help with rife vs support
