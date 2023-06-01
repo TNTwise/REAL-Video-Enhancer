@@ -119,3 +119,4 @@ class Settings:
         self.change_setting("Interpolation_Option", f"2X")
         self.change_setting("Rife_Option", f"2.3")
         self.change_setting("IsAnime", "False")
+    
