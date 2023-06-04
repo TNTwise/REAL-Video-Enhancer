@@ -29,7 +29,7 @@ homedir = os.path.expanduser(r"~")
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
-        self.setMinimumSize(400, 300)
+        self.setMinimumSize(700, 550)
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
@@ -129,9 +129,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 width = self.width()
                 height = self.height()
                 
-                width=int(width/1.4)
-                height=int(height/1.4)
-                pixMap = pixMap.scaled(width,height)
+                width1=int(width/1.5)
+                height1=int(width1/self.aspectratio)
+                if height1 >= height/1.5:
+                    
+                    height1=int(height/1.5)
+                    width1=int(height1/(self.videoheight/self.videowidth))
+                    
+                pixMap = pixMap.scaled(width1,height1)
                 
                 self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
             except:
@@ -317,6 +322,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
         videoName = VideoName.return_video_name(fr'{self.input_file}')
         self.videoName = videoName
+        video = cv2.VideoCapture(self.input_file)
+        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.aspectratio = self.videowidth / self.videoheight
+    # Calculate the aspect ratio
+                
+        
         if self.input_file != '':
             
             self.setDisableEnable(True)
