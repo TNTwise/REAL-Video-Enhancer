@@ -32,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(700, 550)
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowIcon(QIcon(f'{thisdir}/icons/logov2.png'))
+        self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         
         self.def_var()
@@ -118,9 +118,7 @@ class MainWindow(QtWidgets.QMainWindow):
         #Update GUI values
         self.ui.RifePB.setValue(fp*int(self.times/2))
         self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
-        
-        
-        
+       
         if self.imageDisplay != None:
 
             try:
@@ -321,17 +319,18 @@ class MainWindow(QtWidgets.QMainWindow):
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
-        videoName = VideoName.return_video_name(fr'{self.input_file}')
-        self.videoName = videoName
-        video = cv2.VideoCapture(self.input_file)
-        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        self.aspectratio = self.videowidth / self.videoheight
+        
     # Calculate the aspect ratio
                 
         
         if self.input_file != '':
-            
+            # Calculate the aspect ratio
+            videoName = VideoName.return_video_name(fr'{self.input_file}')
+            self.videoName = videoName
+            video = cv2.VideoCapture(self.input_file)
+            self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+            self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            self.aspectratio = self.videowidth / self.videoheight
             self.setDisableEnable(True)
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
@@ -394,10 +393,14 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self.output_file = start.end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
-    def showDialogBox(self,message):
+    def showDialogBox(self,message,displayInfoIcon=False):
+        icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
         msg = QMessageBox()
         msg.setWindowTitle(" ")
+        if displayInfoIcon == True:
+            msg.setIconPixmap(icon.pixmap(32, 32)) 
         msg.setText(f"{message}")
+        
         msg.exec_()
     
     
