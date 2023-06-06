@@ -32,6 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(700, 550)
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setWindowIcon(QIcon(f'{thisdir}/icons/logov2.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         
         self.def_var()
