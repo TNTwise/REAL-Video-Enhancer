@@ -100,7 +100,9 @@ class MainWindow(QtWidgets.QMainWindow):
         fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
         self.fileCount = fc
         if self.i==1:
+            
             self.addLinetoLogs(f'Starting {self.times}X Render')
+            self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
             self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
             self.i=2
         if self.times == 4:
@@ -232,7 +234,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
         self.ui.VideoOptionsFrame.hide()
         self.ui.RenderOptionsFrame.hide()
-        self.ui.RifeStart.clicked.connect(self.startRife)
+        self.ui.RifeStart.clicked.connect(lambda: start.startRife(self))
         
         self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
         #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
@@ -291,81 +293,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.imageSpacerFrame.show()
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
-    def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
-        
-    # Calculate the aspect ratio
-                
-        
-        if self.input_file != '':
-            # Calculate the aspect ratio
-            videoName = VideoName.return_video_name(fr'{self.input_file}')
-            self.videoName = videoName
-            video = cv2.VideoCapture(self.input_file)
-            self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-            self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            self.aspectratio = self.videowidth / self.videoheight
-            self.setDisableEnable(True)
-            os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-            self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
-            
-            self.ui.logsPreview.append(f'Extracting Frames')
-
-            if int(self.ui.Rife_Times.currentText()[0]) == 2:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
-            if int(self.ui.Rife_Times.currentText()[0]) == 4:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
-            if int(self.ui.Rife_Times.currentText()[0]) == 8:
-                self.rifeThread = Thread(target=lambda: self.start_rife((self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
-            self.rifeThread.start()
-                
-        else:
-            no_input_file(self)
-
     
-    def start_rife(self,model,times,videopath,outputpath,end_iteration):
-        
-        
-        self.fps = VideoName.return_video_framerate(f'{self.input_file}')
-        self.ui.ETAPreview.setText('ETA:')
-        self.ui.processedPreview.setText('Files Processed:')
-        
-        # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
-                
-                
-        #self.runLogs(videoName,times)
-        self.transitionDetection.find_timestamps()
-        self.transitionDetection.get_frame_num()
-        start.start(self.render_folder,self.videoName,videopath)
-        
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * times 
-        if times == 4:
-            total_output_files += (total_output_files*2)
-        if times == 8:
-            total_output_files += (total_output_files*4)
-            total_output_files += (total_output_files*2)
-        self.runPB(self.videoName,times)
-        
-        self.ui.RifePB.setMaximum(total_output_files)
-                #change progressbar value
-    
-        for i in range(end_iteration):
-            if i != 0:
-                if times == 4: 
-                    self.addLast=True
-                    self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))))
-                os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
-                
-                
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
-        
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
-            show_on_no_output_files(self)
-        else:
-            self.transitionDetection.merge_frames()
-            
-            self.output_file = start.end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
-            
     def showDialogBox(self,message,displayInfoIcon=False):
         icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
         msg = QMessageBox()
