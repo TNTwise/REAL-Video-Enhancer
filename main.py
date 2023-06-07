@@ -249,7 +249,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if 'rife' in os.path.basename(model_filepath):
                 models.append(os.path.basename(model_filepath))
         
-        
+        models.sort()
         for model in models:
 
             
