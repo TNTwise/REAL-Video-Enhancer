@@ -3,10 +3,11 @@ import csv
 thisdir = os.getcwd()
 from src.return_data import *
 homedir = os.path.expanduser(r"~")
+from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 
 class Settings:
     def __init__(self) -> None:
-
+        
         ManageFiles.create_folder(f"{thisdir}/files")
         if ManageFiles.isfile(f"{thisdir}/files/settings.txt") == False:
             ManageFiles.create_file(f"{thisdir}/files/settings.txt")
@@ -119,4 +120,37 @@ class Settings:
         self.change_setting("Interpolation_Option", f"2X")
         self.change_setting("Rife_Option", f"2.3")
         self.change_setting("IsAnime", "False")
+
+
+
+def changeSceneDetection(self):
+        settings = Settings()
+        if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
+            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
+def selRenderDir(self):
+    settings = Settings()
+    self.render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+    settings.change_setting("RenderDir",f"{self.render_folder}")
     
+    self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+
+def selEncoder(self):
+    settings = Settings()
+    if '.264' in self.ui.EncoderCombo.currentText():
+        
+        settings.change_setting('Encoder','264')
+    if '.265' in self.ui.EncoderCombo.currentText():
+        settings.change_setting('Encoder','265')
+    self.encoder = settings.Encoder
+
+def selVidQuality(self):
+    settings = Settings()
+    if self.ui.VidQualityCombo.currentText() == 'Lossless':
+        settings.change_setting('videoQuality', '10')
+    if self.ui.VidQualityCombo.currentText() == 'High':
+        settings.change_setting('videoQuality', '14')
+    if self.ui.VidQualityCombo.currentText() == 'Medium':
+        settings.change_setting('videoQuality', '18')
+    if self.ui.VidQualityCombo.currentText() == 'Low':
+        settings.change_setting('videoQuality', '22')
+    self.videoQuality = settings.videoQuality

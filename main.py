@@ -206,7 +206,7 @@ class MainWindow(QtWidgets.QMainWindow):
         onlyInt = QIntValidator()
         onlyInt.setRange(0, 9)
         self.ui.sceneChangeLineEdit.setValidator(onlyInt)
-        self.ui.sceneChangeLineEdit.textChanged.connect(self.changeSceneDetection)
+        self.ui.sceneChangeLineEdit.textChanged.connect(lambda: changeSceneDetection(self))
         self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
         if self.encoder == '264':
             self.ui.EncoderCombo.setCurrentIndex(0)
@@ -226,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
 
         self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-        self.ui.RenderDirButton.clicked.connect(self.selRenderDir)
+        self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
         self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
         self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
         self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
@@ -234,10 +234,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RenderOptionsFrame.hide()
         self.ui.RifeStart.clicked.connect(self.startRife)
         
-        self.ui.EncoderCombo.currentIndexChanged.connect(self.selEncoder)
+        self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
         #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
         sleep(0.01)
-        self.ui.VidQualityCombo.currentIndexChanged.connect(self.selVidQuality)
+        self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
 
         # list every model downloaded, and add them to the list
         
@@ -257,34 +257,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
             if model == 'Rife-V4.6':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
-    def changeSceneDetection(self):
-        if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
-            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
-    def selRenderDir(self):
-
-        self.render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
-        settings.change_setting("RenderDir",f"{self.render_folder}")
-        
-        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-
-    def selEncoder(self):
-        if '.264' in self.ui.EncoderCombo.currentText():
-            
-            settings.change_setting('Encoder','264')
-        if '.265' in self.ui.EncoderCombo.currentText():
-            settings.change_setting('Encoder','265')
-        self.encoder = settings.Encoder
     
-    def selVidQuality(self):
-        if self.ui.VidQualityCombo.currentText() == 'Lossless':
-            settings.change_setting('videoQuality', '10')
-        if self.ui.VidQualityCombo.currentText() == 'High':
-            settings.change_setting('videoQuality', '14')
-        if self.ui.VidQualityCombo.currentText() == 'Medium':
-            settings.change_setting('videoQuality', '18')
-        if self.ui.VidQualityCombo.currentText() == 'Low':
-            settings.change_setting('videoQuality', '22')
-        self.videoQuality = settings.videoQuality
         
     def openFileNameDialog(self):
 
