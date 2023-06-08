@@ -158,8 +158,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread = QThread()
         # Step 3: Create a worker object
        
-        self.worker = workers.pb2X(self,videoName)
-        
+        self.worker = workers.pb2X(self,videoName,self.input_file)        
         self.times = times
 
         Thread(target=self.calculateETA).start()
