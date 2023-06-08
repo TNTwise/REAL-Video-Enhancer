@@ -36,8 +36,10 @@ class pb2X(QObject):
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                
-                    files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
+                    try:
+                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
+                    except:
+                        pass
                     try:
                         latest_image = self.get_latest_image()
                     except:

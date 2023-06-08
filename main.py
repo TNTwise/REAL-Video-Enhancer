@@ -136,10 +136,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     
                     height1=int(height/1.5)
                     width1=int(height1/(self.videoheight/self.videowidth))
-                    
-                pixMap = pixMap.scaled(width1,height1)
+                try:
+                    pixMap = pixMap.scaled(width1,height1)
                 
-                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                    self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                except:
+                    pass
             except:
                 self.ui.imageSpacerFrame.show()
                 self.ui.imagePreview.clear()
