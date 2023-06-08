@@ -45,7 +45,7 @@ class pb2X(QObject):
                     except:
                         latest_image= None
 
-                    sleep(0.5)
+                    sleep(5)
                     
                     self.progress.emit(files_processed)
         self.finished.emit()
