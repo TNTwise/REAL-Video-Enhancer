@@ -15,11 +15,11 @@ from time import sleep
 class pb2X(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int)
-    def __init__(self,parent, videoName):
+    def __init__(self,parent, videoName, input_file):
         QThread.__init__(self, parent)
         self.videoName = videoName
         self.settings = Settings()
-   
+        self.input_file = input_file
     def run(self):
         """Long-running task."""
         
@@ -30,22 +30,20 @@ class pb2X(QObject):
         total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * 2
         
-        
-        
+        sleep_time=int(.05*(VideoName.return_video_frame_count(self.input_file)/VideoName.return_video_framerate(self.input_file)))
+        print(sleep_time)
         
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                    try:
-                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                    except:
-                        pass
+                
+                    files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     try:
                         latest_image = self.get_latest_image()
                     except:
                         latest_image= None
-
-                    sleep(5)
+                    
+                    sleep(sleep_time)
                     
                     self.progress.emit(files_processed)
         self.finished.emit()
