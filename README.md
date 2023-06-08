@@ -15,4 +15,6 @@ add vs rife support as it implements better with app<br/>
 
 var cmd = `${inject_env} && "${vspipe}" --arg "tmp=${path.join(cache, "tmp.json")}" -c y4m "${engine}" - -p | "${ffmpeg}" -y -loglevel error -i pipe: ${params} "${tmpOutPath}"`; 
 
-this should help with rife vs support
+this should help with rife vs support<br/>
+
+/home/pax/.local/bin/pyinstaller --icon=icons/logov1.png -F --hidden-import='PyQt5.QFileDialog'  --noconfirm main.py
