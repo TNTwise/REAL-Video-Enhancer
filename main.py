@@ -115,11 +115,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
                 self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-            if self.times == 4:
-                fc += (fc/2) #This line adds in to the total file count the previous 2x interpolation for total file count
-            if self.times == 8:
-                fc += (fc)
-                fc += (fc/2)
+            
             
             if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
                 fp+=self.original_fc*2
