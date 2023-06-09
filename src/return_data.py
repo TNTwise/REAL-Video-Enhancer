@@ -29,3 +29,14 @@ class ManageFiles:
             
     def isfolder(folderpath):
         return os.path.exists(folderpath)
+class HardwareInfo:
+    def get_video_memory_linux():
+        try:
+            with open('/sys/class/drm/card0/device/mem_info_vram_total', 'r') as f:
+                for line in f:
+                    line = line.replace('\n','')
+                    line = int(int(line)/1000000000)
+                    return line
+        except Exception as e:
+            print(f"Error: {e}")
+            return None

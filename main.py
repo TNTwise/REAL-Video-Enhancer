@@ -34,7 +34,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
-        
+        self.gpuMemory=HardwareInfo.get_video_memory_linux()
+        if self.gpuMemory == None:
+            cannot_detect_vram(self)
         self.def_var()
         self.pin_functions()
         self.show()
