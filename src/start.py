@@ -40,7 +40,9 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
         
         os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
-                
+        os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
+        from time import sleep
+        sleep(10)
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
         return output_video_file
 
@@ -90,16 +92,10 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
         self.transitionDetection.get_frame_num()
         start(self.render_folder,self.videoName,videopath)
         
-        total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * times 
-        if times == 4:
-            total_output_files += (total_output_files*2)
-        if times == 8:
-            total_output_files += (total_output_files*4)
-            total_output_files += (total_output_files*2)
+        
         self.runPB(self.videoName,times)
         
-        self.ui.RifePB.setMaximum(total_output_files)
+        
                 #change progressbar value
     
         for i in range(end_iteration):

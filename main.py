@@ -94,62 +94,70 @@ class MainWindow(QtWidgets.QMainWindow):
                 
     
     def reportProgress(self, n):
-        fp = n
-        videoName = VideoName.return_video_name(f'{self.input_file}')
-        # fc is the total file count after interpolation
-        fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
-        self.fileCount = fc
-        if self.i==1:
+        if os.path.isfile(f'{self.render_folder}/{VideoName.return_video_name(self.input_file)}_temp/audio.m4a') == True:
+            fp = n
+            videoName = VideoName.return_video_name(f'{self.input_file}')
+            # fc is the total file count after interpolation
+            fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+            self.fileCount = fc
+            if self.i==1:
+                total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
+                total_output_files = total_input_files * self.times 
+                if self.times == 4:
+                    total_output_files += (total_output_files*2)
+                if self.times == 8:
+                    total_output_files += (total_output_files*4)
+                    total_output_files += (total_output_files*2)
+                self.ui.RifePB.setMaximum(total_output_files)
+                self.addLinetoLogs(f'Starting {self.times}X Render')
+                self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
+                self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
+                self.i=2
+            if self.times == 4:
+                fc += (fc/2) #This line adds in to the total file count the previous 2x interpolation for total file count
+            if self.times == 8:
+                fc += (fc)
+                fc += (fc/2)
             
-            self.addLinetoLogs(f'Starting {self.times}X Render')
-            self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
-            self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
-            self.i=2
-        if self.times == 4:
-            fc += (fc/2) #This line adds in to the total file count the previous 2x interpolation for total file count
-        if self.times == 8:
-            fc += (fc)
-            fc += (fc/2)
+            if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
+                fp+=self.original_fc*2
+                
+            fp=int(fp)
+            fc = int(fc)
+
+            #Update GUI values
+            self.ui.RifePB.setValue(fp*int(self.times/2))
+            self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
         
-        if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
-            fp+=self.original_fc*2
-            
-        fp=int(fp)
-        fc = int(fc)
+            if self.imageDisplay != None:
 
-        #Update GUI values
-        self.ui.RifePB.setValue(fp*int(self.times/2))
-        self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
-       
-        if self.imageDisplay != None:
-
-            try:
-                self.ui.imageSpacerFrame.hide()
-                pixMap = QPixmap(self.imageDisplay)
-                
-                width = self.width()
-                height = self.height()
-                
-                width1=int(width/1.5)
-                height1=int(width1/self.aspectratio)
-                if height1 >= height/1.5:
-                    
-                    height1=int(height/1.5)
-                    width1=int(height1/(self.videoheight/self.videowidth))
                 try:
-                    pixMap = pixMap.scaled(width1,height1)
-                
-                    self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                    self.ui.imageSpacerFrame.hide()
+                    pixMap = QPixmap(self.imageDisplay)
+                    
+                    width = self.width()
+                    height = self.height()
+                    
+                    width1=int(width/1.5)
+                    height1=int(width1/self.aspectratio)
+                    if height1 >= height/1.5:
+                        
+                        height1=int(height/1.5)
+                        width1=int(height1/(self.videoheight/self.videowidth))
+                    try:
+                        pixMap = pixMap.scaled(width1,height1)
+                    
+                        self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                    except:
+                        pass
                 except:
-                    pass
-            except:
-                self.ui.imageSpacerFrame.show()
-                self.ui.imagePreview.clear()
-        if self.ETA != None:
-            self.ui.ETAPreview.setText(self.ETA)
-        if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
-            self.ui.logsPreview.append(f'Starting {self.times}X Render')
-            self.i = 2
+                    self.ui.imageSpacerFrame.show()
+                    self.ui.imagePreview.clear()
+            if self.ETA != None:
+                self.ui.ETAPreview.setText(self.ETA)
+            if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
+                self.ui.logsPreview.append(f'Starting {self.times}X Render')
+                self.i = 2
     
     def runPB(self,videoName,times):
         self.addLast=False
@@ -284,7 +292,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self):
-        
+        sleep(10.1)
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())

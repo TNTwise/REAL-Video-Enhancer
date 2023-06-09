@@ -35,7 +35,7 @@ class pb2X(QObject):
         
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
+                if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                 
                     files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     try:
@@ -43,7 +43,7 @@ class pb2X(QObject):
                     except:
                         latest_image= None
                     
-                    sleep(sleep_time)
+                    sleep(1)
                     
                     self.progress.emit(files_processed)
         self.finished.emit()
