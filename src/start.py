@@ -39,7 +39,7 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         else:
                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
         
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -pix_fmt yuv420p -c:a copy "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
+        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         from time import sleep
         sleep(10)
@@ -99,14 +99,14 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 #change progressbar value
     
         for i in range(end_iteration):
-            '''if i != 0:
+            if i != 0:
                 if times == 4: 
                     self.addLast=True
                     self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))))
                 os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
-            '''    
                 
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n N*{times} -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
+                
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
         
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
@@ -116,3 +116,12 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
             self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
 
+def endRife(self):
+        
+        self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
+        self.setDisableEnable(False)
+        self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+        self.ui.ETAPreview.setText('ETA: 00:00:00')
+        self.ui.imagePreview.clear()
+        self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
+        self.ui.imageSpacerFrame.show()
