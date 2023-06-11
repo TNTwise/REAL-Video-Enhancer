@@ -6,6 +6,7 @@ from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import cv2
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 from PyQt5.QtGui import QTextCursor, QPixmap,QIcon, QIntValidator
+import PyQt5.QtCore as QtCore
 import mainwindow
 import os
 from threading import *
@@ -96,7 +97,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
     
     def reportProgress(self, n):
-        if os.path.isfile(f'{self.render_folder}/{VideoName.return_video_name(self.input_file)}_temp/audio.m4a') == True:
+        
             fp = n
             videoName = VideoName.return_video_name(f'{self.input_file}')
             # fc is the total file count after interpolation
@@ -161,6 +162,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.logsPreview.append(f'Starting {self.times}X Render')
                 self.i = 2
     
+            
     def runPB(self,videoName,times):
         self.addLast=False
         self.i=1
@@ -168,8 +170,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread = QThread()
         # Step 3: Create a worker object
        
-        self.worker = workers.pb2X(self,videoName,self.input_file)        
-        self.times = times
+        self.worker = workers.pb2X(self.input_file)        
+        
 
         Thread(target=self.calculateETA).start()
 
@@ -181,14 +183,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.progress.connect(self.reportProgress)
+        
+        
         # Step 6: Start the thread
+        
         self.thread.start()
-
+        
         # Final resets
+        
         self.worker.finished.connect(
             self.endRife
         )
-        
        
     
         
@@ -293,8 +298,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
             
-    def endRife(self):
-        sleep(10.1)
+    def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
+        sleep(12)
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())

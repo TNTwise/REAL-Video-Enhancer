@@ -42,7 +42,7 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         from time import sleep
-        sleep(10)
+        
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
         return output_video_file
 
@@ -62,9 +62,9 @@ def startRife(self): #should prob make this different, too similar to start_rife
             self.setDisableEnable(True)
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
-            
+            self.times = int(self.ui.Rife_Times.currentText()[0])
             self.ui.logsPreview.append(f'Extracting Frames')
-
+            
             if int(self.ui.Rife_Times.currentText()[0]) == 2:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
             if int(self.ui.Rife_Times.currentText()[0]) == 4:
@@ -72,7 +72,9 @@ def startRife(self): #should prob make this different, too similar to start_rife
             if int(self.ui.Rife_Times.currentText()[0]) == 8:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
-                
+            from time import sleep
+            sleep(1) # has to sleep otherwise function wont work???
+            self.runPB(self.videoName,self.times)
         else:
             no_input_file(self)
 
@@ -93,7 +95,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
         start(self.render_folder,self.videoName,videopath)
         
         
-        self.runPB(self.videoName,times)
+        
         
         
                 #change progressbar value

@@ -1,8 +1,7 @@
 
 from PyQt5 import QtWidgets, uic
 import sys
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
-
+from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox, QListWidget, QListWidgetItem
 from PyQt5.QtGui import QTextCursor
 import mainwindow
@@ -15,13 +14,16 @@ from time import sleep
 class pb2X(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int)
-    def __init__(self,parent, videoName, input_file):
+    def __init__(self,myvar,parent=None):
+        
         QThread.__init__(self, parent)
-        self.videoName = videoName
+        self.input_file = myvar
+        self.videoName = VideoName.return_video_name(f'{self.input_file}')
         self.settings = Settings()
-        self.input_file = input_file
+    
     def run(self):
         """Long-running task."""
+        print('\n\n\n\n')
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
             sleep(1)
@@ -46,6 +48,7 @@ class pb2X(QObject):
                     sleep(1)
                     
                     self.progress.emit(files_processed)
+        sleep(1)
         self.finished.emit()
 
 
