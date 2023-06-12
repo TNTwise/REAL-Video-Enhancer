@@ -52,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
             start_time = time.time()
             
-            sleep(1)
+            
             for i in range(total_iterations):
                 # Do some work for each iteration
                 
@@ -98,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
     
     def reportProgress(self, n):
-            
+        try:
             fp = n
             self.videoName = VideoName.return_video_name(f'{self.input_file}')
             # fc is the total file count after interpolation
@@ -107,24 +107,13 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.i==1:
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
-                if self.times == 4:
-                    total_output_files += (total_output_files*2)
-                if self.times == 8:
-                    total_output_files += (total_output_files*4)
-                    total_output_files += (total_output_files*2)
+                
                 self.ui.RifePB.setMaximum(total_output_files)
                 self.addLinetoLogs(f'Starting {self.times}X Render')
                 self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
                 self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-            if self.times == 4:
-                fc += (fc/2) #This line adds in to the total file count the previous 2x interpolation for total file count
-            if self.times == 8:
-                fc += (fc)
-                fc += (fc/2)
             
-            if self.addLast == True: #this checks for addLast, which is set after first interpolation in 4X, and if its true it will add the original file count * 2 onto that
-                fp+=self.original_fc*2
                 
             fp=int(fp)
             fc = int(fc)
@@ -163,7 +152,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.logsPreview.append(f'Starting {self.times}X Render')
                 self.i = 2
     
-            
+        except:
+            pass
     def runPB(self,videoName,times):
         self.addLast=False
         self.i=1
@@ -300,7 +290,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
-        sleep(12)
+        sleep(1.5)
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())

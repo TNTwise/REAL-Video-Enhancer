@@ -41,7 +41,6 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         
         os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
-        from time import sleep
         
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
         return output_video_file
@@ -72,8 +71,6 @@ def startRife(self): #should prob make this different, too similar to start_rife
             if int(self.ui.Rife_Times.currentText()[0]) == 8:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
-            from time import sleep
-            sleep(1) # has to sleep otherwise function wont work???
             self.runPB(self.videoName,self.times)
         else:
             no_input_file(self)
@@ -100,22 +97,19 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
                 #change progressbar value
     
-        for i in range(end_iteration):
-            if i != 0:
-                if times == 4: 
-                    self.addLast=True
-                    self.ui.RifePB.setValue(int(len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))))
-                os.system(fr'rm -rf "{self.render_folder}/{self.videoName}_temp/input_frames/"  &&  mv "{self.render_folder}/{self.videoName}_temp/output_frames/" "{self.render_folder}/{self.videoName}_temp/input_frames" && mkdir -p "{self.render_folder}/{self.videoName}_temp/output_frames"')
-                
-            Thread(target=self.calculateETA).start()
-            input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
+        
+        
+            
+        Thread(target=self.calculateETA).start()
+        input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
+        os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
         
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
         else:
             self.transitionDetection.merge_frames()
-            
+            from time import sleep
+            sleep(1)
             self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
 
