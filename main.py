@@ -42,12 +42,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.pin_functions()
         self.show()
     def calculateETA(self):
-        videoName = VideoName.return_video_name(f'{self.input_file}')
+        
         self.ETA=None
         self.imageDisplay=None
-        while os.path.exists(f'{self.render_folder}/{videoName}_temp/input_frames/'):
+        
+        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
             
-            total_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/input_frames/')) * self.times
+            total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
         
             start_time = time.time()
             
@@ -59,7 +60,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     
                         
                         
-                    completed_iterations = len(os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/'))
+                    completed_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))
                     
                     # Increment the completed iterations counter
                     sleep(1)
@@ -85,21 +86,21 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     self.ETA = None
                 try:
-                    files = os.listdir(f'{self.render_folder}/{videoName}_temp/output_frames/')
+                    files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
                     files.sort()
                     frame_num =re.findall(r'[\d]*',files[-1])
                     
                     frame_num = int(int(frame_num[0])/self.times)
                     frame_num = str(frame_num).zfill(8)
-                    self.imageDisplay = f"{self.render_folder}/{videoName}_temp/input_frames/{frame_num}.png"
+                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/input_frames/{frame_num}.png"
                 except:
                     self.ui.imagePreview.clear()
                 
     
     def reportProgress(self, n):
-        
+            
             fp = n
-            videoName = VideoName.return_video_name(f'{self.input_file}')
+            self.videoName = VideoName.return_video_name(f'{self.input_file}')
             # fc is the total file count after interpolation
             fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
             self.fileCount = fc
@@ -158,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.imagePreview.clear()
             if self.ETA != None:
                 self.ui.ETAPreview.setText(self.ETA)
-            if self.i == 1 and os.path.exists(f'{self.render_folder}/{videoName}_temp/output_frames'):
+            if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames'):
                 self.ui.logsPreview.append(f'Starting {self.times}X Render')
                 self.i = 2
     
@@ -173,7 +174,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker = workers.pb2X(self.input_file)        
         
 
-        Thread(target=self.calculateETA).start()
+        
 
         # Step 4: Move worker to the thread
         self.worker.moveToThread(self.thread)
