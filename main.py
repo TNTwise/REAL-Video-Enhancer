@@ -119,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
             fc = int(fc)
 
             #Update GUI values
-            self.ui.RifePB.setValue(fp*int(self.times/2))
+            self.ui.RifePB.setValue(fp)
             self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
         
             if self.imageDisplay != None:
@@ -229,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.VidQualityCombo.setCurrentText('Medium')
         if self.videoQuality == '22':
             self.ui.VidQualityCombo.setCurrentText('Low')
-        
+        self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
         #link help buttons
         self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
         self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
@@ -267,7 +267,12 @@ class MainWindow(QtWidgets.QMainWindow):
             if model == 'Rife-V4.6':
                 self.ui.Rife_Model.setCurrentText(f'{model}')
     
-        
+    def greyOutRifeTimes(self):
+        if self.ui.Rife_Model.currentText() == 'Rife-V4' or self.ui.Rife_Model.currentText() == 'Rife-V4.6':
+            self.ui.Rife_Times.setEnabled(True)
+        else:
+            self.ui.Rife_Times.setCurrentText('2X')
+            self.ui.Rife_Times.setEnabled(False)
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
