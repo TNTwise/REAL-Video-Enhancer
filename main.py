@@ -295,7 +295,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
-        sleep(1.5)
+        sleep(1)
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())

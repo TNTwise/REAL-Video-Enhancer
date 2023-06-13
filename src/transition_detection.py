@@ -2,7 +2,7 @@ import src.settings
 import os
 import src.return_data
 import subprocess
-
+from src.return_data import *
 class TransitionDetection:
     def __init__(self,input_file):
         self.settings = src.settings.Settings()
@@ -42,7 +42,7 @@ class TransitionDetection:
         
         
 
-    def get_frame_num(self,frames_subtracted=0):
+    def get_frame_num(self,times,frames_subtracted=0):
         if self.settings.SceneChangeDetection != 'Off':
             frame_list =[]
             for i in self.timestamps:
@@ -65,6 +65,7 @@ class TransitionDetection:
             file_num_list = []
             list1 = []
             list2 = []
+            prevFrameList = []
             for i in self.frame_list:
                         
                         i = int(i) * 2
@@ -74,10 +75,14 @@ class TransitionDetection:
                         list2.append(i)
             for j in self.frame_list:
                         
-                        j = int(j) * 2
+                        j = int(j) * times
+                        prev_file = j - 1
                         j = str(j)
+                        prev_file = str(prev_file)
                         j = j.zfill(8)
+                        prev_file = prev_file.zfill(8)
                         list1.append(j)
+                        prevFrameList.append(prev_file)
                         self.list1 = list1
                         
             
@@ -90,10 +95,14 @@ class TransitionDetection:
                
                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}.png"')
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
-                
+                if times == 4:
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{prevFrameList[p]}.png"')
                 p+=1
                 o+=1
                 # IK this is dumb. but i cant think of anything else rn
+            
+                  
+                  
             os.chdir(f'{self.thisdir}/rife-vulkan-models')
     def merge_frames(self):
         p = 0

@@ -88,7 +88,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
         #self.runLogs(videoName,times)
         self.transitionDetection.find_timestamps()
-        self.transitionDetection.get_frame_num()
+        self.transitionDetection.get_frame_num(times)
         start(self.render_folder,self.videoName,videopath)
         
         
@@ -110,8 +110,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
             show_on_no_output_files(self)
         else:
             self.transitionDetection.merge_frames()
-            from time import sleep
-            sleep(1)
+            
             self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
 
