@@ -87,9 +87,10 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
                 
         #self.runLogs(videoName,times)
+        start(self.render_folder,self.videoName,videopath)
         self.transitionDetection.find_timestamps()
         self.transitionDetection.get_frame_num(times)
-        start(self.render_folder,self.videoName,videopath)
+        
         
         
         

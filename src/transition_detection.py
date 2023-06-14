@@ -43,6 +43,7 @@ class TransitionDetection:
         
 
     def get_frame_num(self,times,frames_subtracted=0):
+        self.times=times
         if self.settings.SceneChangeDetection != 'Off':
             frame_list =[]
             for i in self.timestamps:
@@ -65,7 +66,9 @@ class TransitionDetection:
             file_num_list = []
             list1 = []
             list2 = []
-            prevFrameList = []
+            self.prevFrameList = []
+            self.fileToCopyDict = {}
+            
             for i in self.frame_list:
                         
                         i = int(i) * 2
@@ -77,14 +80,19 @@ class TransitionDetection:
                         
                         j = int(j) * times
                         prev_file = j - 1
+                        file_to_copy = str(int(int(prev_file - 2)/times)).zfill(8)# This fixes 4x transitions having some weird artifacts by copying the first image before the transition
+                        file_to_copy_to = str(prev_file - 1).zfill(8)
+                        
                         j = str(j)
                         prev_file = str(prev_file)
                         j = j.zfill(8)
                         prev_file = prev_file.zfill(8)
                         list1.append(j)
-                        prevFrameList.append(prev_file)
+                        self.fileToCopyDict[file_to_copy] = file_to_copy_to
+                        self.prevFrameList.append(prev_file)
                         self.list1 = list1
-                        
+            
+            
             
             p = 0
             o = 1
@@ -96,11 +104,13 @@ class TransitionDetection:
                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}.png"')
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
                 if times == 4:
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{prevFrameList[p]}.png"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}.png"')
                 p+=1
                 o+=1
                 # IK this is dumb. but i cant think of anything else rn
-            
+            if times == 4:
+                    for file,copyto in self.fileToCopyDict.items():
+                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}.png" "{self.full_render_dir}/transitions/{copyto}.png"')
                   
                   
             os.chdir(f'{self.thisdir}/rife-vulkan-models')
@@ -112,7 +122,7 @@ class TransitionDetection:
         for i in os.listdir():
             
                 os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
-                
+        
         for image in self.frame_list:
             os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}.png" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" ')
             p+=1
