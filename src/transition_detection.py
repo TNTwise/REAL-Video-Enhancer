@@ -67,7 +67,7 @@ class TransitionDetection:
             list1 = []
             list2 = []
             self.prevFrameList = []
-            self.fileToCopyDict = {}
+            self.fileToCopyDict = []
             
             for i in self.frame_list:
                         
@@ -80,7 +80,6 @@ class TransitionDetection:
                         
                         j = int(j) * times
                         prev_file = j - 1
-                        file_to_copy = str(int(int(prev_file - 2)/times)).zfill(8)# This fixes 4x transitions having some weird artifacts by copying the first image before the transition
                         file_to_copy_to = str(prev_file - 1).zfill(8)
                         
                         j = str(j)
@@ -88,7 +87,7 @@ class TransitionDetection:
                         j = j.zfill(8)
                         prev_file = prev_file.zfill(8)
                         list1.append(j)
-                        self.fileToCopyDict[file_to_copy] = file_to_copy_to
+                        self.fileToCopyDict.append(file_to_copy_to)
                         self.prevFrameList.append(prev_file)
                         self.list1 = list1
             
@@ -105,12 +104,14 @@ class TransitionDetection:
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
                 if times == 4:
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}.png"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}.png"')
+                    
                 p+=1
                 o+=1
                 # IK this is dumb. but i cant think of anything else rn
-            if times == 4:
+            '''if times == 4:
                     for file,copyto in self.fileToCopyDict.items():
-                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}.png" "{self.full_render_dir}/transitions/{copyto}.png"')
+                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}.png" "{self.full_render_dir}/transitions/{copyto}.png"')'''
                   
                   
             os.chdir(f'{self.thisdir}/rife-vulkan-models')
