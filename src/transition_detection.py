@@ -68,7 +68,10 @@ class TransitionDetection:
             list2 = []
             self.prevFrameList = []
             self.fileToCopyDict = []
-            
+            self.fileToCopyDict1 = []
+            self.fileToCopyDict2 = []
+            self.fileToCopyDict3 = []
+            self.fileToCopyDict4 = []
             for i in self.frame_list:
                         
                         i = int(i) * 2
@@ -81,13 +84,21 @@ class TransitionDetection:
                         j = int(j) * times
                         prev_file = j - 1
                         file_to_copy_to = str(prev_file - 1).zfill(8)
-                        
+                        file_to_copy_to1 = str(prev_file - 2).zfill(8)
+                        file_to_copy_to2 = str(prev_file - 3).zfill(8)
+                        file_to_copy_to3 = str(prev_file - 4).zfill(8)
+                        file_to_copy_to4 = str(prev_file - 5).zfill(8)
+                        #I am literally braindead lol, cant think of anyhting better for this stupid system
                         j = str(j)
                         prev_file = str(prev_file)
                         j = j.zfill(8)
                         prev_file = prev_file.zfill(8)
                         list1.append(j)
                         self.fileToCopyDict.append(file_to_copy_to)
+                        self.fileToCopyDict1.append(file_to_copy_to1)
+                        self.fileToCopyDict2.append(file_to_copy_to2)
+                        self.fileToCopyDict3.append(file_to_copy_to3)
+                        self.fileToCopyDict4.append(file_to_copy_to4)
                         self.prevFrameList.append(prev_file)
                         self.list1 = list1
             
@@ -102,10 +113,16 @@ class TransitionDetection:
                
                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}.png"')
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
-                if times == 4:
+                if times == 4 or times == 8:
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}.png"')
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}.png"')
-                    
+                if times == 8:
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict1[p]}.png"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict2[p]}.png"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict3[p]}.png"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict4[p]}.png"')
+                    #This is so dumb lmao, ik there is a better way but i am lazy lol
+                
                 p+=1
                 o+=1
                 # IK this is dumb. but i cant think of anything else rn
