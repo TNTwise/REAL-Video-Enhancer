@@ -17,7 +17,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
         def __init__(self,model):
             settings = Settings()
             try:
-                requests.get('https://www.github.com')
+                requests.get('https://raw.githubusercontent.com/')
 
                 super(PopUpProgressB, self).__init__()
                 self.startProgressBar(f'{model}')
