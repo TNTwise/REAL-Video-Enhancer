@@ -42,20 +42,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.pin_functions()
         self.show()
     def calculateETA(self):
-        
         self.ETA=None
-        self.imageDisplay=None
-        
-        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
-            
-            total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
-        
-            start_time = time.time()
-            
-            
-            for i in range(total_iterations):
-                # Do some work for each iteration
+        total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
+        for i in range(total_iterations):
+            if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
+                start_time = time.time()
                 
+                
+                
+                    # Do some work for each iteration
+                    
                 try:
                     
                         
@@ -85,20 +81,28 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
                 except:
                     self.ETA = None
-                try:
+    def getPreviewImage(self):
+        
+       
+        self.imageDisplay=None
+        
+        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
+            
+            
+            try:
                     files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
                     files.sort()
-                    frame_num =re.findall(r'[\d]*',files[-1])
                     
-                    frame_num = int(int(frame_num[0])/self.times)
-                    frame_num = str(frame_num).zfill(8)
-                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/input_frames/{frame_num}.png"
-                except:
+                    
+                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{files[-1]}"
+            except:
+                    self.imageDisplay = None
                     self.ui.imagePreview.clear()
                 
     
     def reportProgress(self, n):
         try:
+            self.getPreviewImage()
             fp = n
             self.videoName = VideoName.return_video_name(f'{self.input_file}')
             # fc is the total file count after interpolation
@@ -125,24 +129,26 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.imageDisplay != None:
 
                 try:
-                    self.ui.imageSpacerFrame.hide()
-                    pixMap = QPixmap(self.imageDisplay)
-                    
-                    width = self.width()
-                    height = self.height()
-                    
-                    width1=int(width/1.5)
-                    height1=int(width1/self.aspectratio)
-                    if height1 >= height/1.5:
+                    if os.path.exists(self.imageDisplay):
+                        self.ui.imageSpacerFrame.hide()
+                        pixMap = QPixmap(self.imageDisplay)
                         
-                        height1=int(height/1.5)
-                        width1=int(height1/(self.videoheight/self.videowidth))
-                    try:
-                        pixMap = pixMap.scaled(width1,height1)
-                    
-                        self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
-                    except:
-                        pass
+                        width = self.width()
+                        height = self.height()
+                        
+                        width1=int(width/1.6)
+                        height1=int(width1/self.aspectratio)
+                        if height1 >= height/1.6:
+                            
+                            height1=int(height/1.6)
+                            width1=int(height1/(self.videoheight/self.videowidth))
+                        try:
+                            if os.path.exists(self.imageDisplay):
+                                pixMap = pixMap.scaled(width1,height1)
+                            
+                                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                        except:
+                            pass
                 except:
                     self.ui.imageSpacerFrame.show()
                     self.ui.imagePreview.clear()
