@@ -71,7 +71,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
             if int(self.ui.Rife_Times.currentText()[0]) == 8:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
-            self.runPB(self.videoName,self.times)
+            self.runPB()
         else:
             no_input_file(self)
 
@@ -124,3 +124,33 @@ def endRife(self):
         self.ui.imagePreview.clear()
         self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
         self.ui.imageSpacerFrame.show()
+
+
+def renderRealsr(self):
+    start(self.render_folder,self.videoName,self.input_file)
+    os.chdir(f'{thisdir}/Real-ESRGAN')
+    
+    os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" ')
+    if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
+            show_on_no_output_files(self)
+    else:
+            
+            
+            self.output_file = end(self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder)
+def startRealSR(self):
+    self.ui.ETAPreview.setText('ETA:')
+    self.ui.processedPreview.setText('Files Processed:')
+    self.setDisableEnable(True)
+    self.times = 1
+    self.runPB()
+    
+    
+    os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+    realESRGAN_Model = self.ui.RealESRGAN_Model.currentText()
+    realESRGAN_Times = self.ui.RealESRGAN_Times.currentText()
+    if realESRGAN_Model == 'Default':
+        self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
+    if realESRGAN_Model == 'Animation':
+        self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
+    Thread(target=lambda: renderRealsr(self)).start()
+    

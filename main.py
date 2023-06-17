@@ -23,6 +23,7 @@ import re
 import src.transition_detection
 from multiprocessing import cpu_count
 from src.messages import *
+import src.realESRGAN as real
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -41,6 +42,67 @@ class MainWindow(QtWidgets.QMainWindow):
         self.def_var()
         self.pin_functions()
         self.show()
+    def pin_functions(self):
+
+        onlyInt = QIntValidator()
+        onlyInt.setRange(0, 9)
+        self.ui.sceneChangeLineEdit.setValidator(onlyInt)
+        self.ui.sceneChangeLineEdit.textChanged.connect(lambda: changeSceneDetection(self))
+        self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
+        if self.encoder == '264':
+            self.ui.EncoderCombo.setCurrentIndex(0)
+        if self.encoder == '265':
+            self.ui.EncoderCombo.setCurrentIndex(1)
+        if self.videoQuality == '10':
+            self.ui.VidQualityCombo.setCurrentText('Lossless')
+        if self.videoQuality == '14':
+            self.ui.VidQualityCombo.setCurrentText('High')
+        if self.videoQuality == '18':
+            self.ui.VidQualityCombo.setCurrentText('Medium')
+        if self.videoQuality == '22':
+            self.ui.VidQualityCombo.setCurrentText('Low')
+        self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
+        self.ui.RealESRGAN_Model.setCurrentIndex(1)
+        self.ui.RealESRGAN_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
+        #link help buttons
+        self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
+        self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
+
+        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+        self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
+        self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
+        self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
+        self.ui.Input_video_RealESRGAN.clicked.connect(self.openFileNameDialog)
+        self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
+        self.ui.Output_folder_RealESRGAN.clicked.connect(self.openFolderDialog)
+        self.ui.VideoOptionsFrame.hide()
+        self.ui.RenderOptionsFrame.hide()
+        self.ui.RifeStart.clicked.connect(lambda: start.startRife(self))
+        self.ui.RealESRGANStart.clicked.connect(lambda: start.startRealSR(self))
+        
+        self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
+        #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
+        sleep(0.01)
+        self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
+
+        # list every model downloaded, and add them to the list
+        
+        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
+        models = []
+        for model_filepath in model_filepaths:
+            if 'rife' in os.path.basename(model_filepath):
+                models.append(os.path.basename(model_filepath))
+        
+        models.sort()
+        for model in models:
+
+            
+            model = model.replace('r',"R")
+            model = model.replace('v','V')
+            model = model.replace('a','A')
+            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
+            if model == 'Rife-V4.6':
+                self.ui.Rife_Model.setCurrentText(f'{model}')
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
@@ -104,7 +166,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self.getPreviewImage()
             fp = n
-            self.videoName = VideoName.return_video_name(f'{self.input_file}')
+            
             # fc is the total file count after interpolation
             fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
             self.fileCount = fc
@@ -160,7 +222,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
         except:
             pass
-    def runPB(self,videoName,times):
+    def runPB(self):
         self.addLast=False
         self.i=1
         # Step 2: Create a QThread object
@@ -216,62 +278,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
     
-    def pin_functions(self):
-
-        onlyInt = QIntValidator()
-        onlyInt.setRange(0, 9)
-        self.ui.sceneChangeLineEdit.setValidator(onlyInt)
-        self.ui.sceneChangeLineEdit.textChanged.connect(lambda: changeSceneDetection(self))
-        self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
-        if self.encoder == '264':
-            self.ui.EncoderCombo.setCurrentIndex(0)
-        if self.encoder == '265':
-            self.ui.EncoderCombo.setCurrentIndex(1)
-        if self.videoQuality == '10':
-            self.ui.VidQualityCombo.setCurrentText('Lossless')
-        if self.videoQuality == '14':
-            self.ui.VidQualityCombo.setCurrentText('High')
-        if self.videoQuality == '18':
-            self.ui.VidQualityCombo.setCurrentText('Medium')
-        if self.videoQuality == '22':
-            self.ui.VidQualityCombo.setCurrentText('Low')
-        self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
-        #link help buttons
-        self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
-        self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
-
-        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-        self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
-        self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
-        self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
-        self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-        self.ui.VideoOptionsFrame.hide()
-        self.ui.RenderOptionsFrame.hide()
-        self.ui.RifeStart.clicked.connect(lambda: start.startRife(self))
-        
-        self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
-        #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
-        sleep(0.01)
-        self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
-
-        # list every model downloaded, and add them to the list
-        
-        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
-        models = []
-        for model_filepath in model_filepaths:
-            if 'rife' in os.path.basename(model_filepath):
-                models.append(os.path.basename(model_filepath))
-        
-        models.sort()
-        for model in models:
-
-            
-            model = model.replace('r',"R")
-            model = model.replace('v','V')
-            model = model.replace('a','A')
-            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-            if model == 'Rife-V4.6':
-                self.ui.Rife_Model.setCurrentText(f'{model}')
+    
     
     def greyOutRifeTimes(self):
         if self.ui.Rife_Model.currentText() == 'Rife-V4' or self.ui.Rife_Model.currentText() == 'Rife-V4.6':
@@ -279,10 +286,17 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
+    def greyOutRealSRTimes(self):
+        if self.ui.RealESRGAN_Model.currentText() == 'Default':
+            self.ui.RealESRGAN_Times.setCurrentText('4X')
+            self.ui.RealESRGAN_Times.setEnabled(False)
+        else:
+            
+            self.ui.RealESRGAN_Times.setEnabled(True)
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
-
+        self.videoName = VideoName.return_video_name(f'{self.input_file}')
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
@@ -293,10 +307,15 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
+        self.ui.RealESRGANStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 
+        self.ui.Input_video_RealESRGAN.setDisabled(mode)
         self.ui.Output_folder_rife.setDisabled(mode)
+        self.ui.Output_folder_RealESRGAN.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
+        self.ui.RealESRGAN_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
+        self.ui.RealESRGAN_Times.setDisabled(mode)
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
             
