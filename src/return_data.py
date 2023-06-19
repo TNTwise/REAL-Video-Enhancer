@@ -1,5 +1,7 @@
 import cv2
 import os 
+import re
+import subprocess
 class Fps:
     def return_video_fps(videopath):
         video=cv2.VideoCapture(fr'{videopath}')
@@ -39,4 +41,28 @@ class HardwareInfo:
                     return line
         except Exception as e:
             print(f"Error: {e}")
-            return None
+            try:
+                output = subprocess.check_output('lspci | grep "VGA"', shell=True).decode('utf-8')# Gets output of VGA and grabs GPU
+                device_id = output[:7] #Grabs the device id
+                output = subprocess.check_output(f'lspci -v -s {device_id} | grep "size="', shell=True).decode('utf-8') #puts the device id into the other command to give me the info
+                find_size_num = (re.findall(r'[\d]*[M|G|K]',output)) # finds the numbers
+                number_list = [] # List to store the numbers before sorted
+                sorted_number_list = []
+                for i in find_size_num: #adds the numbers to a list
+                    if any(char.isdigit() for char in i) == True:
+                        number_list.append(i)
+                for i in number_list: #strips and converts the numbers to a common gigabyte format
+                    
+                    if 'M' in i:
+                        i = re.sub("[^0-9]", "", i)
+                        i = int(i) * 0.001
+                        sorted_number_list.append(i)
+                for i in number_list:
+                    if 'G' in i:
+                        i = re.sub("[^0-9]", "", i)
+                        sorted_number_list.append(i)
+                sorted_number_list.sort(reverse=True)
+                return sorted_number_list[0] # Returns amount of vram
+            except Exception as e:
+                print(f'{e}')
+                return None

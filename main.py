@@ -24,6 +24,7 @@ import src.transition_detection
 from multiprocessing import cpu_count
 from src.messages import *
 import src.realESRGAN as real
+
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
