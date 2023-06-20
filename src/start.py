@@ -8,6 +8,7 @@ from threading import Thread
 import src.transition_detection
 from src.return_data import *
 from src.messages import *
+from src.discord_rpc import *
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 settings = Settings()
@@ -59,6 +60,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
             self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             self.aspectratio = self.videowidth / self.videoheight
             self.setDisableEnable(True)
+            start_discordRPC(self)
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
             self.times = int(self.ui.Rife_Times.currentText()[0])
@@ -99,14 +101,19 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 #change progressbar value
     
         
+        if self.gpuMemory < 2.0:
+            rife_gpu_usage = ''
+        else:
+            num = int(int(self.gpuMemory)+2)
+            rife_gpu_usage = f'-j {num}:{num}:{num}'
         
             
         #Thread(target=self.calculateETA).start()
         input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
         if model == 'rife-v4.6' or model == 'rife-v4':
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {rife_gpu_usage}  ')
         else:
-              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"   -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" -j 10:10:10 ')
+              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"   -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {rife_gpu_usage} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
         else:
@@ -115,15 +122,6 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
             self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             
 
-def endRife(self):
-        
-        self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
-        self.setDisableEnable(False)
-        self.ui.RifePB.setValue(self.ui.RifePB.maximum())
-        self.ui.ETAPreview.setText('ETA: 00:00:00')
-        self.ui.imagePreview.clear()
-        self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
-        self.ui.imageSpacerFrame.show()
 
 
 def renderRealsr(self):

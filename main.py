@@ -24,6 +24,7 @@ import src.transition_detection
 from multiprocessing import cpu_count
 from src.messages import *
 import src.realESRGAN as real
+import pypresence
 
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
@@ -40,6 +41,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
         if self.gpuMemory == None:
             cannot_detect_vram(self)
+        else:
+            print(self.gpuMemory)
         self.def_var()
         self.pin_functions()
         self.show()
@@ -322,6 +325,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         sleep(1)
+        self.RPC.clear(pid=os.getpid())
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
