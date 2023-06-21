@@ -11,7 +11,7 @@ from src.messages import *
 from src.discord_rpc import *
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
-settings = Settings()
+
 def start(renderdir,videoName,videopath):
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
@@ -47,11 +47,12 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         return output_video_file
 
 def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
-        
+    
     # Calculate the aspect ratio
                 
         
         if self.input_file != '':
+            settings = Settings()
             # Calculate the aspect ratio
             videoName = VideoName.return_video_name(fr'{self.input_file}')
             self.videoName = videoName
@@ -60,7 +61,8 @@ def startRife(self): #should prob make this different, too similar to start_rife
             self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             self.aspectratio = self.videowidth / self.videoheight
             self.setDisableEnable(True)
-            start_discordRPC(self)
+            if settings.DiscordRPC == 'Enabled':
+                start_discordRPC(self)
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
             self.times = int(self.ui.Rife_Times.currentText()[0])

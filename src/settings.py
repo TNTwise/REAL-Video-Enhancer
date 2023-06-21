@@ -93,7 +93,15 @@ class Settings:
         except:
             self.write_to_settings_file('Encoder','264')
             self.readSettings()
-        
+        try:
+            self.DiscordRPC=settings_dict['DiscordRPC']
+            if self.DiscordRPC == 'Enabled':
+                self.DiscordRPC == True
+            else:
+                self.DiscordRPC == False
+        except:
+            self.write_to_settings_file('DiscordRPC', 'Enabled')
+            self.readSettings()       
         
     def change_setting(self,setting,svalue):
         original_settings = {}
@@ -121,6 +129,12 @@ class Settings:
         self.change_setting("Rife_Option", f"2.3")
         self.change_setting("IsAnime", "False")
 
+def changeDiscordRPC(self):
+    settings = Settings()
+    if self.ui.DiscordRPCBox.isChecked() == True:
+        settings.change_setting('DiscordRPC',f'Enabled')
+    else:
+        settings.change_setting('DiscordRPC',f'Disabled')
 
 
 def changeSceneDetection(self):

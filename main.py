@@ -23,6 +23,7 @@ from multiprocessing import cpu_count
 from src.messages import *
 import src.realESRGAN as real
 import pypresence
+import src.onProgramStart
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -40,70 +41,12 @@ class MainWindow(QtWidgets.QMainWindow):
             cannot_detect_vram(self)
         else:
             print(self.gpuMemory)
-        self.def_var()
-        self.pin_functions()
+        src.onProgramStart.onApplicationStart(self)
+        
+        
+        
         self.show()
-    def pin_functions(self):
-
-        onlyInt = QIntValidator()
-        onlyInt.setRange(0, 9)
-        self.ui.sceneChangeLineEdit.setValidator(onlyInt)
-        self.ui.sceneChangeLineEdit.textChanged.connect(lambda: changeSceneDetection(self))
-        self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
-        if self.encoder == '264':
-            self.ui.EncoderCombo.setCurrentIndex(0)
-        if self.encoder == '265':
-            self.ui.EncoderCombo.setCurrentIndex(1)
-        if self.videoQuality == '10':
-            self.ui.VidQualityCombo.setCurrentText('Lossless')
-        if self.videoQuality == '14':
-            self.ui.VidQualityCombo.setCurrentText('High')
-        if self.videoQuality == '18':
-            self.ui.VidQualityCombo.setCurrentText('Medium')
-        if self.videoQuality == '22':
-            self.ui.VidQualityCombo.setCurrentText('Low')
-        self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
-        self.ui.RealESRGAN_Model.setCurrentIndex(1)
-        self.ui.RealESRGAN_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
-        #link help buttons
-        self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
-        self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
-
-        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-        self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
-        self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
-        self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
-        self.ui.Input_video_RealESRGAN.clicked.connect(self.openFileNameDialog)
-        self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-        self.ui.Output_folder_RealESRGAN.clicked.connect(self.openFolderDialog)
-        self.ui.VideoOptionsFrame.hide()
-        self.ui.RenderOptionsFrame.hide()
-        self.ui.RifeStart.clicked.connect(lambda: start.startRife(self))
-        self.ui.RealESRGANStart.clicked.connect(lambda: start.startRealSR(self))
-        
-        self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
-        #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
-        sleep(0.01)
-        self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
-
-        # list every model downloaded, and add them to the list
-        
-        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
-        models = []
-        for model_filepath in model_filepaths:
-            if 'rife' in os.path.basename(model_filepath):
-                models.append(os.path.basename(model_filepath))
-        
-        models.sort()
-        for model in models:
-
-            
-            model = model.replace('r',"R")
-            model = model.replace('v','V')
-            model = model.replace('a','A')
-            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-            if model == 'Rife-V4.6':
-                self.ui.Rife_Model.setCurrentText(f'{model}')
+    
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
@@ -257,28 +200,22 @@ class MainWindow(QtWidgets.QMainWindow):
        
     
         
-    def def_var(self):
-        #Define Variables
-        self.input_file = ''
-        self.output_folder = ''
-        self.output_folder = settings.OutputDir 
-        self.videoQuality = settings.videoQuality
-        self.encoder = settings.Encoder
-        if os.path.exists(f"{settings.RenderDir}") == False:
-            settings.change_setting('RenderDir',f'{thisdir}')
-        self.render_folder = settings.RenderDir
-        self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-        self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    
         
     def settings_menu(self):
         item = self.ui.SettingsMenus.currentItem()
         if item.text() == "Video Options":
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.show()
+            self.ui.GeneralOptionsFrame.hide()
         if item.text() == "Render Options":
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
-    
+            self.ui.GeneralOptionsFrame.hide()
+        if item.text() == "General":
+            self.ui.RenderOptionsFrame.hide()
+            self.ui.VideoOptionsFrame.hide()
+            self.ui.GeneralOptionsFrame.show()
     
     
     def greyOutRifeTimes(self):
@@ -322,7 +259,10 @@ class MainWindow(QtWidgets.QMainWindow):
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         sleep(1)
-        self.RPC.clear(pid=os.getpid())
+        try:
+            self.RPC.clear(pid=os.getpid())
+        except:
+            pass
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
