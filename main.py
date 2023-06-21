@@ -19,13 +19,10 @@ import time
 #import src.get_models as get_models
 from time import sleep
 import src.get_models as get_models
-import re
-import src.transition_detection
 from multiprocessing import cpu_count
 from src.messages import *
 import src.realESRGAN as real
 import pypresence
-
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
