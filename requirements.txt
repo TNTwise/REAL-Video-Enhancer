@@ -1,0 +1,5 @@
+pyqt5
+requests
+opencv-python-headless
+pypresence
+pyuic5-tool
