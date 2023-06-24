@@ -1,7 +1,7 @@
 import os
 from src.settings import *
 from src.messages import *
-import src.start as start
+import src.runAI.start as start
 settings = Settings()
 from PyQt5.QtGui import QIntValidator
 

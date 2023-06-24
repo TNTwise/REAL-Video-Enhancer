@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
@@ -13,15 +13,15 @@ from threading import *
 from src.settings import *
 from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
-import src.start as start
+import src.runAI.start as start
 import src.workers as workers
 import time
 #import src.get_models as get_models
 from time import sleep
-import src.get_models as get_models
+import src.getModels.get_models as get_models
 from multiprocessing import cpu_count
 from src.messages import *
-import src.realESRGAN as real
+
 import pypresence
 import src.onProgramStart
 thisdir = os.getcwd()

@@ -5,7 +5,7 @@ import os
 from src.settings import *
 import glob
 from threading import Thread
-import src.transition_detection
+import src.runAI.transition_detection
 from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
@@ -64,7 +64,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
             if settings.DiscordRPC == 'Enabled':
                 start_discordRPC(self)
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-            self.transitionDetection = src.transition_detection.TransitionDetection(self.input_file)
+            self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
             self.times = int(self.ui.Rife_Times.currentText()[0])
             self.ui.logsPreview.append(f'Extracting Frames')
             
@@ -128,7 +128,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
 
 def renderRealsr(self):
     start(self.render_folder,self.videoName,self.input_file)
-    os.chdir(f'{thisdir}/Real-ESRGAN')
+    os.chdir(f'{thisdir}/realesrgan-vulkan-models')
     
     os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" ')
     if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
