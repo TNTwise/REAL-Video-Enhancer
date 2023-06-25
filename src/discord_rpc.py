@@ -9,9 +9,10 @@ def start_discordRPC(self):
             client_id = '1120814311246405743'  # ID for rpc
             self.RPC = Presence(client_id)  # Initialize the client class
             self.RPC.connect() # Start the handshake loop
-            
-            self.RPC.update(state=f"{self.videoName}", details=f"Interpolating Video",large_image='logov1') 
-                
+            if self.render == 'rife':
+              self.RPC.update(state=f"{self.videoName}", details=f"Interpolating Video",large_image='logov1') 
+            else:
+              self.RPC.update(state=f"{self.videoName}", details=f"Upscaling Video",large_image='logov1') 
             
           # The presence will stay on as long as the program is running
          # Can only update rich presence every 15 seconds

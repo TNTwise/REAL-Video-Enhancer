@@ -36,7 +36,7 @@ def start(renderdir,videoName,videopath):
 
 def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         
-        
+       
         if outputpath == '':
                 outputpath = homedir
         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
@@ -52,6 +52,7 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
+        os.chdir(thisdir)
         return output_video_file
 
 def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
