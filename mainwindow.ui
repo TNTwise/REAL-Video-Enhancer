@@ -90,6 +90,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="FPSPreview">
+                <property name="text">
+                 <string>FPS:</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>

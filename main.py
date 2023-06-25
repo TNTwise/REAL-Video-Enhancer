@@ -4,6 +4,7 @@ from PyQt5 import QtWidgets, uic
 import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import cv2
+import psutil
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 from PyQt5.QtGui import QTextCursor, QPixmap,QIcon, QIntValidator
 import PyQt5.QtCore as QtCore
@@ -43,11 +44,16 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             print(self.gpuMemory)
         src.onProgramStart.onApplicationStart(self)
-        
+        self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
         
         
         self.show()
-    
+    def showChangeInFPS(self):
+        
+        
+        
+        
+        self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.ui.Rife_Times.currentText()[0]))}')
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
@@ -256,14 +262,35 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
+        self.showChangeInFPS()
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
         print(self.output_folder)
 
    
+    def pause_render(self):
+        files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
+        for i in range(files_to_delete):
+            i = str(i).zfill(8)
+            os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
+        def get_pid(name):
+        
 
-    
+            p = psutil.process_iter(attrs=['pid', 'name'])
+            for process in p:
+                if process.info['name'] == name:
+                    pid = process.info['pid']
+                    
+                    return pid
+            try:
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}/"')
+            except:
+                pass
+            
+            
+            os.system(f'kill -9 {get_pid("rife-ncnn-vulkan")}')
+            os.system(f'kill -9 {get_pid("realesrgan-ncnn-vulkan")}')
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
         self.ui.RealESRGANStart.setDisabled(mode)
@@ -287,10 +314,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+        self.ui.ESRGANPB.setValue(self.ui.RifePB.maximum())
         self.ui.ETAPreview.setText('ETA: 00:00:00')
         self.ui.imagePreview.clear()
         self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
         self.ui.imageSpacerFrame.show()
+        self.ui.imagePreviewESRGAN.clear()
+        self.ui.processedPreviewESRGAN.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
+        self.ui.imageSpacerFrameESRGAN.show()
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     
@@ -308,7 +339,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def addLinetoLogs(self,line):
         self.ui.logsPreviewESRGAN.append(f'{line}')
         self.ui.logsPreview.append(f'{line}')
-    def removeLastLineInLogs(self):
+    def removeLastLineInLogs(self,exception=None):
         
         cursor = self.ui.logsPreview.textCursor()
         cursor.movePosition(QTextCursor.End)
@@ -318,9 +349,15 @@ class MainWindow(QtWidgets.QMainWindow):
         cursor.movePosition(QTextCursor.PreviousBlock, QTextCursor.KeepAnchor)
 
         # Remove the selected text (the last line)
-        cursor.removeSelectedText()
-        
-        self.ui.logsPreview.setTextCursor(cursor)
+        if exception != None:
+            if exception in cursor.selectedText():
+                cursor.removeSelectedText()
+            
+                self.ui.logsPreview.setTextCursor(cursor)
+        else:
+            cursor.removeSelectedText()
+            
+            self.ui.logsPreview.setTextCursor(cursor)
         
 if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
     ManageFiles.create_folder(f'{thisdir}/files')

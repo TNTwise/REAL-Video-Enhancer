@@ -20,11 +20,11 @@ def return_gpu_settings(self):
         gpu_usage = f'-j {num}:{num}:{num}'
     return gpu_usage
 
-def start(renderdir,videoName,videopath):
+def start(renderdir,videoName,videopath,times):
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        
-        
+        with open(f'{renderdir}/{videoName}_temp/data.txt', 'w') as f:
+            f.write(f'{times}')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
        
@@ -62,6 +62,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
         
         if self.input_file != '':
             self.render='rife'
+            self.fps = VideoName.return_video_framerate(f'{self.input_file}')
             settings = Settings()
             # Calculate the aspect ratio
             videoName = VideoName.return_video_name(fr'{self.input_file}')
@@ -93,7 +94,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
 def start_rife(self,model,times,videopath,outputpath,end_iteration):
         
         
-        self.fps = VideoName.return_video_framerate(f'{self.input_file}')
+        
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
         
@@ -101,7 +102,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
                 
         #self.runLogs(videoName,times)
-        start(self.render_folder,self.videoName,videopath)
+        start(self.render_folder,self.videoName,videopath,times)
         self.transitionDetection.find_timestamps()
         self.transitionDetection.get_frame_num(times)
         
