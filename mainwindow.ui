@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="Rife">
        <property name="toolTip">
@@ -172,18 +172,18 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <layout class="QVBoxLayout" name="verticalLayout_7">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
-             <widget class="QLabel" name="imagePreview">
+             <widget class="QLabel" name="imagePreviewESRGAN">
               <property name="text">
                <string/>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QFrame" name="imageSpacerFrame">
+             <widget class="QFrame" name="imageSpacerFrameESRGAN">
               <property name="frameShape">
                <enum>QFrame::StyledPanel</enum>
               </property>
@@ -192,7 +192,7 @@
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <item>
-                <spacer name="imageSpacer">
+                <spacer name="imageSpacerESRGAN">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -208,23 +208,23 @@
              </widget>
             </item>
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_8">
+             <layout class="QVBoxLayout" name="verticalLayout_9">
               <item>
-               <widget class="QTextEdit" name="logsPreview">
+               <widget class="QTextEdit" name="logsPreviewESRGAN">
                 <property name="readOnly">
                  <bool>true</bool>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="processedPreview">
+               <widget class="QLabel" name="processedPreviewESRGAN">
                 <property name="text">
                  <string>Files Processed: </string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="ETAPreview">
+               <widget class="QLabel" name="ETAPreviewESRGAN">
                 <property name="text">
                  <string>ETA: </string>
                 </property>
@@ -301,7 +301,7 @@
            </layout>
           </item>
           <item>
-           <widget class="QProgressBar" name="RifePB">
+           <widget class="QProgressBar" name="ESRGANPB">
             <property name="value">
              <number>0</number>
             </property>

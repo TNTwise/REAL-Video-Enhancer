@@ -12,6 +12,14 @@ from src.discord_rpc import *
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 
+def return_gpu_settings(self):
+    if self.gpuMemory <= 2.0:
+        gpu_usage = ''
+    else:
+        num = int(int(self.gpuMemory)+2)
+        gpu_usage = f'-j {num}:{num}:{num}'
+    return gpu_usage
+
 def start(renderdir,videoName,videopath):
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
@@ -52,6 +60,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
                 
         
         if self.input_file != '':
+            self.render='rife'
             settings = Settings()
             # Calculate the aspect ratio
             videoName = VideoName.return_video_name(fr'{self.input_file}')
@@ -103,19 +112,14 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 #change progressbar value
     
         
-        if self.gpuMemory < 2.0:
-            rife_gpu_usage = ''
-        else:
-            num = int(int(self.gpuMemory)+2)
-            rife_gpu_usage = f'-j {num}:{num}:{num}'
-        
+       
             
         #Thread(target=self.calculateETA).start()
         input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
         if model == 'rife-v4.6' or model == 'rife-v4':
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {rife_gpu_usage}  ')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)}  ')
         else:
-              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"   -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {rife_gpu_usage} ')
+              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"   -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
         else:
@@ -125,12 +129,11 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
             
 
 
-
 def renderRealsr(self):
     start(self.render_folder,self.videoName,self.input_file)
     os.chdir(f'{thisdir}/realesrgan-vulkan-models')
     
-    os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" ')
+    os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
     if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
     else:
@@ -138,12 +141,23 @@ def renderRealsr(self):
             
             self.output_file = end(self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder)
 def startRealSR(self):
+    self.render='esrgan'
+    settings = Settings()
     self.ui.ETAPreview.setText('ETA:')
     self.ui.processedPreview.setText('Files Processed:')
     self.setDisableEnable(True)
     self.times = 1
-    self.runPB()
     
+    
+    video = cv2.VideoCapture(self.input_file)
+    self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+    self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    self.aspectratio = self.videowidth / self.videoheight
+    self.setDisableEnable(True)
+    
+    if settings.DiscordRPC == 'Enabled':
+        start_discordRPC(self)
+    os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
     
     os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
     realESRGAN_Model = self.ui.RealESRGAN_Model.currentText()
@@ -153,4 +167,4 @@ def startRealSR(self):
     if realESRGAN_Model == 'Animation':
         self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
     Thread(target=lambda: renderRealsr(self)).start()
-    
+    self.runPB()

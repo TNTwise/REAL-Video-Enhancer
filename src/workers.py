@@ -14,13 +14,13 @@ from time import sleep
 class pb2X(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int)
-    def __init__(self,myvar,parent=None):
+    def __init__(self,myvar,render,parent=None):
         
         QThread.__init__(self, parent)
         self.input_file = myvar
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
         self.settings = Settings()
-    
+        self.render = render
     def run(self):
         """Long-running task."""
         print('\n\n\n\n')
@@ -44,8 +44,12 @@ class pb2X(QObject):
                         latest_image = self.get_latest_image()
                     except:
                         latest_image= None
+                        if self.render == 'rife':
+                            sleep(.1)
+                        else:
+                            sleep(1)
                     
-                    sleep(.1)
+                        
                     
                     self.progress.emit(files_processed)
         sleep(1)

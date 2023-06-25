@@ -29,6 +29,7 @@ homedir = os.path.expanduser(r"~")
 
 
 class MainWindow(QtWidgets.QMainWindow):
+         
     def __init__(self):
         super(MainWindow, self).__init__()
         self.setMinimumSize(700, 550)
@@ -104,7 +105,7 @@ class MainWindow(QtWidgets.QMainWindow):
             except:
                     self.imageDisplay = None
                     self.ui.imagePreview.clear()
-                
+                    self.ui.imagePreviewESRGAN.clear()
     
     def reportProgress(self, n):
         try:
@@ -118,9 +119,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
                 
-                self.ui.RifePB.setMaximum(total_output_files)
-                self.addLinetoLogs(f'Starting {self.times}X Render')
-                self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
+                
+                if self.render == 'rife':
+                    self.ui.RifePB.setMaximum(total_output_files)
+                    self.addLinetoLogs(f'Starting {self.times}X Render')
+                    self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
+                else:
+                    self.ui.ESRGANPB.setMaximum(total_output_files)
+                    self.addLinetoLogs(f'Starting {self.ui.RealESRGAN_Times.currentText()[0]}X Render')
+                    self.addLinetoLogs(f'Model: {self.ui.RealESRGAN_Model.currentText()}')
                 self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
             
@@ -129,14 +136,19 @@ class MainWindow(QtWidgets.QMainWindow):
             fc = int(fc)
 
             #Update GUI values
-            self.ui.RifePB.setValue(fp)
-            self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
-        
+            if self.render == 'rife':
+                self.ui.RifePB.setValue(fp)
+                self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
+            else:
+                self.ui.ESRGANPB.setValue(fp)
+                self.ui.processedPreviewESRGAN.setText(f'Files Processed: {fp} / {fc}')
+            
             if self.imageDisplay != None:
 
                 try:
                     if os.path.exists(self.imageDisplay):
                         self.ui.imageSpacerFrame.hide()
+                        self.ui.imageSpacerFrameESRGAN.hide()
                         pixMap = QPixmap(self.imageDisplay)
                         
                         width = self.width()
@@ -151,21 +163,30 @@ class MainWindow(QtWidgets.QMainWindow):
                         try:
                             if os.path.exists(self.imageDisplay):
                                 pixMap = pixMap.scaled(width1,height1)
-                            
-                                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                                
+                                
+                                if self.render == 'rife':
+                                    self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                                else:
+                                    self.ui.imagePreviewESRGAN.setPixmap(pixMap)
                         except:
                             pass
                 except:
                     self.ui.imageSpacerFrame.show()
+                    self.ui.imageSpacerFrameESRGAN.show()
                     self.ui.imagePreview.clear()
-            if self.ETA != None:
-                self.ui.ETAPreview.setText(self.ETA)
-            if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames'):
-                self.ui.logsPreview.append(f'Starting {self.times}X Render')
-                self.i = 2
-    
+                    self.ui.imagePreviewESRGAN.clear()
+            try:
+                if self.ETA != None:
+                    self.ui.ETAPreview.setText(self.ETA)
+                if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames'):
+                    self.ui.logsPreview.append(f'Starting {self.times}X Render')
+                    self.i = 2
+            except:
+                pass
         except:
             pass
+        
     def runPB(self):
         self.addLast=False
         self.i=1
@@ -173,7 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread = QThread()
         # Step 3: Create a worker object
        
-        self.worker = workers.pb2X(self.input_file)        
+        self.worker = workers.pb2X(self.input_file,self.render)        
         
 
         
@@ -285,7 +306,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     
     def addLinetoLogs(self,line):
-        
+        self.ui.logsPreviewESRGAN.append(f'{line}')
         self.ui.logsPreview.append(f'{line}')
     def removeLastLineInLogs(self):
         

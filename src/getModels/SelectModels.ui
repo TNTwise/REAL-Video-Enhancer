@@ -172,7 +172,7 @@
             <item>
              <widget class="QCheckBox" name="rife46">
               <property name="text">
-               <string>Rife-V4.6</string>
+               <string>Rife-V4.6 (recommended)</string>
               </property>
              </widget>
             </item>

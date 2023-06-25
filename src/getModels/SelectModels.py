@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/SelectModels.ui'
+# Form implementation generated from reading ui file 'src/getModels/SelectModels.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -112,5 +112,5 @@ class Ui_MainWindow(object):
         self.rife30.setText(_translate("MainWindow", "Rife-V3.0"))
         self.rife31.setText(_translate("MainWindow", "Rife-V3.1"))
         self.rife4.setText(_translate("MainWindow", "Rife-V4"))
-        self.rife46.setText(_translate("MainWindow", "Rife-V4.6"))
+        self.rife46.setText(_translate("MainWindow", "Rife-V4.6 (recommended)"))
         self.next.setText(_translate("MainWindow", "Next"))
