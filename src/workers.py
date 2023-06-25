@@ -26,14 +26,13 @@ class pb2X(QObject):
         print('\n\n\n\n')
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-            sleep(1)
-        
+            sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
+         
 
         total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * 2
         
-        sleep_time=int(.05*(VideoName.return_video_frame_count(self.input_file)/VideoName.return_video_framerate(self.input_file)))
-        print(sleep_time)
+        
         
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
