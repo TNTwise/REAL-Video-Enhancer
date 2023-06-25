@@ -100,7 +100,7 @@ class Settings:
             else:
                 self.DiscordRPC == False
         except:
-            self.write_to_settings_file('DiscordRPC', 'Enabled')
+            self.write_to_settings_file('DiscordRPC', 'Disabled')
             self.readSettings()       
         
     def change_setting(self,setting,svalue):
