@@ -23,8 +23,8 @@ def return_gpu_settings(self):
 def start(renderdir,videoName,videopath,times):
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        with open(f'{renderdir}/{videoName}_temp/data.txt', 'w') as f:
-            f.write(f'{times}')
+        '''with open(f'{renderdir}/{videoName}_temp/data.txt', 'w') as f:
+            f.write(f'{times}')'''
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
        
@@ -123,11 +123,12 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
         if model == 'rife-v4.6' or model == 'rife-v4':
             os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f {self.endNum}%08d.png')
         else:
-              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"   -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} ')
+              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
         else:
             if self.paused == False:
+                
                 files=os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames')
             
                 files = sorted(files)
@@ -144,41 +145,48 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
 
 
 def renderRealsr(self):
-    start(self.render_folder,self.videoName,self.input_file)
+    
+    start(self.render_folder,self.videoName,self.input_file,1)
     os.chdir(f'{thisdir}/realesrgan-vulkan-models')
+    realESRGAN(self)
+def realESRGAN(self):
+        self.endNum=0
+        self.paused=False
+        os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
+        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
+                show_on_no_output_files(self)
+        else:
+                if self.paused == False:
+                    self.output_file = end(self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder)
+                else:
+                    pass
     
-    os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
-    if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
-            show_on_no_output_files(self)
-    else:
-            
-            
-            self.output_file = end(self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder)
 def startRealSR(self):
-    self.render='esrgan'
-    settings = Settings()
-    self.ui.ETAPreview.setText('ETA:')
-    self.ui.processedPreview.setText('Files Processed:')
-    self.setDisableEnable(True)
-    self.times = 1
-    
-    
-    video = cv2.VideoCapture(self.input_file)
-    self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-    self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    self.aspectratio = self.videowidth / self.videoheight
-    self.setDisableEnable(True)
-    
-    if settings.DiscordRPC == 'Enabled':
-        start_discordRPC(self)
-    os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-    
-    os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-    realESRGAN_Model = self.ui.RealESRGAN_Model.currentText()
-    realESRGAN_Times = self.ui.RealESRGAN_Times.currentText()
-    if realESRGAN_Model == 'Default':
-        self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
-    if realESRGAN_Model == 'Animation':
-        self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
-    Thread(target=lambda: renderRealsr(self)).start()
-    self.runPB()
+    if self.input_file != '':
+        self.render='esrgan'
+        settings = Settings()
+        self.ui.ETAPreview.setText('ETA:')
+        self.ui.processedPreview.setText('Files Processed:')
+        self.setDisableEnable(True)
+        self.times = 1
+        self.fps=VideoName.return_video_framerate(f'{self.input_file}')
+        
+        video = cv2.VideoCapture(self.input_file)
+        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.aspectratio = self.videowidth / self.videoheight
+        self.setDisableEnable(True)
+        
+        if settings.DiscordRPC == 'Enabled':
+            start_discordRPC(self)
+        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+        
+        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+        realESRGAN_Model = self.ui.RealESRGAN_Model.currentText()
+        realESRGAN_Times = self.ui.RealESRGAN_Times.currentText()
+        if realESRGAN_Model == 'Default':
+            self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
+        if realESRGAN_Model == 'Animation':
+            self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
+        Thread(target=lambda: renderRealsr(self)).start()
+        self.runPB()

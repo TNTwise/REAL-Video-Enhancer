@@ -251,6 +251,13 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QLabel" name="RealESRGANResolution">
+                <property name="text">
+                 <string>RES:</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
            </layout>
@@ -263,6 +270,20 @@
                <widget class="QPushButton" name="RealESRGANStart">
                 <property name="text">
                  <string>Start</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RealESRGANPause">
+                <property name="text">
+                 <string>Pause</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RealESRGANResume">
+                <property name="text">
+                 <string>Resume</string>
                 </property>
                </widget>
               </item>
@@ -377,7 +398,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../.designer/backup/icons/Rife-ESRGAN-Render-Settings.png</normaloff>../.designer/backup/icons/Rife-ESRGAN-Render-Settings.png</iconset>
+               <normaloff>icons/Rife-ESRGAN-Render-Settings.png</normaloff>icons/Rife-ESRGAN-Render-Settings.png</iconset>
              </property>
             </item>
             <item>
@@ -391,7 +412,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>../.designer/backup/icons/Rife-ESRGAN-Video-Settings.png</normaloff>../.designer/backup/icons/Rife-ESRGAN-Video-Settings.png</iconset>
+               <normaloff>icons/Rife-ESRGAN-Video-Settings.png</normaloff>icons/Rife-ESRGAN-Video-Settings.png</iconset>
              </property>
             </item>
            </widget>

@@ -39,17 +39,35 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
+        self.ui.RealESRGANPause.clicked.connect(self.pause_render)
+        self.ui.RealESRGANResume.clicked.connect(self.resume_render_realesrgan)
         if self.gpuMemory == None:
             cannot_detect_vram(self)
         else:
-            print(self.gpuMemory)
+            print(self.gpuMemory) # debugging purposes
         src.onProgramStart.onApplicationStart(self)
-        self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
-        self.ui.RifePause.clicked.connect(self.pause_render)
-        self.ui.RifeResume.clicked.connect(self.resume_render)
+        print(self.get_pid("rife-ncnn-vulkan"))
         self.show()
+    def get_pid(self,name):
+        
+
+            p = psutil.process_iter(attrs=['pid', 'name'])
+            for process in p:
+                if process.info['name'] == name:
+                    pid = process.info['pid']
+                    
+                    return pid
+            
     def resume_render(self):
+        self.ui.RifeResume.hide() #show resume button
+        
         Thread(target=lambda: start.Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
+        self.ui.RifePause.show()
+        
+    def resume_render_realesrgan(self):
+        self.ui.RealESRGANResume.hide()
+        Thread(target=lambda: start.realESRGAN(self)).start()
+        self.ui.RealESRGANPause.show()
     def showChangeInFPS(self):
         
         
@@ -123,11 +141,11 @@ class MainWindow(QtWidgets.QMainWindow):
             # fc is the total file count after interpolation
             fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
             self.fileCount = fc
-            if self.i==1:
+            if self.i==1: # put every gui change that happens on start of render here
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
-                
-                
+                self.ui.RifePause.show()
+                self.ui.RealESRGANPause.show()
                 if self.render == 'rife':
                     self.ui.RifePB.setMaximum(total_output_files)
                     self.addLinetoLogs(f'Starting {self.times}X Render')
@@ -272,33 +290,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
    
     def pause_render(self):
-        self.paused = True
-        def get_pid(name):
-        
-
-            p = psutil.process_iter(attrs=['pid', 'name'])
-            for process in p:
-                if process.info['name'] == name:
-                    pid = process.info['pid']
-                    
-                    return pid
-            try:
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}/"')
-            except:
-                pass
+        # Why was this line here??
+            self.paused = True
+            self.ui.RifePause.hide()
+            self.ui.RealESRGANPause.hide()
             
-            
-        os.system(f'kill -9 {get_pid("rife-ncnn-vulkan")}')
-        os.system(f'kill -9 {get_pid("realesrgan-ncnn-vulkan")}')
-        sleep(1)
-        files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
-        for i in range(int(files_to_delete)):
-            i = str(i).zfill(8)
-            os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
-        self.endNum+=1
-            
-            #This function adds a zero to the original frames, so it wont overwrite the old ones
-        
+                
+                
+            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
+            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
+            sleep(0.1)
+            files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
+            for i in range(int(files_to_delete)):
+                i = str(i).zfill(8)
+                os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
+            self.endNum+=1
+            self.ui.RifeResume.show() #show resume button
+                #This function adds a zero to the original frames, so it wont overwrite the old ones
+            self.ui.RealESRGANResume.show()
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
         self.ui.RealESRGANStart.setDisabled(mode)
@@ -308,7 +317,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_RealESRGAN.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.RealESRGAN_Model.setDisabled(mode)
-        self.ui.Rife_Times.setDisabled(mode)
+        if self.ui.Rife_Model.currentText().lower() == 'rife-v4' or self.ui.Rife_Model.currentText().lower() == 'rife-v4.6':
+            self.ui.Rife_Times.setDisabled(mode)
+        else:
+            self.ui.Rife_Times.setDisabled(True)
         self.ui.RealESRGAN_Times.setDisabled(mode)
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
@@ -319,6 +331,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.RPC.clear(pid=os.getpid())
         except:
             pass
+        self.ui.RifePause.hide()
+        self.ui.RifeResume.hide()
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())

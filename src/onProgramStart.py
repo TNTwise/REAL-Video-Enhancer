@@ -1,11 +1,12 @@
-import os
 from src.settings import *
 from src.messages import *
-import src.runAI.start as start
-settings = Settings()
-from PyQt5.QtGui import QIntValidator
-
 def onApplicationStart(self):
+    import os
+    
+    import src.runAI.start as start
+    settings = Settings()
+    from PyQt5.QtGui import QIntValidator, QIcon
+    thisdir=os.getcwd()
     #Define Variables
     self.input_file = ''
     self.output_folder = ''
@@ -17,8 +18,11 @@ def onApplicationStart(self):
     self.render_folder = settings.RenderDir
     self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    
-    
+    self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
+    self.ui.RifePause.clicked.connect(self.pause_render)
+    self.ui.RifeResume.clicked.connect(self.resume_render)
+    self.ui.RifeResume.hide()
+    self.ui.RifePause.hide()
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))
     if settings.DiscordRPC == 'Enabled':
         self.ui.DiscordRPCBox.setChecked(True)
@@ -48,7 +52,8 @@ def onApplicationStart(self):
     #link help buttons
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
-
+    self.ui.RealESRGANPause.hide()
+    self.ui.RealESRGANResume.hide()
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
     self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
