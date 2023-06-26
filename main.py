@@ -303,7 +303,7 @@ class MainWindow(QtWidgets.QMainWindow):
             files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
             for i in range(int(files_to_delete)):
                 i = str(i).zfill(8)
-                os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png"')
             self.endNum+=1
             self.ui.RifeResume.show() #show resume button
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
