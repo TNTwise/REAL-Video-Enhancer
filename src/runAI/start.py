@@ -36,7 +36,8 @@ def start(renderdir,videoName,videopath,times):
 
 def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         
-       
+        
+        
         if outputpath == '':
                 outputpath = homedir
         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
@@ -127,6 +128,14 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
             show_on_no_output_files(self)
         else:
             if self.paused == False:
+                files=os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames')
+            
+                files = sorted(files)
+                iteration=1
+                for i in files:
+                    new_file = str(iteration).zfill(8)
+                    os.rename(f'{self.render_folder}/{self.videoName}_temp/output_frames/{i}',f'{self.render_folder}/{self.videoName}_temp/output_frames/{new_file}.png')
+                    iteration+=1 # fixes any files that were created from a pause/resume, and will fit them into a 8 digit file so ffmpeg can read them
                 self.transitionDetection.merge_frames()
                 
                 self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
