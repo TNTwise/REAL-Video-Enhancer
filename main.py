@@ -45,9 +45,11 @@ class MainWindow(QtWidgets.QMainWindow):
             print(self.gpuMemory)
         src.onProgramStart.onApplicationStart(self)
         self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
-        
-        
+        self.ui.RifePause.clicked.connect(self.pause_render)
+        self.ui.RifeResume.clicked.connect(self.resume_render)
         self.show()
+    def resume_render(self):
+        Thread(target=lambda: start.Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
     def showChangeInFPS(self):
         
         
@@ -270,10 +272,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
    
     def pause_render(self):
-        files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
-        for i in range(files_to_delete):
-            i = str(i).zfill(8)
-            os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
+        self.paused = True
         def get_pid(name):
         
 
@@ -289,8 +288,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 pass
             
             
-            os.system(f'kill -9 {get_pid("rife-ncnn-vulkan")}')
-            os.system(f'kill -9 {get_pid("realesrgan-ncnn-vulkan")}')
+        os.system(f'kill -9 {get_pid("rife-ncnn-vulkan")}')
+        os.system(f'kill -9 {get_pid("realesrgan-ncnn-vulkan")}')
+        sleep(1)
+        files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
+        for i in range(int(files_to_delete)):
+            i = str(i).zfill(8)
+            os.system(f'rm -rf {settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png')
+        self.endNum+=1
+            
+            #This function adds a zero to the original frames, so it wont overwrite the old ones
+        
     def setDisableEnable(self,mode):
         self.ui.RifeStart.setDisabled(mode)
         self.ui.RealESRGANStart.setDisabled(mode)

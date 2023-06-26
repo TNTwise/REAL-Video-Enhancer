@@ -112,6 +112,20 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QPushButton" name="RifePause">
+                <property name="text">
+                 <string>Pause</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="RifeResume">
+                <property name="text">
+                 <string>Resume</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -363,7 +377,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>icons/Rife-ESRGAN-Render-Settings.png</normaloff>icons/Rife-ESRGAN-Render-Settings.png</iconset>
+               <normaloff>../.designer/backup/icons/Rife-ESRGAN-Render-Settings.png</normaloff>../.designer/backup/icons/Rife-ESRGAN-Render-Settings.png</iconset>
              </property>
             </item>
             <item>
@@ -377,7 +391,7 @@
              </property>
              <property name="icon">
               <iconset>
-               <normaloff>icons/Rife-ESRGAN-Video-Settings.png</normaloff>icons/Rife-ESRGAN-Video-Settings.png</iconset>
+               <normaloff>../.designer/backup/icons/Rife-ESRGAN-Video-Settings.png</normaloff>../.designer/backup/icons/Rife-ESRGAN-Video-Settings.png</iconset>
              </property>
             </item>
            </widget>
@@ -423,7 +437,7 @@
                  </property>
                  <property name="icon">
                   <iconset theme="dialog-information">
-                   <normaloff>.</normaloff>.</iconset>
+                   <normaloff>../.designer/backup</normaloff>../.designer/backup</iconset>
                  </property>
                 </widget>
                </item>
