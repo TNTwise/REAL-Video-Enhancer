@@ -146,8 +146,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.i==1: # put every gui change that happens on start of render here
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
-                self.ui.RifePause.show()
-                self.ui.RealESRGANPause.show()
+                if self.times < 3:
+                    self.ui.RifePause.show()
+                    self.ui.RealESRGANPause.show()
                 if self.render == 'rife':
                     self.ui.RifePB.setMaximum(total_output_files)
                     self.addLinetoLogs(f'Starting {self.times}X Render')
