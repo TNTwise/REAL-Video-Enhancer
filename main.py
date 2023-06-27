@@ -72,8 +72,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         
-        
-        self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.ui.Rife_Times.currentText()[0]))}')
+        self.times=int(self.ui.Rife_Times.currentText()[0])
+        if self.input_file != '':
+            self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.ui.Rife_Times.currentText()[0]))}')
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times

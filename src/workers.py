@@ -44,7 +44,7 @@ class pb2X(QObject):
                     except:
                         latest_image= None
                         if self.render == 'rife':
-                            sleep(.1)
+                            sleep(.5) 
                         else:
                             sleep(1)
                     
