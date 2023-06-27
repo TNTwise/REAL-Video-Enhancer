@@ -120,10 +120,11 @@ class MainWindow(QtWidgets.QMainWindow):
        
         self.imageDisplay=None
         
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
+        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
             
             
             try:
+                   #Have to make more optimized sorting alg here 
                     files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
                     files.sort()
                     
@@ -133,10 +134,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.imageDisplay = None
                     self.ui.imagePreview.clear()
                     self.ui.imagePreviewESRGAN.clear()
-    
+            sleep(.5)
     def reportProgress(self, n):
         try:
-            self.getPreviewImage()
+            Thread(target=self.getPreviewImage).start()
             fp = n
             
             # fc is the total file count after interpolation

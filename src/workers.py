@@ -31,6 +31,7 @@ class pb2X(QObject):
 
         total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * 2
+        # fc is the total file count after interpolation
         
         
         
