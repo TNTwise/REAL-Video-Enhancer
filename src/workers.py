@@ -32,8 +32,33 @@ class pb2X(QObject):
         total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
         total_output_files = total_input_files * 2
         # fc is the total file count after interpolation
-        
-        
+        #Could use this instead of just os.listdir
+        '''while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
+
+
+            try:
+
+                   #Have to make more optimized sorting alg here 
+
+                    if last_file != None:
+                        iteration=int(str(last_file).replace('.png',''))
+                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}.png') == True:
+                            iteration+=1
+
+                        last_file=f'{str(iteration).zfill(8)}.png'
+                        print(last_file)
+                    else:
+                        files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
+                        files.sort()
+                        last_file = files[-1]
+
+                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{last_file}"
+            except:
+                    self.imageDisplay = None
+                    self.ui.imagePreview.clear()
+                    self.ui.imagePreviewESRGAN.clear()
+            sleep(.5)
+'''
         
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:

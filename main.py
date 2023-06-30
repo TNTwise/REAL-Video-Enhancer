@@ -119,17 +119,27 @@ class MainWindow(QtWidgets.QMainWindow):
         
        
         self.imageDisplay=None
-        
+        last_file = None
         while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
-            
-            
+
+
             try:
+
                    #Have to make more optimized sorting alg here 
-                    files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
-                    files.sort()
-                    
-                    
-                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{files[-1]}"
+
+                    if last_file != None:
+                        iteration=int(str(last_file).replace('.png',''))
+                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}.png') == True:
+                            iteration+=1
+
+                        last_file=f'{str(iteration).zfill(8)}.png'
+                        print(last_file)
+                    else:
+                        files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
+                        files.sort()
+                        last_file = files[-1]
+
+                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{last_file}"
             except:
                     self.imageDisplay = None
                     self.ui.imagePreview.clear()
@@ -137,17 +147,18 @@ class MainWindow(QtWidgets.QMainWindow):
             sleep(.5)
     def reportProgress(self, n):
         try:
-            Thread(target=self.getPreviewImage).start()
+            
             fp = n
             
             # fc is the total file count after interpolation
             fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
             self.fileCount = fc
             if self.i==1: # put every gui change that happens on start of render here
+                #Thread(target=self.getPreviewImage).start()
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
                 if self.times < 3:
-                    self.ui.RifePause.show()
+                    #self.ui.RifePause.show()
                     self.ui.RealESRGANPause.show()
                 if self.render == 'rife':
                     self.ui.RifePB.setMaximum(total_output_files)
@@ -171,7 +182,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.ui.ESRGANPB.setValue(fp)
                 self.ui.processedPreviewESRGAN.setText(f'Files Processed: {fp} / {fc}')
-            
+            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp).zfill(8)}.png'
             if self.imageDisplay != None:
 
                 try:
@@ -336,6 +347,8 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         self.ui.RifePause.hide()
         self.ui.RifeResume.hide()
+        self.ui.RealESRGANPause.hide()
+        self.ui.RealESRGANResume.hide()
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
