@@ -26,9 +26,10 @@ def onApplicationStart(self):
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))
     if settings.DiscordRPC == 'Enabled':
         self.ui.DiscordRPCBox.setChecked(True)
+        
     else:
         self.ui.DiscordRPCBox.setChecked(False)
-    
+    os.system('ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0') #Enables discord RPC on flatpak
     onlyInt = QIntValidator()
     onlyInt.setRange(0, 9)
     self.ui.sceneChangeLineEdit.setValidator(onlyInt)
