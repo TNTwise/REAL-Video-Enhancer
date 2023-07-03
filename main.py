@@ -43,8 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
-        self.ui.RealESRGANPause.clicked.connect(self.pause_render)
-        self.ui.RealESRGANResume.clicked.connect(self.resume_render_realesrgan)
+        
         self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
         self.switchUI()
         src.onProgramStart.onApplicationStart(self)
@@ -62,7 +61,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.times=2
             self.ui.Rife_Model.clear()
             self.ui.Rife_Times.clear()
-            
+            self.ui.FPSPreview.setText('FPS:')
             
             self.ui.Rife_Times.addItem('2X')
             self.ui.Rife_Times.addItem('4X')
@@ -80,7 +79,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == 'RealESRGAN':
             self.times=1
             self.ui.Rife_Model.clear()
-            
+            self.ui.FPSPreview.setText('RES:')
             self.ui.Rife_Model.addItem('Animation')
             self.ui.Rife_Model.addItem('Default')
             self.ui.Rife_Model.setCurrentIndex(1)
@@ -213,7 +212,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     #self.ui.RealESRGANPause.show()
                 
                     self.ui.RifePB.setMaximum(total_output_files)
-                    self.addLinetoLogs(f'Starting {self.times}X Render')
+                    self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
                     self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
                 
                 self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
@@ -234,7 +233,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     if os.path.exists(self.imageDisplay):
                         self.ui.imageSpacerFrame.hide()
-                        self.ui.imageSpacerFrameESRGAN.hide()
                         pixMap = QPixmap(self.imageDisplay)
                         
                         width = self.width()
@@ -251,17 +249,15 @@ class MainWindow(QtWidgets.QMainWindow):
                                 pixMap = pixMap.scaled(width1,height1)
                                 
                                 
-                                if self.render == 'rife':
-                                    self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
-                                else:
-                                    self.ui.imagePreviewESRGAN.setPixmap(pixMap)
+                                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
+                                
                         except Exception as e:
                             pass
-                except:
+                except Exception as e:
+                    print(e)
                     self.ui.imageSpacerFrame.show()
-                    self.ui.imageSpacerFrameESRGAN.show()
+
                     self.ui.imagePreview.clear()
-                    self.ui.imagePreviewESRGAN.clear()
             try:
                 if self.ETA != None:
                     self.ui.ETAPreview.setText(self.ETA)

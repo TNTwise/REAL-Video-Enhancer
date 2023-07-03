@@ -39,6 +39,7 @@ def startRealSR(self):
         settings = Settings()
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
+        self.ui.FPSPreview.setText('RES:')
         self.setDisableEnable(True)
         self.times = 1
         self.fps=VideoName.return_video_framerate(f'{self.input_file}')
@@ -54,8 +55,8 @@ def startRealSR(self):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        realESRGAN_Model = self.ui.RealESRGAN_Model.currentText()
-        realESRGAN_Times = self.ui.RealESRGAN_Times.currentText()
+        realESRGAN_Model = self.ui.Rife_Model.currentText()
+        realESRGAN_Times = self.ui.Rife_Times.currentText()
         if realESRGAN_Model == 'Default':
             self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
         if realESRGAN_Model == 'Animation':

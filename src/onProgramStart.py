@@ -60,15 +60,12 @@ def onApplicationStart(self):
     #link help buttons
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
-    self.ui.RealESRGANPause.hide()
-    self.ui.RealESRGANResume.hide()
+    
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
     self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
     self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
-    self.ui.Input_video_RealESRGAN.clicked.connect(self.openFileNameDialog)
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-    self.ui.Output_folder_RealESRGAN.clicked.connect(self.openFolderDialog)
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()

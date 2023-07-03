@@ -20,7 +20,7 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="Rife">
+      <widget class="QWidget" name="Upscale">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
@@ -28,7 +28,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <attribute name="title">
-        <string>Rife</string>
+        <string>Upscale</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
@@ -195,178 +195,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="RealESRGAN">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RealESRGAN&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RealESRGAN&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <attribute name="title">
-        <string>RealESRGAN</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_7">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="imagePreviewESRGAN">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QFrame" name="imageSpacerFrameESRGAN">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_6">
-               <item>
-                <spacer name="imageSpacerESRGAN">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>546</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_9">
-              <item>
-               <widget class="QTextEdit" name="logsPreviewESRGAN">
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="processedPreviewESRGAN">
-                <property name="text">
-                 <string>Files Processed: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="ETAPreviewESRGAN">
-                <property name="text">
-                 <string>ETA: </string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="RealESRGANResolution">
-                <property name="text">
-                 <string>RES:</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_4">
-              <item>
-               <widget class="QPushButton" name="RealESRGANStart">
-                <property name="text">
-                 <string>Start</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="RealESRGANPause">
-                <property name="text">
-                 <string>Pause</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="RealESRGANResume">
-                <property name="text">
-                 <string>Resume</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QPushButton" name="Input_video_RealESRGAN">
-                <property name="text">
-                 <string>Input Video</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="Output_folder_RealESRGAN">
-                <property name="text">
-                 <string>Output folder</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="RealESRGAN_Model">
-                <item>
-                 <property name="text">
-                  <string>Default</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>Animation</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
-               <widget class="QComboBox" name="RealESRGAN_Times">
-                <item>
-                 <property name="text">
-                  <string>2X</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>3X</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>4X</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QProgressBar" name="ESRGANPB">
-            <property name="value">
-             <number>0</number>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
+      
       <widget class="QWidget" name="Settings">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
