@@ -113,6 +113,9 @@
                </widget>
               </item>
               <item>
+               <widget class="QComboBox" name="AICombo"/>
+              </item>
+              <item>
                <widget class="QPushButton" name="RifePause">
                 <property name="text">
                  <string>Pause</string>

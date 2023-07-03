@@ -9,16 +9,13 @@ import src.runAI.transition_detection
 from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
+import glob
+import os
+
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 
-def return_gpu_settings(self):
-    if self.gpuMemory <= 2.0:
-        gpu_usage = ''
-    else:
-        num = int(int(self.gpuMemory)+1)
-        gpu_usage = f'-j {num}:{num}:{num}'
-    return gpu_usage
+
 
 def start(renderdir,videoName,videopath,times):
         global fps

@@ -3,7 +3,15 @@ from src.messages import *
 def onApplicationStart(self):
     import os
     
-    import src.runAI.start as start
+    #Import all modules
+    ''' for module in os.listdir(f'{thisdir}/modules/'):
+            if module == '__init__.py' or module[-3:] != '.py':
+                continue
+            __import__(f'modules.{module[:-3]}', locals(), globals())
+            
+            self.ui.AICombo.addItem(f'{module[:-3]}')'''
+    import modules.Rife as rife
+    import modules.ESRGAN as esrgan
     settings = Settings()
     from PyQt5.QtGui import QIntValidator, QIcon
     thisdir=os.getcwd()
@@ -65,8 +73,8 @@ def onApplicationStart(self):
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()
-    self.ui.RifeStart.clicked.connect(lambda: start.startRife(self))
-    self.ui.RealESRGANStart.clicked.connect(lambda: start.startRealSR(self))
+    self.ui.RifeStart.clicked.connect(lambda: rife.startRife(self))
+    self.ui.RealESRGANStart.clicked.connect(lambda: esrgan.startRealSR(self))
     
     self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
     #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb

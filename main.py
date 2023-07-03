@@ -41,6 +41,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
         self.ui.RealESRGANPause.clicked.connect(self.pause_render)
         self.ui.RealESRGANResume.clicked.connect(self.resume_render_realesrgan)
+        
+    
         if self.gpuMemory == None:
             cannot_detect_vram(self)
         else:
