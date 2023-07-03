@@ -38,14 +38,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(700, 550)
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
+        self.input_file = ''
+        self.output_folder = ''
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
         self.ui.RealESRGANPause.clicked.connect(self.pause_render)
         self.ui.RealESRGANResume.clicked.connect(self.resume_render_realesrgan)
         self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
-        src.onProgramStart.onApplicationStart(self)
         self.switchUI()
+        src.onProgramStart.onApplicationStart(self)
+        
+        
         if self.gpuMemory == None:
             cannot_detect_vram(self)
         else:
@@ -55,6 +59,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
     def switchUI(self):
         if self.ui.AICombo.currentText() == 'Rife':
+            self.times=2
             self.ui.Rife_Model.clear()
             self.ui.Rife_Times.clear()
             
@@ -62,14 +67,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Times.addItem('2X')
             self.ui.Rife_Times.addItem('4X')
             self.ui.Rife_Times.addItem('8X')
+            self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
             self.ui.Rife_Times.setCurrentIndex(0)
+            self.showChangeInFPS()
             try:
                 self.ui.RifeStart.clicked.disconnect() 
             except:
                 pass
             self.ui.RifeStart.clicked.connect(lambda: rife.startRife(self))
             src.onProgramStart.list_model_downloaded(self)
+
         if self.ui.AICombo.currentText() == 'RealESRGAN':
+            self.times=1
             self.ui.Rife_Model.clear()
             
             self.ui.Rife_Model.addItem('Animation')
@@ -108,12 +117,15 @@ class MainWindow(QtWidgets.QMainWindow):
         Thread(target=lambda: start.realESRGAN(self)).start()
         self.ui.RealESRGANPause.show()
     def showChangeInFPS(self):
-
-        
-        
-        if self.input_file != '':
-            self.times=int(self.ui.Rife_Times.currentText()[0])
-            self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.ui.Rife_Times.currentText()[0]))}')
+        try:
+            if self.ui.AICombo.currentText() == 'Rife':
+                
+                
+                if self.input_file != '':
+                    self.times = int(self.ui.Rife_Times.currentText()[0])
+                    self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
+        except:
+            pass
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
