@@ -56,8 +56,7 @@ def onApplicationStart(self):
     if self.videoQuality == '22':
         self.ui.VidQualityCombo.setCurrentText('Low')
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
-    self.ui.RealESRGAN_Model.setCurrentIndex(1)
-    self.ui.RealESRGAN_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
+    
     #link help buttons
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
@@ -73,29 +72,28 @@ def onApplicationStart(self):
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()
-    self.ui.RifeStart.clicked.connect(lambda: rife.startRife(self))
-    self.ui.RealESRGANStart.clicked.connect(lambda: esrgan.startRealSR(self))
+   
     
     self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
     #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
     
     self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
-
+    
     # list every model downloaded, and add them to the list
-    
-    model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
-    models = []
-    for model_filepath in model_filepaths:
-        if 'rife' in os.path.basename(model_filepath):
-            models.append(os.path.basename(model_filepath))
-    
-    models.sort()
-    for model in models:
-
+def list_model_downloaded(self):
+        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
+        models = []
+        for model_filepath in model_filepaths:
+            if 'rife' in os.path.basename(model_filepath):
+                models.append(os.path.basename(model_filepath))
         
-        model = model.replace('r',"R")
-        model = model.replace('v','V')
-        model = model.replace('a','A')
-        self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-        if model == 'Rife-V4.6':
-            self.ui.Rife_Model.setCurrentText(f'{model}')
+        models.sort()
+        for model in models:
+
+            
+            model = model.replace('r',"R")
+            model = model.replace('v','V')
+            model = model.replace('a','A')
+            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
+            if model == 'Rife-V4.6':
+                self.ui.Rife_Model.setCurrentText(f'{model}')

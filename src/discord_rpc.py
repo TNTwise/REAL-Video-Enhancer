@@ -2,17 +2,15 @@ from pypresence import Presence
 from time import sleep
 import asyncio
 import os
-def start_discordRPC(self):
+def start_discordRPC(self, mode='Interpolating'):
         try:
             
 
             client_id = '1120814311246405743'  # ID for rpc
             self.RPC = Presence(client_id)  # Initialize the client class
             self.RPC.connect() # Start the handshake loop
-            if self.render == 'rife':
-              self.RPC.update(state=f"{self.videoName}", details=f"Interpolating Video",large_image='logov1') 
-            else:
-              self.RPC.update(state=f"{self.videoName}", details=f"Upscaling Video",large_image='logov1') 
+            self.RPC.update(state=f"{self.videoName}", details=f"{mode} Video",large_image='logov1') 
+            
             
           # The presence will stay on as long as the program is running
          # Can only update rich presence every 15 seconds

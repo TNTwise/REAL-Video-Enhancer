@@ -113,7 +113,18 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="AICombo"/>
+               <widget class="QComboBox" name="AICombo">
+                <item>
+                 <property name="text">
+                  <string>Rife</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>RealESRGAN</string>
+                 </property>
+                </item>
+               </widget>
               </item>
               <item>
                <widget class="QPushButton" name="RifePause">

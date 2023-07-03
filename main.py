@@ -22,7 +22,8 @@ from time import sleep
 import src.getModels.get_models as get_models
 from multiprocessing import cpu_count
 from src.messages import *
-
+import modules.Rife as rife
+import modules.ESRGAN as esrgan
 import pypresence
 import src.onProgramStart
 thisdir = os.getcwd()
@@ -32,6 +33,7 @@ homedir = os.path.expanduser(r"~")
 class MainWindow(QtWidgets.QMainWindow):
          
     def __init__(self):
+        
         super(MainWindow, self).__init__()
         self.setMinimumSize(700, 550)
         self.ui = mainwindow.Ui_MainWindow()
@@ -41,15 +43,50 @@ class MainWindow(QtWidgets.QMainWindow):
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
         self.ui.RealESRGANPause.clicked.connect(self.pause_render)
         self.ui.RealESRGANResume.clicked.connect(self.resume_render_realesrgan)
-        
-    
+        self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
+        src.onProgramStart.onApplicationStart(self)
+        self.switchUI()
         if self.gpuMemory == None:
             cannot_detect_vram(self)
         else:
             print(self.gpuMemory) # debugging purposes
-        src.onProgramStart.onApplicationStart(self)
-        print(self.get_pid("rife-ncnn-vulkan"))
+        
+        
         self.show()
+    def switchUI(self):
+        if self.ui.AICombo.currentText() == 'Rife':
+            self.ui.Rife_Model.clear()
+            self.ui.Rife_Times.clear()
+            
+            
+            self.ui.Rife_Times.addItem('2X')
+            self.ui.Rife_Times.addItem('4X')
+            self.ui.Rife_Times.addItem('8X')
+            self.ui.Rife_Times.setCurrentIndex(0)
+            try:
+                self.ui.RifeStart.clicked.disconnect() 
+            except:
+                pass
+            self.ui.RifeStart.clicked.connect(lambda: rife.startRife(self))
+            src.onProgramStart.list_model_downloaded(self)
+        if self.ui.AICombo.currentText() == 'RealESRGAN':
+            self.ui.Rife_Model.clear()
+            
+            self.ui.Rife_Model.addItem('Animation')
+            self.ui.Rife_Model.addItem('Default')
+            self.ui.Rife_Model.setCurrentIndex(1)
+            
+            self.ui.RifeStart.clicked.disconnect()
+            self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
+            self.ui.RifeStart.clicked.connect(lambda: esrgan.startRealSR(self))
+            self.ui.Rife_Times.clear()
+            
+            
+            self.ui.Rife_Times.addItem('2X')
+            self.ui.Rife_Times.addItem('3X')
+            self.ui.Rife_Times.addItem('4X')
+            self.ui.Rife_Times.setCurrentIndex(2)
+
     def get_pid(self,name):
         
 
@@ -71,11 +108,11 @@ class MainWindow(QtWidgets.QMainWindow):
         Thread(target=lambda: start.realESRGAN(self)).start()
         self.ui.RealESRGANPause.show()
     def showChangeInFPS(self):
+
         
         
-        
-        self.times=int(self.ui.Rife_Times.currentText()[0])
         if self.input_file != '':
+            self.times=int(self.ui.Rife_Times.currentText()[0])
             self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.ui.Rife_Times.currentText()[0]))}')
     def calculateETA(self):
         self.ETA=None
@@ -161,15 +198,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 total_output_files = total_input_files * self.times 
                 if self.times < 3:
                     #self.ui.RifePause.show()
-                    self.ui.RealESRGANPause.show()
-                if self.render == 'rife':
+                    #self.ui.RealESRGANPause.show()
+                
                     self.ui.RifePB.setMaximum(total_output_files)
                     self.addLinetoLogs(f'Starting {self.times}X Render')
                     self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
-                else:
-                    self.ui.ESRGANPB.setMaximum(total_output_files)
-                    self.addLinetoLogs(f'Starting {self.ui.RealESRGAN_Times.currentText()[0]}X Render')
-                    self.addLinetoLogs(f'Model: {self.ui.RealESRGAN_Model.currentText()}')
+                
                 self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
             
@@ -178,12 +212,10 @@ class MainWindow(QtWidgets.QMainWindow):
             fc = int(fc)
 
             #Update GUI values
-            if self.render == 'rife':
-                self.ui.RifePB.setValue(fp)
-                self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
-            else:
-                self.ui.ESRGANPB.setValue(fp)
-                self.ui.processedPreviewESRGAN.setText(f'Files Processed: {fp} / {fc}')
+            
+            self.ui.RifePB.setValue(fp)
+            self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
+            
             self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp).zfill(8)}.png'
             if self.imageDisplay != None:
 
@@ -211,7 +243,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                     self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
                                 else:
                                     self.ui.imagePreviewESRGAN.setPixmap(pixMap)
-                        except:
+                        except Exception as e:
                             pass
                 except:
                     self.ui.imageSpacerFrame.show()
@@ -224,9 +256,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames'):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
-            except:
+            except Exception as e:
                 pass
-        except:
+        except Exception as e:
             pass
         
     def runPB(self):
@@ -288,12 +320,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
     def greyOutRealSRTimes(self):
-        if self.ui.RealESRGAN_Model.currentText() == 'Default':
-            self.ui.RealESRGAN_Times.setCurrentText('4X')
-            self.ui.RealESRGAN_Times.setEnabled(False)
+        if self.ui.Rife_Model.currentText() == 'Default':
+            self.ui.Rife_Times.setCurrentText('4X')
+            self.ui.Rife_Times.setEnabled(False)
         else:
             
-            self.ui.RealESRGAN_Times.setEnabled(True)
+            self.ui.Rife_Times.setEnabled(True)
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
@@ -325,6 +357,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
             self.ui.RealESRGANResume.show()
     def setDisableEnable(self,mode):
+        self.ui.AICombo.setDisabled(mode)
         self.ui.RifeStart.setDisabled(mode)
         self.ui.RealESRGANStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 

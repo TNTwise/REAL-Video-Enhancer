@@ -50,7 +50,7 @@ def startRealSR(self):
         self.setDisableEnable(True)
         
         if settings.DiscordRPC == 'Enabled':
-            start_discordRPC(self)
+            start_discordRPC(self,'Upscaling')
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')

@@ -25,6 +25,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
         
         if self.input_file != '':
             self.render='rife'
+            
             self.fps = VideoName.return_video_framerate(f'{self.input_file}')
             settings = Settings()
             # Calculate the aspect ratio
@@ -35,18 +36,19 @@ def startRife(self): #should prob make this different, too similar to start_rife
             self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             self.aspectratio = self.videowidth / self.videoheight
             self.setDisableEnable(True)
+            
             if settings.DiscordRPC == 'Enabled':
-                start_discordRPC(self)
+                start_discordRPC(self,'Interpolating')
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+            print('h')
             self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
-            self.times = int(self.ui.Rife_Times.currentText()[0])
             self.ui.logsPreview.append(f'Extracting Frames')
             
-            if int(self.ui.Rife_Times.currentText()[0]) == 2:
+            if self.times == 2:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
-            if int(self.ui.Rife_Times.currentText()[0]) == 4:
+            if self.times == 4:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
-            if int(self.ui.Rife_Times.currentText()[0]) == 8:
+            if self.times == 8:
                 self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
             self.rifeThread.start()
             self.runPB()
