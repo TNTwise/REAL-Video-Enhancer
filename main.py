@@ -43,7 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
         self.gpuMemory=HardwareInfo.get_video_memory_linux()
-        
+        self.settings = Settings()
         self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
         self.switchUI()
         src.onProgramStart.onApplicationStart(self)
@@ -178,11 +178,11 @@ class MainWindow(QtWidgets.QMainWindow):
                    #Have to make more optimized sorting alg here 
 
                     if last_file != None:
-                        iteration=int(str(last_file).replace('.png',''))
-                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}.png') == True:
+                        iteration=int(str(last_file).replace(f'{self.settings.Image_Type}',''))
+                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}{self.settings.Image_Type}') == True:
                             iteration+=1
 
-                        last_file=f'{str(iteration).zfill(8)}.png'
+                        last_file=f'{str(iteration).zfill(8)}{self.settings.Image_Type}'
                         print(last_file)
                     else:
                         files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
@@ -193,7 +193,6 @@ class MainWindow(QtWidgets.QMainWindow):
             except:
                     self.imageDisplay = None
                     self.ui.imagePreview.clear()
-                    self.ui.imagePreviewESRGAN.clear()
             sleep(.5)
     def reportProgress(self, n):
         try:
@@ -201,10 +200,11 @@ class MainWindow(QtWidgets.QMainWindow):
             fp = n
             
             # fc is the total file count after interpolation
-            fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
-            self.fileCount = fc
+            
             if self.i==1: # put every gui change that happens on start of render here
                 #Thread(target=self.getPreviewImage).start()
+                fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+                self.filecount = fc
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
                 if self.times < 3:
@@ -215,19 +215,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
                     self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
                 
-                self.original_fc=fc/self.times # this makes the original file count. which is the file count before interpolation
+                self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
             
                 
             fp=int(fp)
-            fc = int(fc)
+            self.filecount = int(self.filecount)
 
             #Update GUI values
             
             self.ui.RifePB.setValue(fp)
-            self.ui.processedPreview.setText(f'Files Processed: {fp} / {fc}')
+            self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
             
-            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp).zfill(8)}.png'
+            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-5).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
             if self.imageDisplay != None:
 
                 try:
@@ -252,9 +252,10 @@ class MainWindow(QtWidgets.QMainWindow):
                                 self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
                                 
                         except Exception as e:
+                            #print(e)
                             pass
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     self.ui.imageSpacerFrame.show()
 
                     self.ui.imagePreview.clear()
@@ -265,13 +266,15 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
             except Exception as e:
+                #print(e)
                 pass
         except Exception as e:
+            #print(e)
             pass
-        
     def runPB(self):
         self.addLast=False
         self.i=1
+        self.settings = Settings()
         # Step 2: Create a QThread object
         self.thread = QThread()
         # Step 3: Create a worker object
@@ -349,7 +352,6 @@ class MainWindow(QtWidgets.QMainWindow):
         # Why was this line here??
             self.paused = True
             self.ui.RifePause.hide()
-            self.ui.RealESRGANPause.hide()
             
                 
                 
@@ -360,25 +362,18 @@ class MainWindow(QtWidgets.QMainWindow):
             for i in range(int(files_to_delete)):
                 i = str(i).zfill(8)
                 os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png"')
-            self.endNum+=1
             self.ui.RifeResume.show() #show resume button
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
-            self.ui.RealESRGANResume.show()
     def setDisableEnable(self,mode):
         self.ui.AICombo.setDisabled(mode)
         self.ui.RifeStart.setDisabled(mode)
-        self.ui.RealESRGANStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 
-        self.ui.Input_video_RealESRGAN.setDisabled(mode)
         self.ui.Output_folder_rife.setDisabled(mode)
-        self.ui.Output_folder_RealESRGAN.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
-        self.ui.RealESRGAN_Model.setDisabled(mode)
         if self.ui.Rife_Model.currentText().lower() == 'rife-v4' or self.ui.Rife_Model.currentText().lower() == 'rife-v4.6':
             self.ui.Rife_Times.setDisabled(mode)
         else:
             self.ui.Rife_Times.setDisabled(True)
-        self.ui.RealESRGAN_Times.setDisabled(mode)
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         
             
@@ -390,19 +385,15 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         self.ui.RifePause.hide()
         self.ui.RifeResume.hide()
-        self.ui.RealESRGANPause.hide()
-        self.ui.RealESRGANResume.hide()
+
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
-        self.ui.ESRGANPB.setValue(self.ui.RifePB.maximum())
         self.ui.ETAPreview.setText('ETA: 00:00:00')
         self.ui.imagePreview.clear()
-        self.ui.processedPreview.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
+        self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
         self.ui.imageSpacerFrame.show()
-        self.ui.imagePreviewESRGAN.clear()
-        self.ui.processedPreviewESRGAN.setText(f'Files Processed: {self.fileCount} / {self.fileCount}')
-        self.ui.imageSpacerFrameESRGAN.show()
+
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     
@@ -418,7 +409,6 @@ class MainWindow(QtWidgets.QMainWindow):
     
     
     def addLinetoLogs(self,line):
-        self.ui.logsPreviewESRGAN.append(f'{line}')
         self.ui.logsPreview.append(f'{line}')
     def removeLastLineInLogs(self,exception=None):
         

@@ -65,14 +65,8 @@ class pb2X(QObject):
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                 
                     files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                    try:
-                        latest_image = self.get_latest_image()
-                    except:
-                        latest_image= None
-                        if self.render == 'rife':
-                            sleep(.5) 
-                        else:
-                            sleep(1)
+                    
+                    sleep(1)
                     
                         
                     

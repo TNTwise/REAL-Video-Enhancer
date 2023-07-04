@@ -38,7 +38,7 @@ def start(renderdir,videoName,videopath,times):
 
 
 def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
-        
+        settings = Settings()
         
         
         if outputpath == '':
@@ -52,7 +52,7 @@ def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
         else:
                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
         
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d.png" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
+        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')

@@ -85,22 +85,22 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
         #Thread(target=self.calculateETA).start()
         input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
         if model == 'rife-v4.6' or model == 'rife-v4':
-            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d.png')
+            os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type}')
         else:
-              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d.png ')
+              os.system(f'"{thisdir}/rife-vulkan-models/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
             show_on_no_output_files(self)
         else:
             if self.paused == False:
-                
-                files=os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames')
+                #Scraping this for now
+                '''files=os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames')
             
                 files = sorted(files)
                 iteration=1
                 for i in files:
                     new_file = str(iteration).zfill(8)
-                    os.rename(f'{self.render_folder}/{self.videoName}_temp/output_frames/{i}',f'{self.render_folder}/{self.videoName}_temp/output_frames/{new_file}.png')
-                    iteration+=1 # fixes any files that were created from a pause/resume, and will fit them into a 8 digit file so ffmpeg can read them
+                    os.rename(f'{self.render_folder}/{self.videoName}_temp/output_frames/{i}',f'{self.render_folder}/{self.videoName}_temp/output_frames/{new_file}{self.settings.Image_Type}')
+                    iteration+=1 # fixes any files that were created from a pause/resume, and will fit them into a 8 digit file so ffmpeg can read them'''
                 self.transitionDetection.merge_frames()
                 
                 self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
