@@ -19,7 +19,7 @@ class Settings:
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")
     def write_defaults(self):
-        self.write_to_settings_file("Image_Type", "png")
+        self.write_to_settings_file("Image_Type", ".png")
         self.write_to_settings_file("IsAnime", "False")
         self.write_to_settings_file("Repository", "stable")
         self.write_to_settings_file("rifeversion", "20221029")
@@ -51,7 +51,7 @@ class Settings:
             
             self.Image_Type = settings_dict['Image_Type']
         except:
-            self.write_to_settings_file("Image_Type", "png")
+            self.write_to_settings_file("Image_Type", ".png")
             self.readSettings()
         try:
             self.videoQuality = settings_dict['videoQuality']
