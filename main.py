@@ -207,17 +207,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.filecount = fc
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
+                self.ui.RifePB.setMaximum(total_output_files)
                 if self.times < 3:
                     #self.ui.RifePause.show()
                     #self.ui.RealESRGANPause.show()
                 
-                    self.ui.RifePB.setMaximum(total_output_files)
+                    
                     self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
                     self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
                 
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-            
+            self.ui.RifePB.setMaximum(total_output_files)
                 
             fp=int(fp)
             self.filecount = int(self.filecount)
