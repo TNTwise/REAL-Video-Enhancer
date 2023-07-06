@@ -383,16 +383,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
-        
-        if len(self.QueueList) > 0:
-            self.input_file = self.QueueList[0]
-            del self.QueueList[0]
-            self.ui.QueueListWidget.takeItem(0)
-            if self.render == 'rife':
-                rife.startRife(self)
-            if self.render == 'esrgan':
-                esrgan.startRealSR(self)
-        sleep(1)
         if len(self.QueueList) == 0:
             self.ui.QueueListWidget.hide()
             try:
@@ -409,6 +399,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imagePreview.clear()
             self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
+        if len(self.QueueList) > 0:
+            self.input_file = self.QueueList[0]
+            del self.QueueList[0]
+            self.ui.QueueListWidget.takeItem(0)
+            if self.render == 'rife':
+                rife.startRife(self)
+            if self.render == 'esrgan':
+                esrgan.startRealSR(self)
+        
+        
         
 
         
