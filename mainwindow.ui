@@ -77,6 +77,9 @@
                </widget>
               </item>
               <item>
+               <widget class="QListWidget" name="QueueListWidget"/>
+              </item>
+              <item>
                <widget class="QLabel" name="processedPreview">
                 <property name="text">
                  <string>Files Processed: </string>
@@ -124,6 +127,13 @@
                   <string>RealESRGAN</string>
                  </property>
                 </item>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="QueueButton">
+                <property name="text">
+                 <string>Add to queue</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -195,7 +205,6 @@
         </item>
        </layout>
       </widget>
-      
       <widget class="QWidget" name="Settings">
        <property name="toolTip">
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

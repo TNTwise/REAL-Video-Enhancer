@@ -26,6 +26,7 @@ import modules.Rife as rife
 import modules.ESRGAN as esrgan
 import pypresence
 import src.onProgramStart
+import src.queue.queue as queue
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -47,7 +48,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
         self.switchUI()
         src.onProgramStart.onApplicationStart(self)
-        
+        self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
+        self.ui.QueueButton.hide()
+        self.QueueList=[]
         
         if self.gpuMemory == None:
             cannot_detect_vram(self)
@@ -208,17 +211,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 total_output_files = total_input_files * self.times 
                 self.ui.RifePB.setMaximum(total_output_files)
-                if self.times < 3:
-                    #self.ui.RifePause.show()
-                    #self.ui.RealESRGANPause.show()
+                self.ui.QueueButton.show()
+                
                 
                     
-                    self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
-                    self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
-                
+                self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
+                self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
+            
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-            self.ui.RifePB.setMaximum(total_output_files)
+            
                 
             fp=int(fp)
             self.filecount = int(self.filecount)
@@ -228,7 +230,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePB.setValue(fp)
             self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
             
-            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-5).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
             if self.imageDisplay != None:
 
                 try:
@@ -256,6 +258,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             #print(e)
                             pass
                 except Exception as e:
+                    
                     #print(e)
                     self.ui.imageSpacerFrame.show()
 

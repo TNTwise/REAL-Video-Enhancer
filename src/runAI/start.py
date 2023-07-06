@@ -59,6 +59,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
                 
         
         if self.input_file != '':
+            self.ui.QueueButton.show()
             self.render='rife'
             self.fps = VideoName.return_video_framerate(f'{self.input_file}')
             settings = Settings()
@@ -160,6 +161,8 @@ def realESRGAN(self):
     
 def startRealSR(self):
     if self.input_file != '':
+        self.ui.QueueButton.show()
+        
         self.render='esrgan'
         settings = Settings()
         self.ui.ETAPreview.setText('ETA:')
@@ -187,3 +190,5 @@ def startRealSR(self):
             self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
         Thread(target=lambda: renderRealsr(self)).start()
         self.runPB()
+    else:
+         no_input_file(self)
