@@ -30,3 +30,4 @@ def addToQueue(self):
     self.QueueList.append(self.queueFile)
     self.queueVideoName = VideoName.return_video_name(self.queueFile)
     self.ui.QueueListWidget.addItem(self.queueVideoName)
+    self.ui.QueueListWidget.show()

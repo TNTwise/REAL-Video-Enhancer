@@ -50,6 +50,7 @@ class MainWindow(QtWidgets.QMainWindow):
         src.onProgramStart.onApplicationStart(self)
         self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
         self.ui.QueueButton.hide()
+        self.ui.QueueListWidget.hide()
         self.QueueList=[]
         
         if self.gpuMemory == None:
@@ -382,21 +383,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
-        sleep(1)
-        try:
-            self.RPC.clear(pid=os.getpid())
-        except:
-            pass
-        self.ui.RifePause.hide()
-        self.ui.RifeResume.hide()
-        self.ui.QueueButton.hide()
-        self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
-        self.setDisableEnable(False)
-        self.ui.RifePB.setValue(self.ui.RifePB.maximum())
-        self.ui.ETAPreview.setText('ETA: 00:00:00')
-        self.ui.imagePreview.clear()
-        self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
-        self.ui.imageSpacerFrame.show()
+        
         if len(self.QueueList) > 0:
             self.input_file = self.QueueList[0]
             del self.QueueList[0]
@@ -405,6 +392,24 @@ class MainWindow(QtWidgets.QMainWindow):
                 rife.startRife(self)
             if self.render == 'esrgan':
                 esrgan.startRealSR(self)
+        sleep(1)
+        if len(self.QueueList) == 0:
+            self.ui.QueueListWidget.hide()
+            try:
+                self.RPC.clear(pid=os.getpid())
+            except:
+                pass
+            self.ui.RifePause.hide()
+            self.ui.RifeResume.hide()
+            self.ui.QueueButton.hide()
+            self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
+            self.setDisableEnable(False)
+            self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+            self.ui.ETAPreview.setText('ETA: 00:00:00')
+            self.ui.imagePreview.clear()
+            self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
+            self.ui.imageSpacerFrame.show()
+        
 
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
