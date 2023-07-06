@@ -389,7 +389,7 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         self.ui.RifePause.hide()
         self.ui.RifeResume.hide()
-
+        self.ui.QueueButton.hide()
         self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
         self.setDisableEnable(False)
         self.ui.RifePB.setValue(self.ui.RifePB.maximum())
@@ -397,6 +397,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.imagePreview.clear()
         self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
         self.ui.imageSpacerFrame.show()
+        if len(self.QueueList) > 0:
+            self.input_file = self.QueueList[0]
+            del self.QueueList[0]
+            self.ui.QueueListWidget.takeItem(0)
+            if self.render == 'rife':
+                rife.startRife(self)
+            if self.render == 'esrgan':
+                esrgan.startRealSR(self)
 
         
     #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation

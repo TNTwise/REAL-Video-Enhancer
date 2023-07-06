@@ -36,6 +36,7 @@ def realESRGAN(self):
 def startRealSR(self):
     if self.input_file != '':
         self.render='esrgan'
+        self.ui.QueueButton.show()
         settings = Settings()
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
