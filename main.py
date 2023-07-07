@@ -360,6 +360,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
                 
                 
+                
             os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
             os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
             sleep(0.1)
