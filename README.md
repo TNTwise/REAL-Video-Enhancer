@@ -11,10 +11,10 @@
 
 <h1>Features: </h1>
 <p>
-  * Discord RPC support for Discord system package and Discord flatpak.
-  * Queue up files to render after current render is finished.
-  * Scene change detection to preserve sharp transitions.
-  * Preview that shows latest frame that has been rendered.
+  * Discord RPC support for Discord system package and Discord flatpak. <br/>
+  * Queue up files to render after current render is finished. <br/>
+  * Scene change detection to preserve sharp transitions. <br/>
+  * Preview that shows latest frame that has been rendered. <br/>
 </p>
 
 
