@@ -1,5 +1,8 @@
 # Rife-ESRGAN-App-Linux-QT
-[![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
+[![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)<br/>
+<p align=center>
+  <img src="https://github.com/TNTwise/Rife-Vulkan-GUI-Linux-QT/blob/main/icons/logo v1.png" width = "25%">
+</p>
 Todo:<br/>
 Finish get models function<br/>
 Output video extension as input vidoe, fix audio by copying audio from input video to output video as output video processces, or by encoding audio both times (prob shouldnt tbh)<br/>
