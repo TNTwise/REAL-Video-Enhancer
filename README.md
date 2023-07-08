@@ -3,7 +3,8 @@
 <p align=center>
   <img src="https://github.com/TNTwise/Rife-ESRGAN-App-Linux-QT/blob/main/icons/logo%20v1.png" width = "25%">
 </p>
-<h1>Demo</h1>
+<br>Demo
+s</br>
 <p align=center>
   <img src="https://github.com/TNTwise/Rife-ESRGAN-App-Linux-QT/blob/main/github/Demo.png" width = "100%">
 </p>
