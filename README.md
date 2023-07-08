@@ -9,5 +9,12 @@
   <img src="https://github.com/TNTwise/Rife-ESRGAN-App-Linux-QT/blob/main/github/Demo.png" width = "100%">
 </p>
 
+<h1>Features: </h1>
+<p>
+  * Discord RPC support for Discord system package and Discord flatpak.
+  * Queue up files to render after current render is finished.
+  * Scene change detection to preserve sharp transitions.
+  * Preview that shows latest frame that has been rendered.
+</p>
 
 
