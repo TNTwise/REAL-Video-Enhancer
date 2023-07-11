@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Upscale">
        <property name="toolTip">
@@ -406,6 +406,32 @@
                  <property name="text">
                   <string>Render Directory</string>
                  </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Image Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QComboBox" name="imageComboBox">
+                 <item>
+                  <property name="text">
+                   <string>.png</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>.jpg</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>.webp</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
               </layout>

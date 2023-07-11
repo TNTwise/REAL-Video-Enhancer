@@ -51,7 +51,7 @@ class Settings:
             
             self.Image_Type = settings_dict['Image_Type']
         except:
-            self.write_to_settings_file("Image_Type", ".png")
+            self.write_to_settings_file("Image_Type", ".jpg")
             self.readSettings()
         try:
             self.videoQuality = settings_dict['videoQuality']

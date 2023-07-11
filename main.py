@@ -52,7 +52,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.QueueButton.hide()
         self.ui.QueueListWidget.hide()
         self.QueueList=[]
-        
+        self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
+        self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
         if self.gpuMemory == None:
             cannot_detect_vram(self)
         else:
