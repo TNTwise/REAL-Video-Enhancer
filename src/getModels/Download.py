@@ -67,4 +67,4 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Rife - ESRGAN - App"))
-        self.gbLabel.setText(_translate("MainWindow", "/GB"))
+        self.gbLabel.setText(_translate("MainWindow", "0.00/0.00GB"))

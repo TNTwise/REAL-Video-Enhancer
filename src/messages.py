@@ -14,3 +14,5 @@ def cannot_detect_vram(self):
     self.showDialogBox("Cannot detect vram amount, please set this value in settings for increased performance.",True)
 def no_downloaded_models(self):
     self.showDialogBox("No models selected, please select at least one model to download.",True)
+def failed_download(self):
+    self.showDialogBox("Failed to download dependencies, please check your connection and try again.",True)

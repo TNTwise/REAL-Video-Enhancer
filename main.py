@@ -52,6 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.QueueButton.hide()
         self.ui.QueueListWidget.hide()
         self.QueueList=[]
+        self.setDirectories()
         self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
         self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
         if self.gpuMemory == None:
@@ -61,6 +62,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         self.show()
+    def setDirectories(self):
+        self.models_dir=f"{thisdir}/models/"
     def switchUI(self):
         if self.ui.AICombo.currentText() == 'Rife':
             self.times=2

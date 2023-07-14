@@ -35,6 +35,7 @@ class Settings:
         self.write_to_settings_file("ExtractionImageType" ,"jpg")
         self.write_to_settings_file('SceneChangeDetection','0.3')
         self.write_to_settings_file('Encoder','264')
+        self.write_to_settings_file('ModelDir',f'{thisdir}/models')
 
         self.readSettings()
 
@@ -69,6 +70,11 @@ class Settings:
             self.GPUUsage = settings_dict['GPUUsage']
         except:
             self.write_to_settings_file("GPUUsage" ,'Default')
+            self.readSettings()
+        try:
+            self.ModelDir = settings_dict['ModelDir']
+        except:
+            self.write_to_settings_file("ModelDir" ,f'{thisdir}/models/')
             self.readSettings()
         try:
             self.RenderDir = settings_dict['RenderDir']

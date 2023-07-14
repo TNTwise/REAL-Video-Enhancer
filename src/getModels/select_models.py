@@ -16,8 +16,12 @@ import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
-
+from src.messages import *
+from src.checks import *
+import tarfile
 rife_install_list=[]
+from src.settings import *
+settings = Settings()
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(list)
@@ -28,7 +32,7 @@ class Worker(QObject):
                     install_modules_dict={
                                         
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
-'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
+'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
 'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
 'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan'}
                     for i in rife_install_list:
@@ -51,7 +55,7 @@ class Worker(QObject):
                     
                     self.finished.emit()
 
-if os.path.isfile(f'{thisdir}/realesrgan-vulkan-models/realesrgan-ncnn-vulkan') == False or os.path.isfile(f'{thisdir}/rife-vulkan-models/rife-ncnn-vulkan') == False:
+if check_if_models_exist() == False:
     
     class ChooseModels(QtWidgets.QMainWindow):
             def __init__(self):
@@ -159,9 +163,31 @@ if os.path.isfile(f'{thisdir}/realesrgan-vulkan-models/realesrgan-ncnn-vulkan') 
                     
                     self.ui.gbLabel.setText(f'{downloaded_data_gb}/{total_data_gb}GB')
                 def start_main(self):
-                    QApplication.closeAllWindows()
-                    return 0
-
+                    if os.path.exists(f"{settings.ModelDir}") == False:
+                        os.mkdir(f"{settings.ModelDir}")
+                        os.mkdir(f"{settings.ModelDir}/rife-ncnn-vulkan")
+                    for i in os.listdir(f'{thisdir}/files/'):
+                        if '.zip' in i:
+                            
+                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                name=i.replace('.zip','')
+                                
+                                
+                                zip_ref.extractall(f'{thisdir}/files/')
+                            
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
+                        if '.tar.gz' in i:
+                            with tarfile.open(f'{thisdir}/files/{i}','r') as f: 
+                                f.extractall(f'{settings.ModelDir}rife-ncnn-vulkan/')
+                                
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife-ncnn-vulkan"')
+                    if check_if_models_exist() == True:
+                        QApplication.closeAllWindows()
+                        return 0
+                    else:
+                        failed_download(self)
+                        exit()
         import src.theme as theme
         
         app1 = QtWidgets.QApplication(sys.argv)
@@ -170,7 +196,14 @@ if os.path.isfile(f'{thisdir}/realesrgan-vulkan-models/realesrgan-ncnn-vulkan') 
         
         window = Downloading()
         app1.exec_()
-        
+        if os.path.exists(f'{thisdir}/rife-vulkan-models') == True:
+            QApplication.closeAllWindows()
+        else:
+            for file in os.listdir(f'{thisdir}/files'):
+                if '.txt' not in file:
+                    os.system(f'rm -rf "{thisdir}/files/{file}"')
+                    
+            exit() # this happens if program abruptly stops while downloading
         
     else:
         exit()

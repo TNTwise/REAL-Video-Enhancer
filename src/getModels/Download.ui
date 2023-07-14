@@ -95,7 +95,7 @@
           <item>
            <widget class="QLabel" name="gbLabel">
             <property name="text">
-             <string>/GB</string>
+             <string>0.00/0.00GB</string>
             </property>
            </widget>
           </item>
