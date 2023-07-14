@@ -21,10 +21,10 @@ def renderRealsr(self):
     os.chdir(f'{thisdir}/realesrgan-vulkan-models')
     realESRGAN(self)
 def realESRGAN(self):
-
+        settings = Settings()
         self.endNum=0
         self.paused=False
-        os.system(f'./realesrgan-ncnn-vulkan {self.realESRGAN_Model} -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
+        os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
                 show_on_no_output_files(self)
         else:

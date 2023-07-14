@@ -165,23 +165,28 @@ if check_if_models_exist() == False:
                 def start_main(self):
                     if os.path.exists(f"{settings.ModelDir}") == False:
                         os.mkdir(f"{settings.ModelDir}")
-                        os.mkdir(f"{settings.ModelDir}/rife-ncnn-vulkan")
+                        os.mkdir(f"{settings.ModelDir}/rife")
                     for i in os.listdir(f'{thisdir}/files/'):
                         if '.zip' in i:
                             
                             with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                                 name=i.replace('.zip','')
+                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                print(original_ai_name)
                                 
                                 
                                 zip_ref.extractall(f'{thisdir}/files/')
-                            
-                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
+                                
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
                         if '.tar.gz' in i:
                             with tarfile.open(f'{thisdir}/files/{i}','r') as f: 
-                                f.extractall(f'{settings.ModelDir}rife-ncnn-vulkan/')
+                                f.extractall(f'{settings.ModelDir}/rife/')
                                 
                             os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
-                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife-ncnn-vulkan"')
+                        
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
                     if check_if_models_exist() == True:
                         QApplication.closeAllWindows()
                         return 0
