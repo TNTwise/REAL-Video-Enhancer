@@ -78,7 +78,8 @@ def onApplicationStart(self):
     
     # list every model downloaded, and add them to the list
 def list_model_downloaded(self):
-        model_filepaths = ([x[0] for x in os.walk(f'{thisdir}/rife-vulkan-models/')])
+        settings = Settings()
+        model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])
         models = []
         for model_filepath in model_filepaths:
             if 'rife' in os.path.basename(model_filepath):
