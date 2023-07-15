@@ -180,14 +180,15 @@ if check_if_models_exist() == False:
                                 
                             os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
                             os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-                            os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                            
                         if '.tar.gz' in i:
                             with tarfile.open(f'{thisdir}/files/{i}','r') as f: 
                                 f.extractall(f'{settings.ModelDir}/rife/')
                                 
                             os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
-                        
+                       
                     os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
                     if check_if_models_exist() == True:
                         QApplication.closeAllWindows()
                         return 0
