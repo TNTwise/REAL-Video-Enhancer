@@ -24,7 +24,8 @@ def realESRGAN(self):
         settings = Settings()
         self.endNum=0
         self.paused=False
-        os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {return_gpu_settings(self)} ')
+        img_type = self.settings.Image_Type.replace('.','')
+        os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {self.realESRGAN_Model}{return_gpu_settings(self)} -f {img_type} ')
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
                 show_on_no_output_files(self)
         else:
@@ -58,6 +59,7 @@ def startRealSR(self):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         realESRGAN_Model = self.ui.Rife_Model.currentText()
         realESRGAN_Times = self.ui.Rife_Times.currentText()
+        print(realESRGAN_Model)
         if realESRGAN_Model == 'Default':
             self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
         if realESRGAN_Model == 'Animation':
