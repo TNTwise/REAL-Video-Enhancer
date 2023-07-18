@@ -175,35 +175,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
                 except:
                     self.ETA = None
-    def getPreviewImage(self):
-        
-       
-        self.imageDisplay=None
-        last_file = None
-        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
-
-
-            try:
-
-                   #Have to make more optimized sorting alg here 
-
-                    if last_file != None:
-                        iteration=int(str(last_file).replace(f'{self.settings.Image_Type}',''))
-                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}{self.settings.Image_Type}') == True:
-                            iteration+=1
-
-                        last_file=f'{str(iteration).zfill(8)}{self.settings.Image_Type}'
-                        print(last_file)
-                    else:
-                        files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
-                        files.sort()
-                        last_file = files[-1]
-
-                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{last_file}"
-            except:
-                    self.imageDisplay = None
-                    self.ui.imagePreview.clear()
-            sleep(.5)
+    
     def reportProgress(self, n):
         try:
             
@@ -212,7 +184,7 @@ class MainWindow(QtWidgets.QMainWindow):
             # fc is the total file count after interpolation
             
             if self.i==1: # put every gui change that happens on start of render here
-                #Thread(target=self.getPreviewImage).start()
+                #Thread(target=self.calculateETA).start()
                 fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
                 self.filecount = fc
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
