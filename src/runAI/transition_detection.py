@@ -3,6 +3,7 @@ import os
 import src.return_data
 import subprocess
 from src.return_data import *
+from src.settings import *
 class TransitionDetection:
     def __init__(self,input_file):
         self.settings = src.settings.Settings()
@@ -44,6 +45,7 @@ class TransitionDetection:
 
     def get_frame_num(self,times,frames_subtracted=0):
         self.times=times
+        settings = Settings()
         if self.settings.SceneChangeDetection != 'Off':
             frame_list =[]
             for i in self.timestamps:
@@ -131,7 +133,7 @@ class TransitionDetection:
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}.png" "{self.full_render_dir}/transitions/{copyto}.png"')'''
                   
                   
-            os.chdir(f'{self.thisdir}/rife-vulkan-models')
+            
     def merge_frames(self):
         p = 0
         o = 1
