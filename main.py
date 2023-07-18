@@ -119,10 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Thread(target=lambda: start.Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
         self.ui.RifePause.show()
         
-    def resume_render_realesrgan(self):
-        self.ui.RealESRGANResume.hide()
-        Thread(target=lambda: start.realESRGAN(self)).start()
-        self.ui.RealESRGANPause.show()
+    
     def showChangeInFPS(self):
         try:
             if self.ui.AICombo.currentText() == 'Rife':
@@ -131,8 +128,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.input_file != '':
                     self.times = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
-        except:
-            pass
+            
+            if self.ui.AICombo.currentText() == 'RealESRGAN':
+                if self.input_file != '':
+                    self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
+                    self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
+        except Exception as e:
+            print(e)
     def calculateETA(self):
         self.ETA=None
         total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times

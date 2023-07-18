@@ -105,7 +105,7 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
                     iteration+=1 # fixes any files that were created from a pause/resume, and will fit them into a 8 digit file so ffmpeg can read them'''
                 self.transitionDetection.merge_frames()
                 
-                self.output_file = end(self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+                self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
             else:
                 pass
 

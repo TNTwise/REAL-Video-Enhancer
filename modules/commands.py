@@ -25,6 +25,10 @@ def return_gpu_settings(self):
 def start(renderdir,videoName,videopath,times):
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
+        
+        global height
+        global width
+        width,height = return_data.VideoName.return_video_resolution(videopath)
         '''with open(f'{renderdir}/{videoName}_temp/data.txt', 'w') as f:
             f.write(f'{times}')'''
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
@@ -37,22 +41,32 @@ def start(renderdir,videoName,videopath,times):
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
 
 
-def end(renderdir,videoName,videopath,times,outputpath,videoQuality,encoder):
+def end(self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         
         
         if outputpath == '':
                 outputpath = homedir
-        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
-                i=1
-                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
-                        i+=1
-                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4' 
+        if mode == 'interpolation':
+                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
+                        i=1
+                        while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
+                                i+=1
+                        output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4' 
 
-        else:
-               output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
-        
-        os.system(f'ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
+                else:
+                        output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
+        if mode == 'upscale': # add upscale/realesrgan resolution bump here
+                upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
+                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.mp4') == True:
+                        i=1
+                        while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4') == True:
+                                i+=1
+                        output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4' 
+
+                else:
+                        output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
+        os.system(f'ffmpeg -framerate {fps} -i "{renderdir}/{videoName}_temp/output_frames/%08d{settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') #ye we gonna have to add settings up in this bish
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')

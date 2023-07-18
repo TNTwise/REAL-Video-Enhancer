@@ -30,7 +30,7 @@ def realESRGAN(self):
                 show_on_no_output_files(self)
         else:
                 if self.paused == False:
-                    self.output_file = end(self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder)
+                    self.output_file = end(self,self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder,'upscale')
                 else:
                     pass
     
