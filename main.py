@@ -14,7 +14,6 @@ from threading import *
 from src.settings import *
 from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
-import src.runAI.start as start
 import src.workers as workers
 import time
 #import src.get_models as get_models
@@ -117,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def resume_render(self):
         self.ui.RifeResume.hide() #show resume button
         
-        Thread(target=lambda: start.Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
+        #Thread(target=lambda: Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
         self.ui.RifePause.show()
         
     

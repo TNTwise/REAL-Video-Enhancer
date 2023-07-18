@@ -13,7 +13,6 @@ from threading import *
 from src.settings import *
 from src.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
-import src.runAI.start as start
 import src.workers as workers
 import time
 #import src.get_models as get_models

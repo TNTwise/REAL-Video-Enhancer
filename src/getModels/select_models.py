@@ -19,6 +19,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from src.messages import *
 from src.checks import *
 import tarfile
+from sys import exit
 rife_install_list=[]
 from src.settings import *
 settings = Settings()
@@ -203,7 +204,7 @@ if check_if_models_exist() == False:
         
         window = Downloading()
         app1.exec_()
-        if os.path.exists(f'{thisdir}/rife-vulkan-models') == True:
+        if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
             QApplication.closeAllWindows()
         else:
             for file in os.listdir(f'{thisdir}/files'):
