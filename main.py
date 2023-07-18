@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 import src.getModels.select_models as sel_mod
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
 import cv2
 import psutil
-from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import  QFileDialog, QMessageBox
 from PyQt5.QtGui import QTextCursor, QPixmap,QIcon, QIntValidator
-import PyQt5.QtCore as QtCore
 import mainwindow
 import os
 from threading import *
