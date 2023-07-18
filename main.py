@@ -27,6 +27,7 @@ import modules.ESRGAN as esrgan
 import pypresence
 import src.onProgramStart
 import src.queue.queue as queue
+from src.ETA import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -135,46 +136,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
         except Exception as e:
             print(e)
-    def calculateETA(self):
-        self.ETA=None
-        total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
-        for i in range(total_iterations):
-            if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
-                start_time = time.time()
-                
-                
-                
-                    # Do some work for each iteration
-                    
-                try:
-                    
-                        
-                        
-                    completed_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))
-                    
-                    # Increment the completed iterations counter
-                    sleep(1)
-
-                    # Estimate the remaining time
-                    elapsed_time = time.time() - start_time
-                    time_per_iteration = elapsed_time / completed_iterations
-                    remaining_iterations = total_iterations - completed_iterations
-                    remaining_time = remaining_iterations * time_per_iteration
-                    remaining_time = int(remaining_time) 
-                    # Print the estimated time remaining
-                    #convert to hours, minutes, and seconds
-                    hours = remaining_time // 3600
-                    remaining_time-= 3600*hours
-                    minutes = remaining_time // 60
-                    remaining_time -= minutes * 60
-                    seconds = remaining_time
-                    if minutes < 10:
-                        minutes = str(f'0{minutes}')
-                    if seconds < 10:
-                        seconds = str(f'0{seconds}')
-                    self.ETA = f'ETA: {hours}:{minutes}:{seconds}'
-                except:
-                    self.ETA = None
+    
     
     def reportProgress(self, n):
         try:
@@ -184,7 +146,7 @@ class MainWindow(QtWidgets.QMainWindow):
             # fc is the total file count after interpolation
             
             if self.i==1: # put every gui change that happens on start of render here
-                #Thread(target=self.calculateETA).start()
+                Thread(target=lambda: calculateETA(self)).start()
                 fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
                 self.filecount = fc
                 total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
@@ -209,7 +171,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePB.setValue(fp)
             self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
             
-            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-2).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
             if self.imageDisplay != None:
 
                 try:
