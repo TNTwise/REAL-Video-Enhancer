@@ -12,13 +12,14 @@ from src.discord_rpc import *
 import glob
 import os
 from modules.commands import *
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 
 thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 def renderRealsr(self):
 
     start(self.render_folder,self.videoName,self.input_file,1)
-    os.chdir(f'{thisdir}/realesrgan-vulkan-models')
+    
     realESRGAN(self)
 def realESRGAN(self):
         settings = Settings()
@@ -46,9 +47,9 @@ def startRealSR(self):
         self.times = 1
         self.fps=VideoName.return_video_framerate(f'{self.input_file}')
         
-        video = cv2.VideoCapture(self.input_file)
-        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        video = VideoCapture(self.input_file)
+        self.videowidth = video.get(CAP_PROP_FRAME_WIDTH)
+        self.videoheight = video.get(CAP_PROP_FRAME_HEIGHT)
         self.aspectratio = self.videowidth / self.videoheight
         self.setDisableEnable(True)
         
@@ -59,7 +60,6 @@ def startRealSR(self):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         realESRGAN_Model = self.ui.Rife_Model.currentText()
         realESRGAN_Times = self.ui.Rife_Times.currentText()
-        print(realESRGAN_Model)
         if realESRGAN_Model == 'Default':
             self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
         if realESRGAN_Model == 'Animation':
