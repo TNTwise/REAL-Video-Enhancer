@@ -132,6 +132,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
+                self.ui.Rife_Model.setCurrentIndex(0)
+                self.ui.Rife_Times.setCurrentIndex(0)
         except Exception as e:
             print(e)
     

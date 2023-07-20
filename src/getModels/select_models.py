@@ -26,12 +26,12 @@ settings = Settings()
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(list)
-    
-                    
+
+
     @pyqtSlot()
     def install_modules(self):
                     install_modules_dict={
-                                        
+
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
 'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
 'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
@@ -43,7 +43,7 @@ class Worker(QObject):
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         total_size_in_bytes+= int(response.headers.get('content-length', 0))
-                    
+
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         with open(f'{thisdir}/files/{name}', 'wb') as f:
@@ -51,13 +51,13 @@ class Worker(QObject):
                                     f.write(data)
                                     data_downloaded+=1024
                                     self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread
-                    
-                    
-                    
+
+
+
                     self.finished.emit()
 
 if check_if_models_exist() == False:
-    
+
     class ChooseModels(QtWidgets.QMainWindow):
             def __init__(self):
                 super(ChooseModels, self).__init__()
@@ -70,15 +70,15 @@ if check_if_models_exist() == False:
                 msg = QMessageBox()
                 msg.setWindowTitle(" ")
                 if displayInfoIcon == True:
-                    msg.setIconPixmap(icon.pixmap(32, 32)) 
+                    msg.setIconPixmap(icon.pixmap(32, 32))
                 msg.setText(f"{message}")
-                
+
                 msg.exec_()
             def pinFunctions(self):
-                
+
                 self.ui.next.clicked.connect(self.nextfunction)
             def nextfunction(self):
-                
+
                 if self.ui.rife.isChecked() == True:
                     rife_install_list.append('rife')
                 if self.ui.rifeanime.isChecked() == True:
@@ -105,20 +105,20 @@ if check_if_models_exist() == False:
                     src.messages.no_downloaded_models(self)
                 else:
                     QApplication.closeAllWindows()
-                    
-                    
+
+
                     return 0
-                    
-                
-                
-                
+
+
+
+
 
     import src.theme as theme
-    
+
     app = QtWidgets.QApplication(sys.argv)
     theme.set_theme(app)
-    
-    
+
+
     window = ChooseModels()
     app.exec_()
     if len(rife_install_list) > 0:
@@ -129,23 +129,23 @@ if check_if_models_exist() == False:
                     self.ui.setupUi(self)
                     self.show()
                     self.nextfunction()
-                    
+
                 def showDialogBox(self,message,displayInfoIcon=False):
                     icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
                     msg = QMessageBox()
                     msg.setWindowTitle(" ")
                     if displayInfoIcon == True:
-                        msg.setIconPixmap(icon.pixmap(32, 32)) 
+                        msg.setIconPixmap(icon.pixmap(32, 32))
                     msg.setText(f"{message}")
-                    
+
                     msg.exec_()
-                
+
                 def nextfunction(self):
-                    
+
                     logo = QIcon(f"{thisdir}/icons/logo v1.png")
-                    
+
                     self.ui.logoPreview.setPixmap(logo.pixmap(256,256))
-                    
+
                     self.obj = Worker()
                     self.thread = QThread()
                     self.obj.intReady.connect(self.on_count_changed)
@@ -161,47 +161,52 @@ if check_if_models_exist() == False:
                     self.ui.downloadProgressBar.setValue(downloaded_data)
                     downloaded_data_gb = str(downloaded_data/1000000000)[:4]
                     total_data_gb = str(total_data/1000000000)[:4]
-                    
+
                     self.ui.gbLabel.setText(f'{downloaded_data_gb}/{total_data_gb}GB')
                 def start_main(self):
                     if os.path.exists(f"{settings.ModelDir}") == False:
                         os.mkdir(f"{settings.ModelDir}")
                         os.mkdir(f"{settings.ModelDir}/rife")
                     for i in os.listdir(f'{thisdir}/files/'):
+
+                        print(i)
                         if '.zip' in i:
-                            
+
                             with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                                 name=i.replace('.zip','')
                                 original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
                                 original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
                                 print(original_ai_name)
-                                
-                                
+
+
                                 zip_ref.extractall(f'{thisdir}/files/')
-                                
+
                             os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
                             os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-                            
+
                         if '.tar.gz' in i:
-                            with tarfile.open(f'{thisdir}/files/{i}','r') as f: 
+                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
                                 f.extractall(f'{settings.ModelDir}/rife/')
-                                
-                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/"')
-                       
+
+
                     os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
                     os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              os.remove(f'{thisdir}/files/{i}')
                     if check_if_models_exist() == True:
                         QApplication.closeAllWindows()
+
                         return 0
                     else:
                         failed_download(self)
                         exit()
         import src.theme as theme
-        
+
         app1 = QtWidgets.QApplication(sys.argv)
         theme.set_theme(app1)
-        
-        
+
+
         window = Downloading()
         app1.exec_()
         if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
@@ -210,8 +215,8 @@ if check_if_models_exist() == False:
             for file in os.listdir(f'{thisdir}/files'):
                 if '.txt' not in file:
                     os.system(f'rm -rf "{thisdir}/files/{file}"')
-                    
+
             exit() # this happens if program abruptly stops while downloading
-        
+
     else:
         exit()
