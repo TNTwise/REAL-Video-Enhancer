@@ -116,17 +116,17 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="AICombo">
-                <item>
-                 <property name="text">
-                  <string>Rife</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>RealESRGAN</string>
-                 </property>
-                </item>
+               <widget class="QPushButton" name="Input_video_rife">
+                <property name="text">
+                 <string>Input Video</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Output_folder_rife">
+                <property name="text">
+                 <string>Output folder</string>
+                </property>
                </widget>
               </item>
               <item>
@@ -155,17 +155,17 @@
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_3">
               <item>
-               <widget class="QPushButton" name="Input_video_rife">
-                <property name="text">
-                 <string>Input Video</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="Output_folder_rife">
-                <property name="text">
-                 <string>Output folder</string>
-                </property>
+               <widget class="QComboBox" name="AICombo">
+                <item>
+                 <property name="text">
+                  <string>Rife</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>RealESRGAN</string>
+                 </property>
+                </item>
                </widget>
               </item>
               <item>
