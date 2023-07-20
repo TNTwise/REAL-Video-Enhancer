@@ -116,13 +116,13 @@ class TransitionDetection:
                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
                 if times == 4 or times == 8:
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}{self.settings.Image_Type}"')
                 if times == 8:
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict1[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict2[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict3[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}.png" "{self.full_render_dir}/transitions/{self.fileToCopyDict4[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict1[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict2[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict3[p]}{self.settings.Image_Type}"')
+                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict4[p]}{self.settings.Image_Type}"')
                     #This is so dumb lmao, ik there is a better way but i am lazy lol
                 
                 p+=1
