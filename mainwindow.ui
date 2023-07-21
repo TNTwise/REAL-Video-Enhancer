@@ -27,6 +27,9 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <item>
            <widget class="QFrame" name="frame">
             <property name="frameShape">
@@ -35,7 +38,25 @@
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
+            <property name="lineWidth">
+             <number>0</number>
+            </property>
             <layout class="QVBoxLayout" name="verticalLayout_6">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
               <widget class="QLabel" name="imagePreview">
                <property name="text">
@@ -55,6 +76,21 @@
                 <number>0</number>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_9">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
                 <item>
                  <spacer name="imageSpacer">
                   <property name="orientation">
