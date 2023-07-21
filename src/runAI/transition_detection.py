@@ -21,10 +21,10 @@ class TransitionDetection:
         if self.settings.SceneChangeDetection != 'Off':
             # This will get the timestamps of the scene changes, and for every scene change timestamp, i can times it by the fps count to get its current frame, and after interpolation, double it and replace it and it -1 frame with the transition frame stored in the transitions folder
             
-           
-            os.system(f'ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 2 "{self.full_render_dir}/transitions/%07d.png"')
-            ffmpeg_cmd = f'ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 2 "{self.full_render_dir}/transitions/%07d.png"' 
-            
+            if self.settings.Image_Type != '.webp':
+                ffmpeg_cmd = f'./bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
+            else:
+                 ffmpeg_cmd = f'./bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
             output = subprocess.check_output(ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT)
             
             # Decode the output as UTF-8 and split it into lines
@@ -112,8 +112,10 @@ class TransitionDetection:
             for image in list1:
                 
                 
-               
-                os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
+                if settings.Image_Type != '.webp':
+                    os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
+                else:
+                    os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
                 # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
                 if times == 4 or times == 8:
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}{self.settings.Image_Type}"')
@@ -130,7 +132,7 @@ class TransitionDetection:
                 # IK this is dumb. but i cant think of anything else rn
             '''if times == 4:
                     for file,copyto in self.fileToCopyDict.items():
-                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}.png" "{self.full_render_dir}/transitions/{copyto}.png"')'''
+                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
                   
             
@@ -144,7 +146,7 @@ class TransitionDetection:
                 os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
         
         for image in self.frame_list:
-            os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}.png" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" ')
+            os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
             p+=1
             o+=1
         os.chdir(f'{self.thisdir}/')

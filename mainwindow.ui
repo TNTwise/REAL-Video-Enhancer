@@ -458,20 +458,6 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="1" column="3">
-                <widget class="QLabel" name="RenderPathLabel">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="4">
-                <widget class="QPushButton" name="RenderDirButton">
-                 <property name="text">
-                  <string>Render Directory</string>
-                 </property>
-                </widget>
-               </item>
                <item row="2" column="3">
                 <widget class="QLabel" name="label_4">
                  <property name="text">
@@ -479,16 +465,16 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="4">
+               <item row="2" column="5">
                 <widget class="QComboBox" name="imageComboBox">
                  <item>
                   <property name="text">
-                   <string>.png</string>
+                   <string>.jpg</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>.jpg</string>
+                   <string>.png</string>
                   </property>
                  </item>
                  <item>
@@ -497,6 +483,40 @@
                   </property>
                  </item>
                 </widget>
+               </item>
+               <item row="1" column="5">
+                <widget class="QPushButton" name="RenderDirButton">
+                 <property name="text">
+                  <string>Render Directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QPushButton" name="imageHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="RenderPathLabel">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>

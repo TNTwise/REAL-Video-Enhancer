@@ -53,6 +53,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.QueueList=[]
         self.setDirectories()
         self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
+        self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
         self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
         if self.gpuMemory == None:
             cannot_detect_vram(self)

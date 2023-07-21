@@ -26,6 +26,7 @@ def onApplicationStart(self):
     self.render_folder = settings.RenderDir
     self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.imageHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.RifePause.clicked.connect(self.pause_render)
     self.ui.RifeResume.clicked.connect(self.resume_render)
