@@ -19,6 +19,8 @@ class Settings:
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")
     def write_defaults(self):
+        with open(f'{thisdir}/files/settings.txt', 'w') as f:
+            pass
         self.write_to_settings_file("Image_Type", ".jpg")
         self.write_to_settings_file("IsAnime", "False")
         self.write_to_settings_file("Repository", "stable")
@@ -45,7 +47,7 @@ class Settings:
         
 
         self.readSettings()
-
+    
     def readSettings(self):
         settings_dict = {}
         with open(f'{thisdir}/files/settings.txt', 'r') as f:

@@ -562,7 +562,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <spacer name="horizontalSpacer_2">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -574,6 +574,13 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPushButton" name="resetSettingsButton">
+                 <property name="text">
+                  <string>Reset Settings</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>

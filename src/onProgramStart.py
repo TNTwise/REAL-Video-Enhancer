@@ -1,5 +1,6 @@
 from src.settings import *
 from src.messages import *
+import src.queue.queue as queue
 def onApplicationStart(self):
     import os
     
@@ -15,6 +16,29 @@ def onApplicationStart(self):
     settings = Settings()
     from PyQt5.QtGui import QIntValidator, QIcon
     thisdir=os.getcwd()
+    
+    
+    
+    self.input_file = ''
+    self.output_folder = ''
+    self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
+    self.ui.SettingsMenus.clicked.connect(self.settings_menu)
+    self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
+    self.settings = Settings()
+    self.gpuMemory=self.settings.VRAM
+    self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
+    self.switchUI()
+    if self.gpuMemory != 'None':
+        
+        self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
+        if HardwareInfo.get_video_memory_linux() != None:
+            self.ui.vramAmountSpinbox.setMaximum(int(self.gpuMemory))
+    else:
+        self.ui.vramAmountSpinbox.setValue(1)
+        cannot_detect_vram(self)
+    self.ui.vramAmountSpinbox.setMinimum(1)
+    self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
+    self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
     #Define Variables
     self.input_file = ''
     self.output_folder = ''
@@ -64,7 +88,7 @@ def onApplicationStart(self):
     
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
-    self.ui.verticalTabWidget.setCurrentWidget(self.ui.verticalTabWidget.findChild(QWidget, 'Rife'))
+    
     self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
     self.ui.VideoOptionsFrame.hide()
@@ -76,8 +100,21 @@ def onApplicationStart(self):
     #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
     
     self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
-    
+    self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
+    self.ui.QueueButton.hide()
+    self.ui.QueueListWidget.hide()
+    self.QueueList=[]
+    self.setDirectories()
+    self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
+    self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
+    self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
+    if self.gpuMemory == None:
+        cannot_detect_vram(self)
+    else:
+        pass
     # list every model downloaded, and add them to the list
+    self.ui.SettingsMenus.setCurrentRow(0)
+    self.ui.GeneralOptionsFrame.show()
 def list_model_downloaded(self):
         settings = Settings()
         model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])
