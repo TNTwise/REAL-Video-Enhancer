@@ -458,14 +458,7 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="2" column="3">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Image Type</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="5">
+               <item row="3" column="5">
                 <widget class="QComboBox" name="imageComboBox">
                  <item>
                   <property name="text">
@@ -484,28 +477,14 @@
                  </item>
                 </widget>
                </item>
-               <item row="1" column="5">
-                <widget class="QPushButton" name="RenderDirButton">
-                 <property name="text">
-                  <string>Render Directory</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="4">
+               <item row="3" column="4">
                 <widget class="QPushButton" name="imageHelpButton">
                  <property name="text">
                   <string/>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="RenderPathLabel">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="5">
+               <item row="4" column="5">
                 <spacer name="horizontalSpacer">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -517,6 +496,52 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Image Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="RenderPathLabel">
+                 <property name="text">
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="5">
+                <widget class="QPushButton" name="RenderDirButton">
+                 <property name="text">
+                  <string>Render Directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="5">
+                <widget class="QSpinBox" name="vramAmountSpinbox">
+                 <property name="suffix">
+                  <string> GB</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="4">
+                <widget class="QPushButton" name="vramAmountHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>VRAM amount</string>
+                 </property>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -536,6 +561,19 @@
                   <string>Discord Rich Presence</string>
                  </property>
                 </widget>
+               </item>
+               <item row="1" column="1">
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>

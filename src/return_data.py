@@ -38,6 +38,7 @@ class ManageFiles:
         return os.path.exists(folderpath)
 class HardwareInfo:
     def get_video_memory_linux():
+        
         try:
             with open('/sys/class/drm/card0/device/mem_info_vram_total', 'r') as f:
                 for line in f:

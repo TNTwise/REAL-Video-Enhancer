@@ -36,6 +36,13 @@ class Settings:
         self.write_to_settings_file('SceneChangeDetection','0.3')
         self.write_to_settings_file('Encoder','264')
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
+        if HardwareInfo.get_video_memory_linux() == None:
+            self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
+        elif  HardwareInfo.get_video_memory_linux() >= 1:
+                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
+        elif HardwareInfo.get_video_memory_linux() < 1:
+                self.write_to_settings_file('VRAM','1')
+        
 
         self.readSettings()
 
@@ -108,6 +115,21 @@ class Settings:
         except:
             self.write_to_settings_file('DiscordRPC', 'Disabled')
             self.readSettings()       
+        try:
+            self.ModelDir=settings_dict['ModelDir']
+        except:
+            self.write_to_settings_file('ModelDir',f'{thisdir}/models')
+            self.readSettings()
+        try:
+            self.VRAM = settings_dict['VRAM']
+        except:
+            if HardwareInfo.get_video_memory_linux() == None:
+                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
+            elif  HardwareInfo.get_video_memory_linux() >= 1:
+                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
+            elif HardwareInfo.get_video_memory_linux() < 1:
+                self.write_to_settings_file('VRAM','1')
+            self.readSettings()
         
     def change_setting(self,setting,svalue):
         original_settings = {}

@@ -15,10 +15,10 @@ import os
 
 
 def return_gpu_settings(self):
-    if self.gpuMemory <= 2.0:
-        gpu_usage = ''
+    if int(self.gpuMemory) < 1:
+        gpu_usage = f'-j 1:1:1'
     else:
-        num = int(int(self.gpuMemory)+1)
+        num = int(int(self.gpuMemory))
         gpu_usage = f'-j {num}:{num}:{num}'
     return gpu_usage
 

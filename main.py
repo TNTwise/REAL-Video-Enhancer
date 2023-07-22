@@ -42,10 +42,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = ''
         self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         self.ui.SettingsMenus.clicked.connect(self.settings_menu)
-        self.gpuMemory=HardwareInfo.get_video_memory_linux()
+        
         self.settings = Settings()
+        self.gpuMemory=self.settings.VRAM
         self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
         self.switchUI()
+        if self.gpuMemory != 'None':
+            
+            self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
+            if HardwareInfo.get_video_memory_linux() != None:
+                self.ui.vramAmountSpinbox.setMaximum(int(self.gpuMemory))
+        else:
+            self.ui.vramAmountSpinbox.setValue(1)
+            cannot_detect_vram(self)
+        self.ui.vramAmountSpinbox.setMinimum(1)
+        self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
+        self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
         src.onProgramStart.onApplicationStart(self)
         self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
         self.ui.QueueButton.hide()
@@ -62,6 +74,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         self.show()
+    def changeVRAM(self):
+        self.settings.change_setting('VRAM', f'{self.ui.vramAmountSpinbox.value()}')
+        self.gpuMemory=self.settings.VRAM
     def setDirectories(self):
         self.models_dir=f"{thisdir}/models/"
     def switchUI(self):

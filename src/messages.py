@@ -22,3 +22,6 @@ def failed_download(self):
 
 def image_help(self):
     self.showDialogBox("Extraction and render image type.\nJPG (recommended) lossy, low file size.\nPNG (high quality) lossless, high file size.\nWEBP (longer render time) lossless, low file size.")
+
+def vram_help(self):
+    self.showDialogBox("VRAM limit for the program: Adjust to reduce system load or fix upscaling issues.\nChanging this alters the amount of VRAM the program has optimizes towards.")
