@@ -18,7 +18,7 @@ thisdir= os.getcwd()
 homedir = os.path.expanduser(r"~")
 def renderRealsr(self):
 
-    start(self.render_folder,self.videoName,self.input_file,1)
+    start(self,self.render_folder,self.videoName,self.input_file,1)
     
     realESRGAN(self)
 def realESRGAN(self):
@@ -42,7 +42,6 @@ def startRealSR(self):
         settings = Settings()
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
-        self.ui.FPSPreview.setText('RES:')
         self.setDisableEnable(True)
         self.times = 1
         self.fps=VideoName.return_video_framerate(f'{self.input_file}')
