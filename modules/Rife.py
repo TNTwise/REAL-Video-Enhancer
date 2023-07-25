@@ -23,19 +23,22 @@ def startRife(self): #should prob make this different, too similar to start_rife
     # Calculate the aspect ratio
                 
         
-        if self.input_file != '':
+        if self.input_file != '' or self.localFile == False:
             self.ui.QueueButton.show()
             self.render='rife'
-            
-            self.fps = VideoName.return_video_framerate(f'{self.input_file}')
+            if self.localFile == True:
+                self.fps = VideoName.return_video_framerate(f'{self.input_file}')
             settings = Settings()
             # Calculate the aspect ratio
-            videoName = VideoName.return_video_name(fr'{self.input_file}')
-            self.videoName = videoName
-            video = cv2.VideoCapture(self.input_file)
-            self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-            self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            self.aspectratio = self.videowidth / self.videoheight
+            if self.localFile == True:
+                videoName = VideoName.return_video_name(fr'{self.input_file}')
+                self.videoName = videoName
+                video = cv2.VideoCapture(self.input_file)
+                self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+                self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                self.aspectratio = self.videowidth / self.videoheight
+            else:
+                 self.videoName = 'output.mp4'
             self.setDisableEnable(True)
             
             if settings.DiscordRPC == 'Enabled':
@@ -69,8 +72,9 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
         #self.runLogs(videoName,times)
         start(self,self.render_folder,self.videoName,videopath,times)
-        self.transitionDetection.find_timestamps()
-        self.transitionDetection.get_frame_num(times)
+        if self.localFile == True:
+            self.transitionDetection.find_timestamps()
+            self.transitionDetection.get_frame_num(times)
         self.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
         Rife(self,model,times,videopath,outputpath,end_iteration)
         

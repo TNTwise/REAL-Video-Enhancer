@@ -26,6 +26,7 @@ import pypresence
 import src.onProgramStart
 import src.queue.queue as queue
 from src.ETA import *
+from src.getLinkVideo.get_video import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
 
@@ -39,8 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setMinimumSize(700, 550)
         src.onProgramStart.onApplicationStart(self)
-        
-        
+        self.localFile=True
+        self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
         
         self.show()
 
@@ -114,20 +115,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RifePause.show()
         
     
-    def showChangeInFPS(self):
+    def showChangeInFPS(self,localFile=False):
+        
         try:
+            
             if self.ui.AICombo.currentText() == 'Rife':
-                
                 
                 if self.input_file != '':
                     self.times = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
-            
+                if self.fps != None:    
+                    self.ui.FPSPreview.setText(f'FPS: {self.fps} -> {int(self.fps)*int(self.times)}')
             if self.ui.AICombo.currentText() == 'RealESRGAN':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
-                
         except Exception as e:
             print(e)
     
@@ -281,6 +283,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
         self.showChangeInFPS()
+        if self.input_file != '':
+            self.localFile = True
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
