@@ -20,14 +20,9 @@ class GetLinkedWindow(QMainWindow):
         self.main = selfdata
         self.setMinimumSize(700, 550)
         self.ui.error_label.setStyleSheet('QLabel#error_label {color: red}')
-        self.ui.qualityCombo.currentIndexChanged.connect(self.setRes)
         
         self.show()
-    def setRes(self):
-         
-         self.res = self.ui.qualityCombo.currentText()
-         print(self.res)
-         self.ui.qualityCombo.setCurrentText(self.res)
+   
     def next(self):
         
         if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
@@ -41,7 +36,6 @@ class GetLinkedWindow(QMainWindow):
     def get_youtube_video_duration(self,url):
         try:
             result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', self.ui.plainTextEdit.toPlainText(), '--get-duration'], capture_output=True, text=True)
-            print(result.stdout)
             if result.returncode == 0:
                 duration_str = result.stdout.strip()
                 duration_parts = duration_str.split(':')
@@ -83,7 +77,8 @@ class GetLinkedWindow(QMainWindow):
                                     self.ui.qualityCombo.addItem(resolution[0])
                     self.duration = self.get_youtube_video_duration(self.ui.plainTextEdit.toPlainText())
                     self.ui.error_label.clear()
-                    
+                    self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+                    self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
                     self.ui.qualityLabel.show()
                     self.ui.qualityCombo.show()
                     self.ui.next.clicked.disconnect(self.next)
@@ -115,8 +110,7 @@ class GetLinkedWindow(QMainWindow):
             return None
     def gen_youtubedlp_command(self):
         global return_command
-        self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
-        self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        
         self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.main.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
         self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
