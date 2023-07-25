@@ -20,10 +20,14 @@ class GetLinkedWindow(QMainWindow):
         self.main = selfdata
         self.setMinimumSize(700, 550)
         self.ui.error_label.setStyleSheet('QLabel#error_label {color: red}')
-        
+        self.ui.qualityCombo.currentIndexChanged.connect(self.setRes)
         
         self.show()
-
+    def setRes(self):
+         
+         self.res = self.ui.qualityCombo.currentText()
+         print(self.res)
+         self.ui.qualityCombo.setCurrentText(self.res)
     def next(self):
         
         if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
@@ -55,11 +59,14 @@ class GetLinkedWindow(QMainWindow):
                                     fps=(line[22:24])
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.ui.qualityCombo.addItem(resolution[0])
-                    self.ui.next.clicked.connect(self.gen_youtubedlp_command)
+                    
+                    
                     self.ui.error_label.clear()
-                    self.ui.qualityCombo.show()
+                    
                     self.ui.qualityLabel.show()
-                    print(fps_list)
+                    self.ui.qualityCombo.show()
+                    self.ui.next.clicked.disconnect(self.next)
+                    self.ui.next.clicked.connect(self.gen_youtubedlp_command)
                 else:
                     if result.stderr == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.toPlainText()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.toPlainText()}" ) to search YouTube\n""": 
                         self.ui.error_label.setText("Invalid URL")

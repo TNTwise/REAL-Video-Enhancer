@@ -144,9 +144,11 @@ class TransitionDetection:
         for i in os.listdir():
             
                 os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
-        
-        for image in self.frame_list:
-            os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
-            p+=1
-            o+=1
+        try:
+            for image in self.frame_list:
+                os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
+                p+=1
+                o+=1
+        except:
+            pass
         os.chdir(f'{self.thisdir}/')
