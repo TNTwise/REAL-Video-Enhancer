@@ -20,7 +20,10 @@ class TransitionDetection:
     def find_timestamps(self):
         if self.settings.SceneChangeDetection != 'Off':
             # This will get the timestamps of the scene changes, and for every scene change timestamp, i can times it by the fps count to get its current frame, and after interpolation, double it and replace it and it -1 frame with the transition frame stored in the transitions folder
-            
+            try:
+                os.mkdir(f"{self.full_render_dir}/transitions/")
+            except:
+                 pass
             if self.settings.Image_Type != '.webp':
                 ffmpeg_cmd = f'./bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
             else:
@@ -144,11 +147,9 @@ class TransitionDetection:
         for i in os.listdir():
             
                 os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
-        try:
-            for image in self.frame_list:
-                os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
-                p+=1
-                o+=1
-        except:
-            pass
+        
+        for image in self.frame_list:
+            os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
+            p+=1
+            o+=1
         os.chdir(f'{self.thisdir}/')

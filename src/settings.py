@@ -12,6 +12,7 @@ class Settings:
         if ManageFiles.isfile(f"{thisdir}/files/settings.txt") == False:
             ManageFiles.create_file(f"{thisdir}/files/settings.txt")
             self.write_defaults()
+        self.write_temp()
         self.readSettings()
     def write_to_settings_file(self,description, option):
     

@@ -37,26 +37,18 @@ def realESRGAN(self):
     
 def startRealSR(self):
     if self.input_file != '':
-        self.render='esrgan'
-        self.ui.QueueButton.show()
-        settings = Settings()
-        self.ui.ETAPreview.setText('ETA:')
-        self.ui.processedPreview.setText('Files Processed:')
-        self.setDisableEnable(True)
-        self.times = 1
-        self.fps=VideoName.return_video_framerate(f'{self.input_file}')
         
-        video = VideoCapture(self.input_file)
-        self.videowidth = video.get(CAP_PROP_FRAME_WIDTH)
-        self.videoheight = video.get(CAP_PROP_FRAME_HEIGHT)
-        self.aspectratio = self.videowidth / self.videoheight
+        self.ui.QueueButton.show()
+        self.render='esrgan'
+        
+        settings = Settings()
         self.setDisableEnable(True)
         
         if settings.DiscordRPC == 'Enabled':
             start_discordRPC(self,'Upscaling')
-        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        
-        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
+        self.ui.logsPreview.append(f'Extracting Frames')
+            
         realESRGAN_Model = self.ui.Rife_Model.currentText()
         realESRGAN_Times = self.ui.Rife_Times.currentText()
         if realESRGAN_Model == 'Default':

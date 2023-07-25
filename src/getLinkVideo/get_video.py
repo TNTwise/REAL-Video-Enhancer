@@ -33,9 +33,30 @@ class GetLinkedWindow(QMainWindow):
         if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
             self.download_yt_vid()
         else:
+            self.main.input_file = self.ui.plainTextEdit.toPlainText()
+            self.main.localFile = True
+            self.main.videoName = 'output.mp4'
+            window.close()
             
-            return 0
-
+    def get_youtube_video_duration(self,url):
+        try:
+            result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', self.ui.plainTextEdit.toPlainText(), '--get-duration'], capture_output=True, text=True)
+            print(result.stdout)
+            if result.returncode == 0:
+                duration_str = result.stdout.strip()
+                duration_parts = duration_str.split(':')
+                if len(duration_parts) == 3:
+                    # Convert HH:MM:SS to seconds
+                    duration_seconds = int(duration_parts[0]) * 3600 + int(duration_parts[1]) * 60 + int(duration_parts[2])
+                    return duration_seconds
+                if len(duration_parts) == 2:
+                     return int(duration_parts[0]) * 60 + int(duration_parts[1])
+                if len(duration_parts) == 1:
+                     return int(duration_parts[0])
+            return None
+        except Exception as e:
+            print("Error:", e)
+            return None
     def download_yt_vid(self):
         try:
                 print(self.ui.plainTextEdit.toPlainText())
@@ -46,8 +67,9 @@ class GetLinkedWindow(QMainWindow):
                     resolutions_list = []
                     self.dict_res_id_fps = {}
                     fps_list=[]
+                    i=0
                     for line in reversed(stdout_lines):
-                        
+                       
                         if 'mp4' in line:
                             
                             resolution = re.findall(r'[\d]*x[\d]*',line)
@@ -59,8 +81,7 @@ class GetLinkedWindow(QMainWindow):
                                     fps=(line[22:24])
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.ui.qualityCombo.addItem(resolution[0])
-                    
-                    
+                    self.duration = self.get_youtube_video_duration(self.ui.plainTextEdit.toPlainText())
                     self.ui.error_label.clear()
                     
                     self.ui.qualityLabel.show()
@@ -82,14 +103,27 @@ class GetLinkedWindow(QMainWindow):
                         self.ui.error_label.setText(result.stderr)
                 self.ui.qualityCombo.hide()
                 self.ui.qualityLabel.hide()
-
+    def get_youtube_video_name(self,url):
+        try:
+            result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '--get-title', url], capture_output=True, text=True)
+            if result.returncode == 0:
+                video_name = result.stdout.strip()
+                return video_name
+            return None
+        except Exception as e:
+            print("Error:", e)
+            return None
     def gen_youtubedlp_command(self):
-        print(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0])
         global return_command
-        self.main.extract_frames_from_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}"  -o - | ffmpeg -i - -s {self.ui.qualityCombo.currentText()} out.mp4 && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o - | ffmpeg -i -  output.m4a')
+        self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.main.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
         self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
         self.main.showChangeInFPS(False)
+        self.main.fc = int(self.main.fps*self.duration)
+        self.main.ytVidWidth = self.ui.qualityCombo.currentText().split('x')[0]
+        self.main.ytVidHeight = self.ui.qualityCombo.currentText().split('x')[1]
         window.close()
 def get_linked_video(self):
     global window

@@ -40,8 +40,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setMinimumSize(700, 550)
         src.onProgramStart.onApplicationStart(self)
-        self.localFile=True
         self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
+        
         
         self.show()
 
@@ -283,8 +283,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
         self.showChangeInFPS()
-        if self.input_file != '':
-            self.localFile = True
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
@@ -312,6 +310,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.AICombo.setDisabled(mode)
         self.ui.RifeStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 
+        self.ui.Input_video_rife_url.setDisabled(mode) 
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         if self.ui.Rife_Model.currentText().lower() == 'rife-v4' or self.ui.Rife_Model.currentText().lower() == 'rife-v4.6':
