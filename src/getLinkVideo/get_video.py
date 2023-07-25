@@ -122,6 +122,7 @@ class GetLinkedWindow(QMainWindow):
         self.main.localFile=False
         self.main.showChangeInFPS(False)
         self.main.fc = int(self.main.fps*self.duration)
+        self.ytVidRes = self.ui.qualityCombo.currentText()
         self.main.ytVidWidth = self.ui.qualityCombo.currentText().split('x')[0]
         self.main.ytVidHeight = self.ui.qualityCombo.currentText().split('x')[1]
         window.close()

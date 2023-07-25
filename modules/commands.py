@@ -23,9 +23,11 @@ def return_gpu_settings(self):
     return gpu_usage
 
 def start(self,renderdir,videoName,videopath,times):
+        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+        os.mkdir(f"{self.render_folder}/{self.videoName}_temp/")
         if self.localFile == False:
                os.system(f'{self.download_youtube_video_command}')
-        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+        
 
         self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         settings = Settings()
