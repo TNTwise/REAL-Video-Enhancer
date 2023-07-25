@@ -39,6 +39,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
         self.setMinimumSize(700, 550)
+        self.localFile = True
         src.onProgramStart.onApplicationStart(self)
         self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
         
@@ -124,6 +125,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.input_file != '':
                     self.times = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
+                    self.localFile = True
                 if self.fps != None:    
                     self.ui.FPSPreview.setText(f'FPS: {self.fps} -> {int(self.fps)*int(self.times)}')
             if self.ui.AICombo.currentText() == 'RealESRGAN':
