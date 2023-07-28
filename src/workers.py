@@ -75,19 +75,42 @@ class pb2X(QObject):
         self.finished.emit()
 
 
-class showLogs(QObject):
-    finished = pyqtSignal()
-    extractionProgress = pyqtSignal(int)
-    
-    def __init__(self,parent, videoName):
+class downloadVideo(QObject):
+    finished = pyqtSignal(dict)
+    progress = pyqtSignal(str)
+    addRes = pyqtSignal(str)
+    def __init__(self,originalSelf,url,parent=None):
+        self.originalSelf = originalSelf
+        self.url = url
         QThread.__init__(self, parent)
-        self.videoName = videoName
-        self.settings = Settings()
     def run(self):
-        """Long-running task."""
-        
-        while os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-            if os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'):
-                files_extracted = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-                self.extractionProgress.emit(files_extracted)
-        self.finished.emit()
+        try:
+                print(self.originalSelf.ui.plainTextEdit.toPlainText())
+                result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '-F', self.url], capture_output=True, text=True)
+                
+                if result.returncode == 0:
+                    stdout_lines = result.stdout.splitlines()
+                    resolutions_list = []
+                    self.dict_res_id_fps = {}
+                    fps_list=[]
+                    i=0
+                    for line in reversed(stdout_lines):
+                       
+                        if 'mp4' in line:
+                            
+                            resolution = re.findall(r'[\d]*x[\d]*',line)
+                            if len(resolution) > 0:
+                                if resolution[0] not in resolutions_list:
+                                    res=resolution[0]
+                                    resolutions_list.append(res)
+                                    id=line[:3]
+                                    fps=(line[22:24])
+                                    self.dict_res_id_fps[res] = [id,fps]
+                                    self.addRes.emit(res)
+                    
+                    self.finished.emit(self.dict_res_id_fps)
+                else:
+                    self.progress.emit(result.stderr)
+        except Exception as e:
+                print(e)
+                

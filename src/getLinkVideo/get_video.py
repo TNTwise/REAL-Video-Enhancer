@@ -5,6 +5,7 @@ import subprocess
 import re
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import src.getLinkVideo.get_vid_from_link as getLinkedVideo
+from src.workers import *
 thisdir = os.getcwd()
 class GetLinkedWindow(QMainWindow):
     
@@ -26,13 +27,47 @@ class GetLinkedWindow(QMainWindow):
     def next(self):
         
         if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
-            self.download_yt_vid()
+            self.run_ytdl_thread()
         else:
             self.main.input_file = self.ui.plainTextEdit.toPlainText()
             self.main.localFile = True
             self.main.videoName = 'output.mp4'
             window.close()
-            
+    def run_ytdl_thread(self):
+        self.thread = QThread()
+        self.worker = downloadVideo(self,self.ui.plainTextEdit.toPlainText())
+        self.ui.next.hide()
+        self.ui.qualityCombo.clear()
+        
+
+        # Step 4: Move worker to the thread
+        self.worker.moveToThread(self.thread)
+        # Step 5: Connect signals and slots
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.worker.progress.connect(self.report_progress)
+        
+        
+        # Step 6: Start the thread
+        
+        self.thread.start()
+        self.worker.addRes.connect(self.addRes)
+        # Final resets
+        
+        self.worker.finished.connect(
+            self.end_DownloadofData
+        )    
+    def addRes(self,res):
+        self.ui.qualityCombo.addItem(res)
+    def report_progress(self,result):
+        if result == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.toPlainText()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.toPlainText()}" ) to search YouTube\n""": 
+            self.ui.error_label.setText("Invalid URL")
+        else:
+            self.ui.error_label.setText(result)
+        self.ui.qualityCombo.hide()
+        self.ui.qualityLabel.hide()
     def get_youtube_video_duration(self,url):
         try:
             result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', self.ui.plainTextEdit.toPlainText(), '--get-duration'], capture_output=True, text=True)
@@ -51,53 +86,7 @@ class GetLinkedWindow(QMainWindow):
         except Exception as e:
             print("Error:", e)
             return None
-    def download_yt_vid(self):
-        try:
-                print(self.ui.plainTextEdit.toPlainText())
-                result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '-F', self.ui.plainTextEdit.toPlainText()], capture_output=True, text=True)
-                self.ui.qualityCombo.clear()
-                if result.returncode == 0:
-                    stdout_lines = result.stdout.splitlines()
-                    resolutions_list = []
-                    self.dict_res_id_fps = {}
-                    fps_list=[]
-                    i=0
-                    for line in reversed(stdout_lines):
-                       
-                        if 'mp4' in line:
-                            
-                            resolution = re.findall(r'[\d]*x[\d]*',line)
-                            if len(resolution) > 0:
-                                if resolution[0] not in resolutions_list:
-                                    res=resolution[0]
-                                    resolutions_list.append(res)
-                                    id=line[:3]
-                                    fps=(line[22:24])
-                                    self.dict_res_id_fps[res] = [id,fps]
-                                    self.ui.qualityCombo.addItem(resolution[0])
-                    self.duration = self.get_youtube_video_duration(self.ui.plainTextEdit.toPlainText())
-                    self.ui.error_label.clear()
-                    self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
-                    self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
-                    self.ui.qualityLabel.show()
-                    self.ui.qualityCombo.show()
-                    self.ui.next.clicked.disconnect(self.next)
-                    self.ui.next.clicked.connect(self.gen_youtubedlp_command)
-                else:
-                    if result.stderr == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.toPlainText()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.toPlainText()}" ) to search YouTube\n""": 
-                        self.ui.error_label.setText("Invalid URL")
-                    else:
-                        self.ui.error_label.setText(result.stderr)
-                    self.ui.qualityCombo.hide()
-                    self.ui.qualityLabel.hide()
-        except Exception as e:
-                print(e)
-                if result.stderr == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.toPlainText()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.toPlainText()}" ) to search YouTube\n""": 
-                        self.ui.error_label.setText("Invalid URL")
-                else:
-                        self.ui.error_label.setText(result.stderr)
-                self.ui.qualityCombo.hide()
-                self.ui.qualityLabel.hide()
+        
     def get_youtube_video_name(self,url):
         try:
             result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '--get-title', url], capture_output=True, text=True)
@@ -108,8 +97,19 @@ class GetLinkedWindow(QMainWindow):
         except Exception as e:
             print("Error:", e)
             return None
-    def gen_youtubedlp_command(self):
+    def end_DownloadofData(self,dict_res_id_fps):
         global return_command
+        self.duration = self.get_youtube_video_duration(self.ui.plainTextEdit.toPlainText())
+        self.ui.error_label.clear()
+        self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        self.ui.next.show()
+        self.ui.qualityLabel.show()
+        self.ui.qualityCombo.show()
+        self.ui.next.clicked.disconnect(self.next)
+        self.ui.next.clicked.connect(self.gen_youtubedlp_command)
+        self.dict_res_id_fps = dict_res_id_fps
+    def gen_youtubedlp_command(self):
         
         self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.main.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
         self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
