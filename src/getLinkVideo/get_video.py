@@ -6,6 +6,9 @@ import re
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import src.getLinkVideo.get_vid_from_link as getLinkedVideo
 from src.workers import *
+import cv2
+from src.return_data import *
+import requests
 thisdir = os.getcwd()
 class GetLinkedWindow(QMainWindow):
     
@@ -23,16 +26,52 @@ class GetLinkedWindow(QMainWindow):
         self.ui.error_label.setStyleSheet('QLabel#error_label {color: red}')
         
         self.show()
-   
+    def get_fps_from_video_link(self,video_link):
+        cap = cv2.VideoCapture(video_link)
+        if not cap.isOpened():
+            self.ui.error_label.setText("Failed to open the video.")
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        cap.release()
+        return fps
+
+    
     def next(self):
-        
+        self.ui.error_label.clear()
+        self.ui.next.hide()
         if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
+            #gets data from youtube using youtubedlp
             self.run_ytdl_thread()
+            self.main.youtubeFile = True
         else:
+            #get data from link here
+            
+            self.main.youtubeFile = False
             self.main.input_file = self.ui.plainTextEdit.toPlainText()
-            self.main.localFile = True
-            self.main.videoName = 'output.mp4'
+            self.main.videoName = self.main.input_file.split('/')[-1]
+            try:
+                response = requests.head(self.main.input_file)
+                response.raise_for_status()
+                content_type = response.headers.get('Content-Type')
+                if content_type and content_type.startswith('video/'):
+                    pass
+                else:
+                    self.ui.error_label.setText(f"Invalid video format. Content-Type: {content_type}")
+                    self.ui.next.show()
+                    return False
+            except requests.exceptions.RequestException as e:
+                if response.status_code != 403: # ignores 403 errors cause they mostly work even when the exception is raised :\
+                    self.ui.error_label.setText(f'{e}')
+                    self.ui.next.show()
+                    return False
+            self.main.fps=int(VideoName.return_video_framerate(self.main.input_file))
+            self.main.localFile=False
+            self.main.showChangeInFPS(False)
+            self.main.fc = VideoName.return_video_frame_count(self.main.input_file)
+            self.ytVidRes = self.ui.qualityCombo.currentText()
+            self.main.download_youtube_video_command = self.main.input_file
+            self.main.input_file = f'{thisdir}/{self.main.videoName}'
             window.close()
+            
     def run_ytdl_thread(self):
         self.thread = QThread()
         self.worker = downloadVideo(self,self.ui.plainTextEdit.toPlainText())

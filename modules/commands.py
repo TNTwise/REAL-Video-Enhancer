@@ -12,7 +12,7 @@ from src.messages import *
 from src.discord_rpc import *
 import glob
 import os
-
+import requests
 
 def return_gpu_settings(self):
     if int(self.gpuMemory) < 1:
@@ -26,8 +26,18 @@ def start(self,renderdir,videoName,videopath,times):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         os.mkdir(f"{self.render_folder}/{self.videoName}_temp/")
         if self.localFile == False:
-               os.system(f'{self.download_youtube_video_command}')
-        
+                if self.youtubeFile == True:
+                        os.system(f'{self.download_youtube_video_command}')
+                else:
+                        response = requests.get(self.download_youtube_video_command, stream=True)
+                        
+                        # Check if the download was successful
+                        if response.status_code != 200:
+                                raise Exception(f"Failed to download the file. Status code: {response.status_code}")
+                        
+                        with open(f'{thisdir}/{self.videoName}', 'wb') as file:
+                                for chunk in response.iter_content(chunk_size=8192):
+                                        file.write(chunk)
 
         self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         settings = Settings()
@@ -54,7 +64,7 @@ def start(self,renderdir,videoName,videopath,times):
                 os.system(f'./bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
         else:
                os.system(f'./bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
-        if self.localFile == True:
+        if self.localFile == True or self.youtubeFile == False:
                 os.system(f'./bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
         else:
                os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')

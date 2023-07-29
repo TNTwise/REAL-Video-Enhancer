@@ -24,6 +24,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
                 
         
         if self.input_file != '':
+            os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.ui.QueueButton.show()
             self.render='rife'
             
