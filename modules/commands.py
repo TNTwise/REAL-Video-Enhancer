@@ -24,7 +24,7 @@ def return_gpu_settings(self):
 
 def start(self,renderdir,videoName,videopath,times):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        os.mkdir(f"{self.render_folder}/{self.videoName}_temp/")
+        os.system(f'mkdir "{self.render_folder}/{self.videoName}_temp/"')
         if self.localFile == False:
                 if self.youtubeFile == True:
                         os.system(f'{self.download_youtube_video_command}')

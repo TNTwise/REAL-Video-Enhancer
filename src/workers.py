@@ -93,9 +93,13 @@ class downloadVideo(QObject):
                     resolutions_list = []
                     self.dict_res_id_fps = {}
                     fps_list=[]
-                    i=0
+                    for line in stdout_lines:
+                         if 'FPS' in line:
+                            fps_index = line.find('FPS')
+                            print(fps_index)
+                            break
                     for line in reversed(stdout_lines):
-                       
+                        
                         if 'mp4' in line:
                             
                             resolution = re.findall(r'[\d]*x[\d]*',line)
@@ -104,12 +108,13 @@ class downloadVideo(QObject):
                                     res=resolution[0]
                                     resolutions_list.append(res)
                                     id=line[:3]
-                                    fps=(line[22:24])
+                                    fps=(line[fps_index:fps_index+3])
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.addRes.emit(res)
                     self.originalSelf.duration = self.originalSelf.get_youtube_video_duration(self.url)
-                    self.originalSelf.main.input_file = f'{thisdir}/{self.originalSelf.get_youtube_video_name(self.url)}.mp4'
-                    self.originalSelf.main.videoName = f'{self.originalSelf.get_youtube_video_name(self.url)}.mp4'
+                    name = self.originalSelf.get_youtube_video_name(self.url)
+                    self.originalSelf.main.input_file = f'{thisdir}/{name}.mp4'
+                    self.originalSelf.main.videoName = f'{name}.mp4'
                     self.finished.emit(self.dict_res_id_fps)
                 else:
                     self.progress.emit(result.stderr)
