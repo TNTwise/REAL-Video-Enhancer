@@ -33,7 +33,7 @@ def startRife(self): #should prob make this different, too similar to start_rife
             
             if settings.DiscordRPC == 'Enabled':
                 start_discordRPC(self,'Interpolating')
-            self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
+            
             self.ui.logsPreview.append(f'Extracting Frames')
             
             if self.times == 2:
@@ -60,6 +60,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
         #self.runLogs(videoName,times)
         start(self,self.render_folder,self.videoName,videopath,times)
+        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
         self.transitionDetection.find_timestamps()
         self.transitionDetection.get_frame_num(times)
         self.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.

@@ -113,6 +113,7 @@ class downloadVideo(QObject):
                                     self.addRes.emit(res)
                     self.originalSelf.duration = self.originalSelf.get_youtube_video_duration(self.url)
                     name = self.originalSelf.get_youtube_video_name(self.url)
+                    print(name)
                     self.originalSelf.main.input_file = f'{thisdir}/{name}.mp4'
                     self.originalSelf.main.videoName = f'{name}.mp4'
                     self.finished.emit(self.dict_res_id_fps)

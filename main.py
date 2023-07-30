@@ -116,7 +116,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RifePause.show()
         
     
-    def showChangeInFPS(self,localFile=False):
+    def showChangeInFPS(self,localFile=True):
         
         try:
             

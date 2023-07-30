@@ -43,7 +43,7 @@ class TransitionDetection:
                             timestamps.append(timestamp)
                     
             self.timestamps = timestamps
-        
+            print(self.timestamps)
         
 
     def get_frame_num(self,times,frames_subtracted=0):
@@ -52,6 +52,7 @@ class TransitionDetection:
         if self.settings.SceneChangeDetection != 'Off':
             frame_list =[]
             for i in self.timestamps:
+                print(self.fps)
                 frame = float(i) * float(self.fps)
                 
                 frame = round(frame)
@@ -111,7 +112,7 @@ class TransitionDetection:
             
             p = 0
             o = 1
-            os.chdir(f'{self.full_render_dir}/transitions/')
+            print(list1)
             for image in list1:
                 
                 
@@ -137,7 +138,7 @@ class TransitionDetection:
                     for file,copyto in self.fileToCopyDict.items():
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
-                  
+                   
             
     def merge_frames(self):
         p = 0
