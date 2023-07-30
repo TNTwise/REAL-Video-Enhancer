@@ -75,6 +75,7 @@ class GetLinkedWindow(QMainWindow):
     def run_ytdl_thread(self):
         self.thread = QThread()
         self.worker = downloadVideo(self,self.ui.plainTextEdit.toPlainText())
+        self.ui.plainTextEdit.setDisabled(True)
         self.ui.next.hide()
         self.ui.qualityCombo.clear()
         
@@ -138,15 +139,14 @@ class GetLinkedWindow(QMainWindow):
             return None
     def end_DownloadofData(self,dict_res_id_fps):
         global return_command
-        self.duration = self.get_youtube_video_duration(self.ui.plainTextEdit.toPlainText())
-        self.ui.error_label.clear()
-        self.main.input_file = f'{thisdir}/{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
-        self.main.videoName = f'{self.get_youtube_video_name(self.ui.plainTextEdit.toPlainText())}.mp4'
+        
+        
+        self.ui.next.clicked.disconnect(self.next)
+        self.ui.next.clicked.connect(self.gen_youtubedlp_command)
         self.ui.next.show()
         self.ui.qualityLabel.show()
         self.ui.qualityCombo.show()
-        self.ui.next.clicked.disconnect(self.next)
-        self.ui.next.clicked.connect(self.gen_youtubedlp_command)
+        
         self.dict_res_id_fps = dict_res_id_fps
     def gen_youtubedlp_command(self):
         
