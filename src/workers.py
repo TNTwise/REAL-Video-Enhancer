@@ -85,7 +85,6 @@ class downloadVideo(QObject):
         QThread.__init__(self, parent)
     def run(self):
         try:
-                print(self.originalSelf.ui.plainTextEdit.toPlainText())
                 result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '-F', self.url], capture_output=True, text=True)
                 
                 if result.returncode == 0:
@@ -99,7 +98,17 @@ class downloadVideo(QObject):
                             print(fps_index)
                             break
                     for line in reversed(stdout_lines):
-                        
+                        if 'Premium' in line:
+                            
+                            resolution = re.findall(r'[\d]*x[\d]*',line)
+                            
+                            res=resolution[0] + ' (Enhanced bitrate)'
+                            resolutions_list.append(res)
+                            id=line[:3]
+                            fps=(line[fps_index:fps_index+3])
+                            print(fps)
+                            self.dict_res_id_fps[res] = [id,fps]
+                            self.addRes.emit(res)
                         if 'mp4' in line:
                             
                             resolution = re.findall(r'[\d]*x[\d]*',line)
@@ -112,6 +121,7 @@ class downloadVideo(QObject):
                                     print(fps)
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.addRes.emit(res)
+                        
                     self.originalSelf.duration = self.originalSelf.get_youtube_video_duration(self.url)
                     name = self.originalSelf.get_youtube_video_name(self.url)
                     

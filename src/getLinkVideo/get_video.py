@@ -156,9 +156,7 @@ class GetLinkedWindow(QMainWindow):
         self.main.localFile=False
         self.main.showChangeInFPS(False)
         self.main.fc = int(self.main.fps*self.duration)
-        self.ytVidRes = self.ui.qualityCombo.currentText()
-        self.main.videowidth = self.ui.qualityCombo.currentText().split('x')[0]
-        self.main.videoheight = self.ui.qualityCombo.currentText().split('x')[1]
+        
         window.close()
 def get_linked_video(self):
     global window
