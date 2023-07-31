@@ -25,3 +25,6 @@ def image_help(self):
 
 def vram_help(self):
     self.showDialogBox("VRAM limit for the program: Adjust to reduce system load or fix upscaling issues.\nChanging this alters the amount of VRAM the program has optimizes towards.")
+
+def quotes(self):
+    self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")

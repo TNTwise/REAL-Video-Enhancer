@@ -283,10 +283,16 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
+        
+        
         self.download_youtube_video_command = ''
         self.localFile = True
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
-        self.showChangeInFPS()
+        if '"' in self.input_file:
+            quotes(self)
+            self.input_file = ''
+        else:
+            self.showChangeInFPS()
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

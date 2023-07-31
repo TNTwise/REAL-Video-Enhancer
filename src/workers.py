@@ -109,12 +109,14 @@ class downloadVideo(QObject):
                                     resolutions_list.append(res)
                                     id=line[:3]
                                     fps=(line[fps_index:fps_index+3])
+                                    print(fps)
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.addRes.emit(res)
                     self.originalSelf.duration = self.originalSelf.get_youtube_video_duration(self.url)
                     name = self.originalSelf.get_youtube_video_name(self.url)
-                    print(name)
+                    
                     self.originalSelf.main.input_file = f'{thisdir}/{name}.mp4'
+                    self.originalSelf.main.input_file = self.originalSelf.main.input_file.replace('"',"")
                     self.originalSelf.main.videoName = f'{name}.mp4'
                     self.finished.emit(self.dict_res_id_fps)
                 else:

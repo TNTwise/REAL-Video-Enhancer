@@ -47,6 +47,7 @@ class GetLinkedWindow(QMainWindow):
             
             self.main.youtubeFile = False
             self.main.input_file = self.ui.plainTextEdit.toPlainText()
+            self.main.input_file = self.main.input_file.replace('"',"")
             self.main.videoName = self.main.input_file.split('/')[-1]
             try:
                 response = requests.head(self.main.input_file)
@@ -156,8 +157,8 @@ class GetLinkedWindow(QMainWindow):
         self.main.showChangeInFPS(False)
         self.main.fc = int(self.main.fps*self.duration)
         self.ytVidRes = self.ui.qualityCombo.currentText()
-        self.main.ytVidWidth = self.ui.qualityCombo.currentText().split('x')[0]
-        self.main.ytVidHeight = self.ui.qualityCombo.currentText().split('x')[1]
+        self.main.videowidth = self.ui.qualityCombo.currentText().split('x')[0]
+        self.main.videoheight = self.ui.qualityCombo.currentText().split('x')[1]
         window.close()
 def get_linked_video(self):
     global window

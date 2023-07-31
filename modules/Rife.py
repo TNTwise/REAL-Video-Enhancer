@@ -60,7 +60,7 @@ def start_rife(self,model,times,videopath,outputpath,end_iteration):
                 
         #self.runLogs(videoName,times)
         start(self,self.render_folder,self.videoName,videopath,times)
-        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
+        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self)
         self.transitionDetection.find_timestamps()
         self.transitionDetection.get_frame_num(times)
         self.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.

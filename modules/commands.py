@@ -24,7 +24,7 @@ def return_gpu_settings(self):
 
 def start(self,renderdir,videoName,videopath,times):
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        os.system(f'mkdir "{self.render_folder}/{self.videoName}_temp/"')
+        
         if self.localFile == False:
                 if self.youtubeFile == True:
                         os.system(f'{self.download_youtube_video_command}')
@@ -45,9 +45,13 @@ def start(self,renderdir,videoName,videopath,times):
         videoName = VideoName.return_video_name(fr'{self.input_file}')
         self.videoName = videoName
         video = cv2.VideoCapture(self.input_file)
-        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        self.aspectratio = self.videowidth / self.videoheight
+        try:
+                self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+                
+                self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                self.aspectratio = self.videowidth / self.videoheight
+        except:
+               self.aspectratio = 1920 / 1080
         global fps
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
         

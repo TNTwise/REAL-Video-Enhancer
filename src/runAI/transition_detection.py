@@ -5,13 +5,13 @@ import subprocess
 from src.return_data import *
 from src.settings import *
 class TransitionDetection:
-    def __init__(self,input_file):
+    def __init__(self,originalSelf):
         self.settings = src.settings.Settings()
         self.render_directory = self.settings.RenderDir
-        self.input_file = input_file
-        self.videoName = src.return_data.VideoName.return_video_name(f'{input_file}')
+        self.input_file = originalSelf.input_file
+        self.videoName = originalSelf.videoName
         self.thisdir=os.getcwd()
-        self.fps = src.return_data.VideoName.return_video_framerate(f'{input_file}')
+        self.fps = originalSelf.fps
         self.full_render_dir = f'{self.render_directory}/{self.videoName}_temp'
         
         src.return_data.ManageFiles.create_folder(f'{self.full_render_dir}')
