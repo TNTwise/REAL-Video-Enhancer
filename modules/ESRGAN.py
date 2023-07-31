@@ -46,7 +46,6 @@ def startRealSR(self):
         
         if settings.DiscordRPC == 'Enabled':
             start_discordRPC(self,'Upscaling')
-        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.input_file)
         self.ui.logsPreview.append(f'Extracting Frames')
             
         realESRGAN_Model = self.ui.Rife_Model.currentText()
