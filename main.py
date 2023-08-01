@@ -180,11 +180,11 @@ class MainWindow(QtWidgets.QMainWindow):
                         width = self.width()
                         height = self.height()
                         
-                        width1=int(width/1.6)
+                        width1=int(width/1.2)
                         height1=int(width1/self.aspectratio)
-                        if height1 >= height/1.6:
+                        if height1 >= height/1.2:
                             
-                            height1=int(height/1.6)
+                            height1=int(height/1.2)
                             width1=int(height1/(self.videoheight/self.videowidth))
                         try:
                             if os.path.exists(self.imageDisplay):
