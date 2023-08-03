@@ -29,6 +29,45 @@ from src.ETA import *
 from src.getLinkVideo.get_video import *
 thisdir = os.getcwd()
 homedir = os.path.expanduser(r"~")
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QDrag
+from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
+
+class FileDropWidget(QListWidget):
+    def __init__(self, parent=None):
+        super(FileDropWidget, self).__init__(parent)
+        self.setAcceptDrops(True)
+        self.main = parent
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dragMoveEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
+            for url in event.mimeData().urls():
+                file_path = url.toLocalFile()
+                self.add_file_item(file_path)
+
+    def add_file_item(self, file_path):
+        item = QListWidgetItem(file_path)
+        self.main.input_file = item.text()
+        
+        
+        self.main.download_youtube_video_command = ''
+        self.main.localFile = True
+        self.main.videoName = VideoName.return_video_name(f'{self.main.input_file}')
+        if '"' in self.main.input_file:
+            quotes(self)
+            self.main.input_file = ''
+        else:
+            self.main.showChangeInFPS()
+        self.main.addLinetoLogs(f'Input file = {item.text()}')
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -43,7 +82,8 @@ class MainWindow(QtWidgets.QMainWindow):
         src.onProgramStart.onApplicationStart(self)
         self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
         self.download_youtube_video_command = ''
-        
+        self.file_drop_widget = FileDropWidget(self)
+        self.ui.imageFormLayout.addWidget(self.file_drop_widget)
         self.show()
 
     def restore_default_settings(self):
@@ -288,6 +328,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.download_youtube_video_command = ''
         self.localFile = True
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
+        self.addLinetoLogs(f'Input file = {self.input_file}')
         if '"' in self.input_file:
             quotes(self)
             self.input_file = ''

@@ -92,16 +92,16 @@
                  <number>0</number>
                 </property>
                 <item>
+                 <layout class="QFormLayout" name="imageFormLayout"/>
+                </item>
+                <item>
                  <spacer name="imageSpacer">
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="sizeType">
-                   <enum>QSizePolicy::MinimumExpanding</enum>
-                  </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>500</width>
+                    <width>40</width>
                     <height>20</height>
                    </size>
                   </property>
