@@ -27,7 +27,7 @@ def realESRGAN(self):
         self.paused=False
         img_type = self.settings.Image_Type.replace('.','')
         os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {self.realESRGAN_Model}{return_gpu_settings(self)} -f {img_type} ')
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
+        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
                 show_on_no_output_files(self)
         else:
                 if self.paused == False:

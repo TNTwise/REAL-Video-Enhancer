@@ -82,15 +82,12 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
             os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type}')
         else:
               os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type} ')
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False or os.path.isfile(f'{self.render_folder}/{self.videoName}_temp/audio.m4a') == False:
-            show_on_no_output_files(self)
-        else:
-            if self.paused == False:
+        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
+             show_on_no_output_files(self)
+        
                 
-                self.transitionDetection.merge_frames()
-                
-                self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
-            else:
-                pass
-
+        self.transitionDetection.merge_frames()
+        
+        self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
+    
 
