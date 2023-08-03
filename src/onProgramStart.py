@@ -32,7 +32,7 @@ def onApplicationStart(self):
         
         self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
         if HardwareInfo.get_video_memory_linux() != None:
-            self.ui.vramAmountSpinbox.setMaximum(int(self.gpuMemory))
+            self.ui.vramAmountSpinbox.setMaximum(int(HardwareInfo.get_video_memory_linux()))
     else:
         self.ui.vramAmountSpinbox.setValue(1)
         cannot_detect_vram(self)
