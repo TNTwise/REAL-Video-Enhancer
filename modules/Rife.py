@@ -85,9 +85,9 @@ def Rife(self,model,times,videopath,outputpath,end_iteration):
         if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
              show_on_no_output_files(self)
         
-                
-        self.transitionDetection.merge_frames()
+        else:
+            self.transitionDetection.merge_frames()
+            
+            self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
         
-        self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
-    
 
