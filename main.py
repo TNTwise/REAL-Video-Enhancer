@@ -20,6 +20,7 @@ if os.path.exists(f'{thisdir}/icons/') == False:
     with zipfile.ZipFile(f'{thisdir}/{local_filename}','r') as f:
         f.extractall(path=f'{thisdir}/')
     os.remove(f'{thisdir}/{local_filename}')
+os.chdir(f'{thisdir}')
 import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets
 import sys
