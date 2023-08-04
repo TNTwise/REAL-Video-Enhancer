@@ -3,3 +3,4 @@ requests
 opencv-python-headless
 pypresence
 pyuic5-tool
+cx_FREEZE
