@@ -16,5 +16,6 @@ var cmd = `${inject_env} && "${vspipe}" --arg "tmp=${path.join(cache, "tmp.json"
 
 this should help with rife vs support<br/>
 
-add drag and drop files into big space
-add interpolation from urls
+add drag and drop files into big space<br/>
+add interpolation from urls<br/>
+stop render when app closes with popup
