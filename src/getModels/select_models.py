@@ -1,7 +1,6 @@
 # WORK IN PROGRESS!!!!
 
 import os
-thisdir = os.getcwd()
 import sys
 import requests
 import re
@@ -23,6 +22,8 @@ from sys import exit
 rife_install_list=[]
 from src.settings import *
 settings = Settings()
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(list)
@@ -35,7 +36,7 @@ class Worker(QObject):
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
 'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
 'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan'}
+'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan','https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/ffmpeg':'ffmpeg','https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/yt-dlp_linux':'yt-dlp_linux'}
                     for i in rife_install_list:
                                         install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
                     total_size_in_bytes=0
@@ -56,7 +57,7 @@ class Worker(QObject):
 
                     self.finished.emit()
 
-if check_if_models_exist() == False:
+if check_if_models_exist(thisdir) == False:
 
     class ChooseModels(QtWidgets.QMainWindow):
             def __init__(self):
@@ -168,7 +169,15 @@ if check_if_models_exist() == False:
                         os.mkdir(f"{settings.ModelDir}")
                         os.mkdir(f"{settings.ModelDir}/rife")
                     for i in os.listdir(f'{thisdir}/files/'):
-
+                        if os.path.exists(f'{thisdir}/bin/') == False:
+                            os.mkdir(f'{thisdir}/bin/')
+                        if i == 'ffmpeg':
+                             os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                             os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                        if i == 'yt-dlp_linux':
+                             os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                             os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                             
                         print(i)
                         if '.zip' in i:
 
@@ -194,7 +203,7 @@ if check_if_models_exist() == False:
                     for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
-                    if check_if_models_exist() == True:
+                    if check_if_models_exist(thisdir) == True:
                         QApplication.closeAllWindows()
 
                         return 0

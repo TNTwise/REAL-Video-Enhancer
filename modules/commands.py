@@ -13,7 +13,8 @@ from src.discord_rpc import *
 import glob
 import os
 import requests
-
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 def return_gpu_settings(self):
     if int(self.gpuMemory) < 1:
         gpu_usage = f'-j 1:1:1'

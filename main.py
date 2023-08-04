@@ -1,4 +1,25 @@
 #!/usr/bin/python3
+import os
+homedir = os.path.expanduser(r"~")
+import requests
+import src.thisdir
+import zipfile
+
+thisdir = src.thisdir.thisdir()
+if os.path.exists(f'{thisdir}') == False:
+    os.mkdir(f'{thisdir}')
+if os.path.exists(f'{thisdir}/icons/') == False:
+    url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
+    local_filename = url.split('/')[-1]
+    r = requests.get(url)
+    f = open(f'{thisdir}/{local_filename}', 'wb')
+    for chunk in r.iter_content(chunk_size=512 * 1024): 
+        if chunk: # filter out keep-alive new chunks
+            f.write(chunk)
+    f.close()
+    with zipfile.ZipFile(f'{thisdir}/{local_filename}','r') as f:
+        f.extractall(path=f'{thisdir}/')
+    os.remove(f'{thisdir}/{local_filename}')
 import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets
 import sys
@@ -27,8 +48,6 @@ import src.onProgramStart
 import src.queue.queue as queue
 from src.ETA import *
 from src.getLinkVideo.get_video import *
-thisdir = os.getcwd()
-homedir = os.path.expanduser(r"~")
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem

@@ -12,7 +12,8 @@ from src.discord_rpc import *
 import glob
 import os
 from modules.commands import *
-thisdir= os.getcwd()
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 

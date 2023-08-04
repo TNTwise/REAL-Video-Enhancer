@@ -14,7 +14,8 @@ import os
 from modules.commands import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 
-thisdir= os.getcwd()
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 def renderRealsr(self):
 

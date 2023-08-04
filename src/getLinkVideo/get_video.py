@@ -9,7 +9,8 @@ from src.workers import *
 import cv2
 from src.return_data import *
 import requests
-thisdir = os.getcwd()
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 class GetLinkedWindow(QMainWindow):
     
 
@@ -164,4 +165,3 @@ def get_linked_video(self):
     window.show()
     
 
-#./yt-dlp_linux -f best "https://www.youtube.com/watch?v=k9hv2l3NOZU"  -o - | ffmpeg -i - frames/%08d.jpg && ./yt-dlp_linux -f 140 "https://www.youtube.com/watch?v=k9hv2l3NOZU"  -o - | ffmpeg -i -  output.m4a

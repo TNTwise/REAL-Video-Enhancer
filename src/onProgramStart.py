@@ -15,8 +15,8 @@ def onApplicationStart(self):
     import modules.ESRGAN as esrgan
     settings = Settings()
     from PyQt5.QtGui import QIntValidator, QIcon
-    thisdir=os.getcwd()
-    
+    import src.thisdir
+    thisdir = src.thisdir.thisdir()
     
     
     self.input_file = ''

@@ -1,4 +1,3 @@
-import src.settings 
 import os
 import src.return_data
 import subprocess
@@ -6,11 +5,12 @@ from src.return_data import *
 from src.settings import *
 class TransitionDetection:
     def __init__(self,originalSelf):
-        self.settings = src.settings.Settings()
+        self.settings = Settings()
         self.render_directory = self.settings.RenderDir
         self.input_file = originalSelf.input_file
         self.videoName = originalSelf.videoName
-        self.thisdir=os.getcwd()
+        import src.thisdir
+        self.thisdir = src.thisdir.thisdir()
         self.fps = originalSelf.fps
         self.full_render_dir = f'{self.render_directory}/{self.videoName}_temp'
         
@@ -25,9 +25,9 @@ class TransitionDetection:
             except:
                  pass
             if self.settings.Image_Type != '.webp':
-                ffmpeg_cmd = f'./bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
+                ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
             else:
-                 ffmpeg_cmd = f'./bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
+                 ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
             output = subprocess.check_output(ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT)
             
             # Decode the output as UTF-8 and split it into lines

@@ -1,6 +1,7 @@
 import os
 import csv
-thisdir = os.getcwd()
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 from src.return_data import *
 homedir = os.path.expanduser(r"~")
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox

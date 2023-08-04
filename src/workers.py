@@ -10,7 +10,8 @@ from threading import *
 from src.settings import *
 from src.return_data import *
 from time import sleep
-
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 class pb2X(QObject):
     finished = pyqtSignal()
     progress = pyqtSignal(int)
