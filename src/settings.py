@@ -39,6 +39,7 @@ class Settings:
         self.write_to_settings_file('SceneChangeDetection','0.3')
         self.write_to_settings_file('Encoder','264')
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
+        
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
