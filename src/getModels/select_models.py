@@ -116,8 +116,7 @@ if check_if_models_exist(thisdir) == False:
 
     import src.theme as theme
 
-    app = QtWidgets.QApplication(sys.argv)
-    theme.set_theme(app)
+
 
 
     window = ChooseModels()
