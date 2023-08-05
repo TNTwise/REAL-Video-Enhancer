@@ -212,12 +212,11 @@ if check_if_models_exist(thisdir) == False:
                         exit()
         import src.theme as theme
 
-        app1 = QtWidgets.QApplication(sys.argv)
-        theme.set_theme(app1)
+        
 
 
         window = Downloading()
-        app1.exec_()
+        app.exec_()
         if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
             QApplication.closeAllWindows()
         else:
