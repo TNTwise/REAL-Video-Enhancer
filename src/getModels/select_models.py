@@ -209,6 +209,7 @@ if check_if_models_exist(thisdir) == False:
                         return 0
                     else:
                         failed_download(self)
+                        
                         exit()
         import src.theme as theme
 
@@ -217,14 +218,14 @@ if check_if_models_exist(thisdir) == False:
 
         window = Downloading()
         app.exec_()
+        app =None 
         if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
             QApplication.closeAllWindows()
+            print('h')
         else:
             for file in os.listdir(f'{thisdir}/files'):
                 if '.txt' not in file:
                     os.system(f'rm -rf "{thisdir}/files/{file}"')
-
             exit() # this happens if program abruptly stops while downloading
-
     else:
         exit()
