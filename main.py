@@ -97,7 +97,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setMinimumSize(700, 550)
+        self.setMinimumSize(1000, 550)
+        self.resize(1000, 550)
         self.localFile = True
         src.onProgramStart.onApplicationStart(self)
         self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
@@ -240,11 +241,11 @@ class MainWindow(QtWidgets.QMainWindow):
                         width = self.width()
                         height = self.height()
                         
-                        width1=int(width/1.2)
+                        width1=int(width/1.4)
                         height1=int(width1/self.aspectratio)
-                        if height1 >= height/1.2:
+                        if height1 >= height/1.4:
                             
-                            height1=int(height/1.2)
+                            height1=int(height/1.4)
                             width1=int(height1/(self.videoheight/self.videowidth))
                         try:
                             if os.path.exists(self.imageDisplay):
