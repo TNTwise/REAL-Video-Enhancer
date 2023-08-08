@@ -18,4 +18,5 @@ this should help with rife vs support<br/>
 
 add drag and drop files into big space<br/>
 add interpolation from urls<br/>
-stop render when app closes with popup
+stop render when app closes with popup<br/>
+implement modular system where app can import modules from scripts(either iterate through module directory or add specific button in settings)
