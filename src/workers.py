@@ -49,6 +49,7 @@ class pb2X(QObject):
                     
                     self.progress.emit(files_processed)
                     self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                    
                     if self.main.imageDisplay != None:
 
                         try:

@@ -111,4 +111,5 @@ def end(self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder
                pass
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
         os.chdir(thisdir)
+        self.input_file = ''
         return output_video_file

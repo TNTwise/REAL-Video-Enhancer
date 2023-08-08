@@ -53,6 +53,7 @@ from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
 import modules.interpolate as interpolate
 import modules.upscale as upscale
+import shutil
 
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
@@ -94,6 +95,7 @@ class FileDropWidget(QListWidget):
 class MainWindow(QtWidgets.QMainWindow):
          
     def __init__(self):
+        print(HardwareInfo.get_free_space(settings.RenderDir))
         
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
@@ -163,8 +165,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
         except Exception as e:
-            print(e)
-    
+            #print(e)
+            pass
     
     def reportProgress(self, files_processed):
         try:
@@ -379,30 +381,44 @@ class MainWindow(QtWidgets.QMainWindow):
         
         msg.exec_()
     def closeEvent(self, event):
-        reply = QMessageBox.question(
-            self,
-            "Confirmation",
-            "Are you sure you want to exit?\nAll renders will be killed.",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No
-        )
+        if self.input_file != '':
+            reply = QMessageBox.question(
+                
+                self,
+                "Confirmation",
+                
+                "Are you sure you want to exit?\nAll renders will be killed.",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+        else:
+            reply = QMessageBox.question(
+                
+                self,
+                "Confirmation",
+                
+                "Are you sure you want to exit?",
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
 
         if reply == QMessageBox.Yes:
             event.accept()
-            try:
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-            except:
-                pass
-            
-            os.system(f'kill -9 {self.get_pid("ffmpeg")}')
-            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
-            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
-            try:
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-            except:
-                pass
-            os.system(f'kill -9 {os.getpid()}')
-            exit()
+            if self.input_file != '':
+                try:
+                    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+                except:
+                    pass
+                
+                os.system(f'kill -9 {self.get_pid("ffmpeg")}')
+                os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
+                os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
+                try:
+                    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+                except:
+                    pass
+                os.system(f'kill -9 {os.getpid()}')
+                exit()
         else:
             event.ignore()
     
