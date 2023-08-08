@@ -47,11 +47,11 @@ class GetLinkedWindow(QMainWindow):
             #get data from link here
             
             self.main.youtubeFile = False
-            self.main.input_file = self.ui.plainTextEdit.toPlainText()
-            self.main.input_file = self.main.input_file.replace('"',"")
-            self.main.videoName = self.main.input_file.split('/')[-1]
+            self.input_file = self.ui.plainTextEdit.toPlainText()
+            self.input_file = self.input_file.replace('"',"")
+            self.main.videoName = self.input_file.split('/')[-1]
             try:
-                response = requests.head(self.main.input_file)
+                response = requests.head(self.input_file)
                 response.raise_for_status()
                 content_type = response.headers.get('Content-Type')
                 if content_type and content_type.startswith('video/'):
@@ -65,12 +65,12 @@ class GetLinkedWindow(QMainWindow):
                     self.ui.error_label.setText(f'{e}')
                     self.ui.next.show()
                     return False
-            self.main.fps=int(VideoName.return_video_framerate(self.main.input_file))
+            self.main.fps=int(VideoName.return_video_framerate(self.input_file))
             self.main.localFile=False
             self.main.showChangeInFPS(False)
-            self.main.fc = VideoName.return_video_frame_count(self.main.input_file)
+            self.main.fc = VideoName.return_video_frame_count(self.input_file)
             self.ytVidRes = self.ui.qualityCombo.currentText()
-            self.main.download_youtube_video_command = self.main.input_file
+            self.main.download_youtube_video_command = self.input_file
             self.main.input_file = f'{thisdir}/{self.main.videoName}'
             window.close()
             
@@ -152,12 +152,13 @@ class GetLinkedWindow(QMainWindow):
         self.dict_res_id_fps = dict_res_id_fps
     def gen_youtubedlp_command(self):
         
-        self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.main.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
+        self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
         self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
         self.main.showChangeInFPS(False)
         self.main.fc = int(self.main.fps*self.duration)
-        
+        self.main.input_file = self.input_file
+        self.main.addLinetoLogs(f"Input file: {self.input_file}")
         window.close()
 def get_linked_video(self):
     global window

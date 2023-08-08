@@ -13,82 +13,27 @@ import glob
 import os
 from modules.commands import *
 import src.thisdir
+import modules.interpolate as interpolate
+import src.onProgramStart as onProgramStart
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-
-
-def startRife(self): #should prob make this different, too similar to start_rife but i will  think of something later prob
+def modelOptions(self):
+    self.times=2
+    self.ui.Rife_Model.clear()
+    self.ui.Rife_Times.clear()
+    self.ui.FPSPreview.setText('FPS:')
     
-    # Calculate the aspect ratio
-                
-        
-        if self.input_file != '':
-            os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-            self.ui.QueueButton.show()
-            self.render='rife'
-            
-            settings = Settings()
-            self.setDisableEnable(True)
-            
-            if settings.DiscordRPC == 'Enabled':
-                start_discordRPC(self,'Interpolating')
-            
-            self.ui.logsPreview.append(f'Extracting Frames')
-            
-            if self.times == 2:
-                self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1))
-            if self.times == 4:
-                self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),4,self.input_file,self.output_folder,2))
-            if self.times == 8:
-                self.rifeThread = Thread(target=lambda: start_rife(self,(self.ui.Rife_Model.currentText().lower()),8,self.input_file,self.output_folder,3))
-            self.rifeThread.start()
-            self.runPB()
-        else:
-            no_input_file(self)
-
-    
-def start_rife(self,model,times,videopath,outputpath,end_iteration):
-        
-        
-        
-        self.ui.ETAPreview.setText('ETA:')
-        self.ui.processedPreview.setText('Files Processed:')
-        
-        # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
-                
-                
-        #self.runLogs(videoName,times)
-        start(self,self.render_folder,self.videoName,videopath,times)
-        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self)
-        self.transitionDetection.find_timestamps()
-        self.transitionDetection.get_frame_num(times)
-        self.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
-        Rife(self,model,times,videopath,outputpath,end_iteration)
-        
-        
-        
-        
-        
-                #change progressbar value
-    
-        
-def Rife(self,model,times,videopath,outputpath,end_iteration):   
-        self.paused = False
-        settings=Settings()
-        #Thread(target=self.calculateETA).start()
-        input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
-        if model == 'rife-v4.6' or model == 'rife-v4':
-            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type}')
-        else:
-              os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type} ')
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
-             show_on_no_output_files(self)
-        
-        else:
-            self.transitionDetection.merge_frames()
-            
-            self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
-        
-
+    self.ui.Rife_Times.addItem('2X')
+    self.ui.Rife_Times.addItem('4X')
+    self.ui.Rife_Times.addItem('8X')
+    self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
+    self.ui.Rife_Times.setCurrentIndex(0)
+    self.showChangeInFPS()
+    try:
+        self.ui.RifeStart.clicked.disconnect() 
+    except:
+        pass
+    self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
+    onProgramStart.list_model_downloaded(self)

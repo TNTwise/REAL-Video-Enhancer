@@ -14,14 +14,16 @@ import src.thisdir
 thisdir = src.thisdir.thisdir()
 class pb2X(QObject):
     finished = pyqtSignal()
+    image_progress = pyqtSignal(str)
     progress = pyqtSignal(int)
-    def __init__(self,myvar,render,parent=None):
+    def __init__(self,myvar,render,main,parent=None):
         
         QThread.__init__(self, parent)
         self.input_file = myvar
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
         self.settings = Settings()
         self.render = render
+        self.main = main
     def run(self):
         """Long-running task."""
         print('\n\n\n\n')
@@ -34,32 +36,7 @@ class pb2X(QObject):
         total_output_files = total_input_files * 2
         # fc is the total file count after interpolation
         #Could use this instead of just os.listdir
-        '''while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
-
-
-            try:
-
-                   #Have to make more optimized sorting alg here 
-
-                    if last_file != None:
-                        iteration=int(str(last_file).replace('.png',''))
-                        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/{str(iteration).zfill(8)}.png') == True:
-                            iteration+=1
-
-                        last_file=f'{str(iteration).zfill(8)}.png'
-                        print(last_file)
-                    else:
-                        files = os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/')
-                        files.sort()
-                        last_file = files[-1]
-
-                    self.imageDisplay = f"{self.render_folder}/{self.videoName}_temp/output_frames/{last_file}"
-            except:
-                    self.imageDisplay = None
-                    self.ui.imagePreview.clear()
-                    self.ui.imagePreviewESRGAN.clear()
-            sleep(.5)
-'''
+        
         
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
@@ -67,11 +44,43 @@ class pb2X(QObject):
                 
                     files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     
-                    sleep(1)
                     
-                        
+                    sleep(.1)
                     
                     self.progress.emit(files_processed)
+                    self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                    if self.main.imageDisplay != None:
+
+                        try:
+                            if os.path.exists(self.main.imageDisplay):
+                                self.image_progress.emit('1')
+                                
+                                width = self.main.width()
+                                height = self.main.height()
+                                
+                                self.main.width1=int(width/1.4)
+                                self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                if self.main.height1 >= height/1.4:
+                                    
+                                    self.main.height1=int(height/1.4)
+                                    self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                try:
+                                    if os.path.exists(self.main.imageDisplay):
+                                        
+                                        
+                                        
+                                        self.image_progress.emit('2')
+                                        
+                                except Exception as e:
+                                    print(e)
+                                    pass
+                        except Exception as e:
+                            
+                            print(e)
+                            self.image_progress.emit('3')
+                        
+                    
+                
         sleep(1)
         self.finished.emit()
 
@@ -126,8 +135,8 @@ class downloadVideo(QObject):
                     self.originalSelf.duration = self.originalSelf.get_youtube_video_duration(self.url)
                     name = self.originalSelf.get_youtube_video_name(self.url)
                     
-                    self.originalSelf.main.input_file = f'{thisdir}/{name}.mp4'
-                    self.originalSelf.main.input_file = self.originalSelf.main.input_file.replace('"',"")
+                    self.originalSelf.input_file = f'{thisdir}/{name}.mp4'
+                    self.originalSelf.input_file = self.originalSelf.input_file.replace('"',"")
                     self.originalSelf.main.videoName = f'{name}.mp4'
                     self.finished.emit(self.dict_res_id_fps)
                 else:

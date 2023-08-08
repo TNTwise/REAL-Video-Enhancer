@@ -4,7 +4,6 @@ homedir = os.path.expanduser(r"~")
 import requests
 import src.thisdir
 import zipfile
-
 thisdir = src.thisdir.thisdir()
 if os.path.exists(f'{thisdir}') == False:
     os.mkdir(f'{thisdir}')
@@ -52,6 +51,8 @@ from src.getLinkVideo.get_video import *
 from PyQt5.QtCore import Qt, QMimeData
 from PyQt5.QtGui import QDrag
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
+import modules.interpolate as interpolate
+import modules.upscale as upscale
 
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
@@ -123,42 +124,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def switchUI(self):
         if self.ui.AICombo.currentText() == 'Rife':
-            self.times=2
-            self.ui.Rife_Model.clear()
-            self.ui.Rife_Times.clear()
-            self.ui.FPSPreview.setText('FPS:')
-            
-            self.ui.Rife_Times.addItem('2X')
-            self.ui.Rife_Times.addItem('4X')
-            self.ui.Rife_Times.addItem('8X')
-            self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
-            self.ui.Rife_Times.setCurrentIndex(0)
-            self.showChangeInFPS()
-            try:
-                self.ui.RifeStart.clicked.disconnect() 
-            except:
-                pass
-            self.ui.RifeStart.clicked.connect(lambda: rife.startRife(self))
-            src.onProgramStart.list_model_downloaded(self)
+            rife.modelOptions(self)
 
         if self.ui.AICombo.currentText() == 'RealESRGAN':
-            self.times=1
-            self.ui.Rife_Model.clear()
-            self.ui.FPSPreview.setText('RES:')
-            self.ui.Rife_Model.addItem('Animation')
-            self.ui.Rife_Model.addItem('Default')
-            self.ui.Rife_Model.setCurrentIndex(1)
-            
-            self.ui.RifeStart.clicked.disconnect()
-            self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
-            self.ui.RifeStart.clicked.connect(lambda: esrgan.startRealSR(self))
-            self.ui.Rife_Times.clear()
-            
-            
-            self.ui.Rife_Times.addItem('2X')
-            self.ui.Rife_Times.addItem('3X')
-            self.ui.Rife_Times.addItem('4X')
-            self.ui.Rife_Times.setCurrentIndex(2)
+            esrgan.modelOptions(self)
 
     def get_pid(self,name):
         
@@ -197,10 +166,9 @@ class MainWindow(QtWidgets.QMainWindow):
             print(e)
     
     
-    def reportProgress(self, n):
+    def reportProgress(self, files_processed):
         try:
             
-            fp = n
             
             # fc is the total file count after interpolation
             
@@ -222,47 +190,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.i=2
             
                 
-            fp=int(fp)
+            fp=files_processed
             self.filecount = int(self.filecount)
 
             #Update GUI values
             
             self.ui.RifePB.setValue(fp)
             self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
-            
-            self.imageDisplay=f'{settings.RenderDir}/{self.videoName}_temp/output_frames/{str(fp-2).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-            if self.imageDisplay != None:
-
-                try:
-                    if os.path.exists(self.imageDisplay):
-                        self.ui.imageSpacerFrame.hide()
-                        pixMap = QPixmap(self.imageDisplay)
-                        
-                        width = self.width()
-                        height = self.height()
-                        
-                        width1=int(width/1.4)
-                        height1=int(width1/self.aspectratio)
-                        if height1 >= height/1.4:
-                            
-                            height1=int(height/1.4)
-                            width1=int(height1/(self.videoheight/self.videowidth))
-                        try:
-                            if os.path.exists(self.imageDisplay):
-                                pixMap = pixMap.scaled(width1,height1)
-                                
-                                
-                                self.ui.imagePreview.setPixmap(pixMap) # sets image preview image
-                                
-                        except Exception as e:
-                            #print(e)
-                            pass
-                except Exception as e:
-                    
-                    #print(e)
-                    self.ui.imageSpacerFrame.show()
-
-                    self.ui.imagePreview.clear()
+           
             try:
                 if self.ETA != None:
                     self.ui.ETAPreview.setText(self.ETA)
@@ -283,7 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread = QThread()
         # Step 3: Create a worker object
        
-        self.worker = workers.pb2X(self.input_file,self.render)        
+        self.worker = workers.pb2X(self.input_file,self.render,self)        
         
 
         
@@ -296,7 +231,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.progress.connect(self.reportProgress)
-        
+        self.worker.image_progress.connect(self.imageViewer)
         
         # Step 6: Start the thread
         
@@ -308,7 +243,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.endRife
         )
        
-    
+    def imageViewer(self,step):
+        if step == '1':
+            self.ui.imageSpacerFrame.hide()
+            self.pixMap = QPixmap(self.imageDisplay)
+        if step == '2':
+            self.pixMap = self.pixMap.scaled(self.width1,self.height1)
+            self.ui.imagePreview.setPixmap(self.pixMap) # sets image preview image
+        if step == '3':
+            self.ui.imageSpacerFrame.show()
+
+            self.ui.imagePreview.clear()
         
     
         
@@ -414,9 +359,9 @@ class MainWindow(QtWidgets.QMainWindow):
             del self.QueueList[0]
             self.ui.QueueListWidget.takeItem(0)
             if self.render == 'rife':
-                rife.startRife(self)
+                interpolate.start_interpolation(self,'rife-ncnn-vulkan')
             if self.render == 'esrgan':
-                esrgan.startRealSR(self)
+                upscale.start_upscale(self,'realesrgan-ncnn-vulkan')
         
         
         
@@ -433,7 +378,33 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.setText(f"{message}")
         
         msg.exec_()
-    
+    def closeEvent(self, event):
+        reply = QMessageBox.question(
+            self,
+            "Confirmation",
+            "Are you sure you want to exit?\nAll renders will be killed.",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        if reply == QMessageBox.Yes:
+            event.accept()
+            try:
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+            except:
+                pass
+            
+            os.system(f'kill -9 {self.get_pid("ffmpeg")}')
+            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
+            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
+            try:
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+            except:
+                pass
+            os.system(f'kill -9 {os.getpid()}')
+            exit()
+        else:
+            event.ignore()
     
     def addLinetoLogs(self,line):
         self.ui.logsPreview.append(f'{line}')

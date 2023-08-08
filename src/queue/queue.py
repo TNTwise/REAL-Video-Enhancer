@@ -26,7 +26,8 @@ import pypresence
 import src.onProgramStart
 def addToQueue(self):
     self.queueFile = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
-    self.QueueList.append(self.queueFile)
-    self.queueVideoName = VideoName.return_video_name(self.queueFile)
-    self.ui.QueueListWidget.addItem(self.queueVideoName)
-    self.ui.QueueListWidget.show()
+    if self.queueFile != '':
+        self.QueueList.append(self.queueFile)
+        self.queueVideoName = VideoName.return_video_name(self.queueFile)
+        self.ui.QueueListWidget.addItem(self.queueVideoName)
+        self.ui.QueueListWidget.show()
