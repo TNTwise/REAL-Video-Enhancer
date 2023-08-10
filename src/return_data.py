@@ -68,9 +68,4 @@ class HardwareInfo:
         except Exception as e:
             print(f'{e}')
             return None
-    def get_free_space(RenderDir):
-        KB = 1024
-        MB = 1024 * KB
-        GB = 1024 * MB
-
-        return shutil.disk_usage(f'{RenderDir}').free / GB
+    

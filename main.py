@@ -54,7 +54,7 @@ from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
 import modules.interpolate as interpolate
 import modules.upscale as upscale
 import shutil
-
+import src.checks as checks
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
@@ -95,7 +95,6 @@ class FileDropWidget(QListWidget):
 class MainWindow(QtWidgets.QMainWindow):
          
     def __init__(self):
-        print(HardwareInfo.get_free_space(settings.RenderDir))
         
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
@@ -149,7 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
     
     def showChangeInFPS(self,localFile=True):
-        
+        checks.check_if_enough_space(self.input_file,'rife',int(self.ui.Rife_Times.currentText()[0]))
         try:
             
             if self.ui.AICombo.currentText() == 'Rife':

@@ -21,10 +21,13 @@ def failed_download(self):
     self.showDialogBox("Failed to download dependencies, please check your connection and try again.",True)
 
 def image_help(self):
-    self.showDialogBox("Extraction and render image type.\nJPG (recommended) lossy, low file size.\nPNG (high quality) lossless, high file size.\nWEBP (longer render time) lossless, low file size.")
+    self.showDialogBox("Extraction and render image type.\nJPG (recommended) lossy, low file size.\nPNG (longer render time) lossless, high file size.\nWEBP (longest render time) lossless, low file size.")
 
 def vram_help(self):
     self.showDialogBox("VRAM limit for the program: Adjust to reduce system load or fix upscaling issues.\nChanging this alters the amount of VRAM the program has optimizes towards.")
 
 def quotes(self):
     self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")
+
+def not_enough_storage(self):
+    self.showDialogBox("Insufficient space for render.\nConsider using a more compressed format or lowering enhancement iterations.")
