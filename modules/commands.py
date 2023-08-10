@@ -65,20 +65,17 @@ def start(self,renderdir,videoName,videopath,times):
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
        
-        if checks.check_if_enough_space(self.input_file,self.render,self.times):
         
-                if settings.Image_Type != '.webp':
-                        os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
-                else:
-                        os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
-                if self.localFile == True or self.youtubeFile == False:
-                        os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
-                else:
-                        os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-                return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
+        if settings.Image_Type != '.webp':
+                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
         else:
-                print('not enough storage')
-                #not_enough_storage(self)
+                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+        if self.localFile == True or self.youtubeFile == False:
+                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
+        else:
+                os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
+        return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
+
 def end(self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         
         

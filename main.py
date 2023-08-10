@@ -148,7 +148,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
     
     def showChangeInFPS(self,localFile=True):
-        checks.check_if_enough_space(self.input_file,'rife',int(self.ui.Rife_Times.currentText()[0]))
+        
         try:
             
             if self.ui.AICombo.currentText() == 'Rife':
@@ -368,7 +368,6 @@ class MainWindow(QtWidgets.QMainWindow):
         
 
         
-    #The code below here is a multithreaded mess, i will fix later with proper pyqt implementation
     
     def showDialogBox(self,message,displayInfoIcon=False):
         icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
@@ -379,6 +378,15 @@ class MainWindow(QtWidgets.QMainWindow):
         msg.setText(f"{message}")
         
         msg.exec_()
+
+    def showQuestionBox(self,message):
+        reply = QMessageBox.question(self, '', f'{message}', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            return True
+        else:
+            return False
+
     def closeEvent(self, event):
         if self.input_file != '':
             reply = QMessageBox.question(

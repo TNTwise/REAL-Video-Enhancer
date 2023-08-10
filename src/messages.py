@@ -29,5 +29,5 @@ def vram_help(self):
 def quotes(self):
     self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")
 
-def not_enough_storage(self):
-    self.showDialogBox("Insufficient space for render.\nConsider using a more compressed format or lowering enhancement iterations.")
+def not_enough_storage(self,predicted_space,total_space):
+    return self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed format, lowering enhancement iterations, or changing the render folder disk.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
