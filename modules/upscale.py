@@ -16,25 +16,10 @@ from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_P
 import src.thisdir
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
-def startRender(self):
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+import src.workers as workers
 
-    start(self,self.render_folder,self.videoName,self.input_file,1)
-    
-    realESRGAN(self)
-def realESRGAN(self):
-        settings = Settings()
-        self.endNum=0
-        self.paused=False
-        img_type = self.settings.Image_Type.replace('.','')
-        if self.AI == 'realesrgan-ncnn-vulkan':
-            os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.render_folder}/{self.videoName}_temp/input_frames" -o "{self.render_folder}/{self.videoName}_temp/output_frames" {self.realESRGAN_Model}{return_gpu_settings(self)} -f {img_type} ')
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
-                show_on_no_output_files(self)
-        else:
-                if self.paused == False:
-                    self.output_file = end(self,self.render_folder,self.videoName,self.input_file,1,self.output_folder, self.videoQuality,self.encoder,'upscale')
-                else:
-                    pass
+
     
 def start_upscale(self,AI):
     if self.input_file != '':
@@ -47,7 +32,6 @@ def start_upscale(self,AI):
         
         if settings.DiscordRPC == 'Enabled':
             start_discordRPC(self,'Upscaling')
-        self.ui.logsPreview.append(f'[Extracting Frames]')
             
         realESRGAN_Model = self.ui.Rife_Model.currentText()
         realESRGAN_Times = self.ui.Rife_Times.currentText()
@@ -56,5 +40,27 @@ def start_upscale(self,AI):
                 self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
             if realESRGAN_Model == 'Animation':
                 self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
-        Thread(target=lambda: startRender(self)).start()
+        self.ui.logsPreview.append(f'[Extracting Frames]')
+        self.ui.ETAPreview.setText('ETA:')
+        self.ui.processedPreview.setText('Files Processed:')
+                
+        self.upscaleThread = QThread()
+            # Step 3: Create a worker object
+        
+        self.upscaleWorker = workers.upscale(self)        
+        
+
+        
+
+        # Step 4: Move worker to the thread
+        self.upscaleWorker.moveToThread(self.upscaleThread)
+        # Step 5: Connect signals and slots
+        self.upscaleThread.started.connect(self.upscaleWorker.start_Render)
+        self.upscaleWorker.finished.connect(self.upscaleThread.quit)
+        self.upscaleWorker.finished.connect(self.upscaleWorker.deleteLater)
+        self.upscaleThread.finished.connect(self.upscaleThread.deleteLater)
+        self.upscaleWorker.log.connect(self.addLinetoLogs)
+        # Step 6: Start the thread
+        
+        self.upscaleThread.start()
         self.runPB()

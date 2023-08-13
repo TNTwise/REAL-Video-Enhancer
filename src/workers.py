@@ -222,4 +222,31 @@ class interpolation(QObject):
                 self.finished.emit()
                 
 class upscale(QObject):
-    pass
+    finished = pyqtSignal()
+    log = pyqtSignal(str)
+    
+    def __init__(self,originalSelf,parent=None):
+        self.originalSelf = originalSelf
+        self.main = originalSelf
+        QThread.__init__(self, parent)
+    def start_Render(self):
+
+        start(self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
+        
+        self.realESRGAN()
+    def realESRGAN(self):
+            settings = Settings()
+            self.main.endNum=0
+            self.main.paused=False
+            img_type = self.main.settings.Image_Type.replace('.','')
+            if self.main.AI == 'realesrgan-ncnn-vulkan':
+                os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+            if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
+                    show_on_no_output_files(self.main)
+            else:
+                    if self.main.paused == False:
+                        self.log.emit("[Merging Frames]")
+                        self.main.output_file = end(self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.encoder,'upscale')
+                    else:
+                        pass
+            self.finished.emit()

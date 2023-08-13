@@ -79,46 +79,7 @@ def start_interpolation(self,AI): #should prob make this different, too similar 
              
             
 
-    
-def start_Render(self,model,times,videopath,outputpath):
+
         
         
         
-        self.ui.ETAPreview.setText('ETA:')
-        self.ui.processedPreview.setText('Files Processed:')
-        
-        # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
-                
-                
-        #self.runLogs(videoName,times)
-        start(self,self.render_folder,self.videoName,videopath,times)
-        self.transitionDetection = src.runAI.transition_detection.TransitionDetection(self)
-        self.transitionDetection.find_timestamps()
-        self.transitionDetection.get_frame_num(times)
-        self.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
-        Render(self,model,times,videopath,outputpath)
-        
-        
-        
-        
-        
-    
-        
-def Render(self,model,times,videopath,outputpath):   
-        self.paused = False
-        settings=Settings()
-        #Thread(target=self.calculateETA).start()
-        input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
-        if self.AI == 'rife-ncnn-vulkan':
-            if model == 'rife-v4.6' or model == 'rife-v4':
-                os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type}')
-            else:
-                os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {model} -i "{self.render_folder}/{self.videoName}_temp/input_frames/" -o "{self.render_folder}/{self.videoName}_temp/output_frames/" {return_gpu_settings(self)} -f %08d{self.settings.Image_Type} ')
-        if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/') == False:
-             show_on_no_output_files(self)
-        
-        else:
-            self.transitionDetection.merge_frames()
-            
-            self.output_file = end(self,self.render_folder,self.videoName,videopath,times,outputpath, self.videoQuality,self.encoder)
- 
