@@ -47,7 +47,7 @@ def start_upscale(self,AI):
         
         if settings.DiscordRPC == 'Enabled':
             start_discordRPC(self,'Upscaling')
-        self.ui.logsPreview.append(f'Extracting Frames')
+        self.ui.logsPreview.append(f'[Extracting Frames]')
             
         realESRGAN_Model = self.ui.Rife_Model.currentText()
         realESRGAN_Times = self.ui.Rife_Times.currentText()

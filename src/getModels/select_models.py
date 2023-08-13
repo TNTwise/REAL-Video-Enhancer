@@ -221,7 +221,6 @@ if check_if_models_exist(thisdir) == False:
         app =None 
         if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
             QApplication.closeAllWindows()
-            print('h')
         else:
             for file in os.listdir(f'{thisdir}/files'):
                 if '.txt' not in file:

@@ -144,4 +144,82 @@ class downloadVideo(QObject):
                     self.progress.emit(result.stderr)
         except Exception as e:
                 print(e)
+
+#This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
+# hz
+import src.return_data as return_data
+import os
+from src.settings import *
+import glob
+from threading import Thread
+import src.runAI.transition_detection
+from src.return_data import *
+from src.messages import *
+from src.discord_rpc import *
+import glob
+import os
+from modules.commands import *
+import src.thisdir
+thisdir = src.thisdir.thisdir()
+homedir = os.path.expanduser(r"~")
+    
+class interpolation(QObject):
+    
+    finished = pyqtSignal()
+    log = pyqtSignal(str)
+    
+    def __init__(self,originalSelf,model,parent=None):
+        self.originalSelf = originalSelf
+        self.model = model
+        self.main = originalSelf
+        QThread.__init__(self, parent)
+   
+             
+            
+
+    
+    def start_Render(self):
+            
+            
+            times = self.main.times
+            videopath = self.main.input_file
+            outputpath = self.main.output_folder
+            
+            # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
+                    
+                    
+            #self.main.runLogs(videoName,times)
+            start(self.main,self.main.render_folder,self.main.videoName,videopath,times)
+            self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
+            self.main.transitionDetection.find_timestamps()
+            self.main.transitionDetection.get_frame_num(times)
+            self.main.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
+            self.Render(self.model,times,videopath,outputpath)
+            
+            
+            
+            
+            
+        
+            
+    def Render(self,model,times,videopath,outputpath):   
+            self.main.paused = False
+            settings=Settings()
+            input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+            if self.main.AI == 'rife-ncnn-vulkan':
+                if model == 'rife-v4.6' or model == 'rife-v4':
+                    os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                else:
+                    os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
+            if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
+                show_on_no_output_files(self.main)
+            
+            else:
+                self.main.transitionDetection.merge_frames()
+                self.log.emit("[Merging Frames]")
+                self.main.output_file = end(self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                 
+                self.finished.emit()
+                
+class upscale(QObject):
+    pass

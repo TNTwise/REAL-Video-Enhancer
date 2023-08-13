@@ -13,6 +13,8 @@ import glob
 import os
 from modules.commands import *
 import src.thisdir
+import src.workers as workers
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
@@ -29,13 +31,31 @@ def run_start(self,AI):
     
     if settings.DiscordRPC == 'Enabled':
         start_discordRPC(self,'Interpolating')
+    #set UI
+    self.ui.logsPreview.append(f'[Extracting Frames]')
+    self.ui.ETAPreview.setText('ETA:')
+    self.ui.processedPreview.setText('Files Processed:')
+            
+    self.rifeThread = QThread()
+        # Step 3: Create a worker object
+       
+    self.rifeWorker = workers.interpolation(self,self.ui.Rife_Model.currentText().lower())        
     
-    self.ui.logsPreview.append(f'Extracting Frames')
+
     
-    
-    self.rifeThread = Thread(target=lambda: start_Render(self,(self.ui.Rife_Model.currentText().lower()),self.times,self.input_file,self.output_folder))
+
+    # Step 4: Move worker to the thread
+    self.rifeWorker.moveToThread(self.rifeThread)
+    # Step 5: Connect signals and slots
+    self.rifeThread.started.connect(self.rifeWorker.start_Render)
+    self.rifeWorker.finished.connect(self.rifeThread.quit)
+    self.rifeWorker.finished.connect(self.rifeWorker.deleteLater)
+    self.rifeThread.finished.connect(self.rifeThread.deleteLater)
+    self.rifeWorker.log.connect(self.addLinetoLogs)
+    # Step 6: Start the thread
     
     self.rifeThread.start()
+    
     self.runPB()
 
 def start_interpolation(self,AI): #should prob make this different, too similar to start_rife but i will  think of something later prob

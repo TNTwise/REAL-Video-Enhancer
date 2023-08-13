@@ -3,7 +3,6 @@ import os
 import re
 import subprocess
 import shutil
-from pyopencl import *
 class Fps:
     def return_video_fps(videopath):
         video=cv2.VideoCapture(fr'{videopath}')
@@ -38,12 +37,31 @@ class ManageFiles:
             
     def isfolder(folderpath):
         return os.path.exists(folderpath)
+    
 def read_vram(card):
         with open(f'/sys/class/drm/card{card}/device/mem_info_vram_total', 'r') as f:
                     for line in f:
                         line = line.replace('\n','')
                         line = int(int(line)/1000000000)
                         return line
+def get_dedicated_vram():
+    try:
+        command = "glxinfo | grep 'Dedicated video memory'"
+        vram_available = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, check=True)
+        vram = vram_available.stdout.split(":")[1].replace('MB', '').strip()
+        return int(vram) // 1000
+    except subprocess.CalledProcessError:
+        return get_integrated_vram()
+
+def get_integrated_vram():
+    try:
+        command = "glxinfo | grep 'Video memory'"
+        vram_available = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, check=True)
+        vram = vram_available.stdout.split(":")[1].replace('MB', '').strip()
+        return int(vram) // 4000
+    except subprocess.CalledProcessError:
+        return None
+    
 class HardwareInfo:
     
     def get_video_memory_linux():
@@ -56,16 +74,8 @@ class HardwareInfo:
                 card+=1
                 continue
         
+        vram = get_dedicated_vram()
+        return vram
 
-       
-        try:
-            import subprocess
-            command = "glxinfo | grep 'Dedicated video memory'"
-            vram_available = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, check=True)
-            vram = vram_available.stdout.split(":")[1].replace('MB','')
 
-            return int(vram / 1000)
-        except Exception as e:
-            print(f'{e}')
-            return None
-    
+
