@@ -430,7 +430,20 @@ class MainWindow(QtWidgets.QMainWindow):
             event.ignore()
     
     def addLinetoLogs(self,line):
-        self.ui.logsPreview.append(f'{line}')
+        if line != 'REMOVE_LAST_LINE':
+            self.ui.logsPreview.append(f'{line}')
+        else:
+            self.removeLastLineInLogs()
+    def update_last_line(self,new_line_text):
+        # Assuming line number is 2 (index 1) - replace with the desired line number
+        line_number = 1
+
+        cursor = self.ui.logsPreview.textCursor()
+        cursor.movePosition(cursor.Start)
+        for _ in range(line_number):
+            cursor.movePosition(cursor.Down, cursor.KeepAnchor)
+        cursor.removeSelectedText()
+        cursor.insertText(new_line_text)
     def removeLastLineInLogs(self,exception=None):
         
         cursor = self.ui.logsPreview.textCursor()

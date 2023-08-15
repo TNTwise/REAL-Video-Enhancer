@@ -32,7 +32,7 @@ def run_start(self,AI):
     if settings.DiscordRPC == 'Enabled':
         start_discordRPC(self,'Interpolating')
     #set UI
-    self.ui.logsPreview.append(f'[Extracting Frames]')
+    
     self.ui.ETAPreview.setText('ETA:')
     self.ui.processedPreview.setText('Files Processed:')
             

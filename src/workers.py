@@ -189,7 +189,7 @@ class interpolation(QObject):
                     
                     
             #self.main.runLogs(videoName,times)
-            start(self.main,self.main.render_folder,self.main.videoName,videopath,times)
+            start(self,self.main,self.main.render_folder,self.main.videoName,videopath,times)
             self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
             self.main.transitionDetection.find_timestamps()
             self.main.transitionDetection.get_frame_num(times)
@@ -217,7 +217,7 @@ class interpolation(QObject):
             else:
                 self.main.transitionDetection.merge_frames()
                 self.log.emit("[Merging Frames]")
-                self.main.output_file = end(self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
+                self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                 
                 self.finished.emit()
                 
@@ -231,7 +231,7 @@ class upscale(QObject):
         QThread.__init__(self, parent)
     def start_Render(self):
 
-        start(self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
+        start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
         
         self.realESRGAN()
     def realESRGAN(self):
@@ -246,7 +246,7 @@ class upscale(QObject):
             else:
                     if self.main.paused == False:
                         self.log.emit("[Merging Frames]")
-                        self.main.output_file = end(self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.encoder,'upscale')
+                        self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.encoder,'upscale')
                     else:
                         pass
             self.finished.emit()

@@ -13,6 +13,7 @@ from src.discord_rpc import *
 import glob
 import os
 import requests
+import re
 import src.thisdir
 import src.checks as checks
 thisdir = src.thisdir.thisdir()
@@ -23,12 +24,65 @@ def return_gpu_settings(self):
         num = int(int(self.gpuMemory))
         gpu_usage = f'-j {num}:{num}:{num}'
     return gpu_usage
+def print_output(thread,self,extracting,pipe):
+    total_frame_count = VideoName.return_video_frame_count(self.input_file)
+    
+    
+    mode='Merged'
+    if extracting == True:
+           mode = 'Extracted'
+           times=1
+    if mode == 'Merged':
+           times = self.times
+    thread.log.emit(" ")
+    while True:
+        line = pipe.readline()
+        if not line:
+            thread.log.emit('REMOVE_LAST_LINE')
+            thread.log.emit(f"Frames {mode}: {int(total_frame_count*times)} / {int(total_frame_count*times)}")
+            break
+        else:
+                if  'frame' in line:
+                        frame_num = re.findall(r'frame= [\d]*',line)
+                        if len(frame_num) != 0:
+                                thread.log.emit('REMOVE_LAST_LINE')
+                                frame_num = frame_num[0]
+                                frame_num = frame_num.split('=')[1]
+                                thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
+def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        shell=True,
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True  # Ensure newline translation
+    )
 
-def start(self,renderdir,videoName,videopath,times):
+    stdout_thread = Thread(target=print_output, args=(thread,self,extracting,process.stdout,))
+    stderr_thread = Thread(target=print_output, args=(thread,self,extracting,process.stderr,))
+
+    stdout_thread.start()
+    stderr_thread.start()
+
+    # Wait for the process to finish
+    process.wait()
+
+    # Wait for the output threads to finish printing
+    stdout_thread.join()
+    stderr_thread.join()
+
+    return process.returncode
+
+   
+def start(thread,self,renderdir,videoName,videopath,times):
+        # i need to clean this up lol
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
         
         if self.localFile == False:
                 if self.youtubeFile == True:
+                        thread.log.emit("[Downloading YouTube Video]")
                         os.system(f'{self.download_youtube_video_command}')
                         
                 else:
@@ -66,18 +120,21 @@ def start(self,renderdir,videoName,videopath,times):
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
        
-        
+        thread.log.emit("[Extracting Frames]")
         if settings.Image_Type != '.webp':
-                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
+                ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
         else:
-                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+                ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+        global output 
+        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True)
+
         if self.localFile == True or self.youtubeFile == False:
                 os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
         else:
                 os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
 
-def end(self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
+def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         
         
         if outputpath == '':
@@ -102,10 +159,11 @@ def end(self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder
                 else:
                         output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                os.system(f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
         else:
               
-                os.system(f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
         os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
         try:
                 os.remove(f'{thisdir}/{videoName}')
