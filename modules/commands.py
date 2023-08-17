@@ -75,26 +75,31 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
 
     return process.returncode
 
-   
+def get_video_from_link(self,thread):
+        if self.youtubeFile == True:
+                thread.log.emit("[Downloading YouTube Video]")
+                os.system(f'{self.download_youtube_video_command}')
+                
+        else:
+                response = requests.get(self.download_youtube_video_command, stream=True)
+                
+                # Check if the download was successful
+                if response.status_code != 200:
+                        raise Exception(f"Failed to download the file. Status code: {response.status_code}")
+                
+                with open(f'{thisdir}/{self.videoName}', 'wb') as file:
+                        for chunk in response.iter_content(chunk_size=8192):
+                                file.write(chunk)
+
 def start(thread,self,renderdir,videoName,videopath,times):
         # i need to clean this up lol
         os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        
+        #Gets the width and height
+        global fps
+        global height
+        global width
         if self.localFile == False:
-                if self.youtubeFile == True:
-                        thread.log.emit("[Downloading YouTube Video]")
-                        os.system(f'{self.download_youtube_video_command}')
-                        
-                else:
-                        response = requests.get(self.download_youtube_video_command, stream=True)
-                        
-                        # Check if the download was successful
-                        if response.status_code != 200:
-                                raise Exception(f"Failed to download the file. Status code: {response.status_code}")
-                        
-                        with open(f'{thisdir}/{self.videoName}', 'wb') as file:
-                                for chunk in response.iter_content(chunk_size=8192):
-                                        file.write(chunk)
+                get_video_from_link(self,thread)
 
         self.fps = VideoName.return_video_framerate(f'{self.input_file}')
         settings = Settings()
@@ -110,11 +115,9 @@ def start(thread,self,renderdir,videoName,videopath,times):
         except:
                self.aspectratio = 1920 / 1080
                #gets the fps
-        global fps
+        
         fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        #Gets the width and height
-        global height
-        global width
+        
         width,height = return_data.VideoName.return_video_resolution(videopath)
         #Create files
         return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')

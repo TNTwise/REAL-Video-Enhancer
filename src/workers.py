@@ -246,7 +246,7 @@ class upscale(QObject):
             else:
                     if self.main.paused == False:
                         self.log.emit("[Merging Frames]")
-                        self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.encoder,'upscale')
+                        self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.main.encoder,'upscale')
                     else:
                         pass
             self.finished.emit()
