@@ -38,15 +38,14 @@ def print_output(thread,self,extracting,pipe):
     while True:
         line = pipe.readline()
         if not line:
-            thread.log.emit('REMOVE_LAST_LINE')
-            thread.log.emit(f"Frames {mode}: {int(total_frame_count*times)} / {int(total_frame_count*times)}")
             break
         else:
                 if  'frame' in line:
-                        frame_num = re.findall(r'frame= [\d]*',line)
+                        frame_num = re.findall(r'frame=[ ]*[\d]*',line)
                         if len(frame_num) != 0:
-                                thread.log.emit('REMOVE_LAST_LINE')
+                                thread.removelog.emit(f'Frames {mode}:')
                                 frame_num = frame_num[0]
+                                
                                 frame_num = frame_num.split('=')[1]
                                 thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):

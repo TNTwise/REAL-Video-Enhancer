@@ -429,11 +429,12 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             event.ignore()
     
-    def addLinetoLogs(self,line):
-        if line != 'REMOVE_LAST_LINE':
+    def addLinetoLogs(self,line,remove_text=''):
+        if line != 'REMOVE_LAST_LINE' or remove_text != '':
             self.ui.logsPreview.append(f'{line}')
         else:
-            self.removeLastLineInLogs()
+            self.removeLastLineInLogs(remove_text)
+            
     def update_last_line(self,new_line_text):
         # Assuming line number is 2 (index 1) - replace with the desired line number
         line_number = 1
@@ -444,9 +445,28 @@ class MainWindow(QtWidgets.QMainWindow):
             cursor.movePosition(cursor.Down, cursor.KeepAnchor)
         cursor.removeSelectedText()
         cursor.insertText(new_line_text)
-    def removeLastLineInLogs(self,exception=None):
-        
-        cursor = self.ui.logsPreview.textCursor()
+    def removeLastLineInLogs(self,text_in_line):#takes in text in line and removes every line that has that specific text.
+        text = self.ui.logsPreview.toPlainText().split('\n')
+        text1=[]
+        for i in text:
+            if i != ' 'or i != '' or i !='\n':
+                
+                if len(i) > 3:
+                    text1.append(i)
+        text = text1
+        display_text = ''
+        for i in text:
+            if text_in_line not in i:
+                display_text+=f'{i}'
+                if i != ' ':
+                    display_text+='\n'
+            else:
+                print(i)
+        self.ui.logsPreview.clear()
+        self.ui.logsPreview.setText(display_text)
+        #print(display_text)
+            
+        '''cursor = self.ui.logsPreview.textCursor()
         cursor.movePosition(QTextCursor.End)
 
         # Move the cursor to the beginning of the last line
@@ -462,7 +482,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             cursor.removeSelectedText()
             
-            self.ui.logsPreview.setTextCursor(cursor)
+            self.ui.logsPreview.setTextCursor(cursor)'''
         
 if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
     ManageFiles.create_folder(f'{thisdir}/files')

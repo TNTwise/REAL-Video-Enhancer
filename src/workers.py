@@ -167,7 +167,7 @@ class interpolation(QObject):
     
     finished = pyqtSignal()
     log = pyqtSignal(str)
-    
+    removelog = pyqtSignal(str)
     def __init__(self,originalSelf,model,parent=None):
         self.originalSelf = originalSelf
         self.model = model
@@ -224,7 +224,7 @@ class interpolation(QObject):
 class upscale(QObject):
     finished = pyqtSignal()
     log = pyqtSignal(str)
-    
+    removelog = pyqtSignal(str)
     def __init__(self,originalSelf,parent=None):
         self.originalSelf = originalSelf
         self.main = originalSelf

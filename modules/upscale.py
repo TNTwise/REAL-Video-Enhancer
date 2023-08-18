@@ -40,7 +40,7 @@ def start_upscale(self,AI):
                 self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
             if realESRGAN_Model == 'Animation':
                 self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
-        
+        self.ui.logsPreview.append(f'[Extracting Frames]')
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
                 
@@ -60,6 +60,7 @@ def start_upscale(self,AI):
         self.upscaleWorker.finished.connect(self.upscaleWorker.deleteLater)
         self.upscaleThread.finished.connect(self.upscaleThread.deleteLater)
         self.upscaleWorker.log.connect(self.addLinetoLogs)
+        self.upscaleWorker.removelog.connect(self.removeLastLineInLogs)
         # Step 6: Start the thread
         
         self.upscaleThread.start()

@@ -52,6 +52,7 @@ def run_start(self,AI):
     self.rifeWorker.finished.connect(self.rifeWorker.deleteLater)
     self.rifeThread.finished.connect(self.rifeThread.deleteLater)
     self.rifeWorker.log.connect(self.addLinetoLogs)
+    self.rifeWorker.removelog.connect(self.removeLastLineInLogs)
     # Step 6: Start the thread
     
     self.rifeThread.start()
