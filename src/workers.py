@@ -180,7 +180,7 @@ class interpolation(QObject):
     
     def start_Render(self):
             
-            
+        try:    
             times = self.main.times
             videopath = self.main.input_file
             outputpath = self.main.output_folder
@@ -195,32 +195,35 @@ class interpolation(QObject):
             self.main.transitionDetection.get_frame_num(times)
             self.main.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
             self.Render(self.model,times,videopath,outputpath)
-            
+        except Exception as e:
+                self.main.showDialogBox(e)     
             
             
             
             
         
             
-    def Render(self,model,times,videopath,outputpath):   
-            self.main.paused = False
-            settings=Settings()
-            input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
-            if self.main.AI == 'rife-ncnn-vulkan':
-                if model == 'rife-v4.6' or model == 'rife-v4':
-                    os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+    def Render(self,model,times,videopath,outputpath):  
+            try: 
+                self.main.paused = False
+                settings=Settings()
+                input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+                if self.main.AI == 'rife-ncnn-vulkan':
+                    if model == 'rife-v4.6' or model == 'rife-v4':
+                        os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                    else:
+                        os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
+                if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
+                    show_on_no_output_files(self.main)
+                
                 else:
-                    os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
-            if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
-                show_on_no_output_files(self.main)
-            
-            else:
-                self.main.transitionDetection.merge_frames()
-                self.log.emit("[Merging Frames]")
-                self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
-                
-                self.finished.emit()
-                
+                    self.main.transitionDetection.merge_frames()
+                    self.log.emit("[Merging Frames]")
+                    self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
+                    
+                    self.finished.emit()
+            except Exception as e:
+                self.main.showDialogBox(e)   
 class upscale(QObject):
     finished = pyqtSignal()
     log = pyqtSignal(str)
@@ -235,6 +238,7 @@ class upscale(QObject):
         
         self.realESRGAN()
     def realESRGAN(self):
+        try:
             settings = Settings()
             self.main.endNum=0
             self.main.paused=False
@@ -250,3 +254,6 @@ class upscale(QObject):
                     else:
                         pass
             self.finished.emit()
+            
+        except Exception as e:
+            self.main.showDialogBox(e) 

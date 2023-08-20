@@ -5,7 +5,7 @@ thisdir = src.thisdir.thisdir()
 from src.return_data import *
 homedir = os.path.expanduser(r"~")
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
-
+#im going to eventually redo this
 class Settings:
     def __init__(self) -> None:
         
@@ -23,19 +23,13 @@ class Settings:
         with open(f'{thisdir}/files/settings.txt', 'w') as f:
             pass
         self.write_to_settings_file("Image_Type", ".jpg")
-        self.write_to_settings_file("IsAnime", "False")
-        self.write_to_settings_file("Repository", "stable")
         self.write_to_settings_file("rifeversion", "20221029")
         self.write_to_settings_file("esrganversion", "0.2.0")
         self.write_to_settings_file("videoQuality", "18")
         self.write_to_settings_file("Theme", "Dark")
         self.write_to_settings_file("OutputDir", f"{homedir}")
         self.write_to_settings_file("Interpolation_Option", f"2X")
-        self.write_to_settings_file("Rife_Option" ,'2.3')
-        self.write_to_settings_file("GPUUsage" ,'Default')
-        self.write_to_settings_file("RenderDevice" ,'GPU')
         self.write_to_settings_file("RenderDir" ,f"{thisdir}")
-        self.write_to_settings_file("ExtractionImageType" ,"jpg")
         self.write_to_settings_file('SceneChangeDetection','0.3')
         self.write_to_settings_file('Encoder','264')
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
@@ -175,11 +169,20 @@ def changeSceneDetection(self):
             settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
 def selRenderDir(self):
     settings = Settings()
-    self.render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
-    settings.change_setting("RenderDir",f"{self.render_folder}")
+    render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+    if render_folder != '':
+        settings.change_setting("RenderDir",f"{self.render_folder}")
+        
+        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+def selOutputDir(self):
+    settings = Settings()
+    output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+    if output_folder != '':
+        self.output_folder = output_folder
+        settings.change_setting("OutputDir",f"{self.output_folder}")
+        
+        self.ui.OutputDirectoryLabel.setText(f"{settings.OutputDir}")
     
-    self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-
 def selEncoder(self):
     settings = Settings()
     if '.264' in self.ui.EncoderCombo.currentText():

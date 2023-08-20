@@ -59,11 +59,9 @@ def run_start(self,AI):
     
     self.runPB()
 
-def start_interpolation(self,AI): #should prob make this different, too similar to start_rife but i will  think of something later prob
-    
-    # Calculate the aspect ratio
+def start_interpolation(self,AI): 
                 
-        
+    try:
         if self.input_file != '':
             self.render='rife'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
@@ -74,10 +72,12 @@ def start_interpolation(self,AI): #should prob make this different, too similar 
                 run_start(self,AI)
             else:
                 pass
-                 
+                    
         else:
-             no_input_file(self)
-             
+                no_input_file(self)
+    except Exception as e:
+        self.showDialogBox(e)
+            
             
 
 

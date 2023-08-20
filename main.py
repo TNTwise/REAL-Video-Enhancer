@@ -55,6 +55,7 @@ import modules.interpolate as interpolate
 import modules.upscale as upscale
 import shutil
 import src.checks as checks
+
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
@@ -101,12 +102,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
-        self.localFile = True
-        src.onProgramStart.onApplicationStart(self)
-        self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
-        self.download_youtube_video_command = ''
-        self.file_drop_widget = FileDropWidget(self)
-        self.ui.imageFormLayout.addWidget(self.file_drop_widget)
+        
+        try:
+            self.localFile = True
+            src.onProgramStart.onApplicationStart(self)
+            self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
+            self.download_youtube_video_command = ''
+            self.file_drop_widget = FileDropWidget(self)
+            self.ui.imageFormLayout.addWidget(self.file_drop_widget)
+            
+        except Exception as e:
+            self.showDialogBox(e)
         self.show()
 
     def restore_default_settings(self):
@@ -464,41 +470,26 @@ class MainWindow(QtWidgets.QMainWindow):
                 print(i)
         self.ui.logsPreview.clear()
         self.ui.logsPreview.setText(display_text)
-        #print(display_text)
-            
-        '''cursor = self.ui.logsPreview.textCursor()
-        cursor.movePosition(QTextCursor.End)
-
-        # Move the cursor to the beginning of the last line
-        cursor.movePosition(QTextCursor.StartOfLine, QTextCursor.MoveAnchor)
-        cursor.movePosition(QTextCursor.PreviousBlock, QTextCursor.KeepAnchor)
-
-        # Remove the selected text (the last line)
-        if exception != None:
-            if exception in cursor.selectedText():
-                cursor.removeSelectedText()
-            
-                self.ui.logsPreview.setTextCursor(cursor)
-        else:
-            cursor.removeSelectedText()
-            
-            self.ui.logsPreview.setTextCursor(cursor)'''
         
-if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
-    ManageFiles.create_folder(f'{thisdir}/files')
-    ManageFiles.create_file(f'{thisdir}/files/settings.txt')
-settings = Settings()
+try:
+    if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
+        ManageFiles.create_folder(f'{thisdir}/files')
+        ManageFiles.create_file(f'{thisdir}/files/settings.txt')
+    settings = Settings()
+except Exception as e:
+    print(e)
 
+try:
+    app = QtWidgets.QApplication(sys.argv)
 
-app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtGui import QPalette, QColor
 
-window = MainWindow()
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QPalette, QColor
-
-# Force the style to be the same on all OSs:
-import src.theme as theme
-theme.set_theme(app)
-sys.exit(app.exec_())
-    
+    # Force the style to be the same on all OSs:
+    import src.theme as theme
+    theme.set_theme(app)
+    sys.exit(app.exec_())
+except Exception as e:
+    print(e)      

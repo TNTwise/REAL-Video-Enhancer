@@ -91,87 +91,91 @@ def get_video_from_link(self,thread):
                                 file.write(chunk)
 
 def start(thread,self,renderdir,videoName,videopath,times):
-        # i need to clean this up lol
-        os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-        #Gets the width and height
-        global fps
-        global height
-        global width
-        if self.localFile == False:
-                get_video_from_link(self,thread)
-
-        self.fps = VideoName.return_video_framerate(f'{self.input_file}')
-        settings = Settings()
-        # Calculate the aspect ratio
-        videoName = VideoName.return_video_name(fr'{self.input_file}')
-        self.videoName = videoName
-        video = cv2.VideoCapture(self.input_file)
         try:
-                self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+                # i need to clean this up lol
+                os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+                #Gets the width and height
+                global fps
+                global height
+                global width
+                if self.localFile == False:
+                        get_video_from_link(self,thread)
+
+                self.fps = VideoName.return_video_framerate(f'{self.input_file}')
+                settings = Settings()
+                # Calculate the aspect ratio
+                videoName = VideoName.return_video_name(fr'{self.input_file}')
+                self.videoName = videoName
+                video = cv2.VideoCapture(self.input_file)
+                try:
+                        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+                        
+                        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                        self.aspectratio = self.videowidth / self.videoheight
+                except:
+                        self.aspectratio = 1920 / 1080
+                        #gets the fps
                 
-                self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-                self.aspectratio = self.videowidth / self.videoheight
-        except:
-               self.aspectratio = 1920 / 1080
-               #gets the fps
+                fps = return_data.Fps.return_video_fps(fr'{videopath}')
+                
+                width,height = return_data.VideoName.return_video_resolution(videopath)
+                #Create files
+                return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
+                return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
         
-        fps = return_data.Fps.return_video_fps(fr'{videopath}')
-        
-        width,height = return_data.VideoName.return_video_resolution(videopath)
-        #Create files
-        return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
-        return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
-       
-        thread.log.emit("[Extracting Frames]")
-        if settings.Image_Type != '.webp':
-                ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
-        else:
-                ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
-        global output 
-        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True)
+                thread.log.emit("[Extracting Frames]")
+                if settings.Image_Type != '.webp':
+                        ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
+                else:
+                        ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+                global output 
+                run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True)
 
-        if self.localFile == True or self.youtubeFile == False:
-                os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
-        else:
-                os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-        return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
-
+                if self.localFile == True or self.youtubeFile == False:
+                        os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
+                else:
+                        os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
+                return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
+        except Exception as e:
+                self.showDialogBox(e)
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
-        
-        
-        if outputpath == '':
-                outputpath = homedir
-        if mode == 'interpolation':
-                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
-                        i=1
-                        while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
-                                i+=1
-                        output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4' 
-
-                else:
-                        output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
-        if mode == 'upscale': # add upscale/realesrgan resolution bump here
-                upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
-                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.mp4') == True:
-                        i=1
-                        while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4') == True:
-                                i+=1
-                        output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4' 
-
-                else:
-                        output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
-        if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
-        else:
-              
-                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
-        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
-        os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
+        settings = Settings()
         try:
-                os.remove(f'{thisdir}/{videoName}')
-        except:
-               pass
-        os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
-        os.chdir(thisdir)
-        self.input_file = ''
-        return output_video_file
+                outputpath = settings.OutputDir
+                if mode == 'interpolation':
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
+                                i=1
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
+                                        i+=1
+                                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4' 
+
+                        else:
+                                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
+                if mode == 'upscale': # add upscale/realesrgan resolution bump here
+                        upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.mp4') == True:
+                                i=1
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4') == True:
+                                        i+=1
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4' 
+
+                        else:
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
+                if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
+                        ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                else:
+                
+                        ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
+                os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
+                try:
+                        os.remove(f'{thisdir}/{videoName}')
+                except:
+                        pass
+                os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
+                os.chdir(thisdir)
+                self.input_file = ''
+                return output_video_file
+                
+        except Exception as e:
+                self.showDialogBox(e)

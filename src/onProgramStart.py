@@ -4,13 +4,7 @@ import src.queue.queue as queue
 def onApplicationStart(self):
     import os
     
-    #Import all modules
-    ''' for module in os.listdir(f'{thisdir}/modules/'):
-            if module == '__init__.py' or module[-3:] != '.py':
-                continue
-            __import__(f'modules.{module[:-3]}', locals(), globals())
-            
-            self.ui.AICombo.addItem(f'{module[:-3]}')'''
+    #this is kind of a mess
     import modules.Rife as rife
     import modules.ESRGAN as esrgan
     settings = Settings()
@@ -20,26 +14,22 @@ def onApplicationStart(self):
     
     
     self.input_file = ''
-    self.output_folder = ''
+    
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
-    self.ui.SettingsMenus.clicked.connect(self.settings_menu)
-    self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
+    
     self.settings = Settings()
     self.gpuMemory=self.settings.VRAM
-    self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
+    
     self.switchUI()
     if self.gpuMemory != 'None':
         
         self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
-        #removing this for now
-        '''if HardwareInfo.get_video_memory_linux() != None:
-            self.ui.vramAmountSpinbox.setMaximum(int(HardwareInfo.get_video_memory_linux()))'''
+        
     else:
         self.ui.vramAmountSpinbox.setValue(1)
         cannot_detect_vram(self)
     self.ui.vramAmountSpinbox.setMinimum(1)
-    self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
-    self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
+    
     #Define Variables
     self.input_file = ''
     self.output_folder = ''
@@ -53,8 +43,9 @@ def onApplicationStart(self):
     self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.imageHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
-    self.ui.RifePause.clicked.connect(self.pause_render)
-    self.ui.RifeResume.clicked.connect(self.resume_render)
+    self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
+    self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
+    
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))
@@ -82,8 +73,14 @@ def onApplicationStart(self):
     if self.videoQuality == '22':
         self.ui.VidQualityCombo.setCurrentText('Low')
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
-    
-    #link help buttons
+    self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
+    #link buttons
+    self.ui.SettingsMenus.clicked.connect(self.settings_menu)
+    self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
+    self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
+    self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
+    self.ui.RifePause.clicked.connect(self.pause_render)
+    self.ui.RifeResume.clicked.connect(self.resume_render)
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
     
