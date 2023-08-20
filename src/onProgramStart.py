@@ -33,7 +33,6 @@ def onApplicationStart(self):
     #Define Variables
     self.input_file = ''
     self.output_folder = ''
-    self.output_folder = settings.OutputDir 
     self.videoQuality = settings.videoQuality
     self.encoder = settings.Encoder
     if os.path.exists(f"{settings.RenderDir}") == False:

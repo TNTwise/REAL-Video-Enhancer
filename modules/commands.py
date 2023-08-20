@@ -141,7 +141,10 @@ def start(thread,self,renderdir,videoName,videopath,times):
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         try:
-                outputpath = settings.OutputDir
+                if self.output_folder == '':
+                        outputpath = settings.OutputDir
+                else:
+                        outputpath = self.output_folder
                 if mode == 'interpolation':
                         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
                                 i=1
