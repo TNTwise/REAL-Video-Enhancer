@@ -14,7 +14,8 @@ this should help with rife vs support<br/>
 
 implement modular system where app can import modules from scripts(either iterate through module directory or add specific button in settings)<br/>
 <br/>
-Add indicator for file drag and drop
-implement warnings for space with realesrgan
-clean up settings
-add more AI options
+Add indicator for file drag and drop<br/>
+implement warnings for space with realesrgan<br/>
+clean up settings<br/>
+add more AI options<br/>
+implement storage optimized option fully. (including transition detection)
