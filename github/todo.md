@@ -18,4 +18,5 @@ Add indicator for file drag and drop<br/>
 implement warnings for space with realesrgan<br/>
 clean up settings<br/>
 add more AI options<br/>
-implement storage optimized option fully. (including transition detection)
+implement storage optimized option fully. (including transition detection)<br/>
+add tab for upscaling images and not just videos<br/>
