@@ -208,7 +208,7 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 if self.ETA != None:
                     self.ui.ETAPreview.setText(self.ETA)
-                if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames'):
+                if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
             except Exception as e:

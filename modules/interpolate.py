@@ -10,11 +10,11 @@ from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
 import glob
-import os
 from modules.commands import *
 import src.thisdir
 import src.workers as workers
 from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 

@@ -33,7 +33,7 @@ class Settings:
         self.write_to_settings_file('SceneChangeDetection','0.3')
         self.write_to_settings_file('Encoder','264')
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
-        
+        self.write_to_settings_file('RenderType','Classic')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
@@ -80,6 +80,11 @@ class Settings:
             self.ModelDir = settings_dict['ModelDir']
         except:
             self.write_to_settings_file("ModelDir" ,f'{thisdir}/models/')
+            self.readSettings()
+        try:
+            self.RenderType = settings_dict['RenderType']
+        except:
+            self.write_to_settings_file('RenderType','Classic')
             self.readSettings()
         try:
             self.RenderDir = settings_dict['RenderDir']

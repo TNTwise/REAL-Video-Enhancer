@@ -117,7 +117,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                         #gets the fps
                 
                 fps = return_data.Fps.return_video_fps(fr'{videopath}')
-                
+                self.fps = fps
                 width,height = return_data.VideoName.return_video_resolution(videopath)
                 #Create files
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
@@ -164,12 +164,19 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
 
                         else:
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
-                if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                        ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                if settings.RenderType == 'Optimized':
+                        if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
+                                os.system(f'ffmpeg -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}"')
+                        else:
+                        
+                                os.system(f'ffmpeg -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}"') 
                 else:
-                
-                        ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
-                run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
+                        if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
+                                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                        else:
+                        
+                                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
                 os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
                 try:
                         os.remove(f'{thisdir}/{videoName}')

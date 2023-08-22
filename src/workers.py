@@ -26,7 +26,6 @@ class pb2X(QObject):
         self.main = main
     def run(self):
         """Long-running task."""
-        print('\n\n\n\n')
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
             sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
@@ -41,15 +40,19 @@ class pb2X(QObject):
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
-                
-                    files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     
+                    if self.settings.RenderType == 'Optimized':
+                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                    else:
+                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     
                     sleep(.1)
                     
                     self.progress.emit(files_processed)
-                    self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                    
+                    if self.settings.RenderType == 'Optimized':
+                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                    else:
+                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
                     if self.main.imageDisplay != None:
 
                         try:
@@ -162,7 +165,75 @@ from modules.commands import *
 import src.thisdir
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
+
+
     
+def merge_frames(self,increment):
+    files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/')
+    files.sort()
+    iteration=0
+    for i in files:# move files to 1-frame_increment_amount
+        os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{str(iteration).zfill(8)}{self.main.settings.Image_Type}"')
+        iteration+=1
+     #make this actual fps of video
+    
+    os.system(f'{thisdir}/bin/ffmpeg -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/%08d{self.main.settings.Image_Type}" -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}.mp4"')#replace png with image type
+    
+    os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment+1}/"')
+def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
+    iteration = 1
+    while True:
+        global output_frame_count
+        output_frame_count = 0
+        while output_frame_count < frame_increments_of_interpolation:# make this while temp dir exists
+        
+            output_frame_count = len(os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/'))
+            print(output_frame_count)
+            sleep(1)
+        
+        increment=1# i guess we are starting at 1
+        files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0')
+        files.sort()
+        for i in files:
+            if increment <= frame_increments_of_interpolation:
+                
+                os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
+                increment+=1
+        
+        merge_frames(self,interpolation_sessions-iteration)
+        # add file to list
+        with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+            f.write(f'file {interpolation_sessions-iteration}.mp4\n')
+        iteration+=1
+        if iteration == interpolation_sessions:
+            if not os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4') :
+                merge_frames(self,0)
+                with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+                    f.write(f'file 0.mp4\n')
+            os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/"')
+            break
+        
+def ceildiv(a, b):
+    return -(a // -b)
+
+def AI(self,command):
+    
+    frame_count = self.input_frames # frame count of video multiplied by times 
+    global frame_increments_of_interpolation
+    frame_increments_of_interpolation = 10
+    global interpolation_sessions
+    interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
+    for i in range(interpolation_sessions):
+        os.mkdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}')
+    fc_thread = Thread(target=lambda: frameCountThread(self))
+    fc_thread.start()
+    os.system(command)
+    #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
+    #merge all videos created here
+    fc_thread.join()
+    
+
+
 class interpolation(QObject):
     
     finished = pyqtSignal()
@@ -207,12 +278,20 @@ class interpolation(QObject):
             try: 
                 self.main.paused = False
                 settings=Settings()
-                input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+                self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
                 if self.main.AI == 'rife-ncnn-vulkan':
+                    
                     if model == 'rife-v4.6' or model == 'rife-v4':
-                        os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                        if settings.RenderType == 'Optimized':
+                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                        else:
+                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                            print('\n\n\nhhhhhhhh')
                     else:
-                        os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
+                        if settings.RenderType == 'Optimized':
+                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
+                        else:
+                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                 if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
                 
@@ -224,6 +303,7 @@ class interpolation(QObject):
                     self.finished.emit()
             except Exception as e:
                 self.main.showDialogBox(e)   
+                
 class upscale(QObject):
     finished = pyqtSignal()
     log = pyqtSignal(str)
@@ -244,7 +324,10 @@ class upscale(QObject):
             self.main.paused=False
             img_type = self.main.settings.Image_Type.replace('.','')
             if self.main.AI == 'realesrgan-ncnn-vulkan':
-                os.system(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized':
+                    AI(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+                else:
+                    os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
