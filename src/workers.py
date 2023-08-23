@@ -223,7 +223,7 @@ def ceildiv(a, b):
 
 def AI(self,command):
     print(1)
-    frame_count = self.input_frames # frame count of video multiplied by times 
+    frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
     global frame_increments_of_interpolation
     frame_increments_of_interpolation = 10
     global interpolation_sessions
