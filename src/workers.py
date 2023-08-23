@@ -40,51 +40,53 @@ class pb2X(QObject):
         
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
-                    
-                    if self.settings.RenderType == 'Optimized':
-                        try:
-                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
-                        except:
-                            print('i really gotta fix this')
-                    else:
-                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                    
-                    sleep(.1)
-                    
-                    self.progress.emit(files_processed)
-                    if self.settings.RenderType == 'Optimized':
-                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                    else:
-                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                    if self.main.imageDisplay != None:
+                    try:
+                        if self.settings.RenderType == 'Optimized':
+                            try:
+                                files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                            except:
+                                print('i really gotta fix this')
+                        else:
+                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
+                        
+                        sleep(.1)
+                        
+                        self.progress.emit(files_processed)
+                        if self.settings.RenderType == 'Optimized':
+                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                        else:
+                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                        if self.main.imageDisplay != None:
 
-                        try:
-                            if os.path.exists(self.main.imageDisplay):
-                                self.image_progress.emit('1')
-                                
-                                width = self.main.width()
-                                height = self.main.height()
-                                
-                                self.main.width1=int(width/1.4)
-                                self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                if self.main.height1 >= height/1.4:
+                            try:
+                                if os.path.exists(self.main.imageDisplay):
+                                    self.image_progress.emit('1')
                                     
-                                    self.main.height1=int(height/1.4)
-                                    self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                try:
-                                    if os.path.exists(self.main.imageDisplay):
+                                    width = self.main.width()
+                                    height = self.main.height()
+                                    
+                                    self.main.width1=int(width/1.4)
+                                    self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                    if self.main.height1 >= height/1.4:
                                         
-                                        
-                                        
-                                        self.image_progress.emit('2')
-                                        
-                                except Exception as e:
-                                    print(e)
-                                    pass
-                        except Exception as e:
-                            
-                            print(e)
-                            self.image_progress.emit('3')
+                                        self.main.height1=int(height/1.4)
+                                        self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                    try:
+                                        if os.path.exists(self.main.imageDisplay):
+                                            
+                                            
+                                            
+                                            self.image_progress.emit('2')
+                                            
+                                    except Exception as e:
+                                        print(e)
+                                        pass
+                            except Exception as e:
+                                
+                                print(e)
+                                self.image_progress.emit('3')
+                    except:
+                        pass
                         
                     
                 
