@@ -422,6 +422,11 @@
                  </item>
                  <item>
                   <property name="text">
+                   <string>Very High</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>Lossless</string>
                   </property>
                  </item>
@@ -430,7 +435,7 @@
                <item row="0" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
-                  <string>Video Quality</string>
+                  <string>Video Output Quality</string>
                  </property>
                 </widget>
                </item>
@@ -469,6 +474,20 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
+               <item row="1" column="5">
+                <widget class="QPushButton" name="RenderDirButton">
+                 <property name="text">
+                  <string>Render Directory</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>VRAM amount</string>
+                 </property>
+                </widget>
+               </item>
                <item row="3" column="5">
                 <widget class="QComboBox" name="imageComboBox">
                  <item>
@@ -488,51 +507,17 @@
                  </item>
                 </widget>
                </item>
-               <item row="3" column="4">
-                <widget class="QPushButton" name="imageHelpButton">
-                 <property name="text">
-                  <string/>
+               <item row="2" column="5">
+                <widget class="QSpinBox" name="vramAmountSpinbox">
+                 <property name="suffix">
+                  <string> GB</string>
                  </property>
                 </widget>
-               </item>
-               <item row="4" column="5">
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item row="3" column="3">
                 <widget class="QLabel" name="label_4">
                  <property name="text">
                   <string>Image Type</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="RenderPathLabel">
-                 <property name="text">
-                  <string>TextLabel</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="5">
-                <widget class="QPushButton" name="RenderDirButton">
-                 <property name="text">
-                  <string>Render Directory</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="5">
-                <widget class="QSpinBox" name="vramAmountSpinbox">
-                 <property name="suffix">
-                  <string> GB</string>
                  </property>
                 </widget>
                </item>
@@ -547,10 +532,62 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="3">
-                <widget class="QLabel" name="label_5">
+               <item row="5" column="5">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="RenderPathLabel">
                  <property name="text">
-                  <string>VRAM amount</string>
+                  <string>TextLabel</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QPushButton" name="imageHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="5">
+                <widget class="QComboBox" name="renderTypeCombo">
+                 <item>
+                  <property name="text">
+                   <string>Classic</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Optimized (EXPERIMENTAL)</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="4" column="3">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Render Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="4">
+                <widget class="QPushButton" name="renderTypeHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
                  </property>
                 </widget>
                </item>

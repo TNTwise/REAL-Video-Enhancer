@@ -197,14 +197,24 @@ def selEncoder(self):
         settings.change_setting('Encoder','265')
     self.encoder = settings.Encoder
 
+def selRenderType(self):
+    settings = Settings()
+    if 'Classic' in self.ui.renderTypeCombo.currentText():
+        
+        settings.change_setting('RenderType','Classic')
+    if 'Optimized' in self.ui.renderTypeCombo.currentText():
+        settings.change_setting('RenderType','Optimized')
+
 def selVidQuality(self):
     settings = Settings()
     if self.ui.VidQualityCombo.currentText() == 'Lossless':
         settings.change_setting('videoQuality', '10')
-    if self.ui.VidQualityCombo.currentText() == 'High':
+    if self.ui.VidQualityCombo.currentText() == 'Very High':
         settings.change_setting('videoQuality', '14')
+    if self.ui.VidQualityCombo.currentText() == 'High':
+         settings.change_setting('videoQuality', '18')
     if self.ui.VidQualityCombo.currentText() == 'Medium':
-        settings.change_setting('videoQuality', '18')
+       settings.change_setting('videoQuality', '20')
     if self.ui.VidQualityCombo.currentText() == 'Low':
         settings.change_setting('videoQuality', '22')
     self.videoQuality = settings.videoQuality

@@ -20,3 +20,5 @@ clean up settings<br/>
 add more AI options<br/>
 implement storage optimized option fully. (including transition detection)<br/>
 add tab for upscaling images and not just videos<br/>
+Add more video output quality options<br/>
+

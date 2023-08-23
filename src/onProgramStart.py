@@ -66,13 +66,21 @@ def onApplicationStart(self):
     if self.videoQuality == '10':
         self.ui.VidQualityCombo.setCurrentText('Lossless')
     if self.videoQuality == '14':
-        self.ui.VidQualityCombo.setCurrentText('High')
+        self.ui.VidQualityCombo.setCurrentText('Very High')
     if self.videoQuality == '18':
+        self.ui.VidQualityCombo.setCurrentText('High')
+    if self.videoQuality == '20':
         self.ui.VidQualityCombo.setCurrentText('Medium')
     if self.videoQuality == '22':
         self.ui.VidQualityCombo.setCurrentText('Low')
+    if self.settings.RenderType == 'Classic':
+        self.ui.renderTypeCombo.setCurrentIndex(0)
+    else:
+        self.ui.renderTypeCombo.setCurrentIndex(1)
+    self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
+    
     #link buttons
     self.ui.SettingsMenus.clicked.connect(self.settings_menu)
     self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
@@ -82,7 +90,8 @@ def onApplicationStart(self):
     self.ui.RifeResume.clicked.connect(self.resume_render)
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
-    
+    self.ui.renderTypeCombo.currentIndexChanged.connect(lambda: selRenderType(self))
+            
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
     
