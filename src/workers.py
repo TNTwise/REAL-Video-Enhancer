@@ -212,8 +212,6 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 f.write(f'file {interpolation_sessions-iteration}.mp4\n')
             iteration+=1
             if iteration == interpolation_sessions:
-                
-                os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/"')
                 break
         except:
             pass
@@ -242,7 +240,6 @@ def AI(self,command):
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file 0.mp4\n')
                 print('file 0 succsessfully made.')
-
 
 class interpolation(QObject):
     
