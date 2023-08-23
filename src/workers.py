@@ -217,12 +217,13 @@ def ceildiv(a, b):
     return -(a // -b)
 
 def AI(self,command):
-    
+    print(1)
     frame_count = self.input_frames # frame count of video multiplied by times 
     global frame_increments_of_interpolation
     frame_increments_of_interpolation = 10
     global interpolation_sessions
     interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
+    print(interpolation_sessions)
     for i in range(interpolation_sessions):
         os.mkdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}')
     fc_thread = Thread(target=lambda: frameCountThread(self))
@@ -322,9 +323,10 @@ class upscale(QObject):
             self.main.endNum=0
             self.main.paused=False
             img_type = self.main.settings.Image_Type.replace('.','')
+            self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 if settings.RenderType == 'Optimized':
-                    AI(f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
                 else:
                     os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
@@ -336,6 +338,6 @@ class upscale(QObject):
                     else:
                         pass
             self.finished.emit()
-            
         except Exception as e:
-            self.main.showDialogBox(e) 
+            self.main.showDialogBox(e)   
+        

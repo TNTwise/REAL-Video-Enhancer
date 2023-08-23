@@ -68,6 +68,7 @@ def check_if_enough_space(input_file,render,times):
                 full_size = full_extraction_size + full_extraction_size * times * 5
                 return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
             else:
-                return True
-    return True
+                return True, 0, 0
+    else:
+        return True,0 ,0
             

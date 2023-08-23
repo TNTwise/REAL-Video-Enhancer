@@ -54,14 +54,13 @@ def run_start(self,AI):
     self.rifeWorker.log.connect(self.addLinetoLogs)
     self.rifeWorker.removelog.connect(self.removeLastLineInLogs)
     # Step 6: Start the thread
-    
+    self.rifeWorker.finished.connect(self.endRife)
     self.rifeThread.start()
     
     self.runPB()
 
 def start_interpolation(self,AI): 
-                
-    try:
+    try:           
         if self.input_file != '':
             self.render='rife'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
@@ -75,9 +74,9 @@ def start_interpolation(self,AI):
                     
         else:
                 no_input_file(self)
+    
     except Exception as e:
         self.showDialogBox(e)
-            
             
 
 

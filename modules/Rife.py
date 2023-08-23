@@ -35,5 +35,6 @@ def modelOptions(self):
         self.ui.RifeStart.clicked.disconnect() 
     except:
         pass
+
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
     onProgramStart.list_model_downloaded(self)
