@@ -42,7 +42,10 @@ class pb2X(QObject):
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                     
                     if self.settings.RenderType == 'Optimized':
-                        files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                        try:
+                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                        except:
+                            print('i really gotta fix this')
                     else:
                         files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                     
@@ -185,33 +188,33 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
     while True:
         global output_frame_count
         output_frame_count = 0
-        while output_frame_count < frame_increments_of_interpolation:# make this while temp dir exists
-        
-            output_frame_count = len(os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/'))
-            print(output_frame_count)
-            sleep(1)
-        
-        increment=1# i guess we are starting at 1
-        files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0')
-        files.sort()
-        for i in files:
-            if increment <= frame_increments_of_interpolation:
+        try:
+            while output_frame_count < frame_increments_of_interpolation:# make this while temp dir exists
+            
+                output_frame_count = len(os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/'))
+                print(output_frame_count)
+                sleep(1)
+            
+            increment=1# i guess we are starting at 1
+            files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0')
+            files.sort()
+            for i in files:
+                if increment <= frame_increments_of_interpolation:
+                    
+                    os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
+                    increment+=1
+            
+            merge_frames(self,interpolation_sessions-iteration)
+            # add file to list
+            with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+                f.write(f'file {interpolation_sessions-iteration}.mp4\n')
+            iteration+=1
+            if iteration == interpolation_sessions:
                 
-                os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
-                increment+=1
-        
-        merge_frames(self,interpolation_sessions-iteration)
-        # add file to list
-        with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
-            f.write(f'file {interpolation_sessions-iteration}.mp4\n')
-        iteration+=1
-        if iteration == interpolation_sessions:
-            if not os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4') :
-                merge_frames(self,0)
-                with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
-                    f.write(f'file 0.mp4\n')
-            os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/"')
-            break
+                os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/"')
+                break
+        except:
+            pass
         
 def ceildiv(a, b):
     return -(a // -b)
@@ -232,7 +235,11 @@ def AI(self,command):
     #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
     #merge all videos created here
     fc_thread.join()
-    
+    if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4') == False:
+                merge_frames(self,0)
+                with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+                    f.write(f'file 0.mp4\n')
+                print('file 0 succsessfully made.')
 
 
 class interpolation(QObject):
