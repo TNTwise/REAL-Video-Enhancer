@@ -178,4 +178,12 @@ class TransitionDetection:
                 o+=1
             os.chdir(f'{self.thisdir}/')
         else:
+            for i in os.listdir(f"{self.full_render_dir}/transitions/"):
+                if os.path.isfile(f'{self.full_render_dir}/output_frames/{i}.mp4'):
+                    try:
+                        os.removedirs(f"{self.full_render_dir}/transitions/{i}")# i think i can use this instead of rm
+                    except:
+                        os.system(f'rm -rf "{self.full_render_dir}/transitions/{i}"')
+                        print('didnt work lol')
+                        
             os.system(f'cp -r "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/"')
