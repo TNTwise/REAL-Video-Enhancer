@@ -160,7 +160,7 @@ import os
 from src.settings import *
 import glob
 from threading import Thread
-import src.runAI.transition_detection
+import src.runAI.transition_detection as transition_detection
 from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
@@ -173,10 +173,11 @@ homedir = os.path.expanduser(r"~")
 
 
     
-def merge_frames(self,increment):
+def merge_frames_to_video(self,increment):
     files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/')
     files.sort()
     iteration=0
+    transitionDetectionClass.merge_frames(frame_increments_of_interpolation)
     for i in files:# move files to 1-frame_increment_amount
         os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{str(iteration).zfill(8)}{self.main.settings.Image_Type}"')
         iteration+=1
@@ -206,7 +207,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                     os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
                     increment+=1
             
-            merge_frames(self,interpolation_sessions-iteration)
+            merge_frames_to_video(self,interpolation_sessions-iteration)
             # add file to list
             with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                 f.write(f'file {interpolation_sessions-iteration}.mp4\n')
@@ -216,17 +217,16 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
         except:
             pass
         
-def ceildiv(a, b):
-    return -(a // -b)
+
 
 def AI(self,command):
-    print(1)
+    global transitionDetectionClass
+    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
     global frame_increments_of_interpolation
-    frame_increments_of_interpolation = 10
+    frame_increments_of_interpolation = 100
     global interpolation_sessions
     interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
-    print(interpolation_sessions)
     for i in range(interpolation_sessions):
         os.mkdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}')
     fc_thread = Thread(target=lambda: frameCountThread(self))
@@ -236,7 +236,7 @@ def AI(self,command):
     #merge all videos created here
     fc_thread.join()
     if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4') == False:
-                merge_frames(self,0)
+                merge_frames_to_video(self,0)
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file 0.mp4\n')
                 print('file 0 succsessfully made.')

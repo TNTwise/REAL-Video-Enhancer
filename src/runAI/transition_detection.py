@@ -3,6 +3,14 @@ import src.return_data
 import subprocess
 from src.return_data import *
 from src.settings import *
+def generate_opposite_pair(number, start, end):
+    if number < start or number > end:
+        return None  # Number is outside the specified range
+
+    opposite = end - (number - start)
+    return opposite
+
+
 class TransitionDetection:
     def __init__(self,originalSelf):
         self.settings = Settings()
@@ -130,7 +138,8 @@ class TransitionDetection:
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict3[p]}{self.settings.Image_Type}"')
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict4[p]}{self.settings.Image_Type}"')
                     #This is so dumb lmao, ik there is a better way but i am lazy lol
-                
+                  
+                       
                 p+=1
                 o+=1
                 # IK this is dumb. but i cant think of anything else rn
@@ -138,19 +147,35 @@ class TransitionDetection:
                     for file,copyto in self.fileToCopyDict.items():
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
-                   
+            if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
+                    frame_count = VideoName.return_video_frame_count(self.input_file)
+                    interpolation_sessions = ceildiv(int(frame_count*times),100)
+                    
+                    for i in range(interpolation_sessions):
+                        os.mkdir(f'{self.settings.RenderDir}/{self.videoName}_temp/transitions/{i}')
+                    for i in os.listdir(f'{self.full_render_dir}/transitions/'):
+                        if settings.Image_Type in i:
+                            frame_num = int(i.replace(settings.Image_Type,''))
+                            file_to_move_to = int(ceildiv(frame_num,100))# frame increments in workers.py, too lazy to get data from there lol   
+                            
+                            os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{generate_opposite_pair(file_to_move_to,0,interpolation_sessions)}/"')    
+                    files = os.listdir(f'{self.full_render_dir}/transitions/')
+                    files.sort()
+                        
+    def merge_frames(self,frames_per_output_file=None):
+        if frames_per_output_file == None:  
+            p = 0
+            o = 1
             
-    def merge_frames(self):
-        p = 0
-        o = 1
-        
-        os.chdir(f'{self.full_render_dir}/transitions/')
-        for i in os.listdir():
+            os.chdir(f'{self.full_render_dir}/transitions/')
+            for i in os.listdir():
+                
+                    os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
             
-                os.system(f'cp {i} "{self.full_render_dir}/output_frames/"')
-        
-        for image in self.frame_list:
-            os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
-            p+=1
-            o+=1
-        os.chdir(f'{self.thisdir}/')
+            for image in self.frame_list:
+                os.system(f'mv "{self.full_render_dir}/transitions/{self.list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" ')
+                p+=1
+                o+=1
+            os.chdir(f'{self.thisdir}/')
+        else:
+            os.system(f'cp -r "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/"')

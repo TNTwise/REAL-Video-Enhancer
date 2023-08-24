@@ -61,7 +61,8 @@ def get_integrated_vram():
         return int(vram) // 4000
     except subprocess.CalledProcessError:
         return None
-    
+def ceildiv(a, b):
+    return -(a // -b)
 class HardwareInfo:
     
     def get_video_memory_linux():
