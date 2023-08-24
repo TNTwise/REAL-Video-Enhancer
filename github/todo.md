@@ -22,4 +22,5 @@ implement storage optimized option fully. (including transition detection)<br/>
 add tab for upscaling images and not just videos<br/>
 Add more video output quality options<br/>
 Add logging system<br/>
-fix transition detection bugging out on experimental render type. most likely due to multiple copies, add checks for this. also maybe merge frames before any interpolation, im going to have to debug more to fix this.
+fix transition detection bugging out on experimental render type. most likely due to multiple copies, add checks for this. also maybe merge frames before any interpolation, im going to have to debug more to fix this.<br/>
+add off switch for transition detection
