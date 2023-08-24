@@ -114,7 +114,7 @@ class downloadVideo(QObject):
                     for line in stdout_lines:
                          if 'FPS' in line:
                             fps_index = line.find('FPS')
-                            print(fps_index)
+                            #print(fps_index)
                             break
                     for line in reversed(stdout_lines):
                         if 'Premium' in line:
@@ -125,7 +125,7 @@ class downloadVideo(QObject):
                             resolutions_list.append(res)
                             id=line[:3]
                             fps=(line[fps_index:fps_index+3])
-                            print(fps)
+                            #print(fps)
                             self.dict_res_id_fps[res] = [id,fps]
                             self.addRes.emit(res)
                         if 'mp4' in line:
@@ -137,7 +137,7 @@ class downloadVideo(QObject):
                                     resolutions_list.append(res)
                                     id=line[:3]
                                     fps=(line[fps_index:fps_index+3])
-                                    print(fps)
+                                    #print(fps)
                                     self.dict_res_id_fps[res] = [id,fps]
                                     self.addRes.emit(res)
                         
@@ -179,16 +179,17 @@ def merge_frames_to_video(self,increment):
     iteration=0
     if os.path.exists(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/'):
         transitionDetectionClass.merge_frames(frame_increments_of_interpolation)
+    
     for i in files:# move files to 1-frame_increment_amount
         os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{str(iteration).zfill(8)}{self.main.settings.Image_Type}"')
         iteration+=1
-     #make this actual fps of video
     
     os.system(f'{thisdir}/bin/ffmpeg -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/%08d{self.main.settings.Image_Type}" -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}.mp4"')#replace png with image type
     
-    os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment+1}/"')
+    os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/"')
 def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
     iteration = 1
+    increment=1
     while True:
         global output_frame_count
         output_frame_count = 0
@@ -196,18 +197,23 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
             while output_frame_count < frame_increments_of_interpolation:# make this while temp dir exists
             
                 output_frame_count = len(os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/'))
-                print(output_frame_count)
+                #print(output_frame_count)
                 sleep(1)
-            
-            increment=1# i guess we are starting at 1
+            # i guess we are starting at 1
             files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0')
             files.sort()
-            for i in files:
-                if increment <= frame_increments_of_interpolation:
-                    
-                    os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
-                    increment+=1
-            
+            #print(files)
+            j=1
+            # moves files into new directory to be rendered into video
+            while j <= frame_increments_of_interpolation:
+                    if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                        os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}/"')
+                        
+                        #print(increment)
+                        increment+=1
+                        j+=1
+                    else:
+                        sleep(1)
             merge_frames_to_video(self,interpolation_sessions-iteration)
             # add file to list
             with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
@@ -240,7 +246,7 @@ def AI(self,command):
                 merge_frames_to_video(self,0)
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file 0.mp4\n')
-                print('file 0 succsessfully made.')
+                #print('file 0 succsessfully made.')
 
 class interpolation(QObject):
     
