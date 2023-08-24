@@ -110,7 +110,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
-            
         except Exception as e:
             self.showDialogBox(e)
         self.show()

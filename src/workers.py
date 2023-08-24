@@ -177,7 +177,8 @@ def merge_frames_to_video(self,increment):
     files = os.listdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/')
     files.sort()
     iteration=0
-    transitionDetectionClass.merge_frames(frame_increments_of_interpolation)
+    if os.path.exists(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/'):
+        transitionDetectionClass.merge_frames(frame_increments_of_interpolation)
     for i in files:# move files to 1-frame_increment_amount
         os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{str(iteration).zfill(8)}{self.main.settings.Image_Type}"')
         iteration+=1
@@ -224,7 +225,7 @@ def AI(self,command):
     transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
     global frame_increments_of_interpolation
-    frame_increments_of_interpolation = 100
+    frame_increments_of_interpolation = self.main.settings.FrameIncrements
     global interpolation_sessions
     interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
     for i in range(interpolation_sessions):

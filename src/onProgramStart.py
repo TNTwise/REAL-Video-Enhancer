@@ -80,8 +80,10 @@ def onApplicationStart(self):
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
-    
+    self.ui.frameIncrementSpinBox.setValue(settings.FrameIncrements)
+    self.ui.frameIncrementSpinBox.valueChanged.connect(lambda: selFrameIncrements(self.ui.frameIncrementSpinBox.value()))
     #link buttons
+    self.ui.frameIncrementHelp.clicked.connect(lambda: frame_increments_help(self))
     self.ui.SettingsMenus.clicked.connect(self.settings_menu)
     self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
     self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)

@@ -149,14 +149,14 @@ class TransitionDetection:
                   
             if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
                     frame_count = VideoName.return_video_frame_count(self.input_file)
-                    interpolation_sessions = ceildiv(int(frame_count*times),100)
+                    interpolation_sessions = ceildiv(int(frame_count*times),self.settings.FrameIncrements)
                     
                     for i in range(interpolation_sessions):
                         os.mkdir(f'{self.settings.RenderDir}/{self.videoName}_temp/transitions/{i}')
                     for i in os.listdir(f'{self.full_render_dir}/transitions/'):
                         if settings.Image_Type in i:
                             frame_num = int(i.replace(settings.Image_Type,''))
-                            file_to_move_to = int(ceildiv(frame_num,100))# frame increments in workers.py, too lazy to get data from there lol   
+                            file_to_move_to = int(ceildiv(frame_num,self.settings.FrameIncrements))# frame increments in workers.py, too lazy to get data from there lol   
                             
                             os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{generate_opposite_pair(file_to_move_to,0,interpolation_sessions)}/"')    
                     files = os.listdir(f'{self.full_render_dir}/transitions/')

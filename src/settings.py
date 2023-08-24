@@ -34,6 +34,7 @@ class Settings:
         self.write_to_settings_file('Encoder','264')
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
         self.write_to_settings_file('RenderType','Classic')
+        self.write_to_settings_file('FrameIncrements', '100')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
@@ -63,6 +64,11 @@ class Settings:
             self.videoQuality = settings_dict['videoQuality']
         except:
             self.write_to_settings_file("videoQuality", "18")
+            self.readSettings()
+        try:
+            self.FrameIncrements = int(settings_dict['FrameIncrements']) # need this to be int
+        except:
+            self.write_to_settings_file('FrameIncrements', '100')
             self.readSettings()
         try:
             self.OutputDir = settings_dict['OutputDir']
@@ -204,7 +210,11 @@ def selRenderType(self):
         settings.change_setting('RenderType','Classic')
     if 'Optimized' in self.ui.renderTypeCombo.currentText():
         settings.change_setting('RenderType','Optimized')
-
+        
+def selFrameIncrements(value):
+    settings = Settings()
+    settings.change_setting('FrameIncrements',f'{value}')
+    
 def selVidQuality(self):
     settings = Settings()
     if self.ui.VidQualityCombo.currentText() == 'Lossless':

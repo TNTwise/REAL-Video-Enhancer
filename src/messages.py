@@ -34,3 +34,6 @@ def not_enough_storage(self,predicted_space,total_space):
 
 def render_help(self):
     self.showDialogBox("Classic uses a lot of storage,\n Optimized splits up the render into sections and deletes old images, saving space.\n (Most features will break while using Optimized.)")
+
+def frame_increments_help(self):
+    self.showDialogBox(f"This is how many frames will be rendered before they are merged into a video. (OPTIMIZED PRESET ONLY)\nLower values can lead to more storage usage as merging the video may take longer for the next render to run.\nHigher values can lead to more storage usage as there are more frames rendered before merging.")
