@@ -35,6 +35,7 @@ class Settings:
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
         self.write_to_settings_file('RenderType','Optimized')
         self.write_to_settings_file('FrameIncrements', '100')
+        self.write_to_settings_file('DiscordRPC', 'Enabled')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
@@ -122,7 +123,7 @@ class Settings:
             else:
                 self.DiscordRPC == False
         except:
-            self.write_to_settings_file('DiscordRPC', 'Disabled')
+            self.write_to_settings_file('DiscordRPC', 'Enabled')
             self.readSettings()       
         try:
             self.ModelDir=settings_dict['ModelDir']

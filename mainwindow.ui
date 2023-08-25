@@ -497,7 +497,7 @@
                  </item>
                  <item>
                   <property name="text">
-                   <string>Optimized (EXPERIMENTAL)</string>
+                   <string>Optimized</string>
                   </property>
                  </item>
                 </widget>

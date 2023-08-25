@@ -30,10 +30,10 @@ def quotes(self):
     self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")
 
 def not_enough_storage(self,predicted_space,total_space):
-    self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed format, lowering enhancement iterations, or changing the render folder disk.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
+    self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed image format, lowering enhancement iterations, changing the render folder disk, or switching to the Optimized Render Type.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
 
 def render_help(self):
-    self.showDialogBox("Classic uses a lot of storage,\n Optimized splits up the render into sections and deletes old images, saving space.\n (Most features will break while using Optimized.)")
+    self.showDialogBox("The classic method consumes a significant amount of storage due to its inability to clear rendered frames.\n\nOptimized involves dividing the rendering process into smaller segments, each containing a predetermined number of frames. These segments are then compressed and merged into individual video segments. This approach effectively conserves storage space while maintaining video quality.")
 
 def frame_increments_help(self):
     self.showDialogBox(f"This is how many frames will be rendered before they are merged into a video. (OPTIMIZED PRESET ONLY)\nLower values can lead to more storage usage as merging the video may take longer for the next render to run.\nHigher values can lead to more storage usage as there are more frames rendered before merging.")

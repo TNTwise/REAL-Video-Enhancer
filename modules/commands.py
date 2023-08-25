@@ -139,6 +139,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
         except Exception as e:
                 self.showDialogBox(e)
+                
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         try:
