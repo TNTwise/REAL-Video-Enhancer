@@ -57,32 +57,35 @@ class pb2X(QObject):
                         sleep(.1)
                         
                         self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                        
+                        if self.main.imageDisplay != None:
 
-                        try:
-                            if os.path.exists(self.main.imageDisplay):
-                                print(self.main.imageDisplay)
-                                self.image_progress.emit('1')
-                                
-                                width = self.main.width()
-                                height = self.main.height()
-                                
-                                self.main.width1=int(width/1.4)
-                                self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                if self.main.height1 >= height/1.4:
+                            try:
+                                if os.path.exists(self.main.imageDisplay):
+                                    self.image_progress.emit('1')
                                     
-                                    self.main.height1=int(height/1.4)
-                                    self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                try:
-                                    self.image_progress.emit('2')
+                                    width = self.main.width()
+                                    height = self.main.height()
+                                    
+                                    self.main.width1=int(width/1.4)
+                                    self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                    if self.main.height1 >= height/1.4:
                                         
-                                except Exception as e:
-                                    print(e)
-                                    pass
-                        except Exception as e:
-                            
-                            print(e)
-                            self.image_progress.emit('3')
+                                        self.main.height1=int(height/1.4)
+                                        self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                    try:
+                                        if os.path.exists(self.main.imageDisplay):
+                                            
+                                            
+                                            
+                                            self.image_progress.emit('2')
+                                            
+                                    except Exception as e:
+                                        print(e)
+                                        pass
+                            except Exception as e:
+                                
+                                print(e)
+                                self.image_progress.emit('3')
                     except:
                         pass
                         
