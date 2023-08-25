@@ -43,14 +43,18 @@ class pb2X(QObject):
                     try:
                         if self.settings.RenderType == 'Optimized':
                             try:
-                                files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                                files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                files_processed.sort()
+                                files_processed = files_processed[-1]
+                                files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                files_processed = int(files_processed)
+                                
                             except:
                                 print('i really gotta fix this')
                         else:
                             files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
                         
                         sleep(.1)
-                        
                         self.progress.emit(files_processed)
                         if self.settings.RenderType == 'Optimized':
                             self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error

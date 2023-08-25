@@ -16,8 +16,11 @@ def calculateETA(self):
                 try:
                    
                         
-                        
-                    completed_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'))
+                    files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                    files_processed.sort()
+                    files_processed = files_processed[-1]
+                    files_processed = files_processed.replace(self.settings.Image_Type,'')
+                    completed_iterations = int(files_processed)
                     
                     # Increment the completed iterations counter
                     sleep(1)
