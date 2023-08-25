@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QPr
 from src.settings import *
 from src.return_data import *
 from threading import Thread
-
+from PyQt5.QtGui import QIcon
 if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisdir}/rife-vulkan-models/') == False:
     
     class PopUpProgressB(QtWidgets.QMainWindow):
@@ -27,7 +27,7 @@ if os.path.exists(f'{thisdir}/Real-ESRGAN/') == False or os.path.exists(f'{thisd
                 msg.setWindowTitle(" ")
                 msg.setText(f"You are offline, please connect to the internet to download the models or download the offline binary.")
                 sys.exit(msg.exec_())
-
+            self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
         def startProgressBar(self,model):
 
             self.pbar = QProgressBar(self)

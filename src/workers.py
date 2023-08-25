@@ -27,7 +27,7 @@ class pb2X(QObject):
     def run(self):
         """Long-running task."""
         
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
+        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/') == False:
             sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
          
 
@@ -48,47 +48,41 @@ class pb2X(QObject):
                                 files_processed = files_processed[-1]
                                 files_processed = files_processed.replace(self.settings.Image_Type,'')
                                 files_processed = int(files_processed)
-                                
+                                self.main.files_processed = files_processed
                             except:
                                 print('i really gotta fix this')
                         else:
-                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'))
-                        
-                        sleep(.1)
+                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
                         self.progress.emit(files_processed)
-                        if self.settings.RenderType == 'Optimized':
-                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                        else:
-                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{str(files_processed-int(self.settings.VRAM)-1).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                        if self.main.imageDisplay != None:
+                        sleep(.1)
+                        
+                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                        
 
-                            try:
-                                if os.path.exists(self.main.imageDisplay):
-                                    self.image_progress.emit('1')
-                                    
-                                    width = self.main.width()
-                                    height = self.main.height()
-                                    
-                                    self.main.width1=int(width/1.4)
-                                    self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                    if self.main.height1 >= height/1.4:
-                                        
-                                        self.main.height1=int(height/1.4)
-                                        self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                    try:
-                                        if os.path.exists(self.main.imageDisplay):
-                                            
-                                            
-                                            
-                                            self.image_progress.emit('2')
-                                            
-                                    except Exception as e:
-                                        print(e)
-                                        pass
-                            except Exception as e:
+                        try:
+                            if os.path.exists(self.main.imageDisplay):
+                                print(self.main.imageDisplay)
+                                self.image_progress.emit('1')
                                 
-                                print(e)
-                                self.image_progress.emit('3')
+                                width = self.main.width()
+                                height = self.main.height()
+                                
+                                self.main.width1=int(width/1.4)
+                                self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                if self.main.height1 >= height/1.4:
+                                    
+                                    self.main.height1=int(height/1.4)
+                                    self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                try:
+                                    self.image_progress.emit('2')
+                                        
+                                except Exception as e:
+                                    print(e)
+                                    pass
+                        except Exception as e:
+                            
+                            print(e)
+                            self.image_progress.emit('3')
                     except:
                         pass
                         
@@ -233,13 +227,16 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
 def AI(self,command):
     global transitionDetectionClass
     transitionDetectionClass = transition_detection.TransitionDetection(self.main)
-    frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
+    
     global frame_increments_of_interpolation
     frame_increments_of_interpolation = self.main.settings.FrameIncrements
     global interpolation_sessions
     interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
     for i in range(interpolation_sessions):
-        os.mkdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}')
+        try:
+         os.mkdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}')
+        except:
+         print("Folder already exists!")
     fc_thread = Thread(target=lambda: frameCountThread(self))
     fc_thread.start()
     os.system(command)
@@ -297,18 +294,20 @@ class interpolation(QObject):
                 self.main.paused = False
                 settings=Settings()
                 self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+                global frame_count
+                frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
                     if model == 'rife-v4.6' or model == 'rife-v4':
-                        if settings.RenderType == 'Optimized':
+                        if settings.RenderType == 'Optimized' and frame_count > settings.FrameIncrements:
                             AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                         else:
-                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                     else:
                         if settings.RenderType == 'Optimized':
                             AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
                         else:
-                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                            os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                 if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
                 
@@ -343,9 +342,9 @@ class upscale(QObject):
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 if settings.RenderType == 'Optimized':
-                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
                 else:
-                    os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
+                    os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:

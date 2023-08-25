@@ -130,6 +130,7 @@ if check_if_models_exist(thisdir) == False:
                     self.ui.setupUi(self)
                     self.show()
                     self.nextfunction()
+                    self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
 
                 def showDialogBox(self,message,displayInfoIcon=False):
                     icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")

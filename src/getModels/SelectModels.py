@@ -100,7 +100,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Rife - ESRGAN - App"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "REAL Video Enhancer"))
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:22pt; font-weight:700;\">Select Rife Models to Download:</span></p></body></html>"))
         self.rife.setText(_translate("MainWindow", "Rife"))
         self.rifeanime.setText(_translate("MainWindow", "Rife-Anime"))
