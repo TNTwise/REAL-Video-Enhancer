@@ -102,77 +102,77 @@
             <item>
              <widget class="QCheckBox" name="rife">
               <property name="text">
-               <string>Rife</string>
+               <string>Rife (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rifeanime">
               <property name="text">
-               <string>Rife-Anime</string>
+               <string>Rife-Anime (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rifehd">
               <property name="text">
-               <string>Rife-HD</string>
+               <string>Rife-HD (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rifeuhd">
               <property name="text">
-               <string>Rife-UHD</string>
+               <string>Rife-UHD (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife2">
               <property name="text">
-               <string>Rife-V2</string>
+               <string>Rife-V2 (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife23">
               <property name="text">
-               <string>Rife-V2.3</string>
+               <string>Rife-V2.3 (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife24">
               <property name="text">
-               <string>Rife-V2.4</string>
+               <string>Rife-V2.4 (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife30">
               <property name="text">
-               <string>Rife-V3.0</string>
+               <string>Rife-V3.0 (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife31">
               <property name="text">
-               <string>Rife-V3.1</string>
+               <string>Rife-V3.1 (2X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife4">
               <property name="text">
-               <string>Rife-V4</string>
+               <string>Rife-V4 (2X), (4X), (8X)</string>
               </property>
              </widget>
             </item>
             <item>
              <widget class="QCheckBox" name="rife46">
               <property name="text">
-               <string>Rife-V4.6 (recommended)</string>
+               <string>Rife-V4.6 (2X), (4X), (8X) (recommended)</string>
               </property>
              </widget>
             </item>

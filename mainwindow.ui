@@ -20,9 +20,9 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="Upscale">
+      <widget class="QWidget" name="Enhance">
        <attribute name="title">
-        <string>Upscale</string>
+        <string>Enhance</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
