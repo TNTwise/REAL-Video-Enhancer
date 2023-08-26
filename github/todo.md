@@ -29,3 +29,4 @@ add different themes<br/>
 add check to make sure file is video<br/>
 add system where you can pause a render, have it save where it took place to a file, and can read that file to resume that render.<br/>
 notification to say when render is finished<br/>
+daily build of app<br/>
