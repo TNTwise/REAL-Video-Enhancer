@@ -20,6 +20,8 @@ if os.path.exists(f'{thisdir}/icons/') == False:
         f.extractall(path=f'{thisdir}/')
     os.remove(f'{thisdir}/{local_filename}')
 os.chdir(f'{thisdir}')
+import src.theme as theme
+
 import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets
 import sys
@@ -55,12 +57,29 @@ import modules.interpolate as interpolate
 import modules.upscale as upscale
 import shutil
 import src.checks as checks
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+def switch_theme(value):
+    
+    settings = Settings()
+    settings.change_setting('Theme',f'{value}')
+    theme.set_theme(app)
 
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
         self.setAcceptDrops(True)
         self.main = parent
+        layout = QVBoxLayout()
+        self.label = QLabel(self)
+        self.label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+          
+        pixmap = QPixmap(f'{thisdir}/icons/Dragndrop.png')
+        scaled_pixmap = pixmap.scaled(self.label.size()*5, Qt.KeepAspectRatio)
+        self.label.setPixmap(scaled_pixmap)
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
@@ -110,6 +129,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
+            self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
+            self.ui.themeCombo.setCurrentText(settings.Theme)
         except Exception as e:
             self.showDialogBox(e)
         self.show()
@@ -486,8 +507,8 @@ try:
     from PyQt5.QtGui import QPalette, QColor
 
     # Force the style to be the same on all OSs:
-    import src.theme as theme
     theme.set_theme(app)
     sys.exit(app.exec_())
 except Exception as e:
     print(e)      
+

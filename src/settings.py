@@ -72,6 +72,11 @@ class Settings:
             self.write_to_settings_file('FrameIncrements', '100')
             self.readSettings()
         try:
+            self.Theme = settings_dict['Theme'] # need this to be int
+        except:
+            self.write_to_settings_file('Theme', 'Dark')
+            self.readSettings()
+        try:
             self.OutputDir = settings_dict['OutputDir']
             if os.path.exists(f'{self.OutputDir}') == False:
                 self.write_to_settings_file("OutputDir" ,f"{homedir}")
@@ -229,3 +234,6 @@ def selVidQuality(self):
     if self.ui.VidQualityCombo.currentText() == 'Low':
         settings.change_setting('videoQuality', '22')
     self.videoQuality = settings.videoQuality
+    
+
+    
