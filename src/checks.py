@@ -52,11 +52,11 @@ def check_if_enough_space(input_file,render,times):
     # 1080p = 1, make adjustments for other resolutions
     print(f'{resolution_multiplier} {frame_count}  {multiplier}  ')
     full_extraction_size = (resolution_multiplier * frame_count * multiplier)
-    
+    free_space = check_if_free_space(settings.RenderDir)
     if settings.RenderType == 'Classic':
          #calculates the anount of storage necessary for the original extraction, in bits
         print(f'{full_extraction_size} KB')
-        free_space = check_if_free_space(settings.RenderDir)
+
         # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == 'esrgan':
             return True,0,0
@@ -74,5 +74,5 @@ def check_if_enough_space(input_file,render,times):
                 full_size = full_extraction_size + full_extraction_size * times * 4
                 return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
     else:
-        return full_extraction_size*2 < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
+        return full_extraction_size*2 < free_space, full_extraction_size*2/ (1024 ** 3), free_space/ (1024 ** 3)
             
