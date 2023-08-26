@@ -25,4 +25,6 @@ Add logging system<br/>
 fix transition detection bugging out on experimental render type. most likely due to multiple copies, add checks for this. also maybe merge frames before any interpolation, im going to have to debug more to fix this.<br/>
 add off switch for transition detection<br/>
 get frame number amount by reading the last files name.<br/>
-add different themes
+add different themes<br/>
+add check to make sure file is video<br/>
+add system where you can pause a render, have it save where it took place to a file, and can read that file to resume that render.
