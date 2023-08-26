@@ -62,9 +62,7 @@ def switch_theme(value):
 class FileDropWidget(QListWidget):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
-        self.setAcceptDrops(True)
-        self.main = parent
-        layout = QVBoxLayout()
+        '''layout = QVBoxLayout()
         self.label = QLabel(self)
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label)
@@ -72,7 +70,10 @@ class FileDropWidget(QListWidget):
           
         pixmap = QPixmap(f'{thisdir}/icons/Dragndrop.png')
         scaled_pixmap = pixmap.scaled(self.label.size()*5, Qt.KeepAspectRatio)
-        self.label.setPixmap(scaled_pixmap)
+        self.label.setPixmap(scaled_pixmap)'''
+        self.setAcceptDrops(True)
+        self.main = parent
+        
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.acceptProposedAction()
