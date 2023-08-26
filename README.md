@@ -21,8 +21,8 @@
 # Not possible without the amazing developers behind:
 
 <ul>
-  <li> <a rel="noopener noreferrer" href="https://ffmpeg.org/" target="_blank" >FFMpeg</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/rife-ncnn-vulkan" target="_blank" >rife-ncnn-vulkan</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a>  </li>
+  <a rel="noopener noreferrer" href="https://ffmpeg.org/" target="_blank" >FFMpeg</a> </li>
+  <a rel="noopener noreferrer" href="https://github.com/nihui/rife-ncnn-vulkan" target="_blank" >rife-ncnn-vulkan</a> 
+  <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a>
+  <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a> 
 </ul>
