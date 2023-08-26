@@ -25,11 +25,10 @@ import src.theme as theme
 import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets
 import sys
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
-import cv2
+from PyQt5.QtCore import QThread
 import psutil
 from PyQt5.QtWidgets import  QFileDialog, QMessageBox
-from PyQt5.QtGui import QTextCursor, QPixmap,QIcon, QIntValidator
+from PyQt5.QtGui import QPixmap,QIcon
 import mainwindow
 import os
 from threading import *
@@ -40,24 +39,18 @@ import src.workers as workers
 import time
 #import src.get_models as get_models
 from time import sleep
-import src.getModels.get_models as get_models
 from multiprocessing import cpu_count
 from src.messages import *
 import modules.Rife as rife
 import modules.ESRGAN as esrgan
-import pypresence
 import src.onProgramStart
-import src.queue.queue as queue
 from src.ETA import *
 from src.getLinkVideo.get_video import *
-from PyQt5.QtCore import Qt, QMimeData
-from PyQt5.QtGui import QDrag
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
 import modules.interpolate as interpolate
 import modules.upscale as upscale
-import shutil
-import src.checks as checks
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import  QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 def switch_theme(value):

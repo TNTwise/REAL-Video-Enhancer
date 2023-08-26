@@ -5,12 +5,10 @@ import sys
 import requests
 import re
 from zipfile import ZipFile
-from PyQt5 import QtWidgets, uic
-from time import sleep
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout, QMessageBox
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtGui import QIcon
 import src.messages
-from threading import Thread
 import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
 global rife_install_list

@@ -1,13 +1,10 @@
 import src.return_data as return_data
 import os
 from src.settings import *
-import glob
-from threading import Thread
 import src.runAI.transition_detection
 from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
-import glob
 import os
 from modules.commands import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT

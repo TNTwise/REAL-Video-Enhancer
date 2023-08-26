@@ -4,9 +4,9 @@ import sys
 import requests
 import re
 from zipfile import ZipFile
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtWidgets
 from time import sleep
-from PyQt5.QtWidgets import QApplication, QPushButton, QWidget, QHBoxLayout, QProgressBar, QVBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QApplication, QProgressBar, QVBoxLayout, QMessageBox
 from src.settings import *
 from src.return_data import *
 from threading import Thread

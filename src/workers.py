@@ -301,7 +301,7 @@ class interpolation(QObject):
                 frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
-                    if model == 'rife-v4.6' or model == 'rife-v4':
+                    if 'v4' in model:
                         if settings.RenderType == 'Optimized' and frame_count > settings.FrameIncrements:
                             AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                         else:

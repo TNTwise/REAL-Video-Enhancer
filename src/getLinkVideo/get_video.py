@@ -1,12 +1,9 @@
 
-import sys
-import os
 import subprocess
-import re
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import  QMainWindow
 import src.getLinkVideo.get_vid_from_link as getLinkedVideo
 from src.workers import *
-import cv2
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 from src.return_data import *
 import requests
 import src.thisdir
@@ -28,10 +25,10 @@ class GetLinkedWindow(QMainWindow):
         
         self.show()
     def get_fps_from_video_link(self,video_link):
-        cap = cv2.VideoCapture(video_link)
+        cap = VideoCapture(video_link)
         if not cap.isOpened():
             self.ui.error_label.setText("Failed to open the video.")
-        fps = cap.get(cv2.CAP_PROP_FPS)
+        fps = cap.get(CAP_PROP_FPS)
         cap.release()
         return fps
 

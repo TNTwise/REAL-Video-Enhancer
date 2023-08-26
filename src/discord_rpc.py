@@ -1,7 +1,5 @@
 from pypresence import Presence
 from time import sleep
-import asyncio
-import os
 def start_discordRPC(self, mode='Interpolating'):
         try:
             
