@@ -51,7 +51,7 @@ from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
 import modules.interpolate as interpolate
 import modules.upscale as upscale
 from PyQt5.QtWidgets import  QVBoxLayout, QLabel
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 def switch_theme(value):
     
@@ -59,18 +59,12 @@ def switch_theme(value):
     settings.change_setting('Theme',f'{value}')
     theme.set_theme(app)
 
-class FileDropWidget(QListWidget):
+class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
-        '''layout = QVBoxLayout()
-        self.label = QLabel(self)
-        self.label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-          
-        pixmap = QPixmap(f'{thisdir}/icons/Dragndrop.png')
-        scaled_pixmap = pixmap.scaled(self.label.size()*5, Qt.KeepAspectRatio)
-        self.label.setPixmap(scaled_pixmap)'''
+        pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
+        pixmap = pixmap.scaled(QSize(int(1088/2.5), int(454/2.5)))
+        self.setPixmap(pixmap)
         self.setAcceptDrops(True)
         self.main = parent
         
