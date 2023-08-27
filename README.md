@@ -17,7 +17,7 @@
   <li> Preview that shows latest frame that has been rendered. </li>
   <li> Enhancing straight from a YouTube link or a video URL.  </li>
 </ul>
-
+<string>Download Nightly releases here: <a href="https://github.com/TNTwise/REAL-Video-Enhancer-Nighly/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-Nighly/releases/latest</a></string>
 # Not possible without the amazing developers behind:
 
 <ul>
