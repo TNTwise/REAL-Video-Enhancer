@@ -203,9 +203,12 @@ if check_if_models_exist(thisdir) == False:
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
                     if check_if_models_exist(thisdir) == True:
-                        QApplication.closeAllWindows()
+                        if check_if_online():
+                            QApplication.closeAllWindows()
 
-                        return 0
+                            return 0
+                        else:
+                            exit()
                     else:
                         failed_download(self)
                         

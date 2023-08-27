@@ -7,19 +7,24 @@ import zipfile
 thisdir = src.thisdir.thisdir()
 if os.path.exists(f'{thisdir}') == False:
     os.mkdir(f'{thisdir}')
-if os.path.exists(f'{thisdir}/icons/') == False:
-    url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
-    local_filename = url.split('/')[-1]
-    r = requests.get(url)
-    f = open(f'{thisdir}/{local_filename}', 'wb')
-    for chunk in r.iter_content(chunk_size=512 * 1024): 
-        if chunk: # filter out keep-alive new chunks
-            f.write(chunk)
-    f.close()
-    with zipfile.ZipFile(f'{thisdir}/{local_filename}','r') as f:
-        f.extractall(path=f'{thisdir}/')
-    os.remove(f'{thisdir}/{local_filename}')
-os.chdir(f'{thisdir}')
+def install_icons():
+    if checks.check_if_online():
+        if os.path.exists(f'{thisdir}/icons/') == False:
+            url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
+            local_filename = url.split('/')[-1]
+            r = requests.get(url)
+            f = open(f'{thisdir}/{local_filename}', 'wb')
+            for chunk in r.iter_content(chunk_size=512 * 1024): 
+                if chunk: # filter out keep-alive new chunks
+                    f.write(chunk)
+            f.close()
+            with zipfile.ZipFile(f'{thisdir}/{local_filename}','r') as f:
+                f.extractall(path=f'{thisdir}/')
+            os.remove(f'{thisdir}/{local_filename}')
+        os.chdir(f'{thisdir}')
+    else:
+        failed_download()
+install_icons()
 import src.theme as theme
 
 import src.getModels.select_models as sel_mod
@@ -64,6 +69,11 @@ class FileDropWidget(QLabel):
         super(FileDropWidget, self).__init__(parent)
         pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
         pixmap = pixmap.scaled(QSize(int(1088/2.5), int(454/2.5)))
+        if pixmap.isNull():
+            os.system(f'rm -rf {thisdir}/icons/')
+            install_icons()
+        
+            
         self.setPixmap(pixmap)
         self.setAcceptDrops(True)
         self.main = parent
