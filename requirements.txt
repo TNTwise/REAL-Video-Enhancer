@@ -1,3 +1,4 @@
+testresources
 PyQt5==5.14.1
 requests
 opencv-python-headless
