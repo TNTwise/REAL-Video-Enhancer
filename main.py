@@ -4,6 +4,7 @@ homedir = os.path.expanduser(r"~")
 import requests
 import src.thisdir
 import zipfile
+import src.checks as checks
 thisdir = src.thisdir.thisdir()
 if os.path.exists(f'{thisdir}') == False:
     os.mkdir(f'{thisdir}')
