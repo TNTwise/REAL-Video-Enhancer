@@ -341,8 +341,11 @@ class upscale(QObject):
             settings = Settings()
             self.main.endNum=0
             self.main.paused=False
+            global frame_count
+             
             img_type = self.main.settings.Image_Type.replace('.','')
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+            frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 if settings.RenderType == 'Optimized':
                     AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
