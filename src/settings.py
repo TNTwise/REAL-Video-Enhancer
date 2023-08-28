@@ -35,6 +35,7 @@ class Settings:
         self.write_to_settings_file('ModelDir',f'{thisdir}/models')
         self.write_to_settings_file('RenderType','Optimized')
         self.write_to_settings_file('FrameIncrements', '100')
+        self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
         self.write_to_settings_file('DiscordRPC', 'Enabled')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
@@ -145,6 +146,11 @@ class Settings:
             elif HardwareInfo.get_video_memory_linux() < 1:
                 self.write_to_settings_file('VRAM','1')
             self.readSettings()
+        try:
+            self.FrameIncrementsMode = settings_dict['FrameIncrementsMode']
+        except:
+            self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
+            self.readSettings()
         
     def change_setting(self,setting,svalue):
         original_settings = {}
@@ -236,4 +242,14 @@ def selVidQuality(self):
     self.videoQuality = settings.videoQuality
     
 
-    
+def selFrameIncrementsMode(self):
+    settings = Settings()
+    settings.change_setting('FrameIncrementsMode',self.ui.frameIncrementsModeCombo.currentText())
+    if settings.FrameIncrementsMode == 'Automatic':
+        self.ui.frameIncrementHelp.hide()
+        self.ui.frameIncrementSpinBox.hide()
+        self.ui.label_7.hide()
+    else:
+        self.ui.frameIncrementHelp.show()
+        self.ui.frameIncrementSpinBox.show()
+        self.ui.label_7.show()

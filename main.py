@@ -128,8 +128,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
-            self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.themeCombo.setCurrentText(settings.Theme)
+            self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
+            
+            self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
+            selFrameIncrementsMode(self)
+            self.ui.frameIncrementsModeCombo.currentTextChanged.connect(lambda: selFrameIncrementsMode(self))
+            
         except Exception as e:
             self.showDialogBox(e)
         self.show()

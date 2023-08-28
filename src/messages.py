@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QIcon
 def show_scene_change_help(self):
-    self.showDialogBox('1 is the most sensitive, detecting the most frame changes in a scene.\n9 is the least sensitive, detecting fewer frame changes in a scene.')
+    self.showDialogBox('1 is the most sensitive, detecting the most frame changes in a scene.\n9 is the least sensitive, detecting fewest frame changes in a scene.')
 
 def show_on_no_output_files(self):
     self.showDialogBox('Output frames or Audio file does not exist. Did you accidently delete them?',True)
@@ -36,4 +36,4 @@ def render_help(self):
     self.showDialogBox("The classic method consumes a significant amount of storage due to its inability to clear rendered frames.\n\nOptimized involves dividing the rendering process into smaller segments, each containing a predetermined number of frames. These segments are then compressed and merged into individual video segments. This approach effectively conserves storage space while maintaining video quality.")
 
 def frame_increments_help(self):
-    self.showDialogBox(f"This is how many frames will be rendered before they are merged into a video. (OPTIMIZED PRESET ONLY)\nLower values can lead to more storage usage as merging the video may take longer for the next render to run.\nHigher values can lead to more storage usage as there are more frames rendered before merging.")
+    self.showDialogBox(f"This is how many frames will be rendered before they are merged into a video. (OPTIMIZED PRESET ONLY)\nLower values can lead to more storage usage as merging the video may take longer than the next render to run.\nHigher values can lead to more storage usage as there are more frames rendered before merging.")
