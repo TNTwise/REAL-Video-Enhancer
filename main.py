@@ -118,7 +118,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             selFrameIncrementsMode(self)
             self.ui.frameIncrementsModeCombo.currentTextChanged.connect(lambda: selFrameIncrementsMode(self))
+            self.ui.sceneChangeDetectionCheckBox.stateChanged.connect(lambda: selSceneDetectionMode(self))
             
+            if settings.SceneChangeDetectionMode == 'Enabled':
+                self.ui.sceneChangeDetectionCheckBox.setChecked(True)
+                self.ui.label_3.show()
+                self.ui.sceneChangeSensativityButton.show()
+                self.ui.sceneChangeLineEdit.show()
+            else:
+                self.ui.sceneChangeDetectionCheckBox.setChecked(False)
+                self.ui.label_3.hide()
+                self.ui.sceneChangeSensativityButton.hide()
+                self.ui.sceneChangeLineEdit.hide()
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()

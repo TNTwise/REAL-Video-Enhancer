@@ -216,6 +216,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             j+=1
                         else:
                             sleep(.1)
+                
                 transitionDetectionClass.merge_frames()
                 os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')#replace png with image type
                 # add file to list
@@ -283,9 +284,10 @@ class interpolation(QObject):
                     
             #self.main.runLogs(videoName,times)
             start(self,self.main,self.main.render_folder,self.main.videoName,videopath,times)
-            self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
-            self.main.transitionDetection.find_timestamps()
-            self.main.transitionDetection.get_frame_num(times)
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled':
+                self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
+                self.main.transitionDetection.find_timestamps()
+                self.main.transitionDetection.get_frame_num(times)
             self.main.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
             self.Render(self.model,times,videopath,outputpath)
         except Exception as e:
@@ -334,7 +336,8 @@ class interpolation(QObject):
                     show_on_no_output_files(self.main)
                 
                 else:
-                    self.main.transitionDetection.merge_frames()
+                    if settings.SceneChangeDetectionMode == 'Enabled':
+                        self.main.transitionDetection.merge_frames()
                     self.log.emit("[Merging Frames]")
                     self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                     

@@ -37,6 +37,7 @@ class Settings:
         self.write_to_settings_file('FrameIncrements', '100')
         self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
         self.write_to_settings_file('DiscordRPC', 'Enabled')
+        self.write_to_settings_file('SceneChangeDetectionMode','Enabled')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
@@ -98,6 +99,11 @@ class Settings:
             self.RenderType = settings_dict['RenderType']
         except:
             self.write_to_settings_file('RenderType','Optimized')
+            self.readSettings()
+        try:
+            self.SceneChangeDetectionMode = settings_dict['SceneChangeDetectionMode']
+        except:
+            self.write_to_settings_file('SceneChangeDetectionMode','Enabled')
             self.readSettings()
         try:
             self.RenderDir = settings_dict['RenderDir']
@@ -253,3 +259,16 @@ def selFrameIncrementsMode(self):
         self.ui.frameIncrementHelp.show()
         self.ui.frameIncrementSpinBox.show()
         self.ui.label_7.show()
+def selSceneDetectionMode(self):
+    
+    settings = Settings()
+    if self.ui.sceneChangeDetectionCheckBox.isChecked() == True:
+        settings.change_setting('SceneChangeDetectionMode','Enabled')
+        self.ui.label_3.show()
+        self.ui.sceneChangeSensativityButton.show()
+        self.ui.sceneChangeLineEdit.show()
+    else:
+        settings.change_setting('SceneChangeDetectionMode','Disabled')
+        self.ui.label_3.hide()
+        self.ui.sceneChangeSensativityButton.hide()
+        self.ui.sceneChangeLineEdit.hide()
