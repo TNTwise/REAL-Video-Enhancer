@@ -202,6 +202,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 if iteration == interpolation_sessions-1:
                     pass
                 else:
+                    #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
                     while j <= frame_increments_of_interpolation :
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
@@ -215,6 +216,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 # add file to list
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
+                # This method removes files better
                 os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/')
                 print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
@@ -351,12 +353,23 @@ class upscale(QObject):
             self.main.endNum=0
             self.main.paused=False
             global frame_count
-             
+            global frame_increments_of_interpolation
+            if self.main.settings.FrameIncrementsMode == 'Manual':
+                frame_increments_of_interpolation = self.main.settings.FrameIncrements
+            elif self.main.settings.FrameIncrementsMode == 'Automatic':
+                resolution = VideoName.return_video_resolution(self.main.input_file)
+                try:
+                    frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM)/(round(int(resolution[0])/1000)))
+                except:
+                        frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM))
+                frame_increments_of_interpolation = int(frame_increments_of_interpolation)
+                print(frame_increments_of_interpolation)
+            self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
             img_type = self.main.settings.Image_Type.replace('.','')
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
             frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
-                if settings.RenderType == 'Optimized':
+                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation:
                     AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
                 else:
                     os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
