@@ -54,7 +54,25 @@ class Worker(QObject):
 
 
                     self.finished.emit()
-
+def install_icons():
+                if os.path.exists(f'{thisdir}/icons/') == False:
+                    if check_if_online():
+                    
+                        print('Downloaded Icons')
+                        url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
+                        local_filename = url.split('/')[-1]
+                        r = requests.get(url)
+                        f = open(f'{thisdir}/{local_filename}', 'wb')
+                        for chunk in r.iter_content(chunk_size=512 * 1024): 
+                            if chunk: # filter out keep-alive new chunks
+                                f.write(chunk)
+                        f.close()
+                        with ZipFile(f'{thisdir}/{local_filename}','r') as f:
+                            f.extractall(path=f'{thisdir}/')
+                        os.remove(f'{thisdir}/{local_filename}')
+                    else:
+                        failed_download()
+                os.chdir(f'{thisdir}')
 if check_if_models_exist(thisdir) == False:
 
     class ChooseModels(QtWidgets.QMainWindow):
@@ -76,38 +94,42 @@ if check_if_models_exist(thisdir) == False:
             def pinFunctions(self):
 
                 self.ui.next.clicked.connect(self.nextfunction)
+           
             def nextfunction(self):
+                if check_if_online():
+                    install_icons()
+                    if self.ui.rife.isChecked() == True:
+                        rife_install_list.append('rife')
+                    if self.ui.rifeanime.isChecked() == True:
+                        rife_install_list.append('rife-anime')
+                    if self.ui.rifehd.isChecked() == True:
+                        rife_install_list.append('rife-HD')
+                    if self.ui.rifeuhd.isChecked() == True:
+                        rife_install_list.append('rife-UHD')
+                    if self.ui.rife2.isChecked() == True:
+                        rife_install_list.append('rife-v2')
+                    if self.ui.rife23.isChecked() == True:
+                        rife_install_list.append('rife-v2.3')
+                    if self.ui.rife24.isChecked() == True:
+                        rife_install_list.append('rife-v2.4')
+                    if self.ui.rife30.isChecked() == True:
+                        rife_install_list.append('rife-v3.0')
+                    if self.ui.rife31.isChecked() == True:
+                        rife_install_list.append('rife-v3.1')
+                    if self.ui.rife4.isChecked() == True:
+                        rife_install_list.append('rife-v4')
+                    if self.ui.rife46.isChecked() == True:
+                        rife_install_list.append('rife-v4.6')
+                    if len(rife_install_list) == 0:
+                        src.messages.no_downloaded_models(self)
+                    else:
+                        QApplication.closeAllWindows()
 
-                if self.ui.rife.isChecked() == True:
-                    rife_install_list.append('rife')
-                if self.ui.rifeanime.isChecked() == True:
-                    rife_install_list.append('rife-anime')
-                if self.ui.rifehd.isChecked() == True:
-                    rife_install_list.append('rife-HD')
-                if self.ui.rifeuhd.isChecked() == True:
-                    rife_install_list.append('rife-UHD')
-                if self.ui.rife2.isChecked() == True:
-                    rife_install_list.append('rife-v2')
-                if self.ui.rife23.isChecked() == True:
-                    rife_install_list.append('rife-v2.3')
-                if self.ui.rife24.isChecked() == True:
-                    rife_install_list.append('rife-v2.4')
-                if self.ui.rife30.isChecked() == True:
-                    rife_install_list.append('rife-v3.0')
-                if self.ui.rife31.isChecked() == True:
-                    rife_install_list.append('rife-v3.1')
-                if self.ui.rife4.isChecked() == True:
-                    rife_install_list.append('rife-v4')
-                if self.ui.rife46.isChecked() == True:
-                    rife_install_list.append('rife-v4.6')
-                if len(rife_install_list) == 0:
-                    src.messages.no_downloaded_models(self)
+
+                        return 0
+
                 else:
-                    QApplication.closeAllWindows()
-
-
-                    return 0
-
+                     failed_download()
 
 
 
