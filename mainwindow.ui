@@ -544,17 +544,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="4">
-                <widget class="QPushButton" name="frameIncrementHelp">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
-                 </property>
-                </widget>
-               </item>
                <item row="4" column="5">
                 <widget class="QComboBox" name="renderTypeCombo">
                  <item>
@@ -655,6 +644,17 @@
                    <string>Manual</string>
                   </property>
                  </item>
+                </widget>
+               </item>
+               <item row="5" column="4">
+                <widget class="QPushButton" name="frameIncrementHelp">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
                 </widget>
                </item>
               </layout>

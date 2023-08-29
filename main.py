@@ -119,7 +119,6 @@ class MainWindow(QtWidgets.QMainWindow):
             selFrameIncrementsMode(self)
             self.ui.frameIncrementsModeCombo.currentTextChanged.connect(lambda: selFrameIncrementsMode(self))
             self.ui.sceneChangeDetectionCheckBox.stateChanged.connect(lambda: selSceneDetectionMode(self))
-            
             if settings.SceneChangeDetectionMode == 'Enabled':
                 self.ui.sceneChangeDetectionCheckBox.setChecked(True)
                 self.ui.label_3.show()

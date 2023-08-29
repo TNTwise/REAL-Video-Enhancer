@@ -252,11 +252,9 @@ def selFrameIncrementsMode(self):
     settings = Settings()
     settings.change_setting('FrameIncrementsMode',self.ui.frameIncrementsModeCombo.currentText())
     if settings.FrameIncrementsMode == 'Automatic':
-        self.ui.frameIncrementHelp.hide()
         self.ui.frameIncrementSpinBox.hide()
         self.ui.label_7.hide()
     else:
-        self.ui.frameIncrementHelp.show()
         self.ui.frameIncrementSpinBox.show()
         self.ui.label_7.show()
 def selSceneDetectionMode(self):
