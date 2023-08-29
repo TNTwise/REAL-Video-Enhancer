@@ -11,7 +11,8 @@ from modules.commands import *
 import src.thisdir
 import src.workers as workers
 from PyQt5.QtCore import  QThread
-
+from src.log import log
+import traceback
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
@@ -73,6 +74,8 @@ def start_interpolation(self,AI):
                 no_input_file(self)
     
     except Exception as e:
+        traceback_info = traceback.format_exc()
+        log(e + 'TRACE:' + traceback_info) 
         self.showDialogBox(e)
             
 

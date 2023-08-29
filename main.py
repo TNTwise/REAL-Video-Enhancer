@@ -9,6 +9,7 @@ if os.path.exists(f'{thisdir}') == False:
 
     
 import src.theme as theme
+import traceback
 
 import src.getModels.select_models as sel_mod
 from PyQt5 import QtWidgets
@@ -41,6 +42,7 @@ import modules.upscale as upscale
 from PyQt5.QtWidgets import  QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
+from src.log import log
 def switch_theme(value):
     
     settings = Settings()
@@ -119,6 +121,8 @@ class MainWindow(QtWidgets.QMainWindow):
             
         except Exception as e:
             self.showDialogBox(e)
+            traceback_info = traceback.format_exc()
+            log(e + 'TRACE:' + traceback_info)
         self.show()
 
     def restore_default_settings(self):
@@ -425,8 +429,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.input_file != '':
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-                except:
-                    pass
+                except Exception as e:
+                    log(e)
                 
                 os.system(f'kill -9 {self.get_pid("ffmpeg")}')
                 os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
@@ -482,18 +486,24 @@ try:
         ManageFiles.create_file(f'{thisdir}/files/settings.txt')
     settings = Settings()
 except Exception as e:
-    print(e)
+    traceback_info = traceback.format_exc()
+    log(e + 'TRACE:' + traceback_info)
 
+try:
+    app = QtWidgets.QApplication(sys.argv)
 
-app = QtWidgets.QApplication(sys.argv)
+    window = MainWindow()
+    from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtGui import QPalette, QColor
 
-window = MainWindow()
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QPalette, QColor
-
-# Force the style to be the same on all OSs:
-theme.set_theme(app)
-sys.exit(app.exec_())
+    # Force the style to be the same on all OSs:
+    theme.set_theme(app)
+    log('Program Started')
+    
+    sys.exit(app.exec_())
+except Exception as e:
+    traceback_info = traceback.format_exc()
+    log(e + 'TRACE:' + traceback_info)
 
 

@@ -14,6 +14,8 @@ import re
 import src.thisdir
 import src.checks as checks
 thisdir = src.thisdir.thisdir()
+from src.log import log
+import traceback
 def return_gpu_settings(self):
     if int(self.gpuMemory) < 1:
         gpu_usage = f'-j 1:1:1'
@@ -77,6 +79,7 @@ def get_video_from_link(self,thread):
                 os.system(f'{self.download_youtube_video_command}')
                 
         else:
+                thread.log.emit("[Downloading Video]")
                 response = requests.get(self.download_youtube_video_command, stream=True)
                 
                 # Check if the download was successful
@@ -135,6 +138,8 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
         except Exception as e:
+                traceback_info = traceback.format_exc()
+                log(e + 'TRACE:' + traceback_info) 
                 self.showDialogBox(e)
                 
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
@@ -187,4 +192,6 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 return output_video_file
                 
         except Exception as e:
+                traceback_info = traceback.format_exc()
+                log(e + 'TRACE:' + traceback_info) 
                 self.showDialogBox(e)

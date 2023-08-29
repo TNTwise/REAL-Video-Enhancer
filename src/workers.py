@@ -11,6 +11,8 @@ from src.settings import *
 from src.return_data import *
 from time import sleep
 import src.thisdir
+from src.log import log
+import traceback
 thisdir = src.thisdir.thisdir()
 class pb2X(QObject):
     finished = pyqtSignal()
@@ -81,11 +83,13 @@ class pb2X(QObject):
                                             self.image_progress.emit('2')
                                             
                                     except Exception as e:
-                                        print(e)
+                                        traceback_info = traceback.format_exc()
+                                        log(e + 'TRACE:' + traceback_info)
                                         pass
                             except Exception as e:
                                 
-                                print(e)
+                                traceback_info = traceback.format_exc()
+                                log(e + 'TRACE:' + traceback_info)
                                 self.image_progress.emit('3')
                     except:
                         pass
@@ -153,7 +157,8 @@ class downloadVideo(QObject):
                 else:
                     self.progress.emit(result.stderr)
         except Exception as e:
-                print(e)
+                traceback_info = traceback.format_exc()
+                log(e + 'TRACE:' + traceback_info)
 
 #This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
 # hz
@@ -284,7 +289,10 @@ class interpolation(QObject):
             self.main.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
             self.Render(self.model,times,videopath,outputpath)
         except Exception as e:
-                self.main.showDialogBox(e)     
+                traceback_info = traceback.format_exc()
+                log(e + 'TRACE:' + traceback_info) 
+                self.main.showDialogBox(e) 
+                   
             
             
             
@@ -332,7 +340,10 @@ class interpolation(QObject):
                     
                     self.finished.emit()
             except Exception as e:
+                traceback_info = traceback.format_exc()
+                log(e + 'TRACE:' + traceback_info)
                 self.main.showDialogBox(e)   
+                
                 
 class upscale(QObject):
     finished = pyqtSignal()
@@ -383,5 +394,7 @@ class upscale(QObject):
                         pass
             self.finished.emit()
         except Exception as e:
+            traceback_info = traceback.format_exc()
+            log(e + 'TRACE:' + traceback_info)
             self.main.showDialogBox(e)   
         
