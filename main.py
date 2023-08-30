@@ -43,7 +43,6 @@ from PyQt5.QtWidgets import  QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.log import log
-from MediaInfo import MediaInfo
 import magic
 
 
