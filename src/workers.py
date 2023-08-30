@@ -223,7 +223,8 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
-                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/')
+                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
+
                 print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.chdir(f'{thisdir}')
@@ -373,9 +374,9 @@ class upscale(QObject):
             elif self.main.settings.FrameIncrementsMode == 'Automatic':
                 resolution = VideoName.return_video_resolution(self.main.input_file)
                 try:
-                    frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM)/(round(int(resolution[0])/1000)))
+                    frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM)*self.main.times/(round(int(resolution[0])/1000)))
                 except:
-                        frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM))
+                        frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
                 print(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
