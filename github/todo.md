@@ -21,7 +21,6 @@ add more AI options<br/>
 implement storage optimized option fully. (including transition detection)<br/>
 add tab for upscaling images and not just videos<br/>
 add different themes<br/>
-add check to make sure file is video<br/>
 add system where you can pause a render, have it save where it took place to a file, and can read that file to resume that render.<br/>
 notification to say when render is finished<br/>
 add automatic detection for how many frames should be rendered

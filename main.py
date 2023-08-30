@@ -43,6 +43,10 @@ from PyQt5.QtWidgets import  QVBoxLayout, QLabel
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.log import log
+from MediaInfo import MediaInfo
+import magic
+
+
 def switch_theme(value):
     
     settings = Settings()
@@ -81,20 +85,31 @@ class FileDropWidget(QLabel):
 
     def add_file_item(self, file_path):
         item = QListWidgetItem(file_path)
-        self.main.input_file = item.text()
-        
-        
-        self.main.download_youtube_video_command = ''
-        self.main.localFile = True
-        self.main.videoName = VideoName.return_video_name(f'{self.main.input_file}')
-        if '"' in self.main.input_file:
-            quotes(self)
-            self.main.input_file = ''
-        else:
-            self.main.showChangeInFPS()
-            self.main.addLinetoLogs(f'Input file = {item.text()}')
-
-
+        try:
+            mime = magic.Magic(mime=True)
+            filename = mime.from_file(item.text())
+            if filename.find('video') != -1:
+            
+                # success!
+                self.main.input_file = item.text()
+                
+                
+                self.main.download_youtube_video_command = ''
+                self.main.localFile = True
+                self.main.videoName = VideoName.return_video_name(f'{self.main.input_file}')
+                if '"' in self.main.input_file:
+                    quotes(self.main)
+                    self.main.input_file = ''
+                else:
+                    self.main.showChangeInFPS()
+                    self.main.addLinetoLogs(f'Input file = {item.text()}')
+            else:
+                not_a_video(self.main)
+        except Exception as e:
+            self.main.showDialogBox(e)
+            traceback_info = traceback.format_exc()
+            log(f'{e} {traceback_info}')
+            
 class MainWindow(QtWidgets.QMainWindow):
          
     def __init__(self):
@@ -130,9 +145,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.sceneChangeSensativityButton.hide()
                 self.ui.sceneChangeLineEdit.hide()
         except Exception as e:
-            self.showDialogBox(e)
+            self.main.showDialogBox(e)
             traceback_info = traceback.format_exc()
-            log(e + 'TRACE:' + traceback_info)
+            log(f'{e} {traceback_info}')
         self.show()
 
     def restore_default_settings(self):
@@ -496,8 +511,9 @@ try:
         ManageFiles.create_file(f'{thisdir}/files/settings.txt')
     settings = Settings()
 except Exception as e:
+    
     traceback_info = traceback.format_exc()
-    log(e + 'TRACE:' + traceback_info)
+    log(f'{e} {traceback_info}')
 
 try:
     app = QtWidgets.QApplication(sys.argv)
@@ -514,6 +530,5 @@ try:
     sys.exit(app.exec_())
 except Exception as e:
     traceback_info = traceback.format_exc()
-    log(e + 'TRACE:' + traceback_info)
-
+    log(f'{e} {traceback_info}')
 

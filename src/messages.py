@@ -37,3 +37,6 @@ def render_help(self):
 
 def frame_increments_help(self):
     self.showDialogBox(f"This is how many frames will be rendered before they are merged into a video. (OPTIMIZED PRESET ONLY)\nLower values can lead to more storage usage as merging the video may take longer than the next render to run.\nHigher values can lead to more storage usage as there are more frames rendered before merging.\n(You usually want this on Automatic)")
+
+def not_a_video(self):
+    self.showDialogBox("This file is not a valid video.")

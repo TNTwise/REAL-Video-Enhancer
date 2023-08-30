@@ -75,7 +75,7 @@ def start_interpolation(self,AI):
     
     except Exception as e:
         traceback_info = traceback.format_exc()
-        log(e + 'TRACE:' + traceback_info) 
+        log(f'{e} {traceback_info}')
         self.showDialogBox(e)
             
 

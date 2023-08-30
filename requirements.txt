@@ -6,3 +6,4 @@ pypresence
 pyuic5-tool
 cx_FREEZE
 psutil
+python-magic

@@ -84,12 +84,12 @@ class pb2X(QObject):
                                             
                                     except Exception as e:
                                         traceback_info = traceback.format_exc()
-                                        log(e + 'TRACE:' + traceback_info)
+                                        log(f'{e} {traceback_info}')
                                         pass
                             except Exception as e:
                                 
                                 traceback_info = traceback.format_exc()
-                                log(e + 'TRACE:' + traceback_info)
+                                log(f'{e} {traceback_info}')
                                 self.image_progress.emit('3')
                     except:
                         pass
@@ -158,7 +158,7 @@ class downloadVideo(QObject):
                     self.progress.emit(result.stderr)
         except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(e + 'TRACE:' + traceback_info)
+                log(f'{e} {traceback_info}')
 
 #This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
 # hz
@@ -179,20 +179,7 @@ homedir = os.path.expanduser(r"~")
 
 
     
-def merge_frames_to_video(self,increment,iteration):
-    
-    '''iteration=0
-    if os.path.exists(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/'):
-        transitionDetectionClass.merge_frames(frame_increments_of_interpolation)
-    
-    for i in range(frame_increments_of_interpolation):# move files to 1-frame_increment_amount
-        os.system(f'mv "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{i}" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{increment}/{str(iteration).zfill(8)}{self.main.settings.Image_Type}"')
-        iteration+=1
-    
-    
-    for i in range(frame_increments_of_interpolation):# move files to 1-frame_increment_amount
-        os.system(f'rm -r "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i).zfill(8)}"')'''
-    print('gone lol')
+
     
     
 def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
@@ -293,7 +280,7 @@ class interpolation(QObject):
             self.Render(self.model,times,videopath,outputpath)
         except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(e + 'TRACE:' + traceback_info) 
+                log(f'{e} {traceback_info}')
                 self.main.showDialogBox(e) 
                    
             
@@ -345,7 +332,7 @@ class interpolation(QObject):
                     self.finished.emit()
             except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(e + 'TRACE:' + traceback_info)
+                log(f'{e} {traceback_info}')
                 self.main.showDialogBox(e)   
                 
                 
@@ -374,7 +361,7 @@ class upscale(QObject):
             elif self.main.settings.FrameIncrementsMode == 'Automatic':
                 resolution = VideoName.return_video_resolution(self.main.input_file)
                 try:
-                    frame_increments_of_interpolation = int(100*(round(int(resolution[0])/1000)/int(self.main.settings.VRAM)))
+                    frame_increments_of_interpolation = int(100*(round(int(resolution[0])/1000)/int(self.main.settings.VRAM))) 
                 except:
                         frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
@@ -399,6 +386,6 @@ class upscale(QObject):
             self.finished.emit()
         except Exception as e:
             traceback_info = traceback.format_exc()
-            log(e + 'TRACE:' + traceback_info)
+            log(f'{e} {traceback_info}')
             self.main.showDialogBox(e)   
         
