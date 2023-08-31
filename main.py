@@ -44,27 +44,31 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.log import log
 import magic
-
-
 def switch_theme(value):
     
     settings = Settings()
     settings.change_setting('Theme',f'{value}')
     theme.set_theme(app)
-
+def setPixMap(self):
+    while self.main.on==True:
+        pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
+        pixmap = pixmap.scaled(self.width(), 500, aspectRatioMode=Qt.KeepAspectRatio)
+        if pixmap.isNull():
+                os.system(f'rm -rf {thisdir}/icons/')
+                sel_mod.install_icons()
+            
+                
+        self.setPixmap(pixmap)
+        sleep(1)
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
-        pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
-        pixmap = pixmap.scaled(QSize(int(1088/2.5), int(454/2.5)))
-        if pixmap.isNull():
-            os.system(f'rm -rf {thisdir}/icons/')
-            sel_mod.install_icons()
-        
-            
-        self.setPixmap(pixmap)
-        self.setAcceptDrops(True)
         self.main = parent
+
+        image_thread = Thread(target=lambda: setPixMap(self))
+        image_thread.start()
+        
+        self.setAcceptDrops(True)
         
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -118,7 +122,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
-        
+        self.on = True
+
         try:
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -428,6 +433,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         if self.input_file != '':
+            
             reply = QMessageBox.question(
                 
                 self,
@@ -436,7 +442,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 "Are you sure you want to exit?\nAll renders will be killed.",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No
+                
             )
+            
         else:
             reply = QMessageBox.question(
                 
@@ -447,8 +455,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No
             )
-
+            
         if reply == QMessageBox.Yes:
+            self.on = False
             event.accept()
             if self.input_file != '':
                 try:
