@@ -46,7 +46,9 @@ class GetLinkedWindow(QMainWindow):
             self.main.youtubeFile = False
             self.input_file = self.ui.plainTextEdit.toPlainText()
             self.input_file = self.input_file.replace('"',"")
+            
             self.main.videoName = self.input_file.split('/')[-1]
+            
             try:
                 response = requests.head(self.input_file)
                 response.raise_for_status()
@@ -67,6 +69,7 @@ class GetLinkedWindow(QMainWindow):
             self.main.showChangeInFPS(False)
             self.main.fc = VideoName.return_video_frame_count(self.input_file)
             self.ytVidRes = self.ui.qualityCombo.currentText()
+            
             self.main.download_youtube_video_command = self.input_file
             self.main.input_file = f'{thisdir}/{self.main.videoName}'
             window.close()
@@ -130,7 +133,7 @@ class GetLinkedWindow(QMainWindow):
         try:
             result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '--get-title', url], capture_output=True, text=True)
             if result.returncode == 0:
-                video_name = result.stdout.strip()
+                video_name = result.stdout.strip().replace("/",'')
                 return video_name
             return None
         except Exception as e:
@@ -154,6 +157,8 @@ class GetLinkedWindow(QMainWindow):
         self.main.localFile=False
         self.main.showChangeInFPS(False)
         self.main.fc = int(self.main.fps*self.duration)
+        self.main.ytVidRes = self.ui.qualityCombo.currentText()
+        
         self.main.input_file = self.input_file
         self.main.addLinetoLogs(f"Input file: {self.input_file}")
         window.close()

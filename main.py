@@ -207,9 +207,13 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.ui.AICombo.currentText() == 'RealESRGAN':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
-                    self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
+                    try:
+                        if self.youtubeFile == True:
+                            self.ui.FPSPreview.setText(f'RES: {self.ytVidRes} -> {int(self.ytVidRes.split("x")[0])*self.resIncrease}x{int(self.ytVidRes.split("x")[1])*self.resIncrease}')
+                    except:
+                        self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
         except Exception as e:
-            #print(e)
+            print(e)
             pass
     
     def reportProgress(self, files_processed):
@@ -493,6 +497,7 @@ class MainWindow(QtWidgets.QMainWindow):
             cursor.movePosition(cursor.Down, cursor.KeepAnchor)
         cursor.removeSelectedText()
         cursor.insertText(new_line_text)
+
     def removeLastLineInLogs(self,text_in_line):#takes in text in line and removes every line that has that specific text.
         text = self.ui.logsPreview.toPlainText().split('\n')
         text1=[]
@@ -511,6 +516,8 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 print(i)
         self.ui.logsPreview.clear()
+        scroll_bar = self.ui.logsPreview.verticalScrollBar()
+        scroll_bar.setValue(scroll_bar.maximum())
         self.ui.logsPreview.setText(display_text)
         
 try:
