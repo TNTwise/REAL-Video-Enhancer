@@ -19,6 +19,7 @@ homedir = os.path.expanduser(r"~")
 
 def modelOptions(self):
     self.times=2
+    self.render='rife'
     self.ui.Rife_Model.clear()
     self.ui.Rife_Times.clear()
     self.ui.FPSPreview.setText('FPS:')

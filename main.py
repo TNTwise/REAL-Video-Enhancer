@@ -32,6 +32,7 @@ from multiprocessing import cpu_count
 from src.messages import *
 import modules.Rife as rife
 import modules.ESRGAN as esrgan
+import modules.Waifu2X as Waifu2X
 import src.onProgramStart
 from src.ETA import *
 from src.getLinkVideo.get_video import *
@@ -175,6 +176,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == 'RealESRGAN':
             esrgan.modelOptions(self)
 
+        if self.ui.AICombo.currentText() == 'Waifu2X':
+            Waifu2X.modelOptions(self)
     def get_pid(self,name):
         
 
@@ -196,7 +199,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         try:
             
-            if self.ui.AICombo.currentText() == 'Rife':
+            if self.render == 'rife':
                 
                 if self.input_file != '':
                     self.times = int(self.ui.Rife_Times.currentText()[0])
@@ -204,7 +207,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     
                 if self.fps != None:    
                     self.ui.FPSPreview.setText(f'FPS: {self.fps} -> {int(self.fps)*int(self.times)}')
-            if self.ui.AICombo.currentText() == 'RealESRGAN':
+            if self.render == 'esrgan':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     try:

@@ -233,6 +233,11 @@
                     <string>RealESRGAN</string>
                    </property>
                   </item>
+                  <item>
+                   <property name="text">
+                    <string>Waifu2X</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item>

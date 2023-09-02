@@ -311,7 +311,7 @@ class interpolation(QObject):
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
                     if 'v4' in model:
-                        if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation:
+                        if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                             AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                         else:
                             os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -371,10 +371,16 @@ class upscale(QObject):
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
             frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
-                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation:
-                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} ')
                 else:
-                    os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model}{return_gpu_settings(self.main)} -f {img_type} '))
+                    os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} '))
+            
+            if self.main.AI == 'waifu2x-ncnn-vulkan':
+                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                    AI(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f {img_type} ')
+                else:
+                    os.system((f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:

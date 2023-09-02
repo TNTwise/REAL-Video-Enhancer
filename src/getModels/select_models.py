@@ -34,7 +34,10 @@ class Worker(QObject):
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
 'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
 'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan','https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/ffmpeg':'ffmpeg','https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/yt-dlp_linux':'yt-dlp_linux'}
+'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan',
+'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/ffmpeg':'ffmpeg',
+'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/yt-dlp_linux':'yt-dlp_linux',
+'https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip':'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'}
                     for i in rife_install_list:
                                         install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
                     total_size_in_bytes=0

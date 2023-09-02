@@ -63,5 +63,7 @@ def start_upscale(self,AI):
             
             self.upscaleThread.start()
             self.runPB()
+        else:
+            self.showDialogBox(no_input_file)
     except Exception as e:
         self.showDialogBox(e)
