@@ -158,6 +158,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
 
                         else:
                                 output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
+                self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                 if mode == 'upscale': # add upscale/realesrgan resolution bump here
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
                         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.mp4') == True:
