@@ -197,7 +197,15 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 j=1
                 
                 if iteration == interpolation_sessions-1:
-                    pass
+                    total_frames_rendered =  (interpolation_sessions*frame_increments_of_interpolation - frame_count)*self.main.times
+                    while j <= total_frames_rendered:
+                        if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                            
+                            print(increment)
+                            increment+=1
+                            j+=1
+                        else:
+                            sleep(.1)
                 else:
                     #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
                     while j <= frame_increments_of_interpolation :
@@ -226,7 +234,6 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
-                
             else:
                 sleep(0.1)
         except Exception as e:
@@ -248,6 +255,7 @@ def AI(self,command):
     sleep(1)
     print('\n\n\n\n')
     os.system(command)
+    
     #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
     #merge all videos created here
     fc_thread.join()
