@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import  QMessageBox
 from src.settings import *
 from src.return_data import *
 def check_if_models_exist(thisdir):
-    if os.path.exists(f'{thisdir}/models/') and os.path.exists(f'{thisdir}/models/rife/') and os.path.exists(f'{thisdir}/models/realesrgan') :
+    if os.path.exists(f'{thisdir}/models/') and os.path.exists(f'{thisdir}/models/rife/') and os.path.exists(f'{thisdir}/models/realesrgan/') and os.path.exists(f'{thisdir}/models/waifu2x/') :
         return True
     else:
         return False

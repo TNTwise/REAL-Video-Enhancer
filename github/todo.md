@@ -26,4 +26,5 @@ notification to say when render is finished<br/>
 add automatic detection for how many frames should be rendered<br/>
 generate script based on module for AI(so its easier to implement them)<br/>
 fix issue where sometimes realesrgan times is disabled, even on animation(happens for waifu2x too)<br/>
-automatically download models that dont exist
+automatically download models that dont exist<br/>
+add denoising option for waifu2x
