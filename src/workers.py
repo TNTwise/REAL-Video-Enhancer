@@ -226,6 +226,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
+                
             else:
                 sleep(0.1)
         except Exception as e:
