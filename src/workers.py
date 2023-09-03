@@ -189,11 +189,13 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
     global iteration
     iteration = 0
     increment=1
+    print('hdfdsfsdfsdf\n\n\n\n\n')
     while True:
         
         try:
             if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= frame_increments_of_interpolation or iteration == interpolation_sessions-1:
                 j=1
+                
                 if iteration == interpolation_sessions-1:
                     pass
                 else:
@@ -201,7 +203,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                     while j <= frame_increments_of_interpolation :
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
-                            #print(increment)
+                            print(increment)
                             increment+=1
                             j+=1
                         else:
@@ -213,21 +215,22 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
-                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
+                '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
 
                 print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{thisdir}')
-                '''for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                os.chdir(f'{thisdir}')'''
+                for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                     
-                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')'''
+                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
             else:
                 sleep(0.1)
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            
         
 
 
@@ -241,6 +244,8 @@ def AI(self,command):
     
     fc_thread = Thread(target=lambda: frameCountThread(self))
     fc_thread.start()
+    sleep(1)
+    print('\n\n\n\n')
     os.system(command)
     #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
     #merge all videos created here
@@ -366,7 +371,7 @@ class upscale(QObject):
                 try:
                     frame_increments_of_interpolation = int(100*(round(int(resolution[0])/1000)/int(self.main.settings.VRAM))) 
                 except:
-                        frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
+                    frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
             img_type = self.main.settings.Image_Type.replace('.','')
