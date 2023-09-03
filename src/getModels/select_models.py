@@ -21,6 +21,7 @@ rife_install_list=[]
 from src.settings import *
 settings = Settings()
 import src.thisdir
+from src.log import log
 thisdir = src.thisdir.thisdir()
 class Worker(QObject):
     finished = pyqtSignal()
@@ -29,6 +30,7 @@ class Worker(QObject):
 
     @pyqtSlot()
     def install_modules(self):
+            try:
                     install_modules_dict={
 
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
@@ -37,6 +39,7 @@ class Worker(QObject):
 'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan',
 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/ffmpeg':'ffmpeg',
 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/yt-dlp_linux':'yt-dlp_linux',
+'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/bin/glxinfo':'glxinfo',
 'https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip':'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'}
                     for i in rife_install_list:
                                         install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
@@ -53,10 +56,11 @@ class Worker(QObject):
                                     f.write(data)
                                     data_downloaded+=1024
                                     self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread
-
-
-
+            
                     self.finished.emit()
+            except Exception as e:
+                print(e)
+                log(e)
 def install_icons():
                 if os.path.exists(f'{thisdir}/icons/') == False:
                     if check_if_online():
@@ -201,6 +205,9 @@ if check_if_models_exist(thisdir) == False:
                         if i == 'yt-dlp_linux':
                              os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
                              os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                        if i == 'glxinfo':
+                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
                              
                         print(i)
                         if '.zip' in i:

@@ -3,6 +3,9 @@ import os
 import re
 import subprocess
 import shutil
+import src.thisdir
+
+thisdir = src.thisdir.thisdir()
 class Fps:
     def return_video_fps(videopath):
         video=cv2.VideoCapture(fr'{videopath}')
@@ -46,7 +49,7 @@ def read_vram(card):
                         return line
 def get_dedicated_vram():
     try:
-        command = "glxinfo | grep 'Dedicated video memory'"
+        command = f"./{thisdir}/bin/glxinfo | grep 'Dedicated video memory'"
         vram_available = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, check=True)
         vram = vram_available.stdout.split(":")[1].replace('MB', '').strip()
         return int(vram) // 1000
@@ -54,13 +57,8 @@ def get_dedicated_vram():
         return get_integrated_vram()
 
 def get_integrated_vram():
-    try:
-        command = "glxinfo | grep 'Video memory'"
-        vram_available = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, check=True)
-        vram = vram_available.stdout.split(":")[1].replace('MB', '').strip()
-        return int(vram) // 4000
-    except subprocess.CalledProcessError:
-        return None
+
+    return 1
 def ceildiv(a, b):
     return -(a // -b)
 class HardwareInfo:

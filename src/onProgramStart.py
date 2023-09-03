@@ -1,6 +1,8 @@
 from src.settings import *
 from src.messages import *
 import src.queue.queue as queue
+import multiprocessing
+
 def onApplicationStart(self):
     import os
     
@@ -26,8 +28,10 @@ def onApplicationStart(self):
         self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
         
     else:
+        if self.settings.VRAM == 'None':
+            cannot_detect_vram(self)
         self.ui.vramAmountSpinbox.setValue(1)
-        cannot_detect_vram(self)
+        
     self.ui.vramAmountSpinbox.setMinimum(1)
     
     #Define Variables
