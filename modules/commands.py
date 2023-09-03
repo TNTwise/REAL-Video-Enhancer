@@ -123,7 +123,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
         
-                thread.log.emit("[Extracting Frames]")
+                
                 if settings.Image_Type != '.webp':
                         ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
                 else:
@@ -137,6 +137,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
+                
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')

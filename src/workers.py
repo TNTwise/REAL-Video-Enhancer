@@ -29,7 +29,7 @@ class pb2X(QObject):
     def run(self):
         """Long-running task."""
         
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/') == False:
+        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/00000001{self.settings.Image_Type}') == False:
             sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
          
 
@@ -91,8 +91,11 @@ class pb2X(QObject):
                                 traceback_info = traceback.format_exc()
                                 log(f'{e} {traceback_info}')
                                 self.image_progress.emit('3')
-                    except:
-                        pass
+                    except Exception as e:
+                                
+                                traceback_info = traceback.format_exc()
+                                log(f'{e} {traceback_info}')
+                                
                         
                     
                 
@@ -365,7 +368,6 @@ class upscale(QObject):
                 except:
                         frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
-                print(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
             img_type = self.main.settings.Image_Type.replace('.','')
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
@@ -378,9 +380,9 @@ class upscale(QObject):
             
             if self.main.AI == 'waifu2x-ncnn-vulkan':
                 if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    AI(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f {img_type} ')
+                    AI(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
                 else:
-                    os.system((f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f {img_type} '))
+                    os.system((f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:

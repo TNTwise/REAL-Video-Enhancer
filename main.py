@@ -124,7 +124,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
         self.on = True
-
         try:
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -292,12 +291,11 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Final resets
         
-        self.worker.finished.connect(
-            self.endRife
-        )
+        
        
     def imageViewer(self,step):
         if step == '1':
+            self.ui.centerLabel.hide()
             self.ui.imageSpacerFrame.hide()
             self.pixMap = QPixmap(self.imageDisplay)
         if step == '2':
@@ -399,6 +397,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePause.hide()
             self.ui.RifeResume.hide()
             self.ui.QueueButton.hide()
+            self.ui.centerLabel.show()
             self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
             self.setDisableEnable(False)
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
@@ -406,14 +405,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imagePreview.clear()
             self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
+            if self.ui.Rife_Model.currentText() != 'Default':
+                self.ui.Rife_Times.setEnabled(True)
         if len(self.QueueList) > 0:
             self.input_file = self.QueueList[0]
             del self.QueueList[0]
             self.ui.QueueListWidget.takeItem(0)
             if self.render == 'rife':
                 interpolate.start_interpolation(self,'rife-ncnn-vulkan')
-            if self.render == 'esrgan':
+            if self.render == 'esrgan' and self.ui.AICombo.currentText() != 'Waifu2x':
                 upscale.start_upscale(self,'realesrgan-ncnn-vulkan')
+            if self.ui.AICombo.currentText() == 'Waifu2x':
+                upscale.start_upscale(self,'waifu2x-ncnn-vulkan')
         
         
         
@@ -519,10 +522,10 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 print(i)
         self.ui.logsPreview.clear()
+        
+        self.ui.logsPreview.setText(display_text)
         scroll_bar = self.ui.logsPreview.verticalScrollBar()
         scroll_bar.setValue(scroll_bar.maximum())
-        self.ui.logsPreview.setText(display_text)
-        
 try:
     if os.path.isfile(f'{thisdir}/files/settings.txt') == False:
         ManageFiles.create_folder(f'{thisdir}/files')

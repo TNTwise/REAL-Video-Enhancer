@@ -28,7 +28,6 @@ def modelOptions(self):
     self.ui.Rife_Times.clear()
     
     
+    self.ui.Rife_Times.addItem('1X')
     self.ui.Rife_Times.addItem('2X')
-    self.ui.Rife_Times.addItem('3X')
-    self.ui.Rife_Times.addItem('4X')
     self.ui.Rife_Times.setCurrentIndex(0)

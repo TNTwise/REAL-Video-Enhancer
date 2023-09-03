@@ -59,6 +59,7 @@ def start_upscale(self,AI):
             self.upscaleThread.finished.connect(self.upscaleThread.deleteLater)
             self.upscaleWorker.log.connect(self.addLinetoLogs)
             self.upscaleWorker.removelog.connect(self.removeLastLineInLogs)
+            self.upscaleWorker.finished.connect(self.endRife)
             # Step 6: Start the thread
             
             self.upscaleThread.start()

@@ -75,7 +75,7 @@
                <property name="lineWidth">
                 <number>0</number>
                </property>
-               <layout class="QVBoxLayout" name="verticalLayout_9">
+               <layout class="QVBoxLayout" name="verticalLayout_11">
                 <property name="spacing">
                  <number>0</number>
                 </property>
@@ -110,7 +110,17 @@
                </layout>
               </widget>
              </item>
+             <item>
+              <widget class="QLabel" name="centerLabel">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
             </layout>
+            <zorder>centerLabel</zorder>
+            <zorder>imagePreview</zorder>
+            <zorder>imageSpacerFrame</zorder>
            </widget>
           </item>
           <item>
