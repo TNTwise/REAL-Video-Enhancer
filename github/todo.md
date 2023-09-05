@@ -28,4 +28,5 @@ generate script based on module for AI(so its easier to implement them)<br/>
 fix issue where sometimes realesrgan times is disabled, even on animation(happens for waifu2x too)<br/>
 automatically download models that dont exist<br/>
 add denoising option for waifu2x<br/>
-add better killing of processes (specific to instance of app) subrpocess.run??
+add better killing of processes (specific to instance of app) subrpocess.run??<br/>
+add better downloads that dont rely on github bin dir??, sometimes slow
