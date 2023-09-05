@@ -31,6 +31,8 @@ class Worker(QObject):
     @pyqtSlot()
     def install_modules(self):
             try:
+                    with open(f'{thisdir}/WARNING!!!!!', 'w') as f:
+                         f.write('DONT**** put any important (or even any!) files in this directory, as this app constantly manipulates files within this directory.')
                     install_modules_dict={
 
 'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
