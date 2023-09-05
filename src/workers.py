@@ -208,7 +208,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             sleep(.1)
                 else:
                     #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
-                    while j <= frame_increments_of_interpolation :
+                    while j <= frame_increments_of_interpolation + 1 :
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
                             print(increment)

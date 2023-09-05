@@ -472,12 +472,17 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.input_file != '':
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+                    
+                    for i in os.listdir(f'{thisdir}'):
+                        if '.mp4' in i:
+                            os.system(f'rm -rf "{thisdir}/{i}"')
                 except Exception as e:
-                    log(e)
+                    log(str(e))
                 
                 os.system(f'kill -9 {self.get_pid("ffmpeg")}')
                 os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
                 os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
+                os.system(f'kill -9 {self.get_pid("waifu2x-ncnn-vulkan")}')
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
                 except:

@@ -189,6 +189,12 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 except:
                         pass
                 os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
+                try:
+                       for i in os.listdir(f'{thisdir}'):
+                        if '.mp4' in i:
+                            os.system(f'rm -rf "{thisdir}/{i}"')
+                except Exception as e:
+                       log(str(e))
                 os.chdir(thisdir)
                 self.input_file = ''
                 return output_video_file
