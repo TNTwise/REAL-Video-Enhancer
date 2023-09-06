@@ -189,7 +189,6 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
     global iteration
     iteration = 0
     increment=1
-    print('hdfdsfsdfsdf\n\n\n\n\n')
     while True:
         
         try:
@@ -197,21 +196,22 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 j=1
                 
                 if iteration == interpolation_sessions-1:
-                    total_frames_rendered =  (interpolation_sessions*frame_increments_of_interpolation - frame_count)*self.main.times
+                    total_frames_rendered =  ((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)*self.main.times
+                    print(interpolation_sessions-1,frame_increments_of_interpolation,frame_count,len(os.listdir(f'{self.main.settings.RenderDir}')))
+                    
                     while j <= total_frames_rendered:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
-                            print(increment)
                             increment+=1
                             j+=1
                         else:
+                            print(total_frames_rendered,j)
                             sleep(.1)
                 else:
                     #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
-                    while j <= frame_increments_of_interpolation + 1 :
+                    while j <= frame_increments_of_interpolation:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
-                            print(increment)
                             increment+=1
                             j+=1
                         else:
