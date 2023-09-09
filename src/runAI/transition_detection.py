@@ -150,15 +150,18 @@ class TransitionDetection:
             if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
                     frame_count = VideoName.return_video_frame_count(self.input_file)
                     interpolation_sessions = ceildiv(int(frame_count*times),self.settings.FrameIncrements)
+                    # I ust need to know what divide the frame number by the frame interpolation count, and then take that over frame increments per interpolation
                     
+                    frame = 0
                     for i in range(interpolation_sessions):
                         os.mkdir(f'{self.settings.RenderDir}/{self.videoName}_temp/transitions/{i}')
+                        frame += self.settings.FrameIncrements
                     for i in os.listdir(f'{self.full_render_dir}/transitions/'):
                         if settings.Image_Type in i:
                             frame_num = int(i.replace(settings.Image_Type,''))
                             file_to_move_to = int(ceildiv(frame_num,self.settings.FrameIncrements))# frame increments in workers.py, too lazy to get data from there lol   
-                            
-                            os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{generate_opposite_pair(file_to_move_to,0,interpolation_sessions)}/"')    
+                            print((ceildiv(frame_num,interpolation_sessions)/self.settings.FrameIncrements))
+                            os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{file_to_move_to}/{(ceildiv(frame_num,interpolation_sessions)/self.settings.FrameIncrements)}"')    
                     files = os.listdir(f'{self.full_render_dir}/transitions/')
                     files.sort()
                         
@@ -184,4 +187,4 @@ class TransitionDetection:
                         os.system(f'rm -rf "{self.full_render_dir}/transitions/{i}"')
                         print('didnt work lol')
                         
-            os.system(f'cp -r "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/"')
+            os.system(f'cp -r "{self.full_render_dir}/transitions/{iteration}"* "{self.full_render_dir}/output_frames/0/"')
