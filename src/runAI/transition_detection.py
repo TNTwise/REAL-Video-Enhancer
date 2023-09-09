@@ -184,4 +184,4 @@ class TransitionDetection:
                         os.system(f'rm -rf "{self.full_render_dir}/transitions/{i}"')
                         print('didnt work lol')
                         
-            os.system(f'cp -r "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/"')'''
+            os.system(f'cp -r "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/"')
