@@ -147,7 +147,7 @@ class TransitionDetection:
                     for file,copyto in self.fileToCopyDict.items():
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
-            if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
+            if settings.RenderType == 'Optimized (Incremental)':# this will sort out the images into the correct directories
                     frame_count = VideoName.return_video_frame_count(self.input_file)
                     interpolation_sessions = ceildiv(int(frame_count*times),self.settings.FrameIncrements)
                     # I ust need to know what divide the frame number by the frame interpolation count, and then take that over frame increments per interpolation

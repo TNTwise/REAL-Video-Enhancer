@@ -226,8 +226,10 @@ def selRenderType(self):
     if 'Classic' in self.ui.renderTypeCombo.currentText():
         
         settings.change_setting('RenderType','Classic')
-    if 'Optimized' in self.ui.renderTypeCombo.currentText():
+    if 'Optimized' == self.ui.renderTypeCombo.currentText():
         settings.change_setting('RenderType','Optimized')
+    if 'Optimized (Incremental)' == self.ui.renderTypeCombo.currentText():
+        settings.change_setting('RenderType','Optimized (Incremental)')
         
 def selFrameIncrements(value):
     settings = Settings()

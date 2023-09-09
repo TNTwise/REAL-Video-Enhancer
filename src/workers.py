@@ -42,7 +42,7 @@ class pb2X(QObject):
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                 if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                     try:
-                        if self.settings.RenderType == 'Optimized':
+                        if self.settings.RenderType == 'Optimized (Incremental)':
                             try:
                                 files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
                                 files_processed.sort()
@@ -54,7 +54,18 @@ class pb2X(QObject):
                             except:
                                 print('i really gotta fix this')
                                 pass
-                                
+                        if self.settings.RenderType == 'Optimized':
+                            try:
+                                files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                files_processed.sort()
+                                files_processed = files_processed[-1]
+                                files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                files_processed = int(files_processed)
+                                self.main.files_processed = files_processed
+                            except:
+                                pass
+                                #print('i really gotta fix this')
+
                         else:
                             files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
                             self.main.files_processed = files_processed
@@ -192,7 +203,7 @@ homedir = os.path.expanduser(r"~")
 
     
     
-'''def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
+def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
     global iteration
     iteration = 0
     increment=1
@@ -230,11 +241,11 @@ homedir = os.path.expanduser(r"~")
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
-                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
+                '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
 
                 print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{thisdir}')
+                os.chdir(f'{thisdir}')'''
                 for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                     
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
@@ -247,9 +258,27 @@ homedir = os.path.expanduser(r"~")
             print(e)
             
         
-'''
+
 
 def AI(self,command):
+    global transitionDetectionClass
+    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
+    
+    
+    global interpolation_sessions
+    interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
+    
+    fc_thread = Thread(target=lambda: frameCountThread(self))
+    fc_thread.start()
+    sleep(1)
+    print('\n\n\n\n')
+    os.system(command)
+    
+    #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
+    #merge all videos created here
+    fc_thread.join()
+
+def AI_Incremental(self,command):
     global transitionDetectionClass
     transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     
@@ -353,13 +382,17 @@ class interpolation(QObject):
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
                     if 'v4' in model:
-                        if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                        if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                            AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                        if settings.RenderType == 'Optimized':
+                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}   -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                         else:
                             os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {self.input_frames*times}   -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                     else:
+                        if settings.RenderType == 'Optimized (Incremental)':
+                            AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
                         if settings.RenderType == 'Optimized':
-                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
+                            AI(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                         else:
                             os.system(f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                 if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
@@ -412,14 +445,18 @@ class upscale(QObject):
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
             frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
-                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    AI(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                    AI_Incremental(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized':
+                    AI(((self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} ')))
                 else:
                     os.system((f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} '))
             
             if self.main.AI == 'waifu2x-ncnn-vulkan':
-                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    AI(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                    AI_Incremental(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
+                if settings.RenderType == 'Optimized':
+                    AI(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
                 else:
                     os.system((f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} '))
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:

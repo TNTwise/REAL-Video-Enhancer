@@ -142,7 +142,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 global frame_count
                 self.filecount = 0
                 frame_count = self.input_frames * self.times # frame count of video multiplied by times 
-                if self.settings.RenderType == 'Optimized':
+                if self.settings.RenderType == 'Optimized (Incremental)':
                         global frame_increments_of_interpolation
                         if self.settings.FrameIncrementsMode == 'Manual':
                             frame_increments_of_interpolation = self.settings.FrameIncrements

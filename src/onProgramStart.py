@@ -79,8 +79,10 @@ def onApplicationStart(self):
         self.ui.VidQualityCombo.setCurrentText('Low')
     if self.settings.RenderType == 'Classic':
         self.ui.renderTypeCombo.setCurrentIndex(0)
-    else:
+    elif self.settings.RenderType == 'Optimized':
         self.ui.renderTypeCombo.setCurrentIndex(1)
+    else:
+        self.ui.renderTypeCombo.setCurrentIndex(2)
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
