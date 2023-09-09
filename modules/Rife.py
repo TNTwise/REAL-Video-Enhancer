@@ -29,6 +29,8 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem('8X')
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.Rife_Times.setCurrentIndex(0)
+    self.ui.denoiseLevelLabel.hide()
+    self.ui.denoiseLevelSpinBox.hide()
     self.showChangeInFPS()
     try:
         self.ui.RifeStart.clicked.disconnect() 

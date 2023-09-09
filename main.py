@@ -124,6 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
         self.on = True
+        print(self.ui.denoiseLevelSpinBox.value())
         try:
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)

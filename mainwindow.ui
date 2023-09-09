@@ -232,51 +232,105 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_3">
                 <item>
-                 <widget class="QComboBox" name="AICombo">
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <item>
-                   <property name="text">
-                    <string>Rife</string>
-                   </property>
+                   <widget class="QLabel" name="label_11">
+                    <property name="text">
+                     <string>AI:</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <property name="text">
-                    <string>RealESRGAN</string>
-                   </property>
+                   <widget class="QComboBox" name="AICombo">
+                    <item>
+                     <property name="text">
+                      <string>Rife</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>RealESRGAN</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Waifu2X</string>
+                     </property>
+                    </item>
+                   </widget>
                   </item>
-                  <item>
-                   <property name="text">
-                    <string>Waifu2X</string>
-                   </property>
-                  </item>
-                 </widget>
+                 </layout>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="Rife_Model"/>
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <item>
+                   <widget class="QLabel" name="label_12">
+                    <property name="text">
+                     <string>Model:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="Rife_Model"/>
+                  </item>
+                 </layout>
                 </item>
                 <item>
-                 <widget class="QComboBox" name="Rife_Times">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
                   <item>
-                   <property name="text">
-                    <string>2X</string>
-                   </property>
+                   <widget class="QLabel" name="label_14">
+                    <property name="text">
+                     <string>Times:</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <property name="text">
-                    <string>4X</string>
-                   </property>
+                   <widget class="QComboBox" name="Rife_Times">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>2X</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>4X</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>8X</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <item>
+                   <widget class="QLabel" name="denoiseLevelLabel">
+                    <property name="text">
+                     <string>Denoise level:</string>
+                    </property>
+                   </widget>
                   </item>
                   <item>
-                   <property name="text">
-                    <string>8X</string>
-                   </property>
+                   <widget class="QSpinBox" name="denoiseLevelSpinBox">
+                    <property name="minimum">
+                     <number>-1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>3</number>
+                    </property>
+                   </widget>
                   </item>
-                 </widget>
+                 </layout>
                 </item>
                </layout>
               </item>

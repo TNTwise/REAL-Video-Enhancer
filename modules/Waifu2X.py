@@ -27,7 +27,8 @@ def modelOptions(self):
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'waifu2x-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
     
-    
+    self.ui.denoiseLevelLabel.show()
+    self.ui.denoiseLevelSpinBox.show()
     self.ui.Rife_Times.addItem('1X')
     self.ui.Rife_Times.addItem('2X')
     self.ui.Rife_Times.setCurrentIndex(0)

@@ -27,7 +27,8 @@ def modelOptions(self):
     self.greyOutRealSRTimes()
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realesrgan-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
-    
+    self.ui.denoiseLevelLabel.hide()
+    self.ui.denoiseLevelSpinBox.hide()
     
     self.ui.Rife_Times.addItem('2X')
     self.ui.Rife_Times.addItem('3X')
