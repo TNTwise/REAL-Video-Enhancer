@@ -92,6 +92,7 @@ def get_video_from_link(self,thread):
 
 def start(thread,self,renderdir,videoName,videopath,times):
         try:
+                self.file_drop_widget.hide()
                 # i need to clean this up lol
                 os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
                 #Gets the width and height
@@ -135,9 +136,39 @@ def start(thread,self,renderdir,videoName,videopath,times):
                         os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
                 else:
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
+                
+                global interpolation_sessions
+                self.input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
+                global frame_count
+                self.filecount = 0
+                frame_count = self.input_frames * self.times # frame count of video multiplied by times 
+                global frame_increments_of_interpolation
+                if self.settings.FrameIncrementsMode == 'Manual':
+                    frame_increments_of_interpolation = self.settings.FrameIncrements
+                elif self.settings.FrameIncrementsMode == 'Automatic':
+                    resolution = VideoName.return_video_resolution(self.input_file)
+                    try:
+                        frame_increments_of_interpolation = int(100*int(self.settings.VRAM)/(round(int(resolution[0])/1000)))
+                    except:
+                         frame_increments_of_interpolation = int(100*int(self.settings.VRAM))
+                    frame_increments_of_interpolation = int(frame_increments_of_interpolation)
+                    print(frame_increments_of_interpolation)
+                self.frame_increments_of_interpolation = frame_increments_of_interpolation
+                interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
+                for i in range(interpolation_sessions ):
+                       os.mkdir(f'{renderdir}/{videoName}_temp/input_frames/{i}')
+                       inc=0
+                       files = os.listdir(f'{renderdir}/{videoName}_temp/input_frames/')
+                       files.sort()
+                       for j in files:
+                                if settings.Image_Type in j:
+                                        if inc < frame_increments_of_interpolation/self.times:
+                                                os.rename(f'{renderdir}/{videoName}_temp/input_frames/{j}',f'{renderdir}/{videoName}_temp/input_frames/{i}/{str(inc).zfill(8)}{self.settings.Image_Type}')
+                                                inc+=1
+                                        else:
+                                               break
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
-
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
@@ -197,6 +228,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                        log(str(e))
                 os.chdir(thisdir)
                 self.input_file = ''
+                self.file_drop_widget.show()
                 return output_video_file
                 
         except Exception as e:

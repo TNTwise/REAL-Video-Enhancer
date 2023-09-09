@@ -225,15 +225,15 @@ class MainWindow(QtWidgets.QMainWindow):
             # fc is the total file count after interpolation
             
             if self.i==1: # put every gui change that happens on start of render here
-                Thread(target=lambda: calculateETA(self)).start()
+                
                 fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
                 self.filecount = fc
-                total_input_files = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-                total_output_files = total_input_files * self.times 
+                total_input_files = fc / self.times
+                total_output_files = fc
                 self.ui.RifePB.setMaximum(total_output_files)
                 self.ui.QueueButton.show()
                 
-                
+                Thread(target=lambda: calculateETA(self,fc)).start()
                     
                 self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
                 self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')

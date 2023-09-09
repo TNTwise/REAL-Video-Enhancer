@@ -1,9 +1,9 @@
 import time
 import os
 from time import sleep
-def calculateETA(self):
+def calculateETA(self,total_iterations):
         self.ETA=None
-        total_iterations = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/')) * self.times
+        
         start_time = time.time()
         while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/'):
             if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):

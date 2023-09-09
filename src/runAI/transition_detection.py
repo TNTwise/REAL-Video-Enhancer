@@ -147,7 +147,7 @@ class TransitionDetection:
                     for file,copyto in self.fileToCopyDict.items():
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
-            '''if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
+            if settings.RenderType == 'Optimized':# this will sort out the images into the correct directories
                     frame_count = VideoName.return_video_frame_count(self.input_file)
                     interpolation_sessions = ceildiv(int(frame_count*times),self.settings.FrameIncrements)
                     
@@ -160,10 +160,10 @@ class TransitionDetection:
                             
                             os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{generate_opposite_pair(file_to_move_to,0,interpolation_sessions)}/"')    
                     files = os.listdir(f'{self.full_render_dir}/transitions/')
-                    files.sort()'''
+                    files.sort()
                         
-    def merge_frames(self,frames_per_output_file=None):
-        #if frames_per_output_file == None:  
+    def merge_frames(self,iteration=None):
+        if iteration == None:  
             #os.system(f'cp "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/0/"')
             
             os.chdir(f'{self.full_render_dir}/transitions/')
@@ -174,7 +174,7 @@ class TransitionDetection:
             
             
             os.chdir(f'{self.thisdir}/')
-            '''else:
+        else:
             
             for i in os.listdir(f"{self.full_render_dir}/transitions/"):
                 if os.path.isfile(f'{self.full_render_dir}/output_frames/{i}.mp4'):
