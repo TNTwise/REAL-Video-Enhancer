@@ -31,4 +31,5 @@ add denoising option for waifu2x<br/>
 add better killing of processes (specific to instance of app) subrpocess.run??<br/>
 add better downloads that dont rely on github bin dir??, sometimes slow<br/>
 show progress on downloading video<br/>
-run error pop up on original thread
+run error pop up on original thread<br/>
+add an option to install more rife models<br/>

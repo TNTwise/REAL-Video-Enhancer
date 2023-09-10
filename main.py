@@ -137,18 +137,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             selFrameIncrementsMode(self)
-            self.ui.frameIncrementsModeCombo.currentTextChanged.connect(lambda: selFrameIncrementsMode(self))
-            self.ui.sceneChangeDetectionCheckBox.stateChanged.connect(lambda: selSceneDetectionMode(self))
-            if settings.SceneChangeDetectionMode == 'Enabled':
-                self.ui.sceneChangeDetectionCheckBox.setChecked(True)
-                self.ui.label_3.show()
-                self.ui.sceneChangeSensativityButton.show()
-                self.ui.sceneChangeLineEdit.show()
-            else:
-                self.ui.sceneChangeDetectionCheckBox.setChecked(False)
-                self.ui.label_3.hide()
-                self.ui.sceneChangeSensativityButton.hide()
-                self.ui.sceneChangeLineEdit.hide()
+            
         except Exception as e:
             self.main.showDialogBox(e)
             traceback_info = traceback.format_exc()
@@ -386,7 +375,7 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.ui.Rife_Times.setDisabled(True)
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
-        
+        self.ui.denoiseLevelSpinBox.setDisabled(mode)
             
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         if len(self.QueueList) == 0:
@@ -480,15 +469,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                     log(str(e))
                 
-                os.system(f'kill -9 {self.get_pid("ffmpeg")}')
-                os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
-                os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
-                os.system(f'kill -9 {self.get_pid("waifu2x-ncnn-vulkan")}')
+                self.ffmpeg.terminate()
+                self.renderAI.terminate()
+
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
                 except:
                     pass
-                os.system(f'kill -9 {os.getpid()}')
+                #os.system(f'kill -9 {os.getpid()}')
                 exit()
         else:
             event.ignore()

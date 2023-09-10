@@ -48,7 +48,7 @@ def print_output(thread,self,extracting,pipe):
                                 frame_num = frame_num.split('=')[1]
                                 thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
-    process = subprocess.Popen(
+    self.ffmpeg  = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
@@ -58,20 +58,20 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
         universal_newlines=True  # Ensure newline translation
     )
 
-    stdout_thread = Thread(target=print_output, args=(thread,self,extracting,process.stdout,))
-    stderr_thread = Thread(target=print_output, args=(thread,self,extracting,process.stderr,))
+    stdout_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stdout,))
+    stderr_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stderr,))
 
     stdout_thread.start()
     stderr_thread.start()
 
     # Wait for the process to finish
-    process.wait()
+    self.ffmpeg.wait()
 
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
 
-    return process.returncode
+    return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
         if self.youtubeFile == True:
@@ -126,14 +126,14 @@ def start(thread,self,renderdir,videoName,videopath,times):
         
                 
                 if settings.Image_Type != '.webp':
-                        ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
+                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
                 else:
-                        ffmpeg_cmd =(f'{thisdir}/bin/ffmpeg -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
                 global output 
                 run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True)
 
                 if self.localFile == True or self.youtubeFile == False:
-                        os.system(f'{thisdir}/bin/ffmpeg -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
+                        os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
                 else:
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
                 
@@ -204,16 +204,16 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                                os.system(f'ffmpeg -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}"')
+                                os.system(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}"')
                         else:
                         
-                                os.system(f'ffmpeg -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}"') 
+                                os.system(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}"') 
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
-                                ffmpeg_cmd = (f'{thisdir}/bin/ffmpeg -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
                         run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
                 os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
                 try:

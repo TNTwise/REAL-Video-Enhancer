@@ -83,6 +83,18 @@ def onApplicationStart(self):
         self.ui.renderTypeCombo.setCurrentIndex(1)
     else:
         self.ui.renderTypeCombo.setCurrentIndex(2)
+    self.ui.frameIncrementsModeCombo.currentTextChanged.connect(lambda: selFrameIncrementsMode(self))
+    self.ui.sceneChangeDetectionCheckBox.stateChanged.connect(lambda: selSceneDetectionMode(self))
+    if settings.SceneChangeDetectionMode == 'Enabled':
+        self.ui.sceneChangeDetectionCheckBox.setChecked(True)
+        self.ui.label_3.show()
+        self.ui.sceneChangeSensativityButton.show()
+        self.ui.sceneChangeLineEdit.show()
+    else:
+        self.ui.sceneChangeDetectionCheckBox.setChecked(False)
+        self.ui.label_3.hide()
+        self.ui.sceneChangeSensativityButton.hide()
+        self.ui.sceneChangeLineEdit.hide()
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
