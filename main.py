@@ -439,7 +439,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self,
                 "Confirmation",
                 
-                "Are you sure you want to exit?\nAll renders will be killed.",
+                "Are you sure you want to exit?\n(The current render will be killed)",
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No
                 
