@@ -32,7 +32,7 @@ def start_upscale(self,AI):
                 start_discordRPC(self,'Upscaling')
                 
             realESRGAN_Model = self.ui.Rife_Model.currentText()
-            realESRGAN_Times = self.ui.Rife_Times.currentText()
+            realESRGAN_Times = self.ui.Rife_Times.currentText()[0]
             if AI == 'realesrgan-ncnn-vulkan':
                 if realESRGAN_Model == 'Default':
                     self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'

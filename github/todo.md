@@ -31,3 +31,5 @@ add better downloads that dont rely on github bin dir??, sometimes slow<br/>
 show progress on downloading video<br/>
 run error pop up on original thread<br/>
 add an option to install more rife models<br/>
+Add pausing by rendering current frames rendered in optimized preset into a video, and then concating all videos together, and removing all of input_frames / self.times frames. Then re-start rife in the same folder to continue<br/>
+log videos created for optimized preset (1 video made out of 10 videos)<br/>
