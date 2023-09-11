@@ -220,7 +220,8 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         os.remove(f'{thisdir}/{videoName}')
                 except:
                         pass
-                os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
+                #os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
+                os.system(f'rm -rf "{thisdir}/{self.input_file}"')
                 try:
                        for i in os.listdir(f'{thisdir}'):
                         if '.mp4' in i:

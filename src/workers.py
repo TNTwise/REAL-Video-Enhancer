@@ -215,6 +215,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 
                 if iteration == interpolation_sessions-1:
                     total_frames_rendered =  ((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)*self.main.times
+                    print(interpolation_sessions-1,frame_increments_of_interpolation,frame_count,len(os.listdir(f'{self.main.settings.RenderDir}')))
                     
                     while j <= total_frames_rendered:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
@@ -222,7 +223,8 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             increment+=1
                             j+=1
                         else:
-                            sleep(.5)
+                            print(total_frames_rendered,j)
+                            sleep(.1)
                 else:
                     #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
                     while j <= frame_increments_of_interpolation:
@@ -231,7 +233,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             increment+=1
                             j+=1
                         else:
-                            sleep(.5)
+                            sleep(.1)
                 
                 transitionDetectionClass.merge_frames()
                 os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')#replace png with image type
@@ -245,18 +247,15 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.chdir(f'{thisdir}')'''
                 for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
-                    
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
                 iteration+=1
+                # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
                 if iteration == interpolation_sessions:
                     break
             else:
                 sleep(0.1)
         except Exception as e:
             print(e)
-            
-        
-
 
 def AI(self,command):
     global transitionDetectionClass
