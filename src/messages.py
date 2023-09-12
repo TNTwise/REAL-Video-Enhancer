@@ -40,3 +40,5 @@ def frame_increments_help(self):
 
 def not_a_video(self):
     self.showDialogBox("This file is not a valid video.")
+def not_valid_link(self):
+    self.showDialogBox("This link is invalid.")

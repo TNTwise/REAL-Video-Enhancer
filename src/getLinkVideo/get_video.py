@@ -60,10 +60,14 @@ class GetLinkedWindow(QMainWindow):
                     self.ui.next.show()
                     return False
             except requests.exceptions.RequestException as e:
-                if response.status_code != 403: # ignores 403 errors cause they mostly work even when the exception is raised :\
-                    self.ui.error_label.setText(f'{e}')
-                    self.ui.next.show()
-                    return False
+                try:
+                    if response.status_code != 403: # ignores 403 errors cause they mostly work even when the exception is raised :\
+                        self.ui.error_label.setText(f'{e}')
+                        self.ui.next.show()
+                        return False
+                except:
+                    not_valid_link(self.main)
+                    
             self.main.fps=int(VideoName.return_video_framerate(self.input_file))
             self.main.localFile=False
             self.main.showChangeInFPS(False)
@@ -73,7 +77,7 @@ class GetLinkedWindow(QMainWindow):
             self.main.download_youtube_video_command = self.input_file
             self.main.input_file = f'{thisdir}/{self.main.videoName}'
             window.close()
-            
+        
     def run_ytdl_thread(self):
         self.thread = QThread()
         self.worker = downloadVideo(self,self.ui.plainTextEdit.toPlainText())
