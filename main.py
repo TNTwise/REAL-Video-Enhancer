@@ -124,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
         self.on = True
-        print(self.ui.denoiseLevelSpinBox.value())
+        #print(self.ui.denoiseLevelSpinBox.value())
         try:
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -205,7 +205,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     except:
                         self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
         except Exception as e:
-            print(e)
+            #print(e)
             pass
     
     def reportProgress(self, files_processed):
