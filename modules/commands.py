@@ -168,6 +168,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                                                        inc+=1
                                                else:
                                                        break
+                self.ui.RifePause.show()
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
         except Exception as e:

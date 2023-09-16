@@ -182,8 +182,17 @@ class MainWindow(QtWidgets.QMainWindow):
         
         #Thread(target=lambda: Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
         self.ui.RifePause.show()
+        i=0
+        while os.path.isfile(f"{settings.RenderDir}/{self.videoName}_temp/output_frames/{i}.mp4"):
+            i+=1
         
-    
+        os.system(f'"{thisdir}/bin/ffmpeg"  -framerate {self.fps*self.times} -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -c:v libx{self.settings.Encoder} -crf {self.settings.videoQuality}  -pix_fmt yuv420p  "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}.mp4"  -y')#replace png with image type
+        # add file to list
+        with open(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt', 'a') as f:
+            f.write(f'file {i}.mp4\n')
+        os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/output_frames/0/"*')
+        self.paused=False
+        Thread(target=lambda: AI(self.AISELF,self.command)).start()
     def showChangeInFPS(self,localFile=True):
         
         try:
@@ -354,13 +363,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
                 
-            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
-            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
+            self.renderAI.terminate()
             sleep(0.1)
-            files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
-            for i in range(int(files_to_delete)):
+            
+            for i in range(int(self.files_processed//2)):
                 i = str(i).zfill(8)
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png"')
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}{settings.Image_Type}"')
             self.ui.RifeResume.show() #show resume button
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
     def setDisableEnable(self,mode):

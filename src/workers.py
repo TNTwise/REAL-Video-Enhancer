@@ -207,57 +207,92 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
     global iteration
     iteration = 0
     increment=1
-    while True:
-        
+    if self.main.settings.FrameIncrementsMode == 'Manual':
+        frame_increments_of_interpolation = self.main.settings.FrameIncrements
+    elif self.main.settings.FrameIncrementsMode == 'Automatic':
+        resolution = VideoName.return_video_resolution(self.main.input_file)
         try:
-            if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= frame_increments_of_interpolation or iteration == interpolation_sessions-1:
-                j=1
+            frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM)/(round(int(resolution[0])/1000)))
+        except:
+                frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM))
+        frame_increments_of_interpolation = int(frame_increments_of_interpolation)
+        print(frame_increments_of_interpolation)
+    self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
+    while True:
+        if self.main.paused != True:
+            try:
+                if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= frame_increments_of_interpolation or iteration == interpolation_sessions-1:
                 
-                if iteration == interpolation_sessions-1:
-                    total_frames_rendered =  ((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)*self.main.times
-                    print(interpolation_sessions-1,frame_increments_of_interpolation,frame_count,len(os.listdir(f'{self.main.settings.RenderDir}')))
+                    j=1
                     
-                    while j <= total_frames_rendered:
-                        if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
-                            
-                            increment+=1
-                            j+=1
-                        else:
-                            print(total_frames_rendered,j)
-                            sleep(.1)
+                    if iteration == interpolation_sessions-1:
+                        total_frames_rendered =  ((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)*self.main.times
+                        print(interpolation_sessions-1,frame_increments_of_interpolation,frame_count,len(os.listdir(f'{self.main.settings.RenderDir}')))
+                        
+                        while j <= total_frames_rendered:
+                            if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                                
+                                increment+=1
+                                j+=1
+                            else:
+                                print(total_frames_rendered,j)
+                                sleep(.1)
+                    else:
+                        #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
+                        while j <= frame_increments_of_interpolation:
+                            if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                                
+                                increment+=1
+                                j+=1
+                            else:
+                                sleep(.1)
+                    
+                    transitionDetectionClass.merge_frames()
+                    os.system(f'"{thisdir}/bin/ffmpeg" -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')#replace png with image type
+                    # add file to list
+                    with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+                        f.write(f'file {interpolation_sessions-iteration}.mp4\n')
+                    # This method removes files better
+                    '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
+
+                    print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
+                    os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
+                    os.chdir(f'{thisdir}')'''
+                    for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                            os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
+                    iteration+=1
+                    # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
+                    if iteration == interpolation_sessions:
+                        endd=True
+                        break
                 else:
-                    #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
-                    while j <= frame_increments_of_interpolation:
-                        if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
-                            
-                            increment+=1
-                            j+=1
-                        else:
-                            sleep(.1)
-                
-                transitionDetectionClass.merge_frames()
-                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')#replace png with image type
-                # add file to list
-                with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
-                    f.write(f'file {interpolation_sessions-iteration}.mp4\n')
-                # This method removes files better
-                '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
-
-                print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{thisdir}')'''
-                for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
-                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                iteration+=1
-                # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
-                if iteration == interpolation_sessions:
-                    break
-            else:
-                sleep(0.1)
-        except Exception as e:
-            print(e)
-
+                    sleep(0.1)
+            except Exception as e:
+                print(e)
+                pass
+        else:
+            
+            i=0
+            while os.path.isfile(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}.mp4"):
+                i+=1
+            self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+            frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
+            if self.main.settings.FrameIncrementsMode == 'Manual':
+                frame_increments_of_interpolation = self.main.settings.FrameIncrements
+            elif self.main.settings.FrameIncrementsMode == 'Automatic':
+                resolution = VideoName.return_video_resolution(self.main.input_file)
+                try:
+                    frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM)/(round(int(resolution[0])/1000)))
+                except:
+                        frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM))
+                frame_increments_of_interpolation = int(frame_increments_of_interpolation)
+            self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
+            iteration=i+1
+            break
 def AI(self,command):
+    global endd
+    endd=False
+    self.main.AISELF=self
     global transitionDetectionClass
     transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     
@@ -269,8 +304,10 @@ def AI(self,command):
     fc_thread.start()
     sleep(1)
     
-    
+    self.main.command=command
     self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    
+    
     stdout, stderr = self.main.renderAI.communicate()
 
     # Decode the byte strings to get text output
@@ -286,7 +323,8 @@ def AI(self,command):
     print('\n\n\n\n')
     #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
     #merge all videos created here
-    fc_thread.join()
+    while endd == False:
+        sleep(1)
 
 def AI_Incremental(self,command):
     global transitionDetectionClass
@@ -343,6 +381,7 @@ class interpolation(QObject):
     def start_Render(self):
             
         try:    
+            self.main.command=None
             times = self.main.times
             videopath = self.main.input_file
             outputpath = self.main.output_folder
@@ -474,7 +513,7 @@ class upscale(QObject):
         self.main = originalSelf
         QThread.__init__(self, parent)
     def start_Render(self):
-
+        self.main.command=None
         start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
         
         self.realESRGAN()
