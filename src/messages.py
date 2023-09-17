@@ -1,3 +1,4 @@
+
 from PyQt5.QtGui import QIcon
 def show_scene_change_help(self):
     self.showDialogBox('1 is the most sensitive, detecting the most frame changes in a scene.\n9 is the least sensitive, detecting fewest frame changes in a scene.')

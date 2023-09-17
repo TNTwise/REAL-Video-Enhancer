@@ -24,6 +24,7 @@ def return_gpu_settings(self):
         gpu_usage = f'-j {num}:{num}:{num}'
     return gpu_usage
 def print_output(thread,self,extracting,pipe):
+    
     total_frame_count = VideoName.return_video_frame_count(self.input_file)
     
     
@@ -33,7 +34,10 @@ def print_output(thread,self,extracting,pipe):
            times=1
     if mode == 'Merged':
            times = self.times
-    thread.log.emit(" ")
+    progressbar='<'
+    for i in range(pb_length):
+                progressbar+='='
+    progressbar += '>'
     while True:
         line = pipe.readline()
         if not line:
@@ -47,6 +51,23 @@ def print_output(thread,self,extracting,pipe):
                                 
                                 frame_num = frame_num.split('=')[1]
                                 thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
+                if '[download]' in line:
+                       percent= re.findall(r'\[download\][ ]*[\d]*',line)
+                       percent= re.findall(r'[\d]*',percent[0])
+                       percent.reverse()
+                       percent=percent[:2]
+                       try:
+                        percent=int(percent[1])
+                        pb_value=(int(pb_length*percent/100))
+                        print(pb_value)
+                        try:
+                                        thread.removelog.emit(last_line)
+                        except:
+                                        pass
+                        last_line=f'{progressbar.replace("=","+", pb_value)} {str((percent))}%'
+                        thread.log.emit(last_line)
+                       except:
+                              pass
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     self.ffmpeg  = subprocess.Popen(
         command,
@@ -74,20 +95,39 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
+        global pb_length
+        pb_length = 15
         if self.youtubeFile == True:
                 thread.log.emit("[Downloading YouTube Video]")
-                os.system(f'{self.download_youtube_video_command}')
+                run_subprocess_with_realtime_output(thread,self,(f'{self.download_youtube_video_command}'))
                 
         else:
                 thread.log.emit("[Downloading Video]")
                 response = requests.get(self.download_youtube_video_command, stream=True)
+                total_size_in_bytes= int(response.headers.get('content-length', 0))
                 
                 # Check if the download was successful
                 if response.status_code != 200:
                         raise Exception(f"Failed to download the file. Status code: {response.status_code}")
                 
+                progressbar = '<'
+                for i in range(pb_length):
+                               progressbar+='='
+                progressbar += '>'
+                print(progressbar)
                 with open(f'{thisdir}/{self.videoName}', 'wb') as file:
+                        progress=0
                         for chunk in response.iter_content(chunk_size=8192):
+                                progress+=len(chunk)
+                                
+                                pb_value=(int(pb_length*progress/total_size_in_bytes))
+                                try:
+                                        thread.removelog.emit(last_line)
+                                except:
+                                       pass
+                                last_line=f'{progressbar.replace("=","+", pb_value)} {(str((progress/total_size_in_bytes)*100))[:5]}%'
+                                thread.log.emit(last_line)
+                                
                                 file.write(chunk)
 
 def start(thread,self,renderdir,videoName,videopath,times):
