@@ -182,17 +182,8 @@ class MainWindow(QtWidgets.QMainWindow):
         
         #Thread(target=lambda: Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
         self.ui.RifePause.show()
-        i=0
-        while os.path.isfile(f"{settings.RenderDir}/{self.videoName}_temp/output_frames/{i}.mp4"):
-            i+=1
         
-        os.system(f'"{thisdir}/bin/ffmpeg"  -framerate {self.fps*self.times} -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -c:v libx{self.settings.Encoder} -crf {self.settings.videoQuality}  -pix_fmt yuv420p  "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}.mp4"  -y')#replace png with image type
-        # add file to list
-        with open(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt', 'a') as f:
-            f.write(f'file {i}.mp4\n')
-        os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/output_frames/0/"*')
-        self.paused=False
-        Thread(target=lambda: AI(self.AISELF,self.command)).start()
+    
     def showChangeInFPS(self,localFile=True):
         
         try:
@@ -243,7 +234,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 
             fp=files_processed
             self.filecount = int(self.filecount)
-
+            videos_rendered=0
+            for i in os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
+                if 'mp4' in i:
+                    videos_rendered+=1
+            try:
+                self.removeLastLineInLogs("Video segments created: ")
+                self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+            except:
+                pass
             #Update GUI values
             
             self.ui.RifePB.setValue(fp)
@@ -339,17 +338,31 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
-        
-        if self.input_file != '':
-            self.download_youtube_video_command = ''
-            self.localFile = True
-            self.videoName = VideoName.return_video_name(f'{self.input_file}')
-            self.addLinetoLogs(f'Input file = {self.input_file}')
-            if '"' in self.input_file:
-                quotes(self)
-                self.input_file = ''
+        print(self.input_file)
+        try:
+            mime = magic.Magic(mime=True)
+            filename = mime.from_file(self.input_file)
+            if filename.find('video') != -1:
+            
+                # success!
+                
+                
+                
+                self.download_youtube_video_command = ''
+                self.localFile = True
+                self.videoName = VideoName.return_video_name(f'{self.input_file}')
+                if '"' in self.input_file:
+                    quotes(self)
+                    self.input_file = ''
+                else:
+                    self.showChangeInFPS()
+                    self.addLinetoLogs(f'Input file = {self.input_file}')
             else:
-                self.showChangeInFPS()
+                not_a_video(self)
+        except Exception as e:
+            self.showDialogBox(e)
+            traceback_info = traceback.format_exc()
+            log(f'{e} {traceback_info}')
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
@@ -363,12 +376,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
                 
-            self.renderAI.terminate()
+            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
+            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
             sleep(0.1)
-            
-            for i in range(int(self.files_processed//2)):
+            files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
+            for i in range(int(files_to_delete)):
                 i = str(i).zfill(8)
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}{settings.Image_Type}"')
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png"')
             self.ui.RifeResume.show() #show resume button
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
     def setDisableEnable(self,mode):
@@ -525,7 +539,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if i != ' ':
                     display_text+='\n'
             else:
-                print(i)
+                #print(i)
+                pass
         self.ui.logsPreview.clear()
         
         self.ui.logsPreview.setText(display_text)
