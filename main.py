@@ -12,6 +12,7 @@ import src.theme as theme
 import traceback
 
 import src.getModels.select_models as sel_mod
+import src.getModels.get_models_settings
 from PyQt5 import QtWidgets
 import sys
 from PyQt5.QtCore import QThread
@@ -40,7 +41,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
 import modules.interpolate as interpolate
 import modules.upscale as upscale
-from PyQt5.QtWidgets import  QVBoxLayout, QLabel
+from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.log import log
@@ -126,6 +127,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.on = True
         #print(self.ui.denoiseLevelSpinBox.value())
         try:
+            
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
             self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
@@ -137,9 +139,21 @@ class MainWindow(QtWidgets.QMainWindow):
             
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             selFrameIncrementsMode(self)
-            
+            models_installed = checks.check_for_individual_models()
+            for i in models_installed:
+                if 'Rife' == i:
+                    self.ui.RifeCheckBox.setChecked(True)
+                if 'RealESRGAN' == i:
+                    self.ui.RealESRGANCheckBox.setChecked(True)
+                if 'RealCUGAN' == i:
+                    self.ui.RealCUGANCheckBox.setChecked(True)
+                if 'Waifu2X' == i:
+                    self.ui.Waifu2xCheckBox.setChecked(True)
+                if 'Cain' == i:
+                    self.ui.CainCheckBox.setChecked(True)
+            self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
         except Exception as e:
-            self.main.showDialogBox(e)
+            self.showDialogBox(e)
             traceback_info = traceback.format_exc()
             log(f'{e} {traceback_info}')
         self.show()
@@ -312,14 +326,22 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.show()
             self.ui.GeneralOptionsFrame.hide()
+            self.ui.InstallModelsFrame.hide()
         if item.text() == "Render Options":
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.hide()
+            self.ui.InstallModelsFrame.hide()
         if item.text() == "General":
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.show()
+            self.ui.InstallModelsFrame.hide()
+        if item.text() == "Install Models":
+            self.ui.RenderOptionsFrame.hide()
+            self.ui.VideoOptionsFrame.hide()
+            self.ui.GeneralOptionsFrame.hide()
+            self.ui.InstallModelsFrame.show()
     
     
     def greyOutRifeTimes(self):

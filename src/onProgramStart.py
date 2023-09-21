@@ -48,7 +48,7 @@ def onApplicationStart(self):
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
     self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
-    
+    self.ui.InstallModelsFrame.hide()
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))

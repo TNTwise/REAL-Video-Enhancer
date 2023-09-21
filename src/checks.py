@@ -6,6 +6,8 @@ thisdir = src.thisdir.thisdir()
 from PyQt5.QtWidgets import  QMessageBox
 from src.settings import *
 from src.return_data import *
+import math
+import shutil
 def check_if_models_exist(thisdir):
     if os.path.exists(f'{thisdir}/models/') and os.path.exists(f'{thisdir}/models/rife/') and os.path.exists(f'{thisdir}/models/realesrgan/') and os.path.exists(f'{thisdir}/models/waifu2x/') :
         return True
@@ -23,12 +25,9 @@ def check_if_online():
         msg.setText(f"You are offline, please connect to the internet to download the models.")
         sys.exit(msg.exec_())
     return online
-import math
-import shutil
+
 def check_if_free_space(RenderDir):
-        KB = 1024
-        MB = 1024 * KB
-        GB = 1024 * MB
+        
 
         return shutil.disk_usage(f'{RenderDir}').free
     
@@ -72,3 +71,18 @@ def check_if_enough_space(input_file,render,times):
     else:
         return full_extraction_size*2 < free_space, full_extraction_size*2/ (1024 ** 3), free_space/ (1024 ** 3)
             
+def check_for_individual_models():
+    return_list = []
+    if os.path.exists(f'{thisdir}/models/'):
+        if os.path.exists(f'{thisdir}/models/rife/'):
+            return_list.append('Rife')
+        if os.path.exists(f'{thisdir}/models/realesrgan/'):
+            return_list.append('RealESRGAN')
+        if os.path.exists(f'{thisdir}/models/waifu2x/'):
+            return_list.append('Waifu2X')
+        if os.path.exists(f'{thisdir}/models/realcugan/'):
+            return_list.append('RealCUGAN')
+        if os.path.exists(f'{thisdir}/models/cain/'):
+            return_list.append('Cain')
+        return return_list
+    return None
