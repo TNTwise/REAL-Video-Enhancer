@@ -31,4 +31,5 @@ run error pop up on original thread<br/>
 add an option to install more rife models<br/>
 Add pausing by rendering current frames rendered in optimized preset into a video, and then concating all videos together, and removing all of input_frames / self.times frames. Then re-start rife in the same folder to continue<br/>
 add checks periodically in the render to check amount of frames remaining, and if ffmpeg is playing catchup, kill render and render everything out.<br/>
-pick which models you want to install
+pick which models you want to install<br/>
+add checks for each binary dependency

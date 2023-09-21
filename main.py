@@ -136,8 +136,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
             self.ui.themeCombo.setCurrentText(settings.Theme)
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
-            
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
+            self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
             selFrameIncrementsMode(self)
             models_installed = checks.check_for_individual_models()
             for i in models_installed:
