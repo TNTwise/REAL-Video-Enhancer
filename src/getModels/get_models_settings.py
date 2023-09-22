@@ -10,31 +10,36 @@ import src.thisdir
 import src.getModels.SelectModels
 from src.checks import *
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
-
+from zipfile import ZipFile
+import tarfile
 thisdir = src.thisdir.thisdir()
 rife_install_list = []
 
 class Worker(QObject):
     finished = pyqtSignal()
-    intReady = pyqtSignal(list)
+    intReady = pyqtSignal(float)
     def __init__(self,parent):
           self.main=parent
           QThread.__init__(self,None)
     @pyqtSlot()
+    
     def install_modules(self):
+            settings = Settings()
             try:
                     os.system(f'touch "{thisdir}/models.txt"')
                     with open(f'{thisdir}/models.txt', 'r') as f:
                          for i in f.readlines():
+                               print(i)
+                               i=i.replace('\n','')
                                rife_install_list.append(i)
                     
                     install_modules_dict={
 
-'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
-'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan',
 
 }
+                    '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
+                    'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
+                    '''
                     if self.main.ui.RifeCheckBox.isChecked() == True:
                           install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                     if self.main.ui.RealESRGANCheckBox.isChecked() == True:
@@ -43,7 +48,9 @@ class Worker(QObject):
                           install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
                     
                     for i in rife_install_list:
-                                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
+                            if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
+                                    install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
+                    
                     total_size_in_bytes=0
                     data_downloaded=0
                     for link,name in install_modules_dict.items():
@@ -56,10 +63,41 @@ class Worker(QObject):
                                 for data in response.iter_content(1024):
                                     f.write(data)
                                     data_downloaded+=1024
-                                    #self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread
-            
+                                    self.intReady.emit(data_downloaded/total_size_in_bytes)# sends back data to main thread
+                    if os.path.exists(f"{settings.ModelDir}") == False:
+                        os.mkdir(f"{settings.ModelDir}")
+                        os.mkdir(f"{settings.ModelDir}/rife")
+                    for i in os.listdir(f'{thisdir}/files/'):
+                        
+                             
+                        if '.zip' in i:
+
+                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                name=i.replace('.zip','')
+                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                print(original_ai_name)
+
+
+                                zip_ref.extractall(f'{thisdir}/files/')
+
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
+
+                        if '.tar.gz' in i:
+                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
+                                f.extractall(f'{settings.ModelDir}/rife/')
+
+
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              os.remove(f'{thisdir}/files/{i}')
             except Exception as e:
                 self.main.showDialogBox(e)
+                traceback_info = traceback.format_exc()
+                log(f'{e} {traceback_info}')
 class ChooseModels(QtWidgets.QMainWindow):
             def __init__(self,parent):
                 super(ChooseModels, self).__init__()
@@ -135,6 +173,7 @@ class ChooseModels(QtWidgets.QMainWindow):
                         f.write(option + '\n')
 
 def run_install_models_from_settings(self):
+    
     self.thread5 = QThread()
     # Step 3: Create a worker object
     
@@ -150,12 +189,16 @@ def run_install_models_from_settings(self):
     self.worker5.finished.connect(self.thread5.quit)
     self.worker5.finished.connect(self.worker5.deleteLater)
     self.thread5.finished.connect(self.thread5.deleteLater)
-    #self.worker5.progress.connect(self.reportProgress)
+    self.worker5.intReady.connect(displayProgressOnInstallBar)
     #self.worker5.image_progress.connect(self.imageViewer)
-    
+    global main
+    main = self
     # Step 6: Start the thread
     
     self.thread5.start()
+
+def displayProgressOnInstallBar(downloaded):
+    main.ui.installModelsProgressBar.setValue(int(downloaded*100))
     
 def get_rife(self):
     global window

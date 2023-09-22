@@ -127,7 +127,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.on = True
         #print(self.ui.denoiseLevelSpinBox.value())
         try:
-            
+            self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
             self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
@@ -152,6 +152,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if 'Cain' == i:
                     self.ui.CainCheckBox.setChecked(True)
             self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
+            self.ui.installModelsProgressBar.setMaximum(100)
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
