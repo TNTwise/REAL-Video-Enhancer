@@ -2,7 +2,7 @@ from src.settings import *
 from src.messages import *
 import src.queue.queue as queue
 import multiprocessing
-
+import src.checks as checks
 def onApplicationStart(self):
     import os
     
@@ -31,6 +31,20 @@ def onApplicationStart(self):
         if self.settings.VRAM == 'None':
             cannot_detect_vram(self)
         self.ui.vramAmountSpinbox.setValue(1)
+    models_installed = checks.check_for_individual_models()
+    for i in models_installed:
+                if 'Rife' == i:
+                    self.ui.RifeCheckBox.setChecked(True)
+                if 'RealESRGAN' == i:
+                    self.ui.RealESRGANCheckBox.setChecked(True)
+                if 'RealCUGAN' == i:
+                    self.ui.RealCUGANCheckBox.setChecked(True)
+                if 'Waifu2X' == i:
+                    self.ui.Waifu2xCheckBox.setChecked(True)
+                if 'Cain' == i:
+                    self.ui.CainCheckBox.setChecked(True)
+    self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
+    self.ui.installModelsProgressBar.setMaximum(100)
         
     self.ui.vramAmountSpinbox.setMinimum(1)
     

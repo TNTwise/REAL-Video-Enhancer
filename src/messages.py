@@ -43,3 +43,6 @@ def not_a_video(self):
     self.showDialogBox("This file is not a valid video.")
 def not_valid_link(self):
     self.showDialogBox("This link is invalid.")
+
+def restart_app(self):
+    self.showDialogBox("Please restart app for changes to take effect.")

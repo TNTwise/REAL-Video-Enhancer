@@ -139,20 +139,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
             selFrameIncrementsMode(self)
-            models_installed = checks.check_for_individual_models()
-            for i in models_installed:
-                if 'Rife' == i:
-                    self.ui.RifeCheckBox.setChecked(True)
-                if 'RealESRGAN' == i:
-                    self.ui.RealESRGANCheckBox.setChecked(True)
-                if 'RealCUGAN' == i:
-                    self.ui.RealCUGANCheckBox.setChecked(True)
-                if 'Waifu2X' == i:
-                    self.ui.Waifu2xCheckBox.setChecked(True)
-                if 'Cain' == i:
-                    self.ui.CainCheckBox.setChecked(True)
-            self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
-            self.ui.installModelsProgressBar.setMaximum(100)
+            
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
@@ -421,7 +408,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Times.setDisabled(True)
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         self.ui.denoiseLevelSpinBox.setDisabled(mode)
-            
+        self.ui.InstallModelsFrame.setDisabled(mode)
+        self.ui.SettingsMenus.setDisabled(mode)
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         if len(self.QueueList) == 0:
             self.ui.QueueListWidget.hide()

@@ -12,6 +12,7 @@ from src.checks import *
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from zipfile import ZipFile
 import tarfile
+import src.onProgramStart as programstart
 thisdir = src.thisdir.thisdir()
 rife_install_list = []
 
@@ -24,6 +25,9 @@ class Worker(QObject):
     @pyqtSlot()
     
     def install_modules(self):
+            for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              os.remove(f'{thisdir}/files/{i}')
             settings = Settings()
             try:
                     os.system(f'touch "{thisdir}/models.txt"')
@@ -33,18 +37,16 @@ class Worker(QObject):
                                i=i.replace('\n','')
                                rife_install_list.append(i)
                     
-                    install_modules_dict={
+                    install_modules_dict={}
 
-
-}
                     '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
                     'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
                     '''
-                    if self.main.ui.RifeCheckBox.isChecked() == True:
+                    if self.main.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife') == False:
                           install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                    if self.main.ui.RealESRGANCheckBox.isChecked() == True:
+                    if self.main.ui.RealESRGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realesrgan') == False:
                           install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip'] = 'realesrgan-ncnn-vulkan-20220424-ubuntu.zip'
-                    if self.main.ui.Waifu2xCheckBox.isChecked() == True:
+                    if self.main.ui.Waifu2xCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/waifu2x') == False:
                           install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
                     
                     for i in rife_install_list:
@@ -76,7 +78,6 @@ class Worker(QObject):
                                 name=i.replace('.zip','')
                                 original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
                                 original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                print(original_ai_name)
 
 
                                 zip_ref.extractall(f'{thisdir}/files/')
@@ -94,6 +95,7 @@ class Worker(QObject):
                     for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
+                    self.finished.emit()
             except Exception as e:
                 self.main.showDialogBox(e)
                 traceback_info = traceback.format_exc()
@@ -173,30 +175,38 @@ class ChooseModels(QtWidgets.QMainWindow):
                         f.write(option + '\n')
 
 def run_install_models_from_settings(self):
-    
-    self.thread5 = QThread()
-    # Step 3: Create a worker object
-    
-    self.worker5 = Worker(self)        
-    
+    try:
+        if check_if_online():
+            self.setDisableEnable(True)
+            self.thread5 = QThread()
+            # Step 3: Create a worker object
+            
+            self.worker5 = Worker(self)        
+            
 
-    
+            
 
-    # Step 4: Move worker to the thread
-    self.worker5.moveToThread(self.thread5)
-    # Step 5: Connect signals and slots
-    self.thread5.started.connect(self.worker5.install_modules)
-    self.worker5.finished.connect(self.thread5.quit)
-    self.worker5.finished.connect(self.worker5.deleteLater)
-    self.thread5.finished.connect(self.thread5.deleteLater)
-    self.worker5.intReady.connect(displayProgressOnInstallBar)
-    #self.worker5.image_progress.connect(self.imageViewer)
-    global main
-    main = self
-    # Step 6: Start the thread
-    
-    self.thread5.start()
-
+            # Step 4: Move worker to the thread
+            self.worker5.moveToThread(self.thread5)
+            # Step 5: Connect signals and slots
+            self.thread5.started.connect(self.worker5.install_modules)
+            self.worker5.finished.connect(self.thread5.quit)
+            self.worker5.finished.connect(self.worker5.deleteLater)
+            self.thread5.finished.connect(self.thread5.deleteLater)
+            self.worker5.intReady.connect(displayProgressOnInstallBar)
+            self.worker5.finished.connect(lambda: endDownload(self))
+            global main
+            main = self
+            # Step 6: Start the thread
+            
+            self.thread5.start()
+    except:
+        
+        return 0
+def endDownload(self):
+     self.setDisableEnable(False)
+     #restart_app(self)
+     programstart.onApplicationStart(self)
 def displayProgressOnInstallBar(downloaded):
     main.ui.installModelsProgressBar.setValue(int(downloaded*100))
     
