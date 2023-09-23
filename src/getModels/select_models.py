@@ -17,34 +17,36 @@ from src.messages import *
 from src.checks import *
 import tarfile
 from sys import exit
-rife_install_list=[]
+
 from src.settings import *
 settings = Settings()
 import src.thisdir
 from src.log import log
 thisdir = src.thisdir.thisdir()
+import src.getModels.SelectAI as SelectAI
+import traceback
 class Worker(QObject):
     finished = pyqtSignal()
     intReady = pyqtSignal(list)
-
-
+    def __init__(self,parent):
+          self.main=parent
+          QThread.__init__(self,None)
     @pyqtSlot()
+    
     def install_modules(self):
+            
+            for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              try:
+                                os.remove(f'{thisdir}/files/{i}')
+                              except:
+                                os.system(f'rm -rf "{thisdir}/files/{i}"')
+            settings = Settings()
             try:
-                    with open(f'{thisdir}/WARNING!!!!!', 'w') as f:
-                         f.write('DONT**** put any important (or even any!) files in this directory, as this app constantly manipulates files within this directory.')
-                    install_modules_dict={
-
-'https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
-'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip':'realesrgan-ncnn-vulkan-20220424-ubuntu.zip',
-'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan':'rife-ncnn-vulkan',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',
-'https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip':'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'}
-                    for i in rife_install_list:
-                                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
+                    os.system(f'touch "{thisdir}/models.txt"')
+                    
+                    
+                    
                     total_size_in_bytes=0
                     data_downloaded=0
                     for link,name in install_modules_dict.items():
@@ -57,12 +59,43 @@ class Worker(QObject):
                                 for data in response.iter_content(1024):
                                     f.write(data)
                                     data_downloaded+=1024
-                                    self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread
-            
+                                    self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread# sends back data to main thread
+                    if os.path.exists(f"{settings.ModelDir}") == False:
+                        os.mkdir(f"{settings.ModelDir}")
+                        os.mkdir(f"{settings.ModelDir}/rife")
+                    for i in os.listdir(f'{thisdir}/files/'):
+                        
+                             
+                        if '.zip' in i:
+
+                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                name=i.replace('.zip','')
+                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+
+
+                                zip_ref.extractall(f'{thisdir}/files/')
+
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
+
+                        if '.tar.gz' in i:
+                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
+                                f.extractall(f'{settings.ModelDir}/rife/')
+
+
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              os.remove(f'{thisdir}/files/{i}')
                     self.finished.emit()
             except Exception as e:
-                print(e)
-                log(e)
+                traceback_info = traceback.format_exc()
+                log(f'{e} {traceback_info}')
+                self.main.showDialogBox(e)
+                
+                
 def clear_files():
      for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
@@ -89,14 +122,20 @@ def install_icons():
                     else:
                         failed_download()
                 os.chdir(f'{thisdir}')
-if check_if_models_exist(thisdir) == False:
+def choose_models(self):
+    
+    global window
+    window = ChooseModels(self)
+    window.show()
 
-    class ChooseModels(QtWidgets.QMainWindow):
+if check_if_models_exist(thisdir) == False:
+    class ChooseAI(QtWidgets.QMainWindow):
             def __init__(self):
-                super(ChooseModels, self).__init__()
-                self.ui = SelectModels.Ui_MainWindow()
+                super(ChooseAI, self).__init__()
+                self.ui = SelectAI.Ui_MainWindow()
                 self.ui.setupUi(self)
                 self.pinFunctions()
+            
                 self.show()
             def showDialogBox(self,message,displayInfoIcon=False):
                 icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
@@ -108,58 +147,147 @@ if check_if_models_exist(thisdir) == False:
 
                 msg.exec_()
             def pinFunctions(self):
+                 self.ui.InstallButton.clicked.connect(self.next)
+                 self.ui.RifeSettings.clicked.connect(lambda: choose_models(self))
+                 
+            def next(self):
+                global install_modules_dict
+                install_modules_dict={}
+                global rife_install_list
+                rife_install_list=[]
+                with open(f'{thisdir}/models.txt', 'r') as f:
+                         for i in f.readlines():
+                               print(i)
+                               i=i.replace('\n','')
+                               rife_install_list.append(i)
+                '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
+                'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
+                '''
+                if self.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
+                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
+                if self.ui.RifeCheckBox.isChecked() == False:
+                        
+                        os.system(f'rm -rf "{settings.ModelDir}/rife/"')
+                if self.ui.RealESRGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realesrgan') == False:
+                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip'] = 'realesrgan-ncnn-vulkan-20220424-ubuntu.zip'
+                if self.ui.RealESRGANCheckBox.isChecked() == False:
+                        os.system(f'rm -rf "{settings.ModelDir}/realesrgan/"')
+                if self.ui.Waifu2xCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/waifu2x') == False:
+                        install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
+                if self.ui.Waifu2xCheckBox.isChecked() == False:
+                        os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
+                for i in rife_install_list:
+                        if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
+                                install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
+                        if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
+                                install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
+                if rife_install_list == [] and self.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
+                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
+                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
+                
+                QApplication.closeAllWindows()
 
-                self.ui.next.clicked.connect(self.nextfunction)
-           
-            def nextfunction(self):
-                if check_if_online():
-                    install_icons()
-                    if self.ui.rife.isChecked() == True:
-                        rife_install_list.append('rife')
-                    if self.ui.rifeanime.isChecked() == True:
-                        rife_install_list.append('rife-anime')
-                    if self.ui.rifehd.isChecked() == True:
-                        rife_install_list.append('rife-HD')
-                    if self.ui.rifeuhd.isChecked() == True:
-                        rife_install_list.append('rife-UHD')
-                    if self.ui.rife2.isChecked() == True:
-                        rife_install_list.append('rife-v2')
-                    if self.ui.rife23.isChecked() == True:
-                        rife_install_list.append('rife-v2.3')
-                    if self.ui.rife24.isChecked() == True:
-                        rife_install_list.append('rife-v2.4')
-                    if self.ui.rife30.isChecked() == True:
-                        rife_install_list.append('rife-v3.0')
-                    if self.ui.rife31.isChecked() == True:
-                        rife_install_list.append('rife-v3.1')
-                    if self.ui.rife4.isChecked() == True:
-                        rife_install_list.append('rife-v4')
-                    if self.ui.rife46.isChecked() == True:
-                        rife_install_list.append('rife-v4.6')
-                    if len(rife_install_list) == 0:
-                        src.messages.no_downloaded_models(self)
-                    else:
-                        QApplication.closeAllWindows()
 
+                return 0
+    class ChooseModels(QtWidgets.QMainWindow):
+            def __init__(self,parent):
+                super(ChooseModels, self).__init__()
+                self.ui = SelectModels.Ui_MainWindow()
+                self.ui.setupUi(self)
+                self.pinFunctions()
+                self.show()
+                self.main = parent
+            def showDialogBox(self,message,displayInfoIcon=False):
+                icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
+                msg = QMessageBox()
+                msg.setWindowTitle(" ")
+                if displayInfoIcon == True:
+                    msg.setIconPixmap(icon.pixmap(32, 32))
+                msg.setText(f"{message}")
 
-                        return 0
+                msg.exec_()
+            def pinFunctions(self):
+                checkboxes = [
+                    (self.ui.rife, 'rife'),
+                    (self.ui.rifeanime, 'rife-anime'),
+                    (self.ui.rifehd, 'rife-HD'),
+                    (self.ui.rifeuhd, 'rife-UHD'),
+                    (self.ui.rife2, 'rife-v2'),
+                    (self.ui.rife23, 'rife-v2.3'),
+                    (self.ui.rife24, 'rife-v2.4'),
+                    (self.ui.rife30, 'rife-v3.0'),
+                    (self.ui.rife31, 'rife-v3.1'),
+                    (self.ui.rife4, 'rife-v4'),
+                    (self.ui.rife46, 'rife-v4.6')
+                ]
+                self.ui.next.hide()
+                self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rifeanime.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rifehd.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rifeuhd.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife2.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife23.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife24.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife30.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife31.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife4.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
+                try:
+                    with open(f'{thisdir}/models.txt', 'r') as f:
+                        for checkbox,option_name in checkboxes:
+                            
+                            if option_name in os.listdir(f'{thisdir}/models/rife/'):
+                                checkbox.setChecked(True)
+                    
+                        for i in f.readlines():
+                               print(i)
+                               i=i.replace('\n','')
+                               for checkbox,option_name in checkboxes:
+                                    if option_name in i:
+                                        checkbox.setChecked(True)
+                except:
+                     pass
+            def checkbox_state_changed(self):
+                checkboxes = [
+                    (self.ui.rife, 'rife'),
+                    (self.ui.rifeanime, 'rife-anime'),
+                    (self.ui.rifehd, 'rife-HD'),
+                    (self.ui.rifeuhd, 'rife-UHD'),
+                    (self.ui.rife2, 'rife-v2'),
+                    (self.ui.rife23, 'rife-v2.3'),
+                    (self.ui.rife24, 'rife-v2.4'),
+                    (self.ui.rife30, 'rife-v3.0'),
+                    (self.ui.rife31, 'rife-v3.1'),
+                    (self.ui.rife4, 'rife-v4'),
+                    (self.ui.rife46, 'rife-v4.6')
+                ]
+                rife_install_list = []
 
-                else:
-                     failed_download()
+                
 
+                for checkbox, option_name in checkboxes:
+                    if checkbox.isChecked():
+                        rife_install_list.append(option_name)
+
+                with open(f'{thisdir}/models.txt', 'w') as f:
+                    for option in rife_install_list:
+                        f.write(option + '\n')
 
 
 
     import src.theme as theme
-
     app = QtWidgets.QApplication(sys.argv)
     theme.set_theme(app)
 
 
-    window = ChooseModels()
+    window = ChooseAI()
+
     app.exec_()
-    if len(rife_install_list) > 0:
-        class Downloading(QtWidgets.QMainWindow):
+
+
+    
+    
+    class Downloading(QtWidgets.QMainWindow):
                 def __init__(self):
                     super(Downloading, self).__init__()
                     self.ui = DownloadUI.Ui_MainWindow()
@@ -184,7 +312,7 @@ if check_if_models_exist(thisdir) == False:
 
                     self.ui.logoPreview.setPixmap(logo.pixmap(256,256))
 
-                    self.obj = Worker()
+                    self.obj = Worker(self)
                     self.thread = QThread()
                     self.obj.intReady.connect(self.on_count_changed)
                     self.obj.moveToThread(self.thread)
@@ -252,20 +380,20 @@ if check_if_models_exist(thisdir) == False:
                         failed_download(self)
                         
                         exit()
-        import src.theme as theme
+    import src.theme as theme
 
-        
+    
 
 
-        window = Downloading()
-        app.exec_()
-        app =None 
-        if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
-            QApplication.closeAllWindows()
-        else:
-            for file in os.listdir(f'{thisdir}/files'):
-                if '.txt' not in file:
-                    os.system(f'rm -rf "{thisdir}/files/{file}"')
-            exit() # this happens if program abruptly stops while downloading
+    window = Downloading()
+    app.exec_()
+    app =None 
+    if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
+        QApplication.closeAllWindows()
     else:
-        exit()
+        for file in os.listdir(f'{thisdir}/files'):
+            if '.txt' not in file:
+                os.system(f'rm -rf "{thisdir}/files/{file}"')
+        exit() # this happens if program abruptly stops while downloading
+'''else:
+    exit()'''
