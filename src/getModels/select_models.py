@@ -63,6 +63,13 @@ class Worker(QObject):
             except Exception as e:
                 print(e)
                 log(e)
+def clear_files():
+     for i in os.listdir(f'{thisdir}/files/'):
+                         if '.txt' not in i:
+                              try:
+                                os.remove(f'{thisdir}/files/{i}')
+                              except:
+                                os.system(f'rm -rf "{thisdir}/files/{i}"')
 def install_icons():
                 if os.path.exists(f'{thisdir}/icons/') == False:
                     if check_if_online():
@@ -233,9 +240,7 @@ if check_if_models_exist(thisdir) == False:
 
                     os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
                     os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
-                    for i in os.listdir(f'{thisdir}/files/'):
-                         if '.txt' not in i:
-                              os.remove(f'{thisdir}/files/{i}')
+                    clear_files()
                     if check_if_models_exist(thisdir) == True:
                         if check_if_online():
                             QApplication.closeAllWindows()

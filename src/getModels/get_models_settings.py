@@ -25,9 +25,13 @@ class Worker(QObject):
     @pyqtSlot()
     
     def install_modules(self):
+            
             for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
-                              os.remove(f'{thisdir}/files/{i}')
+                              try:
+                                os.remove(f'{thisdir}/files/{i}')
+                              except:
+                                os.system(f'rm -rf "{thisdir}/files/{i}"')
             settings = Settings()
             try:
                     os.system(f'touch "{thisdir}/models.txt"')
@@ -42,17 +46,27 @@ class Worker(QObject):
                     '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
                     'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
                     '''
-                    if self.main.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife') == False:
+                    if self.main.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
                           install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
+                    if self.main.ui.RifeCheckBox.isChecked() == False:
+                         
+                         os.system(f'rm -rf "{settings.ModelDir}/rife/"')
                     if self.main.ui.RealESRGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realesrgan') == False:
                           install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip'] = 'realesrgan-ncnn-vulkan-20220424-ubuntu.zip'
+                    if self.main.ui.RealESRGANCheckBox.isChecked() == False:
+                         os.system(f'rm -rf "{settings.ModelDir}/realesrgan/"')
                     if self.main.ui.Waifu2xCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/waifu2x') == False:
                           install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
-                    
+                    if self.main.ui.Waifu2xCheckBox.isChecked() == False:
+                         os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
                     for i in rife_install_list:
+                            if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
+                                 install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                             if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
                                     install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
-                    
+                    if rife_install_list == [] and self.main.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
+                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
+                         rife_install_list.append('rife-v4.6')
                     total_size_in_bytes=0
                     data_downloaded=0
                     for link,name in install_modules_dict.items():
@@ -207,6 +221,8 @@ def endDownload(self):
      self.setDisableEnable(False)
      #restart_app(self)
      programstart.onApplicationStart(self)
+     self.ui.GeneralOptionsFrame.hide()
+     self.ui.InstallModelsFrame.show() # has to re-show frame as OnProgramStart defaults it to general
 def displayProgressOnInstallBar(downloaded):
     main.ui.installModelsProgressBar.setValue(int(downloaded*100))
     
