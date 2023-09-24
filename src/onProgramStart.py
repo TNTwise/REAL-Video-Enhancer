@@ -13,8 +13,16 @@ def onApplicationStart(self):
     from PyQt5.QtGui import QIntValidator, QIcon
     import src.thisdir
     thisdir = src.thisdir.thisdir()
-    
-    
+    self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
+    for i in os.listdir(settings.ModelDir):
+                if i == 'rife':
+                    self.ui.AICombo.addItem('Rife')
+                
+                if i == 'realesrgan':
+                    self.ui.AICombo.addItem('RealESRGAN')
+                if i == 'waifu2x':
+                    self.ui.AICombo.addItem('Waifu2X')
+                
     self.input_file = ''
     
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
@@ -43,6 +51,8 @@ def onApplicationStart(self):
                     self.ui.Waifu2xCheckBox.setChecked(True)
                 if 'Cain' == i:
                     self.ui.CainCheckBox.setChecked(True)
+    
+    
     self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
     self.ui.installModelsProgressBar.setMaximum(100)
         
@@ -155,6 +165,7 @@ def onApplicationStart(self):
     # list every model downloaded, and add them to the list
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()
+
 def list_model_downloaded(self):
         settings = Settings()
         model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])

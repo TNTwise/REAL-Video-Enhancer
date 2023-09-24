@@ -128,7 +128,7 @@ def choose_models(self):
     window = ChooseModels(self)
     window.show()
 
-if check_if_models_exist(thisdir) == False:
+if check_for_individual_models() == None:
     class ChooseAI(QtWidgets.QMainWindow):
             def __init__(self):
                 super(ChooseAI, self).__init__()

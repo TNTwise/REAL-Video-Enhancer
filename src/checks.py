@@ -84,5 +84,7 @@ def check_for_individual_models():
             return_list.append('RealCUGAN')
         if os.path.exists(f'{thisdir}/models/cain/'):
             return_list.append('Cain')
-        return return_list
+        if len(return_list) >0:
+            return return_list
+        
     return None

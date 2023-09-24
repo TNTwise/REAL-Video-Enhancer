@@ -241,23 +241,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="AICombo">
-                    <item>
-                     <property name="text">
-                      <string>Rife</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>RealESRGAN</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>Waifu2X</string>
-                     </property>
-                    </item>
-                   </widget>
+                   <widget class="QComboBox" name="AICombo"/>
                   </item>
                  </layout>
                 </item>
@@ -949,6 +933,9 @@
                  </item>
                  <item row="3" column="0">
                   <widget class="QCheckBox" name="RealCUGANCheckBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="text">
                     <string>RealCUGAN</string>
                    </property>
@@ -963,6 +950,9 @@
                  </item>
                  <item row="7" column="0">
                   <widget class="QCheckBox" name="CainCheckBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="text">
                     <string>Cain</string>
                    </property>
