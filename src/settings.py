@@ -38,6 +38,7 @@ class Settings:
         self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
         self.write_to_settings_file('DiscordRPC', 'Enabled')
         self.write_to_settings_file('SceneChangeDetectionMode','Enabled')
+        self.write_to_settings_file('FixFFMpegCatchup','Disabled')
         if HardwareInfo.get_video_memory_linux() == None:
             self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
         elif  HardwareInfo.get_video_memory_linux() >= 1:
@@ -57,6 +58,11 @@ class Settings:
                     settings_dict[row[0]] = row[1]
                 except:
                     pass
+        try:
+            self.FixFFMpegCatchup = settings_dict['FixFFMpegCatchup']
+        except:
+            self.write_to_settings_file("FixFFMpegCatchup", "Disabled")
+            self.readSettings()
         try:
             
             self.Image_Type = settings_dict['Image_Type']
