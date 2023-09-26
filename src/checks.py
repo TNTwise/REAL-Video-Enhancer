@@ -88,3 +88,7 @@ def check_for_individual_models():
             return return_list
         
     return None
+def check_for_each_binary():
+    if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo'):
+        return True
+    return False
