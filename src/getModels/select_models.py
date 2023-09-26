@@ -64,6 +64,18 @@ class Worker(QObject):
                         os.mkdir(f"{settings.ModelDir}")
                         os.mkdir(f"{settings.ModelDir}/rife")
                     for i in os.listdir(f'{thisdir}/files/'):
+                        if os.path.exists(f'{thisdir}/bin/') == False:
+                            os.mkdir(f'{thisdir}/bin/')
+                        if i == 'ffmpeg':
+                             os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                             os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                        if i == 'yt-dlp_linux':
+                             os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                             os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                        if i == 'glxinfo':
+                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+                    for i in os.listdir(f'{thisdir}/files/'):
                         
                              
                         if '.zip' in i:
@@ -189,7 +201,6 @@ if check_for_individual_models() == None:
                         install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
                 
                 QApplication.closeAllWindows()
-
 
                 return 0
     class ChooseModels(QtWidgets.QMainWindow):
@@ -372,7 +383,7 @@ if check_for_individual_models() == None:
                     os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
                     os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
                     clear_files()
-                    if check_if_models_exist(thisdir) == True:
+                    if check_for_individual_models != None:
                         if check_if_online():
                             QApplication.closeAllWindows()
 
