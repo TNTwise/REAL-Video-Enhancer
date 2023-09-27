@@ -56,15 +56,18 @@ def check_if_enough_space(input_file,render,times):
 
         # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == 'esrgan':
+            rnd = round(resolution*.001)
+            if rnd < 1:
+                rnd = 1
             if img_type == '.png':
-                full_size = full_extraction_size + full_extraction_size * times * 4
+                full_size = full_extraction_size + full_extraction_size * times * rnd
                 
             if img_type == '.jpg':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 20
+                full_size = full_extraction_size + full_extraction_size * times * 5*rnd
             if img_type == '.webp':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 16
+                full_size = full_extraction_size + full_extraction_size * times * 4*rnd
             return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
         
         if render == 'rife':

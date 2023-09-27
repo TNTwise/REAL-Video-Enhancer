@@ -334,12 +334,7 @@
        </layout>
       </widget>
       <widget class="QWidget" name="Settings">
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="whatsThis">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rife&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
+       
        <attribute name="title">
         <string>Settings</string>
        </attribute>
@@ -588,7 +583,7 @@
                <item row="1" column="3">
                 <widget class="QLabel" name="RenderPathLabel">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string>Render Directory:</string>
                  </property>
                 </widget>
                </item>

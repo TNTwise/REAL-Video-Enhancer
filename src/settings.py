@@ -10,45 +10,22 @@ class Settings:
     def __init__(self) -> None:
         
         ManageFiles.create_folder(f"{thisdir}/files")
-        if ManageFiles.isfile(f"{thisdir}/files/settings.txt") == False:
-            ManageFiles.create_file(f"{thisdir}/files/settings.txt")
-            self.write_defaults()
-        self.write_temp()
+        ManageFiles.create_file(f"{thisdir}/files/settings.txt")
         self.readSettings()
     def write_to_settings_file(self,description, option):
     
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")
-    def write_defaults(self):
-        with open(f'{thisdir}/files/settings.txt', 'w') as f:
-            pass
-        self.write_to_settings_file("Image_Type", ".jpg")
-        self.write_to_settings_file("rifeversion", "20221029")
-        self.write_to_settings_file("esrganversion", "0.2.0")
-        self.write_to_settings_file("videoQuality", "18")
-        self.write_to_settings_file("Theme", "Dark")
-        self.write_to_settings_file("OutputDir", f"{homedir}")
-        self.write_to_settings_file("Interpolation_Option", f"2X")
-        self.write_to_settings_file("RenderDir" ,f"{thisdir}")
-        self.write_to_settings_file('SceneChangeDetection','0.3')
-        self.write_to_settings_file('Encoder','264')
-        self.write_to_settings_file('ModelDir',f'{thisdir}/models')
-        self.write_to_settings_file('RenderType','Optimized')
-        self.write_to_settings_file('FrameIncrements', '100')
-        self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
-        self.write_to_settings_file('DiscordRPC', 'Enabled')
-        self.write_to_settings_file('SceneChangeDetectionMode','Enabled')
-        self.write_to_settings_file('FixFFMpegCatchup','Disabled')
-        if HardwareInfo.get_video_memory_linux() == None:
-            self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
-        elif  HardwareInfo.get_video_memory_linux() >= 1:
-                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
-        elif HardwareInfo.get_video_memory_linux() < 1:
-                self.write_to_settings_file('VRAM','1')
-        
-
-        self.readSettings()
     
+    def check_and_write_setting(self,setting_match,value,settings_dict):
+        setting,setting_identifier = setting_match
+        try:
+            setting = settings_dict[value]
+            print(settings_dict)
+            print(setting)
+        except:
+            self.write_to_settings_file(setting_identifier,value)
+            self.readSettings()
     def readSettings(self):
         settings_dict = {}
         with open(f'{thisdir}/files/settings.txt', 'r') as f:
@@ -58,96 +35,38 @@ class Settings:
                     settings_dict[row[0]] = row[1]
                 except:
                     pass
-        try:
-            self.FixFFMpegCatchup = settings_dict['FixFFMpegCatchup']
-        except:
-            self.write_to_settings_file("FixFFMpegCatchup", "Disabled")
-            self.readSettings()
-        try:
             
-            self.Image_Type = settings_dict['Image_Type']
-        except:
-            self.write_to_settings_file("Image_Type", ".jpg")
-            self.readSettings()
-        try:
-            self.videoQuality = settings_dict['videoQuality']
-        except:
-            self.write_to_settings_file("videoQuality", "18")
-            self.readSettings()
-        try:
-            self.FrameIncrements = int(settings_dict['FrameIncrements']) # need this to be int
-        except:
-            self.write_to_settings_file('FrameIncrements', '100')
-            self.readSettings()
-        try:
-            self.Theme = settings_dict['Theme'] # need this to be int
-        except:
-            self.write_to_settings_file('Theme', 'Dark')
-            self.readSettings()
-        try:
-            self.OutputDir = settings_dict['OutputDir']
-            if os.path.exists(f'{self.OutputDir}') == False:
-                self.write_to_settings_file("OutputDir" ,f"{homedir}")
-        except:
-            self.write_to_settings_file("OutputDir", f"{homedir}")
-            self.readSettings()
-        try:
-            self.GPUUsage = settings_dict['GPUUsage']
-        except:
-            self.write_to_settings_file("GPUUsage" ,'Default')
-            self.readSettings()
-        try:
-            self.ModelDir = settings_dict['ModelDir']
-        except:
-            self.write_to_settings_file("ModelDir" ,f'{thisdir}/models/')
-            self.readSettings()
-        try:
-            self.RenderType = settings_dict['RenderType']
-        except:
-            self.write_to_settings_file('RenderType','Optimized')
-            self.readSettings()
-        try:
-            self.SceneChangeDetectionMode = settings_dict['SceneChangeDetectionMode']
-        except:
-            self.write_to_settings_file('SceneChangeDetectionMode','Enabled')
-            self.readSettings()
-        try:
-            self.RenderDir = settings_dict['RenderDir']
-            if os.path.exists(f'{self.RenderDir}') == False:
-                self.write_to_settings_file("RenderDir" ,f"{thisdir}")
-            
-        except:
-            self.write_to_settings_file("RenderDir" ,f"{thisdir}")
-            self.readSettings()
-        try:
-            self.ExtractionImageType=settings_dict['ExtractionImageType']
-        except:
-            self.write_to_settings_file("ExtractionImageType" ,"jpg")
-            self.readSettings()
-        try: 
-            self.SceneChangeDetection=settings_dict['SceneChangeDetection']
-        except:
-            self.write_to_settings_file('SceneChangeDetection','0.3')
-            self.readSettings()
-        try:
-            self.Encoder=settings_dict['Encoder']
-        except:
-            self.write_to_settings_file('Encoder','264')
-            self.readSettings()
-        try:
-            self.DiscordRPC=settings_dict['DiscordRPC']
-            if self.DiscordRPC == 'Enabled':
-                self.DiscordRPC == True
-            else:
-                self.DiscordRPC == False
-        except:
-            self.write_to_settings_file('DiscordRPC', 'Enabled')
-            self.readSettings()       
-        try:
-            self.ModelDir=settings_dict['ModelDir']
-        except:
-            self.write_to_settings_file('ModelDir',f'{thisdir}/models')
-            self.readSettings()
+        default_settings = {
+    "FixFFMpegCatchup": "Disabled",
+    "Image_Type": ".jpg",
+    "videoQuality": "18",
+    "FrameIncrements": '100',
+    "Theme": 'Dark',
+    "OutputDir": f"{homedir}",
+    "GPUUsage": 'Default',
+    "ModelDir": f'{thisdir}/models/',
+    "RenderType": 'Optimized',
+    "SceneChangeDetectionMode": 'Enabled',
+    "RenderDir": f"{thisdir}",
+    "ExtractionImageType": "jpg",
+    "SceneChangeDetection": '0.3',
+    "Encoder": '264',
+    "DiscordRPC": 'Enabled',
+    "ModelDir": f'{thisdir}/models/',
+    'FrameIncrementsMode': 'Automatic',
+}
+
+        for setting, default_value in default_settings.items():
+            try:
+                setattr(self, setting, settings_dict[setting])
+                if setting in ["OutputDir", "RenderDir"] and not os.path.exists(getattr(self, setting)):
+                    raise Exception
+                
+                if setting == "FrameIncrements":
+                    self.FrameIncrements = int(self.FrameIncrements)
+            except:
+                self.write_to_settings_file(setting, default_value)
+                self.readSettings()
         try:
             self.VRAM = settings_dict['VRAM']
         except:
@@ -158,11 +77,7 @@ class Settings:
             elif HardwareInfo.get_video_memory_linux() < 1:
                 self.write_to_settings_file('VRAM','1')
             self.readSettings()
-        try:
-            self.FrameIncrementsMode = settings_dict['FrameIncrementsMode']
-        except:
-            self.write_to_settings_file('FrameIncrementsMode', 'Automatic')
-            self.readSettings()
+        
         
     def change_setting(self,setting,svalue):
         original_settings = {}
@@ -185,10 +100,7 @@ class Settings:
                 if row[0] == setting:
                     return True
             return False
-    def write_temp(self):
-        self.change_setting("Interpolation_Option", f"2X")
-        self.change_setting("Rife_Option", f"2.3")
-        self.change_setting("IsAnime", "False")
+   
 
 def changeDiscordRPC(self):
     settings = Settings()
