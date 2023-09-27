@@ -194,10 +194,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 if self.input_file != '':
                     self.times = int(self.ui.Rife_Times.currentText()[0])
-                    self.ui.FPSPreview.setText(f'FPS: {int(VideoName.return_video_framerate(self.input_file))} -> {int(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
+                    self.ui.FPSPreview.setText(f'FPS: {(round(VideoName.return_video_framerate(self.input_file)))} -> {round(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
                     
                 if self.fps != None:    
-                    self.ui.FPSPreview.setText(f'FPS: {self.fps} -> {int(self.fps)*int(self.times)}')
+                    self.ui.FPSPreview.setText(f'FPS: {round(self.fps)} -> {round(self.fps)*int(self.times)}')
             if self.render == 'esrgan':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
@@ -421,7 +421,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifeResume.hide()
             self.ui.QueueButton.hide()
             self.ui.centerLabel.show()
-            self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n')
+            self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n\n')
             self.setDisableEnable(False)
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
             self.ui.ETAPreview.setText('ETA: 00:00:00')
@@ -538,7 +538,7 @@ class MainWindow(QtWidgets.QMainWindow):
         text = self.ui.logsPreview.toPlainText().split('\n')
         text1=[]
         for i in text:
-            if i != ' 'or i != '' or i !='\n':
+            if i != ' 'or i != '' :
                 
                 if len(i) > 3:
                     text1.append(i)

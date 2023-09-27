@@ -22,6 +22,7 @@ def start_upscale(self,AI):
     try:
         if self.input_file != '':
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+            self.ui.logsPreview.clear()
             self.ui.QueueButton.show()
             self.render='esrgan'
             self.AI = AI

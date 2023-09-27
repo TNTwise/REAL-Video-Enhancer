@@ -39,7 +39,7 @@ def run_start(self,AI):
        
     self.rifeWorker = workers.interpolation(self,self.ui.Rife_Model.currentText().lower())        
     
-
+    self.ui.logsPreview.clear()
     
 
     # Step 4: Move worker to the thread

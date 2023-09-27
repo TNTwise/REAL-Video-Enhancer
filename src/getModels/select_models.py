@@ -52,7 +52,8 @@ class Worker(QObject):
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         total_size_in_bytes+= int(response.headers.get('content-length', 0))
-
+                    if check_if_enough_space_for_install(total_size_in_bytes) == False:
+                         return 0
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         with open(f'{thisdir}/files/{name}', 'wb') as f:
@@ -344,56 +345,57 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
                     self.ui.gbLabel.setText(f'{downloaded_data_gb}/{total_data_gb}GB')
                 def start_main(self):
-                    if os.path.exists(f"{settings.ModelDir}") == False:
-                        os.mkdir(f"{settings.ModelDir}")
-                        os.mkdir(f"{settings.ModelDir}/rife")
-                    for i in os.listdir(f'{thisdir}/files/'):
-                        if os.path.exists(f'{thisdir}/bin/') == False:
-                            os.mkdir(f'{thisdir}/bin/')
-                        if i == 'ffmpeg':
-                             os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
-                             os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
-                        if i == 'yt-dlp_linux':
-                             os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
-                             os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
-                        if i == 'glxinfo':
-                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
-                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                             
-                        print(i)
-                        if '.zip' in i:
+                    if len(os.listdir(f'{thisdir}/files/')) > 1:
+                         
+                        for i in os.listdir(f'{thisdir}/files/'):
+                            if os.path.exists(f'{thisdir}/bin/') == False:
+                                os.mkdir(f'{thisdir}/bin/')
+                            if i == 'ffmpeg':
+                                os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                                os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                            if i == 'yt-dlp_linux':
+                                os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                                os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                            if i == 'glxinfo':
+                                os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                                os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+                                
+                            print(i)
+                            if '.zip' in i:
 
-                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
-                                name=i.replace('.zip','')
-                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                print(original_ai_name)
-
-
-                                zip_ref.extractall(f'{thisdir}/files/')
-
-                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
-                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-
-                        if '.tar.gz' in i:
-                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
-                                f.extractall(f'{settings.ModelDir}/rife/')
+                                with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                    name=i.replace('.zip','')
+                                    original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                    original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                    print(original_ai_name)
 
 
-                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
-                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
-                    clear_files()
-                    if check_for_individual_models != None:
-                        if check_if_online():
-                            QApplication.closeAllWindows()
+                                    zip_ref.extractall(f'{thisdir}/files/')
 
-                            return 0
+                                os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                                os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
+
+                            if '.tar.gz' in i:
+                                with tarfile.open(f'{thisdir}/files/{i}','r') as f:
+                                    f.extractall(f'{settings.ModelDir}/rife/')
+
+
+                        os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                        os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                        clear_files()
+                        if check_for_individual_models != None:
+                            if check_if_online():
+                                QApplication.closeAllWindows()
+
+                                return 0
+                            else:
+                                exit()
                         else:
+                            failed_download(self)
+                            
                             exit()
                     else:
-                        failed_download(self)
-                        
-                        exit()
+                         self.showDialogBox('Not enough space to install models!')
     import src.theme as theme
 
     

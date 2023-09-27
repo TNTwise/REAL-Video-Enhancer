@@ -34,10 +34,13 @@ def print_output(thread,self,extracting,pipe):
            times=1
     if mode == 'Merged':
            times = self.times
-    progressbar='<'
-    for i in range(pb_length):
-                progressbar+='='
-    progressbar += '>'
+    try:
+        progressbar='<'
+        for i in range(pb_length):
+                        progressbar+='='
+        progressbar += '>'
+    except:
+           pass
     while True:
         line = pipe.readline()
         if not line:
@@ -132,6 +135,7 @@ def get_video_from_link(self,thread):
 
 def start(thread,self,renderdir,videoName,videopath,times):
         try:
+                
                 self.file_drop_widget.hide()
                 # i need to clean this up lol
                 os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
@@ -227,10 +231,10 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 i=1
                                 while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(fps*times)}fps({i}).mp4' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(fps*times)}fps.mp4' 
                 self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                 if mode == 'upscale': # add upscale/realesrgan resolution bump here
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'

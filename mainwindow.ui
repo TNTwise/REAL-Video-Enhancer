@@ -376,10 +376,6 @@
                <pointsize>17</pointsize>
               </font>
              </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>icons/Rife-ESRGAN-Render-Settings.png</normaloff>icons/Rife-ESRGAN-Render-Settings.png</iconset>
-             </property>
             </item>
             <item>
              <property name="text">
@@ -389,10 +385,6 @@
               <font>
                <pointsize>17</pointsize>
               </font>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>icons/Rife-ESRGAN-Video-Settings.png</normaloff>icons/Rife-ESRGAN-Video-Settings.png</iconset>
              </property>
             </item>
             <item>

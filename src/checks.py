@@ -30,7 +30,9 @@ def check_if_free_space(RenderDir):
         
 
         return shutil.disk_usage(f'{RenderDir}').free
-    
+def check_if_enough_space_for_install(size_in_bytes):
+    free_space= shutil.disk_usage(f'{thisdir}').free
+    return free_space >  size_in_bytes
 def check_if_enough_space(input_file,render,times):
     settings = Settings()
     img_type = settings.Image_Type
@@ -54,22 +56,30 @@ def check_if_enough_space(input_file,render,times):
 
         # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == 'esrgan':
-            return True,0,0
+            if img_type == '.png':
+                full_size = full_extraction_size + full_extraction_size * times * 4
+                
+            if img_type == '.jpg':
+                
+                full_size = full_extraction_size + full_extraction_size * times * 20
+            if img_type == '.webp':
+                
+                full_size = full_extraction_size + full_extraction_size * times * 16
+            return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
+        
         if render == 'rife':
             if img_type == '.png':
                 full_size = full_extraction_size + full_extraction_size * times
                 
-                return full_size < free_space, full_size / (1024 ** 3), free_space/ (1024 ** 3)
             if img_type == '.jpg':
                 
                 full_size = full_extraction_size + full_extraction_size * times * 5
-                return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
             if img_type == '.webp':
                 
                 full_size = full_extraction_size + full_extraction_size * times * 4
-                return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
+            return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
     else:
-        return full_extraction_size*2 < free_space, full_extraction_size*2/ (1024 ** 3), free_space/ (1024 ** 3)
+        return full_extraction_size*5 < free_space, full_extraction_size*2/ (1024 ** 3), free_space/ (1024 ** 3)
             
 def check_for_individual_models():
     return_list = []

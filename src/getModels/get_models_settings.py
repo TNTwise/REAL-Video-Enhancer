@@ -72,7 +72,8 @@ class Worker(QObject):
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         total_size_in_bytes+= int(response.headers.get('content-length', 0))
-
+                    if check_if_enough_space_for_install(total_size_in_bytes) == False:
+                         return 0
                     for link,name in install_modules_dict.items():
                         response = requests.get(link, stream=True)
                         with open(f'{thisdir}/files/{name}', 'wb') as f:
@@ -218,11 +219,14 @@ def run_install_models_from_settings(self):
         
         return 0
 def endDownload(self):
+    
      self.setDisableEnable(False)
      #restart_app(self)
      programstart.onApplicationStart(self)
      self.ui.GeneralOptionsFrame.hide()
      self.ui.InstallModelsFrame.show() # has to re-show frame as OnProgramStart defaults it to general
+     if len(os.listdir(f'{thisdir}/files/')) < 1:
+          self.ui.showDialogBox('Not enough space to install models!')
 def displayProgressOnInstallBar(downloaded):
     main.ui.installModelsProgressBar.setValue(int(downloaded*100))
     
