@@ -227,9 +227,9 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         outputpath = self.output_folder
                 if mode == 'interpolation':
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps.mp4') == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(fps*times)}fps.mp4') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{int(fps*times)}fps({i}).mp4') == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(fps*times)}fps({i}).mp4') == True:
                                         i+=1
                                 output_video_file = f'{outputpath}/{videoName}_{round(fps*times)}fps({i}).mp4' 
 
