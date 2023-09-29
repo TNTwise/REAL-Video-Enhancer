@@ -124,7 +124,26 @@
            </widget>
           </item>
           <item>
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>10</width>
+              <height>25</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetDefaultConstraint</enum>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <item>
@@ -334,7 +353,6 @@
        </layout>
       </widget>
       <widget class="QWidget" name="Settings">
-       
        <attribute name="title">
         <string>Settings</string>
        </attribute>
@@ -343,6 +361,12 @@
          <layout class="QGridLayout" name="settingsGridLayout">
           <item row="1" column="1">
            <widget class="QListWidget" name="SettingsMenus">
+            <property name="maximumSize">
+             <size>
+              <width>200</width>
+              <height>16777215</height>
+             </size>
+            </property>
             <property name="iconSize">
              <size>
               <width>50</width>
