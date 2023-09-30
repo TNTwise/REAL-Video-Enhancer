@@ -26,4 +26,5 @@ run error pop up on original thread<br/>
 Add pausing by rendering current frames rendered in optimized preset into a video, and then concating all videos together, and removing all of input_frames / self.times frames. Then re-start rife in the same folder to continue<br/>
 add checks periodically in the render to check amount of frames remaining, and if ffmpeg is playing catchup, kill render and render everything out.<br/>
 add ifrnet-ncnn-vulkan(seems promising)<br/>
-use iteration to iterate through every image and render them individually, may help with pausing(might use rife ncnn vulkan python package to achieve this cleanly?)
+use iteration to iterate through every image and render them individually, may help with pausing(might use rife ncnn vulkan python package to achieve this cleanly?)<br/>
+list amount of transitions detected in logs<br/>

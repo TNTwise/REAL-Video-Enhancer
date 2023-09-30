@@ -87,11 +87,11 @@ class pb2X(QObject):
                                     width = self.main.width()
                                     height = self.main.height()
                                     
-                                    self.main.width1=int(width/1.4)
+                                    self.main.width1=int(width/1.6)
                                     self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                    if self.main.height1 >= height/1.4:
+                                    if self.main.height1 >= height/1.6:
                                         
-                                        self.main.height1=int(height/1.4)
+                                        self.main.height1=int(height/1.6)
                                         self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
                                     try:
                                         if os.path.exists(self.main.imageDisplay):
