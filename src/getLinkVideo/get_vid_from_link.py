@@ -86,7 +86,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Rife - ESRGAN - App"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "REAL Video Enhancer"))
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:22pt; font-weight:700;\">Enter video URL:</span></p></body></html>"))
         self.qualityLabel.setText(_translate("MainWindow", "Quality"))
         self.next.setText(_translate("MainWindow", "Next"))
