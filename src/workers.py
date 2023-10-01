@@ -245,15 +245,18 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
-                '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
+                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
 
-                print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
+                #print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
                 os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{thisdir}')'''
-                for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/')
+                #print(f'{str((int((iteration*frame_increments_of_interpolation/self.main.times)-frame_increments_of_interpolation))).zfill(8)}{self.main.settings.Image_Type}..{str((int(iteration*frame_increments_of_interpolation/self.main.times))).zfill(8)}{self.main.settings.Image_Type}')
+                os.system(f'rm -rf {{{str(int((iteration*frame_increments_of_interpolation)/self.main.times)).zfill(8)}..{str(int((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)/self.main.times)).zfill(8)}}}{self.main.settings.Image_Type}')
+                os.chdir(f'{thisdir}')
+                '''for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                        '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
-                            os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/{str((int(i+(iteration*frame_increments_of_interpolation/self.main.times)))).zfill(8)}{self.main.settings.Image_Type}"')'''
+                        
+                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/{str((int(i+(iteration*frame_increments_of_interpolation/self.main.times)))).zfill(8)}{self.main.settings.Image_Type}"')'''
                 iteration+=1
                 # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
                 '''if self.main.settings.FixFFMpegCatchup != 'Disabled':

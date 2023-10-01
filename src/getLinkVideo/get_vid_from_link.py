@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'SelectModels.ui'
+# Form implementation generated from reading ui file 'src/getLinkVideo/get_vid_from_link.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.9
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(973, 654)
+        MainWindow.resize(1061, 643)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.centralwidget)
@@ -35,8 +35,7 @@ class Ui_MainWindow(object):
         spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem3)
         self.verticalLayout_4.addLayout(self.horizontalLayout_3)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.centralwidget)
-        self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 30))
+        self.plainTextEdit = QtWidgets.QLineEdit(self.centralwidget)
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.verticalLayout_4.addWidget(self.plainTextEdit)
         self.qualityLabel = QtWidgets.QLabel(self.centralwidget)

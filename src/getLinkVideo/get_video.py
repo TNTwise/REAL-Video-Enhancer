@@ -36,7 +36,7 @@ class GetLinkedWindow(QMainWindow):
     def next(self):
         self.ui.error_label.clear()
         self.ui.next.hide()
-        if 'youtu.be'  in self.ui.plainTextEdit.toPlainText() or 'youtube.com' in self.ui.plainTextEdit.toPlainText():
+        if 'youtu.be'  in self.ui.plainTextEdit.text() or 'youtube.com' in self.ui.plainTextEdit.text():
             #gets data from youtube using youtubedlp
             self.run_ytdl_thread()
             self.main.youtubeFile = True
@@ -44,7 +44,7 @@ class GetLinkedWindow(QMainWindow):
             #get data from link here
             
             self.main.youtubeFile = False
-            self.input_file = self.ui.plainTextEdit.toPlainText()
+            self.input_file = self.ui.plainTextEdit.text()
             self.input_file = self.input_file.replace('"',"")
             
             self.main.videoName = self.input_file.split('/')[-1]
@@ -80,7 +80,7 @@ class GetLinkedWindow(QMainWindow):
         
     def run_ytdl_thread(self):
         self.thread = QThread()
-        self.worker = downloadVideo(self,self.ui.plainTextEdit.toPlainText())
+        self.worker = downloadVideo(self,self.ui.plainTextEdit.text())
         self.ui.plainTextEdit.setDisabled(True)
         self.ui.next.hide()
         self.ui.qualityCombo.clear()
@@ -108,7 +108,7 @@ class GetLinkedWindow(QMainWindow):
     def addRes(self,res):
         self.ui.qualityCombo.addItem(res)
     def report_progress(self,result):
-        if result == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.toPlainText()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.toPlainText()}" ) to search YouTube\n""": 
+        if result == f"""ERROR: [generic] None: '{self.ui.plainTextEdit.text()}' is not a valid URL. Set --default-search "ytsearch" (or run  yt-dlp "ytsearch:{self.ui.plainTextEdit.text()}" ) to search YouTube\n""": 
             self.ui.error_label.setText("Invalid URL")
         else:
             self.ui.error_label.setText(result)
@@ -116,7 +116,7 @@ class GetLinkedWindow(QMainWindow):
         self.ui.qualityLabel.hide()
     def get_youtube_video_duration(self,url):
         try:
-            result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', self.ui.plainTextEdit.toPlainText(), '--get-duration'], capture_output=True, text=True)
+            result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', self.ui.plainTextEdit.text(), '--get-duration'], capture_output=True, text=True)
             if result.returncode == 0:
                 duration_str = result.stdout.strip()
                 duration_parts = duration_str.split(':')
@@ -156,7 +156,7 @@ class GetLinkedWindow(QMainWindow):
         self.dict_res_id_fps = dict_res_id_fps
     def gen_youtubedlp_command(self):
         
-        self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.toPlainText()}" -o "{self.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.toPlainText()}"  -o {thisdir}/audio.m4a')
+        self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.text()}" -o "{self.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.text()}"  -o {thisdir}/audio.m4a')
         self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
         self.main.showChangeInFPS(False)

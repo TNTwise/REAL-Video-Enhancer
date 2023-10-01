@@ -47,6 +47,29 @@ def read_vram(card):
                         line = line.replace('\n','')
                         line = int(int(line)/1000000000)
                         return line
+
+
+def get_vram_amount():
+    try:
+        # Run the nvidia-smi command and capture the output
+        output = subprocess.check_output(["nvidia-smi", "--query-gpu=memory.total", "--format=csv,noheader,nounits"])
+
+        # Convert the output to a string and strip any leading/trailing whitespace
+        vram_str = output.decode("utf-8").strip()
+
+        # Convert the VRAM amount to an integer
+        vram_amount = int(vram_str)
+
+        return int(vram_amount // 1000)
+    except Exception as e:
+        # Handle any exceptions that may occur (e.g., nvidia-smi not found, error running the command)
+        print(f"Error: {e}")
+        return get_integrated_vram()
+
+# Get the VRAM amount and store it in a variable
+
+
+
 def get_dedicated_vram():
     try:
         command = f"./{thisdir}/bin/glxinfo | grep 'Dedicated video memory'"
@@ -54,7 +77,9 @@ def get_dedicated_vram():
         vram = vram_available.stdout.split(":")[1].replace('MB', '').strip()
         return int(vram) // 1000
     except subprocess.CalledProcessError:
-        return get_integrated_vram()
+        return get_vram_amount()
+        
+        
 
 def get_integrated_vram():
 
@@ -74,6 +99,7 @@ class HardwareInfo:
                 continue
         
         vram = get_dedicated_vram()
+        
         return vram
 
 

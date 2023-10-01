@@ -147,8 +147,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def restore_default_settings(self):
-        settings.write_defaults()
-        
+        with open(f'{thisdir}/files/settings.txt','w') as  f:
+            pass  
         src.onProgramStart.onApplicationStart(self)
         self.ui.verticalTabWidget.setCurrentIndex(1)
         self.ui.SettingsMenus.setCurrentRow(0)

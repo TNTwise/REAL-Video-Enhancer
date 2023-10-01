@@ -41,6 +41,7 @@ def print_output(thread,self,extracting,pipe):
         progressbar += '>'
     except:
            pass
+    
     while True:
         line = pipe.readline()
         if not line:
@@ -61,8 +62,8 @@ def print_output(thread,self,extracting,pipe):
                        percent=percent[:2]
                        try:
                         percent=int(percent[1])
+
                         pb_value=(int(pb_length*percent/100))
-                        print(pb_value)
                         try:
                                         thread.removelog.emit(last_line)
                         except:
@@ -117,7 +118,6 @@ def get_video_from_link(self,thread):
                 for i in range(pb_length):
                                progressbar+='='
                 progressbar += '>'
-                print(progressbar)
                 with open(f'{thisdir}/{self.videoName}', 'wb') as file:
                         progress=0
                         for chunk in response.iter_content(chunk_size=8192):
