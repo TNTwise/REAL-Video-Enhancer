@@ -402,10 +402,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Input_video_rife_url.setDisabled(mode) 
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
-        if self.ui.Rife_Model.currentText().lower() == 'rife-v4' or self.ui.Rife_Model.currentText().lower() == 'rife-v4.6':
+        self.ui.Rife_Times.setDisabled(True)
+        if 'v4' in self.ui.Rife_Model.currentText().lower():
             self.ui.Rife_Times.setDisabled(mode)
-        else:
-            self.ui.Rife_Times.setDisabled(True)
+        
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         self.ui.denoiseLevelSpinBox.setDisabled(mode)
         self.ui.InstallModelsFrame.setDisabled(mode)
@@ -428,7 +428,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imagePreview.clear()
             self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
-            if self.ui.Rife_Model.currentText() != 'Default':
+            if self.ui.Rife_Model.currentText() != 'Default' and self.ui.AICombo.currentText() == 'RealESRGAN':
                 self.ui.Rife_Times.setEnabled(True)
         if len(self.QueueList) > 0:
             self.input_file = self.QueueList[0]
