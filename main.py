@@ -495,12 +495,14 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.input_file != '':
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-                    
+                    os.system(f'rm -rf "{thisdir}/{self.videoName}"')
                     for i in os.listdir(f'{thisdir}'):
                         mime = magic.Magic(mime=True)
                         filename = mime.from_file(f'{thisdir}/{i}')
                         if filename.find('video') != -1:
                         
+                            os.system(f'rm -rf "{thisdir}/{i}"')
+                        if '.mp4' in i:
                             os.system(f'rm -rf "{thisdir}/{i}"')
                 except Exception as e:
                     log(str(e))

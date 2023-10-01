@@ -234,9 +234,9 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             j+=1
                         else:
                             sleep(.1)
-                if self.main.settings.FixFFMpegCatchup != 'Disabled':
+                '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
                     self.main.renderAI.terminate()
-                    os.system('pkill rife-ncnn-vulkan')
+                    os.system('pkill rife-ncnn-vulkan')'''
                 transitionDetectionClass.merge_frames()
                 
                 
@@ -252,16 +252,17 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 os.chdir(f'{thisdir}')'''
                 for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                        if self.main.settings.FixFFMpegCatchup != 'Disabled':
-                            os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/{str((int(i+(iteration*frame_increments_of_interpolation/self.main.times)))).zfill(8)}{self.main.settings.Image_Type}"')
+                        '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
+                            os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/{str((int(i+(iteration*frame_increments_of_interpolation/self.main.times)))).zfill(8)}{self.main.settings.Image_Type}"')'''
                 iteration+=1
                 # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
-                if self.main.settings.FixFFMpegCatchup != 'Disabled':
-                    self.main.renderAI = subprocess.Popen(self.renderCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
+                    self.main.renderAI = subprocess.Popen(self.renderCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)'''
     
-                
-                if iteration == interpolation_sessions:
+                if os.path.exists(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/1.mp4') == True:
                     break
+                '''if iteration == interpolation_sessions:
+                    break'''
             else:
                 sleep(0.1)
         except Exception as e:
