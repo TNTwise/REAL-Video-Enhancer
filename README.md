@@ -19,7 +19,7 @@
 </ul>
 
 ## Download the Latest Beta release here:
-<strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer-Nightly/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-Nightly/releases/latest</a>
+<strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-Nightly/releases/latest</a>
 
 # Not possible without the amazing developers behind:
 
