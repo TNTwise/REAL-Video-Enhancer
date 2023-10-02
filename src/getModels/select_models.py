@@ -168,11 +168,14 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 install_modules_dict={}
                 global rife_install_list
                 rife_install_list=[]
-                with open(f'{thisdir}/models.txt', 'r') as f:
-                         for i in f.readlines():
-                               print(i)
-                               i=i.replace('\n','')
-                               rife_install_list.append(i)
+                try:
+                    with open(f'{thisdir}/models.txt', 'r') as f:
+                            for i in f.readlines():
+                                print(i)
+                                i=i.replace('\n','')
+                                rife_install_list.append(i)
+                except:
+                     rife_install_list.append('rife-v4.6')
                 '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
                 'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
                 '''
@@ -283,10 +286,12 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 for checkbox, option_name in checkboxes:
                     if checkbox.isChecked():
                         rife_install_list.append(option_name)
-
+                
                 with open(f'{thisdir}/models.txt', 'w') as f:
+                    
                     for option in rife_install_list:
                         f.write(option + '\n')
+                
 
 
 
@@ -345,57 +350,56 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
                     self.ui.gbLabel.setText(f'{downloaded_data_gb}/{total_data_gb}GB')
                 def start_main(self):
-                    if len(os.listdir(f'{thisdir}/files/')) > 1:
+                    
                          
-                        for i in os.listdir(f'{thisdir}/files/'):
-                            if os.path.exists(f'{thisdir}/bin/') == False:
-                                os.mkdir(f'{thisdir}/bin/')
-                            if i == 'ffmpeg':
-                                os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
-                                os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
-                            if i == 'yt-dlp_linux':
-                                os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
-                                os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
-                            if i == 'glxinfo':
-                                os.system(f'chmod +x "{thisdir}/files/glxinfo"')
-                                os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                                
-                            print(i)
-                            if '.zip' in i:
-
-                                with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
-                                    name=i.replace('.zip','')
-                                    original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                    original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                    print(original_ai_name)
-
-
-                                    zip_ref.extractall(f'{thisdir}/files/')
-
-                                os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
-                                os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-
-                            if '.tar.gz' in i:
-                                with tarfile.open(f'{thisdir}/files/{i}','r') as f:
-                                    f.extractall(f'{settings.ModelDir}/rife/')
-
-
-                        os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
-                        os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
-                        clear_files()
-                        if check_for_individual_models != None:
-                            if check_if_online():
-                                QApplication.closeAllWindows()
-
-                                return 0
-                            else:
-                                exit()
-                        else:
-                            failed_download(self)
+                    for i in os.listdir(f'{thisdir}/files/'):
+                        if os.path.exists(f'{thisdir}/bin/') == False:
+                            os.mkdir(f'{thisdir}/bin/')
+                        if i == 'ffmpeg':
+                            os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                            os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                        if i == 'yt-dlp_linux':
+                            os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                            os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                        if i == 'glxinfo':
+                            os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                            os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
                             
+                        print(i)
+                        if '.zip' in i:
+
+                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                name=i.replace('.zip','')
+                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                print(original_ai_name)
+
+
+                                zip_ref.extractall(f'{thisdir}/files/')
+
+                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
+
+                        if '.tar.gz' in i:
+                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
+                                f.extractall(f'{settings.ModelDir}/rife/')
+
+
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    clear_files()
+                    if check_for_individual_models != None:
+                        if check_if_online():
+                            QApplication.closeAllWindows()
+
+                            return 0
+                        else:
                             exit()
                     else:
-                         self.showDialogBox('Not enough space to install models!')
+                        failed_download(self)
+                        
+                        exit()
+                    
     import src.theme as theme
 
     
