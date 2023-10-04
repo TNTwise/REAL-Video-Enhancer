@@ -178,9 +178,7 @@ def list_model_downloaded(self):
         for model in models:
 
             
-            model = model.replace('r',"R")
-            model = model.replace('v','V')
-            model = model.replace('a','A')
+            
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-            if model == 'Rife-V4.6':
+            if model == 'rife-v4.6':
                 self.ui.Rife_Model.setCurrentText(f'{model}')

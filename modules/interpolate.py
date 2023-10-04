@@ -37,7 +37,7 @@ def run_start(self,AI):
     self.rifeThread = QThread()
         # Step 3: Create a worker object
        
-    self.rifeWorker = workers.interpolation(self,self.ui.Rife_Model.currentText().lower())        
+    self.rifeWorker = workers.interpolation(self,self.ui.Rife_Model.currentText())        
     
     self.ui.logsPreview.clear()
     
