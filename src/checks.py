@@ -8,6 +8,7 @@ from src.settings import *
 from src.return_data import *
 import math
 import shutil
+
 def check_if_models_exist(thisdir):
     if os.path.exists(f'{thisdir}/models/') and os.path.exists(f'{thisdir}/models/rife/') and os.path.exists(f'{thisdir}/models/realesrgan/') and os.path.exists(f'{thisdir}/models/waifu2x/') :
         return True
@@ -105,3 +106,19 @@ def check_for_each_binary():
     if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo'):
         return True
     return False
+
+def check_for_updates():
+    if check_if_online() == True:
+        settings = Settings()
+        if settings.UpdateChannel == 'Beta':
+            latest='https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest'
+        if settings.UpdateChannel == 'Stable':
+            latest='https://github.com/TNTwise/REAL-Video-Enhancer/releases/latest'
+        latest = requests.get(latest) 
+        latest = latest.url
+        latest = re.findall(r'[\d]*$', latest)
+        latest = latest[0]
+        if int(latest) >= int(settings.Version):
+            return
+        else:
+            new_ver = requests.get(f'https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/download/{latest}/REAL-Video-Enhancer-x86_64.AppImage')

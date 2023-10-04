@@ -54,6 +54,8 @@ class Settings:
     "DiscordRPC": 'Enabled',
     "ModelDir": f'{thisdir}/models/',
     'FrameIncrementsMode': 'Automatic',
+    'UpdateChannel': 'Stable',
+    'Version': '20231004',
 }
 
         for setting, default_value in default_settings.items():
