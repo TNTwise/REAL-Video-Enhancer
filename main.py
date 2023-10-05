@@ -297,6 +297,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if step == '1':
             self.ui.centerLabel.hide()
             self.ui.imageSpacerFrame.hide()
+            img = Image.open(self.imageDisplay)
+            try:
+                img.verify()
+            except:
+                return
             self.pixMap = QPixmap(self.imageDisplay)
         if step == '2':
             self.pixMap = self.pixMap.scaled(self.width1,self.height1)

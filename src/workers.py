@@ -195,13 +195,13 @@ import os
 from modules.commands import *
 import src.thisdir
 import math
+from PIL import Image
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
-
     
 
-    
+
     
 def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
     global iteration
@@ -219,9 +219,16 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                     
                     while j <= total_frames_rendered:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                            img = Image.open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}')
+                            try:
+                                img.verify()
+                                print('Valid image')
+                                increment+=1
+                                j+=1
+                            except Exception:
+                                print('Invalid image')
+
                             
-                            increment+=1
-                            j+=1
                         else:
                             print(total_frames_rendered,j)
                             sleep(.1)
@@ -230,8 +237,10 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                     while j <= frame_increments_of_interpolation:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                             
-                            increment+=1
-                            j+=1
+                            
+                                increment+=1
+                                j+=1
+                            
                         else:
                             sleep(.1)
                 '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
