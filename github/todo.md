@@ -30,3 +30,4 @@ use iteration to iterate through every image and render them individually, may h
 list amount of transitions detected in logs<br/>
 make update system to replace appimage, have beta/stable toggle.<br/>
 add in the other waifu2x models<br/>
+fix randomly graying out rife times?<br/>
