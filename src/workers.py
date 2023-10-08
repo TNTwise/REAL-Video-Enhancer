@@ -416,6 +416,9 @@ class interpolation(QObject):
                 if self.main.AI == 'rife-ncnn-vulkan':
                     if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
                     else:vram=1
+                    width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
+                    if int(width) > 3840 or int(height) > 2160:
+                            vram=1
                     if 'v4' in model:
                         command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
@@ -449,6 +452,9 @@ class interpolation(QObject):
                     else:
                         if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
                         else:vram=1
+                        width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
+                        if int(width) > 3840 or int(height) > 2160:
+                            vram=1
                         command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
     '-m', self.model,

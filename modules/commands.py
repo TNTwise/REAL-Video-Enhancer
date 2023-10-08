@@ -164,6 +164,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 fps = return_data.Fps.return_video_fps(fr'{videopath}')
                 self.fps = fps
                 width,height = return_data.VideoName.return_video_resolution(videopath)
+                
                 #Create files
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')

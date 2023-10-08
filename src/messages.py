@@ -41,8 +41,13 @@ def frame_increments_help(self):
 
 def not_a_video(self):
     self.showDialogBox("This file is not a valid video.")
+
 def not_valid_link(self):
     self.showDialogBox("This link is invalid.")
 
+def not_enough_vram(self):
+    self.showDialogBox("Your GPU does not meet the minimum required VRAM amount.\nMinimum: 4GB\nRecommended: 8GB\n It is highly advised to use Rife-V4 models.")
+def too_large_video(self):
+    self.showDialogBox('WARNING: The video you have chosen exceeds the maximum resolution (3840x2160).\nThis could cause issues in the render!')
 def restart_app(self):
     self.showDialogBox("Please restart app for changes to take effect.")

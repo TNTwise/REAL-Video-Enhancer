@@ -189,7 +189,9 @@ class MainWindow(QtWidgets.QMainWindow):
     def showChangeInFPS(self,localFile=True):
         
         try:
-            
+            width,height = return_data.VideoName.return_video_resolution(self.input_file)
+            if int(width) > 3840 or int(height) > 2160:
+                    too_large_video(self)
             if self.render == 'rife':
                 
                 if self.input_file != '':
