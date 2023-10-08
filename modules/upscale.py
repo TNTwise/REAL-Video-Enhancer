@@ -30,7 +30,10 @@ def start_upscale(self,AI):
             self.setDisableEnable(True)
             
             if settings.DiscordRPC == 'Enabled':
-                start_discordRPC(self,'Upscaling')
+                try:
+                    start_discordRPC(self,'Upscaling')
+                except:
+                    print('No discord on this machine')
                 
             realESRGAN_Model = self.ui.Rife_Model.currentText()
             realESRGAN_Times = self.ui.Rife_Times.currentText()[0]

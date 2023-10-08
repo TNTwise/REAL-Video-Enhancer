@@ -28,7 +28,10 @@ def run_start(self,AI):
     self.setDisableEnable(True)
     
     if settings.DiscordRPC == 'Enabled':
-        start_discordRPC(self,'Interpolating')
+        try:
+            start_discordRPC(self,'Interpolating')
+        except:
+            print('No Discord Installation')
     #set UI
     
     self.ui.ETAPreview.setText('ETA:')
