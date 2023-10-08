@@ -31,3 +31,5 @@ list amount of transitions detected in logs<br/>
 make update system to replace appimage, have beta/stable toggle.<br/>
 add in the other waifu2x models<br/>
 fix randomly graying out rife times?<br/>
+make it more clear about what the AI being used does<br/>
+fix resizing on gnome causing crash?<br/>

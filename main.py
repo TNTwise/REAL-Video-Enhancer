@@ -61,7 +61,7 @@ def setPixMap(self):
             
                 
         self.setPixmap(pixmap)
-        sleep(1)
+        sleep(.1)
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
@@ -341,7 +341,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     
     def greyOutRifeTimes(self):
-        if self.ui.Rife_Model.currentText() == 'Rife-V4' or self.ui.Rife_Model.currentText() == 'Rife-V4.6':
+        if 'v4' in self.ui.Rife_Model.currentText():
             self.ui.Rife_Times.setEnabled(True)
         else:
             self.ui.Rife_Times.setCurrentText('2X')
