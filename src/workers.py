@@ -414,7 +414,8 @@ class interpolation(QObject):
                     print(frame_increments_of_interpolation)
                 self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
                 if self.main.AI == 'rife-ncnn-vulkan':
-                    
+                    if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
+                    else:vram=1
                     if 'v4' in model:
                         command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
@@ -422,7 +423,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'{vram}:{vram}:{vram}',
     '-f', f'%08d{self.main.settings.Image_Type}']
                         if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                             AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -446,12 +447,14 @@ class interpolation(QObject):
                             print("\nStandard Error:")
                             print(stderr_str)
                     else:
+                        if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
+                        else:vram=1
                         command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'{vram}:{vram}:{vram}',
     '-f', f'%08d{self.main.settings.Image_Type}'
 ]
                         if settings.RenderType == 'Optimized (Incremental)':
