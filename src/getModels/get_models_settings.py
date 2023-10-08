@@ -64,7 +64,7 @@ class Worker(QObject):
                                  install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                             if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
                                     install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
-                    if rife_install_list == [] and self.main.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
+                    if rife_install_list == [] and self.main.ui.RifeCheckBox.isChecked():
                          install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                          rife_install_list.append('rife-v4.6')
                     total_size_in_bytes=0
@@ -81,9 +81,8 @@ class Worker(QObject):
                                     f.write(data)
                                     data_downloaded+=1024
                                     self.intReady.emit(data_downloaded/total_size_in_bytes)# sends back data to main thread
-                    if os.path.exists(f"{settings.ModelDir}") == False:
-                        os.mkdir(f"{settings.ModelDir}")
-                        os.mkdir(f"{settings.ModelDir}/rife")
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"')
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"')
                     for i in os.listdir(f'{thisdir}/files/'):
                         
                              
@@ -105,11 +104,14 @@ class Worker(QObject):
                                 f.extractall(f'{settings.ModelDir}/rife/')
 
 
-                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
+                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"')
                     os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
                     for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
+                    for i in os.listdir(f'{settings.ModelDir}/rife/'):
+                        if i not in rife_install_list and i != 'rife-ncnn-vulkan':
+                             os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
                     self.finished.emit()
             except Exception as e:
                 self.main.showDialogBox(e)
@@ -219,7 +221,7 @@ def run_install_models_from_settings(self):
         
         return 0
 def endDownload(self):
-    
+     
      self.setDisableEnable(False)
      #restart_app(self)
      programstart.onApplicationStart(self)
