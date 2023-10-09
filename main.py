@@ -107,6 +107,7 @@ class FileDropWidget(QLabel):
                     self.main.input_file = ''
                 else:
                     self.main.showChangeInFPS()
+                    self.main.ui.logsPreview.clear()
                     self.main.addLinetoLogs(f'Input file = {item.text()}')
             else:
                 not_a_video(self.main)
@@ -376,6 +377,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.input_file = ''
                 else:
                     self.showChangeInFPS()
+                    self.ui.logsPreview.clear()
                     self.addLinetoLogs(f'Input file = {self.input_file}')
             else:
                 not_a_video(self)
