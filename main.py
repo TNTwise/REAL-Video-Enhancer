@@ -350,12 +350,20 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
     def greyOutRealSRTimes(self):
-        if self.ui.Rife_Model.currentText() == 'Default':
-            self.ui.Rife_Times.setCurrentText('4X')
-            self.ui.Rife_Times.setEnabled(False)
-        else:
-            
-            self.ui.Rife_Times.setEnabled(True)
+        if self.ui.AICombo.currentText() == 'RealESRGAN':
+            if self.ui.Rife_Model.currentText() == 'Default':
+                self.ui.Rife_Times.setCurrentText('4X')
+                self.ui.Rife_Times.setEnabled(False)
+            else:
+                
+                self.ui.Rife_Times.setEnabled(True)
+        if self.ui.AICombo.currentText() == 'Waifu2X':
+            if self.ui.Rife_Model.currentText() != 'cunet':
+                self.ui.Rife_Times.setCurrentText('2X')
+                self.ui.Rife_Times.setEnabled(False)
+            else:
+                
+                self.ui.Rife_Times.setEnabled(True)
     def openFileNameDialog(self):
 
         self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
@@ -440,8 +448,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imagePreview.clear()
             self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
-            if self.ui.Rife_Model.currentText() != 'Default' and self.ui.AICombo.currentText() == 'RealESRGAN':
-                self.ui.Rife_Times.setEnabled(True)
+            self.greyOutRealSRTimes()
         if len(self.QueueList) > 0:
             self.input_file = self.QueueList[0]
             del self.QueueList[0]

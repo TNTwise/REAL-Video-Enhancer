@@ -21,7 +21,10 @@ def modelOptions(self):
     self.ui.Rife_Model.addItem('Animation')
     self.ui.Rife_Model.addItem('Default')
     self.ui.Rife_Model.setCurrentIndex(0)
-    
+    try:
+        self.ui.Rife_Model.currentIndexChanged.disconnect()
+    except:
+        pass
     self.ui.RifeStart.clicked.disconnect()
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
     self.greyOutRealSRTimes()

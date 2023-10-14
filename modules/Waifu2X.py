@@ -19,11 +19,19 @@ def modelOptions(self):
     self.ui.Rife_Model.clear()
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('cunet')
+    self.ui.Rife_Model.addItem('upconv_7_anime_style_art_rgb')
+    self.ui.Rife_Model.addItem('upconv_7_photo')
     self.ui.Rife_Model.setCurrentIndex(0)
     
     self.ui.RifeStart.clicked.disconnect()
+    try:
+        self.ui.Rife_Model.currentIndexChanged.disconnect()
+    except:
+        pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
+    
     self.greyOutRealSRTimes()
+    
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'waifu2x-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
     

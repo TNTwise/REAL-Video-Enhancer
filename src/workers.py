@@ -575,8 +575,10 @@ class upscale(QObject):
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
     '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
-    '-f', str(img_type)
+    '-f', str(img_type),
+    '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
 ]
+                print(command)
                 if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                     AI_Incremental(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
                 if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
