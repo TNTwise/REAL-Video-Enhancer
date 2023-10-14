@@ -134,6 +134,11 @@
                <layout class="QVBoxLayout" name="verticalLayout_8">
                 <item>
                  <widget class="QTextEdit" name="logsPreview">
+                  <property name="font">
+                   <font>
+                    <pointsize>12</pointsize>
+                   </font>
+                  </property>
                   <property name="readOnly">
                    <bool>true</bool>
                   </property>

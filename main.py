@@ -46,6 +46,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.log import log
 import magic
+from src.return_latest_update import *
 def switch_theme(value):
     
     settings = Settings()
@@ -128,6 +129,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.on = True
         #print(self.ui.denoiseLevelSpinBox.value())
         try:
+            self.thread2 = QThread()
+        # Step 3: Create a worker object
+            worker = return_latest()
+            
+
+            
+
+            # Step 4: Move worker to the thread
+            worker.moveToThread(self.thread2)
+            # Step 5: Connect signals and slots
+            self.thread2.started.connect(worker.run)
+            worker.finished.connect(self.thread2.quit)
+            worker.finished.connect(worker.deleteLater)
+            self.thread2.finished.connect(self.thread2.deleteLater)
+            worker.progress.connect(self.addVersionstoLogs)
+            # Step 6: Start the thread
+            
+            self.thread2.start()
+            
+        except Exception as e:
+            self.showDialogBox(e)
+            traceback_info = traceback.format_exc()
+            log(f'{e} {traceback_info}')
+            print(f'{e} {traceback_info}')
+        try:
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -154,6 +180,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.verticalTabWidget.setCurrentIndex(1)
         self.ui.SettingsMenus.setCurrentRow(0)
         self.ui.GeneralOptionsFrame.show()
+
+    def addVersionstoLogs(self,n):
+        self.addLinetoLogs(f'Latest Stable: {n[1]}       Latest Beta: {n[0]}')
+
     def changeVRAM(self):
         self.settings.change_setting('VRAM', f'{self.ui.vramAmountSpinbox.value()}')
         self.gpuMemory=self.settings.VRAM

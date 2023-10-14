@@ -28,7 +28,5 @@ add checks periodically in the render to check amount of frames remaining, and i
 add ifrnet-ncnn-vulkan(seems promising)<br/>
 use iteration to iterate through every image and render them individually, may help with pausing(might use rife ncnn vulkan python package to achieve this cleanly?)<br/>
 list amount of transitions detected in logs<br/>
-make update system to replace appimage, have beta/stable toggle.<br/>
 fix randomly graying out rife times?<br/>
 make it more clear about what the AI being used does<br/>
-fix resizing on gnome causing crash?<br/>
