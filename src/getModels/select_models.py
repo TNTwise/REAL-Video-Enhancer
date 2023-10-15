@@ -116,24 +116,26 @@ def clear_files():
                                 os.remove(f'{thisdir}/files/{i}')
                               except:
                                 os.system(f'rm -rf "{thisdir}/files/{i}"')
-def install_icons():
+def install_icons(self):
                 if os.path.exists(f'{thisdir}/icons/') == False:
                     if check_if_online():
-                    
-                        print('Downloaded Icons')
-                        url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
-                        local_filename = url.split('/')[-1]
-                        r = requests.get(url)
-                        f = open(f'{thisdir}/{local_filename}', 'wb')
-                        for chunk in r.iter_content(chunk_size=512 * 1024): 
-                            if chunk: # filter out keep-alive new chunks
-                                f.write(chunk)
-                        f.close()
-                        with ZipFile(f'{thisdir}/{local_filename}','r') as f:
-                            f.extractall(path=f'{thisdir}/')
-                        os.remove(f'{thisdir}/{local_filename}')
+                        try:
+                            print('Downloaded Icons')
+                            url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
+                            local_filename = url.split('/')[-1]
+                            r = requests.get(url)
+                            f = open(f'{thisdir}/{local_filename}', 'wb')
+                            for chunk in r.iter_content(chunk_size=512 * 1024): 
+                                if chunk: # filter out keep-alive new chunks
+                                    f.write(chunk)
+                            f.close()
+                            with ZipFile(f'{thisdir}/{local_filename}','r') as f:
+                                f.extractall(path=f'{thisdir}/')
+                            os.remove(f'{thisdir}/{local_filename}')
+                        except:
+                             failed_download(self)
                     else:
-                        failed_download()
+                        failed_download(self)
                 os.chdir(f'{thisdir}')
 def choose_models(self):
     
@@ -146,6 +148,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             def __init__(self):
                 super(ChooseAI, self).__init__()
                 self.ui = SelectAI.Ui_MainWindow()
+                install_icons(self)
                 self.ui.setupUi(self)
                 self.pinFunctions()
             
