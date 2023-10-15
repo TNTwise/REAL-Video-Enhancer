@@ -256,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 total_input_files = fc / self.times
                 total_output_files = fc
                 self.ui.RifePB.setMaximum(total_output_files)
-                self.ui.QueueButton.show()
+                #self.ui.QueueButton.show()
                 
                 Thread(target=lambda: calculateETA(self,fc)).start()
                     

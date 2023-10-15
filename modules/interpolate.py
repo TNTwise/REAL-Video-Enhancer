@@ -19,7 +19,7 @@ homedir = os.path.expanduser(r"~")
 
 def run_start(self,AI):
     os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
-    self.ui.QueueButton.show()
+    #self.ui.QueueButton.show()
     
     
 

@@ -31,3 +31,4 @@ list amount of transitions detected in logs<br/>
 fix randomly graying out rife times?<br/>
 make it more clear about what the AI being used does<br/>
 choose install location<br/>
+make full queueing system<br/>
