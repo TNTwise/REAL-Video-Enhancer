@@ -12,7 +12,6 @@
 <h1>Features: </h1>
 <ul>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
-  <li> Queue up files to render after current render is finished. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
   <li> Preview that shows latest frame that has been rendered. </li>
   <li> Enhancing straight from a YouTube link or a video URL.  </li>
