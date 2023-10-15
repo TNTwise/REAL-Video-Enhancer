@@ -182,7 +182,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.GeneralOptionsFrame.show()
 
     def addVersionstoLogs(self,n):
-        self.addLinetoLogs(f'Latest Stable: {n[1]}       Latest Beta: {n[0]}')
+        self.addLinetoLogs(f'Latest Stable: {n[1]} Latest Beta: {n[0]}')
 
     def changeVRAM(self):
         self.settings.change_setting('VRAM', f'{self.ui.vramAmountSpinbox.value()}')
