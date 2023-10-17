@@ -165,6 +165,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
+            self.ui.Input_Image.clicked.connect(lambda: self.openFileNameDialog('Image',['.png','.jpg','.webp']))
             selFrameIncrementsMode(self)
             
         except Exception as e:
@@ -394,35 +395,39 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 
                 self.ui.Rife_Times.setEnabled(True)
-    def openFileNameDialog(self):
-
-        self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',"Video files (*.mp4);;All files (*.*)")[0]
+    def openFileNameDialog(self,type_of_file,input_file_list):
+        files=''
+        for i in input_file_list:
+            files += f'*{i} '
+        files = files[:-1]
+        self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',f"{type_of_file} files ({files});;All files (*.*)")[0]
         print(self.input_file)
-        try:
-            mime = magic.Magic(mime=True)
-            filename = mime.from_file(self.input_file)
-            if filename.find('video') != -1:
-            
-                # success!
+        if type_of_file == 'Video':
+            try:
+                mime = magic.Magic(mime=True)
+                filename = mime.from_file(self.input_file)
+                if filename.find('video') != -1:
                 
-                
-                
-                self.download_youtube_video_command = ''
-                self.localFile = True
-                self.videoName = VideoName.return_video_name(f'{self.input_file}')
-                if '"' in self.input_file:
-                    quotes(self)
-                    self.input_file = ''
+                    # success!
+                    
+                    
+                    
+                    self.download_youtube_video_command = ''
+                    self.localFile = True
+                    self.videoName = VideoName.return_video_name(f'{self.input_file}')
+                    if '"' in self.input_file:
+                        quotes(self)
+                        self.input_file = ''
+                    else:
+                        self.showChangeInFPS()
+                        self.ui.logsPreview.clear()
+                        self.addLinetoLogs(f'Input file = {self.input_file}')
                 else:
-                    self.showChangeInFPS()
-                    self.ui.logsPreview.clear()
-                    self.addLinetoLogs(f'Input file = {self.input_file}')
-            else:
-                not_a_video(self)
-        except Exception as e:
-            self.showDialogBox(e)
-            traceback_info = traceback.format_exc()
-            log(f'{e} {traceback_info}')
+                    not_a_video(self)
+            except Exception as e:
+                self.showDialogBox(e)
+                traceback_info = traceback.format_exc()
+                log(f'{e} {traceback_info}')
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

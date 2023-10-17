@@ -426,7 +426,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{vram}',
+    '-j', f'{vram}:{vram}:{int(vram)+1}',
     '-f', f'%08d{self.main.settings.Image_Type}']
                         if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                             AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -460,7 +460,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{vram}',
+    '-j', f'{vram}:{vram}:{int(vram)+1}',
     '-f', f'%08d{self.main.settings.Image_Type}'
 ]
                         if settings.RenderType == 'Optimized (Incremental)':
@@ -538,7 +538,7 @@ class upscale(QObject):
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'{settings.VRAM}:{settings.VRAM}:{int(settings.VRAM)+1}',
     '-f', str(img_type)
 ]
                 for i in self.main.realESRGAN_Model.split(' '):
@@ -574,7 +574,7 @@ class upscale(QObject):
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'{settings.VRAM}:{settings.VRAM}:{int(settings.VRAM)+1}',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
 ]
@@ -598,6 +598,8 @@ class upscale(QObject):
 
                     print("\nStandard Error:")
                     print(stderr_str)
+            
+
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
@@ -611,4 +613,4 @@ class upscale(QObject):
             traceback_info = traceback.format_exc()
             log(f'{e} {traceback_info}')
             self.main.showDialogBox(e)   
-        
+

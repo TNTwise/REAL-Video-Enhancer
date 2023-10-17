@@ -142,7 +142,7 @@ def onApplicationStart(self):
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
     
-    self.ui.Input_video_rife.clicked.connect(self.openFileNameDialog)
+    self.ui.Input_video_rife.clicked.connect(lambda: self.openFileNameDialog('Video',['.mp4','.mkv']))
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
