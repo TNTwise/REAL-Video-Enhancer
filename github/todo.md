@@ -34,3 +34,4 @@ choose install location<br/>
 make full queueing system<br/>
 make install/remove models page add custom models, so they wont get deleted on install/remove(iterate through directory and add add checkbox per custom model?)<br/>
 add ensemble=true,fast=false sudo rife-v4(and also fix it on optimized render?)<br/>
+setting of export video to same directory as input video by defualt<br/>

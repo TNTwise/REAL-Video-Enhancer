@@ -214,19 +214,16 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 j=1
                 
                 if iteration == interpolation_sessions-1:
-                    total_frames_rendered =  ((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)*self.main.times
+                    total_frames_rendered =  abs((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)
+                    #total_frames_rendered = frame_count+frame_increments_of_interpolation 
                     print(interpolation_sessions-1,frame_increments_of_interpolation,frame_count,len(os.listdir(f'{self.main.settings.RenderDir}')))
-                    
+                    print(total_frames_rendered)
                     while j <= total_frames_rendered:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
-                            img = Image.open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}')
-                            try:
-                                img.verify()
-                                print('Valid image')
+                                
                                 increment+=1
                                 j+=1
-                            except Exception:
-                                print('Invalid image')
+                            
 
                             
                         else:
@@ -254,14 +251,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
-                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
-
-                #print(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/')
-                #print(f'{str((int((iteration*frame_increments_of_interpolation/self.main.times)-frame_increments_of_interpolation))).zfill(8)}{self.main.settings.Image_Type}..{str((int(iteration*frame_increments_of_interpolation/self.main.times))).zfill(8)}{self.main.settings.Image_Type}')
-                os.system(f'rm -rf {{{str(int((iteration*frame_increments_of_interpolation)/self.main.times)).zfill(8)}..{str(int((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)/self.main.times)).zfill(8)}}}{self.main.settings.Image_Type}')
-                os.chdir(f'{thisdir}')
+                
                 '''for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
                         
@@ -273,7 +263,15 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
     
                 
                 if iteration == interpolation_sessions:
+                    
+                    
+                    #os.system(f'{thisdir}/bin/ffmpeg -start_number {(frame_increments_of_interpolation)*(iteration-1)} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}"  -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4"  -y')#replace png with image type
+                    #os.system(f'ffmpeg -framerate 50 -start_number 2700 -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d.jpg" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4"  -y')#replace png with image type
+                    '''with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
+                        f.write(f'file 0.mp4\n')'''
                     break
+                for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
             else:
                 sleep(0.1)
         except Exception as e:
