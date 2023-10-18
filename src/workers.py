@@ -240,9 +240,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                             
                         else:
                             sleep(.1)
-                '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
-                    self.main.renderAI.terminate()
-                    os.system('pkill rife-ncnn-vulkan')'''
+                
                 transitionDetectionClass.merge_frames()
                 
                 
@@ -252,23 +250,12 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                     f.write(f'file {interpolation_sessions-iteration}.mp4\n')
                 # This method removes files better
                 
-                '''for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
-                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+(iteration*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                        
-                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/input_frames/{str((int(i+(iteration*frame_increments_of_interpolation/self.main.times)))).zfill(8)}{self.main.settings.Image_Type}"')'''
+                
                 iteration+=1
-                # or len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) == 0
-                '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
-                    self.main.renderAI = subprocess.Popen(self.renderCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)'''
-    
+               
                 
                 if iteration == interpolation_sessions:
                     
-                    
-                    #os.system(f'{thisdir}/bin/ffmpeg -start_number {(frame_increments_of_interpolation)*(iteration-1)} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}"  -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4"  -y')#replace png with image type
-                    #os.system(f'ffmpeg -framerate 50 -start_number 2700 -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d.jpg" "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0.mp4"  -y')#replace png with image type
-                    '''with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
-                        f.write(f'file 0.mp4\n')'''
                     break
                 for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
                         os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
@@ -423,7 +410,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{int(vram)+1}',
+    '-j', f'{vram}:{vram}:{vram}',
     '-f', f'%08d{self.main.settings.Image_Type}']
                         if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                             AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -457,7 +444,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{int(vram)+1}',
+    '-j', f'{vram}:{vram}:{vram}',
     '-f', f'%08d{self.main.settings.Image_Type}'
 ]
                         if settings.RenderType == 'Optimized (Incremental)':
@@ -535,7 +522,7 @@ class upscale(QObject):
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{int(settings.VRAM)+1}',
+    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
     '-f', str(img_type)
 ]
                 for i in self.main.realESRGAN_Model.split(' '):
@@ -571,7 +558,7 @@ class upscale(QObject):
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{int(settings.VRAM)+1}',
+    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
 ]
@@ -595,8 +582,6 @@ class upscale(QObject):
 
                     print("\nStandard Error:")
                     print(stderr_str)
-            
-
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
@@ -610,4 +595,4 @@ class upscale(QObject):
             traceback_info = traceback.format_exc()
             log(f'{e} {traceback_info}')
             self.main.showDialogBox(e)   
-
+        
