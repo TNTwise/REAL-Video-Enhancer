@@ -178,7 +178,7 @@ class MainWindow(QtWidgets.QMainWindow):
         with open(f'{thisdir}/files/settings.txt','w') as  f:
             pass  
         src.onProgramStart.onApplicationStart(self)
-        self.ui.verticalTabWidget.setCurrentIndex(1)
+        self.ui.verticalTabWidget.setCurrentIndex(self.ui.verticalTabWidget.count())
         self.ui.SettingsMenus.setCurrentRow(0)
         self.ui.GeneralOptionsFrame.show()
 

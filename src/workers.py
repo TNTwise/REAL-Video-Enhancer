@@ -271,10 +271,9 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                 '''if self.main.settings.FixFFMpegCatchup != 'Disabled':
                     self.main.renderAI = subprocess.Popen(self.renderCommand, stdout=subprocess.PIPE, stderr=subprocess.PIPE)'''
     
-                if os.path.exists(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/1.mp4') == True:
+                
+                if iteration == interpolation_sessions:
                     break
-                '''if iteration == interpolation_sessions:
-                    break'''
             else:
                 sleep(0.1)
         except Exception as e:

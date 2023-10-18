@@ -32,3 +32,5 @@ fix randomly graying out rife times?<br/>
 make it more clear about what the AI being used does<br/>
 choose install location<br/>
 make full queueing system<br/>
+make install/remove models page add custom models, so they wont get deleted on install/remove(iterate through directory and add add checkbox per custom model?)<br/>
+add ensemble=true,fast=false sudo rife-v4<br/>
