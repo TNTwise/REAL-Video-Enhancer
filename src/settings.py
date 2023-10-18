@@ -45,7 +45,7 @@ class Settings:
     "OutputDir": f"{homedir}",
     "GPUUsage": 'Default',
     "ModelDir": f'{thisdir}/models/',
-    "RenderType": 'Optimized',
+    "RenderType": 'Classic',
     "SceneChangeDetectionMode": 'Enabled',
     "RenderDir": f"{thisdir}",
     "ExtractionImageType": "jpg",
