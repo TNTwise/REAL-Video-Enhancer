@@ -171,6 +171,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
+            print(traceback_info)
             log(f'{e} {traceback_info}')
         self.show()
 
@@ -638,5 +639,6 @@ try:
     sys.exit(app.exec_())
 except Exception as e:
     traceback_info = traceback.format_exc()
+    print(traceback_info)
     log(f'{e} {traceback_info}')
 

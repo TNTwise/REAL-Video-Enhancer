@@ -15,7 +15,7 @@ class return_latest(QObject):
         
     def run(self):
         print('h')
-        if check_if_online():
+        if check_if_online(True):
             try:
                 latest_beta = return_latest_git_ver('https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest') 
                 latest_stable = return_latest_git_ver('https://github.com/TNTwise/REAL-Video-Enhancer/releases/latest') 

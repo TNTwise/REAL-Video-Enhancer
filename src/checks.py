@@ -15,16 +15,18 @@ def check_if_models_exist(thisdir):
     else:
         return False
     
-def check_if_online():
+def check_if_online(dont_check=False):
     online=False
     try:
         requests.get('https://raw.githubusercontent.com/')
         online=True
     except:
-        msg = QMessageBox()
-        msg.setWindowTitle(" ")
-        msg.setText(f"You are offline, please connect to the internet to download the models.")
-        sys.exit(msg.exec_())
+        if dont_check ==False:
+            msg = QMessageBox()
+            msg.setWindowTitle(" ")
+            msg.setText(f"You are offline, please connect to the internet to download the models.")
+            sys.exit(msg.exec_())
+        pass
     return online
 
 def check_if_free_space(RenderDir):
