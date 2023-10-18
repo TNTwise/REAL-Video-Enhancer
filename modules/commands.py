@@ -85,7 +85,7 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
 
     stdout_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stdout,))
     stderr_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stderr,))
-
+    
     stdout_thread.start()
     stderr_thread.start()
 
@@ -95,7 +95,7 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
-
+    print(self.ffmpeg.stderr)
     return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
@@ -175,7 +175,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 else:
                         ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
                 global output 
-                run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True)
+                print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
                 if self.localFile == True or self.youtubeFile == False:
                         os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
@@ -249,37 +249,42 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                                os.system(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}"')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}" -y')
                         else:
                         
-                                os.system(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}"') 
+                                ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}" -y') 
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
-                        run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd)
-                os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
-                try:
-                        os.remove(f'{thisdir}/{videoName}')
-                except:
-                        pass
-                os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
-                os.system(f'rm -rf "{thisdir}/{self.input_file}"')
-                try:
-                       for i in os.listdir(f'{thisdir}'):
-                        if os.path.isfile(os.path.join(thisdir, i)):
-                                if '.mp4' in i:
-                                        os.system(f'rm -rf "{thisdir}/{i}"')
-                            
-                except Exception as e:
-                       log(str(e))
-                os.chdir(thisdir)
-                self.input_file = ''
-                self.file_drop_widget.show()
-                return output_video_file
-                
+                if run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd) !=0:
+                        thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory!')
+                        os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
+                        os.system(f'rm -rf "{thisdir}/{self.input_file}"')
+                else:
+                        os.system(f'rm -rf "{renderdir}/{videoName}_temp/audio.m4a"')
+                        try:
+                                os.remove(f'{thisdir}/{videoName}')
+                                
+                        except:
+                                pass
+                        os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
+                        os.system(f'rm -rf "{thisdir}/{self.input_file}"')
+                        try:
+                                for i in os.listdir(f'{thisdir}'):
+                                        if os.path.isfile(os.path.join(thisdir, i)):
+                                                if '.mp4' in i:
+                                                        os.system(f'rm -rf "{thisdir}/{i}"')
+                                
+                        except Exception as e:
+                                log(str(e))
+                        os.chdir(thisdir)
+                        self.input_file = ''
+                        self.file_drop_widget.show()
+                        return output_video_file
+                return None
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
