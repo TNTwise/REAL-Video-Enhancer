@@ -1,3 +1,5 @@
+import os
+homedir = os.path.expanduser(r"~")
 
 from PyQt5.QtGui import QIcon
 def show_scene_change_help(self):
@@ -51,3 +53,14 @@ def too_large_video(self):
     self.showDialogBox('WARNING: The video you have chosen exceeds the maximum resolution (3840x2160).\nThis could cause issues in the render!')
 def restart_app(self):
     self.showDialogBox("Please restart app for changes to take effect.")
+def no_perms(self):
+    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Output directory will be {homedir}/REAL-Video-Enhancer")
+
+def no_perms_render(self):
+    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Render directory will be {homedir}/.REAL-Video-Enhancer")
+
+def no_perms_change_setting(self):
+    self.showDialogBox("No permissions to write here, please select a different directory.")
+
+def no_perms_anywhere(self):
+    self.showDialogBox(f"No permissions to write to {homedir}/REAL-Video-Enhancer, please select a directory in settings!!!!!")

@@ -104,6 +104,14 @@ def check_for_individual_models():
             return return_list
         
     return None
+def check_for_write_permissions(dir):
+        try:
+            with open(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer','w')as f:
+                f.write('a')
+            os.remove(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer')
+            return True
+        except:
+            return False
 def check_for_each_binary():
     if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo'):
         return True

@@ -3,6 +3,7 @@ import csv
 import src.thisdir
 thisdir = src.thisdir.thisdir()
 from src.return_data import *
+from src.messages import *
 homedir = os.path.expanduser(r"~")
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 #im going to eventually redo this
@@ -102,7 +103,14 @@ class Settings:
                 if row[0] == setting:
                     return True
             return False
-   
+def check_for_write_permissions(dir):
+        try:
+            with open(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer','w')as f:
+                f.write('a')
+            os.remove(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer')
+            return True
+        except:
+            return False
 
 def changeDiscordRPC(self):
     settings = Settings()
@@ -120,17 +128,23 @@ def selRenderDir(self):
     settings = Settings()
     render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     if render_folder != '':
-        settings.change_setting("RenderDir",f"{self.render_folder}")
+        if check_for_write_permissions(render_folder):
+            settings.change_setting("RenderDir",f"{self.render_folder}")
         
-        self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+            self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+        else:
+            no_perms_change_setting(self)
 def selOutputDir(self):
     settings = Settings()
     output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     if output_folder != '':
-        self.output_folder = output_folder
-        settings.change_setting("OutputDir",f"{self.output_folder}")
-        
-        self.ui.OutputDirectoryLabel.setText(f"{settings.OutputDir}")
+        if check_for_write_permissions(output_folder):
+            self.output_folder = output_folder
+            settings.change_setting("OutputDir",f"{self.output_folder}")
+            
+            self.ui.OutputDirectoryLabel.setText(f"{settings.OutputDir}")
+        else:
+            no_perms_change_setting(self)
     
 def selEncoder(self):
     settings = Settings()

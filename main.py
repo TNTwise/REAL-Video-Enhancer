@@ -167,14 +167,26 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
             self.ui.Input_Image.clicked.connect(lambda: self.openFileNameDialog('Image',['.png','.jpg','.webp']))
             selFrameIncrementsMode(self)
-            
+            if check_for_write_permissions(self.settings.OutputDir)==False:
+                no_perms(self)
+                try:
+                    os.mkdir(f'{homedir}/REAL-Video-Enhancer/')
+                except:
+                    pass
+                if check_for_write_permissions(f'{homedir}/REAL-Video-Enhancer/'):
+                    self.settings.change_setting('OutputDir',f'{homedir}/REAL-Video-Enhancer/')
+                else:
+                    no_perms_anywhere(self)
+            if check_for_write_permissions(self.settings.RenderDir)==False:
+                no_perms_render(self)
+                self.settings.change_setting('RenderDir',f'{homedir}/.REAL-Video-Enhancer/')
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
             print(traceback_info)
             log(f'{e} {traceback_info}')
         self.show()
-
+    
     def restore_default_settings(self):
         with open(f'{thisdir}/files/settings.txt','w') as  f:
             pass  
