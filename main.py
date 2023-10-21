@@ -34,6 +34,7 @@ from src.messages import *
 import modules.Rife as rife
 import modules.ESRGAN as esrgan
 import modules.Waifu2X as Waifu2X
+import modules.IFRNET as ifrnet
 import src.onProgramStart
 from src.ETA import *
 from src.getLinkVideo.get_video import *
@@ -48,6 +49,7 @@ from src.log import log
 import magic
 from src.return_latest_update import *
 import src.image_menu
+
 def switch_theme(value):
     
     settings = Settings()
@@ -219,6 +221,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == 'Waifu2X':
             Waifu2X.modelOptions(self)
 
+        if self.ui.AICombo.currentText() == 'IFRNET':
+            ifrnet.modelOptions(self)
     def switchUI_Image(self):
 
         if self.ui.AICombo_Image.currentText() == 'RealESRGAN':

@@ -14,15 +14,23 @@ def onApplicationStart(self):
     import src.thisdir
     thisdir = src.thisdir.thisdir()
     self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
-    for i in os.listdir(settings.ModelDir):
-                if i == 'rife':
+    models_installed = checks.check_for_individual_models()
+    for i in models_installed:
+                if 'Rife' == i:
+                    self.ui.RifeCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('Rife')
-                
-                if i == 'realesrgan':
+                if 'RealESRGAN' == i:
+                    self.ui.RealESRGANCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('RealESRGAN')
-                if i == 'waifu2x':
+                if 'RealCUGAN' == i:
+                    self.ui.RealCUGANCheckBox.setChecked(True)
+                    self.ui.AICombo.addItem('RealCUGAN')
+                if 'Waifu2X' == i:
+                    self.ui.Waifu2xCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('Waifu2X')
-                
+                if 'IFRNET' == i:
+                    self.ui.CainCheckBox.setChecked(True)
+                    self.ui.AICombo.addItem('IFRNET')
     self.input_file = ''
     
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
@@ -39,18 +47,8 @@ def onApplicationStart(self):
         if self.settings.VRAM == 'None':
             cannot_detect_vram(self)
         self.ui.vramAmountSpinbox.setValue(1)
-    models_installed = checks.check_for_individual_models()
-    for i in models_installed:
-                if 'Rife' == i:
-                    self.ui.RifeCheckBox.setChecked(True)
-                if 'RealESRGAN' == i:
-                    self.ui.RealESRGANCheckBox.setChecked(True)
-                if 'RealCUGAN' == i:
-                    self.ui.RealCUGANCheckBox.setChecked(True)
-                if 'Waifu2X' == i:
-                    self.ui.Waifu2xCheckBox.setChecked(True)
-                if 'Cain' == i:
-                    self.ui.CainCheckBox.setChecked(True)
+    
+    
     
     
     self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))

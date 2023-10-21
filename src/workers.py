@@ -466,6 +466,43 @@ class interpolation(QObject):
 
                             print("\nStandard Error:")
                             print(stderr_str)
+
+                if self.main.AI == 'ifrnet-ncnn-vulkan':               
+                    if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
+                    else:vram=1
+                    width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
+                    if int(width) > 3840 or int(height) > 2160:
+                            vram=1
+                    command = [
+f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
+
+    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
+    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-j', f'{vram}:{vram}:{vram}',
+    '-f', f'%08d{self.main.settings.Image_Type}'
+]
+                    if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                        AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                    if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                        
+
+                        AI(self,command)
+                    
+                    else:
+                        self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                        stdout, stderr = self.main.renderAI.communicate()
+
+                        # Decode the byte strings to get text output
+                        stdout_str = stdout.decode()
+                        stderr_str = stderr.decode()
+
+                        # Print or handle stdout and stderr as needed
+                        print("Standard Output:")
+                        print(stdout_str)
+
+                        print("\nStandard Error:")
+                        print(stderr_str)
+            
                 if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
                 

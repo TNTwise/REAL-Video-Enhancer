@@ -98,8 +98,8 @@ def check_for_individual_models():
             return_list.append('Waifu2X')
         if os.path.exists(f'{thisdir}/models/realcugan/'):
             return_list.append('RealCUGAN')
-        if os.path.exists(f'{thisdir}/models/cain/'):
-            return_list.append('Cain')
+        if os.path.exists(f'{thisdir}/models/ifrnet/'):
+            return_list.append('IFRNET')
         if len(return_list) >0:
             return return_list
         

@@ -1181,7 +1181,7 @@
                  <item row="3" column="0">
                   <widget class="QCheckBox" name="RealCUGANCheckBox">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="text">
                     <string>RealCUGAN</string>
@@ -1198,10 +1198,10 @@
                  <item row="7" column="0">
                   <widget class="QCheckBox" name="CainCheckBox">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="text">
-                    <string>Cain</string>
+                    <string>IFRNET</string>
                    </property>
                   </widget>
                  </item>
