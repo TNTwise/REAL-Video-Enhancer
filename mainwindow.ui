@@ -462,6 +462,13 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QLabel" name="RESPreview">
+                  <property name="text">
+                   <string>RES: </string>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </item>
              </layout>
@@ -522,7 +529,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="AICombo_2"/>
+                   <widget class="QComboBox" name="AICombo_Image"/>
                   </item>
                  </layout>
                 </item>
@@ -536,7 +543,7 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="Rife_Model_2"/>
+                   <widget class="QComboBox" name="ModelCombo_Image"/>
                   </item>
                  </layout>
                 </item>
@@ -550,28 +557,13 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="Rife_Times_2">
+                   <widget class="QComboBox" name="Times_Image">
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
-                    <item>
-                     <property name="text">
-                      <string>2X</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>4X</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>8X</string>
-                     </property>
-                    </item>
                    </widget>
                   </item>
                  </layout>

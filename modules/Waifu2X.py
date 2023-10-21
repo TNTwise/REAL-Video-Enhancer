@@ -40,3 +40,31 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem('1X')
     self.ui.Rife_Times.addItem('2X')
     self.ui.Rife_Times.setCurrentIndex(0)
+
+def image_options(self):
+    self.times=1
+    self.render='esrgan'
+    self.ui.ModelCombo_Image.clear()
+    self.ui.RESPreview.setText('RES:')
+    self.ui.ModelCombo_Image.addItem('cunet')
+    self.ui.ModelCombo_Image.addItem('upconv_7_anime_style_art_rgb')
+    self.ui.ModelCombo_Image.addItem('upconv_7_photo')
+    self.ui.ModelCombo_Image.setCurrentIndex(0)
+    
+    self.ui.RifeStart.clicked.disconnect()
+    try:
+        self.ui.ModelCombo_Image.currentIndexChanged.disconnect()
+    except:
+        pass
+    self.ui.ModelCombo_Image.currentIndexChanged.connect((self.greyOutRealSRTimes))
+    
+    self.greyOutRealSRTimes()
+    
+    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'waifu2x-ncnn-vulkan'))
+    self.ui.Rife_Times.clear()
+    
+    self.ui.denoiseLevelLabel.show()
+    self.ui.denoiseLevelSpinBox.show()
+    self.ui.Rife_Times.addItem('1X')
+    self.ui.Rife_Times.addItem('2X')
+    self.ui.Rife_Times.setCurrentIndex(0)

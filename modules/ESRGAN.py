@@ -37,3 +37,28 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem('3X')
     self.ui.Rife_Times.addItem('4X')
     self.ui.Rife_Times.setCurrentIndex(0)
+
+def image_options(self):
+    self.times=1
+    self.render='esrgan'
+    self.ui.ModelCombo_Image.clear()
+    self.ui.RESPreview.setText('RES:')
+    self.ui.ModelCombo_Image.addItem('Animation')
+    self.ui.ModelCombo_Image.addItem('Default')
+    self.ui.ModelCombo_Image.setCurrentIndex(0)
+    try:
+        self.ui.ModelCombo_Image.currentIndexChanged.disconnect()
+    except:
+        pass
+    
+    self.ui.ModelCombo_Image.currentIndexChanged.connect((self.greyOutRealSRTimes))
+    self.greyOutRealSRTimes()
+    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realesrgan-ncnn-vulkan'))
+    self.ui.Times_Image.clear()
+    self.ui.denoiseLevelLabel.hide()
+    self.ui.denoiseLevelSpinBox.hide()
+    
+    self.ui.Times_Image.addItem('2X')
+    self.ui.Times_Image.addItem('3X')
+    self.ui.Times_Image.addItem('4X')
+    self.ui.Times_Image.setCurrentIndex(0)
