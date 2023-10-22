@@ -198,14 +198,14 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
                 if self.ui.Waifu2xCheckBox.isChecked() == False:
                         os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
-                if self.main.ui.CainCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/ifrnet') == False:
+                if self.ui.CainCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/ifrnet') == False:
                           install_modules_dict['https://github.com/nihui/ifrnet-ncnn-vulkan/releases/download/20220720/ifrnet-ncnn-vulkan-20220720-ubuntu.zip'] = 'ifrnet-ncnn-vulkan-20220720-ubuntu.zip'
-                if self.main.ui.CainCheckBox.isChecked() == False:
+                if self.ui.CainCheckBox.isChecked() == False:
                          os.system(f'rm -rf "{settings.ModelDir}/ifrnet/"')
                 
-                if self.main.ui.RealCUGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realcugan') == False:
+                if self.ui.RealCUGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realcugan') == False:
                         install_modules_dict['https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip'] = 'realcugan-ncnn-vulkan-20220728-ubuntu.zip'
-                if self.main.ui.RealCUGANCheckBox.isChecked() == False:
+                if self.ui.RealCUGANCheckBox.isChecked() == False:
                         os.system(f'rm -rf "{settings.ModelDir}/realcugan/"')
                 for i in rife_install_list:
                         if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
@@ -248,7 +248,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     (self.ui.rife30, 'rife-v3.0'),
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
-                    (self.ui.rife46, 'rife-v4.6')
+                    (self.ui.rife46, 'rife-v4.6'),
+                    (self.ui.rife47, 'rife-v4.7')
                 ]
                 self.ui.next.hide()
                 self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
@@ -262,6 +263,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 self.ui.rife31.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife4.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife47.stateChanged.connect(self.checkbox_state_changed)
                 try:
                     with open(f'{thisdir}/models.txt', 'r') as f:
                         for checkbox,option_name in checkboxes:
@@ -289,7 +291,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     (self.ui.rife30, 'rife-v3.0'),
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
-                    (self.ui.rife46, 'rife-v4.6')
+                    (self.ui.rife46, 'rife-v4.6'),
+                    (self.ui.rife47, 'rife-v4.7')
                 ]
                 rife_install_list = []
 

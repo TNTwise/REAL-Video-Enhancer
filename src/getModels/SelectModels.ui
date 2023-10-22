@@ -176,6 +176,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="rife47">
+              <property name="text">
+               <string>Rife-V4.7 (2X), (4X), (8X) (recommended)</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
