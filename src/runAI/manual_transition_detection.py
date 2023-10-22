@@ -85,4 +85,4 @@ try:
     amount_of_zeros = int(input('\nPlease enter the num you put in for the amount of zeros per frame, default = %08d\nif you changed this value in extraction of frames, please put that value here\nif not, just skip this. '))
 except:
         amount_of_zeros=8
-extract(image,file,f'0.{sensativity}',2.5,amount_of_zeros)
+extract(image,file,f'0.{sensativity}',timestep,amount_of_zeros)
