@@ -36,3 +36,5 @@ make install/remove models page add custom models, so they wont get deleted on i
 add ensemble=true,fast=false sudo rife-v4(and also fix it on optimized render?)<br/>
 setting of export video to same directory as input video by defualt<br/>
 add guide on how to add/convert custom models<br/>
+add default rife model option<br/>
+add uhd/tta options<br/>
