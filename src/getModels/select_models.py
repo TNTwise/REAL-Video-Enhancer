@@ -249,7 +249,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
                     (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7')
+                    (self.ui.rife47, 'rife-v4.7'),
+                    (self.ui.rife48,'rife-v4.8')
                 ]
                 self.ui.next.hide()
                 self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
@@ -264,6 +265,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 self.ui.rife4.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife47.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife48.stateChanged.connect(self.checkbox_state_changed)
                 try:
                     with open(f'{thisdir}/models.txt', 'r') as f:
                         for checkbox,option_name in checkboxes:
@@ -292,7 +294,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
                     (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7')
+                    (self.ui.rife47, 'rife-v4.7'),
+                    (self.ui.rife48, 'rife-v4.8'),
                 ]
                 rife_install_list = []
 

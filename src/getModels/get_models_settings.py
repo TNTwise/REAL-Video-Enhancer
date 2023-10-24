@@ -159,7 +159,8 @@ class ChooseModels(QtWidgets.QMainWindow):
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
                     (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7')
+                    (self.ui.rife47, 'rife-v4.7'),
+                    (self.ui.rife48, 'rife-v4.8')
                 ]
                 self.ui.next.hide()
                 self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
@@ -174,6 +175,7 @@ class ChooseModels(QtWidgets.QMainWindow):
                 self.ui.rife4.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife47.stateChanged.connect(self.checkbox_state_changed)
+                self.ui.rife48.stateChanged.connect(self.checkbox_state_changed)
                 for checkbox,option_name in checkboxes:
                       
                     if option_name in os.listdir(f'{thisdir}/models/rife/'):
@@ -192,7 +194,8 @@ class ChooseModels(QtWidgets.QMainWindow):
                     (self.ui.rife31, 'rife-v3.1'),
                     (self.ui.rife4, 'rife-v4'),
                     (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7')
+                    (self.ui.rife47, 'rife-v4.7'),
+                    (self.ui.rife48, 'rife-v4.8')
                 ]
                 rife_install_list = []
 
