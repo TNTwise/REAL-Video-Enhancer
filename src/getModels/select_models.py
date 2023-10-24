@@ -295,7 +295,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     (self.ui.rife4, 'rife-v4'),
                     (self.ui.rife46, 'rife-v4.6'),
                     (self.ui.rife47, 'rife-v4.7'),
-                    (self.ui.rife48, 'rife-v4.8'),
+                    (self.ui.rife48, 'rife-v4.8')
                 ]
                 rife_install_list = []
 
