@@ -157,6 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
+            self.get_models_from_dir('rife')
             self.switchUI_Image()
             self.ui.AICombo_Image.currentIndexChanged.connect(self.switchUI_Image)
             src.image_menu.image_menu_on_start(self)
@@ -230,6 +231,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo_Image.currentText() == 'Waifu2X':
             Waifu2X.image_options(self)
+    
+    def get_models_from_dir(self,AI):
+        for i in os.listdir(f'{settings.ModelDir}/{AI.lower()}'):
+            if os.path.isfile(f'{settings.ModelDir}/{AI.lower()}/{i}') == False:
+                self.ui.Rife_Model.addItem(f'{i}')#Adds model to GUI.
+
+                if i == 'rife-v4.6':
+                        self.ui.Rife_Model.setCurrentText(f'{i}')
+                
+
     def get_pid(self,name):
         
 
@@ -428,7 +439,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.Times_Image.setEnabled(True)
 
         if self.ui.AICombo.currentText() == 'Waifu2X':
-            if self.ui.Rife_Model.currentText() != 'cunet':
+            if self.ui.Rife_Model.currentText() != 'models-cunet':
                 self.ui.Rife_Times.setCurrentText('2X')
                 self.ui.Rife_Times.setEnabled(False)
             else:
@@ -436,7 +447,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.Rife_Times.setEnabled(True)
                 
         if self.ui.AICombo_Image.currentText() == 'Waifu2X':
-            if self.ui.ModelCombo_Image.currentText() != 'cunet':
+            if self.ui.ModelCombo_Image.currentText() != 'models-cunet':
                 self.ui.Times_Image.setCurrentText('2X')
                 self.ui.Times_Image.setEnabled(False)
             else:

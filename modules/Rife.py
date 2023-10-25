@@ -42,7 +42,7 @@ def modelOptions(self):
         pass
     
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
-    onProgramStart.list_model_downloaded(self)
+    self.get_models_from_dir('rife')
     if 'v4' in self.ui.Rife_Model.currentText():
         self.ui.Rife_Times.setEnabled(True)
     else:

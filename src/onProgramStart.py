@@ -169,7 +169,7 @@ def onApplicationStart(self):
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()
 
-def list_model_downloaded(self):
+'''def list_model_downloaded(self):
         settings = Settings()
         model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])
         models = []
@@ -184,4 +184,4 @@ def list_model_downloaded(self):
             
             self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
             if model == 'rife-v4.6':
-                self.ui.Rife_Model.setCurrentText(f'{model}')
+                self.ui.Rife_Model.setCurrentText(f'{model}')'''
