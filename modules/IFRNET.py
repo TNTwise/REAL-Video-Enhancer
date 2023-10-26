@@ -39,6 +39,5 @@ def modelOptions(self):
         self.ui.RifeStart.clicked.disconnect() 
     except:
         pass
-    self.get_models_from_dir('ifrnet')
+    self.ui.Rife_Model.addItems(self.get_models_from_dir('ifrnet'))
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'ifrnet-ncnn-vulkan'))
-    self.ui.Rife_Model.addItem('ifrnet')

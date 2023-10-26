@@ -18,8 +18,12 @@ def modelOptions(self):
     self.render='esrgan'
     self.ui.Rife_Model.clear()
     self.ui.FPSPreview.setText('RES:')
-    self.get_models_from_dir('waifu2x')
-    self.ui.Rife_Model.setCurrentIndex(0)
+    modified_list = list(map(lambda x: x.replace('models-',''), self.get_models_from_dir('waifu2x')))
+    self.ui.Rife_Model.addItems(modified_list)
+    if  'cunet' in modified_list:self.ui.Rife_Model.setCurrentText(f'cunet')
+            
+
+    
     
     self.ui.RifeStart.clicked.disconnect()
     try:
