@@ -43,11 +43,17 @@ def modelOptions(self):
     
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
     models = self.get_models_from_dir('rife')
+    if len (self.get_models_from_dir("rife")) > 0:
+        print('it is')
+        self.ui.Rife_Model.addItems(models)
+        self.ui.defaultRifeModel.addItems(models)
+        if  f'{self.settings.DefaultRifeModel}' in models:
+                self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
+        else:
+            self.settings.change_setting(f'DefaultRifeModel',f'{self.get_models_from_dir("rife")[0]}')
     
-    self.ui.Rife_Model.addItems(models)
-    if  'rife-v4.6' in models:
-            self.ui.Rife_Model.setCurrentText(f'rife-v4.6')
-
+            self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
+    
     if 'v4' in self.ui.Rife_Model.currentText():
 
         self.ui.Rife_Times.setEnabled(True)

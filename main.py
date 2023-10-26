@@ -157,7 +157,6 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
-            self.get_models_from_dir('rife')
             self.switchUI_Image()
             self.ui.AICombo_Image.currentIndexChanged.connect(self.switchUI_Image)
             src.image_menu.image_menu_on_start(self)
@@ -407,12 +406,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.show()
             self.ui.InstallModelsFrame.hide()
-        if item.text() == "Install Models":
+        if item.text() == "Manage Models":
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.hide()
             self.ui.InstallModelsFrame.show()
-    
+            try:
+                self.get_models_from_dir('rife')
+            except:
+                self.ui.defaultRifeModel.hide()
+                self.ui.label_13.hide()
+                self.ui.label_18.hide()
+                self.ui.label_19.hide()
     
     def greyOutRifeTimes(self):
         if 'v4' in self.ui.Rife_Model.currentText():

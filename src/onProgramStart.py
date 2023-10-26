@@ -169,6 +169,9 @@ def onApplicationStart(self):
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()
 
+    #set default model in settings
+    self.ui.defaultRifeModel.setCurrentText(f'{settings.DefaultRifeModel}')
+    self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
 '''def list_model_downloaded(self):
         settings = Settings()
         model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])

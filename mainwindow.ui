@@ -644,7 +644,7 @@
             </item>
             <item>
              <property name="text">
-              <string>Install Models</string>
+              <string>Manage Models</string>
              </property>
              <property name="font">
               <font>
@@ -1136,13 +1136,6 @@
               </property>
               <layout class="QGridLayout" name="gridLayout">
                <item row="3" column="0">
-                <widget class="QPushButton" name="InstallButton">
-                 <property name="text">
-                  <string>Install/Remove</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
                 <widget class="QLabel" name="label_13">
                  <property name="maximumSize">
                   <size>
@@ -1151,11 +1144,53 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>Models:</string>
+                  <string>Available Models:</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="6" column="0">
+                <widget class="QPushButton" name="InstallButton">
+                 <property name="text">
+                  <string>Install/Remove</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_18">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Model Defaults</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="0">
+                <widget class="QProgressBar" name="installModelsProgressBar">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                 <property name="textVisible">
+                  <bool>false</bool>
+                 </property>
+                 <property name="invertedAppearance">
+                  <bool>false</bool>
+                 </property>
+                 <property name="textDirection">
+                  <enum>QProgressBar::TopToBottom</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
                 <layout class="QGridLayout" name="gridLayout_6">
                  <item row="1" column="0">
                   <widget class="QCheckBox" name="RealESRGANCheckBox">
@@ -1207,27 +1242,19 @@
                  </item>
                 </layout>
                </item>
-               <item row="4" column="0">
-                <widget class="QProgressBar" name="installModelsProgressBar">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>10</height>
-                  </size>
-                 </property>
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                 <property name="textVisible">
-                  <bool>false</bool>
-                 </property>
-                 <property name="invertedAppearance">
-                  <bool>false</bool>
-                 </property>
-                 <property name="textDirection">
-                  <enum>QProgressBar::TopToBottom</enum>
-                 </property>
-                </widget>
+               <item row="1" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_17">
+                 <item>
+                  <widget class="QLabel" name="label_19">
+                   <property name="text">
+                    <string>Default Rife Model:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="defaultRifeModel"/>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>

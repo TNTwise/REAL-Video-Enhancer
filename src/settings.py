@@ -36,7 +36,6 @@ class Settings:
                     settings_dict[row[0]] = row[1]
                 except:
                     pass
-            
         default_settings = {
     "FixFFMpegCatchup": "Disabled",
     "Image_Type": ".jpg",
@@ -57,7 +56,9 @@ class Settings:
     'FrameIncrementsMode': 'Automatic',
     'UpdateChannel': 'Stable',
     'Version': '20231004',
+    'DefaultRifeModel': f'rife-v4.6',
 }
+            
 
         for setting, default_value in default_settings.items():
             try:
