@@ -13,6 +13,7 @@ import src.thisdir
 #this file changes the GUI aspects of the AI
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
+settings = Settings()
 def modelOptions(self):
     self.times=1
     self.render='esrgan'
@@ -20,6 +21,10 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('Animation')
     self.ui.Rife_Model.addItem('Default')
+    for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
+                        if (os.path.splitext(i)[1])[1:] == 'bin':
+                            if i not in default_models():
+                                self.ui.Rife_Model.addItem(i.replace('.bin',''))
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
@@ -45,6 +50,10 @@ def image_options(self):
     self.ui.RESPreview.setText('RES:')
     self.ui.ModelCombo_Image.addItem('Animation')
     self.ui.ModelCombo_Image.addItem('Default')
+    for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
+                        if (os.path.splitext(i)[1])[1:] == 'bin':
+                            if i not in default_models():
+                                self.ui.ModelCombo_Image.addItem(i.replace('.bin',''))
     self.ui.ModelCombo_Image.setCurrentIndex(0)
     try:
         self.ui.ModelCombo_Image.currentIndexChanged.disconnect()
@@ -62,3 +71,6 @@ def image_options(self):
     self.ui.Times_Image.addItem('3X')
     self.ui.Times_Image.addItem('4X')
     self.ui.Times_Image.setCurrentIndex(0)
+
+def default_models():
+    return ['realesr-animevideov3-x2.bin','realesr-animevideov3-x3.bin','realesr-animevideov3-x4.bin','realesrgan-x4plus-anime.bin','realesrgan-x4plus.bin']

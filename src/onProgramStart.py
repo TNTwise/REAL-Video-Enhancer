@@ -22,6 +22,8 @@ def onApplicationStart(self):
                 if 'RealESRGAN' == i:
                     self.ui.RealESRGANCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('RealESRGAN')
+                    
+                    
                 if 'RealCUGAN' == i:
                     self.ui.RealCUGANCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('RealCUGAN')
@@ -31,6 +33,8 @@ def onApplicationStart(self):
                 if 'IFRNET' == i:
                     self.ui.CainCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('IFRNET')
+    #get esrgan models
+    
     self.input_file = ''
     
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
@@ -145,7 +149,7 @@ def onApplicationStart(self):
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()
-   
+    
     
     self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
     #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb

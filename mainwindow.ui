@@ -656,139 +656,6 @@
           </item>
           <item row="1" column="2">
            <layout class="QGridLayout" name="gridLayout_3">
-            <item row="1" column="3">
-             <widget class="QFrame" name="VideoOptionsFrame">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Raised</enum>
-              </property>
-              <property name="midLineWidth">
-               <number>0</number>
-              </property>
-              <property name="visable" stdset="0">
-               <string>false</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_4">
-               <item row="3" column="1">
-                <widget class="QPushButton" name="encoderHelpButton">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Encoder</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QComboBox" name="VidQualityCombo">
-                 <item>
-                  <property name="text">
-                   <string>Low</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Medium</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>High</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Very High</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Lossless</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="2" column="2">
-                <widget class="QLineEdit" name="sceneChangeLineEdit">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="maxLength">
-                  <number>1</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>18</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Scene Change Detection Sensativity</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Video Output Quality</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="2">
-                <widget class="QComboBox" name="EncoderCombo">
-                 <item>
-                  <property name="text">
-                   <string>.264</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>.265</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QPushButton" name="sceneChangeSensativityButton">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset theme="dialog-information">
-                   <normaloff>../.designer/backup</normaloff>../.designer/backup</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_10">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QCheckBox" name="sceneChangeDetectionCheckBox">
-                 <property name="text">
-                  <string>Scene Change Detection</string>
-                 </property>
-                 <property name="tristate">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
             <item row="1" column="4">
              <layout class="QVBoxLayout" name="verticalLayout_5"/>
             </item>
@@ -968,6 +835,139 @@
                  <property name="icon">
                   <iconset>
                    <normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item row="1" column="3">
+             <widget class="QFrame" name="VideoOptionsFrame">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <property name="midLineWidth">
+               <number>0</number>
+              </property>
+              <property name="visable" stdset="0">
+               <string>false</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_4">
+               <item row="3" column="1">
+                <widget class="QPushButton" name="encoderHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Encoder</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QComboBox" name="VidQualityCombo">
+                 <item>
+                  <property name="text">
+                   <string>Low</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Medium</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>High</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Very High</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Lossless</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="2" column="2">
+                <widget class="QLineEdit" name="sceneChangeLineEdit">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="maxLength">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>18</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>Scene Change Detection Sensativity</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Video Output Quality</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QComboBox" name="EncoderCombo">
+                 <item>
+                  <property name="text">
+                   <string>.264</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>.265</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QPushButton" name="sceneChangeSensativityButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="dialog-information">
+                   <normaloff>../.designer/backup</normaloff>../.designer/backup</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_10">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QCheckBox" name="sceneChangeDetectionCheckBox">
+                 <property name="text">
+                  <string>Scene Change Detection</string>
+                 </property>
+                 <property name="tristate">
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -1192,20 +1192,6 @@
                </item>
                <item row="4" column="0">
                 <layout class="QGridLayout" name="gridLayout_6">
-                 <item row="1" column="0">
-                  <widget class="QCheckBox" name="RealESRGANCheckBox">
-                   <property name="text">
-                    <string>RealESRGAN</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QPushButton" name="RifeSettings">
-                   <property name="text">
-                    <string>Settings</string>
-                   </property>
-                  </widget>
-                 </item>
                  <item row="6" column="0">
                   <widget class="QCheckBox" name="Waifu2xCheckBox">
                    <property name="text">
@@ -1240,6 +1226,20 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="1" column="0">
+                  <widget class="QCheckBox" name="RealESRGANCheckBox">
+                   <property name="text">
+                    <string>RealESRGAN</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="4" column="1">
+                  <widget class="QPushButton" name="RifeSettings">
+                   <property name="text">
+                    <string>Settings</string>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </item>
                <item row="1" column="0">
@@ -1253,6 +1253,24 @@
                  </item>
                  <item>
                   <widget class="QComboBox" name="defaultRifeModel"/>
+                 </item>
+                </layout>
+               </item>
+               <item row="2" column="0">
+                <layout class="QHBoxLayout" name="horizontalLayout_18">
+                 <item>
+                  <widget class="QLabel" name="label_20">
+                   <property name="text">
+                    <string>Import ESRGAN Model</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="ESRGANModelSelectButton">
+                   <property name="text">
+                    <string>Select Bin/Param file</string>
+                   </property>
+                  </widget>
                  </item>
                 </layout>
                </item>

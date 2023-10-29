@@ -64,3 +64,9 @@ def no_perms_change_setting(self):
 
 def no_perms_anywhere(self):
     self.showDialogBox(f"No permissions to write to {homedir}/REAL-Video-Enhancer, please select a directory in settings!!!!!")
+
+def notAModel(self):
+    self.showDialogBox(f"Not a valid model, please select a different file.")
+
+def alreadyModel(self):
+    self.showDialogBox(f"Same model found in models directory, please rename it to a different model.")

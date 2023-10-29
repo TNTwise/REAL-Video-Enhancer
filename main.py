@@ -157,6 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
+            self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin','.param']))
             self.switchUI_Image()
             self.ui.AICombo_Image.currentIndexChanged.connect(self.switchUI_Image)
             src.image_menu.image_menu_on_start(self)
@@ -431,10 +432,16 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.ui.Rife_Model.currentText() == 'Default':
                 self.ui.Rife_Times.setCurrentText('4X')
                 self.ui.Rife_Times.setEnabled(False)
-            else:
+            elif self.ui.Rife_Model.currentText() == 'Animation':
                 
+                index = self.ui.Rife_Times.findText('1X')
+                if index >= 0:
+                    self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
-
+            else:
+                self.ui.Rife_Times.addItem('1X')
+                self.ui.Rife_Times.setCurrentText('2X')
+                self.ui.Rife_Times.setEnabled(True)
         if self.ui.AICombo_Image.currentText() == 'RealESRGAN':
             if self.ui.ModelCombo_Image.currentText() == 'Default':
                 self.ui.Times_Image.setCurrentText('4X')
@@ -464,10 +471,11 @@ class MainWindow(QtWidgets.QMainWindow):
         for i in input_file_list:
             files += f'*{i} '
         files = files[:-1]
-        self.input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',f"{type_of_file} files ({files});;All files (*.*)")[0]
-        print(self.input_file)
+        input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',f"{type_of_file} files ({files});;All files (*.*)")[0]
+        print(input_file)
         if type_of_file == 'Video':
             try:
+                self.input_file=input_file
                 mime = magic.Magic(mime=True)
                 filename = mime.from_file(self.input_file)
                 if filename.find('video') != -1:
@@ -492,6 +500,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.showDialogBox(e)
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
+        if type_of_file == 'Model':
+            if (os.path.splitext(input_file)[1])[1:] == 'bin' or (os.path.splitext(input_file)[1])[1:] == 'param':
+                if os.path.isfile(input_file) and os.path.isfile(input_file.replace('.bin','.param')) or os.path.isfile(input_file.replace('.param','.bin')):
+                    if os.path.basename(input_file) in os.listdir(f'{settings.ModelDir}/realesrgan/models/'):
+                        alreadyModel(self)
+                        return
+                    os.system(f'cp "{input_file.replace(".param",".bin")}" "{settings.ModelDir}/realesrgan/models/" && cp "{input_file.replace(".bin",".param")}" "{settings.ModelDir}/realesrgan/models/"')
+                    
+            else:
+                notAModel(self)
     def openFolderDialog(self):
         
         self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
