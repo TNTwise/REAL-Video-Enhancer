@@ -945,6 +945,9 @@
                </item>
                <item row="2" column="1">
                 <widget class="QPushButton" name="sceneChangeSensativityButton">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1262,6 +1265,19 @@
                   <widget class="QLabel" name="label_20">
                    <property name="text">
                     <string>Import ESRGAN Model</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="esrganHelpModel">
+                   <property name="maximumSize">
+                    <size>
+                     <width>40</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
                    </property>
                   </widget>
                  </item>

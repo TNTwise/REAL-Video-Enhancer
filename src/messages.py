@@ -70,3 +70,4 @@ def notAModel(self):
 
 def alreadyModel(self):
     self.showDialogBox(f"Same model found in models directory, please rename it to a different model.")
+

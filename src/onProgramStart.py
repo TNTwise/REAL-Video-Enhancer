@@ -3,6 +3,11 @@ from src.messages import *
 import src.queue.queue as queue
 import multiprocessing
 import src.checks as checks
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QDesktopServices
+def open_link():
+        url = QUrl(r'https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion-%E2%80%90-Create-more-AI-models!')
+        QDesktopServices.openUrl(url)
 def onApplicationStart(self):
     import os
     
@@ -79,6 +84,8 @@ def onApplicationStart(self):
     self.ui.vramAmountHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.renderTypeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.frameIncrementHelp.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.esrganHelpModel.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.esrganHelpModel.clicked.connect(open_link)
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
     self.ui.AICombo.currentIndexChanged.connect(self.switchUI)

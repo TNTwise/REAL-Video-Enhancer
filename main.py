@@ -590,7 +590,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if displayInfoIcon == True:
             msg.setIconPixmap(icon.pixmap(32, 32)) 
         msg.setText(f"{message}")
-        
+        msg.setOpenExternalLinks(True)
         msg.exec_()
 
     def showQuestionBox(self,message):
