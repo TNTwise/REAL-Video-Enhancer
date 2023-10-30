@@ -22,7 +22,7 @@ def onApplicationStart(self):
                 if 'RealESRGAN' == i:
                     self.ui.RealESRGANCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('RealESRGAN')
-                    
+                
                     
                 if 'RealCUGAN' == i:
                     self.ui.RealCUGANCheckBox.setChecked(True)
@@ -34,7 +34,12 @@ def onApplicationStart(self):
                     self.ui.CainCheckBox.setChecked(True)
                     self.ui.AICombo.addItem('IFRNET')
     #get esrgan models
-    
+    if not (self.ui.RealESRGANCheckBox.isChecked()):
+        self.ui.ESRGANModelSelectButton.hide()
+        self.ui.label_20.hide()
+    else:
+        self.ui.ESRGANModelSelectButton.show()
+        self.ui.label_20.show()
     self.input_file = ''
     
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
@@ -176,19 +181,3 @@ def onApplicationStart(self):
     #set default model in settings
     self.ui.defaultRifeModel.setCurrentText(f'{settings.DefaultRifeModel}')
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
-'''def list_model_downloaded(self):
-        settings = Settings()
-        model_filepaths = ([x[0] for x in os.walk(f'{settings.ModelDir}/rife/')])
-        models = []
-        for model_filepath in model_filepaths:
-            if 'rife' in os.path.basename(model_filepath):
-                models.append(os.path.basename(model_filepath))
-        
-        models.sort()
-        for model in models:
-
-            
-            
-            self.ui.Rife_Model.addItem(f'{model}')#Adds model to GUI.
-            if model == 'rife-v4.6':
-                self.ui.Rife_Model.setCurrentText(f'{model}')'''

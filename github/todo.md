@@ -33,8 +33,7 @@ make it more clear about what the AI being used does<br/>
 choose install location<br/>
 make full queueing system<br/>
 make install/remove models page add custom models, so they wont get deleted on install/remove(iterate through directory and add add checkbox per custom model?)<br/>
-add ensemble=true,fast=false sudo rife-v4(and also fix it on optimized render?)<br/>
 setting of export video to same directory as input video by defualt<br/>
 add guide on how to add/convert custom models<br/>
-add default rife model option<br/>
 add uhd/tta options<br/>
+finish esrgan custom model support by asking what resolution increase it will be per model added.

@@ -60,3 +60,7 @@ def modelOptions(self):
         self.ui.Rife_Times.setEnabled(True)
     else:
         self.ui.Rife_Times.setEnabled(False)
+
+
+def default_models():
+    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.7']

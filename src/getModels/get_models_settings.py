@@ -13,6 +13,8 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from zipfile import ZipFile
 import tarfile
 import src.onProgramStart as programstart
+import modules.Rife as rife
+from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QCheckBox
 thisdir = src.thisdir.thisdir()
 rife_install_list = []
 
@@ -122,7 +124,7 @@ class Worker(QObject):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
                     for i in os.listdir(f'{settings.ModelDir}/rife/'):
-                        if i not in rife_install_list and i != 'rife-ncnn-vulkan':
+                        if i not in rife_install_list and i != 'rife-ncnn-vulkan' and i in rife.default_models():
                              os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
                     self.finished.emit()
             except Exception as e:
@@ -134,9 +136,13 @@ class ChooseModels(QtWidgets.QMainWindow):
                 super(ChooseModels, self).__init__()
                 self.ui = src.getModels.SelectModels.Ui_MainWindow()
                 self.ui.setupUi(self)
+                self.settings = Settings()
+                self.ui.label_3.hide()
                 self.pinFunctions()
+                
                 self.show()
                 self.main = parent
+
             def showDialogBox(self,message,displayInfoIcon=False):
                 icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
                 msg = QMessageBox()
@@ -176,11 +182,19 @@ class ChooseModels(QtWidgets.QMainWindow):
                 self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife47.stateChanged.connect(self.checkbox_state_changed)
                 self.ui.rife48.stateChanged.connect(self.checkbox_state_changed)
+
                 for checkbox,option_name in checkboxes:
                       
-                    if option_name in os.listdir(f'{thisdir}/models/rife/'):
+                    if option_name in os.listdir(f'{self.settings.ModelDir}/rife/'):
                           checkbox.setChecked(True)
-                      
+                for i in os.listdir(f'{self.settings.ModelDir}/rife/'):
+                     if os.path.isfile(f'{self.settings.ModelDir}/rife/{i}') == False and i not in rife.default_models():
+                            checkbox = QCheckBox(i)
+                            checkbox.setChecked(True)  # Set the default state of the checkbox
+                            checkbox.setEnabled(False)
+                            self.ui.label_3.show()
+                            self.ui.custom_models.addWidget(checkbox)
+
             def checkbox_state_changed(self):
                 checkboxes = [
                     (self.ui.rife, 'rife'),
