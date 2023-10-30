@@ -36,4 +36,5 @@ make install/remove models page add custom models, so they wont get deleted on i
 setting of export video to same directory as input video by defualt<br/>
 add guide on how to add/convert custom models<br/>
 add uhd/tta options<br/>
-finish esrgan custom model support by asking what resolution increase it will be per model added.
+finish esrgan custom model support by asking what resolution increase it will be per model added.<br/>
+fix random crashing after inputing non youtube url, just implement proper threading.
