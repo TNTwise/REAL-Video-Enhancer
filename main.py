@@ -229,10 +229,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo_Image.currentText() == 'RealESRGAN':
             esrgan.image_options(self)
-
         if self.ui.AICombo_Image.currentText() == 'Waifu2X':
             Waifu2X.image_options(self)
-    
     def get_models_from_dir(self,AI):
         return_list = []
         for i in os.listdir(f'{settings.ModelDir}/{AI.lower()}'):
@@ -260,11 +258,18 @@ class MainWindow(QtWidgets.QMainWindow):
         
     
     def showChangeInFPS(self,localFile=True):
-        
         try:
-            width,height = return_data.VideoName.return_video_resolution(self.input_file)
-            if int(width) > 3840 or int(height) > 2160:
+            
+            width=int(self.ytVidRes.split("x")[0])
+            height=int(self.ytVidRes.split("x")[1].replace(' (Enhanced bitrate)',''))
+        except:
+            resolution=VideoName.return_video_resolution(self.input_file)
+            width = int(resolution[0])
+            height=int(resolution[1])
+        if width > 3840 or height > 2160:
                     too_large_video(self)
+        try:
+            
             if self.render == 'rife':
                 
                 if self.input_file != '':
@@ -273,16 +278,24 @@ class MainWindow(QtWidgets.QMainWindow):
                     
                 if self.fps != None:    
                     self.ui.FPSPreview.setText(f'FPS: {round(self.fps)} -> {round(self.fps)*int(self.times)}')
+                
             if self.render == 'esrgan':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     try:
                         if self.youtubeFile == True:
-                            self.ui.FPSPreview.setText(f'RES: {self.ytVidRes} -> {int(self.ytVidRes.split("x")[0])*self.resIncrease}x{int(self.ytVidRes.split("x")[1])*self.resIncrease}')
-                    except:
-                        self.ui.FPSPreview.setText(f'RES: {int(VideoName.return_video_resolution(self.input_file)[0])}x{int(VideoName.return_video_resolution(self.input_file)[1])} -> {int(VideoName.return_video_resolution(self.input_file)[0])*self.resIncrease}x{int(VideoName.return_video_resolution(self.input_file)[1])*self.resIncrease}')
+                            resolution = self.ytVidRes.replace(' (Enhanced bitrate)','')
+                        else:
+                            
+                            resolution = f'{width}x{height}'
+                        self.ui.FPSPreview.setText(f'RES: {resolution} -> {width*self.resIncrease}x{height*self.resIncrease}')
+                      
+                    except Exception as e:
+                        log(str(e))
+                        print(e)
+            self.ui.logsPreview.clear()
         except Exception as e:
-            #print(e)
+            print(e)
             pass
     
     def reportProgress(self, files_processed):
@@ -493,12 +506,11 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.input_file = ''
                     else:
                         self.showChangeInFPS()
-                        self.ui.logsPreview.clear()
+                        
                         self.addLinetoLogs(f'Input file = {self.input_file}')
                 else:
                     not_a_video(self)
             except Exception as e:
-                self.showDialogBox(e)
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
         if type_of_file == 'Model':
