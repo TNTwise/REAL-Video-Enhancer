@@ -40,13 +40,18 @@ def modelOptions(self):
         self.ui.RifeStart.clicked.disconnect() 
     except:
         pass
-    self.ui.defaultRifeModel.clear()
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
     models = self.get_models_from_dir('rife')
     models.sort()
     if len (self.get_models_from_dir("rife")) > 0:
         print('it is')
         self.ui.Rife_Model.addItems(models)
+        
+        for i in models:
+            if (self.ui.defaultRifeModel.findText(i)) == None:
+            
+                
+                self.ui.defaultRifeModel.addItem(i)
         self.ui.defaultRifeModel.addItems(models)
         if  f'{self.settings.DefaultRifeModel}' in models:
                 self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
