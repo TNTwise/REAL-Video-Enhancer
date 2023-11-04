@@ -21,8 +21,7 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('Animation')
     self.ui.Rife_Model.addItem('Default')
-    if os.path.isfile(f'{settings.ModelDir}/realesrgan/models/realesr-general-x4v3.bin') == True:
-        self.ui.Rife_Model.addItem('General')
+    
     for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
                         if (os.path.splitext(i)[1])[1:] == 'bin':
                             if i not in default_models():
@@ -75,4 +74,4 @@ def image_options(self):
     self.ui.Times_Image.setCurrentIndex(0)
 
 def default_models():
-    return ['realesr-animevideov3-x2.bin','realesr-animevideov3-x3.bin','realesr-animevideov3-x4.bin','realesrgan-x4plus-anime.bin','realesrgan-x4plus.bin','realesr-general-x4v3.bin']
+    return ['realesr-animevideov3-x2.bin','realesr-animevideov3-x3.bin','realesr-animevideov3-x4.bin','realesrgan-x4plus-anime.bin','realesrgan-x4plus.bin']

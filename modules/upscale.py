@@ -40,12 +40,12 @@ def start_upscale(self,AI):
             if AI == 'realesrgan-ncnn-vulkan':
                 if realESRGAN_Model == 'Default':
                     self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
-                if realESRGAN_Model == 'General':
-                    self.realESRGAN_Model = '-n realesr-general-x4v3 -s 4'
+                
                 if realESRGAN_Model == 'Animation':
                     self.realESRGAN_Model = f'-n realesr-animevideov3 -s {realESRGAN_Times}'
                 else:
                     self.realESRGAN_Model = f'-n {self.ui.Rife_Model.currentText()} -s {realESRGAN_Times}'
+                
             self.ui.logsPreview.append(f'[Extracting Frames]')
             self.ui.ETAPreview.setText('ETA:')
             self.ui.processedPreview.setText('Files Processed:')
