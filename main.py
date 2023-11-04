@@ -283,10 +283,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                     try:
-                        if self.youtubeFile == True:
-                            resolution = self.ytVidRes.replace(' (Enhanced bitrate)','')
-                        else:
+                        try:
+                            if self.youtubeFile == True:
+                                resolution = self.ytVidRes.replace(' (Enhanced bitrate)','')
+                        except:
                             
+                                
                             resolution = f'{width}x{height}'
                         self.ui.FPSPreview.setText(f'RES: {resolution} -> {width*self.resIncrease}x{height*self.resIncrease}')
                       
@@ -443,7 +445,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def greyOutRealSRTimes(self):
         if self.ui.AICombo.currentText() == 'RealESRGAN':
-            if self.ui.Rife_Model.currentText() == 'Default':
+            if self.ui.Rife_Model.currentText() == 'Default' or self.ui.Rife_Model.currentText() == 'General':
                 self.ui.Rife_Times.setCurrentText('4X')
                 self.ui.Rife_Times.setEnabled(False)
             elif self.ui.Rife_Model.currentText() == 'Animation':
