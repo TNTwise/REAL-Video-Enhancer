@@ -38,5 +38,6 @@ add guide on how to add/convert custom models<br/>
 add uhd/tta options<br/>
 finish esrgan custom model support by asking what resolution increase it will be per model added.<br/>
 fix random crashing after inputing non youtube url, just implement proper threading.<br/>
-properly implemkent popup for too high resolution<br/>
 fix popup for resolution showing up one time after a video that would call it is selected.<br/>
+make sure you can uninstall offline<br/>
+detect when a esrgan model isnt converted correctly (didnt change data to input)<br/>

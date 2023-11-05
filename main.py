@@ -332,7 +332,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     videos_rendered+=1
             try:
                 self.removeLastLineInLogs("Video segments created: ")
-                self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                if videos_rendered == self.interpolation_sessions:
+                    self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
+                else:
+                    self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
             except:
                 pass
             #Update GUI values
@@ -522,7 +525,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         alreadyModel(self)
                         return
                     os.system(f'cp "{input_file.replace(".param",".bin")}" "{settings.ModelDir}/realesrgan/models/" && cp "{input_file.replace(".bin",".param")}" "{settings.ModelDir}/realesrgan/models/"')
-                    
+                    if self.ui.AICombo.currentText() == 'RealESRGAN':
+                        esrgan.modelOptions(self)
             else:
                 notAModel(self)
     def openFolderDialog(self):

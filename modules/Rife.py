@@ -44,7 +44,6 @@ def modelOptions(self):
     models = self.get_models_from_dir('rife')
     models.sort()
     if len (self.get_models_from_dir("rife")) > 0:
-        print('it is')
         self.ui.Rife_Model.addItems(models)
         
         for i in models:
