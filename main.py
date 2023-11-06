@@ -322,7 +322,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-                is_temp=0
+            is_temp=0
             
                 
             fp=files_processed
@@ -337,8 +337,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
                     is_temp=1
                 else:
-                    
-                    self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                    if is_temp == 0:
+                        self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
             except:
                 pass
             #Update GUI values
