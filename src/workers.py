@@ -538,7 +538,7 @@ class upscale(QObject):
                 frame_increments_of_interpolation = self.main.settings.FrameIncrements
             elif self.main.settings.FrameIncrementsMode == 'Automatic':
                 
-                frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM/2))
+                frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))/2
                 
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
