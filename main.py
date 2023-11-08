@@ -286,6 +286,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         try:
                             if self.youtubeFile == True:
                                 resolution = self.ytVidRes.replace(' (Enhanced bitrate)','')
+                            else:
+                               resolution = f'{width}x{height}' 
                         except:
                             
                                 
