@@ -538,10 +538,9 @@ class upscale(QObject):
                 frame_increments_of_interpolation = self.main.settings.FrameIncrements
             elif self.main.settings.FrameIncrementsMode == 'Automatic':
                 resolution = VideoName.return_video_resolution(self.main.input_file)
-                try:
-                    frame_increments_of_interpolation = int(100*(round(int(resolution[0])/1000)/int(self.main.settings.VRAM))) 
-                except:
-                    frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
+                
+                frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))
+                
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
             img_type = self.main.settings.Image_Type.replace('.','')
