@@ -537,8 +537,21 @@ class upscale(QObject):
             if self.main.settings.FrameIncrementsMode == 'Manual':
                 frame_increments_of_interpolation = self.main.settings.FrameIncrements
             elif self.main.settings.FrameIncrementsMode == 'Automatic':
-                
-                frame_increments_of_interpolation = int(10*int(self.main.settings.VRAM))/2
+                resolution = VideoName.return_video_resolution(self.main.input_file)
+                cap = cv2.VideoCapture(self.main.input_file)
+                if not cap.isOpened():
+                    print("Error opening video file")
+                    return
+
+                frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+                fps = cap.get(cv2.CAP_PROP_FPS)
+
+                duration_seconds = frame_count / fps
+
+                duration_minutes = int(duration_seconds // 60)
+                duration_seconds = int(duration_seconds % 60)
+                frame_increments_of_interpolation = int(duration_seconds*int(self.main.settings.VRAM))
                 
                 frame_increments_of_interpolation = int(frame_increments_of_interpolation)
             self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
