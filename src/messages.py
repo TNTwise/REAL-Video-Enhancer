@@ -33,8 +33,8 @@ def quotes(self):
     self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")
 
 def not_enough_storage(self,predicted_space,total_space):
-    self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed image format, lowering enhancement iterations, changing the render folder disk, or switching to the Optimized Render Type.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
-
+    return self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed image format, lowering enhancement iterations, changing the render folder disk, or switching to the Optimized Render Type.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
+    
 def render_help(self):
     self.showDialogBox("The classic method consumes a significant amount of storage due to its inability to clear rendered frames.\n\nOptimized involves dividing the rendering process into smaller segments, each containing a predetermined number of frames. These segments are then compressed and merged into individual video segments. This approach effectively conserves storage space while maintaining video quality.")
 

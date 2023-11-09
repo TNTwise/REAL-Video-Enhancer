@@ -198,8 +198,14 @@ import math
 from PIL import Image
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
+def ffmpeg_preset(self):
+     
+     vq = int(self.main.settings.videoQuality)
+     if vq < 18:
+          return '-preset slow'
+     
+          
 
-    
 
 
     
@@ -242,7 +248,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                         else:
                             sleep(.1)
                 transitionDetectionClass.merge_frames()
-                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {ffmpeg_preset(self)} {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
@@ -404,7 +410,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{vram}',
+    '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}']
                         if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                             AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -438,7 +444,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{vram}',
+    '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}'
 ]
                         if settings.RenderType == 'Optimized (Incremental)':
@@ -472,7 +478,7 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
 
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{vram}:{vram}:{vram}',
+    '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}'
 ]
                     if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
@@ -564,7 +570,7 @@ class upscale(QObject):
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type)
 ]
                 for i in self.main.realESRGAN_Model.split(' '):
