@@ -248,7 +248,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
                         else:
                             sleep(.1)
                 transitionDetectionClass.merge_frames()
-                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v {ffmpeg_preset(self)} {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
