@@ -128,13 +128,16 @@ def changeSceneDetection(self):
 def selRenderDir(self):
     settings = Settings()
     render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+    
     if render_folder != '':
+        self.render_folder = render_folder
         if check_for_write_permissions(render_folder):
             settings.change_setting("RenderDir",f"{self.render_folder}")
         
             self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
         else:
             no_perms_change_setting(self)
+    
 def selOutputDir(self):
     settings = Settings()
     output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
