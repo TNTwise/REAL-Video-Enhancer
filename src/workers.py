@@ -479,10 +479,13 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{vram}:2',
-    '-f', f'%08d{self.main.settings.Image_Type}'
+    '-f', f'%08d{self.main.settings.Image_Type}',
+    '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}'
 ]
+                    print(command)
+                    
                     if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                        AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
+                        AI_Incremental(self,f'"{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
                     if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                         
 

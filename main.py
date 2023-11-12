@@ -580,6 +580,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.denoiseLevelSpinBox.setDisabled(mode)
         self.ui.InstallModelsFrame.setDisabled(mode)
         self.ui.SettingsMenus.setDisabled(mode)
+        self.ui.modeCombo.setDisabled(mode)
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         if len(self.QueueList) == 0:
             self.ui.QueueListWidget.hide()

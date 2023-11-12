@@ -29,7 +29,6 @@ add ifrnet-ncnn-vulkan(seems promising)<br/>
 use iteration to iterate through every image and render them individually, may help with pausing(might use rife ncnn vulkan python package to achieve this cleanly?)<br/>
 list amount of transitions detected in logs<br/>
 fix randomly graying out rife times?<br/>
-make it more clear about what the AI being used does<br/>
 choose install location<br/>
 make full queueing system<br/>
 make install/remove models page add custom models, so they wont get deleted on install/remove(iterate through directory and add add checkbox per custom model?)<br/>
