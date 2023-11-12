@@ -179,24 +179,18 @@ def set_model_params(self):
                 
                 if 'Rife' == i:
                     self.ui.RifeCheckBox.setChecked(True)
-                    #self.ui.AICombo.addItem('Rife')
                     self.model_labels['Rife'] = 'interpolation'
                 if 'RealESRGAN' == i:
                     self.ui.RealESRGANCheckBox.setChecked(True)
-                    #self.ui.AICombo.addItem('RealESRGAN')
                     self.model_labels['RealESRGAN'] = 'upscaling'
-                    
                 if 'RealCUGAN' == i:
                     self.ui.RealCUGANCheckBox.setChecked(True)
-                    #self.ui.AICombo.addItem('RealCUGAN')
                     self.model_labels['RealCUGAN'] = 'upscaling'
                 if 'Waifu2X' == i:
                     self.ui.Waifu2xCheckBox.setChecked(True)
-                    #self.ui.AICombo.addItem('Waifu2X')
                     self.model_labels['Waifu2X'] = 'upscaling'
                 if 'IFRNET' == i:
                     self.ui.CainCheckBox.setChecked(True)
-                    #self.ui.AICombo.addItem('IFRNET')
                     self.model_labels['IFRNET'] = 'interpolation'
                 
     self.switchMode()
