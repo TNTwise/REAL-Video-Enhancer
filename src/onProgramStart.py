@@ -19,25 +19,7 @@ def onApplicationStart(self):
     import src.thisdir
     thisdir = src.thisdir.thisdir()
     self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
-    models_installed = checks.check_for_individual_models()
-    for i in models_installed:
-                if 'Rife' == i:
-                    self.ui.RifeCheckBox.setChecked(True)
-                    self.ui.AICombo.addItem('Rife')
-                if 'RealESRGAN' == i:
-                    self.ui.RealESRGANCheckBox.setChecked(True)
-                    self.ui.AICombo.addItem('RealESRGAN')
-                
-                    
-                if 'RealCUGAN' == i:
-                    self.ui.RealCUGANCheckBox.setChecked(True)
-                    self.ui.AICombo.addItem('RealCUGAN')
-                if 'Waifu2X' == i:
-                    self.ui.Waifu2xCheckBox.setChecked(True)
-                    self.ui.AICombo.addItem('Waifu2X')
-                if 'IFRNET' == i:
-                    self.ui.CainCheckBox.setChecked(True)
-                    self.ui.AICombo.addItem('IFRNET')
+    set_model_params(self)
     #get esrgan models
     if not (self.ui.RealESRGANCheckBox.isChecked()):
         self.ui.ESRGANModelSelectButton.hide()
@@ -89,6 +71,7 @@ def onApplicationStart(self):
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
     self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
+    self.ui.modeCombo.currentIndexChanged.connect(self.switchMode)
     self.ui.InstallModelsFrame.hide()
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
@@ -188,3 +171,32 @@ def onApplicationStart(self):
     #set default model in settings
     self.ui.defaultRifeModel.setCurrentText(f'{settings.DefaultRifeModel}')
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
+
+def set_model_params(self):
+    models_installed = checks.check_for_individual_models()
+    self.model_labels = {}
+    for i in models_installed:
+                
+                if 'Rife' == i:
+                    self.ui.RifeCheckBox.setChecked(True)
+                    #self.ui.AICombo.addItem('Rife')
+                    self.model_labels['Rife'] = 'interpolation'
+                if 'RealESRGAN' == i:
+                    self.ui.RealESRGANCheckBox.setChecked(True)
+                    #self.ui.AICombo.addItem('RealESRGAN')
+                    self.model_labels['RealESRGAN'] = 'upscaling'
+                    
+                if 'RealCUGAN' == i:
+                    self.ui.RealCUGANCheckBox.setChecked(True)
+                    #self.ui.AICombo.addItem('RealCUGAN')
+                    self.model_labels['RealCUGAN'] = 'upscaling'
+                if 'Waifu2X' == i:
+                    self.ui.Waifu2xCheckBox.setChecked(True)
+                    #self.ui.AICombo.addItem('Waifu2X')
+                    self.model_labels['Waifu2X'] = 'upscaling'
+                if 'IFRNET' == i:
+                    self.ui.CainCheckBox.setChecked(True)
+                    #self.ui.AICombo.addItem('IFRNET')
+                    self.model_labels['IFRNET'] = 'interpolation'
+                
+    self.switchMode()

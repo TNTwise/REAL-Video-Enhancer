@@ -239,6 +239,40 @@
               </item>
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_3">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMinimumSize</enum>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_19">
+                  <item>
+                   <widget class="QLabel" name="label_21">
+                    <property name="text">
+                     <string>Mode:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="modeCombo">
+                    <property name="minimumSize">
+                     <size>
+                      <width>250</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <item>
+                     <property name="text">
+                      <string>Interpolation</string>
+                     </property>
+                    </item>
+                    <item>
+                     <property name="text">
+                      <string>Upscaling</string>
+                     </property>
+                    </item>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
                 <item>
                  <layout class="QHBoxLayout" name="horizontalLayout_5">
                   <item>
@@ -249,7 +283,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="AICombo"/>
+                   <widget class="QComboBox" name="AICombo">
+                    <property name="minimumSize">
+                     <size>
+                      <width>250</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -263,7 +304,14 @@
                    </widget>
                   </item>
                   <item>
-                   <widget class="QComboBox" name="Rife_Model"/>
+                   <widget class="QComboBox" name="Rife_Model">
+                    <property name="minimumSize">
+                     <size>
+                      <width>250</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -280,7 +328,7 @@
                    <widget class="QComboBox" name="Rife_Times">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
+                      <width>250</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -314,6 +362,12 @@
                   </item>
                   <item>
                    <widget class="QSpinBox" name="denoiseLevelSpinBox">
+                    <property name="minimumSize">
+                     <size>
+                      <width>250</width>
+                      <height>0</height>
+                     </size>
+                    </property>
                     <property name="minimum">
                      <number>0</number>
                     </property>

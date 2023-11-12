@@ -225,6 +225,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == 'IFRNET':
             ifrnet.modelOptions(self)
+    def switchMode(self):
+        self.ui.AICombo.clear()
+        for key,value in self.model_labels.items():
+            if value == self.ui.modeCombo.currentText().lower():
+                self.ui.AICombo.addItem(key)
     def switchUI_Image(self):
 
         if self.ui.AICombo_Image.currentText() == 'RealESRGAN':
