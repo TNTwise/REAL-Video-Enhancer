@@ -40,3 +40,4 @@ fix random crashing after inputing non youtube url, just implement proper thread
 fix popup for resolution showing up one time after a video that would call it is selected.<br/>
 detect when a esrgan model isnt converted correctly (didnt change data to input)<br/>
 add option for ffmpeg speed/quality preset<br/>
+enter gpu id via text(like upscayl)<br/>
