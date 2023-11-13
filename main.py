@@ -329,7 +329,7 @@ class MainWindow(QtWidgets.QMainWindow):
             
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
-            is_temp=0
+                is_temp=0
             
                 
             fp=files_processed
