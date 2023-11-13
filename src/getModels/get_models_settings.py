@@ -225,33 +225,51 @@ class ChooseModels(QtWidgets.QMainWindow):
 
 def run_install_models_from_settings(self):
     try:
-        if check_if_online():
-            self.setDisableEnable(True)
-            self.thread5 = QThread()
-            # Step 3: Create a worker object
-            
-            self.worker5 = Worker(self)        
-            
+        if model_warning(self):
+            if check_if_online():
+                
+                self.setDisableEnable(True)
+                self.thread5 = QThread()
+                # Step 3: Create a worker object
+                
+                self.worker5 = Worker(self)        
+                
 
-            
+                
 
-            # Step 4: Move worker to the thread
-            self.worker5.moveToThread(self.thread5)
-            # Step 5: Connect signals and slots
-            self.thread5.started.connect(self.worker5.install_modules)
-            self.worker5.finished.connect(self.thread5.quit)
-            self.worker5.finished.connect(self.worker5.deleteLater)
-            self.thread5.finished.connect(self.thread5.deleteLater)
-            self.worker5.intReady.connect(displayProgressOnInstallBar)
-            self.worker5.finished.connect(lambda: endDownload(self))
-            global main
-            main = self
-            # Step 6: Start the thread
-            
-            self.thread5.start()
-    except:
-        
-        return 0
+                # Step 4: Move worker to the thread
+                self.worker5.moveToThread(self.thread5)
+                # Step 5: Connect signals and slots
+                self.thread5.started.connect(self.worker5.install_modules)
+                self.worker5.finished.connect(self.thread5.quit)
+                self.worker5.finished.connect(self.worker5.deleteLater)
+                self.thread5.finished.connect(self.thread5.deleteLater)
+                self.worker5.intReady.connect(displayProgressOnInstallBar)
+                self.worker5.finished.connect(lambda: endDownload(self))
+                global main
+                main = self
+                # Step 6: Start the thread
+                
+                self.thread5.start()
+            else:
+                
+                    settings = Settings()
+                    if self.main.ui.RifeCheckBox.isChecked() == False:
+                            os.system(f'rm -rf "{settings.ModelDir}/rife/"')
+
+                    if self.main.ui.RealESRGANCheckBox.isChecked() == False:
+                            os.system(f'rm -rf "{settings.ModelDir}/realesrgan/"')
+                    
+                    if self.main.ui.Waifu2xCheckBox.isChecked() == False:
+                            os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
+                    
+                    
+                    if self.main.ui.CainCheckBox.isChecked() == False:
+                            os.system(f'rm -rf "{settings.ModelDir}/ifrnet/"')
+                
+    except Exception as e:
+            print(e)            
+            return 0
 def endDownload(self):
      
      self.setDisableEnable(False)
