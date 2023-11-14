@@ -17,7 +17,7 @@ from src.messages import *
 from src.checks import *
 import tarfile
 from sys import exit
-
+from src.getModels.rifeModelsFunctions import *
 from src.settings import *
 settings = Settings()
 import src.thisdir
@@ -237,38 +237,12 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
                 msg.exec_()
             def pinFunctions(self):
-                checkboxes = [
-                    (self.ui.rife, 'rife'),
-                    (self.ui.rifeanime, 'rife-anime'),
-                    (self.ui.rifehd, 'rife-HD'),
-                    (self.ui.rifeuhd, 'rife-UHD'),
-                    (self.ui.rife2, 'rife-v2'),
-                    (self.ui.rife23, 'rife-v2.3'),
-                    (self.ui.rife24, 'rife-v2.4'),
-                    (self.ui.rife30, 'rife-v3.0'),
-                    (self.ui.rife31, 'rife-v3.1'),
-                    (self.ui.rife4, 'rife-v4'),
-                    (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7'),
-                    (self.ui.rife48,'rife-v4.8')
-                ]
+                
                 self.ui.next.hide()
-                self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rifeanime.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rifehd.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rifeuhd.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife2.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife23.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife24.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife30.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife31.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife4.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife46.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife47.stateChanged.connect(self.checkbox_state_changed)
-                self.ui.rife48.stateChanged.connect(self.checkbox_state_changed)
+                rife_pin_functions(self)
                 try:
                     with open(f'{thisdir}/models.txt', 'r') as f:
-                        for checkbox,option_name in checkboxes:
+                        for checkbox,option_name in rife_checkboxes(self):
                             
                             if option_name in os.listdir(f'{thisdir}/models/rife/'):
                                 checkbox.setChecked(True)
@@ -276,32 +250,18 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         for i in f.readlines():
                                print(i)
                                i=i.replace('\n','')
-                               for checkbox,option_name in checkboxes:
+                               for checkbox,option_name in rife_checkboxes(self):
                                     if option_name in i:
                                         checkbox.setChecked(True)
                 except:
                      pass
             def checkbox_state_changed(self):
-                checkboxes = [
-                    (self.ui.rife, 'rife'),
-                    (self.ui.rifeanime, 'rife-anime'),
-                    (self.ui.rifehd, 'rife-HD'),
-                    (self.ui.rifeuhd, 'rife-UHD'),
-                    (self.ui.rife2, 'rife-v2'),
-                    (self.ui.rife23, 'rife-v2.3'),
-                    (self.ui.rife24, 'rife-v2.4'),
-                    (self.ui.rife30, 'rife-v3.0'),
-                    (self.ui.rife31, 'rife-v3.1'),
-                    (self.ui.rife4, 'rife-v4'),
-                    (self.ui.rife46, 'rife-v4.6'),
-                    (self.ui.rife47, 'rife-v4.7'),
-                    (self.ui.rife48, 'rife-v4.8')
-                ]
+            
                 rife_install_list = []
 
                 
 
-                for checkbox, option_name in checkboxes:
+                for checkbox, option_name in rife_checkboxes(self):
                     if checkbox.isChecked():
                         rife_install_list.append(option_name)
                 

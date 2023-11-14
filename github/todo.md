@@ -41,3 +41,4 @@ fix popup for resolution showing up one time after a video that would call it is
 detect when a esrgan model isnt converted correctly (didnt change data to input)<br/>
 add option for ffmpeg speed/quality preset<br/>
 enter gpu id via text(like upscayl)<br/>
+remove mode option if none are available

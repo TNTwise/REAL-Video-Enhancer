@@ -24,9 +24,11 @@ def onApplicationStart(self):
     if not (self.ui.RealESRGANCheckBox.isChecked()):
         self.ui.ESRGANModelSelectButton.hide()
         self.ui.label_20.hide()
+        self.ui.esrganHelpModel.hide()
     else:
         self.ui.ESRGANModelSelectButton.show()
         self.ui.label_20.show()
+        self.ui.esrganHelpModel.show()
     self.input_file = ''
     
     self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
@@ -192,5 +194,21 @@ def set_model_params(self):
                 if 'IFRNET' == i:
                     self.ui.CainCheckBox.setChecked(True)
                     self.model_labels['IFRNET'] = 'interpolation'
-                
+    #not efficient but im lazy so cry abt it
+    upscale_list=[]
+    for i in range(self.ui.modeCombo.count()):
+            item_text = self.ui.modeCombo.itemText(i)
+            upscale_list.append(item_text)
+    if 'Interpolation' not in upscale_list:
+
+        for key,value in self.model_labels.items():
+            if value == 'interpolation':
+                self.ui.modeCombo.addItem('Interpolation')
+                break
+    if 'Upscaling' not in upscale_list:
+        for key,value in self.model_labels.items():
+            if value == 'upscaling':
+                self.ui.modeCombo.addItem('Upscaling')
+                break
+
     self.switchMode()

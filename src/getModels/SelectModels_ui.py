@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'src/getModels/SelectModels.ui'
+# Form implementation generated from reading ui file '/home/pax/REAL-Video-Enhancer/src/getModels/SelectModels.ui'
 #
 # Created by: PyQt5 UI code generator 5.14.1
 #
