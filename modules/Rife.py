@@ -45,13 +45,15 @@ def modelOptions(self):
     models.sort()
     if len (self.get_models_from_dir("rife")) > 0:
         self.ui.Rife_Model.addItems(models)
-        
+        model_list=[]
+        for i in range(self.ui.defaultRifeModel.count()):
+            item_text = self.ui.defaultRifeModel.itemText(i)
+            model_list.append(item_text)
         for i in models:
-            if (self.ui.defaultRifeModel.findText(i)) == None:
+            if i not in model_list:
             
-                
+                print(f'added model {i}')
                 self.ui.defaultRifeModel.addItem(i)
-        self.ui.defaultRifeModel.addItems(models)
         if  f'{self.settings.DefaultRifeModel}' in models:
                 self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
         else:
