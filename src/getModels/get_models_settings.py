@@ -28,7 +28,7 @@ class Worker(QObject):
     @pyqtSlot()
     
     def install_modules(self):
-            
+            rife_install_list = []
             for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
                               try:
@@ -125,8 +125,18 @@ class Worker(QObject):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
                     for i in os.listdir(f'{settings.ModelDir}/rife/'):
+                        print(rife_install_list)
                         if i not in rife_install_list and i != 'rife-ncnn-vulkan' and i in rife.default_models():
                              os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
+                          # Change this to the text you want to remove
+                        index = self.main.ui.defaultRifeModel.findText(i)
+
+                        if index != -1:
+                            self.main.ui.defaultRifeModel.removeItem(index)
+                        else:
+                            pass
+                    os.remove(f'{thisdir}/models.txt')
+                    
                     self.finished.emit()
             except Exception as e:
                 self.main.showDialogBox(e)
