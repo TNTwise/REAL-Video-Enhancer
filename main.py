@@ -174,7 +174,12 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
             self.ui.Input_Image.clicked.connect(lambda: self.openFileNameDialog('Image',['.png','.jpg','.webp']))
             selFrameIncrementsMode(self)
-            
+            if self.gpuMemory == None:
+                cannot_detect_vram(self)
+            else:
+                pass
+            if int(HardwareInfo.get_video_memory_linux()) < 4:
+                not_enough_vram(self)
             if check_for_write_permissions(self.settings.OutputDir)==False:
                 no_perms(self)
                 try:

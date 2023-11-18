@@ -160,12 +160,7 @@ def onApplicationStart(self):
     self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
     self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
     self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
-    if self.gpuMemory == None:
-        cannot_detect_vram(self)
-    else:
-        pass
-    if int(HardwareInfo.get_video_memory_linux()) < 4:
-        not_enough_vram(self)
+    
     # list every model downloaded, and add them to the list
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()

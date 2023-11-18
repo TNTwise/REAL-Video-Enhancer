@@ -22,8 +22,10 @@ def bubble_sort(arr):
     for idx in range(len(arr) - i - 1):
       var1 = arr[idx].replace('rife-v','') 
       var1=var1.replace('.','')
+      var1=var1.replace('-lite','')
       var2 = arr[idx+1].replace('rife-v','') 
       var2=var2.replace('.','')
+      var2=var2.replace('-lite','')
       iteration_count += 1
       try:
         if int(var1) > int(var2):
@@ -89,4 +91,4 @@ def modelOptions(self):
 
 
 def default_models():
-    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7']
+    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7','rife-v4.12-lite']

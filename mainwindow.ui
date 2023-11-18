@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>618</height>
+    <height>699</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -255,7 +255,7 @@
                    <widget class="QComboBox" name="modeCombo">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -276,7 +276,7 @@
                    <widget class="QComboBox" name="AICombo">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -297,7 +297,7 @@
                    <widget class="QComboBox" name="Rife_Model">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -318,7 +318,7 @@
                    <widget class="QComboBox" name="Rife_Times">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
@@ -354,7 +354,7 @@
                    <widget class="QSpinBox" name="denoiseLevelSpinBox">
                     <property name="minimumSize">
                      <size>
-                      <width>250</width>
+                      <width>0</width>
                       <height>0</height>
                      </size>
                     </property>
