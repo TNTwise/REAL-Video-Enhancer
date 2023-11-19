@@ -195,7 +195,7 @@
                <string>Rife-V4.6 </string>
               </property>
               <property name="checked">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
              </widget>
             </item>
