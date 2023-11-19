@@ -99,9 +99,12 @@
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Expanding</enum>
+                  </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>40</width>
+                    <width>5000</width>
                     <height>20</height>
                    </size>
                   </property>
@@ -276,7 +279,7 @@
                    <widget class="QComboBox" name="AICombo">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
+                      <width>110</width>
                       <height>0</height>
                      </size>
                     </property>

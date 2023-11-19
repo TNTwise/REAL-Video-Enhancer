@@ -135,7 +135,6 @@ class Worker(QObject):
                             self.main.ui.defaultRifeModel.removeItem(index)
                         else:
                             pass
-                    os.remove(f'{thisdir}/models.txt')
                     
                     self.finished.emit()
             except Exception as e:
