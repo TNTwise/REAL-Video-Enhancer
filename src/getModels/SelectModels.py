@@ -93,7 +93,7 @@ class Ui_MainWindow(object):
         self.rife45.setObjectName("rife45")
         self.verticalLayout_6.addWidget(self.rife45)
         self.rife46 = QtWidgets.QCheckBox(self.centralwidget)
-        self.rife46.setChecked(True)
+        self.rife46.setChecked(False)
         self.rife46.setObjectName("rife46")
         self.verticalLayout_6.addWidget(self.rife46)
         self.rife47 = QtWidgets.QCheckBox(self.centralwidget)

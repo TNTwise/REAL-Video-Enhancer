@@ -158,9 +158,6 @@ class MainWindow(QtWidgets.QMainWindow):
             print(f'{e} {traceback_info}')
         try:
             self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin','.param']))
-            self.switchUI_Image()
-            self.ui.AICombo_Image.currentIndexChanged.connect(self.switchUI_Image)
-            src.image_menu.image_menu_on_start(self)
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -172,7 +169,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
             self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
-            self.ui.Input_Image.clicked.connect(lambda: self.openFileNameDialog('Image',['.png','.jpg','.webp']))
             selFrameIncrementsMode(self)
             if self.gpuMemory == None:
                 cannot_detect_vram(self)
@@ -235,12 +231,7 @@ class MainWindow(QtWidgets.QMainWindow):
         for key,value in self.model_labels.items():
             if value == self.ui.modeCombo.currentText().lower():
                 self.ui.AICombo.addItem(key)
-    def switchUI_Image(self):
 
-        if self.ui.AICombo_Image.currentText() == 'RealESRGAN':
-            esrgan.image_options(self)
-        if self.ui.AICombo_Image.currentText() == 'Waifu2X':
-            Waifu2X.image_options(self)
     def get_models_from_dir(self,AI):
         return_list = []
         for i in os.listdir(f'{settings.ModelDir}/{AI.lower()}'):
@@ -478,14 +469,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.Rife_Times.addItem('4X')
                 self.ui.Rife_Times.setCurrentText('2X')
                 self.ui.Rife_Times.setEnabled(True)
-        if self.ui.AICombo_Image.currentText() == 'RealESRGAN':
-            if self.ui.ModelCombo_Image.currentText() == 'Default':
-                self.ui.Times_Image.setCurrentText('4X')
-                self.ui.Times_Image.setEnabled(False)
-            else:
-                
-                self.ui.Times_Image.setEnabled(True)
-
+        
         if self.ui.AICombo.currentText() == 'Waifu2X':
             if self.ui.Rife_Model.currentText() != 'cunet':
                 self.ui.Rife_Times.setCurrentText('2X')
@@ -495,13 +479,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 self.ui.Rife_Times.setEnabled(True)
                 
-        if self.ui.AICombo_Image.currentText() == 'Waifu2X':
-            if self.ui.ModelCombo_Image.currentText() != 'cunet':
-                self.ui.Times_Image.setCurrentText('2X')
-                self.ui.Times_Image.setEnabled(False)
-            else:
-                
-                self.ui.Times_Image.setEnabled(True)
+        
     def openFileNameDialog(self,type_of_file,input_file_list):
         files=''
         for i in input_file_list:
