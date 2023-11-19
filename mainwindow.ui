@@ -208,22 +208,18 @@
                  </widget>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_4">
-                  <item>
-                   <widget class="QPushButton" name="Input_video_rife">
-                    <property name="text">
-                     <string>Input Video</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="Input_video_rife_url">
-                    <property name="text">
-                     <string>Input Video URL</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
+                 <widget class="QPushButton" name="Input_video_rife">
+                  <property name="text">
+                   <string>Input Video</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="Input_video_rife_url">
+                  <property name="text">
+                   <string>Input Video URL</string>
+                  </property>
+                 </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="Output_folder_rife">
