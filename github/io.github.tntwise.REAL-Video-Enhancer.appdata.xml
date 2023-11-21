@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
  <id>io.github.tntwise.REAL-Video-Enhancer</id>
- <launchable type="desktop-id">io.github.tntwise.REAL-Video-Enhancer</launchable>
+ <launchable type="desktop-id">io.github.tntwise.REAL-Video-Enhancer.desktop</launchable>
  <name>REAL Video Enhancer</name>
  <developer_name>TNTwise</developer_name>
  <summary>Free and Open Source Video Enhancement Tool</summary>
