@@ -1,0 +1,10 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Exec=REAL-Video-Enhancer
+Icon=io.github.tntwise.REAL-Video-Enhancer
+Version=1.0.4
+Type=Application
+Categories=AudioVideo
+Name=REAL Video Enhancer
+Comment=REAL Video Enhancer is a simple way to enhance videos on Linux.
+Terminal=false

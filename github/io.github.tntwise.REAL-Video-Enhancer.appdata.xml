@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop">
+ <id>io.github.tntwise.REAL-Video-Enhancer</id>
+ <launchable type="desktop-id">io.github.tntwise.REAL-Video-Enhancer</launchable>
+ <name>REAL Video Enhancer</name>
+ <developer_name>TNTwise</developer_name>
+ <summary>Free and Open Source Video Enhancement Tool</summary>
+ <metadata_license>CC0-1.0</metadata_license>
+ <project_license>MIT</project_license>
+ <description>
+  <p>
+            A simple video enhancer for Linux.
+        </p>
+  
+ </description>
+ <url type="homepage">https://github.com/TNTwise/REAL-Video-Enhancer</url>
+ <url type="bugtracker">https://github.com/TNTwise/REAL-Video-Enhancer/issues</url>
+ <screenshots>
+  <screenshot type="default">
+   <image>https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/demo.png</image>
+  </screenshot>
+ </screenshots>
+ <content_rating type="oars-1.1"/>
+ <releases>
+  <release version="1.0.4" date="2023-10-18">
+   <description>
+    <p>Features:</p>
+    <ul>
+       <li> Discord RPC support for Discord system package and Discord flatpak. </li>
+       <li> Scene change detection to preserve sharp transitions. </li>
+       <li> Preview that shows latest frame that has been rendered. </li>
+       <li> Enhancing straight from a YouTube link or a video URL.  </li>
+    </ul>
+   </description>
+  </release>
+ </releases>
+</component> 
