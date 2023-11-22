@@ -22,7 +22,7 @@
       </property>
       <widget class="QWidget" name="Video">
        <attribute name="title">
-        <string>Video</string>
+        <string>Enhance</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
