@@ -185,16 +185,16 @@ class MainWindow(QtWidgets.QMainWindow):
             if check_for_write_permissions(self.settings.OutputDir)==False:
                 no_perms(self)
                 try:
-                    os.mkdir(f'{homedir}/REAL-Video-Enhancer/')
+                    os.mkdir(f'{homedir}/Videos/')
                 except:
                     pass
-                if check_for_write_permissions(f'{homedir}/REAL-Video-Enhancer/'):
-                    self.settings.change_setting('OutputDir',f'{homedir}/REAL-Video-Enhancer/')
+                if check_for_write_permissions(f'{homedir}/Videos/'):
+                    self.settings.change_setting('OutputDir',f'{homedir}/Videos/')
                 else:
                     no_perms_anywhere(self)
             if check_for_write_permissions(self.settings.RenderDir)==False:
                 no_perms_render(self)
-                self.settings.change_setting('RenderDir',f'{homedir}/.REAL-Video-Enhancer/')
+                self.settings.change_setting('RenderDir',f'{thisdir}')
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
@@ -240,6 +240,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def get_models_from_dir(self,AI):
         return_list = []
+        
         for i in os.listdir(f'{settings.ModelDir}/{AI.lower()}'):
             if os.path.isfile(f'{settings.ModelDir}/{AI.lower()}/{i}') == False:
                 return_list.append(f'{i}')#Adds model to GUI.

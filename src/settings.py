@@ -60,7 +60,6 @@ class Settings:
     "SceneChangeDetection": '0.3',
     "Encoder": '264',
     "DiscordRPC": 'Enabled',
-    "ModelDir": f'{thisdir}/models/',
     'FrameIncrementsMode': 'Automatic',
     'UpdateChannel': 'Stable',
     'Version': '20231004',
@@ -82,12 +81,7 @@ class Settings:
                     self.write_to_settings_file(setting, default_value)
                     self.readSettings()
                 else:
-                    try:
-                        os.mkdir(default_value)
-                    except:
-                        pass
-                    if os.path.exists(default_value) == False:
-                        self.write_to_settings_file(setting, thisdir)
+                    self.write_to_settings_file(setting, thisdir)
         try:
             self.VRAM = settings_dict['VRAM']
         except:
