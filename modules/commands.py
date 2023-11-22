@@ -135,7 +135,11 @@ def get_video_from_link(self,thread):
 
 def start(thread,self,renderdir,videoName,videopath,times):
         try:
+                settings = Settings()
                 
+                if check_for_write_permissions(settings.OutputDir) == False:
+                
+                        self.showDialogBox(f'{e}\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.')
                 self.file_drop_widget.hide()
                 # i need to clean this up lol
                 os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
@@ -147,7 +151,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                         get_video_from_link(self,thread)
 
                 self.fps = VideoName.return_video_framerate(f'{self.input_file}')
-                settings = Settings()
+                
                 # Calculate the aspect ratio
                 videoName = VideoName.return_video_name(fr'{self.input_file}')
                 self.videoName = videoName
@@ -218,7 +222,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
-                self.showDialogBox(e)
+                self.showDialogBox(str(f'{e}'))
                 
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()

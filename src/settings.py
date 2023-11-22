@@ -7,6 +7,14 @@ from src.messages import *
 homedir = os.path.expanduser(r"~")
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 #im going to eventually redo this
+class CustomException(Exception):
+    def __init__(self, additional_info):
+        self.additional_info = additional_info
+        super().__init__()
+
+    def __str__(self):
+        return f"{super().__str__()} - Additional Info: {self.additional_info}"
+
 class Settings:
     def __init__(self) -> None:
         
@@ -64,13 +72,22 @@ class Settings:
             try:
                 setattr(self, setting, settings_dict[setting])
                 if setting in ["OutputDir", "RenderDir"] and not os.path.exists(getattr(self, setting)):
-                    raise Exception
+                    
+                    raise CustomException(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.")
                 
                 if setting == "FrameIncrements":
                     self.FrameIncrements = int(self.FrameIncrements)
             except:
-                self.write_to_settings_file(setting, default_value)
-                self.readSettings()
+                if os.path.exists(default_value):
+                    self.write_to_settings_file(setting, default_value)
+                    self.readSettings()
+                else:
+                    try:
+                        os.mkdir(default_value)
+                    except:
+                        pass
+                    if os.path.exists(default_value) == False:
+                        self.write_to_settings_file(setting, thisdir)
         try:
             self.VRAM = settings_dict['VRAM']
         except:

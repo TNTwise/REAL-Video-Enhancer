@@ -4,7 +4,7 @@ import os
 
 homedir = os.path.expanduser(r"~")
 try:
-    os.mkdir(f'{homedir}/Videos')
+    os.system(f'mkdir -p "{homedir}/Videos/"')
 except Exception as e:
     print(e)
 import src.thisdir
