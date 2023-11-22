@@ -5,11 +5,12 @@ import multiprocessing
 import src.checks as checks
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
+import os
+
 def open_link():
         url = QUrl(r'https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion-%E2%80%90-Create-more-AI-models!')
         QDesktopServices.openUrl(url)
 def onApplicationStart(self):
-    import os
     
     #this is kind of a mess
     import modules.Rife as rife

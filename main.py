@@ -1,6 +1,12 @@
 #!/usr/bin/python3
 import os
+
+
 homedir = os.path.expanduser(r"~")
+try:
+    os.mkdir(f'{homedir}/Videos')
+except:
+    pass
 import src.thisdir
 import src.checks as checks
 thisdir = src.thisdir.thisdir()
