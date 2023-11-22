@@ -133,8 +133,8 @@ def changeDiscordRPC(self):
 
 def changeSceneDetection(self):
         settings = Settings()
-        '''if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
-            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')'''
+        if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
+            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
 def selRenderDir(self):
     settings = Settings()
     render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
