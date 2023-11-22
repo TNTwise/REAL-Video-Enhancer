@@ -125,7 +125,7 @@ def onApplicationStart(self):
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
-    self.ui.frameIncrementSpinBox.setValue(settings.FrameIncrements)
+    self.ui.frameIncrementSpinBox.setValue(int(settings.FrameIncrements))
     self.ui.frameIncrementSpinBox.valueChanged.connect(lambda: selFrameIncrements(self.ui.frameIncrementSpinBox.value()))
     #link buttons
     self.ui.frameIncrementHelp.clicked.connect(lambda: frame_increments_help(self))
@@ -172,6 +172,7 @@ def onApplicationStart(self):
 
 def set_model_params(self):
     models_installed = checks.check_for_individual_models()
+    settings = Settings()
     self.model_labels = {}
     for i in models_installed:
                 

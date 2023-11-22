@@ -77,11 +77,10 @@ class Settings:
                 if setting == "FrameIncrements":
                     self.FrameIncrements = int(self.FrameIncrements)
             except:
-                if os.path.exists(default_value):
-                    self.write_to_settings_file(setting, default_value)
-                    self.readSettings()
-                else:
-                    self.write_to_settings_file(setting, thisdir)
+                
+                self.write_to_settings_file(setting, default_value)
+                self.readSettings()
+                
         try:
             self.VRAM = settings_dict['VRAM']
         except:
@@ -134,8 +133,8 @@ def changeDiscordRPC(self):
 
 def changeSceneDetection(self):
         settings = Settings()
-        if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
-            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
+        '''if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
+            settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')'''
 def selRenderDir(self):
     settings = Settings()
     render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

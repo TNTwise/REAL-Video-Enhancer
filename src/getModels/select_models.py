@@ -20,6 +20,7 @@ from sys import exit
 from src.getModels.rifeModelsFunctions import *
 from src.settings import *
 settings = Settings()
+
 import src.thisdir
 from src.log import log
 thisdir = src.thisdir.thisdir()
