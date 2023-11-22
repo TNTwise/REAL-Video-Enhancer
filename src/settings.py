@@ -42,7 +42,7 @@ class Settings:
     "videoQuality": "18",
     "FrameIncrements": '100',
     "Theme": 'Dark',
-    "OutputDir": f"{homedir}",
+    "OutputDir": f"{homedir}/Videos/",
     "GPUUsage": 'Default',
     "ModelDir": f'{thisdir}/models/',
     "RenderType": 'Optimized',

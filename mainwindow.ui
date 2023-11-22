@@ -200,8 +200,17 @@
              <layout class="QHBoxLayout" name="horizontalLayout">
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_4">
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetMaximumSize</enum>
+                </property>
                 <item>
                  <widget class="QPushButton" name="RifeStart">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="text">
                    <string>Start</string>
                   </property>
@@ -209,6 +218,12 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="Input_video_rife">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="text">
                    <string>Input Video</string>
                   </property>
@@ -216,6 +231,12 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="Input_video_rife_url">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="text">
                    <string>Input Video URL</string>
                   </property>
@@ -223,6 +244,12 @@
                 </item>
                 <item>
                  <widget class="QPushButton" name="Output_folder_rife">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
