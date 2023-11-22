@@ -52,7 +52,7 @@ class Ui_MainWindow(object):
         self.Waifu2xCheckBox.setObjectName("Waifu2xCheckBox")
         self.gridLayout_6.addWidget(self.Waifu2xCheckBox, 6, 0, 1, 1)
         self.RealCUGANCheckBox = QtWidgets.QCheckBox(self.InstallModelsFrame)
-        self.RealCUGANCheckBox.setEnabled(True)
+        self.RealCUGANCheckBox.setEnabled(False)
         self.RealCUGANCheckBox.setObjectName("RealCUGANCheckBox")
         self.gridLayout_6.addWidget(self.RealCUGANCheckBox, 3, 0, 1, 1)
         self.RifeCheckBox = QtWidgets.QCheckBox(self.InstallModelsFrame)
