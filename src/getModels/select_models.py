@@ -347,7 +347,10 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         if i == 'glxinfo':
                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                            
+                        if i == 'flatpak':
+                            os.system(f'chmod +x "{thisdir}/files/flatpak"')
+                            os.system(f'mv "{thisdir}/files/flatpak" "{thisdir}/bin/"')
+                        
                         print(i)
                         if '.zip' in i:
 
