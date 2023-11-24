@@ -535,8 +535,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 notAModel(self)
     def openFolderDialog(self):
         
-        self.output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
-
+        output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
+        if check_for_write_permissions(output_folder):
+            self.output_folder = output_folder
+            print(output_folder + 'set Outputdir')
+        else:
+            no_perms_change_setting(self)
    
     def pause_render(self):
         # Why was this line here??

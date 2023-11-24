@@ -1,7 +1,6 @@
 import os
 homedir =  os.path.expanduser(r"~")
 def check_for_write_permissions(dir):
-         print('k')
 
          if 'FLATPAK_ID' in os.environ:
             import subprocess
@@ -15,7 +14,8 @@ def check_for_write_permissions(dir):
             for i in output:
                 if len(i) > 0 and i != '\n':
                     output_2.append(i)
-            
+            print(output)
+            print(output_2)
             directories_with_permissions=[]
             for i in output_2:
                 print(i)
