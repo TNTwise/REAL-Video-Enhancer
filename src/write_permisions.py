@@ -3,21 +3,17 @@ import src.thisdir
 homedir =  os.path.expanduser(r"~")
 thisdir = src.thisdir.thisdir()
 def check_for_write_permissions(dir):
-        i=1
-        if i==1:
-            print(os.environ)
+        if 'FLATPAK_ID' in os.environ:
             import subprocess
 
             command = f'cat /var/lib/flatpak/app/io.github.tntwise.REAL-Video-Enhancer/x86_64/master/active/metadata'
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
-            print(result.stderr)
             output = result.stdout.split('\n')
             output_2=[]
             for i in output:
                 if len(i) > 0 and i != '\n':
                     output_2.append(i)
-            print(output_2)
             directories_with_permissions=[]
             for i in output_2:
                 print(i)
