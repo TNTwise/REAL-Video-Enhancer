@@ -1,6 +1,6 @@
 import os
 def check_for_write_permissions(dir):
-
+         print('k')
 
          if 'FLATPAK_ID' in os.environ:
             import subprocess

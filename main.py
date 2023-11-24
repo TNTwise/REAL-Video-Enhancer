@@ -27,6 +27,7 @@ from PyQt5.QtWidgets import  QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap,QIcon
 import mainwindow
 import os
+from src.write_permisions import *
 from threading import *
 from src.settings import *
 from src.return_data import *
