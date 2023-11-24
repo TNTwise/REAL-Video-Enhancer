@@ -3,8 +3,8 @@ import src.thisdir
 homedir =  os.path.expanduser(r"~")
 thisdir = src.thisdir.thisdir()
 def check_for_write_permissions(dir):
-
-        if 'FLATPAK_ID' in os.environ:
+        i=1
+        if i==1:
             print(os.environ)
             import subprocess
 
@@ -42,6 +42,11 @@ def check_for_write_permissions(dir):
                 else:
                     print(f'Dir: {dir}')
                     print(f'I: {i}')
+                    i=i.replace(f'{homedir}','/run/user/1000/doc/fecc5049/')
+                    if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
+                        print(f'I: {i}')
+                        print(f'Dir: {dir}')
+                        return True
                     return False
         else:
                 if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
