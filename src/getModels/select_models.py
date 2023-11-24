@@ -77,6 +77,9 @@ class Worker(QObject):
                         if i == 'glxinfo':
                              os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                              os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+                        if i == 'flatpak':
+                             os.system(f'chmod +x "{thisdir}/files/flatpak"')
+                             os.system(f'mv "{thisdir}/files/flatpak" "{thisdir}/bin/"')
                     for i in os.listdir(f'{thisdir}/files/'):
                         
                              
@@ -185,10 +188,9 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 '''
                 install_modules_dict = {'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',}
+'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',
+'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/flatpak':'flatpak',}
                 
-                if check_if_flatpak():
-                     install_modules_dict['https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/flatpak'] = 'flatpak'
                 
                 if self.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
@@ -348,6 +350,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
                         if i == 'flatpak':
+                            print('i')
                             os.system(f'chmod +x "{thisdir}/files/flatpak"')
                             os.system(f'mv "{thisdir}/files/flatpak" "{thisdir}/bin/"')
                         

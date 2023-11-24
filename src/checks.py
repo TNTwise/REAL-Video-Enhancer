@@ -115,12 +115,8 @@ def check_for_individual_models():
 
 
 def check_for_each_binary():
-    if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/yt-dlp_linux') and os.path.isfile(f'{thisdir}/bin/glxinfo'):
-        if check_if_flatpak():
-            if os.path.isfile(f'{thisdir}/bin/flatpak'):
-                return True
-            return False
-        return True
+    if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/yt-dlp_linux') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/flatpak'):
+            return True
     return False
 
 def check_for_updates():
