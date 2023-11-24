@@ -104,7 +104,7 @@
                   </property>
                   <property name="sizeHint" stdset="0">
                    <size>
-                    <width>5000</width>
+                    <width>40</width>
                     <height>20</height>
                    </size>
                   </property>
@@ -211,6 +211,12 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Start</string>
                   </property>
@@ -224,6 +230,12 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Input Video</string>
                   </property>
@@ -236,6 +248,12 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
                   </property>
                   <property name="text">
                    <string>Input Video URL</string>
@@ -252,7 +270,7 @@
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>0</width>
+                    <width>100</width>
                     <height>0</height>
                    </size>
                   </property>
@@ -279,6 +297,12 @@
                   </item>
                   <item>
                    <widget class="QComboBox" name="modeCombo">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -300,6 +324,12 @@
                   </item>
                   <item>
                    <widget class="QComboBox" name="AICombo">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>110</width>
@@ -321,6 +351,12 @@
                   </item>
                   <item>
                    <widget class="QComboBox" name="Rife_Model">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -342,6 +378,12 @@
                   </item>
                   <item>
                    <widget class="QComboBox" name="Rife_Times">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
@@ -378,6 +420,12 @@
                   </item>
                   <item>
                    <widget class="QSpinBox" name="denoiseLevelSpinBox">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="minimumSize">
                      <size>
                       <width>0</width>
