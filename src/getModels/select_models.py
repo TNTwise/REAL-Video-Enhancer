@@ -77,9 +77,7 @@ class Worker(QObject):
                         if i == 'glxinfo':
                              os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                              os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                        if i == 'flatpak':
-                             os.system(f'chmod +x "{thisdir}/files/flatpak"')
-                             os.system(f'mv "{thisdir}/files/flatpak" "{thisdir}/bin/"')
+                        
                     for i in os.listdir(f'{thisdir}/files/'):
                         
                              
@@ -188,8 +186,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 '''
                 install_modules_dict = {'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/flatpak':'flatpak',}
+'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',}
                 
                 
                 if self.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
@@ -349,10 +346,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         if i == 'glxinfo':
                             os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                             os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                        if i == 'flatpak':
-                            print('i')
-                            os.system(f'chmod +x "{thisdir}/files/flatpak"')
-                            os.system(f'mv "{thisdir}/files/flatpak" "{thisdir}/bin/"')
+                        
                         
                         print(i)
                         if '.zip' in i:
