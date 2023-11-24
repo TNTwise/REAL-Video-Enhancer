@@ -8,7 +8,7 @@ def check_for_write_permissions(dir):
             command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
-
+            print(result.stdout)
             output = result.stdout.split('\n')
             output_2=[]
             for i in output:
