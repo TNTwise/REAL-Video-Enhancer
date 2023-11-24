@@ -5,6 +5,7 @@ thisdir = src.thisdir.thisdir()
 def check_for_write_permissions(dir):
 
         if 'FLATPAK_ID' in os.environ:
+            print(os.environ)
             import subprocess
 
             command = f'{thisdir}/bin/flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
