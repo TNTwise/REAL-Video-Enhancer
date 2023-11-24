@@ -104,21 +104,51 @@ def check_for_individual_models():
             return return_list
         
     return None
+
 def check_for_write_permissions(dir):
-        '''try:
-            with open(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer','w')as f:
-                f.write('a')
-            os.remove(f'{dir}/fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer')
-            os.chdir(dir)
-            with open(f'fjkgkjdfgbdfjgbdfkbjksdjkbcdsbcsdhfaskghafbvdfjbvhfdbvhfdskvbhfdskbhjkfrhfrauifreifegfiuer','w')as f:
-                f.write('a')
-            return True
-        except:
-            return False'''
-        if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
-            print('has access')
-            return True
-        return False
+
+
+         print(os.environ)
+         if 'FLATPAK_ID' in os.environ or "container" in os.environ:
+            print('checking for permissions')
+            import subprocess
+
+            command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
+
+            result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+            output = result.stdout.split('\n')
+            output_2=[]
+            for i in output:
+                if len(i) > 0 and i != '\n':
+                    output_2.append(i)
+            
+            directories_with_permissions=[]
+            for i in output_2:
+                if 'filesystems=' in i:
+                    i=i.split(';')
+                    s=[]
+                    for e in  i:
+                        if len(e) > 0 and i != '\n':
+                            s.append(e)
+                    for j in s:
+                        j=j.replace('filesystems=','')
+                        j=j.replace('xdg-','/home/pax/')
+                        j+='/'
+                        directories_with_permissions.append(j)
+                    break
+            for i in directories_with_permissions:
+                if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
+                    
+                    return True
+                
+            return False
+         else:
+            if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
+                print('has access')
+                return True
+            return False
+
 def check_for_each_binary():
     if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/glxinfo'):
         return True

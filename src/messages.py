@@ -1,6 +1,7 @@
 import os
 homedir = os.path.expanduser(r"~")
-
+import src.thisdir
+thisdir = src.thisdir.thisdir()
 from PyQt5.QtGui import QIcon
 def show_scene_change_help(self):
     self.showDialogBox('1 is the most sensitive, detecting the most frame changes in a scene.\n9 is the least sensitive, detecting fewest frame changes in a scene.')
@@ -57,16 +58,16 @@ def too_large_video(self):
 def restart_app(self):
     self.showDialogBox("Please restart app for changes to take effect.")
 def no_perms(self):
-    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Output directory will be {homedir}/REAL-Video-Enhancer")
+    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Output directory will be {homedir}/Videos")
 
 def no_perms_render(self):
-    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Render directory will be {homedir}/.REAL-Video-Enhancer")
+    self.showDialogBox(f"No permissions to write here, please select a different directory or the default Render directory will be {thisdir}")
 
 def no_perms_change_setting(self):
     self.showDialogBox("No permissions to write here, please select a different directory.")
 
 def no_perms_anywhere(self):
-    self.showDialogBox(f"No permissions to write to {homedir}/REAL-Video-Enhancer, please select a directory in settings!!!!!")
+    self.showDialogBox(f"No permissions to write to {homedir}/.REAL-Video-Enhancer, please select a directory in settings!!!!!")
 
 def notAModel(self):
     self.showDialogBox(f"Not a valid model, please select a different file.")

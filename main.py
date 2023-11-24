@@ -193,8 +193,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     no_perms_anywhere(self)
             if check_for_write_permissions(self.settings.RenderDir)==False:
-                no_perms_render(self)
                 self.settings.change_setting('RenderDir',f'{thisdir}')
+                no_perms_render(self)
+                
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
