@@ -8,7 +8,7 @@ def check_for_write_permissions(dir):
             print(os.environ)
             import subprocess
 
-            command = f'{thisdir}/bin/flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
+            command = f'cat /var/lib/flatpak/app/io.github.tntwise.REAL-Video-Enhancer/x86_64/master/active/metadata'
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             print(result.stderr)
