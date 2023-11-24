@@ -36,6 +36,13 @@ def check_if_free_space(RenderDir):
 def check_if_enough_space_for_install(size_in_bytes):
     free_space= shutil.disk_usage(f'{thisdir}').free
     return free_space >  size_in_bytes
+
+def check_if_flatpak():
+    if 'FLATPAK_ID' in os.environ:
+        return True
+    return False
+
+
 def check_if_enough_space(input_file,render,times):
     settings = Settings()
     img_type = settings.Image_Type
@@ -108,9 +115,7 @@ def check_for_individual_models():
 def check_for_write_permissions(dir):
 
 
-         print(os.environ)
          if 'FLATPAK_ID' in os.environ or "container" in os.environ:
-            print('checking for permissions')
             import subprocess
 
             command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
@@ -127,6 +132,7 @@ def check_for_write_permissions(dir):
             for i in output_2:
                 if 'filesystems=' in i:
                     i=i.split(';')
+                    print(i)
                     s=[]
                     for e in  i:
                         if len(e) > 0 and i != '\n':
