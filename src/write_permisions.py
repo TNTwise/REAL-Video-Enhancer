@@ -2,7 +2,7 @@ import os
 def check_for_write_permissions(dir):
 
 
-         if 'FLATPAK_ID' in os.environ or "container" in os.environ:
+         if 'FLATPAK_ID' in os.environ:
             import subprocess
 
             command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
@@ -33,10 +33,13 @@ def check_for_write_permissions(dir):
                     break
             for i in directories_with_permissions:
                 if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
-                    
+                    print(f'I: {i}')
+                    print(f'Dir: {dir}')
                     return True
-                
-            return False
+                else:
+                    print(f'Dir: {dir}')
+                    print(f'I: {i}')
+                    return False
          else:
             if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
                 print('has access')
