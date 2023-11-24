@@ -1,4 +1,5 @@
 import os
+homedir =  os.path.expanduser(r"~")
 def check_for_write_permissions(dir):
          print('k')
 
@@ -27,7 +28,7 @@ def check_for_write_permissions(dir):
                             s.append(e)
                     for j in s:
                         j=j.replace('filesystems=','')
-                        j=j.replace('xdg-','/home/pax/')
+                        j=j.replace('xdg-',f'{homedir}')
                         j+='/'
                         directories_with_permissions.append(j)
                     break
