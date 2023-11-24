@@ -186,6 +186,10 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 install_modules_dict = {'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',}
+                
+                if check_if_flatpak():
+                     install_modules_dict['https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/flatpak'] = 'flatpak'
+                
                 if self.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                 if self.ui.RifeCheckBox.isChecked() == False:
