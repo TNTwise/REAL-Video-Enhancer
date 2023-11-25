@@ -6,7 +6,7 @@ def check_for_write_permissions(dir):
         if 'FLATPAK_ID' in os.environ:
             import subprocess
 
-            command = f'cat /var/lib/flatpak/app/io.github.tntwise.REAL-Video-Enhancer/x86_64/master/active/metadata'
+            command = f'cat /.flatpak-info'
 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = result.stdout.split('\n')
