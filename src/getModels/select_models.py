@@ -36,12 +36,7 @@ class Worker(QObject):
     
     def install_modules(self):
             
-            for i in os.listdir(f'{thisdir}/files/'):
-                         if '.txt' not in i:
-                              try:
-                                os.remove(f'{thisdir}/files/{i}')
-                              except:
-                                os.system(f'rm -rf "{thisdir}/files/{i}"')
+            
             settings = Settings()
             try:
                     os.system(f'touch "{thisdir}/models.txt"')
@@ -368,8 +363,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                                 f.extractall(f'{settings.ModelDir}/rife/')
 
 
-                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
-                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    
                     clear_files()
                     if check_for_individual_models != None:
                         if check_if_online():

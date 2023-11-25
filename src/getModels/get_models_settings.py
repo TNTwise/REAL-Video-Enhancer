@@ -31,9 +31,7 @@ class Worker(QObject):
             rife_install_list = []
             for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
-                              try:
-                                os.remove(f'{thisdir}/files/{i}')
-                              except:
+                              
                                 os.system(f'rm -rf "{thisdir}/files/{i}"')
             settings = Settings()
             try:
