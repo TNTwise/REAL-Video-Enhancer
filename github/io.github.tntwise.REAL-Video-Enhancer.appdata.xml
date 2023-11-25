@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop">
+<component type="desktop-application">
  <id>io.github.tntwise.REAL-Video-Enhancer</id>
  <launchable type="desktop-id">io.github.tntwise.REAL-Video-Enhancer.desktop</launchable>
  <name>REAL Video Enhancer</name>
@@ -11,13 +11,13 @@
   <p>
             A simple video enhancer for Linux.
         </p>
-  
+
  </description>
  <url type="homepage">https://github.com/TNTwise/REAL-Video-Enhancer</url>
  <url type="bugtracker">https://github.com/TNTwise/REAL-Video-Enhancer/issues</url>
  <screenshots>
   <screenshot type="default">
-   <image>https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/demo.png</image>
+   <image>https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/1.0.4/github/demo.png</image>
   </screenshot>
  </screenshots>
  <content_rating type="oars-1.1"/>
@@ -34,4 +34,4 @@
    </description>
   </release>
  </releases>
-</component> 
+</component>
