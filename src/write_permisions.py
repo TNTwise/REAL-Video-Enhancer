@@ -43,7 +43,7 @@ def check_for_write_permissions(dir):
                         permissions_dir=''
                         for index in range(len(i)):
                             if index != 0:
-                                permissions_dir+=f'{i[index]}/'
+                                permissions_dir+=f'{dir[index]}/'
                             
                         dir=f'/{permissions_dir}'
                         
