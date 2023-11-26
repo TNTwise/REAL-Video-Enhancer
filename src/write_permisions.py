@@ -3,12 +3,12 @@ import src.thisdir
 homedir =  os.path.expanduser(r"~")
 thisdir = src.thisdir.thisdir()
 def check_for_write_permissions(dir):
-        i=0
+        i=0 # change this to 1 to debug flatpak
         if 'FLATPAK_ID' in os.environ or i==1:
             import subprocess
 
-            #command = f'cat /.flatpak-info'
-            command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
+            command = f'cat /.flatpak-info' # this is for actual flatpak
+            #command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer' 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = result.stdout.split('\n')
             output_2=[]
