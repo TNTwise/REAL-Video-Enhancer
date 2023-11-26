@@ -44,8 +44,10 @@ def check_for_write_permissions(dir):
                         for index in range(len(dir)):
                             if index != 0:
                                 permissions_dir+=f'{dir[index]}/'
-                            
-                        dir=f'/{permissions_dir}'
+                        if homedir not in permissions_dir:
+                            dir=f'{homedir}{permissions_dir}'
+                        else:
+                            dir=f'/{permissions_dir}'
                         
                         
                     print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
