@@ -29,14 +29,16 @@ def check_for_write_permissions(dir):
                             j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
                         j=j.replace('~',f'{homedir}')
-                        if ':ro' in j:
-                            return False
                         directories_with_permissions.append(j)
             for i in directories_with_permissions:
+                if i[-1] !='/':
+                    i+='/'
+                if dir[-1] !='/':
+                    i+='/'
                 print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
+                    
                 
-                
-                if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
+                if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
                     return True
                 else:
                     if '/run/user/1000/doc/' in dir:
@@ -53,7 +55,7 @@ def check_for_write_permissions(dir):
                         
                         
                     print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
-                    if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
+                    if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
                         return True
             
             return False
