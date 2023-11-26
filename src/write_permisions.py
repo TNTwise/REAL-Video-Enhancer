@@ -8,7 +8,7 @@ def check_for_write_permissions(dir):
             import subprocess
 
             command = f'cat /.flatpak-info' # this is for actual flatpak
-            #command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer' 
+            command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer' 
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = result.stdout.split('\n')
             output_2=[]
@@ -31,14 +31,13 @@ def check_for_write_permissions(dir):
                         j=j.replace('~',f'{homedir}')
                         directories_with_permissions.append(j)
             for i in directories_with_permissions:
-                if i[-1] !='/':
-                    i+='/'
+                
                 if dir[-1] !='/':
                     dir+='/'
                 print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
                     
                 
-                if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
+                if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
                     return True
                 else:
                     if '/run/user/1000/doc/' in dir:
@@ -55,7 +54,7 @@ def check_for_write_permissions(dir):
                         
                         
                     print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
-                    if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
+                    if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower() and ':ro' not in i:
                         return True
             
             return False
