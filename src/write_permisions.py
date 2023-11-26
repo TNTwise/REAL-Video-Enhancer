@@ -45,7 +45,7 @@ def check_for_write_permissions(dir):
                             if index != 0:
                                 permissions_dir+=f'{dir[index]}/'
                         if homedir not in permissions_dir:
-                            dir=f'{homedir}{permissions_dir}'
+                            dir=f'{homedir}/{permissions_dir}'
                         else:
                             dir=f'/{permissions_dir}'
                         
