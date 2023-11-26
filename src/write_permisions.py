@@ -17,29 +17,25 @@ def check_for_write_permissions(dir):
                     output_2.append(i)
             directories_with_permissions=[]
             for i in output_2:
-                print(i)
                 if 'filesystems=' in i:
                     i=i.split(';')
-                    print(i)
                     s=[]
                     for e in  i:
                         if len(e) > 0 and i != '\n':
                             s.append(e)
                     for j in s:
                         j=j.replace('filesystems=','')
+                        if 'xdg-download' in j:
+                            j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
                         
                         directories_with_permissions.append(j)
                     break
             for i in directories_with_permissions:
                 if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
-                    print(f'I: {i}')
-                    print(f'Dir: {dir}')
                     return True
                 else:
-                    print(f'Dir: {dir}')
-                    print(f'I: {i}')
-                    if '/run/user/1000/doc/' in i:
+                    if '/run/user/1000/doc/' in dir:
                         i=i.replace('/run/user/1000/doc/','')
                         i=i.split('/')
                         permissions_dir=''
@@ -51,8 +47,6 @@ def check_for_write_permissions(dir):
                         i=f'{homedir}/{permissions_dir}'
                         print(i)
                     if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
-                        print(f'I: {i}')
-                        print(f'Dir: {dir}')
                         return True
                     return False
         else:
