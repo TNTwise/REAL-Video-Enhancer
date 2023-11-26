@@ -25,12 +25,11 @@ def check_for_write_permissions(dir):
                             s.append(e)
                     for j in s:
                         j=j.replace('filesystems=','')
-                        if 'xdg-download' in j:
+                        if 'xdg-download' == j:
                             j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
                         
                         directories_with_permissions.append(j)
-                    break
             for i in directories_with_permissions:
                 if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
                     return True
