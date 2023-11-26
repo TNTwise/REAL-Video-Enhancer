@@ -7,8 +7,8 @@ def check_for_write_permissions(dir):
         if 'FLATPAK_ID' in os.environ or i==1:
             import subprocess
 
-            command = f'cat /.flatpak-info'
-            #command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
+            #command = f'cat /.flatpak-info'
+            command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
             output = result.stdout.split('\n')
             output_2=[]
@@ -25,13 +25,16 @@ def check_for_write_permissions(dir):
                             s.append(e)
                     for j in s:
                         j=j.replace('filesystems=','')
-                        if 'xdg-download' == j:
+                        if j == 'xdg-download':
                             j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
                         
                         directories_with_permissions.append(j)
             for i in directories_with_permissions:
-                if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
+                print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
+                
+                
+                if dir.lower() in i.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
                     return True
                 else:
                     if '/run/user/1000/doc/' in dir:
@@ -42,14 +45,13 @@ def check_for_write_permissions(dir):
                             if index != 0:
                                 permissions_dir+=f'{i[index]}/'
                             
-                        if homedir not in permissions_dir:
-                            i=f'{homedir}/{permissions_dir}'
-                        else:
-                            i=permissions_dir
+                        i=f'{permissions_dir}'
+                        
                         print(i)
                     if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
                         return True
-                    return False
+            
+            return False
         else:
                 if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
                     print('has access')
