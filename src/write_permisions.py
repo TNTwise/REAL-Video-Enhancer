@@ -38,14 +38,14 @@ def check_for_write_permissions(dir):
                     return True
                 else:
                     if '/run/user/1000/doc/' in dir:
-                        i=i.replace('/run/user/1000/doc/','')
-                        i=i.split('/')
+                        dir=dir.replace('/run/user/1000/doc/','')
+                        dir=dir.split('/')
                         permissions_dir=''
                         for index in range(len(i)):
                             if index != 0:
                                 permissions_dir+=f'{i[index]}/'
                             
-                        i=f'/{permissions_dir}'
+                        dir=f'/{permissions_dir}'
                         
                         
                     print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
