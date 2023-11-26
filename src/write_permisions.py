@@ -43,8 +43,10 @@ def check_for_write_permissions(dir):
                             if index != 0:
                                 permissions_dir+=f'{i[index]}/'
                             
-                             
-                        i=f'{homedir}/{permissions_dir}'
+                        if homedir not in permissions_dir:
+                            i=f'{homedir}/{permissions_dir}'
+                        else:
+                            i=permissions_dir
                         print(i)
                     if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
                         return True
