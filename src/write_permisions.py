@@ -41,7 +41,7 @@ def check_for_write_permissions(dir):
                         dir=dir.replace('/run/user/1000/doc/','')
                         dir=dir.split('/')
                         permissions_dir=''
-                        for index in range(len(i)):
+                        for index in range(len(dir)):
                             if index != 0:
                                 permissions_dir+=f'{dir[index]}/'
                             
