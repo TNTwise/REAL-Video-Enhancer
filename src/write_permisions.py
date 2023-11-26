@@ -28,6 +28,7 @@ def check_for_write_permissions(dir):
                         if j == 'xdg-download':
                             j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
+                        j=j.replace('~',f'{homedir}')
                         if ':ro' in j:
                             return False
                         directories_with_permissions.append(j)
