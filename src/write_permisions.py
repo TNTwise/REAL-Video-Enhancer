@@ -45,9 +45,10 @@ def check_for_write_permissions(dir):
                             if index != 0:
                                 permissions_dir+=f'{i[index]}/'
                             
-                        i=f'{permissions_dir}'
+                        i=f'/{permissions_dir}'
                         
-                        print(i)
+                        
+                    print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
                     if i.lower() in dir.lower() or 'io.github.tntwise.real-video-enhancer' in dir.lower():
                         return True
             
