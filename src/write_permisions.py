@@ -28,7 +28,8 @@ def check_for_write_permissions(dir):
                         if j == 'xdg-download':
                             j=f'{homedir}/Downloads'
                         j=j.replace('xdg-',f'{homedir}/')
-                        
+                        if ':ro' in j:
+                            return False
                         directories_with_permissions.append(j)
             for i in directories_with_permissions:
                 print(f'Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}')
