@@ -537,8 +537,20 @@ class MainWindow(QtWidgets.QMainWindow):
         
         output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
         if check_for_write_permissions(output_folder):
+            
+            if '/run/user/1000/doc/' in output_folder:
+                        output_folder=output_folder.replace('/run/user/1000/doc/','')
+                        output_folder=output_folder.split('/')
+                        permissions_dir=''
+                        for index in range(len(output_folder)):
+                            if index != 0:
+                                permissions_dir+=f'{output_folder[index]}/'
+                        if homedir not in permissions_dir:
+                            output_folder=f'{homedir}/{permissions_dir}'
+                        else:
+                            output_folder=f'/{permissions_dir}'
             self.output_folder = output_folder
-            print(output_folder + 'set Outputdir')
+            print(output_folder + ' set Outputdir')
         else:
             no_perms_change_setting(self)
    
