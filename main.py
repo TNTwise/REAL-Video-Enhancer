@@ -164,7 +164,7 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
-            self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin','.param']))
+            self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin']))
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
             src.onProgramStart.onApplicationStart(self)
@@ -523,16 +523,36 @@ class MainWindow(QtWidgets.QMainWindow):
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
         if type_of_file == 'Model':
-            if (os.path.splitext(input_file)[1])[1:] == 'bin' or (os.path.splitext(input_file)[1])[1:] == 'param':
-                if os.path.isfile(input_file) and os.path.isfile(input_file.replace('.bin','.param')) or os.path.isfile(input_file.replace('.param','.bin')):
+            if (os.path.splitext(input_file)[1])[1:] == 'bin':
+                if os.path.isfile(input_file):
                     if os.path.basename(input_file) in os.listdir(f'{settings.ModelDir}/realesrgan/models/'):
                         alreadyModel(self)
                         return
-                    os.system(f'cp "{input_file.replace(".param",".bin")}" "{settings.ModelDir}/realesrgan/models/" && cp "{input_file.replace(".bin",".param")}" "{settings.ModelDir}/realesrgan/models/"')
+                    
+                    
                     if self.ui.AICombo.currentText() == 'RealESRGAN':
                         esrgan.modelOptions(self)
             else:
                 notAModel(self)
+                return
+            bin=input_file
+            inputf = os.path.basename(input_file.replace((os.path.splitext(input_file)[1])[1:],'param'))
+            input_file = QFileDialog.getOpenFileName(self, 'Open File', f'{homedir}',f".param files ({inputf})")[0]
+            if (os.path.splitext(input_file)[1])[1:] == 'param':
+                if os.path.isfile(input_file):
+                    if os.path.basename(input_file) in os.listdir(f'{settings.ModelDir}/realesrgan/models/'):
+                        alreadyModel(self)
+                        return
+                    
+                    
+                    if self.ui.AICombo.currentText() == 'RealESRGAN':
+                        esrgan.modelOptions(self)
+            else:
+                notAModel(self)
+                return
+            param=input_file
+            os.system(f'cp "{bin}" "{settings.ModelDir}/realesrgan/models/"')
+            os.system(f'cp "{param}" "{settings.ModelDir}/realesrgan/models/"')
     def openFolderDialog(self):
         
         output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')

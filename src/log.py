@@ -15,6 +15,6 @@ except:
 def log(log):
     
     with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
-        f.write(log + '\n')
+        f.write(str(log) + '\n')
 
     
