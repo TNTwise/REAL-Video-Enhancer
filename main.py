@@ -182,7 +182,8 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 pass
             if int(HardwareInfo.get_video_memory_linux()) < 4:
-                not_enough_vram(self)
+                if settings.ignoreVramPopup == 'False':
+                    not_enough_vram(self)
             if check_for_write_permissions(self.settings.OutputDir)==False:
                 no_perms(self)
                 try:
@@ -556,24 +557,45 @@ class MainWindow(QtWidgets.QMainWindow):
     def openFolderDialog(self):
         
         output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
-        if check_for_write_permissions(output_folder):
-            
-            if '/run/user/1000/doc/' in output_folder:
-                        output_folder=output_folder.replace('/run/user/1000/doc/','')
-                        output_folder=output_folder.split('/')
-                        permissions_dir=''
-                        for index in range(len(output_folder)):
-                            if index != 0:
-                                permissions_dir+=f'{output_folder[index]}/'
-                        if homedir not in permissions_dir:
-                            output_folder=f'{homedir}/{permissions_dir}'
-                        else:
-                            output_folder=f'/{permissions_dir}'
-            self.output_folder = output_folder
-            print(output_folder + ' set Outputdir')
-        else:
-            no_perms_change_setting(self)
-   
+        if output_folder != '':
+            try:
+                if check_for_write_permissions(output_folder):
+                    
+                    if '/run/user/1000/doc/' in output_folder:
+                                output_folder=output_folder.replace('/run/user/1000/doc/','')
+                                output_folder=output_folder.split('/')
+                                permissions_dir=''
+                                for index in range(len(output_folder)):
+                                    if index != 0:
+                                        permissions_dir+=f'{output_folder[index]}/'
+                                if homedir not in permissions_dir:
+                                    output_folder=f'{homedir}/{permissions_dir}'
+                                else:
+                                    output_folder=f'/{permissions_dir}'
+                    self.output_folder = output_folder
+                    print(output_folder + ' set Outputdir')
+                else:
+                    no_perms_change_setting(self)
+            except:
+                self.showDialogBox('Invalid Directory')
+    def ignore_vram_popup(self):
+        settings.change_setting('ignoreVramPopup', 'True')
+    def showPopup(self,message,ignore_function):
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setText(message)
+        msg_box.setWindowTitle('REAL Video Enhancer')
+        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Ignore)
+
+        # Connect the button signals to functions
+        ignore_button = msg_box.button(QMessageBox.Ignore)
+        ignore_button.clicked.connect(ignore_function)
+
+        result = msg_box.exec_()
+
+    def ignoreButtonClicked(self):
+        print('Ignore button clicked!')
+
     def pause_render(self):
         # Why was this line here??
             self.paused = True

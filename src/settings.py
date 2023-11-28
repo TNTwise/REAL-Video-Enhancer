@@ -66,6 +66,7 @@ class Settings:
     'UpdateChannel': 'Stable',
     
     'DefaultRifeModel': f'rife-v4.6',
+    'ignoreVramPopup': 'False'
 }
             
 
