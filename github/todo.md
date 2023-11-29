@@ -42,4 +42,3 @@ detect when a esrgan model isnt converted correctly (didnt change data to input)
 add option for ffmpeg speed/quality preset<br/>
 enter gpu id via text(like upscayl)<br/>
 add option for after render is done, like shutdown.<br/>
-fix issue where unable to download, and rife not downloading if none is selected. do first by deleting prexisting zip files if they are there.

@@ -357,7 +357,7 @@ class interpolation(QObject):
             outputpath = self.main.output_folder
             
             # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
-                    
+            
                     
             #self.main.runLogs(videoName,times)
             start(self,self.main,self.main.render_folder,self.main.videoName,videopath,times)

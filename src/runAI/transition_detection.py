@@ -18,6 +18,7 @@ class TransitionDetection:
         self.input_file = originalSelf.input_file
         self.videoName = originalSelf.videoName
         import src.thisdir
+        self.main = originalSelf
         self.thisdir = src.thisdir.thisdir()
         self.fps = originalSelf.fps
         self.full_render_dir = f'{self.render_directory}/{self.videoName}_temp'
@@ -32,12 +33,13 @@ class TransitionDetection:
                 os.mkdir(f"{self.full_render_dir}/transitions/")
             except:
                  pass
+            self.main.addLinetoLogs('Detecting Transitions')
             if self.settings.Image_Type != '.webp':
                 ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
             else:
                  ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
             output = subprocess.check_output(ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT)
-            
+            self.main.addLinetoLogs(f'Transitions detected: {len(os.listdir(f"{self.full_render_dir}/transitions/"))}')
             # Decode the output as UTF-8 and split it into lines
             output_lines = output.decode("utf-8").split("\n")
                     # Create a list to store the timestamps
