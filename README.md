@@ -1,4 +1,5 @@
 # REAL Video Enhancer
+![downloads_total](https://img.shields.io/github/downloads/tntwise/REAL-Video-Enhancer/total.svg?label=downloads%40total)
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)<br/>
 <p align=center>
   <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/main/icons/logo%20v1.png" width = "25%">
