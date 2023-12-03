@@ -25,8 +25,6 @@ def start_discordRPC(self, mode='Interpolating'):
 
 
               client_id = '1120814311246405743'  # ID for rpc
-              self.RPC = Presence(client_id)  # Initialize the client class
-              self.RPC.connect() # Start the handshake loop
               try:
                 for i in range(10):
                     ipc_path = f"{os.getenv('XDG_RUNTIME_DIR')}/discord-ipc-{i}"
@@ -34,6 +32,9 @@ def start_discordRPC(self, mode='Interpolating'):
                         os.symlink(f"{os.getenv('HOME')}/.config/discord/{client_id}", ipc_path)
               except:
                 print('Not flatpak')
+              self.RPC = Presence(client_id)  # Initialize the client class
+              self.RPC.connect() # Start the handshake loop
+              
               self.RPC.update(state=f"{self.videoName}", details=f"{mode} Video",large_image='logov1') 
             
             
