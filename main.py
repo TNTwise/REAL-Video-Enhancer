@@ -123,7 +123,10 @@ class FileDropWidget(QLabel):
             else:
                 not_a_video(self.main)
         except Exception as e:
-            self.main.showDialogBox(e)
+            if check_if_flatpak():
+                self.main.showDialogBox(str(e) + f'\nMost likely no permissions to access this directory in flatpak.\nEither select a file from the Input Video button\nOr drag a file from a directory with permissions, most likely {homedir}/Videos/.')
+            else:
+                self.main.showDialogBox(str(e))
             traceback_info = traceback.format_exc()
             log(f'{e} {traceback_info}')
             

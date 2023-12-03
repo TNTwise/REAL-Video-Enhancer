@@ -2,6 +2,7 @@ from pypresence import Presence
 from time import sleep
 import signal
 from contextlib import contextmanager
+import os
 class TimeoutException(Exception): pass
 @contextmanager
 def time_limit(seconds):
@@ -26,6 +27,13 @@ def start_discordRPC(self, mode='Interpolating'):
               client_id = '1120814311246405743'  # ID for rpc
               self.RPC = Presence(client_id)  # Initialize the client class
               self.RPC.connect() # Start the handshake loop
+              try:
+                for i in range(10):
+                    ipc_path = f"{os.getenv('XDG_RUNTIME_DIR')}/discord-ipc-{i}"
+                    if not os.path.exists(ipc_path) or not os.path.isfile(ipc_path):
+                        os.symlink(f"{os.getenv('HOME')}/.config/discord/{client_id}", ipc_path)
+              except:
+                print('Not flatpak')
               self.RPC.update(state=f"{self.videoName}", details=f"{mode} Video",large_image='logov1') 
             
             
