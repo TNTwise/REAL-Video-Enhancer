@@ -42,3 +42,6 @@ detect when a esrgan model isnt converted correctly (didnt change data to input)
 add option for ffmpeg speed/quality preset<br/>
 enter gpu id via text(like upscayl)<br/>
 add option for after render is done, like shutdown.<br/>
+Fix realesrgan not getting resolution from linked videos<br/>
+put render directories into a single folder for easier cleaning<br/>
+make transition detection dynamic between fps, like it can be 2x, 2.5x, 2.7x, any custom timestep for the rife-v4 models
