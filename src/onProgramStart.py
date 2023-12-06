@@ -6,6 +6,7 @@ import src.checks as checks
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
 import os
+from src.log import *
 
 def open_link():
         url = QUrl(r'https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion-%E2%80%90-Create-more-AI-models!')
@@ -78,6 +79,7 @@ def onApplicationStart(self):
     self.ui.InstallModelsFrame.hide()
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
+    
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))
     if settings.DiscordRPC == 'Enabled':
         self.ui.DiscordRPCBox.setChecked(True)
@@ -133,6 +135,7 @@ def onApplicationStart(self):
     self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
     self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
     self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
+    self.ui.logButton.clicked.connect(lambda: viewLogs(self))
     self.ui.RifePause.clicked.connect(self.pause_render)
     self.ui.RifeResume.clicked.connect(self.resume_render)
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
