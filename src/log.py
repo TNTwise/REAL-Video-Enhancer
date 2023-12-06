@@ -58,7 +58,8 @@ class PopupWindow(QDialog):
 
         #layout in order
         layout.addWidget(self.text_edit)
-        layout.addWidget(copy_button)
+        if 'FLATPAK_ID' not in os.environ:
+            layout.addWidget(copy_button)
         layout.addWidget(close_button)
 
         # Set the layout for the dialog
