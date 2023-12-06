@@ -10,11 +10,13 @@ from modules.commands import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 import modules.upscale as upscale
 import src.thisdir
+from src.log import *
 #this file changes the GUI aspects of the AI
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 settings = Settings()
 def modelOptions(self):
+    log('Model: RealESRGAN')
     self.times=1
     self.render='esrgan'
     self.ui.Rife_Model.clear()

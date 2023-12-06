@@ -4,7 +4,7 @@
 import src.return_data as return_data
 import os
 from src.write_permisions import *
-
+from loguru import logger
 from src.settings import *
 from threading import Thread
 import src.runAI.transition_detection
@@ -97,7 +97,7 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
-    print(self.ffmpeg.stderr)
+    log(self.ffmpeg.stderr)
     return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
@@ -137,6 +137,7 @@ def get_video_from_link(self,thread):
 
 def start(thread,self,renderdir,videoName,videopath,times):
         try:
+                log(f'Starting Render, input_file={videopath}')
                 settings = Settings()
                 
                 if check_for_write_permissions(settings.OutputDir) == False:
@@ -221,6 +222,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                                                        break
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
+                log(f'End of start function')
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
@@ -229,6 +231,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         try:
+                log(f'Ending Render, input_file={videopath}')
                 if self.output_folder == '':
                         outputpath = settings.OutputDir
                 else:
@@ -289,7 +292,9 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         os.chdir(thisdir)
                         self.input_file = ''
                         self.file_drop_widget.show()
+                        log(f'Finished Render, output_file={output_video_file}')
                         return output_video_file
+                log(f'Failed Render, output_file=')
                 return None
         except Exception as e:
                 traceback_info = traceback.format_exc()

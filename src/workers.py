@@ -28,7 +28,7 @@ class pb2X(QObject):
         self.main = main
     def run(self):
         """Long-running task."""
-        
+        log('Start Progressbar/Info Thread')
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
             sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
         
@@ -130,6 +130,7 @@ class downloadVideo(QObject):
         self.url = url
         QThread.__init__(self, parent)
     def run(self):
+        log('INFO: Downloading Video')
         try:
                 result = subprocess.run([f'{thisdir}/bin/yt-dlp_linux', '-F', self.url], capture_output=True, text=True)
                 
@@ -210,6 +211,7 @@ def ffmpeg_preset(self):
 
     
 def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
+    log('INFO: Starting Render Thread')
     global iteration
     iteration = 0
     increment=1
@@ -266,6 +268,7 @@ def frameCountThread(self):#in theory, this function will keep moving out frames
             log(str(e))
 
 def AI(self,command):
+    log(f'INFO: Running AI: {command}')
     global transitionDetectionClass
     transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     
@@ -398,8 +401,10 @@ class interpolation(QObject):
                     frame_increments_of_interpolation = int(frame_increments_of_interpolation)
                 self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
                 if self.main.AI == 'rife-ncnn-vulkan':
+                    
                     if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
                     else:vram=1
+                    
                     width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
                     if int(width) > 3840 or int(height) > 2160:
                             vram=1
@@ -482,7 +487,6 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
     '-f', f'%08d{self.main.settings.Image_Type}',
     '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}'
 ]
-                    print(command)
                     
                     if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
                         AI_Incremental(self,f'"{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
@@ -519,7 +523,7 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                     self.finished.emit()
             except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(f'{e} {traceback_info}')
+                log(f'ERROR: {e} {traceback_info}')
                 self.main.showDialogBox(e)   
                 
                 
@@ -550,6 +554,7 @@ class upscale(QObject):
                 cap = cv2.VideoCapture(self.main.input_file)
                 if not cap.isOpened():
                     print("Error opening video file")
+                    log('ERROR: Could not open video file')
                     return
 
                 frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -601,7 +606,7 @@ class upscale(QObject):
 
                     print("\nStandard Error:")
                     print(stderr_str)
-    
+
             if self.main.AI == 'waifu2x-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan',
@@ -638,6 +643,7 @@ class upscale(QObject):
             else:
                     if self.main.paused == False:
                         self.log.emit("[Merging Frames]")
+                        log('INFO: Merging Frames')
                         self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.main.encoder,'upscale')
                     else:
                         pass

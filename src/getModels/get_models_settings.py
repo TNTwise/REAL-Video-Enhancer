@@ -138,7 +138,8 @@ class Worker(QObject):
             except Exception as e:
                 self.main.showDialogBox(e)
                 traceback_info = traceback.format_exc()
-                log(f'{e} {traceback_info}')
+                log(f'ERROR: {e} {traceback_info}')
+
 class ChooseModels(QtWidgets.QMainWindow):
             def __init__(self,parent):
                 super(ChooseModels, self).__init__()
@@ -236,7 +237,9 @@ def run_install_models_from_settings(self):
                             os.system(f'rm -rf "{settings.ModelDir}/ifrnet/"')
                 
     except Exception as e:
-            print(e)            
+            print(e) 
+            traceback_info = traceback.format_exc()
+            log(f'ERROR {e} {traceback_info}')           
             return 0
 def endDownload(self):
      
@@ -247,6 +250,7 @@ def endDownload(self):
      self.ui.InstallModelsFrame.show() # has to re-show frame as OnProgramStart defaults it to general
      if len(os.listdir(f'{thisdir}/files/')) < 1:
           self.ui.showDialogBox('Not enough space to install models!')
+          log('ERROR: Not enough space')
 def displayProgressOnInstallBar(downloaded):
     main.ui.installModelsProgressBar.setValue(int(downloaded*100))
     

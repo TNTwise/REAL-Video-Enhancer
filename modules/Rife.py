@@ -13,6 +13,7 @@ from modules.commands import *
 import src.thisdir
 import modules.interpolate as interpolate
 import src.onProgramStart as onProgramStart
+from src.log import *
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 def bubble_sort(arr):
@@ -38,6 +39,7 @@ def bubble_sort(arr):
             arr.append(i)
 
 def modelOptions(self):
+    log('Model: Rife')
     self.times=2
     self.render='rife'
     self.ui.Rife_Model.clear()

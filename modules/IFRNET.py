@@ -13,12 +13,14 @@ from modules.commands import *
 import src.thisdir
 import modules.interpolate as interpolate
 import src.onProgramStart as onProgramStart
+from src.log import *
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
 def modelOptions(self):
     self.times=2
+    log('Model: IFRNET')
     self.render='rife'
     self.ui.Rife_Model.clear()
     self.ui.Rife_Times.clear()

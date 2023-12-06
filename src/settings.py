@@ -8,7 +8,7 @@ homedir = os.path.expanduser(r"~")
 from src.log import *
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 from src.write_permisions import *
-
+import traceback
 #im going to eventually redo this
 class CustomException(Exception):
     def __init__(self, additional_info):
@@ -82,7 +82,7 @@ class Settings:
                     self.FrameIncrements = int(self.FrameIncrements)
             except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(f'{e} {traceback_info}')
+                log(f'ERROR: {e} {traceback_info}')
                 print(f'{e} {traceback_info}')
                 
                 self.write_to_settings_file(setting, default_value)

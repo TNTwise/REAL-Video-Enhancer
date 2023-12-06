@@ -1,5 +1,5 @@
 testresources
-PyQt5==5.14.1
+PyQt5==5.12
 requests
 opencv-python-headless
 pypresence
@@ -8,3 +8,4 @@ cx_FREEZE
 psutil
 python-magic
 Pillow
+loguru

@@ -102,7 +102,7 @@ class Worker(QObject):
                     self.finished.emit()
             except Exception as e:
                 traceback_info = traceback.format_exc()
-                log(f'{e} {traceback_info}')
+                log(f'ERROR: {e} {traceback_info}')
                 self.main.showDialogBox(e)
                 
                 
@@ -130,7 +130,8 @@ def install_icons(self):
                                 f.extractall(path=f'{thisdir}/')
                             os.remove(f'{thisdir}/{local_filename}')
                         except Exception as e:
-                             log(str(e))
+                             traceback_log = traceback.format_exc()
+                             log(f'ERROR: {e} {traceback_log}')
                              failed_download(self)
                     else:
                         failed_download(self)
@@ -320,8 +321,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         self.obj.finished.connect(self.start_main)
                     except Exception as e:
                         traceback_info = traceback.format_exc()
-                        log(f'{e} {traceback_info}')
-                self.main.showDialogBox(e)
+                        log(f'ERROR: {e} {traceback_info}')
+                        self.main.showDialogBox(e)
                 def on_count_changed(self,list):
                     downloaded_data = list[0]
                     total_data = list[1]
@@ -383,7 +384,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                             exit()
                     except Exception as e:
                         traceback_info = traceback.format_exc()
-                        log(f'{e} {traceback_info}')
+                        log(f'ERROR: {e} {traceback_info}')
                         self.main.showDialogBox(e)
     import src.theme as theme
 
@@ -402,3 +403,9 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
         exit() # this happens if program abruptly stops while downloading
 '''else:
     exit()'''
+def excepthook(type, value, traceback):
+    error_message = f"An unhandled exception occurred: {value}"
+    log(f'ERROR: Unhandled exception! {traceback},{type},{error_message}')
+    QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
+    
+sys.excepthook = excepthook

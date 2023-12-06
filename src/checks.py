@@ -24,8 +24,8 @@ def check_if_online(dont_check=False):
         online=True
     except Exception as e:
         traceback_info = traceback.format_exc()
-        log(f'{e} {traceback_info}')
-        print(f'{e} {traceback_info}')
+        log(f'ERROR: {e} {traceback_info}')
+        print(f'{e}')
         if dont_check ==False:
             msg = QMessageBox()
             msg.setWindowTitle(" ")

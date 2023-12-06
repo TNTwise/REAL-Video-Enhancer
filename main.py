@@ -1,11 +1,12 @@
 #!/usr/bin/python3
 import os
 
-
+from loguru import logger
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
 except Exception as e:
+    
     print(e)
 import src.thisdir
 import src.checks as checks
@@ -789,21 +790,26 @@ except Exception as e:
     traceback_info = traceback.format_exc()
     log(f'{e} {traceback_info}')
 
-try:
-    app = QtWidgets.QApplication(sys.argv)
 
-    window = MainWindow()
-    from PyQt5.QtCore import Qt
-    from PyQt5.QtWidgets import QApplication
-    from PyQt5.QtGui import QPalette, QColor
-
-    # Force the style to be the same on all OSs:
-    theme.set_theme(app)
-    log('Program Started')
+def excepthook(type, value, traceback):
+    error_message = f"An unhandled exception occurred: {value}"
+    log(f'ERROR: Unhandled exception! {traceback},{type},{error_message}')
+    QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
-    sys.exit(app.exec_())
-except Exception as e:
-    traceback_info = traceback.format_exc()
-    print(traceback_info)
-    log(f'{e} {traceback_info}')
+
+
+
+app = QtWidgets.QApplication(sys.argv)
+
+window = MainWindow()
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QPalette, QColor
+
+# Force the style to be the same on all OSs:
+theme.set_theme(app)
+log('Program Started')
+sys.excepthook = excepthook
+app.exec_()
+log('exit')
 
