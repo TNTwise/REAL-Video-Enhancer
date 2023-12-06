@@ -8,7 +8,9 @@ from src.settings import *
 from src.return_data import *
 import math
 import shutil
+from src.log import *
 from src.write_permisions import *
+import traceback
 def check_if_models_exist(thisdir):
     if os.path.exists(f'{thisdir}/models/') and os.path.exists(f'{thisdir}/models/rife/') and os.path.exists(f'{thisdir}/models/realesrgan/') and os.path.exists(f'{thisdir}/models/waifu2x/') :
         return True
@@ -20,13 +22,17 @@ def check_if_online(dont_check=False):
     try:
         requests.get('https://raw.githubusercontent.com/')
         online=True
-    except:
+    except Exception as e:
+        traceback_info = traceback.format_exc()
+        log(f'{e} {traceback_info}')
+        print(f'{e} {traceback_info}')
         if dont_check ==False:
             msg = QMessageBox()
             msg.setWindowTitle(" ")
             msg.setText(f"You are offline, please connect to the internet to download the models.")
             sys.exit(msg.exec_())
         pass
+        
     return online
 
 def check_if_free_space(RenderDir):

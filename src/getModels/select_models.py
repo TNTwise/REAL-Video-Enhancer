@@ -129,7 +129,8 @@ def install_icons(self):
                             with ZipFile(f'{thisdir}/{local_filename}','r') as f:
                                 f.extractall(path=f'{thisdir}/')
                             os.remove(f'{thisdir}/{local_filename}')
-                        except:
+                        except Exception as e:
+                             log(str(e))
                              failed_download(self)
                     else:
                         failed_download(self)
@@ -304,19 +305,23 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     msg.exec_()
 
                 def nextfunction(self):
+                    try:
+                        logo = QIcon(f"{thisdir}/icons/logo v1.png")
 
-                    logo = QIcon(f"{thisdir}/icons/logo v1.png")
+                        self.ui.logoPreview.setPixmap(logo.pixmap(256,256))
 
-                    self.ui.logoPreview.setPixmap(logo.pixmap(256,256))
-
-                    self.obj = Worker(self)
-                    self.thread = QThread()
-                    self.obj.intReady.connect(self.on_count_changed)
-                    self.obj.moveToThread(self.thread)
-                    self.obj.finished.connect(self.thread.quit)
-                    self.thread.started.connect(self.obj.install_modules)
-                    self.thread.start()
-                    self.obj.finished.connect(self.start_main)
+                        self.obj = Worker(self)
+                        self.thread = QThread()
+                        self.obj.intReady.connect(self.on_count_changed)
+                        self.obj.moveToThread(self.thread)
+                        self.obj.finished.connect(self.thread.quit)
+                        self.thread.started.connect(self.obj.install_modules)
+                        self.thread.start()
+                        self.obj.finished.connect(self.start_main)
+                    except Exception as e:
+                        traceback_info = traceback.format_exc()
+                        log(f'{e} {traceback_info}')
+                self.main.showDialogBox(e)
                 def on_count_changed(self,list):
                     downloaded_data = list[0]
                     total_data = list[1]
@@ -328,55 +333,58 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     self.ui.gbLabel.setText(f'{downloaded_data_gb}/{total_data_gb}GB')
                 def start_main(self):
                     
-                         
-                    for i in os.listdir(f'{thisdir}/files/'):
-                        if os.path.exists(f'{thisdir}/bin/') == False:
-                            os.mkdir(f'{thisdir}/bin/')
-                        if i == 'ffmpeg':
-                            os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
-                            os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
-                        if i == 'yt-dlp_linux':
-                            os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
-                            os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
-                        if i == 'glxinfo':
-                            os.system(f'chmod +x "{thisdir}/files/glxinfo"')
-                            os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+                    try:     
+                        for i in os.listdir(f'{thisdir}/files/'):
+                            if os.path.exists(f'{thisdir}/bin/') == False:
+                                os.mkdir(f'{thisdir}/bin/')
+                            if i == 'ffmpeg':
+                                os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                                os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                            if i == 'yt-dlp_linux':
+                                os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                                os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                            if i == 'glxinfo':
+                                os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                                os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+                            
+                            
+                            print(i)
+                            if '.zip' in i:
+
+                                with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
+                                    name=i.replace('.zip','')
+                                    original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                    original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                    print(original_ai_name)
+
+
+                                    zip_ref.extractall(f'{thisdir}/files/')
+
+                                os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
+                                os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
+
+                            if '.tar.gz' in i:
+                                with tarfile.open(f'{thisdir}/files/{i}','r') as f:
+                                    f.extractall(f'{settings.ModelDir}/rife/')
+
+
                         
-                        
-                        print(i)
-                        if '.zip' in i:
+                        clear_files()
+                        if check_for_individual_models != None:
+                            if check_if_online():
+                                QApplication.closeAllWindows()
 
-                            with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
-                                name=i.replace('.zip','')
-                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                print(original_ai_name)
-
-
-                                zip_ref.extractall(f'{thisdir}/files/')
-
-                            os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
-                            os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-
-                        if '.tar.gz' in i:
-                            with tarfile.open(f'{thisdir}/files/{i}','r') as f:
-                                f.extractall(f'{settings.ModelDir}/rife/')
-
-
-                    
-                    clear_files()
-                    if check_for_individual_models != None:
-                        if check_if_online():
-                            QApplication.closeAllWindows()
-
-                            return 0
+                                return 0
+                            else:
+                                exit()
                         else:
+                            failed_download(self)
+                            
                             exit()
-                    else:
-                        failed_download(self)
-                        
-                        exit()
-                    
+                    except Exception as e:
+                        traceback_info = traceback.format_exc()
+                        log(f'{e} {traceback_info}')
+                        self.main.showDialogBox(e)
     import src.theme as theme
 
     
