@@ -17,7 +17,6 @@ A clear and concise description of what the bug is.
 **To Reproduce**
 Steps to reproduce the behavior:
 
-
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
@@ -33,6 +32,9 @@ Logs folder on AppImage: ``/home/$USER/.local/share/REAL-Video-Enhancer/logs/``
  - OS: [e.g. Ubuntu 20.04]
  - Version [e.g. AppImage or Flatpak]
  
+**GPU**
+Please state your GPU, support on NVIDIA is difficult as I lack testing hardware, please be understanding if it is a problem relating to NVIDIA.
+
 
 **Additional context**
 Add any other context about the problem here.
