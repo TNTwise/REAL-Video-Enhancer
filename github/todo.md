@@ -45,4 +45,4 @@ add option for after render is done, like shutdown.<br/>
 Fix realesrgan not getting resolution from linked videos<br/>
 put render directories into a single folder for easier cleaning<br/>
 make transition detection dynamic between fps, like it can be 2x, 2.5x, 2.7x, any custom timestep for the rife-v4 models<br/>
-add show log button
+add documentation<br/>
