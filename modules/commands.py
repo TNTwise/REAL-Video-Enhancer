@@ -4,7 +4,6 @@
 import src.return_data as return_data
 import os
 from src.write_permisions import *
-from loguru import logger
 from src.settings import *
 from threading import Thread
 import src.runAI.transition_detection
