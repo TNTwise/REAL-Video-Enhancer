@@ -15,10 +15,16 @@ except:
             os.remove(f'{thisdir}/logs/{oldest_file}')
             
 def log(log):
+    last_line_in_log_file = ''
+    if os.path.isfile(f'{thisdir}/logs/log_{current_time}.txt'):
+        with open(f'{thisdir}/logs/log_{current_time}.txt', 'r') as f:
+            last_line_in_log_file = f.readlines()[-1]
+            print((last_line_in_log_file))
     
-    with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
-        f.write(str(log) + '\n')
 
+    with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
+        if last_line_in_log_file != log:
+            f.write(str(log) + '\n')
 
 class PopupWindow(QDialog):
     def __init__(self):
