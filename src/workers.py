@@ -13,7 +13,12 @@ from time import sleep
 import src.thisdir
 from src.log import log
 import traceback
+import src.return_data as return_data
+import src.runAI.transition_detection as transition_detection
+import os
+from modules.commands import *
 thisdir = src.thisdir.thisdir()
+homedir = os.path.expanduser(r"~")
 class pb2X(QObject):
     finished = pyqtSignal()
     image_progress = pyqtSignal(str)
@@ -184,158 +189,118 @@ class downloadVideo(QObject):
 
 #This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
 # hz
-import src.return_data as return_data
-import os
-from src.settings import *
-from threading import Thread
-import src.runAI.transition_detection as transition_detection
-from src.return_data import *
-from src.messages import *
-from src.discord_rpc import *
-import os
-from modules.commands import *
-import src.thisdir
-import math
-from PIL import Image
-thisdir = src.thisdir.thisdir()
-homedir = os.path.expanduser(r"~")
-def ffmpeg_preset(self):
-     
-     vq = int(self.main.settings.videoQuality)
-     if vq < 18:
-          return '-preset slow'
-     
-          
 
+
+def stdlog(stdout,stderr):
+    
+    stdout_str = stdout.decode()
+    stderr_str = stderr.decode()
+    log("Standard Output:")
+    log(stdout_str)
+    log("\nStandard Error:")
+    log(stderr_str)
+          
+#functions that ALL ncnn AI use
+def render(self,command):
+    self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
+    stdout, stderr = self.main.renderAI.communicate()
+    stdlog(stdout,stderr)
+
+def optimized_render(self,command):
+    log(f'INFO: Running AI: {command}')
+
+    self.renderCommand = command
+    global interpolation_sessions
+    interpolation_sessions = ceildiv(self.main.frame_count,self.main.frame_increments_of_interpolation)
+    self.main.interpolation_sessions = interpolation_sessions
+    fc_thread = Thread(target=lambda: frameCountThread(self))
+    fc_thread.start()
+    sleep(1)
+
+    render(self,command)
+    
+
+
+def calculateFrameIncrements(self):
+    
+    if self.main.settings.FrameIncrementsMode == 'Manual':
+        frame_increments_of_interpolation = self.main.settings.FrameIncrements
+    elif self.main.settings.FrameIncrementsMode == 'Automatic':
+        cap = cv2.VideoCapture(self.main.input_file)
+        if not cap.isOpened():
+            print("Error opening video file")
+            log('ERROR: Could not open video file')
+            return
+
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        duration_seconds = frame_count / fps
+
+        duration_seconds = int(duration_seconds % 60)
+        frame_increments_of_interpolation = int(duration_seconds*int(self.main.settings.VRAM))
+        return int(frame_increments_of_interpolation)
+
+def calculateVRAM(self):
+    if int(self.main.settings.VRAM) > 1: vram = int(int(self.main.settings.VRAM)/2)
+    else:vram=1
+    width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
+    if int(width) > 3840 or int(height) > 2160:
+            vram=1
+    return vram
 
 
     
-def frameCountThread(self):#in theory, this function will keep moving out frames into a different folder based on a number of how much the video should be split up too, this can severly lower size of interpolation
+def frameCountThread(self):
     log('INFO: Starting Render Thread')
-    global iteration
     iteration = 0
     increment=1
     with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
         for m in range(interpolation_sessions):
             f.write(f'file {interpolation_sessions-m}.mp4\n')
     
+    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
     while True:
         
         try:
-            if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= frame_increments_of_interpolation or iteration == interpolation_sessions-1:
+            if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= self.main.frame_increments_of_interpolation or iteration == interpolation_sessions-1:
                 j=1
                 
                 if iteration == interpolation_sessions-1:
-                    total_frames_rendered =  abs((interpolation_sessions-1)*frame_increments_of_interpolation - frame_count)
+                    total_frames_rendered =  abs((interpolation_sessions-1)*self.main.frame_increments_of_interpolation - self.main.frame_count)
                     #total_frames_rendered = frame_count+frame_increments_of_interpolation 
                     while j <= total_frames_rendered:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
                                 
                                 increment+=1
                                 j+=1
-                            
 
-                            
                         else:
                             sleep(.1)
                 else:
                     #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
-                    while j <= frame_increments_of_interpolation:
+                    while j <= self.main.frame_increments_of_interpolation:
                         if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
-                            
-                            
+
                                 increment+=1
                                 j+=1
                             
                         else:
                             sleep(.1)
                 transitionDetectionClass.merge_frames()
-                os.system(f'{thisdir}/bin/ffmpeg -start_number {frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
                 iteration+=1
                 if iteration == interpolation_sessions:
                     break
-                for i in range(frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
-                       os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                '''os.chdir(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
-
-                os.system(f'rm -rf {{{str((iteration*frame_increments_of_interpolation)).zfill(8)}..{str((iteration*frame_increments_of_interpolation+frame_increments_of_interpolation)).zfill(8)}}}{self.main.settings.Image_Type}')
+                for i in range(self.main.frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                       os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*self.main.frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
                 
-                os.chdir(f'{thisdir}')'''
             else:
                 sleep(0.1)
         except Exception as e:
-            print(e)
+
             log(str(e))
-
-def AI(self,command):
-    log(f'INFO: Running AI: {command}')
-    global transitionDetectionClass
-    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
-    
-    self.renderCommand = command
-    global interpolation_sessions
-    interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
-    self.main.interpolation_sessions = interpolation_sessions
-    fc_thread = Thread(target=lambda: frameCountThread(self))
-    fc_thread.start()
-    sleep(1)
-    
-    
-    self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    
-    stdout, stderr = self.main.renderAI.communicate()
-
-    # Decode the byte strings to get text output
-    stdout_str = stdout.decode()
-    stderr_str = stderr.decode()
-
-    # Print or handle stdout and stderr as needed
-    print("Standard Output:")
-    print(stdout_str)
-
-    print("\nStandard Error:")
-    print(stderr_str)
-    print('\n\n\n\n')
-    #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
-    #merge all videos created here
-    fc_thread.join()
-
-def AI_Incremental(self,command):
-    global transitionDetectionClass
-    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
-    
-    
-    global interpolation_sessions
-    interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
-    
-    '''fc_thread = Thread(target=lambda: frameCountThread(self))
-    fc_thread.start()'''
-    sleep(1)
-    print('\n\n\n\n')
-    #this is only triggered on interpolation, because self.model is set to '' on upscale
-    
-    
-    for i in range(len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))):
-        try:
-            os.mkdir(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/')
-        except:
-            pass
-        
-        command = command.replace(f'input_frames/{i-1}/', f'input_frames/{i}/')
-        if i >= (len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))) -1:
-            command = command.replace(f'-n {frame_increments_of_interpolation}', f'-n {len(os.listdir(f"{self.main.render_folder}/{self.main.videoName}_temp/input_frames/{i}/"))}')
-        os.system(command)
-        #transitionDetectionClass.merge_frames(i)
-        os.system(f'{thisdir}/bin/ffmpeg  -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}"  -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{i}.mp4"  -y')#replace png with image type
-        
-        with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'a') as f:
-            f.write(f'file {i}.mp4\n')
-        shutil.rmtree(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/')
-    #'./rife/rife-ncnn-vulkan -m rife/rife-v4.6 -i input_frames -o output_frames/0'
-    #merge all videos created here
-    ''' fc_thread.join()'''
-    
-                #print('file 0 succsessfully made.')
 
 class interpolation(QObject):
     
@@ -348,136 +313,55 @@ class interpolation(QObject):
         self.main = originalSelf
         QThread.__init__(self, parent)
    
-             
-            
-
-    
     def start_Render(self):
             
-        try:    
-            times = self.main.times
-            videopath = self.main.input_file
-            outputpath = self.main.output_folder
+            start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,self.main.times)
             
-            # Have to put this before otherwise it will error out ???? idk im not good at using qt.....
-            
-                    
-            #self.main.runLogs(videoName,times)
-            start(self,self.main,self.main.render_folder,self.main.videoName,videopath,times)
+            # run transition detection start
             if self.main.settings.SceneChangeDetectionMode == 'Enabled':
                 self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
                 self.main.transitionDetection.find_timestamps()
-                self.main.transitionDetection.get_frame_num(times)
-            self.main.endNum = 0 # This variable keeps track of the amound of zeros to fill in the output frames, this helps with pausing and resuming so rife wont overwrite the original frames.
-            self.Render(self.model,times,videopath,outputpath)
-        except Exception as e:
-                traceback_info = traceback.format_exc()
-                log(f'{e} {traceback_info}')
-                self.main.showDialogBox(e) 
-                   
+                self.main.transitionDetection.get_frame_num(self.main.times)
             
-            
-            
-            
-        
-            
+            self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
+
     def Render(self,model,times,videopath,outputpath):  
-            try: 
+            
                 self.main.paused = False
                 settings=Settings()
                 
                 self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
-                global frame_count
-                frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
-                global frame_increments_of_interpolation
-                if self.main.settings.FrameIncrementsMode == 'Manual':
-                    frame_increments_of_interpolation = self.main.settings.FrameIncrements
-                elif self.main.settings.FrameIncrementsMode == 'Automatic':
-                    resolution = VideoName.return_video_resolution(self.main.input_file)
-                    try:
-                        frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM)/(round(int(resolution[0])/1000)))
-                    except:
-                         frame_increments_of_interpolation = int(100*int(self.main.settings.VRAM))
-                    frame_increments_of_interpolation = int(frame_increments_of_interpolation)
-                self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
+                
+                self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
+                
+                self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
+                vram = calculateVRAM(self)
+                
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
-                    if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
-                    else:vram=1
                     
-                    width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
-                    if int(width) > 3840 or int(height) > 2160:
-                            vram=1
-                    if 'v4' in model:
-                        command = [
+                    
+                    command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
-    '-n', str(self.input_frames * times),
     '-m', self.model,
     '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}']
-                        if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                            AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
-                        if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                            
-
-                            AI(self,command)
+                    if 'v4' in model:
+                         command.append('-n')
+                         command.append(str(self.input_frames * times))
+                    if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                         
-                        else:
-                            self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                            stdout, stderr = self.main.renderAI.communicate()
 
-                            # Decode the byte strings to get text output
-                            stdout_str = stdout.decode()
-                            stderr_str = stderr.decode()
-
-                            # Print or handle stdout and stderr as needed
-                            print("Standard Output:")
-                            print(stdout_str)
-
-                            print("\nStandard Error:")
-                            print(stderr_str)
+                        optimized_render(self,command)
+                    
                     else:
-                        if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
-                        else:vram=1
-                        width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
-                        if int(width) > 3840 or int(height) > 2160:
-                            vram=1
-                        command = [
-    f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
-    '-m', self.model,
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'1:{vram}:2',
-    '-f', f'%08d{self.main.settings.Image_Type}'
-]
-                        if settings.RenderType == 'Optimized (Incremental)':
-                            AI_Incremental(self,f'"{settings.ModelDir}/rife/rife-ncnn-vulkan"  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type} ')
-                        if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                            
-                            AI(self,command)
-                        else:
-                            self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                            stdout, stderr = self.main.renderAI.communicate()
-
-                            # Decode the byte strings to get text output
-                            stdout_str = stdout.decode()
-                            stderr_str = stderr.decode()
-
-                            # Print or handle stdout and stderr as needed
-                            print("Standard Output:")
-                            print(stdout_str)
-
-                            print("\nStandard Error:")
-                            print(stderr_str)
+                        render(self,command)
+                    
 
                 if self.main.AI == 'ifrnet-ncnn-vulkan':               
-                    if int(settings.VRAM) > 1: vram = int(int(settings.VRAM)/2)
-                    else:vram=1
-                    width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
-                    if int(width) > 3840 or int(height) > 2160:
-                            vram=1
+                    
                     command = [
 f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
 
@@ -488,27 +372,13 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
     '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}'
 ]
                     
-                    if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                        AI_Incremental(self,f'"{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan" -n {frame_increments_of_interpolation}  -m  {self.model} -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {return_gpu_settings(self.main)} -f %08d{self.main.settings.Image_Type}')
-                    if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                    if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                         
 
-                        AI(self,command)
+                        optimized_render(self,command)
                     
                     else:
-                        self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        stdout, stderr = self.main.renderAI.communicate()
-
-                        # Decode the byte strings to get text output
-                        stdout_str = stdout.decode()
-                        stderr_str = stderr.decode()
-
-                        # Print or handle stdout and stderr as needed
-                        print("Standard Output:")
-                        print(stdout_str)
-
-                        print("\nStandard Error:")
-                        print(stderr_str)
+                        render(self,command)
             
                 if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
@@ -516,15 +386,12 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                 else:
                     if settings.SceneChangeDetectionMode == 'Enabled':
                         self.main.transitionDetection.merge_frames()
-                    if settings.RenderType != 'Optimized':
-                        self.log.emit("[Merging Frames]")
+                        if settings.RenderType != 'Optimized':
+                            self.log.emit("[Merging Frames]")
                     self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                     
                     self.finished.emit()
-            except Exception as e:
-                traceback_info = traceback.format_exc()
-                log(f'ERROR: {e} {traceback_info}')
-                self.main.showDialogBox(e)   
+            
                 
                 
 class upscale(QObject):
@@ -540,39 +407,17 @@ class upscale(QObject):
         start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
         
         self.realESRGAN()
+
     def realESRGAN(self):
-        try:
+        
             settings = Settings()
             self.main.endNum=0
             self.main.paused=False
-            global frame_count
-            global frame_increments_of_interpolation
-            if self.main.settings.FrameIncrementsMode == 'Manual':
-                frame_increments_of_interpolation = self.main.settings.FrameIncrements
-            elif self.main.settings.FrameIncrementsMode == 'Automatic':
-                resolution = VideoName.return_video_resolution(self.main.input_file)
-                cap = cv2.VideoCapture(self.main.input_file)
-                if not cap.isOpened():
-                    print("Error opening video file")
-                    log('ERROR: Could not open video file')
-                    return
 
-                frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-
-                fps = cap.get(cv2.CAP_PROP_FPS)
-
-                duration_seconds = frame_count / fps
-
-                duration_minutes = int(duration_seconds // 60)
-                duration_seconds = int(duration_seconds % 60)
-                frame_increments_of_interpolation = int(duration_seconds*int(self.main.settings.VRAM))
-                
-                frame_increments_of_interpolation = int(frame_increments_of_interpolation)
-            self.main.frame_increments_of_interpolation = frame_increments_of_interpolation
+            self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
             img_type = self.main.settings.Image_Type.replace('.','')
             self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
-            frame_count = self.input_frames
-            
+            self.main.frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
@@ -585,27 +430,10 @@ class upscale(QObject):
                         
                         command.append(i)
                         print(command)
-                if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    AI_Incremental(self,f'"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" {self.main.realESRGAN_Model} {return_gpu_settings(self.main)} -f {img_type} ')
-                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    
-                    
-                    
-                    AI(self,command)
+                if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
+                    optimized_render(self,command)
                 else:
-                    self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    stdout, stderr = self.main.renderAI.communicate()
-
-                    # Decode the byte strings to get text output
-                    stdout_str = stdout.decode()
-                    stderr_str = stderr.decode()
-
-                    # Print or handle stdout and stderr as needed
-                    print("Standard Output:")
-                    print(stdout_str)
-
-                    print("\nStandard Error:")
-                    print(stderr_str)
+                    render(self,command)
 
             if self.main.AI == 'waifu2x-ncnn-vulkan':
                 command = [
@@ -614,30 +442,15 @@ class upscale(QObject):
     '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
-    '-j', f'{settings.VRAM}:{settings.VRAM}:{settings.VRAM}',
+    '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
 ]
-                print(command)
-                if settings.RenderType == 'Optimized (Incremental)' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
-                    AI_Incremental(self,f'"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan" -i "{self.main.render_folder}/{self.main.videoName}_temp/input_frames/0/" -o "{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/" -s {int(self.main.ui.Rife_Times.currentText()[0])} {return_gpu_settings(self.main)} -f {img_type} ')
-                if settings.RenderType == 'Optimized' and frame_count > frame_increments_of_interpolation and frame_increments_of_interpolation > 0:
+                if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                     
-                    AI(self,command)
+                    optimized_render(self,command)
                 else:
-                    self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    stdout, stderr = self.main.renderAI.communicate()
-
-                    # Decode the byte strings to get text output
-                    stdout_str = stdout.decode()
-                    stderr_str = stderr.decode()
-
-                    # Print or handle stdout and stderr as needed
-                    print("Standard Output:")
-                    print(stdout_str)
-
-                    print("\nStandard Error:")
-                    print(stderr_str)
+                    render(self,command)
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
@@ -648,8 +461,3 @@ class upscale(QObject):
                     else:
                         pass
             self.finished.emit()
-        except Exception as e:
-            traceback_info = traceback.format_exc()
-            log(f'{e} {traceback_info}')
-            self.main.showDialogBox(e)   
-        

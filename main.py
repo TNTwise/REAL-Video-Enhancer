@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import os
 
-from loguru import logger
+
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
@@ -57,6 +57,8 @@ from src.log import log
 import magic
 from src.return_latest_update import *
 import src.image_menu
+from PIL import Image
+
 
 def switch_theme(value):
     
@@ -792,8 +794,10 @@ except Exception as e:
 
 
 def excepthook(type, value, traceback):
+    frame = traceback.tb_frame
+    function_name = frame.f_code.co_name
     error_message = f"An unhandled exception occurred: {value}"
-    log(f'ERROR: Unhandled exception! {traceback},{type},{error_message}')
+    log(f'ERROR: Unhandled exception! {traceback},{function_name},{type},{error_message}')
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
 
