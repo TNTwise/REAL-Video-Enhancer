@@ -291,7 +291,6 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         except Exception as e:
                                 log(str(e))
                         os.chdir(thisdir)
-                        self.input_file = ''
                         self.file_drop_widget.show()
                         log(f'Finished Render, output_file={output_video_file}')
                         return output_video_file

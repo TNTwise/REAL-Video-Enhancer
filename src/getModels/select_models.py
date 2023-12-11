@@ -60,6 +60,10 @@ class Worker(QObject):
                     if os.path.exists(f"{settings.ModelDir}") == False:
                         os.mkdir(f"{settings.ModelDir}")
                         os.mkdir(f"{settings.ModelDir}/rife")
+
+                    if os.path.exists(f"{settings.RenderDir}") == False:
+                        os.mkdir(f"{settings.RenderDir}")
+                    
                     for i in os.listdir(f'{thisdir}/files/'):
                         if os.path.exists(f'{thisdir}/bin/') == False:
                             os.mkdir(f'{thisdir}/bin/')

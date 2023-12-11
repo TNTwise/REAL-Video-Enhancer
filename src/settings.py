@@ -58,7 +58,7 @@ class Settings:
     "ModelDir": f'{thisdir}/models/',
     "RenderType": 'Optimized',
     "SceneChangeDetectionMode": 'Enabled',
-    "RenderDir": f"{thisdir}",
+    "RenderDir": f"{thisdir}/renders/",
     "ExtractionImageType": "jpg",
     "SceneChangeDetection": '0.3',
     "Encoder": '264',

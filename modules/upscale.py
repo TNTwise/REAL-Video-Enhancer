@@ -18,7 +18,7 @@ import src.workers as workers
 
 
     
-def start_upscale(self,AI):
+def run_start(self,AI):
     try:
         if self.input_file != '':
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
@@ -75,4 +75,26 @@ def start_upscale(self,AI):
         else:
             self.showDialogBox(no_input_file)
     except Exception as e:
+        log(e)
         self.showDialogBox(e)
+def start_upscale(self,AI): 
+    try:           
+        if self.input_file != '':
+            self.render='esrgan'
+            has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
+            
+            if has_enough_space:
+                run_start(self,AI)
+            elif not_enough_storage(self,predicted_space,total_space):
+                run_start(self,AI)
+            else:
+                pass
+                    
+        else:
+                no_input_file(self)
+    
+    except Exception as e:
+        traceback_info = traceback.format_exc()
+        log(f'ERROR: {e} {traceback_info}')
+        self.showDialogBox(e)
+            

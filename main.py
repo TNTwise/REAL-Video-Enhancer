@@ -729,9 +729,14 @@ class MainWindow(QtWidgets.QMainWindow):
                             os.system(f'rm -rf "{thisdir}/{i}"')
                 except Exception as e:
                     log(str(e))
-                
-                self.ffmpeg.terminate()
-                self.renderAI.terminate()
+                try:
+                    self.ffmpeg.terminate()
+                except:
+                    pass
+                try:
+                    self.renderAI.terminate()
+                except:
+                    pass
 
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
