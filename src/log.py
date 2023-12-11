@@ -3,7 +3,7 @@ import datetime
 import os
 import sys
 from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QLineEdit, QPushButton, QPlainTextEdit, QMessageBox
-current_time = datetime.datetime.now()
+current_time = datetime.datetime.today().strftime('%Y-%m-%d:%H:%M:%S')
 
 thisdir = src.thisdir.thisdir()
 try:

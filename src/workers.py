@@ -319,10 +319,11 @@ class interpolation(QObject):
             
             # run transition detection start
             if self.main.settings.SceneChangeDetectionMode == 'Enabled':
+                self.log.emit('Detecting Transitions')
                 self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
                 self.main.transitionDetection.find_timestamps()
                 self.main.transitionDetection.get_frame_num(self.main.times)
-            
+                self.log.emit(f'Transitions detected: {str(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/")))}')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
 
     def Render(self,model,times,videopath,outputpath):  

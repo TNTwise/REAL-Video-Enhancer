@@ -184,6 +184,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
                 if self.localFile == True or self.youtubeFile == False:
+                        thread.log.emit('Extracting Audio')
                         os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
                 else:
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
@@ -263,6 +264,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}" -y') 
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
+                                
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
@@ -293,7 +295,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         self.file_drop_widget.show()
                         log(f'Finished Render, output_file={output_video_file}')
                         return output_video_file
-                log(f'Failed Render, output_file=')
+                log(f'Failed Render, output_file=Null')
                 return None
         except Exception as e:
                 traceback_info = traceback.format_exc()
