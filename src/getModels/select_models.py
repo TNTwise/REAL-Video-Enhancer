@@ -4,6 +4,10 @@ import os
 import sys
 import requests
 import re
+import src.thisdir
+thisdir = src.thisdir.thisdir()
+if os.path.exists(f"{thisdir}/renders/") == False:
+        os.mkdir(f"{thisdir}/renders/")
 from zipfile import ZipFile
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMessageBox
@@ -21,9 +25,8 @@ from src.getModels.rifeModelsFunctions import *
 from src.settings import *
 settings = Settings()
 
-import src.thisdir
 from src.log import log
-thisdir = src.thisdir.thisdir()
+
 import src.getModels.SelectAI as SelectAI
 import traceback
 class Worker(QObject):
@@ -61,8 +64,7 @@ class Worker(QObject):
                         os.mkdir(f"{settings.ModelDir}")
                         os.mkdir(f"{settings.ModelDir}/rife")
 
-                    if os.path.exists(f"{settings.RenderDir}") == False:
-                        os.mkdir(f"{settings.RenderDir}")
+                    
                     
                     for i in os.listdir(f'{thisdir}/files/'):
                         if os.path.exists(f'{thisdir}/bin/') == False:

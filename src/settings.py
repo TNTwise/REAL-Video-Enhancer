@@ -76,14 +76,13 @@ class Settings:
                 setattr(self, setting, settings_dict[setting])
                 if setting in ["OutputDir", "RenderDir"] and not os.path.exists(getattr(self, setting)):
                     
+                    log( CustomException(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory."))
+                    exit()
                     raise CustomException(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.")
-                
                 if setting == "FrameIncrements":
                     self.FrameIncrements = int(self.FrameIncrements)
             except Exception as e:
-                traceback_info = traceback.format_exc()
-                log(f'ERROR: {e} {traceback_info}')
-                print(f'{e} {traceback_info}')
+                
                 
                 self.write_to_settings_file(setting, default_value)
                 self.readSettings()
