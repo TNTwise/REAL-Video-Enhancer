@@ -66,8 +66,8 @@ def no_perms_render(self):
 def no_perms_change_setting(self):
     self.showDialogBox("No permissions to write here, please select a different directory.")
 
-def no_perms_anywhere(self):
-    self.showDialogBox(f"No permissions to write to {thisdir}, please select a directory in settings!!!!!")
+def no_perms_anywhere(self,dir=thisdir):
+    self.showDialogBox(f"No permissions to write to {dir}, please select a directory in settings!!!!!")
 
 def notAModel(self):
     self.showDialogBox(f"Not a valid model, please select a different file.")

@@ -23,21 +23,21 @@ class Settings:
         
         ManageFiles.create_folder(f"{thisdir}/files")
         ManageFiles.create_file(f"{thisdir}/files/settings.txt")
-        self.readSettings()
+        try:
+            self.readSettings()
+        except Exception as e:
+            tb = traceback.format_exc()
+            tb = tb.split('\n')[-10:]
+            
+            log(f'RECURSION OVERFLOW!!! {tb}{e}')
+            print(tb,e)
+            exit()
     def write_to_settings_file(self,description, option):
     
         with open(f'{thisdir}/files/settings.txt', 'a') as f:
             f.write(description + ","+option + "\n")
     
-    def check_and_write_setting(self,setting_match,value,settings_dict):
-        setting,setting_identifier = setting_match
-        try:
-            setting = settings_dict[value]
-            print(settings_dict)
-            print(setting)
-        except:
-            self.write_to_settings_file(setting_identifier,value)
-            self.readSettings()
+    
     def readSettings(self):
         settings_dict = {}
         with open(f'{thisdir}/files/settings.txt', 'r') as f:
@@ -76,16 +76,20 @@ class Settings:
                 setattr(self, setting, settings_dict[setting])
                 if setting in ["OutputDir", "RenderDir"] and not os.path.exists(getattr(self, setting)):
                     
-                    log( CustomException(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory."))
-                    exit()
+                    log(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.")
+                    self.write_to_settings_file(setting, default_value)
                     raise CustomException(f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.")
                 if setting == "FrameIncrements":
                     self.FrameIncrements = int(self.FrameIncrements)
+                
             except Exception as e:
-                
-                
+                log(e)
+                print(e)
                 self.write_to_settings_file(setting, default_value)
+                
                 self.readSettings()
+                
+                    
                 
         try:
             self.VRAM = settings_dict['VRAM']

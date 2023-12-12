@@ -199,10 +199,17 @@ class MainWindow(QtWidgets.QMainWindow):
                 if check_for_write_permissions(f'{homedir}/Videos/'):
                     self.settings.change_setting('OutputDir',f'{homedir}/Videos/')
                 else:
-                    no_perms_anywhere(self)
+                    no_perms_anywhere(self,self.settings.OutputDir)
             if check_for_write_permissions(self.settings.RenderDir)==False:
-                self.settings.change_setting('RenderDir',f'{thisdir}')
-                no_perms_render(self)
+                no_perms(self)
+                try:
+                    os.mkdir(f'{thisdir}/renders/')
+                except:
+                    pass
+                if check_for_write_permissions(f'{thisdir}/renders/'):
+                    self.settings.change_setting('RenderDir',f'{thisdir}/renders/')
+                else:
+                    no_perms_anywhere(self,settings.RenderDir)
                 
         except Exception as e:
             self.showDialogBox(e)

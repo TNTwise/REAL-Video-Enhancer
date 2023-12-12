@@ -13,18 +13,24 @@ except:
         if len(os.listdir(f'{thisdir}/logs/')) > 4:
             oldest_file = min(os.listdir(f'{thisdir}/logs/'), key=lambda x: os.path.getctime(os.path.join(f'{thisdir}/logs/', x)))
             os.remove(f'{thisdir}/logs/{oldest_file}')
-            
-def log(log):
-    last_line_in_log_file = ''
-    if os.path.isfile(f'{thisdir}/logs/log_{current_time}.txt'):
-        with open(f'{thisdir}/logs/log_{current_time}.txt', 'r') as f:
-            last_line_in_log_file = f.readlines()[-1]
-            print((last_line_in_log_file))
-    
+error_count = []
 
-    with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
-        if last_line_in_log_file != log:
+def log(log):
+    
+    
+    
+    if log in error_count:
+        # Increment the count if the error has occurred before
+        pass
+        
+    else:
+        # Initialize count if the error is encountered for the first time
+        error_count.append(log)
+        
+        with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
+        
             f.write(str(log) + '\n')
+    
 
 class PopupWindow(QDialog):
     def __init__(self):
