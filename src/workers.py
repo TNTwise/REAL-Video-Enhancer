@@ -205,20 +205,22 @@ def render(self,command):
     self.main.renderAI = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)    
     stdout, stderr = self.main.renderAI.communicate()
     stdlog(stdout,stderr)
-
+    
 def optimized_render(self,command):
     log(f'INFO: Running AI: {command}')
 
     self.renderCommand = command
     global interpolation_sessions
     interpolation_sessions = ceildiv(self.main.frame_count,self.main.frame_increments_of_interpolation)
-    self.main.interpolation_sessions = interpolation_sessions
+    self.main.interpolation_sessions = interpolation_sessions 
+    print(interpolation_sessions)
     fc_thread = Thread(target=lambda: frameCountThread(self))
     fc_thread.start()
     sleep(1)
 
     render(self,command)
-    
+
+    fc_thread.join()
 
 
 def calculateFrameIncrements(self):
@@ -313,9 +315,9 @@ class interpolation(QObject):
         self.main = originalSelf
         QThread.__init__(self, parent)
    
-    def start_Render(self):
+    def finishRenderSetup(self): #3rd and final call, called from interpolate.py
             
-            start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,self.main.times)
+            extractFramesAndAudio(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,self.main.times)
             
             # run transition detection start
             if self.main.settings.SceneChangeDetectionMode == 'Enabled':
@@ -326,7 +328,7 @@ class interpolation(QObject):
                 self.log.emit(f'Transitions detected: {str(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/")))}')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
 
-    def Render(self,model,times,videopath,outputpath):  
+    def Render(self,model,times,videopath,outputpath):
             
                 self.main.paused = False
                 settings=Settings()
@@ -387,8 +389,8 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                 else:
                     if settings.SceneChangeDetectionMode == 'Enabled':
                         self.main.transitionDetection.merge_frames()
-                        if settings.RenderType != 'Optimized':
-                            self.log.emit("[Merging Frames]")
+                    if settings.RenderType != 'Optimized':
+                        self.log.emit("[Merging Frames]")
                     self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                     
                     self.finished.emit()
@@ -403,9 +405,9 @@ class upscale(QObject):
         self.originalSelf = originalSelf
         self.main = originalSelf
         QThread.__init__(self, parent)
-    def start_Render(self):
+    def finishRenderSetup(self): #3rd and final call, called from upscale.py
 
-        start(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
+        extractFramesAndAudio(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
         
         self.realESRGAN()
 
@@ -456,8 +458,9 @@ class upscale(QObject):
                     show_on_no_output_files(self.main)
             else:
                     if self.main.paused == False:
-                        self.log.emit("[Merging Frames]")
-                        log('INFO: Merging Frames')
+                        if settings.RenderType != 'Optimized':
+                            self.log.emit("[Merging Frames]")
+                            log('INFO: Merging Frames')
                         self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.main.encoder,'upscale')
                     else:
                         pass

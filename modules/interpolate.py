@@ -17,7 +17,7 @@ thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-def run_start(self,AI):
+def initializeInterpolation(self,AI):#1st stage in preparing render, starts all worker threads
     os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
     #self.ui.QueueButton.show()
     
@@ -49,7 +49,7 @@ def run_start(self,AI):
     # Step 4: Move worker to the thread
     self.rifeWorker.moveToThread(self.rifeThread)
     # Step 5: Connect signals and slots
-    self.rifeThread.started.connect(self.rifeWorker.start_Render)
+    self.rifeThread.started.connect(self.rifeWorker.finishRenderSetup)
     self.rifeWorker.finished.connect(self.rifeThread.quit)
     self.rifeWorker.finished.connect(self.rifeWorker.deleteLater)
     self.rifeThread.finished.connect(self.rifeThread.deleteLater)
@@ -61,16 +61,16 @@ def run_start(self,AI):
     
     self.runPB()
 
-def start_interpolation(self,AI): 
+def start_interpolation(self,AI): #command directly connected to the rife start button
     try:           
         if self.input_file != '':
             self.render='rife'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
             
             if has_enough_space:
-                run_start(self,AI)
+                initializeInterpolation(self,AI)
             elif not_enough_storage(self,predicted_space,total_space):
-                run_start(self,AI)
+                initializeInterpolation(self,AI)
             else:
                 pass
                     

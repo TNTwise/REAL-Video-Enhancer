@@ -18,12 +18,12 @@ import src.workers as workers
 
 
     
-def run_start(self,AI):
+def initializeUpscale(self,AI):#1st stage in preparing render, starts all worker threads
     try:
         if self.input_file != '':
             os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
             self.ui.logsPreview.clear()
-            #self.ui.QueueButton.show()
+            
             self.render='esrgan'
             self.AI = AI
             settings = Settings()
@@ -61,7 +61,7 @@ def run_start(self,AI):
             # Step 4: Move worker to the thread
             self.upscaleWorker.moveToThread(self.upscaleThread)
             # Step 5: Connect signals and slots
-            self.upscaleThread.started.connect(self.upscaleWorker.start_Render)
+            self.upscaleThread.started.connect(self.upscaleWorker.finishRenderSetup)
             self.upscaleWorker.finished.connect(self.upscaleThread.quit)
             self.upscaleWorker.finished.connect(self.upscaleWorker.deleteLater)
             self.upscaleThread.finished.connect(self.upscaleThread.deleteLater)
@@ -77,16 +77,16 @@ def run_start(self,AI):
     except Exception as e:
         log(e)
         self.showDialogBox(e)
-def start_upscale(self,AI): 
+def start_upscale(self,AI): # command linked directly to upscale buttons 
     try:           
         if self.input_file != '':
             self.render='esrgan'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
             
             if has_enough_space:
-                run_start(self,AI)
+                initializeUpscale(self,AI)
             elif not_enough_storage(self,predicted_space,total_space):
-                run_start(self,AI)
+                initializeUpscale(self,AI)
             else:
                 pass
                     

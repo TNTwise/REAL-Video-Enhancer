@@ -134,7 +134,9 @@ def get_video_from_link(self,thread):
                                 
                                 file.write(chunk)
 
-def start(thread,self,renderdir,videoName,videopath,times):
+
+
+def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # called by workers.py after a started thread, used by both upscaling and interpolation
         try:
                 log(f'Starting Render, input_file={videopath}')
                 settings = Settings()
@@ -146,7 +148,6 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 # i need to clean this up lol
                 os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
                 #Gets the width and height
-                global fps
                 global height
                 global width
                 if self.localFile == False:
@@ -155,8 +156,8 @@ def start(thread,self,renderdir,videoName,videopath,times):
                 self.fps = VideoName.return_video_framerate(f'{self.input_file}')
                 
                 # Calculate the aspect ratio
-                videoName = VideoName.return_video_name(fr'{self.input_file}')
                 self.videoName = videoName
+                
                 video = cv2.VideoCapture(self.input_file)
                 try:
                         self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -167,8 +168,7 @@ def start(thread,self,renderdir,videoName,videopath,times):
                         self.aspectratio = 1920 / 1080
                         #gets the fps
                 
-                fps = return_data.Fps.return_video_fps(fr'{videopath}')
-                self.fps = fps
+                
                 width,height = return_data.VideoName.return_video_resolution(videopath)
                 
                 #Create files
@@ -237,14 +237,14 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         outputpath = self.output_folder
                 if mode == 'interpolation':
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(fps*times)}fps.mp4') == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps.mp4') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(fps*times)}fps({i}).mp4') == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).mp4') == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{round(fps*times)}fps({i}).mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).mp4' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{round(fps*times)}fps.mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps.mp4' 
                 self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                 if mode == 'upscale': # add upscale/realesrgan resolution bump here
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
@@ -265,10 +265,10 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
                 if run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd) !=0:
                         thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory!')
                         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
