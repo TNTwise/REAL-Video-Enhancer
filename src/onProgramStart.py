@@ -177,11 +177,13 @@ def set_model_params(self):
     models_installed = checks.check_for_individual_models()
     settings = Settings()
     self.model_labels = {}
+    self.ui.RifeSettings.setEnabled(False)
     for i in models_installed:
                 
                 if 'Rife' == i:
                     self.ui.RifeCheckBox.setChecked(True)
                     self.model_labels['Rife'] = 'interpolation'
+                    self.ui.RifeSettings.setEnabled(True)
                 if 'RealESRGAN' == i:
                     self.ui.RealESRGANCheckBox.setChecked(True)
                     self.model_labels['RealESRGAN'] = 'upscaling'

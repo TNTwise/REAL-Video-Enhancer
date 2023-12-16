@@ -48,6 +48,7 @@ make transition detection dynamic between fps, like it can be 2x, 2.5x, 2.7x, an
 add documentation<br/>
 repeating logs, if an error has been repeated, dont log it a bunch of times, instead log it once and say how many times it failed.<br/>
 select which log file to view<br/>
+add dependencies install script for ytdlp, so it can automatically be updated.
 Wiki page<br/>
  - How to Uscale<br/>
  - Best uscaling practices<br/>

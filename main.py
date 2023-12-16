@@ -43,6 +43,9 @@ import modules.Rife as rife
 import modules.ESRGAN as esrgan
 import modules.Waifu2X as Waifu2X
 import modules.IFRNET as ifrnet
+import modules.CUGAN as cugan
+
+
 import src.onProgramStart
 from src.ETA import *
 from src.getLinkVideo.get_video import *
@@ -248,6 +251,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == 'IFRNET':
             ifrnet.modelOptions(self)
+
+        if self.ui.AICombo.currentText() == 'RealCUGAN':
+            cugan.modelOptions(self)
     def switchMode(self):
         self.ui.AICombo.clear()
         for key,value in self.model_labels.items():

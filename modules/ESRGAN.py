@@ -33,7 +33,10 @@ def modelOptions(self):
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:
         pass
-    self.ui.RifeStart.clicked.disconnect()
+    try:
+        self.ui.RifeStart.clicked.disconnect()
+    except:
+          pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
     self.greyOutRealSRTimes()
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realesrgan-ncnn-vulkan'))

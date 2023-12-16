@@ -24,7 +24,7 @@ from sys import exit
 from src.getModels.rifeModelsFunctions import *
 from src.settings import *
 settings = Settings()
-
+from src.getModels.returnModelList import *
 from src.log import log
 
 import src.getModels.SelectAI as SelectAI
@@ -42,15 +42,21 @@ class Worker(QObject):
             
             settings = Settings()
             try:
-                    os.system(f'touch "{thisdir}/models.txt"')
+                    
+                    with open(f'{thisdir}/models.txt','w') as f:
+                         f.write('')
                     
                     
                     
                     total_size_in_bytes=0
                     data_downloaded=0
-                    for link,name in install_modules_dict.items():
-                        response = requests.get(link, stream=True)
-                        total_size_in_bytes+= int(response.headers.get('content-length', 0))
+                    try:#this is due to the error message install_modules_dict showing up after exiting on fist screen, if i add this it stops it(very good programming)
+                        for link,name in install_modules_dict.items():
+                            response = requests.get(link, stream=True)
+                            total_size_in_bytes+= int(response.headers.get('content-length', 0))
+                    except:
+                         print('Not Installing!')
+                         exit()
                     if check_if_enough_space_for_install(total_size_in_bytes) == False:
                          return 0
                     for link,name in install_modules_dict.items():
@@ -62,7 +68,7 @@ class Worker(QObject):
                                     self.intReady.emit([int(data_downloaded),total_size_in_bytes]) # sends back data to main thread# sends back data to main thread
                     if os.path.exists(f"{settings.ModelDir}") == False:
                         os.mkdir(f"{settings.ModelDir}")
-                        os.mkdir(f"{settings.ModelDir}/rife")
+                        
 
                     
                     
@@ -100,8 +106,7 @@ class Worker(QObject):
                                 f.extractall(f'{settings.ModelDir}/rife/')
 
 
-                    os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife"')
-                    os.system(f'chmod +x "{settings.ModelDir}/rife/rife-ncnn-vulkan"')
+                    
                     for i in os.listdir(f'{thisdir}/files/'):
                          if '.txt' not in i:
                               os.remove(f'{thisdir}/files/{i}')
@@ -173,55 +178,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                  
             def next(self):
                 global install_modules_dict
-                install_modules_dict={}
-                global rife_install_list
-                rife_install_list=[]
-                try:
-                    with open(f'{thisdir}/models.txt', 'r') as f:
-                            for i in f.readlines():
-                                print(i)
-                                i=i.replace('\n','')
-                                rife_install_list.append(i)
-                except:
-                     rife_install_list.append('rife-v4.6')
-                '''https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
-                'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-                '''
-                install_modules_dict = {'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
-'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',}
-                
-                
-                if self.ui.RifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/rife/') == False:
-                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                if self.ui.RifeCheckBox.isChecked() == False:
-                        
-                        os.system(f'rm -rf "{settings.ModelDir}/rife/"')
-                if self.ui.RealESRGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realesrgan') == False:
-                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/realesrgan-ncnn-vulkan-20220424-ubuntu.zip'] = 'realesrgan-ncnn-vulkan-20220424-ubuntu.zip'
-                if self.ui.RealESRGANCheckBox.isChecked() == False:
-                        os.system(f'rm -rf "{settings.ModelDir}/realesrgan/"')
-                if self.ui.Waifu2xCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/waifu2x') == False:
-                        install_modules_dict['https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip'] = 'waifu2x-ncnn-vulkan-20220728-ubuntu.zip'
-                if self.ui.Waifu2xCheckBox.isChecked() == False:
-                        os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
-                if self.ui.CainCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/ifrnet') == False:
-                          install_modules_dict['https://github.com/nihui/ifrnet-ncnn-vulkan/releases/download/20220720/ifrnet-ncnn-vulkan-20220720-ubuntu.zip'] = 'ifrnet-ncnn-vulkan-20220720-ubuntu.zip'
-                if self.ui.CainCheckBox.isChecked() == False:
-                         os.system(f'rm -rf "{settings.ModelDir}/ifrnet/"')
-                
-                if self.ui.RealCUGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realcugan') == False:
-                        install_modules_dict['https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip'] = 'realcugan-ncnn-vulkan-20220728-ubuntu.zip'
-                if self.ui.RealCUGANCheckBox.isChecked() == False:
-                        os.system(f'rm -rf "{settings.ModelDir}/realcugan/"')
-                for i in rife_install_list:
-                        if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
-                                install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                        if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
-                                install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
-                if rife_install_list == [] and self.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
-                        install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
+                install_modules_dict=returnModelList(self,settings)
+                print(install_modules_dict)
                 
                 QApplication.closeAllWindows()
 
@@ -271,7 +229,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                 for checkbox, option_name in rife_checkboxes(self):
                     if checkbox.isChecked():
                         rife_install_list.append(option_name)
-                
+                    self.main.ui.RifeCheckBox.setChecked(True)
                 with open(f'{thisdir}/models.txt', 'w') as f:
                     
                     for option in rife_install_list:
@@ -396,19 +354,24 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
     
 
-
-    window = Downloading()
-    app.exec_()
-    app =None 
-    if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
-        QApplication.closeAllWindows()
+    if install_modules_dict:
+        window = Downloading()
+        app.exec_()
+        app =None 
+        if os.path.isfile(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == True:
+            QApplication.closeAllWindows()
+        else:
+            for file in os.listdir(f'{thisdir}/files'):
+                if '.txt' not in file:
+                    os.system(f'rm -rf "{thisdir}/files/{file}"')
+             # this happens if program abruptly stops while downloading
     else:
-        for file in os.listdir(f'{thisdir}/files'):
-            if '.txt' not in file:
-                os.system(f'rm -rf "{thisdir}/files/{file}"')
-        exit() # this happens if program abruptly stops while downloading
-'''else:
-    exit()'''
+         msg = QMessageBox()
+         msg.setWindowTitle(" ")
+       
+            
+         msg.setText(f"No models selected!")
+         exit()
 def excepthook(type, value, traceback):
     error_message = f"An unhandled exception occurred: {value}"
     log(f'ERROR: Unhandled exception! {traceback},{type},{error_message}')

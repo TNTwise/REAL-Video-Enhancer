@@ -433,10 +433,7 @@ class upscale(QObject):
                         
                         command.append(i)
                         print(command)
-                if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
-                    optimized_render(self,command)
-                else:
-                    render(self,command)
+                
 
             if self.main.AI == 'waifu2x-ncnn-vulkan':
                 command = [
@@ -449,11 +446,22 @@ class upscale(QObject):
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
 ]
-                if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
-                    
-                    optimized_render(self,command)
-                else:
-                    render(self,command)
+            if self.main.AI == 'realcugan-ncnn-vulkan':
+                command = [
+    f'{settings.ModelDir}/realcugan/realcugan-ncnn-vulkan',
+    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
+    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
+    '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
+    '-j', f'1:{settings.VRAM}:2',
+    '-f', str(img_type),
+    '-m', f'{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}',
+]
+            if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
+                
+                optimized_render(self,command)
+            else:
+                render(self,command)
             if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
