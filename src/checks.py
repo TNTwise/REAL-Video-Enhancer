@@ -98,7 +98,7 @@ def check_if_enough_space(input_file,render,times):
                 full_size = full_extraction_size + full_extraction_size * times * 4
             return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
     else:
-        return full_extraction_size*5 < free_space, full_extraction_size*2/ (1024 ** 3), free_space/ (1024 ** 3)
+        return full_extraction_size*5 < free_space, full_extraction_size*5/ (1024 ** 3), free_space/ (1024 ** 3)
             
 def check_for_individual_models():
     return_list = []
