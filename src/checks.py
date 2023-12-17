@@ -113,6 +113,8 @@ def check_for_individual_models():
             return_list.append('RealCUGAN')
         if os.path.exists(f'{thisdir}/models/ifrnet/'):
             return_list.append('IFRNET')
+        if os.path.exists(f'{thisdir}/models/realsr/'):
+            return_list.append('RealSR')
         if len(return_list) >0:
             return return_list
         

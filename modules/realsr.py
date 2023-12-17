@@ -16,13 +16,13 @@ thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 settings = Settings()
 def modelOptions(self):
-    log('Model: RealCUGAN')
+    log('Model: RealSR')
     self.times=1
     self.render='esrgan'
     self.ui.Rife_Model.clear()
     self.ui.FPSPreview.setText('RES:')
-    self.ui.Rife_Model.addItem('models-se')
-    
+    self.ui.Rife_Model.addItem('DF2K')
+    self.ui.Rife_Model.addItem('DF2K_JPEG')
     
     
     self.ui.Rife_Model.setCurrentIndex(0)
@@ -33,17 +33,15 @@ def modelOptions(self):
     try:
         self.ui.RifeStart.clicked.disconnect()
     except:
-        pass
-    self.ui.Rife_Model.setEnabled(True)
-    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realcugan-ncnn-vulkan'))
+          pass
+    self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
+    self.greyOutRealSRTimes()
+    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realsr-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
+    self.ui.denoiseLevelLabel.hide()
+    self.ui.denoiseLevelSpinBox.hide()
     
-    self.ui.Rife_Times.addItem('2X')
-    self.ui.Rife_Times.addItem('3X')
+    
     self.ui.Rife_Times.addItem('4X')
     self.ui.Rife_Times.setCurrentIndex(0)
-    self.ui.denoiseLevelLabel.show()
-    self.ui.denoiseLevelSpinBox.show()
-    self.ui.Rife_Times.setEnabled(True)
-                
- 
+

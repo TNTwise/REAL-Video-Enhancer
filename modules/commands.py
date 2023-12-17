@@ -146,7 +146,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                         self.showDialogBox(f'{e}\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.')
                 self.file_drop_widget.hide()
                 # i need to clean this up lol
-                os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
                 #Gets the width and height
                 global height
                 global width
@@ -190,7 +190,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
                 
                 global interpolation_sessions
-                self.input_frames = len(os.listdir(f'{self.render_folder}/{self.videoName}_temp/input_frames/'))
+                self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 global frame_count
                 self.filecount = 0
                 frame_count = self.input_frames * self.times # frame count of video multiplied by times 

@@ -28,10 +28,11 @@ class pb2X(QObject):
         QThread.__init__(self, parent)
         self.input_file = myvar
         self.videoName = VideoName.return_video_name(f'{self.input_file}')
-        self.settings = Settings()
-        self.render = render
+        
+        
         self.main = main
     def run(self):
+        self.settings = Settings()
         """Long-running task."""
         log('Start Progressbar/Info Thread')
         while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
@@ -67,9 +68,10 @@ class pb2X(QObject):
                                 files_processed = files_processed.replace(self.settings.Image_Type,'')
                                 files_processed = int(files_processed)
                                 self.main.files_processed = files_processed
-                            except:
-                                pass
-                                #print('i really gotta fix this')
+                            except Exception as e:
+                                self.main.files_processed = 0
+                                tb = traceback.format_exc()
+                                print(f'{e},{tb}')
 
                         else:
                             files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
@@ -118,7 +120,8 @@ class pb2X(QObject):
                                 
                                 traceback_info = traceback.format_exc()
                                 log(f'{e} {traceback_info}')
-                                
+                else:
+                     print('No render folder exists!')             
                         
                     
                 
@@ -258,52 +261,55 @@ def frameCountThread(self):
     log('INFO: Starting Render Thread')
     iteration = 0
     increment=1
-    with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
-        for m in range(interpolation_sessions):
-            f.write(f'file {interpolation_sessions-m}.mp4\n')
-    
-    transitionDetectionClass = transition_detection.TransitionDetection(self.main)
-    while True:
+    try:
+        with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
+            for m in range(interpolation_sessions):
+                f.write(f'file {interpolation_sessions-m}.mp4\n')
         
-        try:
-            if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= self.main.frame_increments_of_interpolation or iteration == interpolation_sessions-1:
-                j=1
-                
-                if iteration == interpolation_sessions-1:
-                    total_frames_rendered =  abs((interpolation_sessions-1)*self.main.frame_increments_of_interpolation - self.main.frame_count)
-                    #total_frames_rendered = frame_count+frame_increments_of_interpolation 
-                    while j <= total_frames_rendered:
-                        if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+        transitionDetectionClass = transition_detection.TransitionDetection(self.main)
+        while True:
+            
+            try:
+                if len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/")) >= self.main.frame_increments_of_interpolation or iteration == interpolation_sessions-1:
+                    j=1
+                    
+                    if iteration == interpolation_sessions-1:
+                        total_frames_rendered =  abs((interpolation_sessions-1)*self.main.frame_increments_of_interpolation - self.main.frame_count)
+                        #total_frames_rendered = frame_count+frame_increments_of_interpolation 
+                        while j <= total_frames_rendered:
+                            if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                                    
+                                    increment+=1
+                                    j+=1
+
+                            else:
+                                sleep(.1)
+                    else:
+                        #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
+                        while j <= self.main.frame_increments_of_interpolation:
+                            if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+
+                                    increment+=1
+                                    j+=1
                                 
-                                increment+=1
-                                j+=1
-
-                        else:
-                            sleep(.1)
+                            else:
+                                sleep(.1)
+                    transitionDetectionClass.merge_frames()
+                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                    iteration+=1
+                    if iteration == interpolation_sessions:
+                        break
+                    for i in range(self.main.frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
+                        os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*self.main.frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
+                    
                 else:
-                    #Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
-                    while j <= self.main.frame_increments_of_interpolation:
-                        if os.path.isfile(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}'):#check if the file exists, prevents rendering issuess
+                    sleep(0.1)
+            except Exception as e:
 
-                                increment+=1
-                                j+=1
-                            
-                        else:
-                            sleep(.1)
-                transitionDetectionClass.merge_frames()
-                os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
-                iteration+=1
-                if iteration == interpolation_sessions:
-                    break
-                for i in range(self.main.frame_increments_of_interpolation):# removes previous frames, takes the most time (optimize this?)
-                       os.system(f'rm -rf "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(i+((iteration-1)*self.main.frame_increments_of_interpolation)).zfill(8)}{self.main.settings.Image_Type}"')
-                
-            else:
-                sleep(0.1)
-        except Exception as e:
-
-            log(str(e))
-
+                log(str(e))
+    except Exception as e:
+        traceb = traceback.format_exc()
+        log(f'{str(e)}, {traceb}')
 class interpolation(QObject):
     
     finished = pyqtSignal()
@@ -317,7 +323,7 @@ class interpolation(QObject):
    
     def finishRenderSetup(self): #3rd and final call, called from interpolate.py
             
-            extractFramesAndAudio(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,self.main.times)
+            extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,self.main.times)
             
             # run transition detection start
             if self.main.settings.SceneChangeDetectionMode == 'Enabled':
@@ -333,7 +339,7 @@ class interpolation(QObject):
                 self.main.paused = False
                 settings=Settings()
                 
-                self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+                self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
                 
                 self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                 
@@ -347,8 +353,8 @@ class interpolation(QObject):
                     command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
     '-m', self.model,
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}']
                     if 'v4' in model:
@@ -368,8 +374,8 @@ class interpolation(QObject):
                     command = [
 f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
 
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}',
     '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}'
@@ -383,7 +389,7 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                     else:
                         render(self,command)
             
-                if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
+                if os.path.exists(f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
                 
                 else:
@@ -391,7 +397,7 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                         self.main.transitionDetection.merge_frames()
                     if settings.RenderType != 'Optimized':
                         self.log.emit("[Merging Frames]")
-                    self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
+                    self.main.output_file = end(self,self.main,settings.RenderDir,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                     
                     self.finished.emit()
             
@@ -407,7 +413,7 @@ class upscale(QObject):
         QThread.__init__(self, parent)
     def finishRenderSetup(self): #3rd and final call, called from upscale.py
 
-        extractFramesAndAudio(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1)
+        extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,1)
         
         self.realESRGAN()
 
@@ -419,13 +425,13 @@ class upscale(QObject):
 
             self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
             img_type = self.main.settings.Image_Type.replace('.','')
-            self.input_frames = len(os.listdir(f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames/'))
+            self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
             self.main.frame_count = self.input_frames
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type)
 ]
@@ -438,8 +444,8 @@ class upscale(QObject):
             if self.main.AI == 'waifu2x-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan',
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
     '-j', f'1:{settings.VRAM}:2',
@@ -449,27 +455,36 @@ class upscale(QObject):
             if self.main.AI == 'realcugan-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/realcugan/realcugan-ncnn-vulkan',
-    '-i', f'{self.main.render_folder}/{self.main.videoName}_temp/input_frames',
-    '-o', f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/0/',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-s', str(int(self.main.ui.Rife_Times.currentText()[0])),
     '-n', str(self.main.ui.denoiseLevelSpinBox.value()),
     '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}',
 ]
+            if self.main.AI == 'realsr-ncnn-vulkan':
+                command = [
+    f'{settings.ModelDir}realsr/realsr-ncnn-vulkan',
+    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames',
+    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
+    '-j', f'1:{settings.VRAM}:2',
+    '-f', str(img_type),
+    '-m', f'{settings.ModelDir}realsr/models-{self.main.ui.Rife_Model.currentText()}',
+]
             if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                 
                 optimized_render(self,command)
             else:
                 render(self,command)
-            if os.path.exists(f'{self.main.render_folder}/{self.main.videoName}_temp/output_frames/') == False:
+            if os.path.exists(f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/') == False:
                     show_on_no_output_files(self.main)
             else:
                     if self.main.paused == False:
                         if settings.RenderType != 'Optimized':
                             self.log.emit("[Merging Frames]")
                             log('INFO: Merging Frames')
-                        self.main.output_file = end(self,self.main,self.main.render_folder,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.main.encoder,'upscale')
+                        self.main.output_file = end(self,self.main,settings.RenderDir,self.main.videoName,self.main.input_file,1,self.main.output_folder, self.main.videoQuality,self.main.encoder,'upscale')
                     else:
                         pass
             self.finished.emit()

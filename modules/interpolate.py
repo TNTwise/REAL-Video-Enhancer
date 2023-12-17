@@ -18,13 +18,14 @@ homedir = os.path.expanduser(r"~")
 
 
 def initializeInterpolation(self,AI):#1st stage in preparing render, starts all worker threads
-    os.system(f'rm -rf "{self.render_folder}/{self.videoName}_temp/"')
+    settings = Settings()
+    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
     #self.ui.QueueButton.show()
     
     
 
     self.AI = AI
-    settings = Settings()
+    
     self.setDisableEnable(True)
     
     if settings.DiscordRPC == 'Enabled':

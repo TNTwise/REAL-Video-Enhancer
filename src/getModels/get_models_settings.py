@@ -159,9 +159,30 @@ class ChooseModels(QtWidgets.QMainWindow):
                     for option in rife_install_list:
                         f.write(option + '\n')
 
+def remove_unchecked(self):
+    if self.ui.RifeCheckBox.isChecked() == False:
+        os.system(f'rm -rf "{self.settings.ModelDir}/rife/"')
+
+    if self.ui.RealESRGANCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/realesrgan/"')
+    
+    if self.ui.Waifu2xCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/waifu2x/"')
+    
+    
+    if self.ui.CainCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/ifrnet/"')
+
+    if self.ui.RealCUGANCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/realcugan/"')
+            
+    if self.ui.RealSRCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
+
 def run_install_models_from_settings(self):
     try:
         if model_warning(self):
+            remove_unchecked(self)
             if check_if_online():
                 
                 self.setDisableEnable(True)
@@ -187,25 +208,9 @@ def run_install_models_from_settings(self):
                 # Step 6: Start the thread
                 
                 self.thread5.start()
-            else:
-                
-                    settings = Settings()
-                    if self.main.ui.RifeCheckBox.isChecked() == False:
-                            os.system(f'rm -rf "{settings.ModelDir}/rife/"')
-
-                    if self.main.ui.RealESRGANCheckBox.isChecked() == False:
-                            os.system(f'rm -rf "{settings.ModelDir}/realesrgan/"')
-                    
-                    if self.main.ui.Waifu2xCheckBox.isChecked() == False:
-                            os.system(f'rm -rf "{settings.ModelDir}/waifu2x/"')
+            
                     
                     
-                    if self.main.ui.CainCheckBox.isChecked() == False:
-                            os.system(f'rm -rf "{settings.ModelDir}/ifrnet/"')
-
-                    if self.main.ui.RealCUGAN.isChecked() == False:
-                            os.system(f'rm -rf "{settings.ModelDir}/realcugan/"')
-                
     except Exception as e:
             print(e) 
             traceback_info = traceback.format_exc()

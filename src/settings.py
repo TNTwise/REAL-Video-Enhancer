@@ -88,7 +88,7 @@ class Settings:
                 self.write_to_settings_file(setting, default_value)
                 
                 self.readSettings()
-                
+        
                     
                 
         try:
@@ -116,6 +116,7 @@ class Settings:
                 with open(f'{thisdir}/files/settings.txt', 'a') as f:
                     f.write(key + ',' + value+'\n')
         self.readSettings()
+
     def is_setting(setting):
         
         with open(f'{thisdir}/files/settings.txt', 'r') as f:
@@ -139,18 +140,29 @@ def changeSceneDetection(self):
         if len(self.ui.sceneChangeLineEdit.text()) > 0 and int(self.ui.sceneChangeLineEdit.text()) != 0:
             settings.change_setting('SceneChangeDetection', f'0.{self.ui.sceneChangeLineEdit.text()}')
 def selRenderDir(self):
-    settings = Settings()
+    self.settings = Settings()
     render_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
     
     if render_folder != '':
-        self.render_folder = render_folder
-        if check_for_write_permissions(render_folder):
-            settings.change_setting("RenderDir",f"{self.render_folder}")
         
-            self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+        if check_for_write_permissions(render_folder):
+            
+            try:
+                os.mkdir(f"{render_folder}/renders/")
+                self.settings.change_setting("RenderDir",f"{render_folder}/renders/")
+                
+                self.ui.RenderPathLabel.setText(f"{self.settings.RenderDir}")
+            except:
+                if already_Render_folder(self):
+                    self.settings.change_setting("RenderDir",f"{render_folder}/renders/")
+        
+                    self.ui.RenderPathLabel.setText(f"{self.settings.RenderDir}")
+                else:
+                    pass
+            
         else:
             no_perms_change_setting(self)
-    
+    self.settings = Settings()
 def selOutputDir(self):
     settings = Settings()
     output_folder = QFileDialog.getExistingDirectory(self, 'Open Folder')
@@ -162,7 +174,7 @@ def selOutputDir(self):
             self.ui.OutputDirectoryLabel.setText(f"{settings.OutputDir}")
         else:
             no_perms_change_setting(self)
-    
+    self.settings = Settings()
 def selEncoder(self):
     settings = Settings()
     if '.264' in self.ui.EncoderCombo.currentText():
@@ -171,7 +183,7 @@ def selEncoder(self):
     if '.265' in self.ui.EncoderCombo.currentText():
         settings.change_setting('Encoder','265')
     self.encoder = settings.Encoder
-
+    self.settings = Settings()
 def selRenderType(self):
     settings = Settings()
     if 'Classic' in self.ui.renderTypeCombo.currentText():

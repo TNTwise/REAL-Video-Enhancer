@@ -75,3 +75,5 @@ def notAModel(self):
 def alreadyModel(self):
     self.showDialogBox(f"Same model found in models directory, please rename it to a different model.")
 
+def already_Render_folder(self):
+    return self.showQuestionBox(f"render folder already exists within directory, this can lead to overwriting of files within this directory.\nSet directory anyway?")

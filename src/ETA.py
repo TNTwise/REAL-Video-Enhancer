@@ -1,12 +1,13 @@
 import time
 import os
 from time import sleep
+from src.settings import Settings
 def calculateETA(self,total_iterations):
         self.ETA=None
-        
+        settings = Settings()
         start_time = time.time()
-        while os.path.exists(f'{self.render_folder}/{self.videoName}_temp/'):
-            if os.path.exists(f'{self.render_folder}/{self.videoName}_temp/input_frames/'):
+        while os.path.exists(f'{settings.RenderDir}/{self.videoName}_temp/'):
+            if os.path.exists(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'):
                 
                 
                 

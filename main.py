@@ -44,7 +44,7 @@ import modules.ESRGAN as esrgan
 import modules.Waifu2X as Waifu2X
 import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
-
+import modules.realsr as realsr
 
 import src.onProgramStart
 from src.ETA import *
@@ -147,6 +147,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.resize(1000, 550)
         self.on = True
         #print(self.ui.denoiseLevelSpinBox.value())
+        self.input_file=''
+        self.settings = Settings()
         try:
             self.thread2 = QThread()
         # Step 3: Create a worker object
@@ -173,18 +175,17 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
-            self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin']))
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
+            
             src.onProgramStart.onApplicationStart(self)
-            self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
+            src.onProgramStart.bindButtons(self)
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
             self.ui.themeCombo.setCurrentText(settings.Theme)
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
-            self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
             selFrameIncrementsMode(self)
             if self.gpuMemory == None:
                 cannot_detect_vram(self)
@@ -254,6 +255,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == 'RealCUGAN':
             cugan.modelOptions(self)
+
+        if self.ui.AICombo.currentText() == 'RealSR':
+            realsr.modelOptions(self)
+
     def switchMode(self):
         self.ui.AICombo.clear()
         for key,value in self.model_labels.items():
@@ -359,7 +364,7 @@ class MainWindow(QtWidgets.QMainWindow):
             fp=files_processed
             self.filecount = int(self.filecount)
             videos_rendered=0
-            for i in os.listdir(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
+            for i in os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
                 if 'mp4' in i:
                     videos_rendered+=1
             try:
@@ -379,14 +384,14 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 if self.ETA != None:
                     self.ui.ETAPreview.setText(self.ETA)
-                if self.i == 1 and os.path.exists(f'{self.render_folder}/{self.videoName}_temp/output_frames/'):
+                if self.i == 1 and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
             except Exception as e:
-                #print(e)
+                print(e)
                 pass
         except Exception as e:
-            #print(e)
+            print(e)
             pass
     def runPB(self):
         self.addLast=False
@@ -507,6 +512,8 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 
                 self.ui.Rife_Times.setEnabled(True)
+        if self.ui.AICombo.currentText() == 'RealCUGAN':
+            self.ui.Rife_Times.setEnabled(True)
                 
         
     def openFileNameDialog(self,type_of_file,input_file_list):
