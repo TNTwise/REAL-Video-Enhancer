@@ -49,7 +49,7 @@ class Ui_MainWindow(object):
         self.CainCheckBox.setObjectName("CainCheckBox")
         self.gridLayout_6.addWidget(self.CainCheckBox, 13, 0, 1, 1)
         self.checkBox = QtWidgets.QCheckBox(self.InstallModelsFrame)
-        self.checkBox.setEnabled(False)
+        self.checkBox.setEnabled(True)
         self.checkBox.setObjectName("checkBox")
         self.gridLayout_6.addWidget(self.checkBox, 6, 0, 1, 1)
         self.RifeCheckBox = QtWidgets.QCheckBox(self.InstallModelsFrame)

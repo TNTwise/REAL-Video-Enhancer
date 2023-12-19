@@ -248,6 +248,13 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="rife413">
+              <property name="text">
+               <string>Rife-V4.13</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="1" column="0">
