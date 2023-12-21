@@ -93,4 +93,4 @@ def modelOptions(self):
 
 
 def default_models():
-    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7','rife-v4.12-lite','rife-v4.13']
+    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7','rife-v4.12-lite','rife-v4.13','rife-v4.13-lite']
