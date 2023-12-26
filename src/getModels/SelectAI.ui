@@ -86,7 +86,7 @@
           </widget>
          </item>
          <item row="6" column="0">
-          <widget class="QCheckBox" name="checkBox">
+          <widget class="QCheckBox" name="RealSRCheckBox">
            <property name="enabled">
             <bool>true</bool>
            </property>
