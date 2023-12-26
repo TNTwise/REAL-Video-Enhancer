@@ -67,7 +67,8 @@ class Settings:
     'UpdateChannel': 'Stable',
     
     'DefaultRifeModel': f'rife-v4.6',
-    'ignoreVramPopup': 'False'
+    'ignoreVramPopup': 'False',
+    'Notifications': 'False',
 }
             
 
@@ -222,6 +223,7 @@ def selFrameIncrementsMode(self):
     else:
         self.ui.frameIncrementSpinBox.show()
         self.ui.label_7.show()
+        
 def selSceneDetectionMode(self):
     
     settings = Settings()
@@ -235,3 +237,11 @@ def selSceneDetectionMode(self):
         self.ui.label_3.hide()
         self.ui.sceneChangeSensativityButton.hide()
         self.ui.sceneChangeLineEdit.hide()
+
+def Notifications(self):
+    
+    settings = Settings()
+    if self.ui.NotificationsCheckBox.isChecked() == True:
+        settings.change_setting('Notifications','Enabled')
+    else:
+        settings.change_setting('Notifications','Disabled')

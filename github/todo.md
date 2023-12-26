@@ -15,10 +15,8 @@ this should help with rife vs support<br/>
 implement modular system where app can import modules from scripts(either iterate through module directory or add specific button in settings)<br/>
 <br/>
 add more AI options<br/>
-add tab for upscaling images and not just videos<br/>
 add different themes<br/>
 add system where you can pause a render, have it save where it took place to a file, and can read that file to resume that render.<br/>
-notification to say when render is finished<br/>
 generate script based on module for AI(so its easier to implement them)<br/>
 fix issue where sometimes realesrgan times is disabled, even on animation(happens for waifu2x too)<br/>
 add better downloads that dont rely on github bin dir??, sometimes slow<br/>

@@ -10,12 +10,17 @@ import src.runAI.transition_detection
 from src.return_data import *
 from src.messages import *
 from src.discord_rpc import *
+from src.log import log
 import requests
+try:
+        from notify import notification
+except:
+        log('ERROR: Importing of notifications failed!')
 import re
 import src.thisdir
 import src.checks as checks
 thisdir = src.thisdir.thisdir()
-from src.log import log
+
 import traceback
 def return_gpu_settings(self):
     if int(self.gpuMemory) < 1:
@@ -232,6 +237,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
         settings = Settings()
         try:
                 log(f'Ending Render, input_file={videopath}')
+                
                 if self.output_folder == '':
                         outputpath = settings.OutputDir
                 else:
@@ -293,6 +299,11 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         os.chdir(thisdir)
                         self.file_drop_widget.show()
                         log(f'Finished Render, output_file={output_video_file}')
+                        if settings.Notifications == 'Enabled':
+                                try:
+                                        notification('REAL Video Enhancer', message='Render Finished', app_name='REAL-Video-Enhancer')
+                                except:
+                                        log('ERROR: Notification Failed!')
                         return output_video_file
                 log(f'Failed Render, output_file=Null')
                 return None

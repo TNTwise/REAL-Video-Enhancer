@@ -55,7 +55,7 @@ def bindButtons(self):
     self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
     self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
-    
+    self.ui.NotificationsCheckBox.stateChanged.connect(lambda: Notifications(self))
 def onApplicationStart(self):
     
     #this is kind of a mess
@@ -170,7 +170,10 @@ def onApplicationStart(self):
     
             
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
-    
+    if settings.Notifications == 'Enabled':
+        self.ui.NotificationsCheckBox.setChecked(True)
+    else:
+        self.ui.NotificationsCheckBox.setChecked(False)
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()

@@ -16,27 +16,7 @@ import src.onProgramStart as onProgramStart
 from src.log import *
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
-def bubble_sort(arr):
-  iteration_count = 0
-  list_at_end=[]
-  for i in range(len(arr)):
-    for idx in range(len(arr) - i - 1):
-      var1 = arr[idx].replace('rife-v','') 
-      var1=var1.replace('.','')
-      var1=var1.replace('-lite','')
-      var2 = arr[idx+1].replace('rife-v','') 
-      var2=var2.replace('.','')
-      var2=var2.replace('-lite','')
-      iteration_count += 1
-      try:
-        if int(var1) > int(var2):
-            arr[idx], arr[idx + 1] = arr[idx + 1], arr[idx]
-      except:
-          list_at_end.append(arr[idx])
-  for i in list_at_end:
-      if i not in arr:
-        
-            arr.append(i)
+
 
 def modelOptions(self):
     log('Model: Rife')
@@ -64,9 +44,8 @@ def modelOptions(self):
         pass
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
     models = self.get_models_from_dir('rife')
-    bubble_sort(models)
-    print(models)
     
+    models.sort()
     if len (self.get_models_from_dir("rife")) > 0:
         self.ui.Rife_Model.addItems(models)
         model_list=[]
@@ -76,7 +55,7 @@ def modelOptions(self):
         for i in models:
             if i not in model_list:
             
-                print(f'added model {i}')
+                log(f'added model {i}')
                 self.ui.defaultRifeModel.addItem(i)
         if  f'{self.settings.DefaultRifeModel}' in models:
                 self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')

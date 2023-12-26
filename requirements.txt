@@ -9,3 +9,4 @@ psutil
 python-magic
 Pillow
 loguru
+notify-send
