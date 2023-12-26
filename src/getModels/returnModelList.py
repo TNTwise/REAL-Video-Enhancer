@@ -3,6 +3,8 @@ import src.thisdir
 thisdir = src.thisdir.thisdir()
 def returnModelList(self,settings): # make sure names match up on both selectAI.ui and main.ui
                 rife_install_list=[] 
+                if os.path.exists(f'{settings.ModelDir}/') == False:
+                       os.mkdir(f'{settings.ModelDir}/')
                 try:
                     if self.ui.RifeCheckBox.isChecked():
                         with open(f'{thisdir}/models.txt', 'r') as f:
