@@ -23,7 +23,7 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('Animation')
     self.ui.Rife_Model.addItem('Default')
-    
+    self.ui.EnsembleCheckBox.hide()
     for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
                         if (os.path.splitext(i)[1])[1:] == 'bin':
                             if i not in default_models():

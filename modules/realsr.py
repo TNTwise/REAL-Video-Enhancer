@@ -23,7 +23,7 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('DF2K')
     self.ui.Rife_Model.addItem('DF2K_JPEG')
-    
+    self.ui.EnsembleCheckBox.hide()
     self.ui.EnsembleCheckBox.hide()
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
