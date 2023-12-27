@@ -481,10 +481,12 @@ class MainWindow(QtWidgets.QMainWindow):
         if 'v4' in self.ui.Rife_Model.currentText():
             self.ui.Rife_Times.setEnabled(True)
             self.ui.EnsembleCheckBox.show()
+            self.ui.ensembleHelpButton.show()
         else:
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
             self.ui.EnsembleCheckBox.hide()
+            self.ui.ensembleHelpButton.hide()
     def greyOutRealSRTimes(self):
         if self.ui.AICombo.currentText() == 'RealESRGAN':
             if self.ui.Rife_Model.currentText() == 'Default' or self.ui.Rife_Model.currentText() == 'General':

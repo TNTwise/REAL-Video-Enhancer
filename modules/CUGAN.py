@@ -46,4 +46,4 @@ def modelOptions(self):
     self.ui.denoiseLevelSpinBox.show()
     self.ui.Rife_Times.setEnabled(True)
                 
- 
+    self.ui.ensembleHelpButton.hide()

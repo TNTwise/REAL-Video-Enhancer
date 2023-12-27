@@ -38,7 +38,7 @@ def modelOptions(self):
     self.ui.EnsembleCheckBox.hide()
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'waifu2x-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
-    
+    self.ui.ensembleHelpButton.hide()
     self.ui.denoiseLevelLabel.show()
     self.ui.denoiseLevelSpinBox.show()
     self.ui.Rife_Times.addItem('1X')
