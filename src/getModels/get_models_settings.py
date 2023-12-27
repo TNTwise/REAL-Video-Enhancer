@@ -42,6 +42,8 @@ class Worker(QObject):
                         print(i)
                         i=i.replace('\n','')
                         rife_install_list.append(i)
+                        if 'v4' in i:
+                            rife_install_list.append(f'{i}-ensemble')
             if len(rife_install_list) == 0 and self.main.ui.RifeCheckBox.isChecked():
                   rife_install_list.append('rife-v4.6')
             install_modules_dict=returnModelList(self.main,settings)
@@ -181,6 +183,10 @@ def remove_unchecked(self):
 
 def run_install_models_from_settings(self):
     try:
+        try:
+            window.close()
+        except:
+            pass
         if model_warning(self):
             remove_unchecked(self)
             if check_if_online():

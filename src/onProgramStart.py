@@ -42,6 +42,7 @@ def bindButtons(self):
     self.ui.RifeResume.clicked.connect(self.resume_render)
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))
+    self.ui.ensembleHelpButton.clicked.connect(lambda: ensemble_help(self))
     self.ui.renderTypeCombo.currentIndexChanged.connect(lambda: selRenderType(self))
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
@@ -56,6 +57,15 @@ def bindButtons(self):
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
     self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
     self.ui.NotificationsCheckBox.stateChanged.connect(lambda: Notifications(self))
+    
+    self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.imageHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.vramAmountHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.renderTypeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.frameIncrementHelp.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.esrganHelpModel.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.ensembleHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
 def onApplicationStart(self):
     
     #this is kind of a mess
@@ -109,13 +119,7 @@ def onApplicationStart(self):
     if os.path.exists(f"{settings.RenderDir}") == False:
         settings.change_setting('RenderDir',f'{thisdir}')
     
-    self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.imageHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.vramAmountHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.renderTypeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.frameIncrementHelp.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.esrganHelpModel.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    
     
     self.ui.InstallModelsFrame.hide()
     self.ui.RifeResume.hide()

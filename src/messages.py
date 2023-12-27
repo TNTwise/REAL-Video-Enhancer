@@ -77,3 +77,9 @@ def alreadyModel(self):
 
 def already_Render_folder(self):
     return self.showQuestionBox(f"render folder already exists within directory, this can lead to overwriting of files within this directory.\nSet directory anyway?")
+
+def ensembleModelDoesntExist(self):
+    self.showDialogBox('Ensemble model does not exist, please click Install/Remove models to download the ensemble version. Using the regular model instead.')
+
+def ensemble_help(self):
+    self.showDialogBox('Ensemble interpolates a single frame twice, leading to a better result, but the render will take twice as long.')

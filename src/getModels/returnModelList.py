@@ -9,9 +9,12 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                     if self.ui.RifeCheckBox.isChecked():
                         with open(f'{thisdir}/models.txt', 'r') as f:
                             for i in f.readlines():
-                                print(i)
+                                
                                 i=i.replace('\n','')
                                 rife_install_list.append(i)
+                                print(f'{i}-ensemble')
+                                if 'v4' in i:
+                                        rife_install_list.append(f'{i}-ensemble')
                 except Exception as e:
                      if self.ui.RifeCheckBox.isChecked():
                         rife_install_list.append('rife-v4.6')
@@ -46,7 +49,7 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                         if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
                                 install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                         if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
-                                install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/{i}.tar.gz'] = f'{i}.tar.gz'
+                                install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/{i}.tar.gz'] = f'{i}.tar.gz'
                 if rife_install_list == [] and self.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                         install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'

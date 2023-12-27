@@ -27,7 +27,7 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('FPS:')
     
     self.ui.Rife_Times.addItem('2X')
-
+    self.ui.EnsembleCheckBox.hide()
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

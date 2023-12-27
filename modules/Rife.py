@@ -43,19 +43,25 @@ def modelOptions(self):
     except:
         pass
     self.ui.RifeStart.clicked.connect(lambda: interpolate.start_interpolation(self,'rife-ncnn-vulkan'))
-    models = self.get_models_from_dir('rife')
-    
+    models2 = self.get_models_from_dir('rife')
+    models=[]
+    for i in models2:
+        if 'ensemble' not in i:
+            models.append(i)
     models.sort()
     if len (self.get_models_from_dir("rife")) > 0:
+       
         self.ui.Rife_Model.addItems(models)
         model_list=[]
         for i in range(self.ui.defaultRifeModel.count()):
             item_text = self.ui.defaultRifeModel.itemText(i)
             model_list.append(item_text)
+       
         for i in models:
             if i not in model_list:
-            
+                
                 log(f'added model {i}')
+                
                 self.ui.defaultRifeModel.addItem(i)
         if  f'{self.settings.DefaultRifeModel}' in models:
                 self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
@@ -64,12 +70,12 @@ def modelOptions(self):
     
             self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
     
-    if 'v4' in self.ui.Rife_Model.currentText():
+        self.greyOutRifeTimes()
+    
+    
 
-        self.ui.Rife_Times.setEnabled(True)
-    else:
-        self.ui.Rife_Times.setEnabled(False)
-
+def ensemble_models():
+    return ['rife-v4-ensemble','rife-v4.1-ensemble','rife-v4.2-ensemble','rife-v4.3-ensemble','rife-v4.4-ensemble','rife-v4.5-ensemble','rife-v4.9-ensemble','rife-v4.10-ensemble','rife-v4.11-ensemble','rife-v4.12-ensemble','rife-v4.7-ensemble','rife-v4.12-lite-ensemble','rife-v4.13-ensemble','rife-v4.13-lite-ensemble']
 
 def default_models():
-    return ['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7','rife-v4.12-lite','rife-v4.13','rife-v4.13-lite']
+    return ensemble_models()+['rife-v2.3','rife-v4.6','rife-v4.8','rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.7','rife-v4.12-lite','rife-v4.13','rife-v4.13-lite']

@@ -177,7 +177,6 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
-            
             src.onProgramStart.onApplicationStart(self)
             src.onProgramStart.bindButtons(self)
             self.download_youtube_video_command = ''
@@ -478,12 +477,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.label_19.hide()
     
     def greyOutRifeTimes(self):
+        
         if 'v4' in self.ui.Rife_Model.currentText():
             self.ui.Rife_Times.setEnabled(True)
+            self.ui.EnsembleCheckBox.show()
         else:
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
-
+            self.ui.EnsembleCheckBox.hide()
     def greyOutRealSRTimes(self):
         if self.ui.AICombo.currentText() == 'RealESRGAN':
             if self.ui.Rife_Model.currentText() == 'Default' or self.ui.Rife_Model.currentText() == 'General':
