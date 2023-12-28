@@ -79,16 +79,26 @@ def print_output(thread,self,extracting,pipe):
                        except:
                               pass
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
-    self.ffmpeg  = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        shell=True,
-        bufsize=1,  # Line-buffered output
-        universal_newlines=True  # Ensure newline translation
-    )
-
+    if type(command) == str:
+        self.ffmpeg  = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                shell=True,
+                bufsize=1,  # Line-buffered output
+                universal_newlines=True  # Ensure newline translation
+        )
+    if type(command) == list :
+        self.ffmpeg  = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                
+                
+        )
+    stdout, stderr = self.ffmpeg.communicate()
     stdout_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stdout,))
     stderr_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stderr,))
     
@@ -101,7 +111,10 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
-    log(self.ffmpeg.stderr)
+    print("STDOUT:")
+    print(stdout)
+    print("\nSTDERR:")
+    print(stderr)
     return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
@@ -199,32 +212,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 global frame_count
                 self.filecount = 0
                 frame_count = self.input_frames * self.times # frame count of video multiplied by times 
-                if self.settings.RenderType == 'Optimized (Incremental)':
-                        global frame_increments_of_interpolation
-                        if self.settings.FrameIncrementsMode == 'Manual':
-                            frame_increments_of_interpolation = self.settings.FrameIncrements
-                        elif self.settings.FrameIncrementsMode == 'Automatic':
-                            resolution = VideoName.return_video_resolution(self.input_file)
-                            try:
-                                frame_increments_of_interpolation = int(100*int(self.settings.VRAM)/(round(int(resolution[0])/1000)))
-                            except:
-                                 frame_increments_of_interpolation = int(100*int(self.settings.VRAM))
-                            frame_increments_of_interpolation = int(frame_increments_of_interpolation)
-                            print(frame_increments_of_interpolation)
-                        self.frame_increments_of_interpolation = frame_increments_of_interpolation
-                        interpolation_sessions = ceildiv(frame_count,frame_increments_of_interpolation)
-                        for i in range(interpolation_sessions ):
-                               os.mkdir(f'{renderdir}/{videoName}_temp/input_frames/{i}')
-                               inc=0
-                               files = os.listdir(f'{renderdir}/{videoName}_temp/input_frames/')
-                               files.sort()
-                               for j in files:
-                                        if settings.Image_Type in j:
-                                               if inc < frame_increments_of_interpolation/self.times:
-                                                       os.rename(f'{renderdir}/{videoName}_temp/input_frames/{j}',f'{renderdir}/{videoName}_temp/input_frames/{i}/{str(inc).zfill(8)}{self.settings.Image_Type}')
-                                                       inc+=1
-                                               else:
-                                                       break
+                
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
                 log(f'End of start function')
@@ -232,7 +220,8 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
                 self.showDialogBox(str(f'{e}'))
-                
+
+
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         try:
@@ -264,7 +253,8 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy "{output_video_file}" -y')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -f concat  -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy  "{output_video_file}" -y')
+                                
                         else:
                         
                                 ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -f concat -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -c copy "{output_video_file}" -y') 

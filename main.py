@@ -367,12 +367,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 if 'mp4' in i:
                     videos_rendered+=1
             try:
-                self.removeLastLineInLogs("Video segments created: ")
-                if videos_rendered == self.interpolation_sessions:
-                    self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
-                else:
-                    
-                    self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                if settings.RenderType == 'Optimized':
+                    self.removeLastLineInLogs("Video segments created: ")
+                    if videos_rendered == self.interpolation_sessions:
+                        self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
+                    else:
+                        
+                        self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
             except:
                 pass
             #Update GUI values
@@ -644,6 +645,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
     def setDisableEnable(self,mode):
         self.ui.AICombo.setDisabled(mode)
+        self.ui.EnsembleCheckBox.setDisabled(mode)
+        self.ui.ensembleHelpButton.setDisabled(mode)
         self.ui.RifeStart.setDisabled(mode)
         self.ui.Input_video_rife.setDisabled(mode) 
         self.ui.Input_video_rife_url.setDisabled(mode) 

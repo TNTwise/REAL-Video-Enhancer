@@ -53,7 +53,6 @@ class TransitionDetection:
                             timestamps.append(timestamp)
                     
             self.timestamps = timestamps
-            print(self.timestamps)
         
 
     def get_frame_num(self,times,frames_subtracted=0):
@@ -62,7 +61,6 @@ class TransitionDetection:
         if self.settings.SceneChangeDetection != 'Off':
             frame_list =[]
             for i in self.timestamps:
-                print(self.fps)
                 frame = float(i) * float(self.fps)
                 
                 frame = round(frame)
@@ -122,7 +120,6 @@ class TransitionDetection:
             
             p = 0
             o = 1
-            print(list1)
             for image in list1:
                 
                 
@@ -173,7 +170,6 @@ class TransitionDetection:
             
             os.chdir(f'{self.full_render_dir}/transitions/')
             for i in os.listdir():
-                print(i)
                 if os.path.isfile(f'{self.full_render_dir}/output_frames/0/{i}'):
                     os.system(f'cp {i} "{self.full_render_dir}/output_frames/0/"')
             
@@ -187,6 +183,5 @@ class TransitionDetection:
                         os.removedirs(f"{self.full_render_dir}/transitions/{i}")# i think i can use this instead of rm
                     except:
                         os.system(f'rm -rf "{self.full_render_dir}/transitions/{i}"')
-                        print('didnt work lol')
                         
             os.system(f'cp -r "{self.full_render_dir}/transitions/{iteration}"* "{self.full_render_dir}/output_frames/0/"')

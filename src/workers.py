@@ -58,7 +58,7 @@ class pb2X(QObject):
                                 self.main.files_processed = int((len(os.listdir(f"{self.settings.RenderDir}/{self.videoName}_temp/output_frames/"))-1)/interpolation_sessions*total_output_files)
                                 
                             except:
-                                print('i really gotta fix this')
+                                #print('i really gotta fix this')
                                 pass
                         if self.settings.RenderType == 'Optimized':
                             try:
@@ -71,7 +71,7 @@ class pb2X(QObject):
                             except Exception as e:
                                 self.main.files_processed = 0
                                 tb = traceback.format_exc()
-                                print(f'{e},{tb}')
+                                #print(f'{e},{tb}')
 
                         else:
                             files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
@@ -80,7 +80,8 @@ class pb2X(QObject):
                         try:
                             self.progress.emit(self.main.files_processed)
                         except Exception as e:
-                            print(e)
+                            #print(e)
+                            pass
                             
                         sleep(.1)
                         
@@ -121,7 +122,9 @@ class pb2X(QObject):
                                 traceback_info = traceback.format_exc()
                                 log(f'{e} {traceback_info}')
                 else:
-                     print('No render folder exists!')             
+                     pass
+                     #log('No render folder exists!') 
+                     #print('No render folder exists!')             
                         
                     
                 
@@ -216,7 +219,7 @@ def optimized_render(self,command):
     global interpolation_sessions
     interpolation_sessions = ceildiv(self.main.frame_count,self.main.frame_increments_of_interpolation)
     self.main.interpolation_sessions = interpolation_sessions 
-    print(interpolation_sessions)
+    #print(interpolation_sessions)
     fc_thread = Thread(target=lambda: frameCountThread(self))
     fc_thread.start()
     sleep(1)
@@ -230,6 +233,7 @@ def calculateFrameIncrements(self):
     
     if self.main.settings.FrameIncrementsMode == 'Manual':
         frame_increments_of_interpolation = self.main.settings.FrameIncrements
+        return int(frame_increments_of_interpolation)
     elif self.main.settings.FrameIncrementsMode == 'Automatic':
         cap = cv2.VideoCapture(self.main.input_file)
         if not cap.isOpened():
@@ -261,7 +265,12 @@ def frameCountThread(self):
     log('INFO: Starting Render Thread')
     iteration = 0
     increment=1
+    
     try:
+        width,height = VideoName.return_video_resolution(self.main.input_file)
+        width = int(width)
+        height = int(height)
+        self.main.vid_resolution = f'{width}x{height}'
         with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
             for m in range(interpolation_sessions):
                 f.write(f'file {interpolation_sessions-m}.mp4\n')
@@ -295,7 +304,7 @@ def frameCountThread(self):
                             else:
                                 sleep(.1)
                     transitionDetectionClass.merge_frames()
-                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -vf "scale=w={width}:h={height},setsar=1"  -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
                     iteration+=1
                     if iteration == interpolation_sessions:
                         break
@@ -331,7 +340,10 @@ class interpolation(QObject):
                 self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
                 self.main.transitionDetection.find_timestamps()
                 self.main.transitionDetection.get_frame_num(self.main.times)
-                self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//self.main.times))}')
+                try:
+                    self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//self.main.times))}')
+                except:
+                    self.log.emit(f'Transitions detected: 0')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
 
     def Render(self,model,times,videopath,outputpath):
