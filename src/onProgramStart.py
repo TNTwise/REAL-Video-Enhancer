@@ -56,7 +56,12 @@ def bindButtons(self):
     self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
     self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
-    self.ui.NotificationsCheckBox.stateChanged.connect(lambda: Notifications(self))
+    try:
+        from notify import notification
+        self.ui.NotificationsCheckBox.stateChanged.connect(lambda: Notifications(self))
+    except Exception as e:
+        self.ui.NotificationsCheckBox.hide()
+        settings.change_setting('Notifications','Disabled')
     self.ui.uninstallButton.clicked.connect(lambda: uninstallAPP(self))
     self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
