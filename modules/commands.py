@@ -14,8 +14,9 @@ from src.log import log
 import requests
 try:
         from notify import notification
-except:
-        log('ERROR: Importing of notifications failed!')
+except Exception as e:
+        log(f'ERROR: Importing of notifications failed! {e}')
+        
 import re
 import src.thisdir
 import src.checks as checks

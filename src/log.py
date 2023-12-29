@@ -36,7 +36,7 @@ class PopupWindow(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle('Tabbed Popup')
+        self.setWindowTitle('Logs')
         self.setGeometry(200, 200, 400, 300)
 
         # Create a tab widget

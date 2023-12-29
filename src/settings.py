@@ -9,6 +9,7 @@ from src.log import *
 from PyQt5.QtWidgets import QApplication, QWidget, QInputDialog, QLineEdit, QFileDialog, QMessageBox
 from src.write_permisions import *
 import traceback
+from sys import exit
 #im going to eventually redo this
 class CustomException(Exception):
     def __init__(self, additional_info):
