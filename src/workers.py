@@ -202,9 +202,9 @@ def stdlog(stdout,stderr):
     stdout_str = stdout.decode()
     stderr_str = stderr.decode()
     log("Standard Output:")
-    log(stdout_str)
+    log(stdout_str[:400])
     log("\nStandard Error:")
-    log(stderr_str)
+    log(stderr_str[:400])
           
 #functions that ALL ncnn AI use
 def render(self,command):
