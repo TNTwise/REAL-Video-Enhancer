@@ -66,7 +66,15 @@ def modelOptions(self):
         if  f'{self.settings.DefaultRifeModel}' in models:
                 self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
         else:
-            self.settings.change_setting(f'DefaultRifeModel',f'{self.get_models_from_dir("rife")[-1]}')
+            models = sorted(self.get_models_from_dir("rife"))
+            model_list=[]
+            for model in models:
+                if 'ensemble' in model:
+                    pass
+                else:
+                    model_list.append(model)
+            
+            self.settings.change_setting(f'DefaultRifeModel',f'{model_list[-1]}')
     
             self.ui.Rife_Model.setCurrentText(f'{self.settings.DefaultRifeModel}')
     

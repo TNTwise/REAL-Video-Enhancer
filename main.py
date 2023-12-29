@@ -824,11 +824,11 @@ except Exception as e:
     log(f'{e} {traceback_info}')
 
 
-def excepthook(type, value, traceback):
-    frame = traceback.tb_frame
+def excepthook(type, value, extraceback):
+    frame = extraceback.tb_frame
     function_name = frame.f_code.co_name
     error_message = f"An unhandled exception occurred: {value}"
-    log(f'ERROR: Unhandled exception! {traceback},{function_name},{type},{error_message}')
+    log(f'ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{function_name},{type},{error_message}')
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
 

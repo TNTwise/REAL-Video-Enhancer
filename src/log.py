@@ -2,7 +2,7 @@ import src.thisdir
 import datetime
 import os
 import sys
-from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QLineEdit, QPushButton, QPlainTextEdit, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QVBoxLayout, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QPlainTextEdit, QMessageBox
 current_time = datetime.datetime.today().strftime('%Y-%m-%d:%H:%M:%S')
 
 thisdir = src.thisdir.thisdir()
@@ -30,56 +30,70 @@ def log(log):
         with open(f'{thisdir}/logs/log_{current_time}.txt', 'a') as f:
         
             f.write(str(log) + '\n')
-    
+
 
 class PopupWindow(QDialog):
     def __init__(self):
         super().__init__()
 
-        self.init_ui()
+        self.setWindowTitle('Tabbed Popup')
+        self.setGeometry(200, 200, 400, 300)
 
-    def init_ui(self):
-        self.setWindowTitle('Log')
+        # Create a tab widget
+        tab_widget = QTabWidget(self)
 
-        layout = QVBoxLayout()
+        # Define the number of tabs
+       
 
-        # Create an uneditable textbox
-        self.text_edit = QPlainTextEdit()
-        self.text_edit.setReadOnly(True)
+        # Create tabs in a loop
+        files = sorted(os.listdir(f'{thisdir}/logs/'))
+        files.reverse()
+        
+        for i in range(len(files)):
+            tab = QWidget()
+            tab_layout = QVBoxLayout(tab)
 
-        self.text_edit.setMinimumSize(600,600)
-        # Add some text to the textbox
-        log = sorted(os.listdir(f'{thisdir}/logs/'))[-1]
+            
+            self.text_edit = QPlainTextEdit()
+            self.text_edit.setReadOnly(True)
 
-        log_file = f'{thisdir}/logs/{log}'
+            self.text_edit.setMinimumSize(600,600)
+            # Add some text to the textbox
 
-        with open(log_file, 'r') as f:
-            log_list = f.readlines()
-        log_string=''
-        for i in log_list:
-            log_string+=f'{i}'
-        self.text_edit.setPlainText(log_string)
+            log_file = f'{thisdir}/logs/{files[i]}'
+
+            with open(log_file, 'r') as f:
+                log_list = f.readlines()
+            log_string=''
+            for j in log_list:
+                log_string+=f'{j}'
+            self.text_edit.setPlainText(log_string)
 
 
-        #define buttons
-        close_button = QPushButton('Close', self)
-        close_button.clicked.connect(self.close)
+            #define buttons
+            close_button = QPushButton('Close', self)
+            close_button.clicked.connect(self.close)
 
-        copy_button = QPushButton("Copy to Clipboard")
-        copy_button.clicked.connect(self.copy_to_clipboard)
+            copy_button = QPushButton("Copy to Clipboard")
+            copy_button.clicked.connect(self.copy_to_clipboard)
 
-        #layout in order
-        layout.addWidget(self.text_edit)
-        if 'FLATPAK_ID' not in os.environ:
-            layout.addWidget(copy_button)
-        layout.addWidget(close_button)
+            #layout in order
+            tab_layout.addWidget(self.text_edit)
+            if 'FLATPAK_ID' not in os.environ:
+                tab_layout.addWidget(copy_button)
+            tab_layout.addWidget(close_button)
+            
+            tab_widget.addTab(tab, f'{files[i]}')
+            # Set the layout for the dialog
+        
 
-        # Set the layout for the dialog
-        self.setLayout(layout)
+        # Create a layout for the dialog and add the tab widget
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(tab_widget)
     def copy_to_clipboard(self):
-        clipboard = QApplication.clipboard()
-        clipboard.setText(self.text_edit.toPlainText())
-        QMessageBox.information(self, "Information", "Text copied to clipboard.")
+            clipboard = QApplication.clipboard()
+            clipboard.setText(self.text_edit.toPlainText())
+            QMessageBox.information(self, "Information", "Text copied to clipboard.")
 
 def viewLogs(self):
     popup = PopupWindow()

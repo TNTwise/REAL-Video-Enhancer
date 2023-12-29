@@ -97,13 +97,12 @@ class Worker(QObject):
                     
                     if i not in rife_install_list and i != 'rife-ncnn-vulkan' and i in rife.default_models():
                             os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
-                        # Change this to the text you want to remove
-                    index = self.main.ui.defaultRifeModel.findText(i)
+                            index = self.main.ui.defaultRifeModel.findText(i)
 
-                    if index != -1:
-                        self.main.ui.defaultRifeModel.removeItem(index)
-                    else:
-                        pass
+                            if index != -1:
+                                self.main.ui.defaultRifeModel.removeItem(index)
+                            else:
+                                pass
             except:
                   log('Rife not installed, but tried to remove anyway!')
             self.finished.emit()
