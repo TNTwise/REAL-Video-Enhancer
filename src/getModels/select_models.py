@@ -84,8 +84,14 @@ class Worker(QObject):
                         if i == 'glxinfo':
                              os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                              os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
-                        
-                    for i in os.listdir(f'{thisdir}/files/'):
+                        if i == 'rife-ncnn-vulkan':
+                             try:
+                                os.mkdir(f"{settings.ModelDir}/rife/")
+                             except:
+                                 pass
+                             os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
+                             os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{thisdir}/models/rife/"')
+                    
                         
                              
                         if '.zip' in i:
@@ -100,7 +106,7 @@ class Worker(QObject):
 
                             os.system(f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"')
                             os.system(f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"')
-
+                    
                         if '.tar.gz' in i:
                             with tarfile.open(f'{thisdir}/files/{i}','r') as f:
                                 f.extractall(f'{settings.ModelDir}/rife/')

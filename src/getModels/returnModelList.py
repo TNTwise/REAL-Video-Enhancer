@@ -15,6 +15,7 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                                 print(f'{i}-ensemble')
                                 if 'v4' in i:
                                         rife_install_list.append(f'{i}-ensemble')
+                     
                 except Exception as e:
                      if self.ui.RifeCheckBox.isChecked():
                         rife_install_list.append('rife-v4.6')
@@ -52,17 +53,18 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                                 install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/{i}.tar.gz'] = f'{i}.tar.gz'
                 if rife_install_list == [] and self.ui.RifeCheckBox.isChecked() and os.path.exists(f'{settings.ModelDir}/rife') == False:
                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
+                        install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
+                        install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6-ensemble.tar.gz'] = f'rife-v4.6-ensemble.tar.gz'
                 if len(install_modules_dict) == 0 and len(os.listdir(f'{settings.ModelDir}/')) == 0:
                         install_modules_dict['https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
-                        install_modules_dict[f'https://raw.githubusercontent.com/TNTwise/Rife-Vulkan-Models/main/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
-
+                        install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz'] = f'rife-v4.6.tar.gz'
+                        install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6-ensemble.tar.gz'] = f'rife-v4.6-ensemble.tar.gz'
                 if os.path.isfile(f'{thisdir}/bin/ffmpeg') and os.path.isfile(f'{thisdir}/bin/glxinfo') and os.path.isfile(f'{thisdir}/bin/yt-dlp_linux'):
                         pass
                 else:
                         install_modules_dict.update({'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/ffmpeg':'ffmpeg',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/yt-dlp_linux':'yt-dlp_linux',
 'https://raw.githubusercontent.com/TNTwise/REAL-Video-Enhancer/main/bin/glxinfo':'glxinfo',})
-
+                        
                 
                 return install_modules_dict

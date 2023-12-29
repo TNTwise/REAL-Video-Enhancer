@@ -970,7 +970,7 @@
                  </property>
                 </spacer>
                </item>
-               <item row="12" column="1">
+               <item row="14" column="1">
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1020,7 +1020,7 @@
                <item row="9" column="1">
                 <widget class="QPushButton" name="logButton">
                  <property name="text">
-                  <string>Show Log</string>
+                  <string>Show Logs</string>
                  </property>
                 </widget>
                </item>
@@ -1030,6 +1030,26 @@
                   <string>Notifications</string>
                  </property>
                 </widget>
+               </item>
+               <item row="13" column="1">
+                <widget class="QPushButton" name="uninstallButton">
+                 <property name="text">
+                  <string>Uninstall</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="12" column="1">
+                <spacer name="horizontalSpacer_4">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
                </item>
               </layout>
              </widget>

@@ -83,3 +83,6 @@ def ensembleModelDoesntExist(self):
 
 def ensemble_help(self):
     self.showDialogBox('Ensemble interpolates a single frame twice, leading to a better result, but the render will take twice as long.')
+
+def uninstallMessage(self):
+    return self.showQuestionBox(f"Will remove EVERYTHING.\nContinue?")

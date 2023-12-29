@@ -66,7 +66,13 @@ class Worker(QObject):
             
             for i in os.listdir(f'{thisdir}/files/'):
                 
-                        
+                if i == 'rife-ncnn-vulkan':
+                             try:
+                                os.mkdir(f"{settings.ModelDir}/rife/")
+                             except:
+                                 pass
+                             os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
+                             os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/models/rife/"')
                 if '.zip' in i:
 
                     with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
@@ -84,11 +90,7 @@ class Worker(QObject):
                     with tarfile.open(f'{thisdir}/files/{i}','r') as f:
                         f.extractall(f'{settings.ModelDir}/rife/')
 
-            try:
-                  os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
-                  os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"')
-            except:
-                  pass
+            
             for i in os.listdir(f'{thisdir}/files/'):
                     if '.txt' not in i:
                         os.remove(f'{thisdir}/files/{i}')

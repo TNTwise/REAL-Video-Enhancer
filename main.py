@@ -481,8 +481,9 @@ class MainWindow(QtWidgets.QMainWindow):
         
         if 'v4' in self.ui.Rife_Model.currentText():
             self.ui.Rife_Times.setEnabled(True)
-            self.ui.EnsembleCheckBox.show()
-            self.ui.ensembleHelpButton.show()
+            if os.path.exists(f'{settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble'):
+                self.ui.EnsembleCheckBox.show()
+                self.ui.ensembleHelpButton.show()
         else:
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)

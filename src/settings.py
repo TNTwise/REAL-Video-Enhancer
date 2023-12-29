@@ -68,7 +68,7 @@ class Settings:
     
     'DefaultRifeModel': f'rife-v4.6',
     'ignoreVramPopup': 'False',
-    'Notifications': 'False',
+    'Notifications': 'Enabled',
 }
             
 
@@ -245,3 +245,10 @@ def Notifications(self):
         settings.change_setting('Notifications','Enabled')
     else:
         settings.change_setting('Notifications','Disabled')
+
+
+def uninstallAPP(self):
+    if uninstallMessage(self):
+        os.system(f'rm -rf "{thisdir}/"*') 
+        exit()
+    
