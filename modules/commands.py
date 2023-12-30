@@ -80,26 +80,16 @@ def print_output(thread,self,extracting,pipe):
                        except:
                               pass
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
-    if type(command) == str:
-        self.ffmpeg  = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                shell=True,
-                bufsize=1,  # Line-buffered output
-                universal_newlines=True  # Ensure newline translation
-        )
-    if type(command) == list :
-        self.ffmpeg  = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                
-                
-        )
-    stdout, stderr = self.ffmpeg.communicate()
+    self.ffmpeg  = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        shell=True,
+        bufsize=1,  # Line-buffered output
+        universal_newlines=True  # Ensure newline translation
+    )
+    
     stdout_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stdout,))
     stderr_thread = Thread(target=print_output, args=(thread,self,extracting,self.ffmpeg.stderr,))
     
@@ -112,10 +102,7 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
-    print("STDOUT:")
-    print(stdout)
-    print("\nSTDERR:")
-    print(stderr)
+    
     return self.ffmpeg.returncode
 
 def get_video_from_link(self,thread):
