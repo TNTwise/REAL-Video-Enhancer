@@ -2,14 +2,14 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="284.83368mm"
+   width="349.83401mm"
    height="113.65046mm"
-   viewBox="0 0 1076.5368 429.54506"
+   viewBox="0 0 1322.2056 429.54506"
    version="1.1"
    id="svg1"
    xml:space="preserve"
-   sodipodi:docname="drawing.svg"
-   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="DragnDrop.svg"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
    inkscape:export-filename="drawing.png"
    inkscape:export-xdpi="108.70415"
    inkscape:export-ydpi="108.70415"
@@ -28,12 +28,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.93360119"
-     inkscape:cx="561.26749"
+     inkscape:cx="560.73193"
      inkscape:cy="396.85039"
      inkscape:window-width="1920"
-     inkscape:window-height="939"
+     inkscape:window-height="1011"
      inkscape:window-x="0"
-     inkscape:window-y="32"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" /><defs
      id="defs1"><style
@@ -143,11 +143,11 @@
                style="fill:url(#i)" /></g></g></g></g><text
        xml:space="preserve"
        style="font-size:85.3333px;fill:#000000"
-       x="796.23596"
-       y="432.0051"
+       x="868.46552"
+       y="422.59094"
        id="text1"><tspan
          sodipodi:role="line"
          id="tspan1"
-         x="796.23596"
-         y="432.0051"
+         x="868.46552"
+         y="422.59094"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:85.3333px;font-family:Ubuntu;-inkscape-font-specification:'Ubuntu Bold';text-align:center;text-anchor:middle">Drop video here</tspan></text></g></svg>

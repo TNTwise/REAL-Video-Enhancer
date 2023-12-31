@@ -68,25 +68,11 @@ def switch_theme(value):
     settings = Settings()
     settings.change_setting('Theme',f'{value}')
     theme.set_theme(app)
-def setPixMap(self):
-    while self.main.on==True:
-        pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
-        pixmap = pixmap.scaled(self.width(), 500, aspectRatioMode=Qt.KeepAspectRatio)
-        if pixmap.isNull():
-                os.system(f'rm -rf {thisdir}/icons/')
-                sel_mod.install_icons()
-            
-                
-        self.setPixmap(pixmap)
-        sleep(.1)
+
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
         self.main = parent
-
-        image_thread = Thread(target=lambda: setPixMap(self))
-        image_thread.start()
-        
         self.setAcceptDrops(True)
         
     def dragEnterEvent(self, event):
@@ -139,7 +125,7 @@ class FileDropWidget(QLabel):
 class MainWindow(QtWidgets.QMainWindow):
          
     def __init__(self):
-        
+        self.aspect_ratio = 16 / 9
         super(MainWindow, self).__init__()
         self.ui = mainwindow.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -181,7 +167,13 @@ class MainWindow(QtWidgets.QMainWindow):
             src.onProgramStart.bindButtons(self)
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
+            
+            pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
+            pixmap = pixmap.scaled(int(self.width()),int(self.height()))
+            self.file_drop_widget.setPixmap(pixmap)
+            self.file_drop_widget.setScaledContents(True) 
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
+            
             self.ui.themeCombo.setCurrentText(settings.Theme)
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
