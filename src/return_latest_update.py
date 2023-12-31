@@ -23,7 +23,10 @@ class return_latest(QObject):
                 self.progress.emit([latest_beta,latest_stable])
                 self.finished.emit()
             except:
+                 self.finished.emit()
                  pass
         else:
+              self.finished.emit()
               print('why')
               return 'why'
+        

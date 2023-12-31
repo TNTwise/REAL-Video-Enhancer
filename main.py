@@ -343,15 +343,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.RifePB.setMaximum(total_output_files)
                 #self.ui.QueueButton.show()
                 
-                Thread(target=lambda: calculateETA(self,fc)).start()
-                    
+                
+                self.start_time = time.time()   
                 self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
                 self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
             
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
             
-                
+            try:
+                    
+                ETA=calculateETA(self)
+                self.ui.ETAPreview.setText(ETA)
+                       
+            except Exception as e:
+                    print(e)
+                    self.ETA = None
             fp=files_processed
             self.filecount = int(self.filecount)
             videos_rendered=0
@@ -374,8 +381,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
            
             try:
-                if self.ETA != None:
-                    self.ui.ETAPreview.setText(self.ETA)
+                
+                    
                 if self.i == 1 and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
@@ -407,7 +414,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.progress.connect(self.reportProgress)
         self.worker.image_progress.connect(self.imageViewer)
-        
+        self.worker.finished.connect(self.endRife)
         # Step 6: Start the thread
         
         self.thread.start()

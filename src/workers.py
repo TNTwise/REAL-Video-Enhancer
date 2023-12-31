@@ -413,7 +413,7 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
                         self.log.emit("[Merging Frames]")
                     self.main.output_file = end(self,self.main,settings.RenderDir,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
                     
-                    self.finished.emit()
+                self.finished.emit()
             
                 
                 

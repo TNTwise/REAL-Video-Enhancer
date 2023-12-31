@@ -18,57 +18,60 @@ homedir = os.path.expanduser(r"~")
 
 
 def initializeInterpolation(self,AI):#1st stage in preparing render, starts all worker threads
-    settings = Settings()
-    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-    #self.ui.QueueButton.show()
-    
-    
+    try:
+        settings = Settings()
+        os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+        #self.ui.QueueButton.show()
+        
+        
 
-    self.AI = AI
-    
-    self.setDisableEnable(True)
-    
-    if settings.DiscordRPC == 'Enabled':
-        try:
-            start_discordRPC(self,'Interpolating')
-        except Exception as e:
-            print('No Discord Installation')
-            print(e)
-    #set UI
-    
-    self.ui.ETAPreview.setText('ETA:')
-    self.ui.processedPreview.setText('Files Processed:')
-            
-    self.rifeThread = QThread()
-        # Step 3: Create a worker object
-    model = self.ui.Rife_Model.currentText()
-    #check if ensemble
-    if self.ui.EnsembleCheckBox.isChecked() == True and 'rife' in AI:
-        if os.path.exists(f'{settings.ModelDir}/rife/{model}-ensemble'):
-            model+='-ensemble'
-        else:
-            ensembleModelDoesntExist(self)
-            
-    self.rifeWorker = workers.interpolation(self,model)        
-    
-    self.ui.logsPreview.clear()
-    
+        self.AI = AI
+        
+        self.setDisableEnable(True)
+        
+        if settings.DiscordRPC == 'Enabled':
+            try:
+                start_discordRPC(self,'Interpolating')
+            except Exception as e:
+                print('No Discord Installation')
+                print(e)
+        #set UI
+        
+        self.ui.ETAPreview.setText('ETA:')
+        self.ui.processedPreview.setText('Files Processed:')
+                
+        self.rifeThread = QThread()
+            # Step 3: Create a worker object
+        model = self.ui.Rife_Model.currentText()
+        #check if ensemble
+        if self.ui.EnsembleCheckBox.isChecked() == True and 'rife' in AI:
+            if os.path.exists(f'{settings.ModelDir}/rife/{model}-ensemble'):
+                model+='-ensemble'
+            else:
+                ensembleModelDoesntExist(self)
+                
+        self.rifeWorker = workers.interpolation(self,model)        
+        
+        self.ui.logsPreview.clear()
+        
 
-    # Step 4: Move worker to the thread
-    self.rifeWorker.moveToThread(self.rifeThread)
-    # Step 5: Connect signals and slots
-    self.rifeThread.started.connect(self.rifeWorker.finishRenderSetup)
-    self.rifeWorker.finished.connect(self.rifeThread.quit)
-    self.rifeWorker.finished.connect(self.rifeWorker.deleteLater)
-    self.rifeThread.finished.connect(self.rifeThread.deleteLater)
-    self.rifeWorker.log.connect(self.addLinetoLogs)
-    self.rifeWorker.removelog.connect(self.removeLastLineInLogs)
-    # Step 6: Start the thread
-    self.rifeWorker.finished.connect(self.endRife)
-    self.rifeThread.start()
-    
-    self.runPB()
-
+        # Step 4: Move worker to the thread
+        self.rifeWorker.moveToThread(self.rifeThread)
+        # Step 5: Connect signals and slots
+        self.rifeThread.started.connect(self.rifeWorker.finishRenderSetup)
+        self.rifeWorker.finished.connect(self.rifeThread.quit)
+        self.rifeWorker.finished.connect(self.rifeWorker.deleteLater)
+        self.rifeThread.finished.connect(self.rifeThread.deleteLater)
+        self.rifeWorker.log.connect(self.addLinetoLogs)
+        self.rifeWorker.removelog.connect(self.removeLastLineInLogs)
+        # Step 6: Start the thread
+        self.rifeThread.start()
+        
+        self.runPB()
+    except Exception as e:
+        traceback_info = traceback.format_exc()
+        log(f'ERROR: {e} {traceback_info}')
+        self.showDialogBox(e)
 def start_interpolation(self,AI): #command directly connected to the rife start button
     try:           
         if self.input_file != '':

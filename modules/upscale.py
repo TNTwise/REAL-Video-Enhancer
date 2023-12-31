@@ -68,7 +68,6 @@ def initializeUpscale(self,AI):#1st stage in preparing render, starts all worker
             self.upscaleThread.finished.connect(self.upscaleThread.deleteLater)
             self.upscaleWorker.log.connect(self.addLinetoLogs)
             self.upscaleWorker.removelog.connect(self.removeLastLineInLogs)
-            self.upscaleWorker.finished.connect(self.endRife)
             # Step 6: Start the thread
             
             self.upscaleThread.start()
@@ -76,7 +75,8 @@ def initializeUpscale(self,AI):#1st stage in preparing render, starts all worker
         else:
             self.showDialogBox(no_input_file)
     except Exception as e:
-        log(e)
+        traceback_info = traceback.format_exc()
+        log(f'ERROR: {e} {traceback_info}')
         self.showDialogBox(e)
 def start_upscale(self,AI): # command linked directly to upscale buttons 
     try:           
