@@ -33,105 +33,107 @@ class pb2X(QObject):
         self.main = main
     def run(self):
         self.settings = Settings()
-        """Long-running task."""
         log('Start Progressbar/Info Thread')
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-            sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
-        
+        try:
+            while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
+                sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
+            
 
-        total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-        total_output_files = total_input_files * self.main.times
-        # fc is the total file count after interpolation
-        #Could use this instead of just os.listdir
-        
-        
-        while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
-                    try:
-                        if self.settings.RenderType == 'Optimized (Incremental)':
-                            try:
-                                files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
-                                files_processed.sort()
-                                files_processed = files_processed[-1]
-                                files_processed = files_processed.replace(self.settings.Image_Type,'')
-                                files_processed = int(files_processed)
-                                self.main.files_processed = int((len(os.listdir(f"{self.settings.RenderDir}/{self.videoName}_temp/output_frames/"))-1)/interpolation_sessions*total_output_files)
-                                
-                            except:
-                                #print('i really gotta fix this')
-                                pass
-                        if self.settings.RenderType == 'Optimized':
-                            try:
-                                files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
-                                files_processed.sort()
-                                files_processed = files_processed[-1]
-                                files_processed = files_processed.replace(self.settings.Image_Type,'')
-                                files_processed = int(files_processed)
-                                self.main.files_processed = files_processed
-                            except Exception as e:
-                                self.main.files_processed = 0
-                                tb = traceback.format_exc()
-                                #print(f'{e},{tb}')
-
-                        else:
-                            files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
-                            self.main.files_processed = files_processed
-                            
+            total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
+            total_output_files = total_input_files * self.main.times
+            # fc is the total file count after interpolation
+            #Could use this instead of just os.listdir
+            
+            
+            while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
+                    if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                         try:
-                            self.progress.emit(self.main.files_processed)
-                        except Exception as e:
-                            #print(e)
-                            pass
-                            
-                        sleep(.1)
-                        
-                        self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                        if self.main.imageDisplay != None:
+                            if self.settings.RenderType == 'Optimized (Incremental)':
+                                try:
+                                    files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                    files_processed.sort()
+                                    files_processed = files_processed[-1]
+                                    files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                    files_processed = int(files_processed)
+                                    self.main.files_processed = int((len(os.listdir(f"{self.settings.RenderDir}/{self.videoName}_temp/output_frames/"))-1)/interpolation_sessions*total_output_files)
+                                    
+                                except:
+                                    #print('i really gotta fix this')
+                                    pass
+                            if self.settings.RenderType == 'Optimized':
+                                try:
+                                    files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                    files_processed.sort()
+                                    files_processed = files_processed[-1]
+                                    files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                    files_processed = int(files_processed)
+                                    self.main.files_processed = files_processed
+                                except Exception as e:
+                                    self.main.files_processed = 0
+                                    tb = traceback.format_exc()
+                                    #print(f'{e},{tb}')
 
+                            else:
+                                files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                                self.main.files_processed = files_processed
+                                
                             try:
-                                if os.path.exists(self.main.imageDisplay):
-                                    self.image_progress.emit('1')
-                                    
-                                    width = self.main.width()
-                                    height = self.main.height()
-                                    
-                                    self.main.width1=int(width/1.6)
-                                    self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                    if self.main.height1 >= height/1.6:
-                                        
-                                        self.main.height1=int(height/1.6)
-                                        self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                    try:
-                                        if os.path.exists(self.main.imageDisplay):
-                                            
-                                            
-                                            
-                                            self.image_progress.emit('2')
-                                            
-                                    except Exception as e:
-                                        traceback_info = traceback.format_exc()
-                                        log(f'{e} {traceback_info}')
-                                        pass
+                                self.progress.emit(self.main.files_processed)
                             except Exception as e:
+                                #print(e)
+                                pass
                                 
-                                traceback_info = traceback.format_exc()
-                                log(f'{e} {traceback_info}')
-                                self.image_progress.emit('3')
-                    except Exception as e:
-                                
-                                traceback_info = traceback.format_exc()
-                                log(f'{e} {traceback_info}')
-                else:
-                     pass
-                     #log('No render folder exists!') 
-                     #print('No render folder exists!')             
+                            sleep(.1)
+                            
+                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                            if self.main.imageDisplay != None:
+
+                                try:
+                                    if os.path.exists(self.main.imageDisplay):
+                                        self.image_progress.emit('1')
+                                        
+                                        width = self.main.width()
+                                        height = self.main.height()
+                                        
+                                        self.main.width1=int(width/1.6)
+                                        self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                        if self.main.height1 >= height/1.6:
+                                            
+                                            self.main.height1=int(height/1.6)
+                                            self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                        try:
+                                            if os.path.exists(self.main.imageDisplay):
+                                                
+                                                
+                                                
+                                                self.image_progress.emit('2')
+                                                
+                                        except Exception as e:
+                                            traceback_info = traceback.format_exc()
+                                            log(f'{e} {traceback_info}')
+                                            pass
+                                except Exception as e:
+                                    
+                                    traceback_info = traceback.format_exc()
+                                    log(f'{e} {traceback_info}')
+                                    self.image_progress.emit('3')
+                        except Exception as e:
+                                    
+                                    traceback_info = traceback.format_exc()
+                                    log(f'{e} {traceback_info}')
+                    else:
+                        pass
+                        log('No render folder exists!') 
+                        print('No render folder exists!')             
+                            
                         
                     
-                
-        sleep(1)
-        self.finished.emit()
+            sleep(1)
+            self.finished.emit()
 
-
+        except Exception as e:
+                traceback_info = traceback.format_exc()
+                log(f'{e} {traceback_info}')
 class downloadVideo(QObject):
     finished = pyqtSignal(dict)
     progress = pyqtSignal(str)
@@ -314,8 +316,8 @@ def frameCountThread(self):
                 else:
                     sleep(0.1)
             except Exception as e:
-
-                log(str(e))
+                traceback_info = traceback.format_exc()
+                log(f'{e} {traceback_info}')
     except Exception as e:
         traceb = traceback.format_exc()
         log(f'{str(e)}, {traceb}')

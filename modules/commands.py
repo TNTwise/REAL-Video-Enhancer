@@ -280,8 +280,8 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         if settings.Notifications == 'Enabled':
                                 try:
                                         notification('REAL Video Enhancer', message='Render Finished', app_name='REAL-Video-Enhancer')
-                                except:
-                                        log('ERROR: Notification Failed!')
+                                except Exception as e:
+                                        log(f'ERROR: Notification Failed! {e}')
                         return output_video_file
                 log(f'Failed Render, output_file=Null')
                 return None
