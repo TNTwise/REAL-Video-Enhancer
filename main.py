@@ -168,10 +168,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             
-            pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
-            pixmap = pixmap.scaled(int(self.width()),int(self.height()))
-            self.file_drop_widget.setPixmap(pixmap)
-            self.file_drop_widget.setScaledContents(True) 
+            self.pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
+            self.file_drop_widget.setPixmap(self.pixmap)
+            self.label = QLabel(self)
+            #self.label.setPixmap(self.pixmap)
+            #self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+            #self.file_drop_widget.setScaledContents(True) 
+            self.file_drop_widget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             self.ui.imageFormLayout.addWidget(self.file_drop_widget)
             
             self.ui.themeCombo.setCurrentText(settings.Theme)
@@ -212,7 +215,10 @@ class MainWindow(QtWidgets.QMainWindow):
             print(traceback_info)
             log(f'{e} {traceback_info}')
         self.show()
-    
+    def resizeEvent(self, event):
+        # Resize the pixmap to maintain the aspect ratio
+        scaled_pixmap = self.pixmap.scaled(self.size()/2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        self.file_drop_widget.setPixmap(scaled_pixmap)
     def restore_default_settings(self):
         with open(f'{thisdir}/files/settings.txt','w') as  f:
             pass  
