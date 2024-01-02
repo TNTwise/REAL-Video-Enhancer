@@ -159,7 +159,6 @@ class TransitionDetection:
                         if settings.Image_Type in i:
                             frame_num = int(i.replace(settings.Image_Type,''))
                             file_to_move_to = int(ceildiv(frame_num,self.settings.FrameIncrements))# frame increments in workers.py, too lazy to get data from there lol   
-                            print((ceildiv(frame_num,interpolation_sessions)/self.settings.FrameIncrements))
                             os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{file_to_move_to}/{(ceildiv(frame_num,interpolation_sessions)/self.settings.FrameIncrements)}"')    
                     files = os.listdir(f'{self.full_render_dir}/transitions/')
                     files.sort()

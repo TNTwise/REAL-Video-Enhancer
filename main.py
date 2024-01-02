@@ -132,7 +132,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
         self.on = True
-        #print(self.ui.denoiseLevelSpinBox.value())
         self.input_file=''
         self.settings = Settings()
         try:
@@ -327,11 +326,15 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.ui.FPSPreview.setText(f'RES: {resolution} -> {width*self.resIncrease}x{height*self.resIncrease}')
                       
                     except Exception as e:
-                        log(str(e))
-                        print(e)
+                        tb = traceback.format_exc()
+                        log(f'{str(e)} {tb}')
+                        print(e,tb)
+                        pass
             self.ui.logsPreview.clear()
         except Exception as e:
-            print(e)
+            tb = traceback.format_exc()
+            log(f'{str(e)} {tb}')
+            print(e,tb)
             pass
     
     def reportProgress(self, files_processed):
@@ -351,9 +354,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 
                 self.start_time = time.time()   
-                self.addLinetoLogs(f'Starting {self.ui.Rife_Times.currentText()[0]}X Render')
-                self.addLinetoLogs(f'Model: {self.ui.Rife_Model.currentText()}')
-            
+                
+                
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                 self.i=2
             
@@ -363,7 +365,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.ETAPreview.setText(ETA)
                        
             except Exception as e:
-                    print(e)
+                    #print(e)
                     self.ETA = None
             fp=files_processed
             self.filecount = int(self.filecount)
@@ -393,10 +395,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.logsPreview.append(f'Starting {self.times}X Render')
                     self.i = 2
             except Exception as e:
-                print(e)
+                #print(e)
                 pass
         except Exception as e:
-            print(e)
+            #print(e)
             pass
     def runPB(self):
         self.addLast=False

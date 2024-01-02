@@ -123,8 +123,8 @@ class pb2X(QObject):
                                     log(f'{e} {traceback_info}')
                     else:
                         pass
-                        log('No render folder exists!') 
-                        print('No render folder exists!')             
+                        #log('No render folder exists!') 
+                        #print('No render folder exists!')             
                             
                         
                     
@@ -342,8 +342,9 @@ class interpolation(QObject):
                 self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
                 self.main.transitionDetection.find_timestamps()
                 self.main.transitionDetection.get_frame_num(self.main.times)
+                divisor=(self.main.times/2)
                 try:
-                    self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//self.main.times))}')
+                    self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//divisor))}')
                 except:
                     self.log.emit(f'Transitions detected: 0')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
@@ -352,7 +353,8 @@ class interpolation(QObject):
             
                 self.main.paused = False
                 settings=Settings()
-                
+                self.log.emit(f'Starting {self.main.ui.Rife_Times.currentText()[0]}X Render')
+                self.log.emit(f'Model: {self.main.ui.Rife_Model.currentText()}')
                 self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
                 
                 self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
