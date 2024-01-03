@@ -13,7 +13,8 @@ from src.discord_rpc import *
 from src.log import log
 import requests
 try:
-        from notify import notification
+        from notify import *
+        import notify
 except Exception as e:
         log(f'ERROR: Importing of notifications failed! {e}')
         

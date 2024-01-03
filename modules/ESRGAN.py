@@ -22,7 +22,6 @@ def modelOptions(self):
     self.ui.Rife_Model.clear()
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('Animation')
-    self.ui.Rife_Model.addItem('Default')
     self.ui.EnsembleCheckBox.hide()
     self.ui.ensembleHelpButton.hide()
     for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
