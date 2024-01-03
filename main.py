@@ -166,10 +166,12 @@ class MainWindow(QtWidgets.QMainWindow):
             src.onProgramStart.bindButtons(self)
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
-            
+            self.ui.verticalTabWidget.setFocusPolicy(Qt.ClickFocus)
             self.pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
-            self.file_drop_widget.setPixmap(self.pixmap)
-            self.label = QLabel(self)
+            scaled_pixmap = self.pixmap.scaled(self.size()/2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self.file_drop_widget.setPixmap(scaled_pixmap)
+            
+            
             #self.label.setPixmap(self.pixmap)
             #self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
             #self.file_drop_widget.setScaledContents(True) 
@@ -216,8 +218,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
     def resizeEvent(self, event):
         # Resize the pixmap to maintain the aspect ratio
-        scaled_pixmap = self.pixmap.scaled(self.size()/2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.file_drop_widget.setPixmap(scaled_pixmap)
+        try:
+                scaled_pixmap = self.pixmap.scaled(self.size()/2, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                self.file_drop_widget.setPixmap(scaled_pixmap)
+        except Exception as e:
+            print('ResizeEvent FAILED!')
+            log(f'resizeEvent failed! {e}')
     def restore_default_settings(self):
         with open(f'{thisdir}/files/settings.txt','w') as  f:
             pass  
@@ -374,7 +380,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if 'mp4' in i:
                     videos_rendered+=1
             try:
-                if settings.RenderType == 'Optimized':
+                if self.settings.RenderType == 'Optimized':
                     self.removeLastLineInLogs("Video segments created: ")
                     if videos_rendered == self.interpolation_sessions:
                         self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")

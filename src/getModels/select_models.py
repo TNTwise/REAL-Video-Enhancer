@@ -135,7 +135,7 @@ def install_icons(self):
                     if check_if_online():
                         try:
                             print('Downloaded Icons')
-                            url = 'https://github.com/TNTwise/REAL-Video-Enhancer/raw/main/github/icons.zip'
+                            url = 'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/icons.zip'
                             local_filename = url.split('/')[-1]
                             r = requests.get(url)
                             f = open(f'{thisdir}/{local_filename}', 'wb')

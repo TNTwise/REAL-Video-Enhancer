@@ -237,7 +237,7 @@ def calculateFrameIncrements(self):
         frame_increments_of_interpolation = self.main.settings.FrameIncrements
         return int(frame_increments_of_interpolation)
     elif self.main.settings.FrameIncrementsMode == 'Automatic':
-        cap = cv2.VideoCapture(self.main.input_file)
+        '''cap = cv2.VideoCapture(self.main.input_file)
         if not cap.isOpened():
             print("Error opening video file")
             log('ERROR: Could not open video file')
@@ -251,6 +251,39 @@ def calculateFrameIncrements(self):
 
         duration_seconds = int(duration_seconds % 60)
         frame_increments_of_interpolation = int(duration_seconds*int(self.main.settings.VRAM))
+        return int(frame_increments_of_interpolation)'''
+        width,height=VideoName.return_video_resolution(self.main.input_file)
+        
+        #coult take the reciprical of the resolution, and multiply it by '10' + len(resolution) *
+        '''cap = cv2.VideoCapture(self.main.input_file)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        duration_seconds = frame_count / fps
+        duration_minutes = duration_seconds // 120
+        if duration_minutes == 0: duration_minutes = 1'''
+        '''zeros=''
+        for i in range(len(str(int(width)))+1):
+             zeros+='0'
+        dividor = '1'+zeros
+        dividor = int(dividor)
+        print(dividor)
+        return_val = 1/width * dividor
+        print(return_val)'''
+        cap = cv2.VideoCapture(self.main.input_file)
+        if not cap.isOpened():
+            print("Error opening video file")
+            log('ERROR: Could not open video file')
+            return
+
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+        fps = cap.get(cv2.CAP_PROP_FPS)
+
+        duration_seconds = frame_count // fps
+
+        #divisor = len(str(int(width))) 
+        frame_increments_of_interpolation = int((duration_seconds*int(self.main.settings.VRAM)))
+        print(frame_increments_of_interpolation)
         return int(frame_increments_of_interpolation)
 
 def calculateVRAM(self):

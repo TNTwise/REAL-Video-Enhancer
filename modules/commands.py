@@ -61,7 +61,10 @@ def print_output(thread,self,extracting,pipe):
                                 frame_num = frame_num[0]
                                 
                                 frame_num = frame_num.split('=')[1]
-                                thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
+                                if mode == 'Merged' and self.settings.RenderType == 'Optimized':
+                                        pass
+                                else:
+                                        thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
                 if '[download]' in line:
                        percent= re.findall(r'\[download\][ ]*[\d]*',line)
                        percent= re.findall(r'[\d]*',percent[0])
