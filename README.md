@@ -23,7 +23,7 @@
 </ul>
 
 ## Confused on anything?
-- Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>:
+- Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>
 ## Download the Latest Beta release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest</a>
 
