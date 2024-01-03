@@ -22,6 +22,8 @@
   <li> Enhancing straight from a YouTube link or a video URL.  </li>
 </ul>
 
+## Confused on anything?
+- Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>:
 ## Download the Latest Beta release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest</a>
 
