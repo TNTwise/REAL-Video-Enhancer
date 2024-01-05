@@ -246,6 +246,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
 
                         else:
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
+                output_video_file=output_video_file.replace('#','')
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -f concat  -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy  "{output_video_file}" -y')
