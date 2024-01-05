@@ -77,7 +77,9 @@ def start_interpolation(self,AI): #command directly connected to the rife start 
         if self.input_file != '':
             self.render='rife'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
-            
+            if '#'  in self.input_file:
+                self.showDialogBox('Unsupported characters in input file!, # is not supported!')
+                return
             if has_enough_space:
                 initializeInterpolation(self,AI)
             elif not_enough_storage(self,predicted_space,total_space):
