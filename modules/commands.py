@@ -67,6 +67,7 @@ def print_output(thread,self,extracting,pipe):
                                 else:
                                         thread.log.emit(f"Frames {mode}: {frame_num} / {int(total_frame_count*times)}")
                 if '[download]' in line:
+                       
                        percent= re.findall(r'\[download\][ ]*[\d]*',line)
                        percent= re.findall(r'[\d]*',percent[0])
                        percent.reverse()
@@ -83,6 +84,8 @@ def print_output(thread,self,extracting,pipe):
                         thread.log.emit(last_line)
                        except:
                               pass
+                line = line.replace(f'\n','')
+                log(line)
 def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     self.ffmpeg  = subprocess.Popen(
         command,
@@ -289,7 +292,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         self.file_drop_widget.show()
                         return output_video_file
                 log(f'Failed Render, output_file=Null')
-                return None
+                return None  
         except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
