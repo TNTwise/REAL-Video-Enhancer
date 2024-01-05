@@ -846,7 +846,27 @@ def excepthook(type, value, extraceback):
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
 
+import functools
+import inspect
 
+def log_function_call(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        caller_frame = inspect.currentframe().f_back
+        caller_file = inspect.getfile(caller_frame)
+        caller_function = inspect.getframeinfo(caller_frame).function
+        print(f"Function {func.__name__} called from {caller_function} in file {caller_file}")
+        return func(*args, **kwargs)
+    return wrapper
+
+# Applying the decorator to all functions in a script
+def apply_decorator_to_all_functions(module):
+    for name, obj in inspect.getmembers(module):
+        if inspect.isfunction(obj):
+            setattr(module, name, log_function_call(obj))
+
+# Applying the decorator to all functions in the current module
+apply_decorator_to_all_functions(globals())
 
 app = QtWidgets.QApplication(sys.argv)
 

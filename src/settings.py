@@ -252,4 +252,5 @@ def uninstallAPP(self):
     if uninstallMessage(self):
         os.system(f'rm -rf "{thisdir}/"*') 
         exit()
-    
+
+
