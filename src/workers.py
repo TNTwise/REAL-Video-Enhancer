@@ -308,7 +308,7 @@ def frameCountThread(self):
         self.main.vid_resolution = f'{width}x{height}'
         with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
             for m in range(interpolation_sessions):
-                f.write(f'file {interpolation_sessions-m}.mp4\n')
+                f.write(f"file '{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-m}.mp4'\n")
         
         transitionDetectionClass = transition_detection.TransitionDetection(self.main)
         while True:
