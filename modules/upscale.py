@@ -83,6 +83,9 @@ def start_upscale(self,AI): # command linked directly to upscale buttons
         if self.input_file != '':
             self.render='esrgan'
             has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
+            if self.input_file.count("'") > 0 or '"' in self.input_file:
+                quotes(self)
+                return 
             
             if has_enough_space:
                 initializeUpscale(self,AI)

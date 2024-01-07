@@ -151,6 +151,7 @@ def get_video_from_link(self,thread):
 
 def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # called by workers.py after a started thread, used by both upscaling and interpolation
         try:
+                  
                 log(f'Starting Render, input_file={videopath}')
                 settings = Settings()
                 
