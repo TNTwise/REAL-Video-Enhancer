@@ -83,7 +83,7 @@ def modelOptions(self):
     
 
 def ensemble_models():
-    return ['rife-v4-ensemble','rife-v4.1-ensemble','rife-v4.2-ensemble','rife-v4.3-ensemble','rife-v4.4-ensemble','rife-v4.5-ensemble','rife-v4.6-ensemble','rife-v4.7-ensemble','rife-v4.8-ensemble','rife-v4.9-ensemble','rife-v4.10-ensemble','rife-v4.11-ensemble','rife-v4.12-ensemble','rife-v4.12-lite-ensemble','rife-v4.13-ensemble','rife-v4.13-lite-ensemble']
+    return ['rife-v4-ensemble','rife-v4.1-ensemble','rife-v4.2-ensemble','rife-v4.3-ensemble','rife-v4.4-ensemble','rife-v4.5-ensemble','rife-v4.6-ensemble','rife-v4.7-ensemble','rife-v4.8-ensemble','rife-v4.9-ensemble','rife-v4.10-ensemble','rife-v4.11-ensemble','rife-v4.12-ensemble','rife-v4.12-lite-ensemble','rife-v4.13-ensemble','rife-v4.13-lite-ensemble','rife-v4.14-ensemble']
 
 def default_models():
-    return ensemble_models()+['rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.3','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.6','rife-v4.7','rife-v4.8','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.12-lite','rife-v4.13','rife-v4.13-lite']
+    return ensemble_models()+['rife','rife-anime','rife-HD','rife-UHD','rife-v2','rife-v2.3','rife-v2.4','rife-v3.0','rife-v3.1','rife-v4','rife-v4.1','rife-v4.2','rife-v4.3','rife-v4.4','rife-v4.5','rife-v4.6','rife-v4.7','rife-v4.8','rife-v4.9','rife-v4.10','rife-v4.11','rife-v4.12','rife-v4.12-lite','rife-v4.13','rife-v4.13-lite','rife-v4.14']
