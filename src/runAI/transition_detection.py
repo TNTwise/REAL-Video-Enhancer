@@ -9,7 +9,7 @@ def generate_opposite_pair(number, start, end):
 
     opposite = end - (number - start)
     return opposite
-
+import math
 
 class TransitionDetection:
     def __init__(self,originalSelf):
@@ -22,7 +22,7 @@ class TransitionDetection:
         self.thisdir = src.thisdir.thisdir()
         self.fps = originalSelf.fps
         self.full_render_dir = f'{self.render_directory}/{self.videoName}_temp'
-        
+        self.main = originalSelf
         src.return_data.ManageFiles.create_folder(f'{self.full_render_dir}')
         src.return_data.ManageFiles.create_folder(f'{self.full_render_dir}/transitions')
             # Change scene\,0.6 to edit how much scene detections it does, do this for both ffmpeg commands
@@ -50,7 +50,7 @@ class TransitionDetection:
                         if "pts_time" in line:
                             timestamp = str(line.split("_")[3])
                             timestamp = str(timestamp.split(':')[1])
-                            timestamps.append(timestamp)
+                            timestamps.append(math.ceil(round(float(timestamp)*float(self.fps))*self.main.times))
                     
             self.timestamps = timestamps
         
@@ -58,8 +58,25 @@ class TransitionDetection:
     def get_frame_num(self,times,frames_subtracted=0):
         self.times=times
         settings = Settings()
-        if self.settings.SceneChangeDetection != 'Off':
-            frame_list =[]
+        try:
+            
+            if self.settings.SceneChangeDetection != 'Off':
+                transitions = os.listdir(f'{self.full_render_dir}/transitions/')
+                if not os.path.exists(f'{self.full_render_dir}/transitions/temp/'): os.mkdir(f'{self.full_render_dir}/transitions/temp/')
+                for iteration,i in enumerate(transitions):
+                    print(iteration,i)
+                    if settings.Image_Type != '.webp':
+                                os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
+                    else:
+                                os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}.png" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
+                for i in self.timestamps:
+                        for j in range(math.ceil(times)):
+                                os.system(f'cp "{self.full_render_dir}/transitions/temp/{i}{settings.Image_Type}" "{self.full_render_dir}/transitions/{str(int(i)-j).zfill(8)}{settings.Image_Type}"' )
+                os.system(f'rm -rf "{self.full_render_dir}/transitions/temp/"')
+        except Exception as e:
+            tb = traceback.format_exc()
+            print(e,tb)
+            '''frame_list =[]
             for i in self.timestamps:
                 frame = float(i) * float(self.fps)
                 
@@ -127,7 +144,7 @@ class TransitionDetection:
                     os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
                 else:
                     os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
-                # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{Image_Type}"')
+                # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{settings.Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{settings.Image_Type}"')
                 if times == 4 or times == 8:
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}{self.settings.Image_Type}"')
                     os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}{self.settings.Image_Type}"')
@@ -141,27 +158,12 @@ class TransitionDetection:
                        
                 p+=1
                 o+=1
-                # IK this is dumb. but i cant think of anything else rn
+                # IK this is dumb. but i cant think of anything else rn'''
             '''if times == 4:
                     for file,copyto in self.fileToCopyDict.items():
                         os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
                   
-            if settings.RenderType == 'Optimized (Incremental)':# this will sort out the images into the correct directories
-                    frame_count = VideoName.return_video_frame_count(self.input_file)
-                    interpolation_sessions = ceildiv(int(frame_count*times),self.settings.FrameIncrements)
-                    # I ust need to know what divide the frame number by the frame interpolation count, and then take that over frame increments per interpolation
-                    
-                    frame = 0
-                    for i in range(interpolation_sessions):
-                        os.mkdir(f'{self.settings.RenderDir}/{self.videoName}_temp/transitions/{i}')
-                        frame += self.settings.FrameIncrements
-                    for i in os.listdir(f'{self.full_render_dir}/transitions/'):
-                        if settings.Image_Type in i:
-                            frame_num = int(i.replace(settings.Image_Type,''))
-                            file_to_move_to = int(ceildiv(frame_num,self.settings.FrameIncrements))# frame increments in workers.py, too lazy to get data from there lol   
-                            os.system(f'mv "{self.full_render_dir}/transitions/{i}" "{self.full_render_dir}/transitions/{file_to_move_to}/{(ceildiv(frame_num,interpolation_sessions)/self.settings.FrameIncrements)}"')    
-                    files = os.listdir(f'{self.full_render_dir}/transitions/')
-                    files.sort()
+            
                         
     def merge_frames(self,iteration=None):
         if iteration == None:  
