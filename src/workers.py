@@ -354,6 +354,10 @@ def frameCountThread(self):
     except Exception as e:
         traceb = traceback.format_exc()
         log(f'{str(e)}, {traceb}')
+
+
+
+
 class interpolation(QObject):
     
     finished = pyqtSignal()
@@ -409,6 +413,7 @@ class interpolation(QObject):
                     if 'v4' in model:
                          command.append('-n')
                          command.append(str(self.input_frames * times))
+                         print(self.input_frames * times)
                     if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                         
 

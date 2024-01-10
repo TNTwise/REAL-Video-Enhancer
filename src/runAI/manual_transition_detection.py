@@ -42,7 +42,7 @@ def extract(Image_Type,input_file,SceneChangeDetection,times,amount_of_zeros=8):
                     os.system(f'mv transitions/{str(str(iteration+1).zfill(7))}.png transitions/{timestamps[iteration]}.{Image_Type}')
     for i in timestamps:
             for j in range(math.ceil(times)):
-                    os.system(f'cp transitions/{i}.{Image_Type} transitions/{str(int(i)+j).zfill(amount_of_zeros)}.{Image_Type}' )
+                    os.system(f'cp transitions/{i}.{Image_Type} transitions/{str(int(i)-j).zfill(amount_of_zeros)}.{Image_Type}' )
             os.remove(f'transitions/{i}.{Image_Type}')
 image = input('Please pick an image type:\n1:PNG\n2:JPG\n3:WEBP\n(Please pick 1,2 or 3): ')
 if image == '1':

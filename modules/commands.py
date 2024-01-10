@@ -264,7 +264,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
                 if run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd) !=0:
-                        thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory!')
+                        thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory or renaming the video to not contain quotes!')
                         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
                         os.system(f'rm -rf "{thisdir}/{self.input_file}"')
                 else:
