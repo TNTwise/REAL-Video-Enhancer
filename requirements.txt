@@ -1,5 +1,5 @@
 testresources
-PyQt5
+PyQt5==5.12
 requests
 opencv-python-headless
 pypresence
