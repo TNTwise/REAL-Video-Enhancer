@@ -23,8 +23,9 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('RES:')
     self.ui.Rife_Model.addItem('models-se')
     
-    
-    
+    self.ui.FPSFrom.hide()
+    self.ui.FPSTo.hide()
+    self.ui.FPSToSign.hide()
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

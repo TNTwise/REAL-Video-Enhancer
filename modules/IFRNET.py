@@ -22,6 +22,9 @@ def modelOptions(self):
     self.times=2
     log('Model: IFRNET')
     self.render='rife'
+    self.ui.FPSFrom.hide()
+    self.ui.FPSTo.hide()
+    self.ui.FPSToSign.hide()
     self.ui.Rife_Model.clear()
     self.ui.Rife_Times.clear()
     self.ui.FPSPreview.setText('FPS:')

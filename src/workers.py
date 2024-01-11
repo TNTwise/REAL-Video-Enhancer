@@ -17,6 +17,7 @@ import src.return_data as return_data
 import src.runAI.transition_detection as transition_detection
 import os
 from modules.commands import *
+import math
 thisdir = src.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 class pb2X(QObject):
@@ -219,7 +220,7 @@ def optimized_render(self,command):
 
     self.renderCommand = command
     global interpolation_sessions
-    interpolation_sessions = ceildiv(self.main.frame_count,self.main.frame_increments_of_interpolation)
+    interpolation_sessions = int(ceildiv(self.main.frame_count,self.main.frame_increments_of_interpolation))
     self.main.interpolation_sessions = interpolation_sessions 
     #print(interpolation_sessions)
     fc_thread = Thread(target=lambda: frameCountThread(self))
@@ -376,6 +377,10 @@ class interpolation(QObject):
             # run transition detection start
             if self.main.settings.SceneChangeDetectionMode == 'Enabled':
                 self.log.emit('Detecting Transitions')
+                if self.main.AI == 'rife-ncnn-vulkan':
+                    if 'v4' in self.model:
+                         self.main.times=(self.main.ui.FPSTo.value()/self.main.ui.FPSFrom.value())
+                print(self.main.times)
                 self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
                 self.main.transitionDetection.find_timestamps()
                 self.main.transitionDetection.get_frame_num(self.main.times)
@@ -396,7 +401,7 @@ class interpolation(QObject):
                 
                 self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                 
-                self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
+                self.main.frame_increments_of_interpolation = int(calculateFrameIncrements(self))
                 vram = calculateVRAM(self)
                 
                 if self.main.AI == 'rife-ncnn-vulkan':
@@ -412,8 +417,8 @@ class interpolation(QObject):
     '-f', f'%08d{self.main.settings.Image_Type}']
                     if 'v4' in model:
                          command.append('-n')
-                         command.append(str(self.input_frames * times))
-                         print(self.input_frames * times)
+                         command.append(str(math.ceil(self.input_frames * times)))
+                         print(command)
                     if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                         
 

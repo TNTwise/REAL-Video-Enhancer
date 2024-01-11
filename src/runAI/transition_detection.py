@@ -75,94 +75,9 @@ class TransitionDetection:
                 os.system(f'rm -rf "{self.full_render_dir}/transitions/temp/"')
         except Exception as e:
             tb = traceback.format_exc()
+            log(e,tb)
             print(e,tb)
-            '''frame_list =[]
-            for i in self.timestamps:
-                frame = float(i) * float(self.fps)
-                
-                frame = round(frame)
-                frame = int(frame)
-                
-                #subtract from frame for anime method too
-
-                
-                frame = frame - frames_subtracted
-                
-                frame_list.append(frame)
-            self.frame_list = frame_list
             
-            # This code is shit, i will have to fix later, i have no idea why it works
-            filenames = os.listdir(f'{self.full_render_dir}/transitions/')
-            sorted_filenames = sorted(filenames)
-            file_num_list = []
-            list1 = []
-            list2 = []
-            self.prevFrameList = []
-            self.fileToCopyDict = []
-            self.fileToCopyDict1 = []
-            self.fileToCopyDict2 = []
-            self.fileToCopyDict3 = []
-            self.fileToCopyDict4 = []
-            for i in self.frame_list:
-                        
-                        i = int(i) * 2
-                        i = int(i) - 1
-                        i = str(i)
-                        i = i.zfill(8)
-                        list2.append(i)
-            for j in self.frame_list:
-                        
-                        j = int(j) * times
-                        prev_file = j - 1
-                        file_to_copy_to = str(prev_file - 1).zfill(8)
-                        file_to_copy_to1 = str(prev_file - 2).zfill(8)
-                        file_to_copy_to2 = str(prev_file - 3).zfill(8)
-                        file_to_copy_to3 = str(prev_file - 4).zfill(8)
-                        file_to_copy_to4 = str(prev_file - 5).zfill(8)
-                        #I am literally braindead lol, cant think of anyhting better for this stupid system
-                        j = str(j)
-                        prev_file = str(prev_file)
-                        j = j.zfill(8)
-                        prev_file = prev_file.zfill(8)
-                        list1.append(j)
-                        self.fileToCopyDict.append(file_to_copy_to)
-                        self.fileToCopyDict1.append(file_to_copy_to1)
-                        self.fileToCopyDict2.append(file_to_copy_to2)
-                        self.fileToCopyDict3.append(file_to_copy_to3)
-                        self.fileToCopyDict4.append(file_to_copy_to4)
-                        self.prevFrameList.append(prev_file)
-                        self.list1 = list1
-            
-            
-            
-            p = 0
-            o = 1
-            for image in list1:
-                
-                
-                if settings.Image_Type != '.webp':
-                    os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
-                else:
-                    os.system(f'mv "{self.full_render_dir}/transitions/{str(str(o).zfill(7))}.png" "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}"')
-                # Commenting this out due to it overlaping frames os.system(f'cp "{self.render_directory}/{filename}/transitions/{list1[p]}{settings.Image_Type}" "{self.render_directory}/{filename}/transitions/{list2[p]}{settings.Image_Type}"')
-                if times == 4 or times == 8:
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.prevFrameList[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict[p]}{self.settings.Image_Type}"')
-                if times == 8:
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict1[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict2[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict3[p]}{self.settings.Image_Type}"')
-                    os.system(f'cp "{self.full_render_dir}/transitions/{list1[p]}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{self.fileToCopyDict4[p]}{self.settings.Image_Type}"')
-                    #This is so dumb lmao, ik there is a better way but i am lazy lol
-                  
-                       
-                p+=1
-                o+=1
-                # IK this is dumb. but i cant think of anything else rn'''
-            '''if times == 4:
-                    for file,copyto in self.fileToCopyDict.items():
-                        os.system(f'cp "{self.full_render_dir}/input_frames/{file}{self.settings.Image_Type}" "{self.full_render_dir}/transitions/{copyto}{self.settings.Image_Type}"')'''
-                  
             
                         
     def merge_frames(self,iteration=None):

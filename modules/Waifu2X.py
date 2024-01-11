@@ -23,9 +23,10 @@ def modelOptions(self):
     modified_list = list(map(lambda x: x.replace('models-',''), self.get_models_from_dir('waifu2x')))
     self.ui.Rife_Model.addItems(modified_list)
     if  'cunet' in modified_list:self.ui.Rife_Model.setCurrentText(f'cunet')
-            
+    self.ui.FPSToSign.hide()
+    self.ui.FPSFrom.hide()
+    self.ui.FPSTo.hide()
 
-    
     
     self.ui.RifeStart.clicked.disconnect()
     try:

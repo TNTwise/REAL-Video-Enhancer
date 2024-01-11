@@ -186,11 +186,38 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLabel" name="FPSPreview">
-                  <property name="text">
-                   <string>FPS:</string>
-                  </property>
-                 </widget>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <item>
+                   <widget class="QLabel" name="FPSPreview">
+                    <property name="text">
+                     <string>FPS:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="FPSFrom">
+                    <property name="enabled">
+                     <bool>false</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="FPSToSign">
+                    <property name="maximumSize">
+                     <size>
+                      <width>15</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QDoubleSpinBox" name="FPSTo"/>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </item>

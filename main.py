@@ -293,7 +293,9 @@ class MainWindow(QtWidgets.QMainWindow):
         #Thread(target=lambda: Rife(self,(self.ui.Rife_Model.currentText().lower()),2,self.input_file,self.output_folder,1)).start()
         self.ui.RifePause.show()
         
-    
+    def videoProperties(self):
+        self.fps = VideoName.return_video_framerate(self.input_file)
+        self.amountFrames = VideoName.return_video_frame_count(self.input_file)
     def showChangeInFPS(self,localFile=True):
         try:
             
@@ -306,16 +308,23 @@ class MainWindow(QtWidgets.QMainWindow):
         if width > 3840 or height > 2160:
                     too_large_video(self)
         try:
-            
+            self.videoProperties()
             if self.render == 'rife':
-                
+                self.times = int(self.ui.Rife_Times.currentText()[0])
                 if self.input_file != '':
-                    self.times = int(self.ui.Rife_Times.currentText()[0])
-                    self.ui.FPSPreview.setText(f'FPS: {(round(VideoName.return_video_framerate(self.input_file)))} -> {round(VideoName.return_video_framerate(self.input_file)*int(self.times))}')
-                    
-                if self.fps != None:    
-                    self.ui.FPSPreview.setText(f'FPS: {round(self.fps)} -> {round(self.fps)*int(self.times)}')
-                
+                    if self.fps != None: 
+                        if self.ui.AICombo.currentText() != 'Rife':
+                            self.ui.FPSPreview.setText(f'FPS: {(round(self.fps))} -> {round(self.fps*self.times)}')
+                        else:
+                      
+                            self.ui.FPSFrom.setMinimum(self.fps)
+                            self.ui.FPSFrom.setMaximum(self.fps)
+                            self.ui.FPSTo.setMinimum(self.fps*2) 
+                            self.ui.FPSFrom.setValue(self.fps)
+                            self.ui.FPSTo.setValue((self.fps)*int(self.times))
+                            print((self.amountFrames/self.ui.FPSFrom.value()))
+                            math.ceil(self.ui.FPSTo.value() * (self.amountFrames/self.ui.FPSFrom.value()))
+                            print(self.times)
             if self.render == 'esrgan':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
@@ -497,7 +506,11 @@ class MainWindow(QtWidgets.QMainWindow):
             if os.path.exists(f'{settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble'):
                 self.ui.EnsembleCheckBox.show()
                 self.ui.ensembleHelpButton.show()
+            self.ui.FPSFrom.show()
+            self.ui.FPSTo.show()
         else:
+            self.ui.FPSFrom.hide()
+            self.ui.FPSTo.hide()
             self.ui.Rife_Times.setCurrentText('2X')
             self.ui.Rife_Times.setEnabled(False)
             self.ui.EnsembleCheckBox.hide()

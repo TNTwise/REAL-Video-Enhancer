@@ -18,6 +18,10 @@ settings = Settings()
 def modelOptions(self):
     log('Model: RealESRGAN')
     self.times=1
+    self.ui.FPSFrom.hide()
+    self.ui.FPSTo.hide()
+    self.ui.FPSTo.hide()
+    self.ui.FPSToSign.hide()
     self.render='esrgan'
     self.ui.Rife_Model.clear()
     self.ui.FPSPreview.setText('RES:')
