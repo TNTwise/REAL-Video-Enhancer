@@ -179,11 +179,9 @@ def selOutputDir(self):
     self.settings = Settings()
 def selEncoder(self):
     settings = Settings()
-    if '.264' in self.ui.EncoderCombo.currentText():
-        
-        settings.change_setting('Encoder','264')
-    if '.265' in self.ui.EncoderCombo.currentText():
-        settings.change_setting('Encoder','265')
+    if self.ui.EncoderCombo.currentText() == 'Lossless':
+        transition_detection_lossless_warning(self)
+    settings.change_setting('Encoder',self.ui.EncoderCombo.currentText())
     self.encoder = settings.Encoder
     self.settings = Settings()
 def selRenderType(self):

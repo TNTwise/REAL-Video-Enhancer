@@ -86,6 +86,54 @@ def get_integrated_vram():
     return 1
 def ceildiv(a, b):
     return -(a // -b)
+
+def returnCodec(codec):
+    if codec=='264':
+        return 'libx264'
+    if codec=='265':
+        return 'libx265'
+    if codec == 'VP9':
+        return 'libvpx-vp9'
+    if codec == 'ProRes':
+        return 'prores -profile:v 2'
+    if codec == 'Lossless':
+        return 'copy'
+'''
+Codec Options
+
+
+
+libvpx-vp9 - address bitrate based on quality setting
+
+prores: 
+pair these to quality settings
+-profile:
+    -1: auto (default)
+    0: proxy ≈ 45Mbps YUV 4:2:2
+    1: lt ≈ 102Mbps YUV 4:2:2
+    2: standard ≈ 147Mbps YUV 4:2:2
+    3: hq ≈ 220Mbps YUV 4:2:2
+    4: 4444≈ 330Mbps YUVA 4:4:4:4
+    5: 4444xq ≈ 500Mbps YUVA 4:4:4:4
+
+
+
+
+'''
+
+def returnContainer(codec):
+    if codec=='264':
+        return 'mp4'
+    if codec=='265':
+        return 'mp4'
+    if codec == 'VP9' or 'vp9' in codec:
+        return 'mp4'
+    if 'prores' in codec:
+        return 'mov'
+    if codec == 'copy' or codec == 'Lossless':
+        return 'mkv'
+    
+    
 class HardwareInfo:
     
     def get_video_memory_linux():

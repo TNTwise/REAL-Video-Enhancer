@@ -76,26 +76,26 @@ def check_if_enough_space(input_file,render,times):
             if rnd < 1:
                 rnd = 1
             if img_type == '.png':
-                full_size = full_extraction_size + full_extraction_size * times * rnd
+                full_size = full_extraction_size*(2) + full_extraction_size * times * rnd
                 
             if img_type == '.jpg':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 5*rnd
+                full_size = full_extraction_size*(2) + full_extraction_size * times * 5*rnd
             if img_type == '.webp':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 4*rnd
+                full_size = full_extraction_size*(2) + full_extraction_size * times * 4*rnd
             return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
         
         if render == 'rife':
             if img_type == '.png':
-                full_size = full_extraction_size + full_extraction_size * times
+                full_size = full_extraction_size*(2) + full_extraction_size * times
                 
             if img_type == '.jpg':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 5
+                full_size = full_extraction_size*(2) + full_extraction_size * times * 5
             if img_type == '.webp':
                 
-                full_size = full_extraction_size + full_extraction_size * times * 4
+                full_size = full_extraction_size*(2) + full_extraction_size * times * 4
             return full_size < free_space, full_size/ (1024 ** 3), free_space/ (1024 ** 3)
     else:
         return full_extraction_size*5 < free_space, full_extraction_size*5/ (1024 ** 3), free_space/ (1024 ** 3)

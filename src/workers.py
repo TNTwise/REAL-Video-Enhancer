@@ -307,10 +307,14 @@ def frameCountThread(self):
         width = int(width)
         height = int(height)
         self.main.vid_resolution = f'{width}x{height}'
+        encoder = return_data.returnCodec(self.main.settings.Encoder)
         with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
             for m in range(interpolation_sessions):
-                f.write(f"file '{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-m}.mp4'\n")
-        
+                f.write(f"file '{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-m}.{return_data.returnContainer(encoder)}'\n")
+        if encoder != 'copy':
+            vf = f'-vf "scale=w={width}:h={height},setsar=1"'
+        else:
+            vf=''
         transitionDetectionClass = transition_detection.TransitionDetection(self.main)
         while True:
             
@@ -340,7 +344,7 @@ def frameCountThread(self):
                             else:
                                 sleep(.1)
                     transitionDetectionClass.merge_frames()
-                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" -vf "scale=w={width}:h={height},setsar=1"  -frames:v  {self.main.frame_increments_of_interpolation} -c:v libx{self.main.settings.Encoder} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.mp4"  -y')
+                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(encoder)}"  -y')
                     iteration+=1
                     if iteration == interpolation_sessions:
                         break
@@ -375,7 +379,7 @@ class interpolation(QObject):
             extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,self.main.times)
             
             # run transition detection start
-            if self.main.settings.SceneChangeDetectionMode == 'Enabled':
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and  self.main.settings.Encoder != 'Lossless':
                 self.log.emit('Detecting Transitions')
                 if self.main.AI == 'rife-ncnn-vulkan':
                     if 'v4' in self.model:

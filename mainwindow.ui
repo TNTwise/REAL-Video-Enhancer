@@ -15,7 +15,7 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
        <number>0</number>
@@ -774,17 +774,30 @@
                <string>false</string>
               </property>
               <layout class="QGridLayout" name="gridLayout_4">
-               <item row="3" column="1">
-                <widget class="QPushButton" name="encoderHelpButton">
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_3">
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>18</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string/>
+                  <string>Scene Change Detection Sensativity</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_2">
+               <item row="3" column="1">
+                <widget class="QPushButton" name="sceneChangeSensativityButton">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
                  <property name="text">
-                  <string>Encoder</string>
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="dialog-information">
+                   <normaloff>../.designer/backup</normaloff>../.designer/backup</iconset>
                  </property>
                 </widget>
                </item>
@@ -817,26 +830,10 @@
                  </item>
                 </widget>
                </item>
-               <item row="2" column="2">
-                <widget class="QLineEdit" name="sceneChangeLineEdit">
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_10">
                  <property name="text">
                   <string/>
-                 </property>
-                 <property name="maxLength">
-                  <number>1</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_3">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>18</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Scene Change Detection Sensativity</string>
                  </property>
                 </widget>
                </item>
@@ -847,48 +844,66 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="2">
-                <widget class="QComboBox" name="EncoderCombo">
-                 <item>
-                  <property name="text">
-                   <string>.264</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>.265</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QPushButton" name="sceneChangeSensativityButton">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset theme="dialog-information">
-                   <normaloff>../.designer/backup</normaloff>../.designer/backup</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_10">
-                 <property name="text">
-                  <string/>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
+               <item row="2" column="2">
                 <widget class="QCheckBox" name="sceneChangeDetectionCheckBox">
                  <property name="text">
                   <string>Scene Change Detection</string>
                  </property>
                  <property name="tristate">
                   <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QLineEdit" name="sceneChangeLineEdit">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="maxLength">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QComboBox" name="EncoderCombo">
+                 <item>
+                  <property name="text">
+                   <string>264</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>265</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>VP9</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>ProRes</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Lossless</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QPushButton" name="encoderHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Encoder</string>
                  </property>
                 </widget>
                </item>

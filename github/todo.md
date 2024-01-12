@@ -50,7 +50,8 @@ add dependencies install script for ytdlp, so it can automatically be updated.
 Wiki page<br/>
 create a python interface to easily interact with ncnn, more and create the optimized method, and also use it to add vapoursynth support.<br/>
 redo calculations on how to calculate video segment amount<br/>
-fix if ' is in video
+fix if ' is in video<br/>
+check if there is enough storage to output video <br/>
  - How to Uscale<br/>
  - Best uscaling practices<br/>
  - Explanation of Settings<br/>

@@ -384,9 +384,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ETA = None
             fp=files_processed
             self.filecount = int(self.filecount)
-            videos_rendered=0
+            videos_rendered=-1
             for i in os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
-                if 'mp4' in i:
+                if os.path.isfile(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}'):
                     videos_rendered+=1
             try:
                 if self.settings.RenderType == 'Optimized':

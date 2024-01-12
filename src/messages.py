@@ -86,3 +86,6 @@ def ensemble_help(self):
 
 def uninstallMessage(self):
     return self.showQuestionBox(f"Will remove EVERYTHING.\nContinue?")
+
+def transition_detection_lossless_warning(self):
+    self.showDialogBox('Transition detection is currently unsupported with Lossless encoding.')

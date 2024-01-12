@@ -146,6 +146,14 @@ def onApplicationStart(self):
         self.ui.EncoderCombo.setCurrentIndex(0)
     if self.encoder == '265':
         self.ui.EncoderCombo.setCurrentIndex(1)
+    if self.encoder == 'VP9':
+        self.ui.EncoderCombo.setCurrentIndex(2)
+    if self.encoder == 'AV1':
+        self.ui.EncoderCombo.setCurrentIndex(3)
+    if self.encoder == 'ProRes':
+        self.ui.EncoderCombo.setCurrentIndex(4)
+    if self.encoder == 'Lossless':
+        self.ui.EncoderCombo.setCurrentIndex(5)
     if self.videoQuality == '10':
         self.ui.VidQualityCombo.setCurrentText('Lossless')
     if self.videoQuality == '14':

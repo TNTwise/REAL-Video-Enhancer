@@ -109,6 +109,8 @@ def run_subprocess_with_realtime_output(thread,self,command,extracting=False):
     # Wait for the output threads to finish printing
     stdout_thread.join()
     stderr_thread.join()
+    log(self.ffmpeg.stdout)
+    log(self.ffmpeg.stderr)
     
     return self.ffmpeg.returncode
 
@@ -191,9 +193,9 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
         
                 
                 if settings.Image_Type != '.webp':
-                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
+                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 -vf "scale=w={self.videowidth}:h={self.videoheight}" "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
                 else:
-                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -c:v libwebp -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
+                        ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -c:v libwebp -vf "scale=w={self.videowidth}:h={self.videoheight}" -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y ') 
                 global output 
                 print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
@@ -228,25 +230,25 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         outputpath = self.output_folder
                 if mode == 'interpolation':
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps.mp4') == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).mp4') == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}') == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps.mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}' 
                 self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                 if mode == 'upscale': # add upscale/realesrgan resolution bump here
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.mp4') == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4') == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}') == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).mp4' 
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.mp4'
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
                 output_video_file=output_video_file.replace('#','')
                 print(output_video_file)
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
@@ -259,10 +261,10 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v -c:v {return_data.returnCodec(encoder)} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v libx{encoder} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v {return_data.returnCodec(encoder)} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
                 if run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd) !=0:
                         thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory or renaming the video to not contain quotes!')
                         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 
@@ -279,7 +281,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         try:
                                 for i in os.listdir(f'{thisdir}'):
                                         if os.path.isfile(os.path.join(thisdir, i)):
-                                                if '.mp4' in i:
+                                                if '.{return_data.returnContainer(encoder)}' in i:
                                                         os.system(f'rm -rf "{thisdir}/{i}"')
                                 
                         except Exception as e:

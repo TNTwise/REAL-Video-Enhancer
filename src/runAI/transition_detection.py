@@ -34,10 +34,11 @@ class TransitionDetection:
             except:
                  pass
             #self.main.addLinetoLogs('Detecting Transitions')
+            
             if self.settings.Image_Type != '.webp':
-                ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
+                ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"' 
             else:
-                 ffmpeg_cmd = f'{thisdir}/bin/ffmpeg -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
+                ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
             output = subprocess.check_output(ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT)
             #self.main.addLinetoLogs(f'Transitions detected: {len(os.listdir(f"{self.full_render_dir}/transitions/"))}')
             # Decode the output as UTF-8 and split it into lines
@@ -64,7 +65,6 @@ class TransitionDetection:
                 transitions = os.listdir(f'{self.full_render_dir}/transitions/')
                 if not os.path.exists(f'{self.full_render_dir}/transitions/temp/'): os.mkdir(f'{self.full_render_dir}/transitions/temp/')
                 for iteration,i in enumerate(transitions):
-                    print(iteration,i)
                     if settings.Image_Type != '.webp':
                                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                     else:
