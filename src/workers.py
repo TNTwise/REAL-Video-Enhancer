@@ -379,7 +379,7 @@ class interpolation(QObject):
             extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,self.main.times)
             
             # run transition detection start
-            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and  self.main.settings.Encoder != 'Lossless':
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled':
                 self.log.emit('Detecting Transitions')
                 if self.main.AI == 'rife-ncnn-vulkan':
                     if 'v4' in self.model:
