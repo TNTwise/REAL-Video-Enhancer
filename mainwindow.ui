@@ -883,6 +883,11 @@
                  </item>
                  <item>
                   <property name="text">
+                   <string>AV1</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>ProRes</string>
                   </property>
                  </item>

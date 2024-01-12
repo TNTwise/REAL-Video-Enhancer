@@ -98,6 +98,8 @@ def returnCodec(codec):
         return 'prores -profile:v 2'
     if codec == 'Lossless':
         return 'copy'
+    if codec == 'AV1':
+        return 'libaom-av1'
 '''
 Codec Options
 
@@ -122,16 +124,20 @@ pair these to quality settings
 '''
 
 def returnContainer(codec):
-    if codec=='264':
+    print(codec)
+    if '264' in codec:
         return 'mp4'
-    if codec=='265':
+    if '265' in codec:
         return 'mp4'
-    if codec == 'VP9' or 'vp9' in codec:
+    if 'vp9' in codec.lower():
         return 'mp4'
-    if 'prores' in codec:
+    if 'prores' in codec.lower():
         return 'mov'
     if codec == 'copy' or codec == 'Lossless':
         return 'mkv'
+    if 'av1' in codec.lower():
+        return 'mkv'
+    
     
     
 class HardwareInfo:
