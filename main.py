@@ -671,6 +671,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifeResume.show() #show resume button
                 #This function adds a zero to the original frames, so it wont overwrite the old ones
     def setDisableEnable(self,mode):
+        self.ui.FPSTo.setDisabled(mode)
         self.ui.AICombo.setDisabled(mode)
         self.ui.EnsembleCheckBox.setDisabled(mode)
         self.ui.ensembleHelpButton.setDisabled(mode)
