@@ -124,20 +124,28 @@ pair these to quality settings
 '''
 
 def returnContainer(codec):
-    print(codec)
-    if '264' in codec:
+    
+    print(codec+'\n\n\n')
+    if '264' in codec or codec == 'libx264':
+        print('codec:x264')
         return 'mp4'
-    if '265' in codec:
+    if '265' in codec or codec == 'libx265':
+        print('codec:x265')
         return 'mp4'
-    if 'vp9' in codec.lower():
+    if 'vp9' in codec.lower() or codec == 'libvpx-vp9':
+        print('codec:vp9')
         return 'mp4'
-    if 'prores' in codec.lower():
+    if 'prores' in codec.lower() or codec == 'prores -profile:v 2':
+        print('codec:prores')
         return 'mov'
     if codec == 'copy' or codec == 'Lossless':
+        print('codec:Lossless')
         return 'mkv'
-    if 'av1' in codec.lower():
+    if 'av1' in codec.lower() or codec == 'libaom-av1':
+        print('codec:AV1')
         return 'mkv'
-    
+    print('codec:Fallback')
+    return 'mkv'
     
     
 class HardwareInfo:
