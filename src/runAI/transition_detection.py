@@ -68,7 +68,7 @@ class TransitionDetection:
                 if not os.path.exists(f'{self.full_render_dir}/transitions/temp/'): os.mkdir(f'{self.full_render_dir}/transitions/temp/')
                 for iteration,i in enumerate(transitions):
                     if settings.Image_Type == '.png':
-                                os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -compression_level 8 "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
+                                #os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -compression_level 8 "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                     if settings.Image_Type == '.jpg':
                                 #os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -pix_fmt yuv444p "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')

@@ -153,18 +153,20 @@ class GetLinkedWindow(QMainWindow):
         self.ui.qualityCombo.show()
         
         self.dict_res_id_fps = dict_res_id_fps
+        print(self.dict_res_id_fps)
     def gen_youtubedlp_command(self):
         self.input_file = self.input_file.replace("'",'') # i need to find where this is called to rename the input file
         self.input_file = self.input_file.replace("#",'')
         self.input_file = self.input_file.replace('"','')
         self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.text()}" -o "{self.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.text()}"  -o {thisdir}/audio.m4a')
-        self.main.fps=int(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
+        self.main.fps=float(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
-        self.main.showChangeInFPS(False)
+        
         self.main.fc = int(self.main.fps*self.duration)
         self.main.ytVidRes = self.ui.qualityCombo.currentText()
         
         self.main.input_file = self.input_file
+        self.main.showChangeInFPS(False)
         self.main.addLinetoLogs(f"Input file: {self.input_file}")
         window.close()
 def get_linked_video(self):

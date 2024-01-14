@@ -56,6 +56,7 @@ def bindButtons(self):
     self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
     self.ui.defaultRifeModel.currentIndexChanged.connect(lambda: settings.change_setting('DefaultRifeModel',f'{self.ui.defaultRifeModel.currentText()}'))
     self.ui.InstallButton.clicked.connect(lambda: src.getModels.get_models_settings.run_install_models_from_settings(self))
+    self.ui.Rife_Times.currentIndexChanged.connect(lambda: self.showChangeInFPS(self.localFile))
     try:
         from notify import notification
         self.ui.NotificationsCheckBox.stateChanged.connect(lambda: Notifications(self))

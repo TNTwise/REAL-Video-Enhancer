@@ -31,7 +31,7 @@ def modelOptions(self):
     self.ui.ensembleHelpButton.hide()
     self.ui.Rife_Times.addItem('2X')
     self.ui.EnsembleCheckBox.hide()
-    self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
+    
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:
@@ -39,7 +39,7 @@ def modelOptions(self):
     self.ui.Rife_Times.setCurrentIndex(0)
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
-    self.showChangeInFPS()
+    
     try:
         self.ui.RifeStart.clicked.disconnect() 
     except:

@@ -294,33 +294,39 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.RifePause.show()
         
     def videoProperties(self):
-        self.fps = VideoName.return_video_framerate(self.input_file)
         self.amountFrames = VideoName.return_video_frame_count(self.input_file)
+        self.fps = VideoName.return_video_framerate(self.input_file)
     def showChangeInFPS(self,localFile=True):
+        
         try:
             
             width=int(self.ytVidRes.split("x")[0])
             height=int(self.ytVidRes.split("x")[1].replace(' (Enhanced bitrate)',''))
-        except:
+        except Exception as e:
+            log(e)
             resolution=VideoName.return_video_resolution(self.input_file)
             width = int(resolution[0])
             height=int(resolution[1])
         if width > 3840 or height > 2160:
                     too_large_video(self)
+        
         try:
-            self.videoProperties()
+            if self.localFile:
+                self.videoProperties()
+            
             if self.render == 'rife':
                 self.times = int(self.ui.Rife_Times.currentText()[0])
                 if self.input_file != '':
                     if self.fps != None: 
-                        if self.ui.AICombo.currentText() != 'Rife':
+                        if self.ui.AICombo.currentText() != 'Rife' and 'v4' in self.ui.Rife_Model.currentText():
                             self.ui.FPSPreview.setText(f'FPS: {(round(self.fps))} -> {round(self.fps*self.times)}')
                         else:
-                      
                             self.ui.FPSFrom.setMinimum(self.fps)
+                            self.ui.FPSFrom.setValue(self.fps)
+                            
                             self.ui.FPSFrom.setMaximum(self.fps)
                             self.ui.FPSTo.setMinimum(self.fps*2) 
-                            self.ui.FPSFrom.setValue(self.fps)
+                            
                             self.ui.FPSTo.setValue((self.fps)*int(self.times))
                             print((self.amountFrames/self.ui.FPSFrom.value()))
                             math.ceil(self.ui.FPSTo.value() * (self.amountFrames/self.ui.FPSFrom.value()))
