@@ -399,7 +399,7 @@ class interpolation(QObject):
             
                 self.main.paused = False
                 settings=Settings()
-                self.log.emit(f'Starting {self.main.ui.Rife_Times.currentText()[0]}X Render')
+                self.log.emit(f'Starting {str(self.main.times)[:3]}X Render')
                 self.log.emit(f'Model: {self.main.ui.Rife_Model.currentText()}')
                 self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
                 

@@ -366,7 +366,8 @@ class MainWindow(QtWidgets.QMainWindow):
             # fc is the total file count after interpolation
             
             if self.i==1: # put every gui change that happens on start of render here
-                
+                if 'v4' in self.ui.Rife_Model.currentText().lower():
+                    self.times= float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
                 fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
                 self.filecount = fc
                 total_input_files = fc / self.times
@@ -413,11 +414,10 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 
                     
-                if self.i == 1 and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
-                    self.ui.logsPreview.append(f'Starting {self.times}X Render')
-                    self.i = 2
+                
+                self.i = 2
             except Exception as e:
-                #print(e)
+                print(e)
                 pass
         except Exception as e:
             #print(e)
