@@ -35,10 +35,9 @@ class TransitionDetection:
                  pass
             #self.main.addLinetoLogs('Detecting Transitions')
             
-            if self.settings.Image_Type == '.png':
-                ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d.png"'
-            if self.settings.Image_Type == '.jpg':
-                ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d.jpg"'  
+           
+            if self.settings.Image_Type == '.jpg' or self.settings.Image_Type == '.png':
+                ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"'  
             if self.settings.Image_Type == '.webp':
                 ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"' 
             output = subprocess.check_output(ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT)
@@ -67,10 +66,8 @@ class TransitionDetection:
                 transitions = os.listdir(f'{self.full_render_dir}/transitions/')
                 if not os.path.exists(f'{self.full_render_dir}/transitions/temp/'): os.mkdir(f'{self.full_render_dir}/transitions/temp/')
                 for iteration,i in enumerate(transitions):
-                    if settings.Image_Type == '.png':
-                                #os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -compression_level 8 "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
-                                os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
-                    if settings.Image_Type == '.jpg':
+                    
+                    if settings.Image_Type == '.jpg' or settings.Image_Type == '.png':
                                 #os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -pix_fmt yuv444p "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                     else:

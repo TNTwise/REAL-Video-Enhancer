@@ -33,6 +33,7 @@ def modelOptions(self):
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:
         pass
+    self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.Rife_Times.setCurrentIndex(0)
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
