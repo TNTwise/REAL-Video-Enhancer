@@ -36,6 +36,9 @@ def quotes(self):
 def not_enough_storage(self,predicted_space,total_space):
     return self.showQuestionBox(f"Insufficient space for render.\nConsider using a more compressed image format, lowering enhancement iterations, changing the render folder disk, or switching to the Optimized Render Type.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
 
+def not_enough_output_storage(self,predicted_space,total_space):
+    return self.showQuestionBox(f"Insufficient space for Output file.\n Consider changing the output folder disk.\nTotal space predicted for render: {int(predicted_space)} GB.\nTotal space left on disk: {int(total_space)} GB.\nContinue?")
+
 def model_warning(self):
     return self.showQuestionBox(f"Will remove all unselected models.\nContinue?")
 

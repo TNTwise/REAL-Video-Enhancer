@@ -86,7 +86,12 @@ def start_upscale(self,AI): # command linked directly to upscale buttons
             if self.input_file.count("'") > 0 or '"' in self.input_file:
                 quotes(self)
                 return 
-            
+            has_enough_output_space,predicted_output_space,total_output_space = checks.check_if_enough_space_output_disk(self.input_file,self.render,self.times)
+            if not has_enough_output_space:
+                if not_enough_output_storage(self,predicted_output_space,total_output_space):
+                    initializeUpscale(self,AI)
+                else:
+                    pass
             if has_enough_space:
                 initializeUpscale(self,AI)
             elif not_enough_storage(self,predicted_space,total_space):
