@@ -283,7 +283,7 @@ def calculateFrameIncrements(self):
         duration_seconds = frame_count // fps
 
         #divisor = len(str(int(width))) 
-        frame_increments_of_interpolation = int((duration_seconds*int(self.main.settings.VRAM)))
+        frame_increments_of_interpolation = int((duration_seconds))
         print(frame_increments_of_interpolation)
         return int(frame_increments_of_interpolation)
 
