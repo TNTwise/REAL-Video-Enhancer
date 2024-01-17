@@ -74,7 +74,7 @@ class TransitionDetection:
                                 os.system(f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}.png" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                 for i in self.timestamps:
                         for j in range(math.ceil(times)+1):
-                                os.system(f'cp "{self.full_render_dir}/transitions/temp/{i}{settings.Image_Type}" "{self.full_render_dir}/transitions/{str(int(i)-(j)).zfill(8)}{settings.Image_Type}"' )
+                                os.system(f'cp "{self.full_render_dir}/transitions/temp/{i}{settings.Image_Type}" "{self.full_render_dir}/transitions/{str(int(i)-(j)+1).zfill(8)}{settings.Image_Type}"' )
                 os.system(f'rm -rf "{self.full_render_dir}/transitions/temp/"')
         except Exception as e:
             tb = traceback.format_exc()
