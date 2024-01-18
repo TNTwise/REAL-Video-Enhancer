@@ -243,7 +243,7 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
                         if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}') == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}'.replace('#','')) == True:
                                         i+=1
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}' 
 
