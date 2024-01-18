@@ -92,6 +92,8 @@ def start_interpolation(self,AI): #command directly connected to the rife start 
                 initializeInterpolation(self,AI)
             else:
                 pass
+        else:
+                no_input_file(self)
     
     except Exception as e:
         traceback_info = traceback.format_exc()
