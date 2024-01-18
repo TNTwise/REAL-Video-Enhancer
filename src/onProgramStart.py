@@ -1,7 +1,6 @@
 from src.settings import *
 from src.messages import *
 import src.queue.queue as queue
-import multiprocessing
 import src.checks as checks
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices

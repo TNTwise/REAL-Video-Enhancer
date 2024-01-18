@@ -1,11 +1,9 @@
 import time
-import os
 from time import sleep
 from src.settings import Settings
 def calculateETA(self):
         completed_iterations = int(self.files_processed)
                     
-                    # Increment the completed iterations counter
                     
                     
         # Estimate the remaining time
