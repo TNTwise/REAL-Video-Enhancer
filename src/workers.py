@@ -394,7 +394,7 @@ class interpolation(QObject):
                 except:
                     self.log.emit(f'Transitions detected: 0')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
-
+    import math
     def Render(self,model,times,videopath,outputpath):
             
                 self.main.paused = False
@@ -407,6 +407,8 @@ class interpolation(QObject):
                 
                 self.main.frame_increments_of_interpolation = int(calculateFrameIncrements(self))
                 vram = calculateVRAM(self)
+                if 'lite' in self.main.ui.Rife_Model.currentText():
+                    vram*=2
                 
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
@@ -417,7 +419,7 @@ class interpolation(QObject):
     '-m', self.model,
     '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'1:{vram}:2',
+    '-j', f'{math.ceil(vram/4)}:{vram}:{math.ceil(vram/4)+1}',
     '-f', f'%08d{self.main.settings.Image_Type}']
                     if 'v4' in model:
                          command.append('-n')
