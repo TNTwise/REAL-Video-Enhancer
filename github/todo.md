@@ -51,7 +51,8 @@ Wiki page<br/>
 create a python interface to easily interact with ncnn, more and create the optimized method, and also use it to add vapoursynth support.<br/>
 redo calculations on how to calculate video segment amount<br/>
 fix if ' is in video<br/>
-add cropping video to a specific time.
+add cropping video to a specific time. <br/>
+add uhd mode for high resolutions <br/>
  - How to Uscale<br/>
  - Best uscaling practices<br/>
  - Explanation of Settings<br/>

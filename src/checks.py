@@ -160,3 +160,22 @@ def check_for_each_binary():
             return True
     return False
 
+def check_for_updated_binary(self,binary):
+    if check_if_online():
+        try:
+            import hashlib
+        except Exception as e:
+            tb=traceback.format_exc()
+            log(f'ERROR: Unable to import hashlib!{e,tb}')
+            return
+        if binary == 'rife-ncnn-vulkan' and os.path.exists(f'{thisdir}/models/rife/'):
+            sha256 = hashlib.sha256()
+            with open(f'{thisdir}/models/rife/rife-ncnn-vulkan', 'rb') as f:
+                while True:
+                    data = f.read()
+                    if not data:
+                        break
+                    sha256.update(data)
+            OLDrifencnnvulkansha256=sha256.hexdigest()
+            NEWrifencnnvulkansha256='32b8f3a05e1e8ffb0e3ebab2a0c7e49dfb3c1994378dfe250cd4de2364992e98'
+check_for_updated_binary(2,'rife-ncnn-vulkan')
