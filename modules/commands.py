@@ -153,7 +153,10 @@ def get_video_from_link(self,thread):
 
 def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # called by workers.py after a started thread, used by both upscaling and interpolation
         try:
-                  
+                videoName = videoName.replace("'",'')
+                videoName = videoName.replace('"','')
+                self.input_file = self.input_file.replace("'",'')
+                self.input_file  = self.input_file.replace('"','')
                 log(f'Starting Render, input_file={videopath}')
                 settings = Settings()
                 
@@ -162,7 +165,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                         self.showDialogBox(f'{e}\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.')
                 self.file_drop_widget.hide()
                 # i need to clean this up lol
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+                os.system(f'rm -rf "{settings.RenderDir}/{videoName}_temp/"')
                 #Gets the width and height
                 global height
                 global width
