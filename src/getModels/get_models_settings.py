@@ -72,7 +72,9 @@ class Worker(QObject):
                              except:
                                  pass
                              os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
-                             os.system(f'mv "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/models/rife/"')
+                             
+                             print('moving rife')
+                             os.system(f'mv -f "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"')
                 if '.zip' in i:
 
                     with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
@@ -181,7 +183,8 @@ def remove_unchecked(self):
             
     if self.ui.RealSRCheckBox.isChecked() == False:
             os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
-
+            
+    
 def run_install_models_from_settings(self):
     try:
         try:

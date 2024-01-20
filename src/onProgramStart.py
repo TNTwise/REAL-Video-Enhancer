@@ -109,8 +109,8 @@ def onApplicationStart(self):
         self.ui.vramAmountSpinbox.setValue(1)
     
     
-    
-    
+    if  checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
+        outdated_binary(self,'rife-ncnn-vulkan')  
     
     self.ui.installModelsProgressBar.setMaximum(100)
         

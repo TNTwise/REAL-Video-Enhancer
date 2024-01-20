@@ -92,3 +92,6 @@ def uninstallMessage(self):
 
 def transition_detection_lossless_warning(self):
     self.showDialogBox('Transition detection is currently unsupported with Lossless encoding.')
+
+def outdated_binary(self,binary):
+    self.showDialogBox(f'Outdated {binary} binary, click on Install/Remove in the Manage Models settings menu to download the latest binary and use newer models!')

@@ -1,5 +1,6 @@
+from src.checks import *
 def rife_checkboxes(self):
-    return [
+    rife_list = [
                     (self.ui.rife, 'rife'),
                     (self.ui.rifeanime, 'rife-anime'),
                     (self.ui.rifehd, 'rife-HD'),
@@ -27,6 +28,14 @@ def rife_checkboxes(self):
                     (self.ui.rife413lite, 'rife-v4.13-lite'),
                     (self.ui.rife414, 'rife-v4.14')
                 ]
+    # new models
+    
+    if check_for_updated_binary('rife-ncnn-vulkan',True) >= 1:
+        rife_list += [
+            (self.ui.rife414lite, 'rife-v4.14-lite')
+        ]
+    return rife_list
+            
 def rife_pin_functions(self):
     self.ui.rife.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rifeanime.stateChanged.connect(self.checkbox_state_changed)
@@ -54,3 +63,9 @@ def rife_pin_functions(self):
     self.ui.rife413.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife413lite.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife414.stateChanged.connect(self.checkbox_state_changed)
+    # new models
+    if check_for_updated_binary('rife-ncnn-vulkan'):
+        
+        self.ui.rife414lite.stateChanged.connect(self.checkbox_state_changed)
+        self.ui.rife414lite.setEnabled(True)
+        

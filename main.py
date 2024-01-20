@@ -297,7 +297,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.amountFrames = VideoName.return_video_frame_count(self.input_file)
         self.fps = VideoName.return_video_framerate(self.input_file)
     def showChangeInFPS(self,fps=None):
-        print(str(fps) + '1')
         try:
             
             width=int(self.ytVidRes.split("x")[0])
@@ -315,7 +314,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 log ('Couldnt grab resolution in showChangeInFPS')
         
         try:
-            print(str(fps) + '2')
             if self.localFile == True:
                 self.videoProperties()
             if fps == None:
@@ -323,15 +321,13 @@ class MainWindow(QtWidgets.QMainWindow):
             
             if self.render == 'rife':
                 try:
-                    print(str(fps) + '3')
                     self.times = int(self.ui.Rife_Times.currentText()[0])
                     
                     if fps != None: 
                             if self.ui.AICombo.currentText() != 'Rife' or 'v4' not in self.ui.Rife_Model.currentText():
-                                print('why?')
                                 self.ui.FPSPreview.setText(f'FPS: {(round(fps))} -> {round(fps*self.times)}')
                             if  'Rife' in self.ui.AICombo.currentText() and 'v4' in self.ui.Rife_Model.currentText():
-                                print(str(fps) + '4')
+                                self.ui.FPSPreview.setText(f'FPS:')
                                 self.ui.FPSFrom.setMinimum(fps)
                                 self.ui.FPSFrom.setValue(fps)
                                 

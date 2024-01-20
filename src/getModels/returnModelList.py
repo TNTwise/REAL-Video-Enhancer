@@ -1,6 +1,7 @@
 import os
 import src.thisdir
 thisdir = src.thisdir.thisdir()
+import src.checks as checks
 def returnModelList(self,settings): # make sure names match up on both selectAI.ui and main.ui
                 rife_install_list=[] 
                 if os.path.exists(f'{settings.ModelDir}/') == False:
@@ -47,7 +48,8 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                         install_modules_dict['https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip'] = 'realcugan-ncnn-vulkan-20220728-ubuntu.zip'
                 
                 for i in rife_install_list:
-                        if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False:
+                        
+                        if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False or checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
                                 install_modules_dict['https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan'] = 'rife-ncnn-vulkan'
                         if os.path.exists(f'{settings.ModelDir}/rife/{i}') == False:
                                 install_modules_dict[f'https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/{i}.tar.gz'] = f'{i}.tar.gz'

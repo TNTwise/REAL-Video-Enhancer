@@ -269,6 +269,16 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QCheckBox" name="rife414lite">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Rife-V4.14-lite</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="1" column="0">
