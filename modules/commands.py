@@ -261,10 +261,10 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a" -c:v -c:v {return_data.returnCodec(encoder)} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}" -i "{renderdir}/{videoName}_temp/audio.m4a"  -c:v {return_data.returnCodec(self.main.settings.Encoder)} {returnCRFFactor(videoQuality,self.main.settings.Encoder)} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y')
                         else:
                         
-                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v {return_data.returnCodec(encoder)} -crf {videoQuality} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
+                                ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -framerate {self.fps*times} -i "{renderdir}/{videoName}_temp/output_frames/0/%08d{self.settings.Image_Type}"  -c:v {return_data.returnCodec(encoder)} {returnCRFFactor(videoQuality,self.main.settings.Encoder)} -c:a copy  -pix_fmt yuv420p "{output_video_file}" -y') 
                 if run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd) !=0:
                         thread.log.emit('ERROR: Couldn\'t output video! Maybe try changing the output directory or renaming the video to not contain quotes!')
                         os.system(f'rm -rf "{renderdir}/{videoName}_temp/"') 

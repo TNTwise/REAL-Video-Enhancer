@@ -67,9 +67,9 @@ class GetLinkedWindow(QMainWindow):
                 except:
                     not_valid_link(self.main)
                     
-            self.main.fps=int(VideoName.return_video_framerate(self.input_file))
+            self.main.fps=VideoName.return_video_framerate(self.input_file)
             self.main.localFile=False
-            self.main.showChangeInFPS(False)
+            self.main.showChangeInFPS(self.main.fps)
             self.main.fc = VideoName.return_video_frame_count(self.input_file)
             self.ytVidRes = self.ui.qualityCombo.currentText()
             
@@ -165,7 +165,7 @@ class GetLinkedWindow(QMainWindow):
         self.main.ytVidRes = self.ui.qualityCombo.currentText()
         
         self.main.input_file = self.input_file
-        self.main.showChangeInFPS(False)
+        self.main.showChangeInFPS(self.main.fps)
         self.main.addLinetoLogs(f"Input file: {self.input_file}")
         window.close()
 def get_linked_video(self):

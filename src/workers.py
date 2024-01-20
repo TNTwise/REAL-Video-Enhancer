@@ -316,7 +316,7 @@ def frameCountThread(self):
                             else:
                                 sleep(.1)
                     transitionDetectionClass.merge_frames()
-                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)} -crf {self.main.settings.videoQuality}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(encoder)}"  -y')
+                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)} {returnCRFFactor(self.main.settings.videoQuality,self.main.settings.Encoder)}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(self.main.settings.Encoder)}"  -y')
                     iteration+=1
                     if iteration == interpolation_sessions:
                         break
@@ -384,7 +384,10 @@ class interpolation(QObject):
                 
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
-                    
+                    if int(self.main.videowidth) > 1920:
+                        uhd_mode = '-u'
+                    else:
+                        uhd_mode = ''
                     
                     command = [
     f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
@@ -392,7 +395,9 @@ class interpolation(QObject):
     '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
     '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'{math.ceil(vram/4)}:{vram}:{math.ceil(vram/4)+1}',
-    '-f', f'%08d{self.main.settings.Image_Type}']
+    '-f', f'%08d{self.main.settings.Image_Type}',
+    f'{uhd_mode}']
+    
                     if 'v4' in model:
                          command.append('-n')
                          command.append(str(math.ceil(self.input_frames * times)))

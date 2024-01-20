@@ -296,42 +296,56 @@ class MainWindow(QtWidgets.QMainWindow):
     def videoProperties(self):
         self.amountFrames = VideoName.return_video_frame_count(self.input_file)
         self.fps = VideoName.return_video_framerate(self.input_file)
-    def showChangeInFPS(self,localFile=True):
-        
+    def showChangeInFPS(self,fps=None):
+        print(str(fps) + '1')
         try:
             
             width=int(self.ytVidRes.split("x")[0])
             height=int(self.ytVidRes.split("x")[1].replace(' (Enhanced bitrate)',''))
         except Exception as e:
             log(e)
-            resolution=VideoName.return_video_resolution(self.input_file)
-            width = int(resolution[0])
-            height=int(resolution[1])
-        if width > 3840 or height > 2160:
-                    too_large_video(self)
+            try:
+                if self.localFile == True:
+                    resolution=VideoName.return_video_resolution(self.input_file)
+                    width = int(resolution[0])
+                    height=int(resolution[1])
+                    if width > 3840 or height > 2160:
+                        too_large_video(self)
+            except:
+                log ('Couldnt grab resolution in showChangeInFPS')
         
         try:
-            if self.localFile:
+            print(str(fps) + '2')
+            if self.localFile == True:
                 self.videoProperties()
+            if fps == None:
+                fps = self.fps
             
             if self.render == 'rife':
-                self.times = int(self.ui.Rife_Times.currentText()[0])
-                if self.input_file != '':
-                    if self.fps != None: 
-                        if self.ui.AICombo.currentText() != 'Rife' or 'v4' not in self.ui.Rife_Model.currentText():
-                            self.ui.FPSPreview.setText(f'FPS: {(round(self.fps))} -> {round(self.fps*self.times)}')
-                        else:
-                            self.ui.FPSFrom.setMinimum(self.fps)
-                            self.ui.FPSFrom.setValue(self.fps)
-                            
-                            self.ui.FPSFrom.setMaximum(self.fps)
-                            self.ui.FPSTo.setMinimum(self.fps*2) 
-                            
-                            self.ui.FPSTo.setValue((self.fps)*int(self.times))
-                            print((self.amountFrames/self.ui.FPSFrom.value()))
-                            math.ceil(self.ui.FPSTo.value() * (self.amountFrames/self.ui.FPSFrom.value()))
-                            self.times = float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
-                            print(self.times)
+                try:
+                    print(str(fps) + '3')
+                    self.times = int(self.ui.Rife_Times.currentText()[0])
+                    
+                    if fps != None: 
+                            if self.ui.AICombo.currentText() != 'Rife' or 'v4' not in self.ui.Rife_Model.currentText():
+                                print('why?')
+                                self.ui.FPSPreview.setText(f'FPS: {(round(fps))} -> {round(fps*self.times)}')
+                            if  'Rife' in self.ui.AICombo.currentText() and 'v4' in self.ui.Rife_Model.currentText():
+                                print(str(fps) + '4')
+                                self.ui.FPSFrom.setMinimum(fps)
+                                self.ui.FPSFrom.setValue(fps)
+                                
+                                self.ui.FPSFrom.setMaximum(fps)
+                                self.ui.FPSTo.setMinimum(fps*2) 
+                                
+                                self.ui.FPSTo.setValue((fps)*int(self.times))
+                                print((self.amountFrames/self.ui.FPSFrom.value()))
+                                math.ceil(self.ui.FPSTo.value() * (self.amountFrames/self.ui.FPSFrom.value()))
+                                self.times = float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
+                                print(self.times)
+                            print('help me')
+                except Exception as e:
+                    print(e)
             if self.render == 'esrgan':
                 if self.input_file != '':
                     self.resIncrease = int(self.ui.Rife_Times.currentText()[0])

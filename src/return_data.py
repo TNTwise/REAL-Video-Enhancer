@@ -86,7 +86,7 @@ def get_integrated_vram():
     return 1
 def ceildiv(a, b):
     return -(a // -b)
-
+import multiprocessing
 def returnCodec(codec):
     if codec=='264':
         return 'libx264'
@@ -99,8 +99,41 @@ def returnCodec(codec):
     if codec == 'Lossless':
         return 'copy'
     if codec == 'AV1':
-        return 'libaom-av1'
-'''
+        if multiprocessing.cpu_count() >= 8:
+            cpus= 8
+        else:
+            cpus=multiprocessing.cpu_count()
+        return f'libaom-av1 -tiles 2x2 -b:v 0 -row-mt 1 -cpu-used {cpus}'
+    
+def returnCRFFactor(crffactor,encoder):
+    if 'av1' in encoder:
+        print('av1 crf')
+        crf = (int(crffactor) + 12)
+        
+    elif 'vp9' in encoder.lower():
+        print('vp9 crf')
+        crf = (int(crffactor) + 12)   
+    
+    elif '265' in encoder.lower():
+        print('265 crf')
+        crf = (int(crffactor) + 5)   
+            
+    elif 'prores' in encoder.lower():
+        print('prores crf')
+        crf = (int(crffactor) + 5)     
+    
+    elif 'lossless' in encoder.lower():
+        return ''
+    else:
+        print('264 crf')
+        crf = crffactor
+        '10'
+        '14'
+        '18'
+        '20'
+        '22'
+    return f'-crf {crf}'
+''' 
 Codec Options
 
 
@@ -125,24 +158,17 @@ pair these to quality settings
 
 def returnContainer(codec):
     
-    print(codec+'\n\n\n')
     if '264' in codec or codec == 'libx264':
-        print('codec:x264')
         return 'mp4'
     if '265' in codec or codec == 'libx265':
-        print('codec:x265')
         return 'mp4'
     if 'vp9' in codec.lower() or codec == 'libvpx-vp9':
-        print('codec:vp9')
         return 'mp4'
     if 'prores' in codec.lower() or codec == 'prores -profile:v 2':
-        print('codec:prores')
         return 'mov'
     if codec == 'copy' or codec == 'Lossless':
-        print('codec:Lossless')
         return 'mkv'
     if 'av1' in codec.lower() or codec == 'libaom-av1':
-        print('codec:AV1')
         return 'mkv'
     print('codec:Fallback')
     return 'mkv'
