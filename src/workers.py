@@ -266,7 +266,7 @@ def calculateVRAM(self):
     if int(self.main.settings.VRAM) > 1: vram = int(int(self.main.settings.VRAM)/2)
     else:vram=1
     width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
-    if int(width) > 3840 or int(height) > 2160:
+    if int(width) >= 3840 or int(height) >= 2160:
             vram=1
     return vram
 
