@@ -717,24 +717,21 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifeResume.hide()
             self.ui.QueueButton.hide()
             self.ui.centerLabel.show()
-            self.addLinetoLogs(f'Finished! Output video: {self.output_file}\n\n')
+            self.addLinetoLogs(f'Finished! Output video: {self.output_file}')
             self.setDisableEnable(False)
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
             self.ui.ETAPreview.setText('ETA: 00:00:00')
             self.ui.imagePreview.clear()
             self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
+            
+            remaining_time = int(time.time() - self.start_time) 
+
+            hours,minutes,seconds=convertTime(remaining_time)
+            
+            self.addLinetoLogs(f'Total Time: {hours}:{minutes}:{seconds}')
             self.greyOutRealSRTimes()
-        if len(self.QueueList) > 0:
-            self.input_file = self.QueueList[0]
-            del self.QueueList[0]
-            self.ui.QueueListWidget.takeItem(0)
-            if self.render == 'rife':
-                interpolate.start_interpolation(self,'rife-ncnn-vulkan')
-            if self.render == 'esrgan' and self.ui.AICombo.currentText() != 'Waifu2x':
-                upscale.start_upscale(self,'realesrgan-ncnn-vulkan')
-            if self.ui.AICombo.currentText() == 'Waifu2x':
-                upscale.start_upscale(self,'waifu2x-ncnn-vulkan')
+        
         
         
         

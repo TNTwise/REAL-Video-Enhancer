@@ -257,6 +257,9 @@ def calculateFrameIncrements(self):
         #divisor = len(str(int(width))) 
         frame_increments_of_interpolation = int((duration_seconds))
         print(frame_increments_of_interpolation)
+        log(f'Frames per video increment: {frame_increments_of_interpolation}')
+        if int(frame_increments_of_interpolation) <=10:
+            frame_increments_of_interpolation = 100
         return int(frame_increments_of_interpolation)
 
 def calculateVRAM(self):
@@ -371,7 +374,7 @@ class interpolation(QObject):
             
                 self.main.paused = False
                 settings=Settings()
-                self.log.emit(f'Starting {str(self.main.times)[:3]}X Render')
+                self.log.emit(f'Starting {str(round(self.main.times,1))[:3]}X Render')
                 self.log.emit(f'Model: {self.main.ui.Rife_Model.currentText()}')
                 self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
                 

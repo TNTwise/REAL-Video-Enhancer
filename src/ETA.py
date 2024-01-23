@@ -1,6 +1,17 @@
 import time
 from time import sleep
 from src.settings import Settings
+def convertTime(remaining_time):
+    hours = remaining_time // 3600
+    remaining_time-= 3600*hours
+    minutes = remaining_time // 60
+    remaining_time -= minutes * 60
+    seconds = remaining_time
+    if minutes < 10:
+        minutes = str(f'0{minutes}')
+    if seconds < 10:
+        seconds = str(f'0{seconds}')
+    return hours,minutes,seconds
 def calculateETA(self):
         completed_iterations = int(self.files_processed)
                     
@@ -14,13 +25,5 @@ def calculateETA(self):
         remaining_time = int(remaining_time) 
         # Print the estimated time remaining
         #convert to hours, minutes, and seconds
-        hours = remaining_time // 3600
-        remaining_time-= 3600*hours
-        minutes = remaining_time // 60
-        remaining_time -= minutes * 60
-        seconds = remaining_time
-        if minutes < 10:
-            minutes = str(f'0{minutes}')
-        if seconds < 10:
-            seconds = str(f'0{seconds}')
+        hours,minutes,seconds=convertTime(remaining_time)
         return f'ETA: {hours}:{minutes}:{seconds}'
