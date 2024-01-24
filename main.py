@@ -236,7 +236,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.addLinetoLogs(f'Latest Stable: {n[1]} Latest Beta: {n[0]}')
 
     def changeVRAM(self):
-        self.settings.change_setting('VRAM', f'{self.ui.vramAmountSpinbox.value()}')
+        self.settings.change_setting('VRAM', f'{self.ui.gpuThreadingSpinBox.value()}')
         self.gpuMemory=self.settings.VRAM
 
     def setDirectories(self):

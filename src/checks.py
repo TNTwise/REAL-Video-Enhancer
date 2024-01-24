@@ -2,7 +2,6 @@ import os
 import requests
 import sys
 
-from sympy import false
 import src.thisdir
 thisdir = src.thisdir.thisdir()
 from PyQt5.QtWidgets import  QMessageBox

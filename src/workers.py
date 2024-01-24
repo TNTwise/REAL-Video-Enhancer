@@ -263,11 +263,12 @@ def calculateFrameIncrements(self):
         return int(frame_increments_of_interpolation)
 
 def calculateVRAM(self):
-    if int(self.main.settings.VRAM) > 1: vram = int(int(self.main.settings.VRAM)/2)
-    else:vram=1
+    
     width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
-    if int(width) >= 3840 or int(height) >= 2160:
+    if int(height) > int(self.main.settings.UHDResCutOff): 
             vram=1
+    else:
+         vram = self.main.settings.VRAM
     return vram
 
 
@@ -381,13 +382,13 @@ class interpolation(QObject):
                 self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                 
                 self.main.frame_increments_of_interpolation = int(calculateFrameIncrements(self))
-                vram = calculateVRAM(self)
+                vram = int(calculateVRAM(self))
                 if 'lite' in self.main.ui.Rife_Model.currentText():
                     vram*=2
                 
                 if self.main.AI == 'rife-ncnn-vulkan':
                     
-                    if int(self.main.videowidth) > 1920:
+                    if int(self.main.videoheight) > int(settings.UHDResCutOff):
                         uhd_mode = '-u'
                     else:
                         uhd_mode = ''

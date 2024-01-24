@@ -16,7 +16,9 @@ def bindButtons(self):
     self.ui.RifeSettings.clicked.connect(lambda: src.getModels.get_models_settings.get_rife(self))
     self.ui.esrganHelpModel.clicked.connect(open_link)
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
-    self.ui.vramAmountSpinbox.valueChanged.connect(self.changeVRAM)
+    self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
+    self.ui.UHDResCutoffSpinBox.valueChanged.connect(lambda: change_UHD_res(self))
+    self.ui.frameIncrementSpinBox.valueChanged.connect(lambda: selFrameIncrements(self.ui.frameIncrementSpinBox.value()))
     self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
     self.ui.modeCombo.currentIndexChanged.connect(self.switchMode)
     self.ui.DiscordRPCBox.stateChanged.connect(lambda: changeDiscordRPC(self))
@@ -29,13 +31,13 @@ def bindButtons(self):
     
     
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
-    self.ui.frameIncrementSpinBox.valueChanged.connect(lambda: selFrameIncrements(self.ui.frameIncrementSpinBox.value()))
+   
     #link buttons
     self.ui.frameIncrementHelp.clicked.connect(lambda: frame_increments_help(self))
     self.ui.SettingsMenus.clicked.connect(self.settings_menu)
     self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
     self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
-    self.ui.vramAmountHelpButton.clicked.connect(lambda: vram_help(self))
+    self.ui.gpuThreadingHelpButton.clicked.connect(lambda: vram_help(self))
     self.ui.logButton.clicked.connect(lambda: viewLogs(self))
     self.ui.RifePause.clicked.connect(self.pause_render)
     self.ui.RifeResume.clicked.connect(self.resume_render)
@@ -66,7 +68,7 @@ def bindButtons(self):
     self.ui.sceneChangeSensativityButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.encoderHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.imageHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-    self.ui.vramAmountHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.gpuThreadingHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.renderTypeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.frameIncrementHelp.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.esrganHelpModel.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
@@ -101,12 +103,12 @@ def onApplicationStart(self):
     self.switchUI()
     if self.gpuMemory != 'None':
         
-        self.ui.vramAmountSpinbox.setValue(int(self.gpuMemory))
+        self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
         
     else:
         if self.settings.VRAM == 'None':
             cannot_detect_vram(self)
-        self.ui.vramAmountSpinbox.setValue(1)
+        self.ui.gpuThreadingSpinBox.setValue(1)
     
     
     if  checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
@@ -114,7 +116,7 @@ def onApplicationStart(self):
     
     self.ui.installModelsProgressBar.setMaximum(100)
         
-    self.ui.vramAmountSpinbox.setMinimum(1)
+    self.ui.gpuThreadingSpinBox.setMinimum(1)
     
     #Define Variables
     self.input_file = ''
@@ -184,7 +186,7 @@ def onApplicationStart(self):
     
     self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
     self.ui.frameIncrementSpinBox.setValue(int(settings.FrameIncrements))
-    
+    self.ui.UHDResCutoffSpinBox.setValue(int(settings.UHDResCutOff))
             
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     if settings.Notifications == 'Enabled':

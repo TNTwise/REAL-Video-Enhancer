@@ -70,6 +70,7 @@ class Settings:
     'DefaultRifeModel': f'rife-v4.6',
     'ignoreVramPopup': 'False',
     'Notifications': 'Enabled',
+    'UHDResCutOff' : '1080',
 }
             
 
@@ -97,10 +98,10 @@ class Settings:
             self.VRAM = settings_dict['VRAM']
         except:
             if HardwareInfo.get_video_memory_linux() == None:
-                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
+                self.write_to_settings_file('VRAM',f'2')
             elif  HardwareInfo.get_video_memory_linux() >= 1:
-                self.write_to_settings_file('VRAM',f'{HardwareInfo.get_video_memory_linux()}')
-            elif HardwareInfo.get_video_memory_linux() < 1:
+                self.write_to_settings_file('VRAM',f'2')
+            elif HardwareInfo.get_video_memory_linux() < 2:
                 self.write_to_settings_file('VRAM','1')
             self.readSettings()
         
@@ -128,7 +129,9 @@ class Settings:
                     return True
             return False
 
-
+def change_UHD_res(self):
+    settings = Settings()
+    settings.change_setting('UHDResCutOff',str(self.ui.UHDResCutoffSpinBox.value()))
 def changeDiscordRPC(self):
     settings = Settings()
     if self.ui.DiscordRPCBox.isChecked() == True:
