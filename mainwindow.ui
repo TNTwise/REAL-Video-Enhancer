@@ -590,35 +590,7 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout_5">
-               <item row="2" column="4">
-                <widget class="QPushButton" name="vramAmountHelpButton">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="6" column="5">
-                <widget class="QSpinBox" name="frameIncrementSpinBox">
-                 <property name="minimum">
-                  <number>10</number>
-                 </property>
-                 <property name="maximum">
-                  <number>10000</number>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="3">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Image Type</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="4">
+               <item row="5" column="4">
                 <widget class="QPushButton" name="renderTypeHelpButton">
                  <property name="text">
                   <string/>
@@ -629,6 +601,54 @@
                  </property>
                 </widget>
                </item>
+               <item row="7" column="5">
+                <widget class="QSpinBox" name="frameIncrementSpinBox">
+                 <property name="minimum">
+                  <number>10</number>
+                 </property>
+                 <property name="maximum">
+                  <number>10000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="5">
+                <widget class="QSpinBox" name="gpuIDSpinBox">
+                 <property name="minimum">
+                  <number>-1</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="4">
+                <widget class="QPushButton" name="gpuThreadingHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="8" column="5">
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="5">
+                <widget class="QPushButton" name="RenderDirButton">
+                 <property name="text">
+                  <string>Render Directory</string>
+                 </property>
+                </widget>
+               </item>
                <item row="1" column="3">
                 <widget class="QLabel" name="RenderPathLabel">
                  <property name="text">
@@ -636,14 +656,53 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="3">
-                <widget class="QLabel" name="label_5">
+               <item row="6" column="3">
+                <widget class="QLabel" name="label_9">
                  <property name="text">
-                  <string>VRAM amount</string>
+                  <string>Frame Increments mode</string>
                  </property>
                 </widget>
                </item>
-               <item row="4" column="5">
+               <item row="4" column="3">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Image Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="4">
+                <widget class="QPushButton" name="imageHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="3">
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>GPU ID</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="3">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Render Type</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="7" column="3">
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>Frame Increments</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="5" column="5">
                 <widget class="QComboBox" name="renderTypeCombo">
                  <item>
                   <property name="text">
@@ -657,14 +716,28 @@
                  </item>
                 </widget>
                </item>
-               <item row="4" column="3">
-                <widget class="QLabel" name="label_6">
+               <item row="6" column="5">
+                <widget class="QComboBox" name="frameIncrementsModeCombo">
+                 <item>
+                  <property name="text">
+                   <string>Automatic</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Manual</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="3" column="3">
+                <widget class="QLabel" name="label_5">
                  <property name="text">
-                  <string>Render Type</string>
+                  <string>GPU Threading</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="5">
+               <item row="4" column="5">
                 <widget class="QComboBox" name="imageComboBox">
                  <item>
                   <property name="text">
@@ -683,73 +756,7 @@
                  </item>
                 </widget>
                </item>
-               <item row="1" column="5">
-                <widget class="QPushButton" name="RenderDirButton">
-                 <property name="text">
-                  <string>Render Directory</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="4">
-                <widget class="QPushButton" name="imageHelpButton">
-                 <property name="text">
-                  <string/>
-                 </property>
-                 <property name="icon">
-                  <iconset>
-                   <normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="5">
-                <widget class="QSpinBox" name="vramAmountSpinbox">
-                 <property name="suffix">
-                  <string> GB</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="7" column="5">
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item row="6" column="3">
-                <widget class="QLabel" name="label_7">
-                 <property name="text">
-                  <string>Frame Increments</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="3">
-                <widget class="QLabel" name="label_9">
-                 <property name="text">
-                  <string>Frame Increments mode</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="5" column="5">
-                <widget class="QComboBox" name="frameIncrementsModeCombo">
-                 <item>
-                  <property name="text">
-                   <string>Automatic</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Manual</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="5" column="4">
+               <item row="6" column="4">
                 <widget class="QPushButton" name="frameIncrementHelp">
                  <property name="text">
                   <string/>
@@ -757,6 +764,16 @@
                  <property name="icon">
                   <iconset>
                    <normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</normaloff>../.REAL-Video-Enhancer/icons/Rife-ESRGAN-Video-Settings - Help.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="5">
+                <widget class="QSpinBox" name="gpuThreadingSpinBox"/>
+               </item>
+               <item row="2" column="4">
+                <widget class="QPushButton" name="pushButton">
+                 <property name="text">
+                  <string/>
                  </property>
                 </widget>
                </item>
