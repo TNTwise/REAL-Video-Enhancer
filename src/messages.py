@@ -28,7 +28,7 @@ def image_help(self):
     self.showDialogBox("Extraction and render image type.\nJPG (recommended) lossy, low file size.\nPNG (longer render time) lossless, high file size.\nWEBP (longest render time) lossless, low file size.")
 
 def vram_help(self):
-    self.showDialogBox("VRAM limit for the program: Adjust to reduce system load or fix upscaling issues.\nChanging this alters the amount of VRAM the program has optimizes towards.")
+    self.showDialogBox("GPU Threading for the app. \nChanging this alters the amount of VRAM usage.\n2 Is usually fine for most senarios, but if you find that your GPU is not being utilized, try increasing it.")
 
 def quotes(self):
     self.showDialogBox("Filenames with Quotes are not supported, please rename the file and try again.")
@@ -95,3 +95,6 @@ def transition_detection_lossless_warning(self):
 
 def outdated_binary(self,binary):
     self.showDialogBox(f'Outdated {binary} binary, click on Install/Remove in the Manage Models settings menu to download the latest binary and use newer models!')
+
+def UHDModeHelp(self):
+    self.showDialogBox(f'UHD mode allows for flow to be calculated at a lower resolution, hopefully saving on VRAM.\nThis cutoff resolution means that anything greater than it will enable UHD mode, and lower threading on the GPU.')
