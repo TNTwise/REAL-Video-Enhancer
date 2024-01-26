@@ -344,7 +344,11 @@ class MainWindow(QtWidgets.QMainWindow):
                     print(e)
             if self.render == 'esrgan':
                 if self.input_file != '':
-                    self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
+                    try:
+                        self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
+                    except:
+                        pass # hope this works 
+                        
                     try:
                         try:
                             if self.youtubeFile == True:
