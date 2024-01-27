@@ -17,6 +17,7 @@ def bindButtons(self):
     self.ui.esrganHelpModel.clicked.connect(open_link)
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
+    self.ui.gpuIDSpinBox.valueChanged.connect(lambda: change_GPU_ID(self))
     self.ui.UHDResCutoffSpinBox.valueChanged.connect(lambda: change_UHD_res(self))
     self.ui.frameIncrementSpinBox.valueChanged.connect(lambda: selFrameIncrements(self.ui.frameIncrementSpinBox.value()))
     self.ui.AICombo.currentIndexChanged.connect(self.switchUI)
@@ -109,7 +110,8 @@ def onApplicationStart(self):
         if self.settings.VRAM == 'None':
             cannot_detect_vram(self)
         self.ui.gpuThreadingSpinBox.setValue(1)
-    
+
+    self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
     
     if  checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
         outdated_binary(self,'rife-ncnn-vulkan')  

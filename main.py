@@ -181,6 +181,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.themeCombo.setCurrentText(settings.Theme)
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
+            
             selFrameIncrementsMode(self)
             if self.gpuMemory == None:
                 cannot_detect_vram(self)

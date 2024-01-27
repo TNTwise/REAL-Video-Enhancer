@@ -71,6 +71,7 @@ class Settings:
     'ignoreVramPopup': 'False',
     'Notifications': 'Enabled',
     'UHDResCutOff' : '1080',
+    'gpuID' : '0',
 }
             
 
@@ -132,6 +133,9 @@ class Settings:
 def change_UHD_res(self):
     settings = Settings()
     settings.change_setting('UHDResCutOff',str(self.ui.UHDResCutoffSpinBox.value()))
+def change_GPU_ID(self):
+    settings = Settings()
+    settings.change_setting('gpuID',str(self.ui.gpuIDSpinBox.value()))
 def changeDiscordRPC(self):
     settings = Settings()
     if self.ui.DiscordRPCBox.isChecked() == True:

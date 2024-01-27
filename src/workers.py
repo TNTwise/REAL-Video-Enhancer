@@ -402,6 +402,7 @@ class interpolation(QObject):
     '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'{math.ceil(vram/4)}:{vram}:{math.ceil(vram/4)+1}',
     '-f', f'%08d{self.main.settings.Image_Type}',
+    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
     f'{uhd_mode}']
     
                     if 'v4' in model:
