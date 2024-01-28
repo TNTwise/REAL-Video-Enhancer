@@ -4,7 +4,7 @@ requests
 opencv-python-headless
 pypresence
 pyuic5-tool
-cx_FREEZE
+cx-Freeze==6.15.12
 psutil
 python-magic
 Pillow
