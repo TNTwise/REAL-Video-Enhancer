@@ -40,7 +40,6 @@ def bindButtons(self):
     self.ui.resetSettingsButton.clicked.connect(self.restore_default_settings)
     self.ui.gpuThreadingHelpButton.clicked.connect(lambda: vram_help(self))
     self.ui.logButton.clicked.connect(lambda: viewLogs(self))
-    self.ui.RifePause.clicked.connect(self.pause_render)
     self.ui.RifeResume.clicked.connect(self.resume_render)
     self.ui.sceneChangeSensativityButton.clicked.connect(lambda: show_scene_change_help(self))
     self.ui.encoderHelpButton.clicked.connect(lambda:  encoder_help(self))

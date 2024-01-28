@@ -38,6 +38,8 @@ def modelOptions(self):
     self.ui.Rife_Model.setEnabled(True)
     self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realcugan-ncnn-vulkan'))
     self.ui.Rife_Times.clear()
+    self.ui.Rife_Times.currentIndexChanged.connect(self.cuganDenoiseLevel)
+    self.ui.denoiseLevelSpinBox.valueChanged.connect(self.incrementcuganDenoiseLevel)
     self.ui.EnsembleCheckBox.hide()
     self.ui.Rife_Times.addItem('2X')
     self.ui.Rife_Times.addItem('3X')

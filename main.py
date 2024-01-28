@@ -62,7 +62,7 @@ from src.return_latest_update import *
 import src.image_menu
 from PIL import Image
 
-
+from PyQt5.QtCore import Qt, QEvent
 def switch_theme(value):
     
     settings = Settings()
@@ -674,24 +674,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def ignoreButtonClicked(self):
         print('Ignore button clicked!')
-
-    def pause_render(self):
-        # Why was this line here??
-            self.paused = True
-            self.ui.RifePause.hide()
-            
-                
-                
-                
-            os.system(f'kill -9 {self.get_pid("rife-ncnn-vulkan")}')
-            os.system(f'kill -9 {self.get_pid("realesrgan-ncnn-vulkan")}')
-            sleep(0.1)
-            files_to_delete = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/output_frames/')) / self.times
-            for i in range(int(files_to_delete)):
-                i = str(i).zfill(8)
-                os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/input_frames/{i}.png"')
-            self.ui.RifeResume.show() #show resume button
-                #This function adds a zero to the original frames, so it wont overwrite the old ones
+    
+          
+    def cuganDenoiseLevel(self):
+        if self.ui.AICombo.currentText() == 'RealCUGAN':
+            if int(self.ui.Rife_Times.currentText()[0]) > 2:
+                self.ui.denoiseLevelSpinBox.setValue(0)
+                self.ui.denoiseLevelSpinBox.setSingleStep(3)
+            else:
+                self.ui.denoiseLevelSpinBox.setSingleStep(1)
+    
+    def incrementcuganDenoiseLevel(self):
+        if self.ui.AICombo.currentText() == 'RealCUGAN':
+            if int(self.ui.Rife_Times.currentText()[0]) > 2:
+                if self.ui.denoiseLevelSpinBox.value() == 1 or self.ui.denoiseLevelSpinBox.value() == 2:
+                    self.ui.denoiseLevelSpinBox.setValue(3)
     def setDisableEnable(self,mode):
         self.ui.FPSTo.setDisabled(mode)
         self.ui.AICombo.setDisabled(mode)
