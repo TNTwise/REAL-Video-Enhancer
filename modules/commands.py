@@ -233,25 +233,25 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                 else:
                         outputpath = self.output_folder
                 if mode == 'interpolation':
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'')) == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}'.replace('#','')) == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'')) == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}') == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'') 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps({i}).{return_data.returnContainer(encoder)}' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'') 
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*times)}fps.{return_data.returnContainer(encoder)}' 
                 self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
                 if mode == 'upscale': # add upscale/realesrgan resolution bump here
                         upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
-                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}').replace('#','').replace('"','').replace("'",'') == True:
+                        if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}') == True:
                                 i=1
-                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'')) == True:
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}'.replace('#','')) == True:
                                         i+=1
-                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'') 
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}' 
 
                         else:
-                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'.replace('#','').replace('"','').replace("'",'')
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
                 output_video_file=output_video_file.replace('#','')
                 print(output_video_file)
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
