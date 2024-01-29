@@ -1,18 +1,17 @@
-import src.return_data as return_data
+import src.programData.return_data as return_data
 import os
-from src.settings import *
+from src.programData.settings import *
 import src.runAI.transition_detection
-from src.return_data import *
-from src.messages import *
-from src.discord_rpc import *
+from src.programData.return_data import *
+from src.misc.messages import *
+from src.runAI.discord_rpc import *
 import os
 from modules.commands import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 import modules.upscale as upscale
-import src.thisdir
-from src.log import *
+from src.misc.log import *
 #this file changes the GUI aspects of the AI
-thisdir = src.thisdir.thisdir()
+thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 def modelOptions(self):
     log('Model: Waifu2x')

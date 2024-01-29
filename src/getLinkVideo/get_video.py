@@ -2,12 +2,12 @@
 import subprocess
 from PyQt5.QtWidgets import  QMainWindow
 import src.getLinkVideo.get_vid_from_link as getLinkedVideo
-from src.workers import *
+from src.runAI.workers import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
-from src.return_data import *
+from src.programData.return_data import *
 import requests
-import src.thisdir
-thisdir = src.thisdir.thisdir()
+import src.programData.thisdir
+thisdir = src.programData.thisdir.thisdir()
 class GetLinkedWindow(QMainWindow):
     
 

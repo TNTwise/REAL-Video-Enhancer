@@ -8,14 +8,14 @@ try:
 except Exception as e:
     
     print(e)
-import src.thisdir
-import src.checks as checks
-thisdir = src.thisdir.thisdir()
+import src.programData.thisdir
+import src.programData.checks as checks
+thisdir = src.programData.thisdir.thisdir()
 if os.path.exists(f'{thisdir}') == False:
     os.mkdir(f'{thisdir}')
 
     
-import src.theme as theme
+import src.programData.theme as theme
 import traceback
 
 import src.getModels.select_models as sel_mod
@@ -28,17 +28,17 @@ from PyQt5.QtWidgets import  QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap,QIcon
 import mainwindow
 import os
-from src.write_permisions import *
+from src.programData.write_permisions import *
 from threading import *
-from src.settings import *
-from src.return_data import *
+from src.programData.settings import *
+from src.programData.return_data import *
 ManageFiles.create_folder(f'{thisdir}/files/')
-import src.workers as workers
+import src.runAI.workers as workers
 import time
 #import src.get_models as get_models
 from time import sleep
 from multiprocessing import cpu_count
-from src.messages import *
+from src.misc.messages import *
 import modules.Rife as rife
 import modules.ESRGAN as esrgan
 import modules.Waifu2X as Waifu2X
@@ -46,8 +46,8 @@ import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
 import modules.realsr as realsr
 
-import src.onProgramStart
-from src.ETA import *
+import src.misc.onProgramStart
+from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
@@ -56,10 +56,11 @@ import modules.upscale as upscale
 from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
-from src.log import log
+from src.misc.log import log
+from src.programData.return_data import *
+from src.programData.checks import *
+from src.programData.return_latest_update import *
 import magic
-from src.return_latest_update import *
-import src.image_menu
 from PIL import Image
 
 from PyQt5.QtCore import Qt, QEvent
@@ -162,8 +163,8 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
-            src.onProgramStart.onApplicationStart(self)
-            src.onProgramStart.bindButtons(self)
+            src.misc.onProgramStart.onApplicationStart(self)
+            src.misc.onProgramStart.bindButtons(self)
             self.download_youtube_video_command = ''
             self.file_drop_widget = FileDropWidget(self)
             self.ui.verticalTabWidget.setFocusPolicy(Qt.ClickFocus)
@@ -228,7 +229,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def restore_default_settings(self):
         with open(f'{thisdir}/files/settings.txt','w') as  f:
             pass  
-        src.onProgramStart.onApplicationStart(self)
+        src.misc.onProgramStart.onApplicationStart(self)
         self.ui.verticalTabWidget.setCurrentIndex(self.ui.verticalTabWidget.count())
         self.ui.SettingsMenus.setCurrentRow(0)
         self.ui.GeneralOptionsFrame.show()
@@ -870,9 +871,18 @@ except Exception as e:
 
 def excepthook(type, value, extraceback):
     frame = extraceback.tb_frame
+    print(f"Exception Type: {type}")
+    print(f"Exception Value: {value}")
+    print("Traceback:")
+    traceback.print_tb(extraceback)
+
+    # Optionally, you can extract and print the file name
+    file_name = extraceback.tb_frame.f_code.co_filename
+    print(f"Exception occurred in file: {file_name}")
+
     function_name = frame.f_code.co_name
     error_message = f"An unhandled exception occurred: {value}"
-    log(f'ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{function_name},{type},{error_message}')
+    log(f'ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{file_name},{function_name},{type},{error_message}')
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
 

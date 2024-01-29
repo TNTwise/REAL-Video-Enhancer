@@ -1,7 +1,7 @@
 import os
-import src.thisdir
-thisdir = src.thisdir.thisdir()
-import src.checks as checks
+import src.programData.thisdir
+thisdir = src.programData.thisdir.thisdir()
+import src.programData.checks as checks
 def returnModelList(self,settings): # make sure names match up on both selectAI.ui and main.ui
                 rife_install_list=[] 
                 if os.path.exists(f'{settings.ModelDir}/') == False:

@@ -1,17 +1,22 @@
 
 #This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
 # hz
-import src.return_data as return_data
+import src.programData.return_data as return_data
 import os
-from src.write_permisions import *
-from src.settings import *
-from threading import Thread
+from src.programData.settings import *
 import src.runAI.transition_detection
-from src.return_data import *
-from src.messages import *
-from src.discord_rpc import *
-from src.log import log
+from src.programData.return_data import *
+from src.misc.messages import *
+from src.runAI.discord_rpc import *
 import requests
+import os
+from modules.commands import *
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
+import modules.upscale as upscale
+from src.misc.log import *
+#this file changes the GUI aspects of the AI
+thisdir = src.programData.thisdir.thisdir()
+from threading import Thread
 try:
         from notify import *
         import notify
@@ -19,9 +24,7 @@ except Exception as e:
         log(f'ERROR: Importing of notifications failed! {e}')
         
 import re
-import src.thisdir
-import src.checks as checks
-thisdir = src.thisdir.thisdir()
+thisdir = src.programData.thisdir.thisdir()
 
 import traceback
 def return_gpu_settings(self):

@@ -4,28 +4,28 @@ import os
 import sys
 import requests
 import re
-import src.thisdir
-thisdir = src.thisdir.thisdir()
+import src.programData.thisdir
+thisdir = src.programData.thisdir.thisdir()
 if os.path.exists(f"{thisdir}/renders/") == False:
         os.mkdir(f"{thisdir}/renders/")
 from zipfile import ZipFile
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication, QMessageBox
 from PyQt5.QtGui import QIcon
-import src.messages
+import src.misc.messages
 import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
-from src.messages import *
-from src.checks import *
+from src.misc.messages import *
+from src.programData.checks import *
 import tarfile
 from sys import exit
 from src.getModels.rifeModelsFunctions import *
-from src.settings import *
+from src.programData.settings import *
 settings = Settings()
 from src.getModels.returnModelList import *
-from src.log import log
+from src.misc.log import log
 
 import src.getModels.SelectAI as SelectAI
 import traceback
@@ -244,7 +244,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
 
 
-    import src.theme as theme
+    import programData.theme as theme
     app = QtWidgets.QApplication(sys.argv)
     theme.set_theme(app)
 
@@ -356,7 +356,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         traceback_info = traceback.format_exc()
                         log(f'ERROR: {e} {traceback_info}')
                         self.main.showDialogBox(e)
-    import src.theme as theme
+    import programData.theme as theme
 
     
 

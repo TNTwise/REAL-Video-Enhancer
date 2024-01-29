@@ -1,4 +1,4 @@
-from src.checks import *
+from src.programData.checks import *
 def rife_checkboxes(self):
     rife_list = [
                     (self.ui.rife, 'rife'),

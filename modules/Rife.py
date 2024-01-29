@@ -1,20 +1,17 @@
-#This script creates a class that takes in params like "RealESRGAN or Rife", the model for the program,  the times of upscaling, and the path of the video, and the output path
-# hz
-import src.return_data as return_data
+import src.programData.return_data as return_data
 import os
-from src.settings import *
-from threading import Thread
+from src.programData.settings import *
 import src.runAI.transition_detection
-from src.return_data import *
-from src.messages import *
-from src.discord_rpc import *
+from src.programData.return_data import *
+from src.misc.messages import *
+from src.runAI.discord_rpc import *
 import os
 from modules.commands import *
-import src.thisdir
-import modules.interpolate as interpolate
-import src.onProgramStart as onProgramStart
-from src.log import *
-thisdir = src.thisdir.thisdir()
+from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
+import modules.upscale as upscale
+from src.misc.log import *
+#this file changes the GUI aspects of the AI
+thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 

@@ -2,22 +2,22 @@
 import subprocess
 from PyQt5.QtWidgets import  QMainWindow
 import src.getLinkVideo.get_vid_from_link as getLinkedVideo
-from src.workers import *
+from src.runAI.workers import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
-from src.return_data import *
+from src.programData.return_data import *
 import requests
-import src.thisdir
+import src.programData.thisdir
 import src.getModels.SelectModels
 from src.getModels.rifeModelsFunctions import *
-from src.checks import *
+from src.programData.checks import *
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from zipfile import ZipFile
 import tarfile
-import src.onProgramStart as programstart
+import src.misc.onProgramStart as programstart
 import modules.Rife as rife
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QCheckBox
 from src.getModels.returnModelList import *
-thisdir = src.thisdir.thisdir()
+thisdir = src.programData.thisdir.thisdir()
 rife_install_list = []
 
 class Worker(QObject):

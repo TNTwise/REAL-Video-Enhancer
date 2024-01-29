@@ -1,8 +1,7 @@
 import os
-import src.return_data
 import subprocess
-from src.return_data import *
-from src.settings import *
+from src.programData.return_data import *
+from  src.programData.settings import *
 def generate_opposite_pair(number, start, end):
     if number < start or number > end:
         return None  # Number is outside the specified range
@@ -17,14 +16,14 @@ class TransitionDetection:
         self.render_directory = self.settings.RenderDir
         self.input_file = originalSelf.input_file
         self.videoName = originalSelf.videoName
-        import src.thisdir
+        import src.programData.thisdir
         #self.main = originalSelf
-        self.thisdir = src.thisdir.thisdir()
+        self.thisdir = src.programData.thisdir.thisdir()
         self.fps = originalSelf.fps
         self.full_render_dir = f'{self.render_directory}/{self.videoName}_temp'
         self.main = originalSelf
-        src.return_data.ManageFiles.create_folder(f'{self.full_render_dir}')
-        src.return_data.ManageFiles.create_folder(f'{self.full_render_dir}/transitions')
+        ManageFiles.create_folder(f'{self.full_render_dir}')
+        ManageFiles.create_folder(f'{self.full_render_dir}/transitions')
             # Change scene\,0.6 to edit how much scene detections it does, do this for both ffmpeg commands
     def find_timestamps(self):
         if self.settings.SceneChangeDetection != 'Off':
