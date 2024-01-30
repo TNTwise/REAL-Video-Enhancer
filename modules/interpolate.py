@@ -13,7 +13,10 @@ from src.misc.log import *
 #this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
+import src.programData.checks as checks
+from PyQt5.QtCore import QThread
 
+import src.runAI.workers as workers
 
 def initializeInterpolation(self,AI):#1st stage in preparing render, starts all worker threads
     try:

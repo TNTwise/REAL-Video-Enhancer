@@ -18,6 +18,8 @@ import src.runAI.transition_detection as transition_detection
 import os
 from modules.commands import *
 import math
+import src.programData.checks as checks
+
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 class pb2X(QObject):
@@ -427,7 +429,8 @@ f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
     '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
     '-j', f'1:{vram}:2',
     '-f', f'%08d{self.main.settings.Image_Type}',
-    '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}'
+    '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}',
+    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
 ]
                     
                     if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
@@ -476,6 +479,7 @@ class upscale(QObject):
             img_type = self.main.settings.Image_Type.replace('.','')
             self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
             self.main.frame_count = self.input_frames
+            
             if self.main.AI == 'realesrgan-ncnn-vulkan':
                 command = [
     f'{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan',
@@ -500,6 +504,7 @@ class upscale(QObject):
     '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}',
+    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
 ]
             if self.main.AI == 'realcugan-ncnn-vulkan':
                 command = [
@@ -511,6 +516,7 @@ class upscale(QObject):
     '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}',
+    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
 ]
             if self.main.AI == 'realsr-ncnn-vulkan':
                 command = [
@@ -520,6 +526,7 @@ class upscale(QObject):
     '-j', f'1:{settings.VRAM}:2',
     '-f', str(img_type),
     '-m', f'{settings.ModelDir}realsr/models-{self.main.ui.Rife_Model.currentText()}',
+    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
 ]
             if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                 

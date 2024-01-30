@@ -10,6 +10,7 @@ from modules.commands import *
 from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
 import modules.upscale as upscale
 from src.misc.log import *
+import modules.interpolate as interpolate
 #this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")

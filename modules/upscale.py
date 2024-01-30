@@ -15,6 +15,7 @@ thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 from PyQt5.QtCore import  QThread
 import src.runAI.workers as workers
+import src.programData.checks as checks
 
 
     
@@ -35,10 +36,12 @@ def initializeUpscale(self,AI):#1st stage in preparing render, starts all worker
                     start_discordRPC(self,'Upscaling')
                 except:
                     print('No discord on this machine')
-                
+        
             realESRGAN_Model = self.ui.Rife_Model.currentText()
             realESRGAN_Times = self.ui.Rife_Times.currentText()[0]
             if AI == 'realesrgan-ncnn-vulkan':
+                if  self.ui.gpuIDSpinBox.value() == -1:
+                 self.showDialogBox('ESRGAN does not support CPU inference, using GPU inference instead.')
                 if realESRGAN_Model == 'Default':
                     self.realESRGAN_Model = '-n realesrgan-x4plus -s 4'
                 
