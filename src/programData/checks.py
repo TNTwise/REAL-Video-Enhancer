@@ -178,12 +178,12 @@ def check_for_updated_binary(binary,returnVersion=False):
                         break
                     sha256.update(data)
             CURRENTrifencnnvulkansha256=sha256.hexdigest()
-            NEWrifencnnvulkansha256list = ['6bea88b5cca082f9b4c475f07bfa771127fdf683a9b80c29d758dbe429e9c6fc']
+            NEWrifencnnvulkansha256list = ['32b8f3a05e1e8ffb0e3ebab2a0c7e49dfb3c1994378dfe250cd4de2364992e98']
             log(f'Current sha256 rife: {CURRENTrifencnnvulkansha256}')
             log(f'New sha256 rife: {NEWrifencnnvulkansha256list[-1]}')
             # this is to check version, like this version will support up to 4.14-lite
             if returnVersion:
-                    if '6bea88b5cca082f9b4c475f07bfa771127fdf683a9b80c29d758dbe429e9c6fc' == CURRENTrifencnnvulkansha256:
+                    if '32b8f3a05e1e8ffb0e3ebab2a0c7e49dfb3c1994378dfe250cd4de2364992e98' == CURRENTrifencnnvulkansha256:
                         return 1
                     
             if CURRENTrifencnnvulkansha256 in NEWrifencnnvulkansha256list:
