@@ -157,6 +157,7 @@ class GetLinkedWindow(QMainWindow):
     def gen_youtubedlp_command(self):
         self.input_file = self.input_file.replace("'",'') # i need to find where this is called to rename the input file
         self.input_file = self.input_file.replace('"','')
+        os.system(f'{thisdir}/audio.m4a')
         self.main.download_youtube_video_command = (f'{thisdir}/bin/yt-dlp_linux -f {self.dict_res_id_fps[self.ui.qualityCombo.currentText()][0]} "{self.ui.plainTextEdit.text()}" -o "{self.input_file}" && {thisdir}/bin/yt-dlp_linux -f 140 "{self.ui.plainTextEdit.text()}"  -o {thisdir}/audio.m4a')
         self.main.fps=float(self.dict_res_id_fps[self.ui.qualityCombo.currentText()][1])
         self.main.localFile=False
