@@ -268,7 +268,7 @@ def calculateVRAM(self):
     
     width,height = return_data.VideoName.return_video_resolution(self.main.input_file)
     if int(height) > int(self.main.settings.UHDResCutOff): #check if resolution is greater than cutoff, if it is set to 2 if threading val is greater than or equal to 4
-            if self.main.settings.VRAM >=4:
+            if int(self.main.settings.VRAM) >=4:
                 vram=2
             else:
                 vram=1
