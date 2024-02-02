@@ -34,6 +34,8 @@ def bindButtons(self):
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
    
     #link buttons
+    self.ui.UHDModeHelpButton.clicked.connect(lambda: UHDModeHelp(self))
+    self.ui.gpuIDHelpButton.clicked.connect(lambda: GPUIDHelp(self))
     self.ui.frameIncrementHelp.clicked.connect(lambda: frame_increments_help(self))
     self.ui.SettingsMenus.clicked.connect(self.settings_menu)
     self.ui.OutputDirectoryButton.clicked.connect(lambda: selOutputDir(self))
@@ -73,6 +75,8 @@ def bindButtons(self):
     self.ui.frameIncrementHelp.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.esrganHelpModel.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.ensembleHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.UHDModeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
+    self.ui.gpuIDHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
 def onApplicationStart(self):
     
     #this is kind of a mess

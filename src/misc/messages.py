@@ -98,3 +98,6 @@ def outdated_binary(self,binary):
 
 def UHDModeHelp(self):
     self.showDialogBox(f'UHD mode allows for flow to be calculated at a lower resolution, hopefully saving on VRAM.\nThis cutoff resolution means that anything greater than it will enable UHD mode, and lower threading on the GPU.')
+
+def GPUIDHelp(self):
+    self.showDialogBox(f'GPU ID selects what GPU to use. Usually, 0 is the best option, as ncnn generally selects the dedicated GPU.\nIf you are in a dual-gpu setup, you can set this to 1 if the render does not seem to be using the right GPU.\n-1 option means it uses CPU inference.')
