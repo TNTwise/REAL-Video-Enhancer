@@ -101,3 +101,6 @@ def UHDModeHelp(self):
 
 def GPUIDHelp(self):
     self.showDialogBox(f'GPU ID selects what GPU to use. Usually, 0 is the best option, as ncnn generally selects the dedicated GPU.\nIf you are in a dual-gpu setup, you can set this to 1 if the render does not seem to be using the right GPU.\n-1 option means it uses CPU inference.')
+
+def cantDetectUpscaleTimes(self):
+    self.showDialogBox(f'Could not detect the current custom model\'s upscale multiplier.\nPlease select the correct one manually.')

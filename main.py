@@ -551,11 +551,25 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.Rife_Times.setEnabled(True)
             else:
                 self.ui.Rife_Times.clear()
-                self.ui.Rife_Times.addItem('1X')
-                self.ui.Rife_Times.addItem('2X')
-                self.ui.Rife_Times.addItem('3X')
-                self.ui.Rife_Times.addItem('4X')
-                self.ui.Rife_Times.setCurrentText('2X')
+                model = self.ui.Rife_Model.currentText().lower()
+                if '1x' in model:
+                    self.ui.Rife_Times.addItem('1X')
+                    self.ui.Rife_Times.setCurrentText('1X')
+                elif '2x' in model:
+                    self.ui.Rife_Times.addItem('2X')
+                    self.ui.Rife_Times.setCurrentText('2X')
+                elif '3x' in model:
+                    self.ui.Rife_Times.addItem('3X')
+                    self.ui.Rife_Times.setCurrentText('3X')
+                elif '4x' in model:
+                    self.ui.Rife_Times.addItem('4X')
+                    self.ui.Rife_Times.setCurrentText('4X')
+                else:
+                    cantDetectUpscaleTimes(self)
+                    self.ui.Rife_Times.addItem('1X')
+                    self.ui.Rife_Times.addItem('2X')
+                    self.ui.Rife_Times.addItem('3X')
+                    self.ui.Rife_Times.addItem('4X')
                 self.ui.Rife_Times.setEnabled(True)
         
         if self.ui.AICombo.currentText() == 'Waifu2X':
