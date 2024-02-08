@@ -45,7 +45,7 @@ import modules.Waifu2X as Waifu2X
 import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
 import modules.realsr as realsr
-
+import modeules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
 import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
@@ -253,6 +253,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == 'Waifu2X':
             Waifu2X.modelOptions(self)
+
+        if self.ui.AICombo.currentText() == 'Vapoursynth-RIFE':
+            VapoursynthRifeNCNN.modelOptions(self)
 
         if self.ui.AICombo.currentText() == 'IFRNET':
             ifrnet.modelOptions(self)
