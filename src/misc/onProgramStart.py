@@ -239,7 +239,7 @@ def set_model_params(self):
                 if 'Waifu2X' == i:
                     self.ui.Waifu2xCheckBox.setChecked(True)
                     self.model_labels['Waifu2X'] = 'upscaling'
-                if 'VapoursynthR' == i:
+                if 'Vapoursynth-RIFE' == i:
                     self.ui.VapoursynthRIFECheckBox.setChecked(True)
                     self.model_labels['Vapoursynth-RIFE'] = 'interpolation'
                 if 'IFRNET' == i:

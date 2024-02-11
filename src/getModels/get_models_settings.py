@@ -183,6 +183,8 @@ def remove_unchecked(self):
             
     if self.ui.RealSRCheckBox.isChecked() == False:
             os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
+    if self.ui.RifeVSCheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/vapoursynth-rife/"')
             
     
 def run_install_models_from_settings(self):

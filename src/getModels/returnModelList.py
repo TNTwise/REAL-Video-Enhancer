@@ -46,7 +46,8 @@ def returnModelList(self,settings): # make sure names match up on both selectAI.
                 
                 if self.ui.RealCUGANCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realcugan') == False:
                         install_modules_dict['https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip'] = 'realcugan-ncnn-vulkan-20220728-ubuntu.zip'
-                
+                if self.ui.VSRifeCheckBox.isChecked() == True and os.path.exists(f'{settings.ModelDir}/realcugan') == False:
+                        install_modules_dict['https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip'] = 'realcugan-ncnn-vulkan-20220728-ubuntu.zip'
                 for i in rife_install_list:
                         
                         if os.path.exists(f'{settings.ModelDir}/rife/rife-ncnn-vulkan') == False or checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
