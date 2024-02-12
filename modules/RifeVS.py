@@ -10,8 +10,9 @@ core.std.LoadPlugin(path="/home/pax/VapourSynth-RIFE-ncnn-Vulkan/librife.so")
 clip = core.bs.VideoSource(source="MFGhost-OP1.webm")
 clip = core.resize.Bilinear(clip, format=vs.RGBS, matrix_in_s="709")
 
-# detects scene changes, requires misc plugin
-#clip = core.misc.SCDetect(clip)
+# detects scene changes, requires misc plugin # threshold is sensativity
+
+#clip = core.misc.SCDetect(clip,threshold=0.05) 
 
 clip = core.rife.RIFE(
     
