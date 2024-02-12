@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>744</height>
+    <height>773</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1284,7 +1284,7 @@
                   </widget>
                  </item>
                  <item row="10" column="0">
-                  <widget class="QCheckBox" name="VSRifeCheckBox">
+                  <widget class="QCheckBox" name="RifeVSCheckBox">
                    <property name="text">
                     <string>VS-Rife</string>
                    </property>
