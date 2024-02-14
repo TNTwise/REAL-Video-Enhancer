@@ -66,6 +66,7 @@ class Ui_MainWindow(object):
         self.CainCheckBox.setObjectName("CainCheckBox")
         self.gridLayout_6.addWidget(self.CainCheckBox, 14, 0, 1, 1)
         self.RifeVSCheckBox = QtWidgets.QCheckBox(self.InstallModelsFrame)
+        self.RifeVSCheckBox.setEnabled(False)
         self.RifeVSCheckBox.setObjectName("RifeVSCheckBox")
         self.gridLayout_6.addWidget(self.RifeVSCheckBox, 11, 0, 1, 1)
         self.gridLayout.addLayout(self.gridLayout_6, 1, 0, 1, 1)
@@ -90,4 +91,4 @@ class Ui_MainWindow(object):
         self.RifeCheckBox.setText(_translate("MainWindow", "RIFE (Interpolate General)"))
         self.RealESRGANCheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
         self.CainCheckBox.setText(_translate("MainWindow", "IFRNET (Interpolate General)"))
-        self.RifeVSCheckBox.setText(_translate("MainWindow", "CheckBox"))
+        self.RifeVSCheckBox.setText(_translate("MainWindow", "RifeVS (Interpolate General)"))
