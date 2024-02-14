@@ -1285,6 +1285,9 @@
                  </item>
                  <item row="10" column="0">
                   <widget class="QCheckBox" name="RifeVSCheckBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="text">
                     <string>VS-Rife</string>
                    </property>

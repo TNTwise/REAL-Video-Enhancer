@@ -244,7 +244,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
 
 
-    import programData.theme as theme
+    import src.programData.theme as theme
     app = QtWidgets.QApplication(sys.argv)
     theme.set_theme(app)
 
@@ -356,7 +356,6 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         traceback_info = traceback.format_exc()
                         log(f'ERROR: {e} {traceback_info}')
                         self.main.showDialogBox(e)
-    import programData.theme as theme
 
     
 

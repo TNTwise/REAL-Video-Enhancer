@@ -68,23 +68,6 @@
        </item>
        <item row="1" column="0">
         <layout class="QGridLayout" name="gridLayout_6">
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="Waifu2xCheckBox">
-           <property name="text">
-            <string>Waifu2X  (Upscale Animation)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="0">
-          <widget class="QCheckBox" name="CainCheckBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>IFRNET (Interpolate General)</string>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="0">
           <widget class="QCheckBox" name="RealSRCheckBox">
            <property name="enabled">
@@ -95,10 +78,20 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="0">
-          <widget class="QCheckBox" name="RifeCheckBox">
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="RealCUGANCheckBox">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
            <property name="text">
-            <string>RIFE (Interpolate General)</string>
+            <string>RealCUGAN (Upscale Animation)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QCheckBox" name="Waifu2xCheckBox">
+           <property name="text">
+            <string>Waifu2X  (Upscale Animation)</string>
            </property>
           </widget>
          </item>
@@ -109,6 +102,13 @@
            </property>
           </widget>
          </item>
+         <item row="10" column="0">
+          <widget class="QCheckBox" name="RifeCheckBox">
+           <property name="text">
+            <string>RIFE (Interpolate General)</string>
+           </property>
+          </widget>
+         </item>
          <item row="2" column="0">
           <widget class="QCheckBox" name="RealESRGANCheckBox">
            <property name="text">
@@ -116,13 +116,23 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="RealCUGANCheckBox">
+         <item row="14" column="0">
+          <widget class="QCheckBox" name="CainCheckBox">
            <property name="enabled">
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>RealCUGAN (Upscale Animation)</string>
+            <string>IFRNET (Interpolate General)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QCheckBox" name="RifeVSCheckBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>RifeVS (Interpolate General)</string>
            </property>
           </widget>
          </item>
