@@ -187,11 +187,12 @@ def check_for_updated_binary(binary,returnVersion=False):
             if returnVersion:
                     if '32b8f3a05e1e8ffb0e3ebab2a0c7e49dfb3c1994378dfe250cd4de2364992e98' == CURRENTrifencnnvulkansha256:
                         return 1
-                    
+                    else:
+                        return 0  
             if CURRENTrifencnnvulkansha256 in NEWrifencnnvulkansha256list:
                 
                 return True
             return False
-        return 'PathNotExist'
+        return True # if the path doesnt exist, just return true
                   
     

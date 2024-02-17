@@ -115,7 +115,7 @@ def onApplicationStart(self):
 
     self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
     
-    if  checks.check_for_updated_binary('rife-ncnn-vulkan') == False:
+    if  checks.check_for_updated_binary('rife-ncnn-vulkan',True) == 0:
         outdated_binary(self,'rife-ncnn-vulkan')  
     
     self.ui.installModelsProgressBar.setMaximum(100)

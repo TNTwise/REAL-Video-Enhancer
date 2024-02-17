@@ -30,7 +30,7 @@ def rife_checkboxes(self):
                 ]
     # new models
     
-    if check_for_updated_binary('rife-ncnn-vulkan',True) >= 1:
+    if int(check_for_updated_binary('rife-ncnn-vulkan',True)) >= 1:
         rife_list += [
             (self.ui.rife414lite, 'rife-v4.14-lite')
         ]
@@ -64,7 +64,7 @@ def rife_pin_functions(self):
     self.ui.rife413lite.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife414.stateChanged.connect(self.checkbox_state_changed)
     # new models
-    if check_for_updated_binary('rife-ncnn-vulkan'):
+    if check_for_updated_binary('rife-ncnn-vulkan',True) >= 1:
         
         self.ui.rife414lite.stateChanged.connect(self.checkbox_state_changed)
         self.ui.rife414lite.setEnabled(True)

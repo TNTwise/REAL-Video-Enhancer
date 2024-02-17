@@ -91,4 +91,4 @@ class Ui_MainWindow(object):
         self.RifeCheckBox.setText(_translate("MainWindow", "RIFE (Interpolate General)"))
         self.RealESRGANCheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
         self.CainCheckBox.setText(_translate("MainWindow", "IFRNET (Interpolate General)"))
-        self.RifeVSCheckBox.setText(_translate("MainWindow", "RifeVS (Interpolate General)"))
+        self.RifeVSCheckBox.setText(_translate("MainWindow", "VS-Rife (Interpolate General)"))
