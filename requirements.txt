@@ -1,5 +1,5 @@
 testresources
-PyQt5==5.12
+PyQt5
 requests
 opencv-python-headless
 pypresence
@@ -10,3 +10,4 @@ python-magic
 Pillow
 loguru
 notify-send
+scenedetect

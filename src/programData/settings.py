@@ -62,6 +62,7 @@ class Settings:
     "RenderDir": f"{thisdir}/renders/",
     "ExtractionImageType": "jpg",
     "SceneChangeDetection": '0.3',
+    "SceneChangeMethod" : "ffmpeg",
     "Encoder": '264',
     "DiscordRPC": 'Enabled',
     'FrameIncrementsMode': 'Automatic',
@@ -238,11 +239,20 @@ def selSceneDetectionMode(self):
         self.ui.label_3.show()
         self.ui.sceneChangeSensativityButton.show()
         self.ui.sceneChangeLineEdit.show()
+        self.ui.label_17.show()
+        self.ui.sceneChangeMethodComboBox.show()
     else:
         settings.change_setting('SceneChangeDetectionMode','Disabled')
         self.ui.label_3.hide()
         self.ui.sceneChangeSensativityButton.hide()
         self.ui.sceneChangeLineEdit.hide()
+        self.ui.label_17.hide()
+        self.ui.sceneChangeMethodComboBox.hide()
+
+def selSceneDetectionMethod(self):
+    
+    settings = Settings()
+    settings.change_setting('SceneChangeMethod',self.ui.sceneChangeMethodComboBox.currentText())
 
 def Notifications(self):
     

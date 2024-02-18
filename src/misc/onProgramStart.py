@@ -51,6 +51,7 @@ def bindButtons(self):
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
     self.ui.imageComboBox.currentIndexChanged.connect(lambda: settings.change_setting('Image_Type', f'{self.ui.imageComboBox.currentText()}'))
+    self.ui.sceneChangeMethodComboBox.currentIndexChanged.connect(lambda: selSceneDetectionMethod(self))
     self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
     #apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
     self.ui.ESRGANModelSelectButton.clicked.connect(lambda: self.openFileNameDialog('Model',['.bin']))
@@ -146,7 +147,10 @@ def onApplicationStart(self):
     onlyInt = QIntValidator()
     onlyInt.setRange(0, 9)
     self.ui.sceneChangeLineEdit.setValidator(onlyInt)
-    
+    if settings.SceneChangeMethod == 'ffmpeg':
+        self.ui.sceneChangeMethodComboBox.setCurrentIndex(0)
+    if settings.SceneChangeMethod == 'pyscenedetect':
+        self.ui.sceneChangeMethodComboBox.setCurrentIndex(1)
     self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
     if self.encoder == '264':
         self.ui.EncoderCombo.setCurrentIndex(0)
