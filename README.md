@@ -2,6 +2,8 @@
 ![Visitors](https://api.visitorbadge.io/api/visitors?path=https%3A%2F%2Fgithub.com%2FTNTwise%2FREAL-Video-enhancer%2F&countColor=%23263759)
 ![downloads_total](https://img.shields.io/github/downloads/tntwise/REAL-Video-Enhancer/total.svg?label=downloads%40total)
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)<br/>
+<a href="https://discord.gg/hwGHXga8ck">
+      <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
 ### Need help?
  - Join the <a href="https://discord.gg/YHM7nFheyM">TAS discord!</a> https://github.com/NevermindNilas/TheAnimeScripter
  - Report bugs and provide feedback in the real-video-enhancer-feedback channel.
