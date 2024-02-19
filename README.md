@@ -32,7 +32,7 @@
 ## Download the Latest Beta release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest">https://github.com/TNTwise/REAL-Video-Enhancer-BETA/releases/latest</a>
 
-# Not possible without the amazing developers behind:
+# Software used:
 
 <ul>
   <li> <a rel="noopener noreferrer" href="https://ffmpeg.org/" target="_blank" >FFMpeg</a> </li>
@@ -41,6 +41,13 @@
   <li> <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar/VapourSynth-RIFE-ncnn-Vulkan" target="_blank">VapourSynth-RIFE-ncnn-Vulkan (For RIFE models [4.1-4.5],[4.7-4.12-lite])</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/nihui/ifrnet-ncnn-vulkan" target="_blank" >ifrnet-ncnn-vulkan</a>  </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/hzwer/Practical-RIFE" target="_blank" >RIFE</a>  </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/realcugan-ncnn-vulkan" target="_blank" >realcugan-ncnn-vulkan</a>  </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/bilibili/ailab/tree/main/Real-CUGAN" target="_blank" >REAL-Cugan</a>  </li>
+  
+  
+  
 </ul>
 
 
