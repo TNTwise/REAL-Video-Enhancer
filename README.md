@@ -4,7 +4,7 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
-### Need help?
+### Join the discord
  - Join the <a href="https://discord.gg/YHM7nFheyM">TAS discord!</a> https://github.com/NevermindNilas/TheAnimeScripter
  - Report bugs and provide feedback in the real-video-enhancer-feedback channel.
 ### Now out on flathub!
@@ -40,7 +40,7 @@
   <li> <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar/VapourSynth-RIFE-ncnn-Vulkan" target="_blank">VapourSynth-RIFE-ncnn-Vulkan (For RIFE models [4.1-4.5],[4.7-4.12-lite])</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/ifrnet-ncnn-vulkan" target="_blank" >ifrnet-ncnn-vulkan</a>  </li></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/ifrnet-ncnn-vulkan" target="_blank" >ifrnet-ncnn-vulkan</a>  </li>
 </ul>
 
 
