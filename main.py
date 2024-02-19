@@ -62,7 +62,7 @@ from src.programData.checks import *
 from src.programData.return_latest_update import *
 import magic
 from PIL import Image
-
+import src.runAI.FPS as FPS
 from PyQt5.QtCore import Qt, QEvent
 def switch_theme(value):
     
@@ -394,7 +394,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 total_output_files = fc
                 self.ui.RifePB.setMaximum(total_output_files)
                 #self.ui.QueueButton.show()
-                
+                fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
+                fpsThread.start()
                 
                 self.start_time = time.time()   
                 
@@ -424,6 +425,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     else:
                         
                         self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                self.removeLastLineInLogs('FPS: ') 
+                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
             except:
                 pass
             #Update GUI values
@@ -443,6 +446,7 @@ class MainWindow(QtWidgets.QMainWindow):
             #print(e)
             pass
     def runPB(self):
+        
         self.addLast=False
         self.i=1
         self.settings = Settings()
