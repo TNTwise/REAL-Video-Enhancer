@@ -292,7 +292,7 @@ def frameCountThread(self):
         with open(f'{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt', 'w') as f:
             for m in range(interpolation_sessions):
                 f.write(f"file '{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-m}.{return_data.returnContainer(encoder)}'\n")
-        if encoder != 'copy':
+        if encoder != 'copy' and self.main.render=='rife':
             vf = f'-vf "scale=w={width}:h={height},setsar=1"'
         else:
             vf=''
