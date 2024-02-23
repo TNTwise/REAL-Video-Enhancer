@@ -322,8 +322,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.localFile == True:
                 self.videoProperties()
             
-            
-            fps = self.fps
+            if self.fps != None:
+                fps = self.fps
             
             if self.render == 'rife':
                 try:
