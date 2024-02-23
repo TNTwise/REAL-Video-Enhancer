@@ -733,6 +733,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.modeCombo.setDisabled(mode)
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
         if len(self.QueueList) == 0:
+            self.file_drop_widget.show()
             self.ui.QueueListWidget.hide()
             try:
                 self.RPC.clear(pid=os.getpid())

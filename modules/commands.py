@@ -256,7 +256,8 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         else:
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
                 output_video_file=output_video_file.replace('#','')
-                print(output_video_file)
+                
+                
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):
                                 ffmpeg_cmd = (f'"{thisdir}/bin/ffmpeg" -f concat  -safe 0 -i "{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt" -i "{self.settings.RenderDir}/{self.videoName}_temp/audio.m4a" -c copy  "{output_video_file}" -y')
@@ -293,14 +294,15 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                         except Exception as e:
                                 log(str(e))
                         os.chdir(thisdir)
-                        
+                        self.output_file=output_video_file
                         log(f'Finished Render, output_file={output_video_file}')
+                        
                         if settings.Notifications == 'Enabled':
                                 try:
                                         notification('REAL Video Enhancer', message='Render Finished', app_name='REAL-Video-Enhancer')
                                 except Exception as e:
                                         log(f'ERROR: Notification Failed! {e}')
-                        self.file_drop_widget.show()
+                        
                         return output_video_file
                 log(f'Failed Render, output_file=Null')
                 return None  
