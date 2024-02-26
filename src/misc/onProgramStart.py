@@ -78,75 +78,10 @@ def bindButtons(self):
     self.ui.ensembleHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.UHDModeHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
     self.ui.gpuIDHelpButton.setIcon(QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png"))
-def onApplicationStart(self):
-    
-    #this is kind of a mess
-    import modules.Rife as rife
-    import modules.ESRGAN as esrgan
-    settings = Settings()
-    from PyQt5.QtGui import QIntValidator, QIcon
-    thisdir = src.programData.thisdir.thisdir()
-    self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
-    set_model_params(self)
-    #get esrgan models
-    if not (self.ui.RealESRGANCheckBox.isChecked()):
-        self.ui.ESRGANModelSelectButton.hide()
-        self.ui.label_20.hide()
-        self.ui.esrganHelpModel.hide()
-    else:
-        self.ui.ESRGANModelSelectButton.show()
-        self.ui.label_20.show()
-        self.ui.esrganHelpModel.show()
-    self.input_file = ''
-    
-    self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
-    
-    self.settings = Settings()
-    self.gpuMemory=self.settings.VRAM
-    
-    self.switchUI()
-    if self.gpuMemory != 'None':
-        
-        self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
-        
-    else:
-        if self.settings.VRAM == 'None':
-            cannot_detect_vram(self)
-        self.ui.gpuThreadingSpinBox.setValue(1)
 
-    self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
-    
-    if  checks.check_for_updated_binary('rife-ncnn-vulkan',True) == 0:
-        outdated_binary(self,'rife-ncnn-vulkan')  
-    
-    self.ui.installModelsProgressBar.setMaximum(100)
-        
-    self.ui.gpuThreadingSpinBox.setMinimum(1)
-    
-    #Define Variables
-    self.input_file = ''
-    self.output_folder = ''
-    self.videoQuality = settings.videoQuality
-    self.encoder = settings.Encoder
-    if os.path.exists(f"{settings.RenderDir}") == False:
-        settings.change_setting('RenderDir',f'{thisdir}')
-    
-    
-    
-    self.ui.InstallModelsFrame.hide()
-    self.ui.RifeResume.hide()
-    self.ui.RifePause.hide()
-    
-    
-    if settings.DiscordRPC == 'Enabled':
-        self.ui.DiscordRPCBox.setChecked(True)
-        
-    else:
-        self.ui.DiscordRPCBox.setChecked(False)
-    os.system('ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0') #Enables discord RPC on flatpak
-    onlyInt = QIntValidator()
-    onlyInt.setRange(0, 9)
-    self.ui.sceneChangeLineEdit.setValidator(onlyInt)
+def settingsStart(self):
+    settings = Settings()
+    self.settings = Settings()
     if settings.SceneChangeMethod == 'ffmpeg':
         self.ui.sceneChangeMethodComboBox.setCurrentIndex(0)
     if settings.SceneChangeMethod == 'pyscenedetect':
@@ -174,9 +109,9 @@ def onApplicationStart(self):
         self.ui.VidQualityCombo.setCurrentText('Medium')
     if self.videoQuality == '22':
         self.ui.VidQualityCombo.setCurrentText('Low')
-    if self.settings.RenderType == 'Classic':
+    if settings.RenderType == 'Classic':
         self.ui.renderTypeCombo.setCurrentIndex(0)
-    elif self.settings.RenderType == 'Optimized':
+    elif settings.RenderType == 'Optimized':
         self.ui.renderTypeCombo.setCurrentIndex(1)
     else:
         self.ui.renderTypeCombo.setCurrentIndex(2)
@@ -191,16 +126,97 @@ def onApplicationStart(self):
         self.ui.label_3.hide()
         self.ui.sceneChangeSensativityButton.hide()
         self.ui.sceneChangeLineEdit.hide()
+    self.videoQuality = settings.videoQuality
+    self.encoder = settings.Encoder
+    if os.path.exists(f"{settings.RenderDir}") == False:
+        settings.change_setting('RenderDir',f'{thisdir}')
     
-    self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
-    self.ui.frameIncrementSpinBox.setValue(int(settings.FrameIncrements))
-    self.ui.UHDResCutoffSpinBox.setValue(int(settings.UHDResCutOff))
-            
-    self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+    
     if settings.Notifications == 'Enabled':
         self.ui.NotificationsCheckBox.setChecked(True)
     else:
         self.ui.NotificationsCheckBox.setChecked(False)
+
+    if settings.DiscordRPC == 'Enabled':
+        self.ui.DiscordRPCBox.setChecked(True)
+        
+    else:
+        self.ui.DiscordRPCBox.setChecked(False)
+
+    self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
+    self.ui.defaultRifeModel.setCurrentText(f'{settings.DefaultRifeModel}')
+    self.ui.OutputDirectoryLabel.setText(settings.OutputDir)
+    self.ui.frameIncrementSpinBox.setValue(int(settings.FrameIncrements))
+    self.ui.UHDResCutoffSpinBox.setValue(int(settings.UHDResCutOff))
+    self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
+    self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
+    self.gpuMemory=settings.VRAM
+    if self.gpuMemory != 'None':
+        
+        self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
+        
+    else:
+        if settings.VRAM == 'None':
+            cannot_detect_vram(self)
+        self.ui.gpuThreadingSpinBox.setValue(1)
+def onApplicationStart(self):
+    
+    #this is kind of a mess
+    import modules.Rife as rife
+    import modules.ESRGAN as esrgan
+    from PyQt5.QtGui import QIntValidator, QIcon
+    thisdir = src.programData.thisdir.thisdir()
+    self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
+    set_model_params(self)
+    #get esrgan models
+    if not (self.ui.RealESRGANCheckBox.isChecked()):
+        self.ui.ESRGANModelSelectButton.hide()
+        self.ui.label_20.hide()
+        self.ui.esrganHelpModel.hide()
+    else:
+        self.ui.ESRGANModelSelectButton.show()
+        self.ui.label_20.show()
+        self.ui.esrganHelpModel.show()
+    self.input_file = ''
+    
+    self.setWindowIcon(QIcon(f'{thisdir}/icons/logo v1.png'))
+    
+    
+    
+    
+    self.switchUI()
+
+    
+
+    
+    
+    if  checks.check_for_updated_binary('rife-ncnn-vulkan',True) == 0:
+        outdated_binary(self,'rife-ncnn-vulkan')  
+    
+    self.ui.installModelsProgressBar.setMaximum(100)
+        
+    self.ui.gpuThreadingSpinBox.setMinimum(1)
+    
+    #Define Variables
+    self.input_file = ''
+    self.output_folder = ''
+    
+    
+    
+    
+    self.ui.InstallModelsFrame.hide()
+    self.ui.RifeResume.hide()
+    self.ui.RifePause.hide()
+    
+    
+    
+    os.system('ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0') #Enables discord RPC on flatpak
+    onlyInt = QIntValidator()
+    onlyInt.setRange(0, 9)
+    self.ui.sceneChangeLineEdit.setValidator(onlyInt)
+    
+    
+    
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
     self.ui.GeneralOptionsFrame.hide()
@@ -211,18 +227,23 @@ def onApplicationStart(self):
     self.ui.QueueListWidget.hide()
     self.QueueList=[]
     self.setDirectories()
-    self.ui.imageComboBox.setCurrentText(f'{settings.Image_Type}')
+    
     
     # list every model downloaded, and add them to the list
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()
 
-    #set default model in settings
-    self.ui.defaultRifeModel.setCurrentText(f'{settings.DefaultRifeModel}')
+    # call settings specific changes to GUI
+    settingsStart(self)
+    
     
 def set_model_params(self):
+    """
+    Sets up individual models in gui, and if they exist, adds them to their respective category.
+    
+    
+    """
     models_installed = checks.check_for_individual_models()
-    settings = Settings()
     self.model_labels = {}
     self.ui.RifeSettings.setEnabled(False)
     for i in models_installed:
@@ -265,6 +286,20 @@ def set_model_params(self):
         for key,value in self.model_labels.items():
             if value == 'upscaling':
                 self.ui.modeCombo.addItem('Upscaling')
+                break
+    if 'Interpolation and Upscaling' not in upscale_list:
+        interp_bool = False
+        upscale_bool = False
+
+        for key,value in self.model_labels.items():
+            
+
+            if value == 'upscaling':
+                upscale_bool = True
+            if value == 'interpolation':
+                interp_bool = True 
+            if interp_bool == True and upscale_bool == True:
+                self.ui.modeCombo.addItem('Interpolation and Upscaling')
                 break
 
     self.switchMode()
