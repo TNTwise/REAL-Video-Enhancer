@@ -82,10 +82,16 @@ def bindButtons(self):
 def settingsStart(self):
     settings = Settings()
     self.settings = Settings()
+    
+    self.videoQuality = settings.videoQuality
+    self.encoder = settings.Encoder
+    
     if settings.SceneChangeMethod == 'ffmpeg':
         self.ui.sceneChangeMethodComboBox.setCurrentIndex(0)
+        
     if settings.SceneChangeMethod == 'pyscenedetect':
         self.ui.sceneChangeMethodComboBox.setCurrentIndex(1)
+        
     self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
     if self.encoder == '264':
         self.ui.EncoderCombo.setCurrentIndex(0)
@@ -126,8 +132,7 @@ def settingsStart(self):
         self.ui.label_3.hide()
         self.ui.sceneChangeSensativityButton.hide()
         self.ui.sceneChangeLineEdit.hide()
-    self.videoQuality = settings.videoQuality
-    self.encoder = settings.Encoder
+    
     if os.path.exists(f"{settings.RenderDir}") == False:
         settings.change_setting('RenderDir',f'{thisdir}')
     
@@ -159,6 +164,21 @@ def settingsStart(self):
         if settings.VRAM == 'None':
             cannot_detect_vram(self)
         self.ui.gpuThreadingSpinBox.setValue(1)
+
+def hideChainModeButtons(self):
+    self.ui.TimesInterpolationLabel.hide()
+    self.ui.TimesInterpolationComboBox.hide()
+    self.ui.TimesUpscaleComboBox.hide()
+    self.ui.TimesUpscalingLabel.hide()
+    self.ui.ModelInterpolationComboBox.hide()
+    self.ui.ModelInterpolationLabel.hide()
+    self.ui.ModelUpscalingComboBox.hide()
+    self.ui.ModelUpscalingLabel.hide()
+    self.ui.AIInterpolationComboBox.hide()
+    self.ui.AIInterpolationLabel.hide()
+    self.ui.AIUpscalingComboBox.hide()
+    self.ui.AIUpscalingLabel.hide()
+
 def onApplicationStart(self):
     
     #this is kind of a mess
@@ -168,6 +188,7 @@ def onApplicationStart(self):
     thisdir = src.programData.thisdir.thisdir()
     self.ui.AICombo.clear() # needs to be in this order, before SwitchUI is called
     set_model_params(self)
+    hideChainModeButtons(self)
     #get esrgan models
     if not (self.ui.RealESRGANCheckBox.isChecked()):
         self.ui.ESRGANModelSelectButton.hide()
