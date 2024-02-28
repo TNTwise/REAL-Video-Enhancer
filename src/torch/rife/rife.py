@@ -2,7 +2,7 @@ import os
 import torch
 import numpy as np
 
-from src.downloadModels import downloadModels, weightsDir
+
 from torch.nn import functional as F
 
 
@@ -13,10 +13,10 @@ class Rife:
         half,
         width,
         height,
-        UHD,
         interpolate_method,
         ensemble=False,
         nt=1,
+        UHD=False,
     ):
         self.interpolation_factor = interpolation_factor
         self.half = half
@@ -39,10 +39,9 @@ class Rife:
             
         
         filenameWithoutExtension = os.path.splitext(self.filename)[0]
-        if not os.path.exists(os.path.join(weightsDir, "rife", filenameWithoutExtension, "flownet.pkl")):
-            modelDir = os.path.dirname(downloadModels(self.interpolate_method))
-        else:
-            modelDir = os.path.dirname(os.path.join(weightsDir, "rife", filenameWithoutExtension, "flownet.pkl"))
+        
+        
+        modelDir = os.path.dirname(os.path.join('', "rife", 'rife414', "flownet.pkl"))
 
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")

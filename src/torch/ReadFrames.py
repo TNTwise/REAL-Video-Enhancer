@@ -51,8 +51,10 @@ class ReadBuffer:
     def render(self):
         frame = self.readBuffer.get() if not self.readBuffer.empty() else None
         procInterp = Interp()
+       
         while True:
            procInterp.processFrame(frame)
            
 readbuffer = ReadBuffer('test.webm')
 readbuffer.start()
+readbuffer.render()
