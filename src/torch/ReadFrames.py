@@ -2,6 +2,7 @@ import subprocess
 import numpy as np
 from queue import Queue
 from RenderFrames import *
+from threading import Thread
 class ReadBuffer:
     def __init__(self,video_path):
         self.video_path = video_path
@@ -50,11 +51,13 @@ class ReadBuffer:
             self.readBuffer.put(None)
     def render(self):
         frame = self.readBuffer.get() if not self.readBuffer.empty() else None
-        procInterp = Interp()
+        procInterp = Interp() # calls interp, which inturn calls writebuffer and Rife
        
         while True:
            procInterp.processFrame(frame)
            
-readbuffer = ReadBuffer('test.webm')
+readbuffer = ReadBuffer('test.mp4')
 readbuffer.start()
-readbuffer.render()
+renderThread = Thread(target=readbuffer.render)
+renderThread.start()
+
