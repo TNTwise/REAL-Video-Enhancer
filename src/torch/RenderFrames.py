@@ -1,6 +1,6 @@
 from rife.rife import *
 
-class ProcessInterp:
+class Interp:
     def __init__(self):
         self.interpolate_factor = 2
         self.interpolate_process = Rife()
@@ -24,3 +24,6 @@ class ProcessInterp:
             print(f"Something went wrong while processing the frames, {e}")
         finally:
             self.semaphore.release()
+
+
+    

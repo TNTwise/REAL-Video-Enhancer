@@ -743,6 +743,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifeResume.hide()
             self.ui.QueueButton.hide()
             self.ui.centerLabel.show()
+            self.greyOutRealSRTimes()
             self.addLinetoLogs(f'Finished! Output video: {self.output_file}')
             self.setDisableEnable(False)
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
@@ -756,7 +757,6 @@ class MainWindow(QtWidgets.QMainWindow):
             hours,minutes,seconds=convertTime(remaining_time)
             
             self.addLinetoLogs(f'Total Time: {hours}:{minutes}:{seconds}')
-            self.greyOutRealSRTimes()
         
         
         

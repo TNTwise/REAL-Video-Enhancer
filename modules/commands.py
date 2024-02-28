@@ -206,7 +206,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
                 if self.localFile == True or self.youtubeFile == False:
-                        thread.log.emit('Extracting Audio')
+                        thread.log.emit('[Extracting Audio]')
                         os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
                 else:
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')

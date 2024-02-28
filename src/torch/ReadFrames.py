@@ -1,7 +1,7 @@
 import subprocess
 import numpy as np
 from queue import Queue
-
+from RenderFrames import *
 class ReadBuffer:
     def __init__(self,video_path):
         self.video_path = video_path
@@ -48,6 +48,11 @@ class ReadBuffer:
             
             self.readingDone = True
             self.readBuffer.put(None)
-
+    def render(self):
+        frame = self.readBuffer.get() if not self.readBuffer.empty() else None
+        procInterp = Interp()
+        while True:
+           procInterp.processFrame(frame)
+           
 readbuffer = ReadBuffer('test.webm')
 readbuffer.start()
