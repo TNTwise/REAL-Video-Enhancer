@@ -35,6 +35,22 @@ class WriteFrames:
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
             )
+        writtenFrames = 0
+        self.isWritingDone = False
+        while True:
+                frame = self.writeBuffer.get()
+                if frame is None:
+                   
+
+                    self.process.stdin.close()
+                    self.process.wait()
+                    self.isWritingDone = True
+                    break
+
+                frame = np.ascontiguousarray(frame)
+                self.process.stdin.buffer.write(frame.tobytes())
+                writtenFrames += 1
+
     def write(self, frame: np.ndarray):
         """
         Add a frame to the queue. Must be in RGB format.
