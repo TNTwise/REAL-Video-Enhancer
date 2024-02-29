@@ -6,7 +6,7 @@
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
 ### Join the discord
  - Join the <a href="https://discord.gg/YHM7nFheyM">TAS discord!</a> https://github.com/NevermindNilas/TheAnimeScripter
- - Report bugs and provide feedback in the real-video-enhancer-feedback channel.
+ - Report bugs and provide feedback in the rve-feedback channel.
 ### Now out on flathub!
 <a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer</a>
 <p align=center>
