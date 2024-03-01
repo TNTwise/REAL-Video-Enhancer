@@ -5,18 +5,35 @@ from queue import Queue
 from rife.rife import *
 import sys
 from threading import Thread
+import cv2
 #read
 
 #def
 class Render:
-    def __init__(self):
+    def __init__(self,input_file):
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
         self.interpolation_factor = 10
         self.prevFrame = None
-
+        cap = cv2.VideoCapture(input_file)
+        self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
+        self.finalFPS = self.initialFPS*self.interpolation_factor
+        self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.input_file = input_file
     def extractFramesToBytes(self):
-        command = ['ffmpeg', '-i', 'out.mp4', '-f', 'image2pipe', '-ss', '00:00:00', '-pix_fmt', 'rgb24', '-vcodec', 'rawvideo','-s','1280x720', '-']
+        command = [f'ffmpeg', 
+                   '-i', 
+                   f'{self.input_file}', 
+                   '-f',
+                   'image2pipe',
+                   '-pix_fmt', 
+                   'rgb24', 
+                   '-vcodec',
+                   'rawvideo',
+                   '-s',
+                   f'{self.width}x{self.height}',
+                   '-']
         self.interpolate_process = Rife( interpolation_factor = self.interpolation_factor,
                 interpolate_method = 'rife4.14',
                 width=1280,
@@ -34,10 +51,10 @@ class Render:
         
     def readThread(self):
         while True:
-                print('reading')
+                
                 chunk = self.process.stdout.read(self.frame_size)
                 if len(chunk) < self.frame_size:
-                    print('Done reading')
+                    
                     self.process.stdout.close()
                     self.process.terminate()
                     self.readingDone = True
@@ -57,7 +74,7 @@ class Render:
 #proc
     
     def proc_image(self,frame1,frame2):
-        print('processing')
+        
         self.interpolate_process.run(frame1, frame2)
         self.writeBuffer.put(frame1)
         for i in range(self.interpolation_factor - 1):
@@ -92,7 +109,21 @@ class Render:
 
     def FFmpegOut(self):
         print('saving')
-        command = ['ffmpeg', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-vcodec', 'rawvideo','-s','1280x720','-r','10', '-i', '-', 'out1.mp4', '-y']
+        command = ['ffmpeg',
+                   '-f', 
+                   'rawvideo',
+                   '-pix_fmt',
+                   'rgb24',
+                   '-vcodec', 
+                   'rawvideo',
+                   '-s',
+                   f'{self.width}x{self.height}',
+                   '-r',
+                   f'{self.finalFPS}',
+                   '-i',
+                   '-',
+                   'out1.mp4',
+                   '-y']
         process = subprocess.Popen(
                     command,
                     stdin=subprocess.PIPE,
@@ -120,7 +151,7 @@ class Render:
     
 
 
-render = Render()
+render = Render('temp.webm')
 render.extractFramesToBytes()
 readThread1 = Thread(target=render.readThread)
 procThread1 = Thread(target=render.procThread)
