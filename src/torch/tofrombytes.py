@@ -47,7 +47,7 @@ class Render:
                         stderr=subprocess.DEVNULL,
                         
                     )
-        self.frame_size = 1280 * 720 * 3
+        self.frame_size = self.width * self.height * 3
         
         
     def readThread(self):
@@ -63,7 +63,7 @@ class Render:
                     print('done with read')
                     break
                 frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
-                                    (720, 1280, 3)
+                                    (self.width, self.height, 3)
                                 )
                                 
                 self.readBuffer.put(frame)
