@@ -63,7 +63,7 @@ class Render:
                     print('done with read')
                     break
                 frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
-                                    (self.width, self.height, 3)
+                                    (self.height, self.width, 3)
                                 )
                                 
                 self.readBuffer.put(frame)
