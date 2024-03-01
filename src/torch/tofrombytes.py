@@ -7,13 +7,14 @@ import sys
 from threading import Thread
 import cv2
 #read
-
+# Calculate eta by time remaining divided by speed
+# add scenedetect by if frame_num in transitions in proc_frames
 #def
 class Render:
     def __init__(self,input_file):
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        self.interpolation_factor = 10
+        self.interpolation_factor = 2
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
@@ -78,11 +79,12 @@ class Render:
         self.interpolate_process.run(frame1, frame2)
         self.writeBuffer.put(frame1)
         for i in range(self.interpolation_factor - 1):
+                    
                     result = self.interpolate_process.make_inference(
                                     (i + 1) * 1.0 / (self.interpolation_factor + 1)
                                 )
                     self.writeBuffer.put(result)
-        self.writeBuffer.put(frame2)
+        
         
     def procThread(self):
         while True:
@@ -95,7 +97,7 @@ class Render:
                 self.prevFrame = frame
                 continue
             self.proc_image(self.prevFrame,frame)
-            
+            self.prevFrame = frame
     
     
     def finish_render(self):
@@ -122,7 +124,7 @@ class Render:
                    f'{self.finalFPS}',
                    '-i',
                    '-',
-                   'out1.mp4',
+                   f'{os.path.basename(self.input_file)}_60fps.mp4',
                    '-y']
         process = subprocess.Popen(
                     command,
@@ -151,7 +153,7 @@ class Render:
     
 
 
-render = Render('temp.webm')
+render = Render('temp.mp4')
 render.extractFramesToBytes()
 readThread1 = Thread(target=render.readThread)
 procThread1 = Thread(target=render.procThread)
