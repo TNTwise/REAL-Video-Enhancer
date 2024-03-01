@@ -14,7 +14,7 @@ class Render:
     def __init__(self,input_file):
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        self.interpolation_factor = 2
+        self.interpolation_factor = 10
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
@@ -37,8 +37,8 @@ class Render:
                    '-']
         self.interpolate_process = Rife( interpolation_factor = self.interpolation_factor,
                 interpolate_method = 'rife4.14',
-                width=1280,
-                height=720,
+                width=self.width,
+                height=self.height,
                 half=True)
                 
         self.process = subprocess.Popen(
@@ -91,6 +91,7 @@ class Render:
             frame = self.readBuffer.get()
             if frame is None:
                 print('done with proc')
+                self.writeBuffer.put(self.prevFrame)
                 self.writeBuffer.put(None)
                 break # done with proc
             if self.prevFrame is None:
@@ -153,7 +154,7 @@ class Render:
     
 
 
-render = Render('HunterHunter2011-OP1v2.webm')
+render = Render('out.mp4')
 render.extractFramesToBytes()
 readThread1 = Thread(target=render.readThread)
 procThread1 = Thread(target=render.procThread)
