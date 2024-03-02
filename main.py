@@ -67,6 +67,9 @@ import magic
 from PIL import Image
 import src.runAI.FPS as FPS
 from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtGui import QPixmap, QImage
+import numpy as np
+import matplotlib.pyplot as plt
 def switch_theme(value):
     
     settings = Settings()
@@ -481,24 +484,51 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Final resets
         
-        
+    def numpy_array_to_pixmap(self, numpy_array):
+        # Ensure that the array is contiguous in memory
+        numpy_array = np.ascontiguousarray(numpy_array)
+
+        # Normalize the array data to 0-255
+        normalized_array = ((numpy_array - numpy_array.min()) / (numpy_array.max() - numpy_array.min()) * 255).astype(np.uint8)
+
+        # Create a QImage from the numpy array
+        height, width, channel = normalized_array.shape
+        q_image = QImage(normalized_array.data, width, height, channel * width, QImage.Format_RGB888)
+
+        # Convert QImage to QPixmap
+        pixmap = QPixmap.fromImage(q_image)
+        return pixmap
        
     def imageViewer(self,step):
         if step == '1':
             self.ui.centerLabel.hide()
             self.ui.imageSpacerFrame.hide()
-            try:
-                img = Image.open(self.imageDisplay)
+            if '-ncnn-vulkan' in self.AI:
                 try:
-                    img.verify()
+                    img = Image.open(self.imageDisplay)
+                    try:
+                        img.verify()
+                    except:
+                        return
+                    self.pixMap = QPixmap(self.imageDisplay)
                 except:
-                    return
-                self.pixMap = QPixmap(self.imageDisplay)
-            except:
-                print('Cannot open image!')
+                    print('Cannot open image!')
+            if 'cuda' in self.AI:
+
+                try:    
+                    image = self.numpy_array_to_pixmap(self.imageDisplay)
+                    self.pixMap = image
+                except Exception as e:
+                    traceback_info = traceback.format_exc()
+                    print(f'noimage {e} {traceback_info}')  
+                
         if step == '2':
-            self.pixMap = self.pixMap.scaled(self.width1,self.height1)
-            self.ui.imagePreview.setPixmap(self.pixMap) # sets image preview image
+            try:
+                self.pixMap = self.pixMap.scaled(self.width1,self.height1)
+                self.ui.imagePreview.setPixmap(self.pixMap) # sets image preview image
+            except Exception as e:
+                print(f'Something went wrong with image preview pixmap: {e}')
+
         if step == '3':
             self.ui.imageSpacerFrame.show()
 

@@ -153,6 +153,15 @@ def get_video_from_link(self,thread):
                                 file.write(chunk)
 
 def extractAudio(self,videopath,renderdir,videoName,thread):
+        self.file_drop_widget.hide()
+        video = cv2.VideoCapture(self.input_file)
+        try:
+                        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+                        
+                        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+                        self.aspectratio = self.videowidth / self.videoheight
+        except:
+                        self.aspectratio = 1920 / 1080
         if self.localFile == True or self.youtubeFile == False:
                         thread.log.emit('[Extracting Audio]')
                         os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
@@ -172,7 +181,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 if check_for_write_permissions(settings.OutputDir) == False:
                 
                         self.showDialogBox(f'{e}\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory.')
-                self.file_drop_widget.hide()
+                
                 # i need to clean this up lol
                 os.system(f'rm -rf "{settings.RenderDir}/{videoName}_temp/"')
                 #Gets the width and height
@@ -186,14 +195,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 # Calculate the aspect ratio
                 self.videoName = videoName
                 
-                video = cv2.VideoCapture(self.input_file)
-                try:
-                        self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-                        
-                        self.videoheight = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-                        self.aspectratio = self.videowidth / self.videoheight
-                except:
-                        self.aspectratio = 1920 / 1080
+                
                         #gets the fps
                 
                 

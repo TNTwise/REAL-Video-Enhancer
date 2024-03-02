@@ -8,6 +8,8 @@ thisdir = thisdir()
 import sys
 from threading import Thread
 import cv2
+import matplotlib.pyplot as plt
+import io
 #read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -90,31 +92,40 @@ class Render:
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
                                 )
+                    self.main.imageDisplay=result
                     self.writeBuffer.put(result)
         
         
     def procThread(self):
+        i=0
         while True:
             frame = self.readBuffer.get()
-            self.main.imageDisplay=frame
+            
             if frame is None:
                 print('done with proc')
                 self.writeBuffer.put(self.prevFrame)
                 self.writeBuffer.put(None)
                 break # done with proc
+
             if self.prevFrame is None:
                 self.prevFrame = frame
                 continue
+            self.main.imageDisplay=frame
+            plt.imsave(f'{i}.png',self.main.imageDisplay)
+            
+
             self.proc_image(self.prevFrame,frame)
             self.prevFrame = frame
-    
+            i+=1
     
     def finish_render(self):
         self.writeBuffer.put(None)
 
     def returnLatestFrame(self):
-        if self.prevFrame != None: return np.ascontiguousarray(self.prevFrame).tobytes()
-
+        try:
+            return self.prevFrame
+        except:
+            print('No frame to return!')
         
     
 # save
@@ -149,12 +160,13 @@ class Render:
                 try:
                     frame = self.writeBuffer.get()
                     if frame is None:
-                            self.main.output_file = self.output_file
-                            self.main.CudaRenderFinished = True
+                            
                             
                             process.stdin.close()
                             process.wait()
                             print('done with save')
+                            self.main.output_file = self.output_file
+                            self.main.CudaRenderFinished = True
                             break
                     frame = np.ascontiguousarray(frame)
                     process.stdin.buffer.write(frame.tobytes())
@@ -168,7 +180,8 @@ def startRender(self,inputFile,outputFile,times):
     render.extractFramesToBytes()
     readThread1 = Thread(target=render.readThread)
     procThread1 = Thread(target=render.procThread)
+    renderThread1 = Thread(target=render.FFmpegOut)
     readThread1.start()
     procThread1.start()
-    render.FFmpegOut()
+    renderThread1.start()
     
