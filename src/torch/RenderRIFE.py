@@ -13,7 +13,10 @@ import cv2
 # add scenedetect by if frame_num in transitions in proc_frames
 #def
 class Render:
-    def __init__(self,input_file,output_file,times):
+    def __init__(self,main,input_file,output_file,times):
+        
+        self.main = main
+        
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
         times = 2
@@ -93,6 +96,7 @@ class Render:
     def procThread(self):
         while True:
             frame = self.readBuffer.get()
+            self.main.imageDisplay=frame
             if frame is None:
                 print('done with proc')
                 self.writeBuffer.put(self.prevFrame)
@@ -145,6 +149,8 @@ class Render:
                 try:
                     frame = self.writeBuffer.get()
                     if frame is None:
+                            self.main.output_file = self.output_file
+                            self.main.CudaRenderFinished = True
                             
                             process.stdin.close()
                             process.wait()
@@ -157,8 +163,8 @@ class Render:
         
             
             
-def startRender(inputFile,outputFile,times):
-    render = Render(inputFile,outputFile,int(times))
+def startRender(self,inputFile,outputFile,times):
+    render = Render(self,inputFile,outputFile,int(times))
     render.extractFramesToBytes()
     readThread1 = Thread(target=render.readThread)
     procThread1 = Thread(target=render.procThread)

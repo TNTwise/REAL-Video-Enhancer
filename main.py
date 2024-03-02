@@ -738,6 +738,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.SettingsMenus.setDisabled(mode)
         self.ui.modeCombo.setDisabled(mode)
     def endRife(self): # Crashes most likely due to the fact that it is being ran in a different thread
+
+        if 'cuda' in self.AI:
+            while self.CudaRenderFinished == False:
+                sleep(1)
         if len(self.QueueList) == 0:
             self.file_drop_widget.show()
             self.ui.QueueListWidget.hide()
@@ -755,7 +759,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
             self.ui.ETAPreview.setText('ETA: 00:00:00')
             self.ui.imagePreview.clear()
-            self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
+            if 'cuda' in self.AI:
+                self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
             
             remaining_time = int(time.time() - self.start_time) 

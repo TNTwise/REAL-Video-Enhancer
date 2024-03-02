@@ -130,7 +130,15 @@ class pb2X(QObject):
                             #log('No render folder exists!') 
                             #print('No render folder exists!')             
             if 'cuda' in self.main.AI:
-                
+                self.main.CudaRenderFinished = False
+                self.main.imageDisplay = None
+                try:
+                    while self.main.CudaRenderFinished == False:
+                        if self.main.imageDisplay != None:
+                            self.image_progress.emit('1')
+                            self.image_progress.emit('2')
+                except Exception as e:
+                     log(f'Something went wrong with CUDA render: {e}')
                 print('CUDA render finished')     
                         
                     
@@ -461,8 +469,9 @@ class interpolation(QObject):
                 
                 if 'cuda' in self.main.AI:
                     output_file = returnOutputFile(self.main,self.main.videoName,self.main.encoder)
-                    print(output_file)
-                    RifeCUDA.startRender(self.main.input_file,output_file,self.main.times)
+                    
+                    RifeCUDA.startRender(self.main,self.main.input_file,output_file,self.main.times)
+                    self.main.output_file = output_file
                     print('Done')
 
                 self.finished.emit()
