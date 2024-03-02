@@ -162,8 +162,7 @@ def startRender(inputFile,outputFile,times):
     render.extractFramesToBytes()
     readThread1 = Thread(target=render.readThread)
     procThread1 = Thread(target=render.procThread)
-    saveThread1 = Thread(target=render.FFmpegOut)
     readThread1.start()
     procThread1.start()
-    saveThread1.start()
+    render.FFmpegOut()
     

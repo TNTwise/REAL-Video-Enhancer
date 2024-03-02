@@ -19,7 +19,7 @@ import os
 from modules.commands import *
 import math
 import src.programData.checks as checks
-
+import src.torch.RenderRIFE as RifeCUDA
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 class pb2X(QObject):
@@ -38,97 +38,100 @@ class pb2X(QObject):
         self.settings = Settings()
         log('Start Progressbar/Info Thread')
         try:
-            while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
-                sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
-            
+            if '-ncnn-vulkan' in self.main.AI:
+                while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == False:
+                    sleep(.1) # has to refresh quickly or small files that interpolate fast do not work
+                
 
-            total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
-            total_output_files = total_input_files * self.main.times
-            # fc is the total file count after interpolation
-            #Could use this instead of just os.listdir
-            
-            
-            while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
-                    if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
-                        try:
-                            if self.settings.RenderType == 'Optimized (Incremental)':
-                                try:
-                                    files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
-                                    files_processed.sort()
-                                    files_processed = files_processed[-1]
-                                    files_processed = files_processed.replace(self.settings.Image_Type,'')
-                                    files_processed = int(files_processed)
-                                    self.main.files_processed = int((len(os.listdir(f"{self.settings.RenderDir}/{self.videoName}_temp/output_frames/"))-1)/interpolation_sessions*total_output_files)
-                                    
-                                except:
-                                    #print('i really gotta fix this')
-                                    pass
-                            if self.settings.RenderType == 'Optimized':
-                                try:
-                                    files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
-                                    files_processed.sort()
-                                    files_processed = files_processed[-1]
-                                    files_processed = files_processed.replace(self.settings.Image_Type,'')
-                                    files_processed = int(files_processed)
-                                    self.main.files_processed = files_processed
-                                except Exception as e:
-                                    self.main.files_processed = 0
-                                    tb = traceback.format_exc()
-                                    #print(f'{e},{tb}')
-
-                            else:
-                                files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
-                                self.main.files_processed = files_processed
-                                
+                total_input_files = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/input_frames/'))
+                total_output_files = total_input_files * self.main.times
+                # fc is the total file count after interpolation
+                #Could use this instead of just os.listdir
+                
+                
+                while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
+                        if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                             try:
-                                self.progress.emit(self.main.files_processed)
-                            except Exception as e:
-                                #print(e)
-                                pass
-                                
-                            sleep(.1)
-                            
-                            self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
-                            if self.main.imageDisplay != None:
+                                if self.settings.RenderType == 'Optimized (Incremental)':
+                                    try:
+                                        files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                        files_processed.sort()
+                                        files_processed = files_processed[-1]
+                                        files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                        files_processed = int(files_processed)
+                                        self.main.files_processed = int((len(os.listdir(f"{self.settings.RenderDir}/{self.videoName}_temp/output_frames/"))-1)/interpolation_sessions*total_output_files)
+                                        
+                                    except:
+                                        #print('i really gotta fix this')
+                                        pass
+                                if self.settings.RenderType == 'Optimized':
+                                    try:
+                                        files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
+                                        files_processed.sort()
+                                        files_processed = files_processed[-1]
+                                        files_processed = files_processed.replace(self.settings.Image_Type,'')
+                                        files_processed = int(files_processed)
+                                        self.main.files_processed = files_processed
+                                    except Exception as e:
+                                        self.main.files_processed = 0
+                                        tb = traceback.format_exc()
+                                        #print(f'{e},{tb}')
 
+                                else:
+                                    files_processed = len(os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/'))
+                                    self.main.files_processed = files_processed
+                                    
                                 try:
-                                    if os.path.exists(self.main.imageDisplay):
-                                        self.image_progress.emit('1')
-                                        
-                                        width = self.main.width()
-                                        height = self.main.height()
-                                        
-                                        self.main.width1=int(width/1.6)
-                                        self.main.height1=int(self.main.width1/self.main.aspectratio)
-                                        if self.main.height1 >= height/1.6:
-                                            
-                                            self.main.height1=int(height/1.6)
-                                            self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                        try:
-                                            if os.path.exists(self.main.imageDisplay):
-                                                
-                                                
-                                                
-                                                self.image_progress.emit('2')
-                                                
-                                        except Exception as e:
-                                            traceback_info = traceback.format_exc()
-                                            log(f'{e} {traceback_info}')
-                                            pass
+                                    self.progress.emit(self.main.files_processed)
                                 except Exception as e:
+                                    #print(e)
+                                    pass
                                     
-                                    traceback_info = traceback.format_exc()
-                                    log(f'{e} {traceback_info}')
-                                    self.image_progress.emit('3')
-                        except Exception as e:
-                                    
-                                    traceback_info = traceback.format_exc()
-                                    log(f'{e} {traceback_info}')
-                    else:
-                        pass
-                        #log('No render folder exists!') 
-                        #print('No render folder exists!')             
-                            
+                                sleep(.1)
+                                
+                                self.main.imageDisplay=f'{self.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(files_processed).zfill(8)}{self.settings.Image_Type}' # sets behind to stop corrupted jpg error
+                                if self.main.imageDisplay != None:
+
+                                    try:
+                                        if os.path.exists(self.main.imageDisplay):
+                                            self.image_progress.emit('1')
+                                            
+                                            width = self.main.width()
+                                            height = self.main.height()
+                                            
+                                            self.main.width1=int(width/1.6)
+                                            self.main.height1=int(self.main.width1/self.main.aspectratio)
+                                            if self.main.height1 >= height/1.6:
+                                                
+                                                self.main.height1=int(height/1.6)
+                                                self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
+                                            try:
+                                                if os.path.exists(self.main.imageDisplay):
+                                                    
+                                                    
+                                                    
+                                                    self.image_progress.emit('2')
+                                                    
+                                            except Exception as e:
+                                                traceback_info = traceback.format_exc()
+                                                log(f'{e} {traceback_info}')
+                                                pass
+                                    except Exception as e:
+                                        
+                                        traceback_info = traceback.format_exc()
+                                        log(f'{e} {traceback_info}')
+                                        self.image_progress.emit('3')
+                            except Exception as e:
+                                        
+                                        traceback_info = traceback.format_exc()
+                                        log(f'{e} {traceback_info}')
+                        else:
+                            pass
+                            #log('No render folder exists!') 
+                            #print('No render folder exists!')             
+            if 'cuda' in self.main.AI:
+                
+                print('CUDA render finished')     
                         
                     
             sleep(1)
@@ -356,25 +359,27 @@ class interpolation(QObject):
         QThread.__init__(self, parent)
    
     def finishRenderSetup(self): #3rd and final call, called from interpolate.py
+            if 'cuda' in self.main.AI:
+                extractAudio(self.main,self.main.input_file,self.main.settings.RenderDir,self.main.videoName,self)
+            if '-ncnn-vulkan' in self.main.AI:
+                extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,self.main.times)
             
-            extractFramesAndAudio(self,self.main,self.main.settings.RenderDir,self.main.videoName,self.main.input_file,self.main.times)
-            
-            # run transition detection start
-            if self.main.AI == 'rife-ncnn-vulkan':
-                    if 'v4' in self.model:
-                         self.main.times=(self.main.ui.FPSTo.value()/self.main.ui.FPSFrom.value())
-            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and self.main.settings.Encoder != 'Lossless':
-                self.log.emit('Detecting Transitions')
-                
-                print(self.main.times)
-                self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
-                self.main.transitionDetection.find_timestamps()
-                self.main.transitionDetection.get_frame_num(self.main.times)
-                divisor=(self.main.times/2)
-                try:
-                    self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//divisor))}')
-                except:
-                    self.log.emit(f'Transitions detected: 0')
+                # run transition detection start
+                if self.main.AI == 'rife-ncnn-vulkan':
+                        if 'v4' in self.model:
+                            self.main.times=(self.main.ui.FPSTo.value()/self.main.ui.FPSFrom.value())
+                if self.main.settings.SceneChangeDetectionMode == 'Enabled' and self.main.settings.Encoder != 'Lossless':
+                    self.log.emit('Detecting Transitions')
+                    
+                    print(self.main.times)
+                    self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
+                    self.main.transitionDetection.find_timestamps()
+                    self.main.transitionDetection.get_frame_num(self.main.times)
+                    divisor=(self.main.times/2)
+                    try:
+                        self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//divisor))}')
+                    except:
+                        self.log.emit(f'Transitions detected: 0')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
     import math
     def Render(self,model,times,videopath,outputpath):
@@ -383,76 +388,83 @@ class interpolation(QObject):
                 settings=Settings()
                 self.log.emit(f'Starting {str(round(self.main.times,1))[:3]}X Render')
                 self.log.emit(f'Model: {self.main.ui.Rife_Model.currentText()}')
-                self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
-                
-                self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
-                
-                self.main.frame_increments_of_interpolation = int(calculateFrameIncrements(self))
-                vram = int(calculateVRAM(self))
-                
-                
-                if self.main.AI == 'rife-ncnn-vulkan':
+                if '-ncnn-vulkan' in self.main.AI:
+                    self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/'))
                     
-                    if int(self.main.videoheight) > int(settings.UHDResCutOff):
-                        uhd_mode = '-u'
-                    else:
-                        uhd_mode = ''
+                    self.main.frame_count = self.input_frames * self.main.times # frame count of video multiplied by times 
                     
-                    command = [
-    f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
-    '-m', self.model,
-    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
-    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'{math.ceil(vram/4)}:{vram}:{math.ceil(vram/4)+1}',
-    '-f', f'%08d{self.main.settings.Image_Type}',
-    '-g', f'{self.main.ui.gpuIDSpinBox.value()}',
-    f'{uhd_mode}',
+                    self.main.frame_increments_of_interpolation = int(calculateFrameIncrements(self))
+                    vram = int(calculateVRAM(self))
+                    
+                    
+                    if self.main.AI == 'rife-ncnn-vulkan':
+                        
+                        if int(self.main.videoheight) > int(settings.UHDResCutOff):
+                            uhd_mode = '-u'
+                        else:
+                            uhd_mode = ''
+                        
+                        command = [
+        f'{settings.ModelDir}/rife/rife-ncnn-vulkan',
+        '-m', self.model,
+        '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
+        '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
+        '-j', f'{math.ceil(vram/4)}:{vram}:{math.ceil(vram/4)+1}',
+        '-f', f'%08d{self.main.settings.Image_Type}',
+        '-g', f'{self.main.ui.gpuIDSpinBox.value()}',
+        f'{uhd_mode}',
+        ]
+        
+                        if 'v4' in model:
+                            command.append('-n')
+                            command.append(str(math.ceil(self.input_frames * times)))
+                            print(command)
+                        if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
+                            
+
+                            optimized_render(self,command)
+                        
+                        else:
+                            render(self,command)
+                        
+
+                    if self.main.AI == 'ifrnet-ncnn-vulkan':               
+                        
+                        command = [
+    f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
+
+        '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
+        '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
+        '-j', f'1:{vram}:2',
+        '-f', f'%08d{self.main.settings.Image_Type}',
+        '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}',
+        '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
     ]
-    
-                    if 'v4' in model:
-                         command.append('-n')
-                         command.append(str(math.ceil(self.input_frames * times)))
-                         print(command)
-                    if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
                         
+                        if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
+                            
 
-                        optimized_render(self,command)
-                    
-                    else:
-                        render(self,command)
-                    
-
-                if self.main.AI == 'ifrnet-ncnn-vulkan':               
-                    
-                    command = [
-f'{settings.ModelDir}/ifrnet/ifrnet-ncnn-vulkan',
-
-    '-i', f'{settings.RenderDir}/{self.main.videoName}_temp/input_frames/',
-    '-o', f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/',
-    '-j', f'1:{vram}:2',
-    '-f', f'%08d{self.main.settings.Image_Type}',
-    '-m', f'{settings.ModelDir}ifrnet/{self.main.ui.Rife_Model.currentText()}',
-    '-g', f'{self.main.ui.gpuIDSpinBox.value()}'
-]
-                    
-                    if settings.RenderType == 'Optimized' and self.main.frame_count > self.main.frame_increments_of_interpolation and self.main.frame_increments_of_interpolation > 0:
+                            optimized_render(self,command)
                         
-
-                        optimized_render(self,command)
-                    
-                    else:
-                        render(self,command)
-            
-                if os.path.exists(f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/') == False:
-                    show_on_no_output_files(self.main)
+                        else:
+                            render(self,command)
                 
-                else:
-                    if settings.SceneChangeDetectionMode == 'Enabled':
-                        self.main.transitionDetection.merge_frames()
-                    if settings.RenderType != 'Optimized':
-                        self.log.emit("[Merging Frames]")
-                    self.main.output_file = end(self,self.main,settings.RenderDir,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
+                    if os.path.exists(f'{settings.RenderDir}/{self.main.videoName}_temp/output_frames/') == False:
+                        show_on_no_output_files(self.main)
                     
+                    else:
+                        if settings.SceneChangeDetectionMode == 'Enabled':
+                            self.main.transitionDetection.merge_frames()
+                        if settings.RenderType != 'Optimized':
+                            self.log.emit("[Merging Frames]")
+                        self.main.output_file = end(self,self.main,settings.RenderDir,self.main.videoName,videopath,times,outputpath, self.main.videoQuality,self.main.encoder)
+                
+                if 'cuda' in self.main.AI:
+                    output_file = returnOutputFile(self.main,self.main.videoName,self.main.encoder)
+                    print(output_file)
+                    RifeCUDA.startRender(self.main.input_file,output_file,self.main.times)
+                    print('Done')
+
                 self.finished.emit()
             
                 

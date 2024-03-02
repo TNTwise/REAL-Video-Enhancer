@@ -49,4 +49,5 @@ def modelOptions(self):
     except:
         pass
     self.ui.Rife_Model.addItems(['rife-4.14'])
-    self.ui.RifeStart.clicked.connect(lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times))
+    #lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
+    self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self,'rife-cuda'))

@@ -152,7 +152,13 @@ def get_video_from_link(self,thread):
                                 
                                 file.write(chunk)
 
-
+def extractAudio(self,videopath,renderdir,videoName,thread):
+        if self.localFile == True or self.youtubeFile == False:
+                        thread.log.emit('[Extracting Audio]')
+                        os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
+        else:
+                        os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
+                
 
 def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # called by workers.py after a started thread, used by both upscaling and interpolation
         try:
@@ -205,12 +211,8 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 global output 
                 print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
-                if self.localFile == True or self.youtubeFile == False:
-                        thread.log.emit('[Extracting Audio]')
-                        os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
-                else:
-                        os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-                
+                extractAudio(self,videopath,renderdir,videoName,thread)
+
                 global interpolation_sessions
                 self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))
                 global frame_count
@@ -225,7 +227,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 log(f'{e} {traceback_info}')
                 self.showDialogBox(str(f'{e}'))
 
-'''def returnOutputFile(self):
+def returnOutputFile(self,videoName,encoder):
         settings = Settings()
         if self.output_folder == '':
                         outputpath = settings.OutputDir
@@ -252,8 +254,8 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 else:
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
                 output_video_file=output_video_file.replace('#','')
-'''
 
+        return output_video_file
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()
         try:
@@ -285,6 +287,8 @@ def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,
                                 output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
                 output_video_file=output_video_file.replace('#','')
                 
+                if 'cuda' in self.AI:
+                        return output_video_file
                 
                 if settings.RenderType == 'Optimized' and os.path.exists(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/videos.txt'):
                         if os.path.isfile(f'{renderdir}/{videoName}_temp/audio.m4a'):

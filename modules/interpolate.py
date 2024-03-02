@@ -27,6 +27,9 @@ def initializeInterpolation(self,AI):#1st stage in preparing render, starts all 
         
 
         self.AI = AI
+        self.rifeThread = QThread()
+        model = self.ui.Rife_Model.currentText()
+        self.rifeWorker = workers.interpolation(self,model)         
         
         self.setDisableEnable(True)
         
@@ -41,17 +44,17 @@ def initializeInterpolation(self,AI):#1st stage in preparing render, starts all 
         self.ui.ETAPreview.setText('ETA:')
         self.ui.processedPreview.setText('Files Processed:')
                 
-        self.rifeThread = QThread()
+        
             # Step 3: Create a worker object
-        model = self.ui.Rife_Model.currentText()
+        
         #check if ensemble
-        if self.ui.EnsembleCheckBox.isChecked() == True and 'rife' in AI:
+        if self.ui.EnsembleCheckBox.isChecked() == True and 'rife-ncnn-vulkan' in AI:
             if os.path.exists(f'{settings.ModelDir}/rife/{model}-ensemble'):
                 model+='-ensemble'
             else:
                 ensembleModelDoesntExist(self)
                 
-        self.rifeWorker = workers.interpolation(self,model)        
+        
         
         self.ui.logsPreview.clear()
         
