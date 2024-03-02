@@ -1,7 +1,9 @@
 import os
 import torch
 import numpy as np
+import src.programData.thisdir
 
+thisdir = src.programData.thisdir.thisdir()
 
 from torch.nn import functional as F
 
@@ -41,7 +43,7 @@ class Rife:
         filenameWithoutExtension = os.path.splitext(self.filename)[0]
         
         
-        modelDir = os.path.dirname(os.path.join('', "rife", 'rife414', "flownet.pkl"))
+        modelDir = os.path.dirname(os.path.join(f'{thisdir}',"models", "rife-cuda", 'rife414', "flownet.pkl"))
 
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")

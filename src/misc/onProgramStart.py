@@ -285,6 +285,7 @@ def set_model_params(self):
                 if 'Waifu2X' == i:
                     self.ui.Waifu2xCheckBox.setChecked(True)
                     self.model_labels['Waifu2X'] = 'upscaling'
+                
                 if 'Vapoursynth-RIFE' == i:
                     self.ui.VapoursynthRIFECheckBox.setChecked(True)
                     self.model_labels['Vapoursynth-RIFE'] = 'interpolation'
@@ -292,6 +293,12 @@ def set_model_params(self):
                     self.ui.CainCheckBox.setChecked(True)
                     self.model_labels['IFRNET'] = 'interpolation'
     #not efficient but im lazy so cry abt it
+    #placeholder
+    cuda_installed = True
+    if cuda_installed == True:
+        
+            #self.ui.Waifu2xCheckBox.setChecked(True)
+            self.model_labels['Rife Cuda (Nvidia only)'] = 'interpolation'
     self.ui.modeCombo.clear()
     upscale_list=[]
     for i in range(self.ui.modeCombo.count()):

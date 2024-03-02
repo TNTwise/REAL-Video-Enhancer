@@ -11,3 +11,5 @@ Pillow
 loguru
 notify-send
 scenedetect
+torch
+torchvision

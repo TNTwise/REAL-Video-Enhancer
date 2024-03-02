@@ -1,8 +1,10 @@
 import subprocess
-import matplotlib.pyplot as plt
 import numpy as np
 from queue import Queue
-from rife.rife import *
+try:
+    from rife.rife import *
+except:
+    from src.torch.rife.rife import *
 import sys
 from threading import Thread
 import cv2
@@ -104,9 +106,11 @@ class Render:
     def finish_render(self):
         self.writeBuffer.put(None)
 
+    def returnLatestFrame(self):
+        if self.prevFrame != None: return np.ascontiguousarray(self.prevFrame).tobytes()
 
-                        
-
+        
+    
 # save
 
 
@@ -125,7 +129,7 @@ class Render:
                    f'{self.finalFPS}',
                    '-i',
                    '-',
-                   f'{os.path.basename(self.input_file)}_60fps.mp4',
+                   f'{os.path.basename(self.input_file)}_{self.finalFPS}fps.mp4',
                    '-y']
         process = subprocess.Popen(
                     command,
@@ -151,13 +155,12 @@ class Render:
         
             
             
-    
+def startRender(inputFile):
+    render = Render(inputFile)
+    render.extractFramesToBytes()
+    readThread1 = Thread(target=render.readThread)
+    procThread1 = Thread(target=render.procThread)
+    readThread1.start()
+    procThread1.start()
 
-
-render = Render('out.mp4')
-render.extractFramesToBytes()
-readThread1 = Thread(target=render.readThread)
-procThread1 = Thread(target=render.procThread)
-readThread1.start()
-procThread1.start()
-render.FFmpegOut()
+    render.FFmpegOut()

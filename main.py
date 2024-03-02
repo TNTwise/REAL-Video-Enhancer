@@ -46,6 +46,8 @@ import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
+import modules.RifeCUDA as rifeCUDA
+
 import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
@@ -257,6 +259,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == 'Vapoursynth-RIFE':
             VapoursynthRifeNCNN.modelOptions(self)
 
+        if self.ui.AICombo.currentText() == 'Rife Cuda (Nvidia only)':
+            rifeCUDA.modelOptions(self)
+            
         if self.ui.AICombo.currentText() == 'IFRNET':
             ifrnet.modelOptions(self)
 
