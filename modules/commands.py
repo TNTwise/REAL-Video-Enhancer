@@ -225,6 +225,34 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 log(f'{e} {traceback_info}')
                 self.showDialogBox(str(f'{e}'))
 
+'''def returnOutputFile(self):
+        settings = Settings()
+        if self.output_folder == '':
+                        outputpath = settings.OutputDir
+        else:
+                        outputpath = self.output_folder
+        if self.render == 'rife':
+                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*self.times)}fps.{return_data.returnContainer(encoder)}'.replace('#','')) == True:
+                                i=1
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{round(self.fps*self.times)}fps({i}).{return_data.returnContainer(encoder)}') == True:
+                                        i+=1
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*self.times)}fps({i}).{return_data.returnContainer(encoder)}' 
+
+                else:
+                                output_video_file = f'{outputpath}/{videoName}_{round(self.fps*self.times)}fps.{return_data.returnContainer(encoder)}' 
+                self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
+        if self.render == 'esrgan': # add upscale/realesrgan resolution bump here
+                upscaled_res = f'{int(width*self.resIncrease)}x{int(height*self.resIncrease)}'
+                if return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}') == True:
+                                i=1
+                                while return_data.ManageFiles.isfile(f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}'.replace('#','')) == True:
+                                        i+=1
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}({i}).{return_data.returnContainer(encoder)}' 
+
+                else:
+                                output_video_file = f'{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}'
+                output_video_file=output_video_file.replace('#','')
+'''
 
 def end(thread,self,renderdir,videoName,videopath,times,outputpath,videoQuality,encoder,mode='interpolation'):
         settings = Settings()

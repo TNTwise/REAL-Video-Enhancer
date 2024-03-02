@@ -18,6 +18,7 @@ homedir = os.path.expanduser(r"~")
 
 
 def modelOptions(self):
+    settings = Settings()
     self.times=2
     log('Model: RIFE')
     self.render='rife'
@@ -30,6 +31,10 @@ def modelOptions(self):
     self.ui.ensembleHelpButton.hide()
     self.ui.Rife_Times.addItem('2X')
     self.ui.EnsembleCheckBox.hide()
+    if self.output_folder == '':
+                        outputpath = settings.OutputDir
+    else:
+                        outputpath = self.output_folder
     
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
@@ -44,4 +49,4 @@ def modelOptions(self):
     except:
         pass
     self.ui.Rife_Model.addItems(['rife-4.14'])
-    self.ui.RifeStart.clicked.connect(lambda: startRender(self.input_file))
+    self.ui.RifeStart.clicked.connect(lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times))

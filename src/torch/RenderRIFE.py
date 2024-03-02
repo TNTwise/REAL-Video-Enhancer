@@ -13,10 +13,11 @@ import cv2
 # add scenedetect by if frame_num in transitions in proc_frames
 #def
 class Render:
-    def __init__(self,input_file):
+    def __init__(self,input_file,output_file,times):
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        self.interpolation_factor = 2
+        times = 2
+        self.interpolation_factor = times
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
@@ -24,6 +25,7 @@ class Render:
         self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.input_file = input_file
+        self.output_file = output_file
     def extractFramesToBytes(self):
         command = [f'ffmpeg', 
                    '-i', 
@@ -129,7 +131,7 @@ class Render:
                    f'{self.finalFPS}',
                    '-i',
                    '-',
-                   f'{os.path.basename(self.input_file)}_{self.finalFPS}fps.mp4',
+                   f'{self.output_file}',
                    '-y']
         process = subprocess.Popen(
                     command,
@@ -155,8 +157,8 @@ class Render:
         
             
             
-def startRender(inputFile):
-    render = Render(inputFile)
+def startRender(inputFile,outputFile,times):
+    render = Render(inputFile,outputFile,int(times))
     render.extractFramesToBytes()
     readThread1 = Thread(target=render.readThread)
     procThread1 = Thread(target=render.procThread)
