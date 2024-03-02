@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os
-
+import torch
+import torchvision
 
 homedir = os.path.expanduser(r"~")
 try:
