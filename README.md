@@ -47,6 +47,7 @@
   <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/nihui/realcugan-ncnn-vulkan" target="_blank" >realcugan-ncnn-vulkan</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/bilibili/ailab/tree/main/Real-CUGAN" target="_blank" >REAL-Cugan</a>  </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter (For CUDA implementation code)</a>  </li>
   
   
   
