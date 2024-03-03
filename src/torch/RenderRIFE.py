@@ -30,7 +30,7 @@ class Render:
         self.input_file = input_file
         self.output_file = output_file
     def extractFramesToBytes(self):
-        command = [f'ffmpeg', 
+        command = [f'{thisdir}/bin/ffmpeg', 
                    '-i', 
                    f'{self.input_file}', 
                    '-f',
@@ -131,7 +131,7 @@ class Render:
 
     def FFmpegOut(self):
         print('saving')
-        command = ['ffmpeg',
+        command = [f'{thisdir}/bin/ffmpeg',
                    '-f', 
                    'rawvideo',
                    '-pix_fmt',
