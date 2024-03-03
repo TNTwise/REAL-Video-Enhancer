@@ -1,7 +1,18 @@
 #!/usr/bin/python3
 import os
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QThread
 
-
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
+from PyQt5.QtWidgets import  QMessageBox
+from PyQt5.QtWidgets import  QFileDialog, QMessageBox
+from PyQt5.QtGui import QPixmap,QIcon
+from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
+from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QEvent
+from PyQt5.QtGui import QPixmap, QImage
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
@@ -9,23 +20,21 @@ except Exception as e:
     
     print(e)
 import src.programData.thisdir
+
 import src.programData.checks as checks
 thisdir = src.programData.thisdir.thisdir()
 if os.path.exists(f'{thisdir}') == False:
     os.mkdir(f'{thisdir}')
 
-    
+
 import src.programData.theme as theme
 import traceback
 
 import src.getModels.select_models as sel_mod
 import src.getModels.get_models_settings
-from PyQt5 import QtWidgets
 import sys
-from PyQt5.QtCore import QThread
 import psutil
-from PyQt5.QtWidgets import  QFileDialog, QMessageBox
-from PyQt5.QtGui import QPixmap,QIcon
+
 import mainwindow
 import os
 from src.programData.write_permisions import *
@@ -51,13 +60,10 @@ import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
 import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
+
 import modules.interpolate as interpolate
 import modules.upscale as upscale
-from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QPixmap
+
 from src.misc.log import log
 try:
     import torch
@@ -78,8 +84,7 @@ from src.programData.return_latest_update import *
 import magic
 from PIL import Image
 import src.runAI.FPS as FPS
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPixmap, QImage
+
 
 def switch_theme(value):
     
