@@ -8,8 +8,6 @@ thisdir = thisdir()
 import sys
 from threading import Thread
 import cv2
-import matplotlib.pyplot as plt
-import io
 #read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames

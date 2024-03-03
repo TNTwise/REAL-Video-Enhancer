@@ -2,10 +2,9 @@
 
 # Form implementation generated from reading ui file 'src/getLinkVideo/get_vid_from_link.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -89,3 +88,5 @@ class Ui_MainWindow(object):
         self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:22pt; font-weight:700;\">Enter video URL:</span></p></body></html>"))
         self.qualityLabel.setText(_translate("MainWindow", "Quality"))
         self.next.setText(_translate("MainWindow", "Next"))
+
+

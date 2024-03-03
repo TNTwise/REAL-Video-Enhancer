@@ -77,7 +77,7 @@ except:
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import numpy as np
-    import matplotlib.pyplot as plt
+    
 from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *

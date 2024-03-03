@@ -33,10 +33,9 @@ class Rife:
         self.handle_model()
 
     def handle_model(self):
-        match self.interpolate_method:
-            case "rife" | "rife4.14":
-                from .rife414.RIFE_HDv3 import Model
-                self.filename = "flownet.pkl"
+            
+        from .rife414.RIFE_HDv3 import Model
+        self.filename = "flownet.pkl"
 
             
         

@@ -2,10 +2,9 @@
 
 # Form implementation generated from reading ui file 'src/getModels/Download.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -67,3 +66,5 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "REAL Video Enhancer"))
         self.gbLabel.setText(_translate("MainWindow", "0.00/0.00GB"))
+
+
