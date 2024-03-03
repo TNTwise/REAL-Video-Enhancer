@@ -9,5 +9,3 @@ psutil
 python-magic
 Pillow
 scenedetect
-torch
-torchvision
