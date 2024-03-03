@@ -19,7 +19,10 @@ import os
 from modules.commands import *
 import math
 import src.programData.checks as checks
-import src.torch.RenderRIFE as RifeCUDA
+try:
+    import src.torch.RenderRIFE as RifeCUDA
+except:
+     pass
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 class pb2X(QObject):

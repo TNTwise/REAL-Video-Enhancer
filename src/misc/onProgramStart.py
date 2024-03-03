@@ -7,6 +7,11 @@ from PyQt5.QtGui import QDesktopServices
 import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
+try:
+    import torch
+    torch_version = True
+except:
+    torch_version = False
 def open_link():
         url = QUrl(r'https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!')
         QDesktopServices.openUrl(url)
@@ -294,11 +299,13 @@ def set_model_params(self):
                     self.model_labels['IFRNET'] = 'interpolation'
     #not efficient but im lazy so cry abt it
     #placeholder
-    cuda_rife_installed = os.path.exists(f'{thisdir}/models/rife-cuda')
+    cuda_rife_installed = os.path.exists(f'{thisdir}/models/rife-cuda') 
     if cuda_rife_installed == True:
-        
+        if torch_version == True:
             self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels['Rife Cuda (Nvidia only)'] = 'interpolation'
+        else:
+            self.ui.RifeCUDACheckBox.setDisabled(True)
     self.ui.modeCombo.clear()
     upscale_list=[]
     for i in range(self.ui.modeCombo.count()):

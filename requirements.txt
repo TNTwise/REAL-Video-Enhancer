@@ -8,8 +8,6 @@ cx-Freeze==6.15.12
 psutil
 python-magic
 Pillow
-loguru
-notify-send
 scenedetect
 torch
 torchvision

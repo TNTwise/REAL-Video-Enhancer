@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os
-import torch
-import torchvision
+
 
 homedir = os.path.expanduser(r"~")
 try:
@@ -47,7 +46,7 @@ import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
-import modules.RifeCUDA as rifeCUDA
+
 
 import src.misc.onProgramStart
 from src.runAI.ETA import *
@@ -60,6 +59,17 @@ from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QPixmap
 from src.misc.log import log
+try:
+    import torch
+    import torchvision
+    torch_version = True
+    log('torch_version')
+
+except:
+    log('ncnn_verson')
+    torch_version = False
+if torch_version:
+    import modules.RifeCUDA as rifeCUDA
 from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *
@@ -264,8 +274,9 @@ class MainWindow(QtWidgets.QMainWindow):
             VapoursynthRifeNCNN.modelOptions(self)
 
         if self.ui.AICombo.currentText() == 'Rife Cuda (Nvidia only)':
-            rifeCUDA.modelOptions(self)
-            
+            try:
+                rifeCUDA.modelOptions(self)
+            except: pass
         if self.ui.AICombo.currentText() == 'IFRNET':
             ifrnet.modelOptions(self)
 
@@ -937,14 +948,15 @@ def excepthook(type, value, extraceback):
     print(f"Exception Value: {value}")
     print("Traceback:")
     traceback.print_tb(extraceback)
-
+    tb = traceback.format_exc()
+    print(tb)
     # Optionally, you can extract and print the file name
     file_name = extraceback.tb_frame.f_code.co_filename
     print(f"Exception occurred in file: {file_name}")
 
     function_name = frame.f_code.co_name
     error_message = f"An unhandled exception occurred: {value}"
-    log(f'ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{file_name},{function_name},{type},{error_message}')
+    log(f'ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{file_name},{function_name},{type},{error_message},{tb}')
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
     
 
@@ -957,7 +969,8 @@ def log_function_call(func):
         caller_frame = inspect.currentframe().f_back
         caller_file = inspect.getfile(caller_frame)
         caller_function = inspect.getframeinfo(caller_frame).function
-        print(f"Function {func.__name__} called from {caller_function} in file {caller_file}")
+        tb = traceback.format_exc()
+        print(f"Function {func.__name__} called from {caller_function} in file {caller_file} {tb}")
         return func(*args, **kwargs)
     return wrapper
 

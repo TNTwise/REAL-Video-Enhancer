@@ -186,6 +186,7 @@ def remove_unchecked(self):
             
     if self.ui.RealSRCheckBox.isChecked() == False:
             os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
+            
     if self.ui.RifeCUDACheckBox.isChecked() == False:
             os.system(f'rm -rf "{self.settings.ModelDir}/rife-cuda/"')
             
