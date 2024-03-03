@@ -65,6 +65,7 @@ import modules.interpolate as interpolate
 import modules.upscale as upscale
 
 from src.misc.log import log
+try:
     import torch
     import torchvision
     torch_version = True
