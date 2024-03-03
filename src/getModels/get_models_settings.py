@@ -79,9 +79,12 @@ class Worker(QObject):
 
                     with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                         name=i.replace('.zip','')
-                        original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                        original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-
+                        if '-ncnn-vulkan' in name:
+                            original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                            original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                        else:
+                                         original_ai_name = name
+                                         original_ai_name_ncnn_vulkan = name
 
                         zip_ref.extractall(f'{thisdir}/files/')
 
@@ -183,8 +186,8 @@ def remove_unchecked(self):
             
     if self.ui.RealSRCheckBox.isChecked() == False:
             os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
-    if self.ui.RifeVSCheckBox.isChecked() == False:
-            os.system(f'rm -rf "{self.settings.ModelDir}/vapoursynth-rife/"')
+    if self.ui.RifeCUDACheckBox.isChecked() == False:
+            os.system(f'rm -rf "{self.settings.ModelDir}/rife-cuda/"')
             
     
 def run_install_models_from_settings(self):

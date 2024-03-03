@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>817</height>
+    <height>837</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -790,10 +790,41 @@
                    </property>
                   </widget>
                  </item>
+                 <item row="8" column="1">
+                  <widget class="QPushButton" name="RifeSettings">
+                   <property name="text">
+                    <string>Settings</string>
+                   </property>
+                  </widget>
+                 </item>
                  <item row="8" column="0">
                   <widget class="QCheckBox" name="RifeCheckBox">
                    <property name="text">
-                    <string>Rife</string>
+                    <string>Rife NCNN</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="6" column="0">
+                  <widget class="QCheckBox" name="Waifu2xCheckBox">
+                   <property name="text">
+                    <string>Waifu2X</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QCheckBox" name="RealESRGANCheckBox">
+                   <property name="text">
+                    <string>RealESRGAN</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="11" column="0">
+                  <widget class="QCheckBox" name="RifeVSCheckBox">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="text">
+                    <string>VS-Rife</string>
                    </property>
                   </widget>
                  </item>
@@ -807,28 +838,7 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="6" column="0">
-                  <widget class="QCheckBox" name="Waifu2xCheckBox">
-                   <property name="text">
-                    <string>Waifu2X</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="1">
-                  <widget class="QPushButton" name="RifeSettings">
-                   <property name="text">
-                    <string>Settings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QCheckBox" name="RealESRGANCheckBox">
-                   <property name="text">
-                    <string>RealESRGAN</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="0">
+                 <item row="10" column="0">
                   <widget class="QCheckBox" name="CainCheckBox">
                    <property name="enabled">
                     <bool>true</bool>
@@ -838,13 +848,10 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="10" column="0">
-                  <widget class="QCheckBox" name="RifeVSCheckBox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
+                 <item row="9" column="0">
+                  <widget class="QCheckBox" name="RifeCUDACheckBox">
                    <property name="text">
-                    <string>VS-Rife</string>
+                    <string>Rife CUDA</string>
                    </property>
                   </widget>
                  </item>

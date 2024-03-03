@@ -208,7 +208,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/')
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/input_frames')
         
-                
+                extractAudio(self,videopath,renderdir,videoName,thread)
                 if settings.Image_Type != '.webp':
                         ffmpeg_cmd =(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 -vf "scale=w={self.videowidth}:h={self.videoheight}" "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y ') 
                 else:
@@ -216,7 +216,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 global output 
                 print(run_subprocess_with_realtime_output(thread,self,ffmpeg_cmd,True))
 
-                extractAudio(self,videopath,renderdir,videoName,thread)
+                
 
                 global interpolation_sessions
                 self.input_frames = len(os.listdir(f'{settings.RenderDir}/{self.videoName}_temp/input_frames/'))

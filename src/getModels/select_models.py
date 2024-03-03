@@ -324,10 +324,12 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
                                 with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                                     name=i.replace('.zip','')
-                                    original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                    original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                    print(original_ai_name)
-
+                                    if '-ncnn-vulkan' in name:
+                                        original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                        original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                        print(original_ai_name)
+                                    else:
+                                         original_ai_name = name
 
                                     zip_ref.extractall(f'{thisdir}/files/')
 

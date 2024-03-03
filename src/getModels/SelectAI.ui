@@ -78,6 +78,13 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="RealESRGANCheckBox">
+           <property name="text">
+            <string>RealESRGAN (Upscale Animation)</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="0">
           <widget class="QCheckBox" name="RealCUGANCheckBox">
            <property name="enabled">
@@ -88,10 +95,10 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="Waifu2xCheckBox">
+         <item row="10" column="0">
+          <widget class="QCheckBox" name="RifeCheckBox">
            <property name="text">
-            <string>Waifu2X  (Upscale Animation)</string>
+            <string>RIFE NCNN (Interpolate General)</string>
            </property>
           </widget>
          </item>
@@ -102,21 +109,24 @@
            </property>
           </widget>
          </item>
-         <item row="10" column="0">
-          <widget class="QCheckBox" name="RifeCheckBox">
+         <item row="7" column="0">
+          <widget class="QCheckBox" name="Waifu2xCheckBox">
            <property name="text">
-            <string>RIFE (Interpolate General)</string>
+            <string>Waifu2X  (Upscale Animation)</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="RealESRGANCheckBox">
+         <item row="12" column="0">
+          <widget class="QCheckBox" name="RifeVSCheckBox">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
-            <string>RealESRGAN (Upscale Animation)</string>
+            <string>VS-Rife (Interpolate General)</string>
            </property>
           </widget>
          </item>
-         <item row="14" column="0">
+         <item row="15" column="0">
           <widget class="QCheckBox" name="CainCheckBox">
            <property name="enabled">
             <bool>true</bool>
@@ -127,12 +137,9 @@
           </widget>
          </item>
          <item row="11" column="0">
-          <widget class="QCheckBox" name="RifeVSCheckBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
+          <widget class="QCheckBox" name="RifeCUDACheckBox">
            <property name="text">
-            <string>VS-Rife (Interpolate General)</string>
+            <string>RIFE CUDA (Interpolate General)</string>
            </property>
           </widget>
          </item>

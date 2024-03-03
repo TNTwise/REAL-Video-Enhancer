@@ -294,10 +294,10 @@ def set_model_params(self):
                     self.model_labels['IFRNET'] = 'interpolation'
     #not efficient but im lazy so cry abt it
     #placeholder
-    cuda_installed = True
-    if cuda_installed == True:
+    cuda_rife_installed = os.path.exists(f'{thisdir}/models/rife-cuda')
+    if cuda_rife_installed == True:
         
-            #self.ui.Waifu2xCheckBox.setChecked(True)
+            self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels['Rife Cuda (Nvidia only)'] = 'interpolation'
     self.ui.modeCombo.clear()
     upscale_list=[]
