@@ -111,7 +111,7 @@ class Render:
                 self.prevFrame = frame
                 continue
             self.main.imageDisplay=frame
-            plt.imsave(f'{i}.png',self.main.imageDisplay)
+           
             
 
             self.proc_image(self.prevFrame,frame)

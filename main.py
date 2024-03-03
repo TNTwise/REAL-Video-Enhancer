@@ -406,7 +406,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
                 fpsThread.start()
                 
-                self.start_time = time.time()   
+                  
                 
                 
                 self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
@@ -484,20 +484,19 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Final resets
         
-    def numpy_array_to_pixmap(self, numpy_array):
-        # Ensure that the array is contiguous in memory
-        numpy_array = np.ascontiguousarray(numpy_array)
+    def numpy_array_to_pixmap(self,numpy_array):
+    # Assuming the NumPy array has shape (height, width, channels)
+        height, width, channels = numpy_array.shape
+        bytes_per_line = channels * width
 
-        # Normalize the array data to 0-255
-        normalized_array = ((numpy_array - numpy_array.min()) / (numpy_array.max() - numpy_array.min()) * 255).astype(np.uint8)
+        # Create a QImage from the NumPy array
+        q_image = QImage(numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
 
-        # Create a QImage from the numpy array
-        height, width, channel = normalized_array.shape
-        q_image = QImage(normalized_array.data, width, height, channel * width, QImage.Format_RGB888)
-
-        # Convert QImage to QPixmap
+        # Create a QPixmap from the QImage
         pixmap = QPixmap.fromImage(q_image)
+
         return pixmap
+
        
     def imageViewer(self,step):
         if step == '1':
@@ -516,8 +515,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if 'cuda' in self.AI:
 
                 try:    
-                    image = self.numpy_array_to_pixmap(self.imageDisplay)
-                    self.pixMap = image
+                    self.pixMap = self.numpy_array_to_pixmap(self.imageDisplay)
                 except Exception as e:
                     traceback_info = traceback.format_exc()
                     print(f'noimage {e} {traceback_info}')  
@@ -789,7 +787,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
             self.ui.ETAPreview.setText('ETA: 00:00:00')
             self.ui.imagePreview.clear()
-            if 'cuda' in self.AI:
+            if '-ncnn-vulkan' in self.AI:
                 self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
             self.ui.imageSpacerFrame.show()
             

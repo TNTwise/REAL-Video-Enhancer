@@ -135,8 +135,8 @@ class pb2X(QObject):
                 try:
                     while self.main.CudaRenderFinished == False:
                         try:
-                            
-                                
+                                sleep(.5)
+                                self.image_progress.emit('1')
                                 width = self.main.width()
                                 height = self.main.height()
                                 self.main.width1=int(width/1.6)
@@ -145,7 +145,7 @@ class pb2X(QObject):
                                                     
                                                     self.main.height1=int(height/1.6)
                                                     self.main.width1=int(self.main.height1/(self.main.videoheight/self.main.videowidth))
-                                
+                                self.image_progress.emit('2')
                         except Exception as e:
                              traceback_info = traceback.format_exc()
                              print(f"Soemthing went wrong with cuda image preview {e} {traceback_info}")

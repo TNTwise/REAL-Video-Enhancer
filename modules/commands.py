@@ -27,6 +27,8 @@ import re
 thisdir = src.programData.thisdir.thisdir()
 
 import traceback
+
+import time
 def return_gpu_settings(self):
     if int(self.gpuMemory) < 1:
         gpu_usage = f'-j 1:1:1'
@@ -153,6 +155,7 @@ def get_video_from_link(self,thread):
                                 file.write(chunk)
 
 def extractAudio(self,videopath,renderdir,videoName,thread):
+        self.start_time = time.time() 
         self.file_drop_widget.hide()
         video = cv2.VideoCapture(self.input_file)
         try:
