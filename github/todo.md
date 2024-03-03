@@ -52,7 +52,7 @@ create a python interface to easily interact with ncnn, more and create the opti
 redo calculations on how to calculate video segment amount<br/>
 fix if ' is in video<br/>
 add cropping video to a specific time. <br/>
-add uhd mode for high resolutions <br/>
+add universal upscale ncnn with option to download a bunch of different models
  - How to Uscale<br/>
  - Best uscaling practices<br/>
  - Explanation of Settings<br/>
