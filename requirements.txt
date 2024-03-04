@@ -6,7 +6,6 @@ pypresence
 pyuic5-tool
 cx-Freeze==6.15.12
 psutil
-python-magic
 Pillow
 scenedetect
 pyinstaller
