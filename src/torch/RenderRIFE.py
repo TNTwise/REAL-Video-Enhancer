@@ -12,9 +12,11 @@ import cv2
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
 #def
+import re
+from time import sleep
 class Render:
-    def __init__(self,main,input_file,output_file,times):
-        
+    def __init__(self,thread,main,input_file,output_file,times):
+        self.thread = thread
         self.main = main
         
         self.readBuffer = Queue(maxsize=50)
@@ -29,6 +31,8 @@ class Render:
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.input_file = input_file
         self.output_file = output_file
+    
+    
     def extractFramesToBytes(self):
         command = [f'{thisdir}/bin/ffmpeg', 
                    '-i', 
@@ -126,7 +130,14 @@ class Render:
         
     
 # save
+    def returnFrameCount(self):
+        pass
 
+    def returnFrameRate(self):
+        pass
+    
+    def returnPercentageDone(self):
+        pass
 
     def FFmpegOut(self):
         print('saving')
@@ -145,11 +156,11 @@ class Render:
                    '-',
                    f'{self.output_file}',
                    '-y']
-        process = subprocess.Popen(
+        self.writeProcess = subprocess.Popen(
                     command,
                     stdin=subprocess.PIPE,
-                    stdout=sys.stdout,
-                    stderr=sys.stdout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     universal_newlines=True,
                     
                 )
@@ -159,23 +170,29 @@ class Render:
                     if frame is None:
                             
                             
-                            process.stdin.close()
-                            process.wait()
+                            self.writeProcess.stdin.close()
+                            self.writeProcess.wait()
                             print('done with save')
                             self.main.output_file = self.output_file
                             self.main.CudaRenderFinished = True
                             break
                     self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
-                    process.stdin.buffer.write(frame.tobytes())
+                    self.writeProcess.stdin.buffer.write(frame.tobytes())
+                    output_data, error_data = self.writeProcess.communicate()
+
+                    # Print the output and any potential errors
+                    self.outputData = output_data
+                    self.errorData = error_data
                 except Exception as e:
                     print(e)
         
             
             
-def startRender(self,inputFile,outputFile,times):
-    render = Render(self,inputFile,outputFile,int(times))
+def startRender(thread,self,inputFile,outputFile,times):
+    render = Render(thread,self,inputFile,outputFile,int(times))
     render.extractFramesToBytes()
+
     readThread1 = Thread(target=render.readThread)
     procThread1 = Thread(target=render.procThread)
     renderThread1 = Thread(target=render.FFmpegOut)
