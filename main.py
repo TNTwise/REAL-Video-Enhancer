@@ -82,7 +82,6 @@ import modules.upscale as upscale
 from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *
-import magic
 from PIL import Image
 import src.runAI.FPS as FPS
 
@@ -118,10 +117,11 @@ class FileDropWidget(QLabel):
     def add_file_item(self, file_path):
         item = QListWidgetItem(file_path)
         try:
-            mime = magic.Magic(mime=True)
-            filename = mime.from_file(item.text())
-            if filename.find('video') != -1:
-            
+            cap = cv2.VideoCapture(file_path)
+        # Check if the file can be opened successfully
+            if cap.isOpened():
+                print(f"{file_path} is a video file.")
+                cap.release()
                 # success!
                 self.main.input_file = item.text()
                 
@@ -137,6 +137,12 @@ class FileDropWidget(QLabel):
                     self.main.ui.logsPreview.clear()
                     self.main.addLinetoLogs(f'Input file = {item.text()}')
             else:
+                print(f"{file_path} is not a video file.")
+                
+            
+            
+            
+                
                 not_a_video(self.main)
         except Exception as e:
             if check_if_flatpak():
@@ -654,14 +660,11 @@ class MainWindow(QtWidgets.QMainWindow):
         if type_of_file == 'Video':
             try:
                 self.input_file=input_file
-                mime = magic.Magic(mime=True)
-                filename = mime.from_file(self.input_file)
-                if filename.find('video') != -1:
-                
-                    # success!
-                    
-                    
-                    
+                cap = cv2.VideoCapture(self.input_file)
+                # Check if the file can be opened successfully
+                if cap.isOpened():
+                    print(f"{self.input_file} is a video file.")
+                    cap.release()
                     self.download_youtube_video_command = ''
                     self.localFile = True
                     self.videoName = VideoName.return_video_name(f'{self.input_file}')
@@ -673,10 +676,18 @@ class MainWindow(QtWidgets.QMainWindow):
                         
                         self.addLinetoLogs(f'Input file = {self.input_file}')
                 else:
+                    print(f"{self.input_file} is not a video file.")
                     not_a_video(self)
             except Exception as e:
                 traceback_info = traceback.format_exc()
                 log(f'{e} {traceback_info}')
+                
+                    # success!
+                    
+                    
+                    
+                    
+                    
         if type_of_file == 'Model':
             if (os.path.splitext(input_file)[1])[1:] == 'bin':
                 if os.path.isfile(input_file):
@@ -870,14 +881,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
                     os.system(f'rm -rf "{thisdir}/{self.videoName}"')
-                    for i in os.listdir(f'{thisdir}'):
-                        mime = magic.Magic(mime=True)
-                        filename = mime.from_file(f'{thisdir}/{i}')
-                        if filename.find('video') != -1:
-                        
-                            os.system(f'rm -rf "{thisdir}/{i}"')
-                        if '.mp4' in i:
-                            os.system(f'rm -rf "{thisdir}/{i}"')
+                    
                 except Exception as e:
                     log(str(e))
                 try:
