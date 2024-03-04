@@ -1,4 +1,18 @@
 #!/usr/bin/python3
+from src.misc.log import log
+try:
+    import torch
+    import torchvision
+    torch_version = True
+    log('torch_version')
+
+except Exception as e:
+    log(f'ncnn_verson {e}')
+    torch_version = False
+if torch_version:
+    import modules.RifeCUDA as rifeCUDA
+    import numpy as np
+    
 import os
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread
@@ -64,20 +78,7 @@ from src.getLinkVideo.get_video import *
 import modules.interpolate as interpolate
 import modules.upscale as upscale
 
-from src.misc.log import log
-try:
-    import torch
-    import torchvision
-    torch_version = True
-    log('torch_version')
 
-except Exception as e:
-    log(f'ncnn_verson {e}')
-    torch_version = False
-if torch_version:
-    import modules.RifeCUDA as rifeCUDA
-    import numpy as np
-    
 from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *

@@ -368,7 +368,7 @@ def frameCountThread(self):
         log(f'{str(e)}, {traceb}')
 
 
-
+from modules.commands import returnOutputFile
 
 class interpolation(QObject):
     
