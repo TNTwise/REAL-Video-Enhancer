@@ -90,7 +90,6 @@ class Render:
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
                                 )
-                    self.main.imageDisplay=result
                     self.writeBuffer.put(result)
         
         
@@ -108,7 +107,7 @@ class Render:
             if self.prevFrame is None:
                 self.prevFrame = frame
                 continue
-            self.main.imageDisplay=frame
+            
            
             
 
@@ -166,6 +165,7 @@ class Render:
                             self.main.output_file = self.output_file
                             self.main.CudaRenderFinished = True
                             break
+                    self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
                     process.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
