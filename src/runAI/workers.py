@@ -23,6 +23,7 @@ try:
     import src.torch.RenderRIFE as RifeCUDA
 except:
      pass
+from modules.commands import returnOutputFile
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 class pb2X(QObject):
@@ -141,6 +142,7 @@ class pb2X(QObject):
                         try:
                                 sleep(.5)
                                 self.main.files_processed = self.main.renderAI.returnFrameCount()
+                                self.main.currentRenderFPS = self.main.renderAI.returnFrameRate()
                                 try:
                                     self.progress.emit(self.main.files_processed)
                                 except Exception as e:
@@ -375,7 +377,7 @@ def frameCountThread(self):
         log(f'{str(e)}, {traceb}')
 
 
-from modules.commands import returnOutputFile
+
 
 class interpolation(QObject):
     
@@ -500,7 +502,7 @@ class interpolation(QObject):
                     readThread1.start()
                     procThread1.start()
                     renderThread1.start()
-                    self.main.renderAI.log()
+                    
                     self.main.output_file = output_file
                     print('Done')
 

@@ -147,7 +147,8 @@ class Render:
             print('No frame to return!')
     
     def log(self):
-        while True:
+        
+            
             try:
                 for line in iter(self.writeProcess.stderr.readline, b''):
                     print(line)
@@ -228,7 +229,7 @@ class Render:
                             break
                     self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
-                    
+                    self.log()
                     self.writeProcess.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
                     tb = traceback.format_exc()

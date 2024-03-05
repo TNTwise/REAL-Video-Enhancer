@@ -484,13 +484,18 @@ class MainWindow(QtWidgets.QMainWindow):
                         
                     ETA=calculateETA(self)
                     self.ui.ETAPreview.setText(ETA)
+                    
                         
                 except Exception as e:
                         #print(e)
                         self.ETA = None
+                self.removeLastLineInLogs('FPS: ') 
+                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
                 self.i = 2
                 self.ui.RifePB.setValue(files_processed)
                 self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {self.filecount}')
+                self.removeLastLineInLogs('FPS: ') 
+                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
         except Exception as e:
             #print(e)
             pass
