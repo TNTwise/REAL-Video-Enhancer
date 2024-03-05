@@ -155,7 +155,7 @@ class Render:
         process = subprocess.Popen(
                     command,
                     stdin=subprocess.PIPE,
-                    
+                    stdout=subprocess.PIPE,
                     text=True,
                     
                     universal_newlines=True,
