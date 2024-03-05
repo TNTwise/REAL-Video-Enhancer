@@ -485,7 +485,7 @@ class interpolation(QObject):
                 if 'cuda' in self.main.AI:
                     output_file = returnOutputFile(self.main,self.main.videoName,self.main.encoder)
                     
-                    RifeCUDA.startRender(self,self.main,self.main.input_file,output_file,self.main.times)
+                    RifeCUDA.startRender(self.main,self.main.input_file,output_file,self.main.times)
                     self.main.output_file = output_file
                     print('Done')
 

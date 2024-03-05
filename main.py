@@ -597,11 +597,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.ensembleHelpButton.show()
             self.ui.FPSFrom.show()
             self.ui.FPSTo.show()
+        
         else:
             self.ui.FPSFrom.hide()
             self.ui.FPSTo.hide()
             self.ui.Rife_Times.setCurrentText('2X')
+            
             self.ui.Rife_Times.setEnabled(False)
+            
+            
             self.ui.EnsembleCheckBox.hide()
             self.ui.ensembleHelpButton.hide()
     def greyOutRealSRTimes(self):

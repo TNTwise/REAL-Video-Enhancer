@@ -30,6 +30,10 @@ def modelOptions(self):
     self.ui.FPSPreview.setText('FPS:')
     self.ui.ensembleHelpButton.hide()
     self.ui.Rife_Times.addItem('2X')
+    self.ui.Rife_Times.addItem('4X')
+    self.ui.Rife_Times.addItem('8X')
+    self.ui.Rife_Model.addItems(['rife-v4.14-cuda'])
+    self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.hide()
     if self.output_folder == '':
                         outputpath = settings.OutputDir
@@ -48,6 +52,6 @@ def modelOptions(self):
         self.ui.RifeStart.clicked.disconnect() 
     except:
         pass
-    self.ui.Rife_Model.addItems(['rife-4.14'])
+    
     #lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
     self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self,'rife-cuda'))
