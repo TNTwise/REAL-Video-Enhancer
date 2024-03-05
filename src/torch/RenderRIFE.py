@@ -150,10 +150,12 @@ class Render:
         while True:
             try:
                 for line in iter(self.writeProcess.stderr.readline, b''):
-                    self.frame = re.findall(r'frame=\d+',line.replace(' ','').replace(' ',''))[0].replace('frame=','')
+                    self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
                     self.frame = int(self.frame.replace('frame=',''))
                    
-                    self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','').replace(' ',''))[0].replace('fps=',''))
+                    self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
+                    print(self.writeProcess.stderr.readline)
+                    print(self.writeProcess.stdout.readline)
             except Exception as e:
                 pass
 # save
