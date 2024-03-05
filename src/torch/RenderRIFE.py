@@ -178,16 +178,19 @@ class Render:
                    '-s',
                    f'{self.width}x{self.height}',
                    '-r',
-                   f'{self.finalFPS}',
+                   f'{int(self.finalFPS)}',
                    '-i',
                    '-',
-                   '-i',
-                   f'{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a',
-                   '-c:v',
+
+                   
                    
                    
                    ]
         encoder_list = return_data.returnCodec(self.settings.Encoder).split(' ')
+        if os.path.isfile(f'{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a'):
+            command+=['-i',
+                    f'{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a',]
+        command+=['-c:v']
         command += encoder_list
         command+=[f'-crf', 
                    f'{crf.replace("-crf","")}',
@@ -196,6 +199,7 @@ class Render:
                    '-c:a',
                    'copy',
                    f'{self.output_file}']
+        print(command)
         self.writeProcess = subprocess.Popen(
                     command,
                     stdin=subprocess.PIPE,
@@ -224,7 +228,8 @@ class Render:
                     
                     self.writeProcess.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
-                    print(f'Something went wrong with the writebuffer: {e}')
+                    tb = traceback.format_exc()
+                    print(f'Something went wrong with the writebuffer: {e},{tb}')
         
             
             
