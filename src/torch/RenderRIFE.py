@@ -107,13 +107,12 @@ class Render:
                 self.writeBuffer.put(self.prevFrame)
                 self.writeBuffer.put(None)
                 break # done with proc
-
+                
             if self.prevFrame is None:
                 self.prevFrame = frame
                 continue
             
-           
-            
+            self.frame = i
 
             self.proc_image(self.prevFrame,frame)
             self.prevFrame = frame
@@ -153,8 +152,8 @@ class Render:
                 for line in iter(self.writeProcess.stderr.readline, b''):
                     print(line)
                     log(line)
-                    self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
-                    self.frame = int(self.frame.replace('frame=',''))
+                    #self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
+                    #self.frame = int(self.frame.replace('frame=',''))
                    
                     self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
                     

@@ -225,6 +225,7 @@ def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # ca
                 
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames') # this is at end due to check in progressbar to start, bad implementation should fix later....
                 return_data.ManageFiles.create_folder(f'{renderdir}/{videoName}_temp/output_frames/0/')
+                self.start_time = time.time() 
                 log(f'End of start function')
         except Exception as e:
                 traceback_info = traceback.format_exc()
