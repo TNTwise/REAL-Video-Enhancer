@@ -414,67 +414,83 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def reportProgress(self, files_processed):
         try:
-            
-            
-            # fc is the total file count after interpolation
-            
-            if self.i==1: # put every gui change that happens on start of render here
-                if 'v4' in self.ui.Rife_Model.currentText().lower():
-                    self.times= float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
-                fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
-                self.filecount = fc
-                total_input_files = fc / self.times
-                total_output_files = fc
-                self.ui.RifePB.setMaximum(total_output_files)
-                #self.ui.QueueButton.show()
-                fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
-                fpsThread.start()
-                
-                  
+            if '-ncnn-vulkan' in self.AI:
                 
                 
-                self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
-                self.i=2
-            
-            try:
+                # fc is the total file count after interpolation
+                
+                if self.i==1: # put every gui change that happens on start of render here
+                    if 'v4' in self.ui.Rife_Model.currentText().lower():
+                        self.times= float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
+                    fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+                    self.filecount = int(fc)
+                    total_input_files = fc / self.times
+                    total_output_files = fc
+                    self.ui.RifePB.setMaximum(total_output_files)
+                    #self.ui.QueueButton.show()
+                    fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
+                    fpsThread.start()
                     
-                ETA=calculateETA(self)
-                self.ui.ETAPreview.setText(ETA)
-                       
-            except Exception as e:
-                    #print(e)
-                    self.ETA = None
-            fp=files_processed
-            self.filecount = int(self.filecount)
-            videos_rendered=-1
-            for i in os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
-                if os.path.isfile(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}'):
-                    videos_rendered+=1
-            try:
-                if self.settings.RenderType == 'Optimized':
-                    self.removeLastLineInLogs("Video segments created: ")
-                    if videos_rendered == self.interpolation_sessions:
-                        self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
-                    else:
+                    
+                    
+                    
+                    self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
+                    self.i=2
+                self.filecount = int(VideoName.return_video_frame_count(f"{self.input_file}") * self.times)
+                try:
                         
-                        self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
-                self.removeLastLineInLogs('FPS: ') 
-                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
-            except:
-                pass
-            #Update GUI values
+                    ETA=calculateETA(self)
+                    self.ui.ETAPreview.setText(ETA)
+                        
+                except Exception as e:
+                        #print(e)
+                        self.ETA = None
+                fp=files_processed
+                videos_rendered=-1
+                for i in os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
+                    if os.path.isfile(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}'):
+                        videos_rendered+=1
+                try:
+                    if self.settings.RenderType == 'Optimized':
+                        self.removeLastLineInLogs("Video segments created: ")
+                        if videos_rendered == self.interpolation_sessions:
+                            self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
+                        else:
+                            
+                            self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                    self.removeLastLineInLogs('FPS: ') 
+                    self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
+                except:
+                    pass
+                #Update GUI values
+                
+                self.ui.RifePB.setValue(fp)
+                self.ui.processedPreview.setText(f'Files Processed: {fp} / {int(VideoName.return_video_frame_count(f"{self.input_file}") * self.times)}')
             
-            self.ui.RifePB.setValue(fp)
-            self.ui.processedPreview.setText(f'Files Processed: {fp} / {self.filecount}')
-           
-            try:
-                
+                try:
                     
-                
+                        
+                    
+                    self.i = 2
+                except Exception as e:
+                    print(e)
+                    pass
+            if '-cuda' in self.AI:
+                if self.i==1:
+                    fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
+                    self.filecount = fc
+                    self.ui.RifePB.setMaximum(self.filecount)
+                try:
+                        
+                    ETA=calculateETA(self)
+                    self.ui.ETAPreview.setText(ETA)
+                        
+                except Exception as e:
+                        #print(e)
+                        self.ETA = None
                 self.i = 2
-            except Exception as e:
-                print(e)
-                pass
+                self.ui.RifePB.setValue(files_processed)
+                self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {self.filecount}')
         except Exception as e:
             #print(e)
             pass
@@ -595,8 +611,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if os.path.exists(f'{settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble'):
                 self.ui.EnsembleCheckBox.show()
                 self.ui.ensembleHelpButton.show()
+            
             self.ui.FPSFrom.show()
             self.ui.FPSTo.show()
+            
         
         else:
             self.ui.FPSFrom.hide()

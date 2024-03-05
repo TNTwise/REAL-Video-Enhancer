@@ -22,8 +22,7 @@ def modelOptions(self):
     self.times=2
     log('Model: RIFE')
     self.render='rife'
-    self.ui.FPSFrom.hide()
-    self.ui.FPSTo.hide()
+    
     self.ui.FPSToSign.hide()
     self.ui.Rife_Model.clear()
     self.ui.Rife_Times.clear()
@@ -52,6 +51,7 @@ def modelOptions(self):
         self.ui.RifeStart.clicked.disconnect() 
     except:
         pass
-    
+    self.ui.FPSFrom.hide()
+    self.ui.FPSTo.hide()
     #lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
     self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self,'rife-cuda'))

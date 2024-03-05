@@ -55,6 +55,7 @@ class pb2X(QObject):
                 while ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/') == True:
                         if ManageFiles.isfolder(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/') == True:
                             try:
+                                
                                 if self.settings.RenderType == 'Optimized (Incremental)':
                                     try:
                                         files_processed = os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/0/')
@@ -139,6 +140,12 @@ class pb2X(QObject):
                     while self.main.CudaRenderFinished == False:
                         try:
                                 sleep(.5)
+                                self.main.files_processed = self.main.renderAI.returnFrameCount()
+                                try:
+                                    self.progress.emit(self.main.files_processed)
+                                except Exception as e:
+                                    #print(e)
+                                    pass
                                 self.image_progress.emit('1')
                                 width = self.main.width()
                                 height = self.main.height()
@@ -351,7 +358,7 @@ def frameCountThread(self):
                             else:
                                 sleep(.1)
                     transitionDetectionClass.merge_frames()
-                    os.system(f'{thisdir}/bin/ffmpeg -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)} {returnCRFFactor(self.main.settings.videoQuality,self.main.settings.Encoder)}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(self.main.settings.Encoder)}"  -y')
+                    os.system(f'"{thisdir}/bin/ffmpeg" -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)}  {returnCRFFactor(self.main.settings.videoQuality,self.main.settings.Encoder)}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(self.main.settings.Encoder)}"  -y')
                     iteration+=1
                     if iteration == interpolation_sessions:
                         break
@@ -484,8 +491,16 @@ class interpolation(QObject):
                 
                 if 'cuda' in self.main.AI:
                     output_file = returnOutputFile(self.main,self.main.videoName,self.main.encoder)
+                    self.main.renderAI = RifeCUDA.Render(self.main,self.main.input_file,output_file,self.main.times)
+                    self.main.renderAI.extractFramesToBytes()
+                    readThread1 = Thread(target=self.main.renderAI.readThread)
+                    procThread1 = Thread(target=self.main.renderAI.procThread)
+                    renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
                     
-                    RifeCUDA.startRender(self.main,self.main.input_file,output_file,self.main.times)
+                    readThread1.start()
+                    procThread1.start()
+                    renderThread1.start()
+                    self.main.renderAI.log()
                     self.main.output_file = output_file
                     print('Done')
 

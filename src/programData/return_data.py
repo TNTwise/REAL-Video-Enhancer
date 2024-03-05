@@ -105,6 +105,8 @@ def returnCodec(codec):
             cpus=multiprocessing.cpu_count()
         return f'libaom-av1 -tiles 2x2 -b:v 0 -row-mt 1 -cpu-used {cpus}'
     
+
+    
 def returnCRFFactor(crffactor,encoder):
     if 'av1' in encoder:
         print('av1 crf')

@@ -153,7 +153,7 @@ def get_video_from_link(self,thread):
                                 file.write(chunk)
 
 def extractAudio(self,videopath,renderdir,videoName,thread):
-        self.start_time = time.time() 
+        
         self.file_drop_widget.hide()
         video = cv2.VideoCapture(self.input_file)
         try:
@@ -163,12 +163,13 @@ def extractAudio(self,videopath,renderdir,videoName,thread):
                         self.aspectratio = self.videowidth / self.videoheight
         except:
                         self.aspectratio = 1920 / 1080
+        os.system(f'mkdir -p "{renderdir}/{videoName}_temp/output_frames/0"')
         if self.localFile == True or self.youtubeFile == False:
                         thread.log.emit('[Extracting Audio]')
                         os.system(f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -vn -c:a aac -b:a 320k "{renderdir}/{videoName}_temp/audio.m4a" -y') # do same here i think maybe
         else:
                         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-                
+        self.start_time = time.time() 
 
 def extractFramesAndAudio(thread,self,renderdir,videoName,videopath,times): # called by workers.py after a started thread, used by both upscaling and interpolation
         try:

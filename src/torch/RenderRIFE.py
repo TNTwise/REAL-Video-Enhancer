@@ -8,6 +8,9 @@ thisdir = thisdir()
 import sys
 from threading import Thread
 import cv2
+import re
+from src.programData.settings import *
+import src.programData.return_data as return_data
 #read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -19,7 +22,6 @@ class Render:
         
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        times = 2
         self.interpolation_factor = times
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
@@ -29,6 +31,8 @@ class Render:
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.input_file = input_file
         self.output_file = output_file
+        self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.settings = Settings()
     def extractFramesToBytes(self):
         command = [f'{thisdir}/bin/ffmpeg', 
                    '-i', 
@@ -85,7 +89,7 @@ class Render:
         
         self.interpolate_process.run(frame1, frame2)
         self.writeBuffer.put(frame1)
-        for i in range(self.interpolation_factor - 1):
+        for i in range(int(self.interpolation_factor) - 1):
                     
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
@@ -123,20 +127,45 @@ class Render:
             return self.prevFrame
         except:
             print('No frame to return!')
+            
     def returnFrameCount(self):
-        pass
-
+        try:
+            return self.frame
+        except:
+            print('No frame to return!')
+            
     def returnFrameRate(self):
-        pass
+        try:
+            return self.frameRate
+        except:
+            print('No framerate to return!')
 
     def returnPercentageDone(self):
-        pass
+        try:
+            return self.frame/self.frame_count
+        except:
+            print('No frame to return!')
     
+    def log(self):
+        while True:
+            try:
+                for line in iter(self.writeProcess.stderr.readline, b''):
+                    self.frame = re.findall(r'frame=\d+',line.replace(' ','').replace(' ',''))[0].replace('frame=','')
+                    self.frame = int(self.frame.replace('frame=',''))
+                   
+                    self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','').replace(' ',''))[0].replace('fps=',''))
+            except Exception as e:
+                pass
 # save
 
 
     def FFmpegOut(self):
         print('saving')
+        try:
+            crf = return_data.returnCRFFactor(self.settings.videoQuality,self.settings.Encoder)
+        except Exception as e:
+            print(f'unable to set crf {e}')
+        
         command = [f'{thisdir}/bin/ffmpeg',
                    '-f', 
                    'rawvideo',
@@ -150,44 +179,53 @@ class Render:
                    f'{self.finalFPS}',
                    '-i',
                    '-',
-                   f'{self.output_file}',
-                   '-y']
-        process = subprocess.Popen(
+                   '-i',
+                   f'{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a',
+                   '-c:v',
+                   
+                   
+                   ]
+        encoder_list = return_data.returnCodec(self.settings.Encoder).split(' ')
+        command += encoder_list
+        command+=[f'-crf', 
+                   f'{crf.replace("-crf","")}',
+                   '-pix_fmt',
+                   'yuv420p',
+                   '-c:a',
+                   'copy',
+                   f'{self.output_file}']
+        self.writeProcess = subprocess.Popen(
                     command,
                     stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
                     text=True,
                     
                     universal_newlines=True,
                     
                 )
+        
         while True:
                 try:
                     frame = self.writeBuffer.get()
                     if frame is None:
                             
                             
-                            process.stdin.close()
-                            process.wait()
+                            self.writeProcess.stdin.close()
+                            self.writeProcess.wait()
                             print('done with save')
                             self.main.output_file = self.output_file
                             self.main.CudaRenderFinished = True
                             break
                     self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
-                    process.stdin.buffer.write(frame.tobytes())
+                    
+                    self.writeProcess.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
-                    print(e)
+                    print(f'Something went wrong with the writebuffer: {e}')
         
             
             
-def startRender(self,inputFile,outputFile,times):
-    render = Render(self,inputFile,outputFile,int(times))
-    render.extractFramesToBytes()
-    readThread1 = Thread(target=render.readThread)
-    procThread1 = Thread(target=render.procThread)
-    renderThread1 = Thread(target=render.FFmpegOut)
-    readThread1.start()
-    procThread1.start()
-    renderThread1.start()
+
+    
     
