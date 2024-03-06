@@ -22,7 +22,7 @@ class Render:
         
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        self.interpolation_factor = times
+        self.interpolation_factor = round(times)
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
@@ -91,7 +91,7 @@ class Render:
         
         self.writeBuffer.put(frame1)
         self.frame+=1
-        for i in range(int(self.interpolation_factor) - 1):
+        for i in range(self.interpolation_factor - 1):
                     
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
