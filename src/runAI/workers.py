@@ -142,7 +142,7 @@ class pb2X(QObject):
                         try:
                                 sleep(.5)
                                 self.main.files_processed = self.main.renderAI.returnFrameCount()
-                                self.main.currentRenderFPS = self.main.renderAI.returnFrameRate()
+                                
                                 try:
                                     self.progress.emit(self.main.files_processed)
                                 except Exception as e:
@@ -160,7 +160,7 @@ class pb2X(QObject):
                                 self.image_progress.emit('2')
                         except Exception as e:
                              traceback_info = traceback.format_exc()
-                             print(f"Soemthing went wrong with cuda image preview {e} {traceback_info}")
+                             log(f"Soemthing went wrong with cuda image preview {e} {traceback_info}")
                 except Exception as e:
                      log(f'Something went wrong with CUDA render: {e}')
                 print('CUDA render finished')     
@@ -497,12 +497,12 @@ class interpolation(QObject):
                     self.main.renderAI.extractFramesToBytes()
                     readThread1 = Thread(target=self.main.renderAI.readThread)
                     procThread1 = Thread(target=self.main.renderAI.procThread)
-                    renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+                    #renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
                     
                     readThread1.start()
                     procThread1.start()
-                    renderThread1.start()
-                    
+                    #renderThread1.start()
+                    self.main.renderAI.FFmpegOut()
                     self.main.output_file = output_file
                     print('Done')
 

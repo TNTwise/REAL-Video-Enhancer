@@ -489,13 +489,11 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                         #print(e)
                         self.ETA = None
-                self.removeLastLineInLogs('FPS: ') 
-                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
+                
                 self.i = 2
                 self.ui.RifePB.setValue(files_processed)
                 self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {self.filecount}')
-                self.removeLastLineInLogs('FPS: ') 
-                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
+                
         except Exception as e:
             #print(e)
             pass
@@ -556,14 +554,16 @@ class MainWindow(QtWidgets.QMainWindow):
                         return
                     self.pixMap = QPixmap(self.imageDisplay)
                 except:
-                    print('Cannot open image!')
+                    pass
+                    #print('Cannot open image!')
             if 'cuda' in self.AI:
 
                 try:    
                     self.pixMap = self.numpy_array_to_pixmap(self.imageDisplay)
-                except Exception as e:
-                    traceback_info = traceback.format_exc()
-                    print(f'noimage {e} {traceback_info}')  
+                except Exception:
+                    #traceback_info = traceback.format_exc()
+                    pass
+                    #print(f'noimage {e} {traceback_info}')  
                 
         if step == '2':
             try:

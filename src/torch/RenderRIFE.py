@@ -91,7 +91,6 @@ class Render:
         
         self.writeBuffer.put(frame1)
         self.frame+=1
-        print(self.interpolation_factor)
         for i in range(self.interpolation_factor - 1):
                     
                     result = self.interpolate_process.make_inference(
@@ -127,42 +126,27 @@ class Render:
         try:
             return self.prevFrame
         except:
-            print('No frame to return!')
-            
+            #print('No frame to return!')
+            pass
     def returnFrameCount(self):
         try:
             return self.frame
         except:
-            print('No frame to return!')
-            
+            #print('No frame to return!')
+            pass
     def returnFrameRate(self):
         try:
             return self.frameRate
-        except:
-            print('No framerate to return!')
+        except Exception as e:
+            print(f'No framerate to return! {e}')
 
     def returnPercentageDone(self):
         try:
             return self.frame/self.frame_count
         except:
-            print('No frame to return!')
+            #print('No frame to return!')
+            pass
     
-    def log(self):
-        
-            
-            try:
-                for line in iter(self.writeProcess.stderr.readline, b''):
-                    print(line)
-                    log(line)
-                    #self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
-                    #self.frame = int(self.frame.replace('frame=',''))
-                   
-                    self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
-                    
-            except Exception as e:
-                tb = traceback.format_exc()
-                print(tb,e)
-                log(f'{tb},{e}')
 # save
 
 
@@ -230,7 +214,6 @@ class Render:
                             break
                     self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
-                    self.log()
                     self.writeProcess.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
                     tb = traceback.format_exc()
