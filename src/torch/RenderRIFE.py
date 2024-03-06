@@ -88,17 +88,20 @@ class Render:
     def proc_image(self,frame1,frame2):
         
         self.interpolate_process.run(frame1, frame2)
+        
         self.writeBuffer.put(frame1)
+        self.frame+=1
         for i in range(int(self.interpolation_factor) - 1):
                     
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
                                 )
+                    self.frame+=1
                     self.writeBuffer.put(result)
         
         
     def procThread(self):
-        i=0
+        self.frame=0
         while True:
             frame = self.readBuffer.get()
             
@@ -112,12 +115,10 @@ class Render:
                 self.prevFrame = frame
                 continue
             
-            self.frame = i
-
+            
             self.proc_image(self.prevFrame,frame)
             self.prevFrame = frame
-            i+=1
-    
+
     def finish_render(self):
         self.writeBuffer.put(None)
 
