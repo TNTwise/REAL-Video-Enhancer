@@ -22,7 +22,7 @@ class Render:
         
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
-        self.interpolation_factor = round(times)
+        self.interpolation_factor = times
         self.prevFrame = None
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
@@ -91,7 +91,7 @@ class Render:
         
         self.writeBuffer.put(frame1)
         self.frame+=1
-        for i in range(self.interpolation_factor - 1):
+        for i in range(int(self.interpolation_factor) - 1):
                     
                     result = self.interpolate_process.make_inference(
                                     (i+1) * 1. / (self.interpolation_factor)
@@ -126,27 +126,43 @@ class Render:
         try:
             return self.prevFrame
         except:
-            #print('No frame to return!')
-            pass
+            print('No frame to return!')
+            
     def returnFrameCount(self):
         try:
             return self.frame
         except:
-            #print('No frame to return!')
-            pass
+            print('No frame to return!')
+            
     def returnFrameRate(self):
         try:
             return self.frameRate
-        except Exception as e:
-            print(f'No framerate to return! {e}')
+        except:
+            print('No framerate to return!')
 
     def returnPercentageDone(self):
         try:
             return self.frame/self.frame_count
         except:
-            #print('No frame to return!')
-            pass
+            print('No frame to return!')
     
+    def log(self):
+        while True:
+            
+            try:
+                for line in iter(self.writeProcess.stderr.readline, b''):
+                    print(line)
+                    log(line)
+                    #self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
+                    #self.frame = int(self.frame.replace('frame=',''))
+                   
+                    #self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
+                    
+            except Exception as e:
+                pass
+                #tb = traceback.format_exc()
+                #print(tb,e)
+                #log(f'{tb},{e}')
 # save
 
 
@@ -214,6 +230,7 @@ class Render:
                             break
                     self.main.imageDisplay=frame
                     frame = np.ascontiguousarray(frame)
+                   
                     self.writeProcess.stdin.buffer.write(frame.tobytes())
                 except Exception as e:
                     tb = traceback.format_exc()
