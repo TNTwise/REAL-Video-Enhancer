@@ -11,6 +11,7 @@ import cv2
 import re
 from src.programData.settings import *
 import src.programData.return_data as return_data
+from time import sleep
 #read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -147,11 +148,11 @@ class Render:
             print('No frame to return!')
     
     def log(self):
-        while True:
+        sleep(1)
+        while self.main.CudaRenderFinished:
             
             try:
                 for line in iter(self.writeProcess.stderr.readline, b''):
-                    print(line)
                     log(line)
                     #self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
                     #self.frame = int(self.frame.replace('frame=',''))
@@ -163,6 +164,8 @@ class Render:
                 #tb = traceback.format_exc()
                 #print(tb,e)
                 #log(f'{tb},{e}')
+        print('Done with logging')
+        log('done with logging thread for cuda')
 # save
 
 

@@ -413,7 +413,6 @@ class interpolation(QObject):
                     except:
                         self.log.emit(f'Transitions detected: 0')
             self.Render(self.model,self.main.times,self.main.input_file,self.main.output_folder)
-    import math
     def Render(self,model,times,videopath,outputpath):
             
                 self.main.paused = False
@@ -498,11 +497,12 @@ class interpolation(QObject):
                     readThread1 = Thread(target=self.main.renderAI.readThread)
                     procThread1 = Thread(target=self.main.renderAI.procThread)
                     renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-                    
+                    #logThread1 = Thread(target=self.main.renderAI.log)
                     readThread1.start()
                     procThread1.start()
                     renderThread1.start()
                     self.main.renderAI.log() ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+                    #logThread1.start()
                     self.main.output_file = output_file
                     print('Done')
 
