@@ -7,21 +7,30 @@ from src.misc.messages import *
 from src.runAI.discord_rpc import *
 import os
 from modules.commands import *
-from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
+from cv2 import (
+    VideoCapture,
+    CAP_PROP_FRAME_WIDTH,
+    CAP_PROP_FRAME_HEIGHT,
+    CAP_PROP_FPS,
+    CAP_PROP_FRAME_COUNT,
+)
 import modules.upscale as upscale
 from src.misc.log import *
-#this file changes the GUI aspects of the AI
+
+# this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 settings = Settings()
+
+
 def modelOptions(self):
-    log('Model: RealSR')
-    self.times=1
-    self.render='esrgan'
+    log("Model: RealSR")
+    self.times = 1
+    self.render = "esrgan"
     self.ui.Rife_Model.clear()
-    self.ui.FPSPreview.setText('RES:')
-    self.ui.Rife_Model.addItem('DF2K')
-    self.ui.Rife_Model.addItem('DF2K_JPEG')
+    self.ui.FPSPreview.setText("RES:")
+    self.ui.Rife_Model.addItem("DF2K")
+    self.ui.Rife_Model.addItem("DF2K_JPEG")
     self.ui.EnsembleCheckBox.hide()
     self.ui.EnsembleCheckBox.hide()
     self.ui.FPSFrom.hide()
@@ -36,15 +45,15 @@ def modelOptions(self):
     try:
         self.ui.RifeStart.clicked.disconnect()
     except:
-          pass
+        pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
     self.greyOutRealSRTimes()
-    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realsr-ncnn-vulkan'))
+    self.ui.RifeStart.clicked.connect(
+        lambda: upscale.start_upscale(self, "realsr-ncnn-vulkan")
+    )
     self.ui.Rife_Times.clear()
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
-    
-    
-    self.ui.Rife_Times.addItem('4X')
-    self.ui.Rife_Times.setCurrentIndex(0)
 
+    self.ui.Rife_Times.addItem("4X")
+    self.ui.Rife_Times.setCurrentIndex(0)

@@ -3,9 +3,10 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QPalette, QColor
 from src.programData.settings import Settings
 
+
 def set_theme(app):
     settings = Settings()
-    if settings.Theme == 'Dark':
+    if settings.Theme == "Dark":
         app.setStyle("Fusion")
 
         # Now use a palette to switch to dark colors:
@@ -30,8 +31,8 @@ def set_theme(app):
         palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
         palette.setColor(QPalette.HighlightedText, Qt.black)
         app.setPalette(palette)
-        
-    if settings.Theme == 'Flashbang':
+
+    if settings.Theme == "Flashbang":
         app.setStyle("Fusion")
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(240, 240, 240))
@@ -49,8 +50,12 @@ def set_theme(app):
         palette.setColor(QPalette.Disabled, QPalette.ButtonText, QColor(160, 160, 160))
         palette.setColor(QPalette.Disabled, QPalette.Window, QColor(240, 240, 240))
         palette.setColor(QPalette.Disabled, QPalette.WindowText, QColor(160, 160, 160))
-        palette.setColor(QPalette.BrightText, Qt.green)  # You can choose a suitable bright text color
+        palette.setColor(
+            QPalette.BrightText, Qt.green
+        )  # You can choose a suitable bright text color
         palette.setColor(QPalette.Link, QColor(42, 130, 218))
-        palette.setColor(QPalette.Highlight, QColor(150, 200, 255))  # Light blue highlight
+        palette.setColor(
+            QPalette.Highlight, QColor(150, 200, 255)
+        )  # Light blue highlight
         palette.setColor(QPalette.HighlightedText, Qt.black)
         app.setPalette(palette)

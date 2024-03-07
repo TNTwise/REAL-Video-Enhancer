@@ -7,10 +7,17 @@ from src.misc.messages import *
 from src.runAI.discord_rpc import *
 import os
 from modules.commands import *
-from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
+from cv2 import (
+    VideoCapture,
+    CAP_PROP_FRAME_WIDTH,
+    CAP_PROP_FRAME_HEIGHT,
+    CAP_PROP_FPS,
+    CAP_PROP_FRAME_COUNT,
+)
 import modules.upscale as upscale
 from src.misc.log import *
-#this file changes the GUI aspects of the AI
+
+# this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 import src.programData.checks as checks
@@ -18,46 +25,43 @@ from PyQt5.QtCore import QThread
 
 import src.runAI.workers as workers
 
-def initializeInterpolation(self,AI):#1st stage in preparing render, starts all worker threads
+
+def initializeInterpolation(
+    self, AI
+):  # 1st stage in preparing render, starts all worker threads
     try:
         settings = Settings()
         os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-        #self.ui.QueueButton.show()
-        
-        
+        # self.ui.QueueButton.show()
 
         self.AI = AI
         self.rifeThread = QThread()
         model = self.ui.Rife_Model.currentText()
-        self.rifeWorker = workers.interpolation(self,model)         
-        
+        self.rifeWorker = workers.interpolation(self, model)
+
         self.setDisableEnable(True)
-        
-        if settings.DiscordRPC == 'Enabled':
+
+        if settings.DiscordRPC == "Enabled":
             try:
-                start_discordRPC(self,'Interpolating')
+                start_discordRPC(self, "Interpolating")
             except Exception as e:
-                print('No Discord Installation')
+                print("No Discord Installation")
                 print(e)
-        #set UI
-        
-        self.ui.ETAPreview.setText('ETA:')
-        self.ui.processedPreview.setText('Files Processed:')
-                
-        
-            # Step 3: Create a worker object
-        
-        #check if ensemble
-        if self.ui.EnsembleCheckBox.isChecked() == True and 'rife-ncnn-vulkan' in AI:
-            if os.path.exists(f'{settings.ModelDir}/rife/{model}-ensemble'):
-                model+='-ensemble'
+        # set UI
+
+        self.ui.ETAPreview.setText("ETA:")
+        self.ui.processedPreview.setText("Files Processed:")
+
+        # Step 3: Create a worker object
+
+        # check if ensemble
+        if self.ui.EnsembleCheckBox.isChecked() == True and "rife-ncnn-vulkan" in AI:
+            if os.path.exists(f"{settings.ModelDir}/rife/{model}-ensemble"):
+                model += "-ensemble"
             else:
                 ensembleModelDoesntExist(self)
-                
-        
-        
+
         self.ui.logsPreview.clear()
-        
 
         # Step 4: Move worker to the thread
         self.rifeWorker.moveToThread(self.rifeThread)
@@ -70,42 +74,48 @@ def initializeInterpolation(self,AI):#1st stage in preparing render, starts all 
         self.rifeWorker.removelog.connect(self.removeLastLineInLogs)
         # Step 6: Start the thread
         self.rifeThread.start()
-        
+
         self.runPB()
     except Exception as e:
         traceback_info = traceback.format_exc()
-        log(f'ERROR: {e} {traceback_info}')
+        log(f"ERROR: {e} {traceback_info}")
         self.showDialogBox(e)
-def start_interpolation(self,AI): #command directly connected to the rife start button
-    try:           
-        if self.input_file != '':
-            self.render='rife'
-            has_enough_space,predicted_space,total_space = checks.check_if_enough_space(self.input_file,self.render,self.times)
+
+
+def start_interpolation(
+    self, AI
+):  # command directly connected to the rife start button
+    try:
+        if self.input_file != "":
+            self.render = "rife"
+            has_enough_space, predicted_space, total_space = (
+                checks.check_if_enough_space(self.input_file, self.render, self.times)
+            )
             if self.input_file.count("'") > 0 or '"' in self.input_file:
                 quotes(self)
-                return 
-            has_enough_output_space,predicted_output_space,total_output_space = checks.check_if_enough_space_output_disk(self.input_file,self.render,self.times)
+                return
+            has_enough_output_space, predicted_output_space, total_output_space = (
+                checks.check_if_enough_space_output_disk(
+                    self.input_file, self.render, self.times
+                )
+            )
             if not has_enough_output_space:
-                if not_enough_output_storage(self,predicted_output_space,total_output_space):
-                    initializeInterpolation(self,AI)
+                if not_enough_output_storage(
+                    self, predicted_output_space, total_output_space
+                ):
+                    initializeInterpolation(self, AI)
                 else:
                     pass
             if has_enough_space:
-                initializeInterpolation(self,AI)
-            elif not_enough_storage(self,predicted_space,total_space):
-                initializeInterpolation(self,AI)
+                initializeInterpolation(self, AI)
+            elif not_enough_storage(self, predicted_space, total_space):
+                initializeInterpolation(self, AI)
             else:
                 pass
         else:
-                no_input_file(self)
-    
+            no_input_file(self)
+
     except Exception as e:
         traceback_info = traceback.format_exc()
-        log(f'ERROR: {e} {traceback_info}')
+        log(f"ERROR: {e} {traceback_info}")
         self.showDialogBox(e)
-            
-
-
-        
-        
-        

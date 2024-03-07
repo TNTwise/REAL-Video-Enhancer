@@ -7,30 +7,39 @@ from src.misc.messages import *
 from src.runAI.discord_rpc import *
 import os
 from modules.commands import *
-from cv2 import VideoCapture, CAP_PROP_FRAME_WIDTH, CAP_PROP_FRAME_HEIGHT, CAP_PROP_FPS, CAP_PROP_FRAME_COUNT
+from cv2 import (
+    VideoCapture,
+    CAP_PROP_FRAME_WIDTH,
+    CAP_PROP_FRAME_HEIGHT,
+    CAP_PROP_FPS,
+    CAP_PROP_FRAME_COUNT,
+)
 import modules.upscale as upscale
 from src.misc.log import *
-#this file changes the GUI aspects of the AI
+
+# this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 settings = Settings()
+
+
 def modelOptions(self):
-    log('Model: RealESRGAN')
-    self.times=1
+    log("Model: RealESRGAN")
+    self.times = 1
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
     self.ui.FPSTo.hide()
     self.ui.FPSToSign.hide()
-    self.render='esrgan'
+    self.render = "esrgan"
     self.ui.Rife_Model.clear()
-    self.ui.FPSPreview.setText('RES:')
-    self.ui.Rife_Model.addItem('Animation')
+    self.ui.FPSPreview.setText("RES:")
+    self.ui.Rife_Model.addItem("Animation")
     self.ui.EnsembleCheckBox.hide()
     self.ui.ensembleHelpButton.hide()
-    for i in os.listdir(f'{settings.ModelDir}realesrgan/models/'):
-                        if (os.path.splitext(i)[1])[1:] == 'bin':
-                            if i not in default_models():
-                                self.ui.Rife_Model.addItem(i.replace('.bin',''))
+    for i in os.listdir(f"{settings.ModelDir}realesrgan/models/"):
+        if (os.path.splitext(i)[1])[1:] == "bin":
+            if i not in default_models():
+                self.ui.Rife_Model.addItem(i.replace(".bin", ""))
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
@@ -39,19 +48,27 @@ def modelOptions(self):
     try:
         self.ui.RifeStart.clicked.disconnect()
     except:
-          pass
+        pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
     self.greyOutRealSRTimes()
-    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self,'realesrgan-ncnn-vulkan'))
+    self.ui.RifeStart.clicked.connect(
+        lambda: upscale.start_upscale(self, "realesrgan-ncnn-vulkan")
+    )
     self.ui.Rife_Times.clear()
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
-    
-    self.ui.Rife_Times.addItem('2X')
-    self.ui.Rife_Times.addItem('3X')
-    self.ui.Rife_Times.addItem('4X')
+
+    self.ui.Rife_Times.addItem("2X")
+    self.ui.Rife_Times.addItem("3X")
+    self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.setCurrentIndex(0)
 
 
 def default_models():
-    return ['realesr-animevideov3-x2.bin','realesr-animevideov3-x3.bin','realesr-animevideov3-x4.bin','realesrgan-x4plus-anime.bin','realesrgan-x4plus.bin']
+    return [
+        "realesr-animevideov3-x2.bin",
+        "realesr-animevideov3-x3.bin",
+        "realesr-animevideov3-x4.bin",
+        "realesrgan-x4plus-anime.bin",
+        "realesrgan-x4plus.bin",
+    ]

@@ -22,12 +22,16 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.setObjectName("verticalLayout_4")
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.horizontalLayout_3.addItem(spacerItem)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setObjectName("label")
         self.horizontalLayout_3.addWidget(self.label)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.horizontalLayout_3.addItem(spacerItem1)
         self.verticalLayout_4.addLayout(self.horizontalLayout_3)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
@@ -130,13 +134,19 @@ class Ui_MainWindow(object):
         self.rife414lite.setObjectName("rife414lite")
         self.verticalLayout_6.addWidget(self.rife414lite)
         self.gridLayout.addLayout(self.verticalLayout_6, 1, 3, 1, 1)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem2 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.gridLayout.addItem(spacerItem2, 1, 0, 1, 1)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem3 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.gridLayout.addItem(spacerItem3, 1, 4, 1, 1)
         self.verticalLayout_5 = QtWidgets.QVBoxLayout()
         self.verticalLayout_5.setObjectName("verticalLayout_5")
-        spacerItem4 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem4 = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.verticalLayout_5.addItem(spacerItem4)
         self.next = QtWidgets.QPushButton(self.centralwidget)
         self.next.setObjectName("next")
@@ -146,16 +156,22 @@ class Ui_MainWindow(object):
         self.label_3.setMaximumSize(QtCore.QSize(16777215, 20))
         self.label_3.setObjectName("label_3")
         self.gridLayout.addWidget(self.label_3, 0, 5, 1, 1)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem5 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.gridLayout.addItem(spacerItem5, 1, 6, 1, 1)
-        spacerItem6 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem6 = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.gridLayout.addItem(spacerItem6, 1, 2, 1, 1)
         self.vert_lay = QtWidgets.QVBoxLayout()
         self.vert_lay.setObjectName("vert_lay")
         self.custom_models = QtWidgets.QVBoxLayout()
         self.custom_models.setObjectName("custom_models")
         self.vert_lay.addLayout(self.custom_models)
-        spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
+        spacerItem7 = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding
+        )
         self.vert_lay.addItem(spacerItem7)
         self.gridLayout.addLayout(self.vert_lay, 1, 5, 1, 1)
         self.verticalLayout_2.addLayout(self.gridLayout)
@@ -172,7 +188,12 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "REAL Video Enhancer"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:22pt; font-weight:700;\">Select Rife Models to Download:</span></p></body></html>"))
+        self.label.setText(
+            _translate(
+                "MainWindow",
+                '<html><head/><body><p><span style=" font-size:22pt; font-weight:700;">Select Rife Models to Download:</span></p></body></html>',
+            )
+        )
         self.rife.setText(_translate("MainWindow", "Rife "))
         self.rifeanime.setText(_translate("MainWindow", "Rife-Anime "))
         self.rifehd.setText(_translate("MainWindow", "Rife-HD "))
@@ -183,7 +204,9 @@ class Ui_MainWindow(object):
         self.rife30.setText(_translate("MainWindow", "Rife-V3.0"))
         self.rife31.setText(_translate("MainWindow", "Rife-V3.1"))
         self.label_4.setText(_translate("MainWindow", "Old Models (2X)"))
-        self.label_2.setText(_translate("MainWindow", "Recommended models  (2X), (4X), (8X)"))
+        self.label_2.setText(
+            _translate("MainWindow", "Recommended models  (2X), (4X), (8X)")
+        )
         self.rife4.setText(_translate("MainWindow", "Rife-V4"))
         self.rife41.setText(_translate("MainWindow", "Rife-V4.1"))
         self.rife42.setText(_translate("MainWindow", "Rife-V4.2"))

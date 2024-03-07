@@ -33,16 +33,15 @@ class Rife:
         self.handle_model()
 
     def handle_model(self):
-            
         from .rife414.RIFE_HDv3 import Model
+
         self.filename = "flownet.pkl"
 
-            
-        
         filenameWithoutExtension = os.path.splitext(self.filename)[0]
-        
-        
-        modelDir = os.path.dirname(os.path.join(f'{thisdir}',"models", "rife-cuda", 'rife414', "flownet.pkl"))
+
+        modelDir = os.path.dirname(
+            os.path.join(f"{thisdir}", "models", "rife-cuda", "rife414", "flownet.pkl")
+        )
 
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")
@@ -67,7 +66,6 @@ class Rife:
         self.model = Model()
         self.model.load_model(modelDir, -1)
         self.model.eval()
-        
 
         if self.cuda_available and self.half:
             self.model.half()
