@@ -106,8 +106,9 @@ class Render:
         
         
         while True:
-            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and len(self.main.transitionFrames) > 0:
-                self.transition_frame = self.main.transitionFrames[0]
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled':
+                if len(self.main.transitionFrames) > 0:
+                    self.transition_frame = self.main.transitionFrames[0]
             else:
                 self.transition_frame = -1
             frame = self.readBuffer.get()
