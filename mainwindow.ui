@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>837</height>
+    <height>859</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -707,19 +707,8 @@
                <enum>QFrame::Raised</enum>
               </property>
               <layout class="QGridLayout" name="gridLayout">
-               <item row="1" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_17">
-                 <item>
-                  <widget class="QLabel" name="label_19">
-                   <property name="text">
-                    <string>Default Rife Model:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="defaultRifeModel"/>
-                 </item>
-                </layout>
+               <item row="5" column="0">
+                <layout class="QGridLayout" name="gridLayout_6"/>
                </item>
                <item row="7" column="0">
                 <widget class="QPushButton" name="InstallButton">
@@ -751,126 +740,6 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <layout class="QHBoxLayout" name="horizontalLayout_18">
-                 <item>
-                  <widget class="QLabel" name="label_20">
-                   <property name="text">
-                    <string>Import ESRGAN Model</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="esrganHelpModel">
-                   <property name="maximumSize">
-                    <size>
-                     <width>40</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="ESRGANModelSelectButton">
-                   <property name="text">
-                    <string>Select Bin/Param file</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="5" column="0">
-                <layout class="QGridLayout" name="gridLayout_6">
-                 <item row="7" column="0">
-                  <widget class="QCheckBox" name="RealSRCheckBox">
-                   <property name="text">
-                    <string>RealSR</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="1">
-                  <widget class="QPushButton" name="RifeSettings">
-                   <property name="text">
-                    <string>Settings</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="8" column="0">
-                  <widget class="QCheckBox" name="RifeCheckBox">
-                   <property name="text">
-                    <string>Rife NCNN</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="6" column="0">
-                  <widget class="QCheckBox" name="Waifu2xCheckBox">
-                   <property name="text">
-                    <string>Waifu2X</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QCheckBox" name="RealESRGANCheckBox">
-                   <property name="text">
-                    <string>RealESRGAN</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="11" column="0">
-                  <widget class="QCheckBox" name="RifeVSCheckBox">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>VS-Rife</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QCheckBox" name="RealCUGANCheckBox">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>RealCUGAN</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="10" column="0">
-                  <widget class="QCheckBox" name="CainCheckBox">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="text">
-                    <string>IFRNET</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="9" column="0">
-                  <widget class="QCheckBox" name="RifeCUDACheckBox">
-                   <property name="text">
-                    <string>Rife CUDA</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_18">
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Model Defaults</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
                 <widget class="QLabel" name="label_13">
                  <property name="maximumSize">
                   <size>
@@ -881,6 +750,161 @@
                  <property name="text">
                   <string>Available Models:</string>
                  </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QTabWidget" name="modelTabWidget">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="NCNNTab">
+                  <attribute name="title">
+                   <string>NCNN (AMD/Intel/Nvidia)</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout">
+                   <item>
+                    <widget class="QCheckBox" name="RealCUGANCheckBox">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="text">
+                      <string>RealCUGAN</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="RealESRGANCheckBox">
+                     <property name="text">
+                      <string>RealESRGAN</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="Waifu2xCheckBox">
+                     <property name="text">
+                      <string>Waifu2X</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="RealSRCheckBox">
+                     <property name="text">
+                      <string>RealSR</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_15">
+                     <item>
+                      <widget class="QCheckBox" name="RifeCheckBox">
+                       <property name="text">
+                        <string>RIFE</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="RifeSettings">
+                       <property name="text">
+                        <string>Settings</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="CainCheckBox">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="text">
+                      <string>IFRNET</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="RifeVSCheckBox">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string>VS-Rife</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_18">
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                     <property name="text">
+                      <string>Model Defaults</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_16">
+                     <item>
+                      <widget class="QLabel" name="label_19">
+                       <property name="text">
+                        <string>Default Rife NCNN Model:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="defaultRifeModel"/>
+                     </item>
+                    </layout>
+                   </item>
+                   <item>
+                    <layout class="QHBoxLayout" name="horizontalLayout_20">
+                     <item>
+                      <widget class="QLabel" name="label_20">
+                       <property name="text">
+                        <string>Import ESRGAN NCNN Model</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="esrganHelpModel">
+                       <property name="maximumSize">
+                        <size>
+                         <width>40</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="ESRGANModelSelectButton">
+                       <property name="text">
+                        <string>Select Bin/Param file</string>
+                       </property>
+                      </widget>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="CUDATab">
+                  <attribute name="title">
+                   <string>CUDA (Nvidia Only)</string>
+                  </attribute>
+                  <layout class="QVBoxLayout" name="verticalLayout">
+                   <item>
+                    <widget class="QCheckBox" name="RifeCUDACheckBox">
+                     <property name="text">
+                      <string>RIFE</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
                 </widget>
                </item>
               </layout>

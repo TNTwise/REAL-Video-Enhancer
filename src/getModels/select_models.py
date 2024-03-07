@@ -26,7 +26,14 @@ from src.programData.settings import *
 settings = Settings()
 from src.getModels.returnModelList import *
 from src.misc.log import log
+try:
+    import torch
+    import torchvision
+    torch_version = True
 
+except Exception as e:
+    torch_version = False
+    
 import src.getModels.SelectAI as SelectAI
 import traceback
 class Worker(QObject):
@@ -98,8 +105,12 @@ class Worker(QObject):
 
                             with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                                 name=i.replace('.zip','')
-                                original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                if '-ncnn-vulkan' in name:
+                                    original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                    original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                else:
+                                         original_ai_name = name
+                                         original_ai_name_ncnn_vulkan = name
 
 
                                 zip_ref.extractall(f'{thisdir}/files/')
@@ -179,8 +190,10 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
                 msg.exec_()
             def pinFunctions(self):
-                 self.ui.InstallButton.clicked.connect(self.next)
-                 self.ui.RifeSettings.clicked.connect(lambda: choose_models(self))
+                    
+                self.ui.modelsTabWidget.setTabEnabled(1,torch_version)
+                self.ui.InstallButton.clicked.connect(self.next)
+                self.ui.RifeSettings.clicked.connect(lambda: choose_models(self))
                  
             def next(self):
                 global install_modules_dict
@@ -325,11 +338,15 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                                 with ZipFile(f'{thisdir}/files/{i}', 'r') as zip_ref:
                                     name=i.replace('.zip','')
                                     if '-ncnn-vulkan' in name:
-                                        original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
-                                        original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
-                                        print(original_ai_name)
+                                        try:
+                                            original_ai_name_ncnn_vulkan = re.findall(r'[\w]*-ncnn-vulkan', name)[0]
+                                            original_ai_name = original_ai_name_ncnn_vulkan.replace('-ncnn-vulkan','')
+                                            print(original_ai_name)
+                                        except:
+                                            pass
                                     else:
                                          original_ai_name = name
+                                         original_ai_name_ncnn_vulkan = name
 
                                     zip_ref.extractall(f'{thisdir}/files/')
 

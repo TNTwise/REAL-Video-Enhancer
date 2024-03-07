@@ -37,14 +37,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QPushButton" name="InstallButton">
          <property name="text">
           <string>Install</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QProgressBar" name="installModelsProgressBar">
          <property name="maximumSize">
           <size>
@@ -67,83 +67,107 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <layout class="QGridLayout" name="gridLayout_6">
-         <item row="6" column="0">
-          <widget class="QCheckBox" name="RealSRCheckBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>RealSR (Upscale General)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="RealESRGANCheckBox">
-           <property name="text">
-            <string>RealESRGAN (Upscale Animation)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="RealCUGANCheckBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>RealCUGAN (Upscale Animation)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QCheckBox" name="RifeCheckBox">
-           <property name="text">
-            <string>RIFE NCNN (Interpolate General)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
-          <widget class="QPushButton" name="RifeSettings">
-           <property name="text">
-            <string>Settings</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="Waifu2xCheckBox">
-           <property name="text">
-            <string>Waifu2X  (Upscale Animation)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="12" column="0">
-          <widget class="QCheckBox" name="RifeVSCheckBox">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>VS-Rife (Interpolate General)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="15" column="0">
-          <widget class="QCheckBox" name="CainCheckBox">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>IFRNET (Interpolate General)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="0">
-          <widget class="QCheckBox" name="RifeCUDACheckBox">
-           <property name="text">
-            <string>RIFE CUDA (Interpolate General)</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QTabWidget" name="modelsTabWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="NCNNTab">
+          <attribute name="title">
+           <string>NCNN (AMD/Intel/Nvidia)</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QCheckBox" name="RifeCheckBox">
+               <property name="text">
+                <string>RIFE (Interpolate General)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="RifeSettings">
+               <property name="text">
+                <string>Settings</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="RealESRGANCheckBox">
+             <property name="text">
+              <string>RealESRGAN (Upscale Animation)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="RealSRCheckBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>RealSR (Upscale General)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="Waifu2xCheckBox">
+             <property name="text">
+              <string>Waifu2X  (Upscale Animation)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="RealCUGANCheckBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>RealCUGAN (Upscale Animation)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="CainCheckBox">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>IFRNET (Interpolate General)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="RifeVSCheckBox">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>VS-Rife (Interpolate General)</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="CUDATab">
+          <attribute name="title">
+           <string>CUDA (Nvidia Only)</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <item>
+            <widget class="QCheckBox" name="RifeCUDACheckBox">
+             <property name="text">
+              <string>RIFE (Interpolate General)</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <layout class="QGridLayout" name="gridLayout_6"/>
        </item>
       </layout>
      </widget>

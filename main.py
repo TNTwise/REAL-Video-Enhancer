@@ -9,6 +9,7 @@ try:
 except Exception as e:
     log(f'ncnn_verson {e}')
     torch_version = False
+    
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import numpy as np
@@ -190,6 +191,7 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
+                
             self.ui.installModelsProgressBar.setMaximum(100)
             self.localFile = True
             src.misc.onProgramStart.onApplicationStart(self)

@@ -305,6 +305,7 @@ def set_model_params(self):
             self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels['Rife Cuda (Nvidia only)'] = 'interpolation'
         else:
+            self.ui.modelTabWidget.setTabEnabled(1,False)
             self.ui.RifeCUDACheckBox.setDisabled(True)
     self.ui.modeCombo.clear()
     upscale_list=[]
