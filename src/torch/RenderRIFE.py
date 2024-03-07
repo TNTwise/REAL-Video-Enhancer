@@ -103,7 +103,13 @@ class Render:
         
     def procThread(self):
         self.frame=0
+        
+        
         while True:
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and len(self.main.transitionFrames) > 0:
+                self.transition_frame = self.main.transitionFrames[0]
+            else:
+                self.transition_frame = -1
             frame = self.readBuffer.get()
             
             if frame is None:
@@ -116,8 +122,18 @@ class Render:
                 self.prevFrame = frame
                 continue
             
-            
-            self.proc_image(self.prevFrame,frame)
+            if self.frame != self.transition_frame-self.interpolation_factor:
+                self.proc_image(self.prevFrame,frame)
+                
+            else:
+                
+                
+                for i in range(self.interpolation_factor):
+                    self.writeBuffer.put(frame)
+                    
+                self.frame+=self.interpolation_factor
+                self.transition_frame = self.main.transitionFrames.pop(0)
+                
             self.prevFrame = frame
 
     def finish_render(self):
@@ -149,7 +165,7 @@ class Render:
     
     def log(self):
         sleep(1)
-        while self.main.CudaRenderFinished:
+        while not self.main.CudaRenderFinished:
             
             try:
                 for line in iter(self.writeProcess.stderr.readline, b''):

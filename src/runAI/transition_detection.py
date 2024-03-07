@@ -86,6 +86,7 @@ class TransitionDetection:
                 self.timestamps = timestamps
                 print(timestamps)
                 cap.release()
+                return self.timestamps
 
             
     def get_frame_num(self,times,frames_subtracted=0):

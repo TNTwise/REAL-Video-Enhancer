@@ -400,13 +400,13 @@ class interpolation(QObject):
                 if self.main.AI == 'rife-ncnn-vulkan':
                         if 'v4' in self.model:
                             self.main.times=(self.main.ui.FPSTo.value()/self.main.ui.FPSFrom.value())
-                if self.main.settings.SceneChangeDetectionMode == 'Enabled' and self.main.settings.Encoder != 'Lossless':
+            if self.main.settings.SceneChangeDetectionMode == 'Enabled' and self.main.settings.Encoder != 'Lossless':
                     self.log.emit('Detecting Transitions')
                     
-                    print(self.main.times)
                     self.main.transitionDetection = src.runAI.transition_detection.TransitionDetection(self.main)
-                    self.main.transitionDetection.find_timestamps()
-                    self.main.transitionDetection.get_frame_num(self.main.times)
+                    self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
+                    if '-ncnn-vulkan' in self.main.AI:
+                        self.main.transitionDetection.get_frame_num(self.main.times)
                     divisor=(self.main.times/2)
                     try:
                         self.log.emit(f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//divisor))}')
