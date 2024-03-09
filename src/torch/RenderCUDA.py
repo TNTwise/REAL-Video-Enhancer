@@ -153,7 +153,7 @@ class Render:
             "-s",
             f"{self.outputWidth}x{self.outputHeight}",
             "-r",
-            f"{int(self.finalFPS)}",
+            f"{self.finalFPS}",
             "-i",
             "-",
         ]

@@ -23,10 +23,9 @@ class UpscaleCUDA:
         self.cuda_available = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.cuda_available else "cpu")
         
-    def pad_frame(self,image):
-        return F.pad(image, [0, self.padding[1], 0, self.padding[3]])
+
         
-        
+    @torch.inference_mode()
     def UpscaleImage(self,npArr):
         image = (
             torch.from_numpy(npArr)
@@ -37,19 +36,14 @@ class UpscaleCUDA:
             / 255.0
         )
         image = image.contiguous(memory_format=torch.channels_last)
-        ph = ((self.height - 1) // 64 + 1) * 64
-        pw = ((self.width - 1) // 64 + 1) * 64
-        self.padding = (0, pw - self.width, 0, ph - self.height)
         
-        if self.padding != (0, 0, 0, 0):
-            image = self.pad_frame(image)
             
         
         output = self.model(image)
         #output = output[:, :, : self.width, : self.height]
-        output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
+        output = output.squeeze(0).permute(1, 2, 0).mul_(255).clamp_(0, 255).byte()
         
-        return output
+        return output.cpu().numpy()
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
