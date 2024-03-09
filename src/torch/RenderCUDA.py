@@ -34,8 +34,10 @@ class Render:
         
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
-        self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)) * resIncrease
-        self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)) * resIncrease
+        self.originalWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.outputWidth = self.originalWidth * resIncrease
+        self.originalHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.outputHeight = self.originalHeight * resIncrease
         self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         
         self.finalFPS = self.initialFPS * self.interpolation_factor
@@ -54,7 +56,7 @@ class Render:
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.width}x{self.height}",
+            f"{self.originalWidth}x{self.originalHeight}",
             "-",
         ]
         
@@ -64,7 +66,7 @@ class Render:
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-        self.frame_size = self.width * self.height * 3
+        self.frame_size = self.originalWidth * self.originalHeight * 3
 
     def readThread(self):
         while True:
@@ -77,7 +79,7 @@ class Render:
                 print("done with read")
                 break
             frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
-                (self.height, self.width, 3)
+                (self.originalHeight, self.originalWidth, 3)
             )
 
             self.readBuffer.put(frame)
@@ -149,7 +151,7 @@ class Render:
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.width}x{self.height}",
+            f"{self.outputWidth}x{self.outputHeight}",
             "-r",
             f"{int(self.finalFPS)}",
             "-i",
@@ -209,8 +211,8 @@ class Interpolation(Render):
         self.interpolate_process = Rife(
             interpolation_factor=self.interpolation_factor,
             interpolate_method="rife4.14",
-            width=self.width,
-            height=self.height,
+            width=self.originalWidth,
+            height=self.originalHeight,
             half=True,
         )
     def proc_image(self, frame1, frame2):
@@ -270,8 +272,8 @@ class Upscaling(Render):
 
     def procUpscaleThread(self):
         self.frame = 0
-        self.upscaleMethod = UpscaleCUDA(self.width,
-                                         self.height)
+        self.upscaleMethod = UpscaleCUDA(self.originalWidth,
+                                         self.originalHeight)
         while True:
             
             frame = self.readBuffer.get()
@@ -287,7 +289,7 @@ class Upscaling(Render):
             
             self.writeBuffer.put(result)
             self.prevFrame = result
-
+            
             self.frame += 1
 
             

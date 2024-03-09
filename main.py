@@ -558,11 +558,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def numpy_array_to_pixmap(self, numpy_array):
         # Assuming the NumPy array has shape (height, width, channels)
         height, width, channels = numpy_array.shape
+        
+        
+        
         bytes_per_line = channels * width
 
         # Create a QImage from the NumPy array
         q_image = QImage(
-            numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888
+            numpy_array.data, width=width, height=height, bytesPerLine=bytes_per_line, format=QImage.Format_RGB888
         )
 
         # Create a QPixmap from the QImage

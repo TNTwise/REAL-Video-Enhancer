@@ -38,7 +38,7 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("2X")
     self.ui.Rife_Times.addItem("3X")
     self.ui.Rife_Times.addItem("4X")
-    self.ui.Rife_Model.addItems(["realesrgan-anime-2x"])
+    self.ui.Rife_Model.addItems(["realesrgan-anime-4x"])
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.hide()
     if self.output_folder == "":
