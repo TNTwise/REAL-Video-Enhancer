@@ -13,8 +13,7 @@ import re
 from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
-from spandrel import ImageModelDescriptor, ModelLoader
-
+from .UpscaleImage import UpscaleCUDA
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -265,19 +264,14 @@ class Upscaling(Render):
     
     def __init__(self, main, input_file, output_file, resIncrease):
         super(Upscaling, self).__init__(main, input_file, output_file, interpolationIncrease=1,resIncrease=resIncrease)
-        self.model = ModelLoader().load_from_file(f"{thisdir}/models/realesrgan-cuda/realesr-animevideov3.pth")
-
-        assert isinstance(self.model, ImageModelDescriptor)
-
-        self.model.eval() # gonna have to put cuda back in here lmfaooooooo
         
-    def proc_image(self, image):
-        with torch.no_grad():
-            self.writeBuffer.put(self.model(image))
+        
+    
 
     def procUpscaleThread(self):
         self.frame = 0
-
+        self.upscaleMethod = UpscaleCUDA(self.width,
+                                         self.height)
         while True:
             
             frame = self.readBuffer.get()
@@ -289,10 +283,10 @@ class Upscaling(Render):
                 break  # done with proc
 
             
-            self.proc_image(frame)
+            result = self.upscaleMethod.UpscaleImage(frame)
             
-
-            
+            self.writeBuffer.put(result)
+            self.prevFrame = result
 
             self.frame += 1
 

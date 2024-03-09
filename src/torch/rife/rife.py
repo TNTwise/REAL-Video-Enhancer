@@ -94,7 +94,7 @@ class Rife:
             .float()
             / 255.0
         )
-
+        print(self.I0.shape)
         self.I1 = (
             torch.from_numpy(I1)
             .to(self.device, non_blocking=True)

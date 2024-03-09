@@ -588,10 +588,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if "cuda" in self.AI:
                 try:
                     self.pixMap = self.numpy_array_to_pixmap(self.imageDisplay)
-                except Exception:
-                    # traceback_info = traceback.format_exc()
-                    pass
-                    # print(f'noimage {e} {traceback_info}')
+                except Exception as e:
+                    traceback_info = traceback.format_exc()
+                    
+                    print(f'noimage {e} {traceback_info}')
 
         if step == "2":
             try:
