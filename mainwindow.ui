@@ -755,7 +755,7 @@
                <item row="3" column="0">
                 <widget class="QTabWidget" name="modelTabWidget">
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>1</number>
                  </property>
                  <widget class="QWidget" name="NCNNTab">
                   <attribute name="title">
@@ -900,6 +900,13 @@
                     <widget class="QCheckBox" name="RifeCUDACheckBox">
                      <property name="text">
                       <string>RIFE</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="RealESRGAN">
+                     <property name="text">
+                      <string>RealESRGAN</string>
                      </property>
                     </widget>
                    </item>
