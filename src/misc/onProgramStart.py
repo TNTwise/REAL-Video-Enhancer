@@ -341,11 +341,20 @@ def set_model_params(self):
             self.model_labels["IFRNET"] = "interpolation"
     # not efficient but im lazy so cry abt it
     # placeholder
-    cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
-    if cuda_rife_installed == True:
-        if torch_version == True:
+    if torch_version == True:
+        cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
+        if cuda_rife_installed == True:
+        
             self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
+        else:
+            self.ui.modelTabWidget.setTabEnabled(1, False)
+            self.ui.RifeCUDACheckBox.setDisabled(True)
+        cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
+        if cuda_esrgan_installed == True:
+        
+            self.ui.RealESRGANCUDACheckBox.setChecked(True)
+            self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
         else:
             self.ui.modelTabWidget.setTabEnabled(1, False)
             self.ui.RifeCUDACheckBox.setDisabled(True)

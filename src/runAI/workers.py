@@ -29,7 +29,7 @@ import math
 import src.programData.checks as checks
 
 try:
-    import src.torch.RenderCUDA as RifeCUDA
+    import src.torch.RenderCUDA as RenderCUDA
 except:
     pass
 from modules.commands import returnOutputFile
@@ -651,7 +651,7 @@ class interpolation(QObject):
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
-            self.main.renderAI = RifeCUDA.Interpolation(
+            self.main.renderAI = RenderCUDA.Interpolation(
                 self.main, self.main.input_file, output_file, self.main.times
             )
             self.main.renderAI.extractFramesToBytes()
@@ -681,14 +681,23 @@ class upscale(QObject):
         QThread.__init__(self, parent)
 
     def finishRenderSetup(self):  # 3rd and final call, called from upscale.py
-        extractFramesAndAudio(
-            self,
-            self.main,
-            self.main.settings.RenderDir,
-            self.main.videoName,
-            self.main.input_file,
-            1,
-        )
+        if "cuda" in self.main.AI:
+            extractAudio(
+                self.main,
+                self.main.input_file,
+                self.main.settings.RenderDir,
+                self.main.videoName,
+                self,
+            )
+        if "-ncnn-vulkan" in self.main.AI:
+            extractFramesAndAudio(
+                self,
+                self.main,
+                self.main.settings.RenderDir,
+                self.main.videoName,
+                self.main.input_file,
+                1,
+            )
 
         self.realESRGAN()
 
@@ -696,118 +705,142 @@ class upscale(QObject):
         settings = Settings()
         self.main.endNum = 0
         self.main.paused = False
-
-        self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
-        img_type = self.main.settings.Image_Type.replace(".", "")
-        self.input_frames = len(
-            os.listdir(f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames/")
-        )
-        self.main.frame_count = self.input_frames
-
-        if self.main.AI == "realesrgan-ncnn-vulkan":
-            command = [
-                f"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan",
-                "-i",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                "-o",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                "-j",
-                f"1:{settings.VRAM}:2",
-                "-f",
-                str(img_type),
-            ]
-            for i in self.main.realESRGAN_Model.split(" "):
-                command.append(i)
-                print(command)
-
-        if self.main.AI == "waifu2x-ncnn-vulkan":
-            command = [
-                f"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan",
-                "-i",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                "-o",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                "-s",
-                str(int(self.main.ui.Rife_Times.currentText()[0])),
-                "-n",
-                str(self.main.ui.denoiseLevelSpinBox.value()),
-                "-j",
-                f"1:{settings.VRAM}:2",
-                "-f",
-                str(img_type),
-                "-m",
-                f"{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}",
-                "-g",
-                f"{self.main.ui.gpuIDSpinBox.value()}",
-            ]
-        if self.main.AI == "realcugan-ncnn-vulkan":
-            command = [
-                f"{settings.ModelDir}/realcugan/realcugan-ncnn-vulkan",
-                "-i",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                "-o",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                "-s",
-                str(int(self.main.ui.Rife_Times.currentText()[0])),
-                "-n",
-                str(self.main.ui.denoiseLevelSpinBox.value()),
-                "-j",
-                f"1:{settings.VRAM}:2",
-                "-f",
-                str(img_type),
-                "-m",
-                f"{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}",
-                "-g",
-                f"{self.main.ui.gpuIDSpinBox.value()}",
-            ]
-        if self.main.AI == "realsr-ncnn-vulkan":
-            command = [
-                f"{settings.ModelDir}realsr/realsr-ncnn-vulkan",
-                "-i",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                "-o",
-                f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                "-j",
-                f"1:{settings.VRAM}:2",
-                "-f",
-                str(img_type),
-                "-m",
-                f"{settings.ModelDir}realsr/models-{self.main.ui.Rife_Model.currentText()}",
-                "-g",
-                f"{self.main.ui.gpuIDSpinBox.value()}",
-            ]
-        if (
-            settings.RenderType == "Optimized"
-            and self.main.frame_count > self.main.frame_increments_of_interpolation
-            and self.main.frame_increments_of_interpolation > 0
-        ):
-            optimized_render(self, command)
-        else:
-            render(self, command)
-        if (
-            os.path.exists(
-                f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/"
+        if '-ncnn-vulkan' in self.main.AI:
+            self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
+            img_type = self.main.settings.Image_Type.replace(".", "")
+            self.input_frames = len(
+                os.listdir(f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames/")
             )
-            == False
-        ):
-            show_on_no_output_files(self.main)
-        else:
-            if self.main.paused == False:
-                if settings.RenderType != "Optimized":
-                    self.log.emit("[Merging Frames]")
-                    log("INFO: Merging Frames")
-                self.main.output_file = end(
-                    self,
-                    self.main,
-                    settings.RenderDir,
-                    self.main.videoName,
-                    self.main.input_file,
-                    1,
-                    self.main.output_folder,
-                    self.main.videoQuality,
-                    self.main.encoder,
-                    "upscale",
-                )
+            self.main.frame_count = self.input_frames
+
+            if self.main.AI == "realesrgan-ncnn-vulkan":
+                command = [
+                    f"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan",
+                    "-i",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
+                    "-o",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
+                    "-j",
+                    f"1:{settings.VRAM}:2",
+                    "-f",
+                    str(img_type),
+                ]
+                for i in self.main.realESRGAN_Model.split(" "):
+                    command.append(i)
+                    print(command)
+
+            if self.main.AI == "waifu2x-ncnn-vulkan":
+                command = [
+                    f"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan",
+                    "-i",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
+                    "-o",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
+                    "-s",
+                    str(int(self.main.ui.Rife_Times.currentText()[0])),
+                    "-n",
+                    str(self.main.ui.denoiseLevelSpinBox.value()),
+                    "-j",
+                    f"1:{settings.VRAM}:2",
+                    "-f",
+                    str(img_type),
+                    "-m",
+                    f"{settings.ModelDir}waifu2x/models-{self.main.ui.Rife_Model.currentText()}",
+                    "-g",
+                    f"{self.main.ui.gpuIDSpinBox.value()}",
+                ]
+            if self.main.AI == "realcugan-ncnn-vulkan":
+                command = [
+                    f"{settings.ModelDir}/realcugan/realcugan-ncnn-vulkan",
+                    "-i",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
+                    "-o",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
+                    "-s",
+                    str(int(self.main.ui.Rife_Times.currentText()[0])),
+                    "-n",
+                    str(self.main.ui.denoiseLevelSpinBox.value()),
+                    "-j",
+                    f"1:{settings.VRAM}:2",
+                    "-f",
+                    str(img_type),
+                    "-m",
+                    f"{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}",
+                    "-g",
+                    f"{self.main.ui.gpuIDSpinBox.value()}",
+                ]
+            if self.main.AI == "realsr-ncnn-vulkan":
+                command = [
+                    f"{settings.ModelDir}realsr/realsr-ncnn-vulkan",
+                    "-i",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
+                    "-o",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
+                    "-j",
+                    f"1:{settings.VRAM}:2",
+                    "-f",
+                    str(img_type),
+                    "-m",
+                    f"{settings.ModelDir}realsr/models-{self.main.ui.Rife_Model.currentText()}",
+                    "-g",
+                    f"{self.main.ui.gpuIDSpinBox.value()}",
+                ]
+            if (
+                settings.RenderType == "Optimized"
+                and self.main.frame_count > self.main.frame_increments_of_interpolation
+                and self.main.frame_increments_of_interpolation > 0
+            ):
+                optimized_render(self, command)
             else:
-                pass
+                render(self, command)
+            if (
+                os.path.exists(
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/"
+                )
+                == False
+            ):
+                show_on_no_output_files(self.main)
+            else:
+                if self.main.paused == False:
+                    if settings.RenderType != "Optimized":
+                        self.log.emit("[Merging Frames]")
+                        log("INFO: Merging Frames")
+                    self.main.output_file = end(
+                        self,
+                        self.main,
+                        settings.RenderDir,
+                        self.main.videoName,
+                        self.main.input_file,
+                        1,
+                        self.main.output_folder,
+                        self.main.videoQuality,
+                        self.main.encoder,
+                        "upscale",
+                    )
+                else:
+                    pass
+        if self.main.AI == 'realesrgan-cuda':
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
+            self.main.renderAI = RenderCUDA.Upscaling(
+                self.main, 
+                self.main.input_file, 
+                output_file,
+                int(self.main.ui.Rife_Times.currentText()[0])
+            )
+            self.main.renderAI.extractFramesToBytes()
+            readThread1 = Thread(target=self.main.renderAI.readThread)
+            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
+            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+            # logThread1 = Thread(target=self.main.renderAI.log)
+            readThread1.start()
+            procThread1.start()
+            renderThread1.start()
+            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+            # logThread1.start()
+            self.main.output_file = output_file
+            print("Done")
+
+        self.finished.emit()
         self.finished.emit()

@@ -191,6 +191,9 @@ def get_video_from_link(self, thread):
 
 def extractAudio(self, videopath, renderdir, videoName, thread):
     self.file_drop_widget.hide()
+    global height
+    global width
+    width, height = return_data.VideoName.return_video_resolution(videopath)
     video = cv2.VideoCapture(self.input_file)
     try:
         self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -241,7 +244,7 @@ def extractFramesAndAudio(
 
         # gets the fps
 
-        width, height = return_data.VideoName.return_video_resolution(videopath)
+        
 
         # Create files
         return_data.ManageFiles.create_folder(f"{renderdir}/{videoName}_temp/")

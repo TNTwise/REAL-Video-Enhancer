@@ -904,7 +904,7 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QCheckBox" name="RealESRGAN">
+                    <widget class="QCheckBox" name="RealESRGANCUDACheckBox">
                      <property name="text">
                       <string>RealESRGAN</string>
                      </property>

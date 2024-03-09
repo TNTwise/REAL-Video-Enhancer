@@ -12,6 +12,7 @@ except Exception as e:
 
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
+    import modules.RealESRGANCUDA as RealESRGANCuda
 
 import os
 from PyQt5 import QtWidgets
@@ -299,6 +300,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "RealSR":
             realsr.modelOptions(self)
+        
+        if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
+            RealESRGANCuda.modelOptions(self)
 
     def switchMode(self):
         self.ui.AICombo.clear()

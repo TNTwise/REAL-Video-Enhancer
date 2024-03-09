@@ -25,10 +25,7 @@ def returnModelList(
         if self.ui.RifeCheckBox.isChecked():
             rife_install_list.append("rife-v4.6")
 
-    """https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip':'realcugan-ncnn-vulkan-20220728-ubuntu.zip',
-                'https://github.com/nihui/cain-ncnn-vulkan/releases/download/20220728/cain-ncnn-vulkan-20220728-ubuntu.zip':'cain-ncnn-vulkan-20220728-ubuntu.zip',
-                """
-
+ 
     install_modules_dict = {}
 
     if (
@@ -85,6 +82,13 @@ def returnModelList(
         install_modules_dict[
             "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-cuda.zip"
         ] = "rife-cuda.zip"
+    if (
+        self.ui.RealESRGANCUDACheckBox.isChecked() == True
+        and os.path.exists(f"{settings.ModelDir}/realesrgan-cuda.zip") == False
+    ):
+        install_modules_dict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/realesrgan-cuda.zip"
+        ] = "realesrgan-cuda.zip"
     for i in rife_install_list:
         if (
             os.path.exists(f"{settings.ModelDir}/rife/rife-ncnn-vulkan") == False

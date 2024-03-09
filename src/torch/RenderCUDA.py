@@ -206,7 +206,7 @@ class Render:
 class Interpolation(Render):
     
     def __init__(self, main, input_file, output_file, times):
-        super(Interpolation, self).__init__(main, input_file, output_file, times,resIncrease=1)
+        super(Interpolation, self).__init__(main, input_file, output_file, interpolationIncrease=times,resIncrease=1)
         self.interpolate_process = Rife(
             interpolation_factor=self.interpolation_factor,
             interpolate_method="rife4.14",
@@ -233,6 +233,8 @@ class Interpolation(Render):
             if self.main.settings.SceneChangeDetectionMode == "Enabled":
                 if len(self.main.transitionFrames) > 0:
                     self.transition_frame = self.main.transitionFrames[0]
+                else:
+                    self.transition_frame = -1
             else:
                 self.transition_frame = -1
             frame = self.readBuffer.get()
@@ -262,8 +264,8 @@ class Interpolation(Render):
 class Upscaling(Render):
     
     def __init__(self, main, input_file, output_file, resIncrease):
-        super(Interpolation, self).__init__(main, input_file, output_file, times=1,resIncrease=resIncrease)
-        self.model = ModelLoader().load_from_file(r"path/to/model.pth")
+        super(Upscaling, self).__init__(main, input_file, output_file, interpolationIncrease=1,resIncrease=resIncrease)
+        self.model = ModelLoader().load_from_file(f"{thisdir}/models/realesrgan-cuda/realesr-animevideov3.pth")
 
         assert isinstance(self.model, ImageModelDescriptor)
 
@@ -282,18 +284,16 @@ class Upscaling(Render):
 
             if frame is None:
                 print("done with proc")
-                self.writeBuffer.put(self.prevFrame)
+                self.writeBuffer.put(frame)
                 self.writeBuffer.put(None)
                 break  # done with proc
 
-            if self.prevFrame is None:
-                self.prevFrame = frame
-                continue
-
+            
+            self.proc_image(frame)
             
 
             
 
             self.frame += 1
 
-            self.prevFrame = frame
+            
