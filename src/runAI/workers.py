@@ -29,7 +29,7 @@ import math
 import src.programData.checks as checks
 
 try:
-    import src.torch.RenderRIFE as RifeCUDA
+    import src.torch.RenderCUDA as RifeCUDA
 except:
     pass
 from modules.commands import returnOutputFile
@@ -647,16 +647,16 @@ class interpolation(QObject):
                     self.main.encoder,
                 )
 
-        if "cuda" in self.main.AI:
+        if self.main.AI == 'rife-cuda':
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
-            self.main.renderAI = RifeCUDA.Render(
+            self.main.renderAI = RifeCUDA.Interpolation(
                 self.main, self.main.input_file, output_file, self.main.times
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procThread)
+            procThread1 = Thread(target=self.main.renderAI.procInterpThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
             # logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()

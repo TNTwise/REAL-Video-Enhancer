@@ -2,8 +2,6 @@
 from src.misc.log import log
 
 try:
-    import torch
-    import torchvision
 
     torch_version = True
     log("torch_version")
@@ -14,22 +12,17 @@ except Exception as e:
 
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
-    import numpy as np
 
 import os
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import QThread
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
+from PyQt5.QtWidgets import QFileDialog, QListWidgetItem
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QProgressBar
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QLabel
+from PyQt5.QtGui import QImage
 
 homedir = os.path.expanduser(r"~")
 try:
@@ -38,17 +31,15 @@ except Exception as e:
     print(e)
 import src.programData.thisdir
 
-import src.programData.checks as checks
 
 thisdir = src.programData.thisdir.thisdir()
-if os.path.exists(f"{thisdir}") == False:
+if os.path.exists(f"{thisdir}") is False:
     os.mkdir(f"{thisdir}")
 
 
 import src.programData.theme as theme
 import traceback
 
-import src.getModels.select_models as sel_mod
 import src.getModels.get_models_settings
 import sys
 import psutil
@@ -66,7 +57,6 @@ import time
 
 # import src.get_models as get_models
 from time import sleep
-from multiprocessing import cpu_count
 from src.misc.messages import *
 import modules.Rife as rife
 import modules.ESRGAN as esrgan
@@ -81,8 +71,6 @@ import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
 
-import modules.interpolate as interpolate
-import modules.upscale as upscale
 
 
 from src.programData.return_data import *
@@ -221,14 +209,14 @@ class MainWindow(QtWidgets.QMainWindow):
             )
 
             selFrameIncrementsMode(self)
-            if self.gpuMemory == None:
+            if self.gpuMemory is None:
                 cannot_detect_vram(self)
             else:
                 pass
             if int(HardwareInfo.get_video_memory_linux()) < 4:
                 if settings.ignoreVramPopup == "False":
                     not_enough_vram(self)
-            if check_for_write_permissions(self.settings.OutputDir) == False:
+            if check_for_write_permissions(self.settings.OutputDir) is False:
                 no_perms(self)
                 try:
                     os.mkdir(f"{homedir}/Videos/")
@@ -238,7 +226,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.settings.change_setting("OutputDir", f"{homedir}/Videos/")
                 else:
                     no_perms_anywhere(self, self.settings.OutputDir)
-            if check_for_write_permissions(self.settings.RenderDir) == False:
+            if check_for_write_permissions(self.settings.RenderDir) is False:
                 no_perms(self)
                 try:
                     os.mkdir(f"{thisdir}/renders/")
@@ -268,7 +256,7 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f"resizeEvent failed! {e}")
 
     def restore_default_settings(self):
-        with open(f"{thisdir}/files/settings.txt", "w") as f:
+        with open(f"{thisdir}/files/settings.txt", "w"):
             pass
         src.misc.onProgramStart.onApplicationStart(self)
         self.ui.verticalTabWidget.setCurrentIndex(self.ui.verticalTabWidget.count())
@@ -322,7 +310,7 @@ class MainWindow(QtWidgets.QMainWindow):
         return_list = []
 
         for i in os.listdir(f"{settings.ModelDir}/{AI.lower()}"):
-            if os.path.isfile(f"{settings.ModelDir}/{AI.lower()}/{i}") == False:
+            if os.path.isfile(f"{settings.ModelDir}/{AI.lower()}/{i}") is False:
                 return_list.append(f"{i}")  # Adds model to GUI.
 
         return return_list
@@ -352,7 +340,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             log(e)
             try:
-                if self.localFile == True:
+                if self.localFile is True:
                     resolution = VideoName.return_video_resolution(self.input_file)
                     width = int(resolution[0])
                     height = int(resolution[1])
@@ -362,7 +350,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 log("Couldnt grab resolution in showChangeInFPS")
 
         try:
-            if self.localFile == True:
+            if self.localFile is True:
                 self.videoProperties()
 
             fps = self.fps
@@ -371,7 +359,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 try:
                     self.times = int(self.ui.Rife_Times.currentText()[0])
 
-                    if fps != None:
+                    if fps is not None:
                         if (
                             self.ui.AICombo.currentText() != "Rife"
                             or "v4" not in self.ui.Rife_Model.currentText()
@@ -383,7 +371,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             "Rife" in self.ui.AICombo.currentText()
                             and "v4" in self.ui.Rife_Model.currentText()
                         ):
-                            self.ui.FPSPreview.setText(f"FPS:")
+                            self.ui.FPSPreview.setText("FPS:")
                             self.ui.FPSFrom.setMinimum(fps)
                             self.ui.FPSFrom.setValue(fps)
 
@@ -412,7 +400,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
                     try:
                         try:
-                            if self.youtubeFile == True:
+                            if self.youtubeFile is True:
                                 resolution = self.ytVidRes.replace(
                                     " (Enhanced bitrate)", ""
                                 )
@@ -453,7 +441,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         * self.times
                     )
                     self.filecount = int(fc)
-                    total_input_files = fc / self.times
+                    fc / self.times
                     total_output_files = fc
                     self.ui.RifePB.setMaximum(total_output_files)
                     # self.ui.QueueButton.show()
@@ -472,7 +460,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     ETA = calculateETA(self)
                     self.ui.ETAPreview.setText(ETA)
 
-                except Exception as e:
+                except Exception:
                     # print(e)
                     self.ETA = None
                 fp = files_processed
@@ -523,7 +511,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     ETA = calculateETA(self)
                     self.ui.ETAPreview.setText(ETA)
 
-                except Exception as e:
+                except Exception:
                     # print(e)
                     self.ETA = None
 
@@ -533,7 +521,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     f"Files Processed: {files_processed} / {self.filecount}"
                 )
 
-        except Exception as e:
+        except Exception:
             # print(e)
             pass
 
@@ -681,16 +669,16 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.ui.Rife_Times.clear()
                 model = self.ui.Rife_Model.currentText().lower()
-                if "1x" in model:
+                if "1x" in model or 'x1' in model:
                     self.ui.Rife_Times.addItem("1X")
                     self.ui.Rife_Times.setCurrentText("1X")
-                elif "2x" in model:
+                elif "2x" in model or 'x2' in model:
                     self.ui.Rife_Times.addItem("2X")
                     self.ui.Rife_Times.setCurrentText("2X")
-                elif "3x" in model:
+                elif "3x" in model or 'x3' in model:
                     self.ui.Rife_Times.addItem("3X")
                     self.ui.Rife_Times.setCurrentText("3X")
-                elif "4x" in model:
+                elif "4x" in model or 'x4' in model:
                     self.ui.Rife_Times.addItem("4X")
                     self.ui.Rife_Times.setCurrentText("4X")
                 else:
@@ -825,7 +813,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ignore_button = msg_box.button(QMessageBox.Ignore)
         ignore_button.clicked.connect(ignore_function)
 
-        result = msg_box.exec_()
+        msg_box.exec_()
 
     def ignoreButtonClicked(self):
         print("Ignore button clicked!")
@@ -871,7 +859,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self,
     ):  # Crashes most likely due to the fact that it is being ran in a different thread
         if "cuda" in self.AI:
-            while self.CudaRenderFinished == False:
+            while self.CudaRenderFinished is False:
                 sleep(1)
         if len(self.QueueList) == 0:
             self.file_drop_widget.show()
@@ -906,7 +894,7 @@ class MainWindow(QtWidgets.QMainWindow):
         icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")
         msg = QMessageBox()
         msg.setWindowTitle(" ")
-        if displayInfoIcon == True:
+        if displayInfoIcon is True:
             msg.setIconPixmap(icon.pixmap(32, 32))
         msg.setText(f"{message}")
         msg.exec_()
@@ -1012,7 +1000,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 try:
-    if os.path.isfile(f"{thisdir}/files/settings.txt") == False:
+    if os.path.isfile(f"{thisdir}/files/settings.txt") is False:
         ManageFiles.create_folder(f"{thisdir}/files")
         ManageFiles.create_file(f"{thisdir}/files/settings.txt")
     settings = Settings()
@@ -1073,9 +1061,6 @@ apply_decorator_to_all_functions(globals())
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QPalette, QColor
 
 # Force the style to be the same on all OSs:
 theme.set_theme(app)

@@ -17,7 +17,6 @@ from cv2 import (
 import modules.upscale as upscale
 from src.misc.log import *
 from modules.interpolate import *
-from src.torch.RenderRIFE import *
 
 # this file changes the GUI aspects of the AI
 thisdir = src.programData.thisdir.thisdir()
