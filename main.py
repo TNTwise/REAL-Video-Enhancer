@@ -536,12 +536,13 @@ class MainWindow(QtWidgets.QMainWindow):
         
     def numpy_array_to_pixmap(self,numpy_array):
     # Assuming the NumPy array has shape (height, width, channels)
+        numpy_array = np.ascontiguousarray(numpy_array)
         height, width, channels = numpy_array.shape
         bytes_per_line = channels * width
 
         # Create a QImage from the NumPy array
         q_image = QImage(numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
-
+        
         # Create a QPixmap from the QImage
         pixmap = QPixmap.fromImage(q_image)
 
@@ -567,11 +568,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 try:    
                     self.pixMap = self.numpy_array_to_pixmap(self.imageDisplay)
-                except Exception:
+                except:
                     #traceback_info = traceback.format_exc()
-                    pass
                     #print(f'noimage {e} {traceback_info}')  
-                
+                    pass
         if step == '2':
             try:
                 self.pixMap = self.pixMap.scaled(self.width1,self.height1)
