@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 from src.misc.log import log
+import os
+import PyQt5
+from PyQt5 import QtWidgets
+from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem, QMessageBox,  QFileDialog, QMessageBox, QVBoxLayout, QLabel,QProgressBar
+from PyQt5.QtGui import QPixmap,QIcon
+from PyQt5.QtCore import Qt, QSize, QEvent, QThread
+from PyQt5.QtGui import QPixmap, QImage
 try:
     import torch
     import torchvision
@@ -15,20 +22,8 @@ if torch_version:
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import numpy as np
     
-import os
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QThread
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem
-from PyQt5.QtWidgets import  QMessageBox
-from PyQt5.QtWidgets import  QFileDialog, QMessageBox
-from PyQt5.QtGui import QPixmap,QIcon
-from PyQt5.QtWidgets import  QVBoxLayout, QLabel,QProgressBar
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt, QEvent
-from PyQt5.QtGui import QPixmap, QImage
+
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
