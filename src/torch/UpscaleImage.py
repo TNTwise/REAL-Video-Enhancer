@@ -8,7 +8,7 @@ import torch as torch
 from torch.nn import functional as F
 import cv2
 import numpy as np
-from upscale_ncnn_py import UPSCALE
+#from upscale_ncnn_py import UPSCALE
 
 
 
