@@ -162,6 +162,13 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QCheckBox" name="RealESRGANCUDACheckBox">
+             <property name="text">
+              <string>RealESRGAN (Upscale Animation)</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>

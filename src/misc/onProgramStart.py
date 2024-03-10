@@ -342,22 +342,23 @@ def set_model_params(self):
     # not efficient but im lazy so cry abt it
     # placeholder
     if torch_version == True:
+        
         self.ui.modelTabWidget.setTabEnabled(1, True)
         cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
         if cuda_rife_installed == True:
         
-            self.ui.RifeCUDACheckBox.setChecked(True)
+            self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
-        else:
-            self.ui.RifeCUDACheckBox.setDisabled(True)
+        
         cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
         if cuda_esrgan_installed == True:
         
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
+
     else:
+            
             self.ui.modelTabWidget.setTabEnabled(1, False)
-            self.ui.RifeCUDACheckBox.setDisabled(True)
     self.ui.modeCombo.clear()
     upscale_list = []
     for i in range(self.ui.modeCombo.count()):
