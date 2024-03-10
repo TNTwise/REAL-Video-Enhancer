@@ -488,7 +488,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.ETAPreview.setText(ETA)
                     
                         
-                except Exception as e:
+                except:
                         #print(e)
                         self.ETA = None
                 
@@ -551,10 +551,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if '-ncnn-vulkan' in self.AI:
                 try:
                     img = Image.open(self.imageDisplay)
-                    try:
-                        img.verify()
-                    except:
-                        return
+                    
+                    
+                    
                     self.pixMap = QPixmap(self.imageDisplay)
                 except:
                     pass
@@ -572,8 +571,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.pixMap = self.pixMap.scaled(self.width1,self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap) # sets image preview image
             except Exception as e:
-                print(f'Something went wrong with image preview pixmap: {e}')
-
+                #print(f'Something went wrong with image preview pixmap: {e}')
+                pass
         if step == '3':
             self.ui.imageSpacerFrame.show()
 

@@ -658,12 +658,12 @@ class interpolation(QObject):
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procInterpThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
+            logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()
             procThread1.start()
             renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-            # logThread1.start()
+            #self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+            logThread1.start()
             self.main.output_file = output_file
             print("Done")
 
@@ -833,12 +833,12 @@ class upscale(QObject):
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
+            logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()
             procThread1.start()
             renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-            # logThread1.start()
+            #self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+            logThread1.start()
             self.main.output_file = output_file
             print("Done")
 

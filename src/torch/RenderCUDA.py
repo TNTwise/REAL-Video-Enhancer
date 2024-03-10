@@ -272,9 +272,9 @@ class Upscaling(Render):
 
     def procUpscaleThread(self):
         self.frame = 0
-        self.upscaleMethod = UpscaleCUDA(self.originalWidth,
-                                         self.originalHeight)
-        #self.upscaleMethod = UpscaleNCNN()
+        #self.upscaleMethod = UpscaleCUDA(self.originalWidth,
+        #                                 self.originalHeight)
+        self.upscaleMethod = UpscaleNCNN()
         while True:
             
             frame = self.readBuffer.get()
