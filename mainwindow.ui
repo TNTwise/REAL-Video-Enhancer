@@ -18,7 +18,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="verticalTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="Video">
        <attribute name="title">
@@ -755,7 +755,7 @@
                <item row="3" column="0">
                 <widget class="QTabWidget" name="modelTabWidget">
                  <property name="currentIndex">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
                  <widget class="QWidget" name="NCNNTab">
                   <attribute name="title">
