@@ -8,6 +8,7 @@ import torch as torch
 from torch.nn import functional as F
 import cv2
 import numpy as np
+from upscale_ncnn_py import UPSCALE
 
 
 
@@ -45,10 +46,24 @@ class UpscaleCUDA:
         
         return output.cpu().numpy()
 
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
+class UpscaleNCNN:
+    def __init__(self):
+        
+        self.model = UPSCALE(gpuid=0,model=29)
+    def UpscaleImage(self,image):
+        image = self.model.process_cv2(image)
+        return image
 
-    upscale = UpscaleCUDA(960,576)
+if __name__ == '__main__':
+    from PIL import Image
+    import matplotlib.pyplot as plt
+    from realesrgan_ncnn_py import Realesrgan
+    realesrgan = Realesrgan(gpuid=0)
+    image = cv2.imdecode(np.fromfile("in0.png", dtype=np.uint8), cv2.IMREAD_COLOR)
+    image = realesrgan.process_cv2(image)
+    cv2.imencode(".jpg", image)[1].tofile("output_cv2.jpg")
+
+    upscale = UpscaleNCNN()
     image = cv2.imread('in0.png')
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # Convert the image to a NumPy array

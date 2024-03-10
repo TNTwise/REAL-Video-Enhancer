@@ -13,7 +13,7 @@ import re
 from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
-from .UpscaleImage import UpscaleCUDA
+from .UpscaleImage import UpscaleCUDA, UpscaleNCNN
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -274,6 +274,7 @@ class Upscaling(Render):
         self.frame = 0
         self.upscaleMethod = UpscaleCUDA(self.originalWidth,
                                          self.originalHeight)
+        #self.upscaleMethod = UpscaleNCNN()
         while True:
             
             frame = self.readBuffer.get()
