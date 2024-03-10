@@ -4,7 +4,7 @@ requests
 opencv-python-headless
 pypresence
 pyuic5-tool
-cx-Freeze==6.15.12
+cx-Freeze
 psutil
 Pillow
 scenedetect
