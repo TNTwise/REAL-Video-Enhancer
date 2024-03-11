@@ -416,7 +416,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def reportProgress(self, files_processed):
         try:
-            if '-ncnn-vulkan' in self.AI:
+            if self.ncnn:
                 
                 
                 # fc is the total file count after interpolation
@@ -438,7 +438,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     
                     self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                     self.i=2
-                self.filecount = int(VideoName.return_video_frame_count(f"{self.input_file}") * self.times)
+                self.filecount = int(self.original_filecount) * self.times
                 try:
                         
                     ETA=calculateETA(self)
@@ -477,7 +477,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                     print(e)
                     pass
-            if '-cuda' in self.AI:
+            if self.cuda:
                 if self.i==1:
                     fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
                     self.filecount = fc

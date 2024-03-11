@@ -190,6 +190,12 @@ def get_video_from_link(self, thread):
 
 
 def extractAudio(self, videopath, renderdir, videoName, thread):
+    if '-ncnn-vulkan' in self.AI:
+        self.ncnn = True
+        self.cuda = False
+    if '-cuda' in self.AI:
+        self.ncnn = False
+        self.cuda = True
     self.file_drop_widget.hide()
     global height
     global width
