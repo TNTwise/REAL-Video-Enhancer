@@ -6,7 +6,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem, QMessageBox,  QFileDialog, QMessageBox, QVBoxLayout, QLabel,QProgressBar
 from PyQt5.QtGui import QPixmap,QIcon
 from PyQt5.QtCore import Qt, QSize, QEvent, QThread
-from PyQt5.QtGui import QPixmap, QImage
+
 try:
     import torch
     import torchvision
@@ -415,6 +415,7 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
     
     def reportProgress(self, files_processed):
+        self.currentRenderFPS =  round((files_processed / (time.time() - self.start_time)), 3)
         try:
             if self.ncnn:
                 
@@ -430,8 +431,8 @@ class MainWindow(QtWidgets.QMainWindow):
                     total_output_files = fc
                     self.ui.RifePB.setMaximum(total_output_files)
                     #self.ui.QueueButton.show()
-                    fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
-                    fpsThread.start()
+                    #fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
+                    #fpsThread.start()
                     
                     
                     
@@ -439,44 +440,37 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.original_filecount=self.filecount/self.times # this makes the original file count. which is the file count before interpolation
                     self.i=2
                 self.filecount = int(self.original_filecount) * self.times
-                try:
                         
-                    ETA=calculateETA(self)
-                    self.ui.ETAPreview.setText(ETA)
+                ETA=calculateETA(self)
+                self.ui.ETAPreview.setText(ETA)
                         
-                except Exception as e:
-                        #print(e)
-                        self.ETA = None
+                
                 fp=files_processed
                 videos_rendered=-1
+                
                 for i in os.listdir(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/'):
                     if os.path.isfile(f'{self.settings.RenderDir}/{self.videoName}_temp/output_frames/{i}'):
                         videos_rendered+=1
-                try:
-                    if self.settings.RenderType == 'Optimized':
-                        self.removeLastLineInLogs("Video segments created: ")
-                        if videos_rendered == self.interpolation_sessions:
-                            self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
-                        else:
-                            
-                            self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
-                    self.removeLastLineInLogs('FPS: ') 
-                    self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
-                except:
-                    pass
+                if self.settings.RenderType == 'Optimized':
+                    self.removeLastLineInLogs("Video segments created: ")
+                    if videos_rendered == self.interpolation_sessions:
+                        self.addLinetoLogs(f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}")
+                    else:
+                        
+                        self.addLinetoLogs(f"Video segments created: {videos_rendered}/{self.interpolation_sessions}")
+                self.removeLastLineInLogs('FPS: ') 
+                self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
+                
                 #Update GUI values
                 
                 self.ui.RifePB.setValue(fp)
                 self.ui.processedPreview.setText(f'Files Processed: {fp} / {int(VideoName.return_video_frame_count(f"{self.input_file}") * self.times)}')
             
-                try:
                     
                         
                     
-                    self.i = 2
-                except Exception as e:
-                    print(e)
-                    pass
+                self.i = 2
+                
             if self.cuda:
                 if self.i==1:
                     fc = int(VideoName.return_video_frame_count(f'{self.input_file}') * self.times)
@@ -486,10 +480,10 @@ class MainWindow(QtWidgets.QMainWindow):
                         
                     ETA=calculateETA(self)
                     self.ui.ETAPreview.setText(ETA)
-                    
-                        
-                except:
-                        #print(e)
+                    self.removeLastLineInLogs('FPS: ') 
+                    self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
+                except Exception as e:
+                        print(e)
                         self.ETA = None
                 
                 self.i = 2
@@ -497,7 +491,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {self.filecount}')
                 
         except Exception as e:
-            #print(e)
+            print(e)
             pass
     def runPB(self):
         
@@ -529,20 +523,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         # Final resets
         
-    def numpy_array_to_pixmap(self,numpy_array):
-    # Assuming the NumPy array has shape (height, width, channels)
-        numpy_array = np.ascontiguousarray(numpy_array)
-        height, width, channels = numpy_array.shape
-        bytes_per_line = channels * width
-
-        # Create a QImage from the NumPy array
-        q_image = QImage(numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
-        
-        # Create a QPixmap from the QImage
-        pixmap = QPixmap.fromImage(q_image)
-
-        return pixmap
-
+    
        
     def imageViewer(self,step):
         if step == '1':
@@ -558,14 +539,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 except:
                     pass
                     #print('Cannot open image!')
-            if 'cuda' in self.AI:
-
-                try:    
-                    self.pixMap = self.numpy_array_to_pixmap(self.imageDisplay)
-                except:
-                    #traceback_info = traceback.format_exc()
-                    #print(f'noimage {e} {traceback_info}')  
-                    pass
+            
         if step == '2':
             try:
                 self.pixMap = self.pixMap.scaled(self.width1,self.height1)

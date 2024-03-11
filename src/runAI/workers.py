@@ -1,17 +1,8 @@
 from PyQt5 import QtWidgets, uic
 import sys
-from PyQt5.QtCore import QObject, QThread, pyqtSignal, pyqtSlot
-from PyQt5.QtWidgets import (
-    QApplication,
-    QWidget,
-    QInputDialog,
-    QLineEdit,
-    QFileDialog,
-    QMessageBox,
-    QListWidget,
-    QListWidgetItem,
-)
-from PyQt5.QtGui import QTextCursor
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
+
+from PyQt5.QtGui import QPixmap, QImage
 import mainwindow
 import os
 from threading import *
@@ -30,6 +21,7 @@ import src.programData.checks as checks
 
 try:
     import src.torch.RenderCUDA as RenderCUDA
+    import numpy as np
 except:
     pass
 from modules.commands import returnOutputFile
@@ -49,6 +41,19 @@ class pb2X(QObject):
         self.videoName = VideoName.return_video_name(f"{self.input_file}")
 
         self.main = main
+    def numpy_array_to_pixmap(self,numpy_array):
+    # Assuming the NumPy array has shape (height, width, channels)
+        numpy_array = np.ascontiguousarray(numpy_array)
+        height, width, channels = numpy_array.shape
+        bytes_per_line = channels * width
+
+        # Create a QImage from the NumPy array
+        q_image = QImage(numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
+        
+        # Create a QPixmap from the QImage
+        pixmap = QPixmap.fromImage(q_image)
+
+        return pixmap
 
     def run(self):
         self.settings = Settings()
@@ -205,6 +210,7 @@ class pb2X(QObject):
                                 # print(e)
                                 pass
                             self.image_progress.emit("1")
+                            self.main.pixMap = self.numpy_array_to_pixmap(self.main.imageDisplay)
                             width = self.main.width()
                             height = self.main.height()
                             self.main.width1 = int(width / 1.6)
