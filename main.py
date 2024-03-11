@@ -415,8 +415,10 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
     
     def reportProgress(self, files_processed):
-        self.currentRenderFPS =  round((files_processed / (time.time() - self.start_time)), 3)
+        files_processed = int(files_processed)
+        
         try:
+            self.currentRenderFPS =  round((files_processed / (time.time() - self.start_time)), 3)
             if self.ncnn:
                 
                 
@@ -462,9 +464,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.addLinetoLogs(f'FPS: {self.currentRenderFPS}')
                 
                 #Update GUI values
-                
+                fp = int(fp)
                 self.ui.RifePB.setValue(fp)
-                self.ui.processedPreview.setText(f'Files Processed: {fp} / {int(VideoName.return_video_frame_count(f"{self.input_file}") * self.times)}')
+                
             
                     
                         
@@ -488,7 +490,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 self.i = 2
                 self.ui.RifePB.setValue(files_processed)
-                self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {self.filecount}')
+                
+            self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {int(self.filecount)}')
                 
         except Exception as e:
             print(e)
@@ -818,8 +821,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
             self.ui.ETAPreview.setText('ETA: 00:00:00')
             self.ui.imagePreview.clear()
-            if '-ncnn-vulkan' in self.AI:
-                self.ui.processedPreview.setText(f'Files Processed: {self.filecount} / {self.filecount}')
+            
             self.ui.imageSpacerFrame.show()
             
             remaining_time = int(time.time() - self.start_time) 

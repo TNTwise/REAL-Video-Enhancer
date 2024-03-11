@@ -51,7 +51,7 @@ class UpscaleNCNN:
     def __init__(self):
         #self.model = UPSCALE(gpuid=0, model=12,num_threads=2)
         pass
-        self.model = UPSCALE(gpuid=0,model=29,num_threads=4)
+        self.model = UPSCALE(gpuid=0,model=7,num_threads=4)
     def UpscaleImage(self,image):
         image = self.model.process_cv2(image)
         return image

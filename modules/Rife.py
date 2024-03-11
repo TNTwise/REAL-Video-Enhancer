@@ -105,6 +105,7 @@ def ensemble_models():
         "rife-v4.13-lite-ensemble",
         "rife-v4.14-ensemble",
         "rife-v4.14-lite-ensemble",
+        "rife-v4.15-ensemble",
     ]
 
 
@@ -137,4 +138,5 @@ def default_models():
         "rife-v4.13-lite",
         "rife-v4.14",
         "rife-v4.14-lite",
+        "rife-v4.15",
     ]

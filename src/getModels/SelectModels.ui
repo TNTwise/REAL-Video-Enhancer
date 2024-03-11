@@ -58,6 +58,32 @@
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="8">
+           <widget class="QLabel" name="label_3">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Custom Models:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
           <item row="1" column="1">
            <layout class="QVBoxLayout" name="verticalLayout">
             <item>
@@ -124,26 +150,6 @@
              </widget>
             </item>
            </layout>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Old Models (2X)</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QLabel" name="label_2">
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>Recommended models  (2X), (4X), (8X)</string>
-            </property>
-           </widget>
           </item>
           <item row="1" column="3">
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -242,23 +248,9 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="rife412lite">
-              <property name="text">
-               <string>Rife-V4.12-lite</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QCheckBox" name="rife413">
               <property name="text">
                <string>Rife-V4.13</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="rife413lite">
-              <property name="text">
-               <string>Rife-V4.13-lite</string>
               </property>
              </widget>
             </item>
@@ -270,16 +262,26 @@
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="rife414lite">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
+             <widget class="QCheckBox" name="rife415">
               <property name="text">
-               <string>Rife-V4.14-lite</string>
+               <string>Rife-V4.15</string>
               </property>
              </widget>
             </item>
            </layout>
+          </item>
+          <item row="1" column="7">
+           <spacer name="horizontalSpacer_7">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item row="1" column="0">
            <spacer name="horizontalSpacer">
@@ -294,20 +296,7 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="4">
-           <spacer name="horizontalSpacer_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="7">
+          <item row="1" column="10">
            <layout class="QVBoxLayout" name="verticalLayout_5">
             <item>
              <spacer name="verticalSpacer">
@@ -331,8 +320,8 @@
             </item>
            </layout>
           </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="label_3">
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_2">
             <property name="maximumSize">
              <size>
               <width>16777215</width>
@@ -340,11 +329,11 @@
              </size>
             </property>
             <property name="text">
-             <string>Custom Models:</string>
+             <string>Recommended models  (2X), (4X), (8X)</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="6">
+          <item row="1" column="9">
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -357,20 +346,7 @@
             </property>
            </spacer>
           </item>
-          <item row="1" column="2">
-           <spacer name="horizontalSpacer_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="1" column="5">
+          <item row="1" column="8">
            <layout class="QVBoxLayout" name="vert_lay">
             <item>
              <layout class="QVBoxLayout" name="custom_models"/>
@@ -389,6 +365,61 @@
              </spacer>
             </item>
            </layout>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Old Models (2X)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <spacer name="horizontalSpacer_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="6">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QCheckBox" name="rife413lite">
+              <property name="text">
+               <string>Rife-V4.13-lite</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="rife412lite">
+              <property name="text">
+               <string>Rife-V4.12-lite</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="rife414lite">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Rife-V4.14-lite</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="6">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Lite models (2x), (4x), (8x))</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>
