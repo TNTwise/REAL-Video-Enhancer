@@ -8,7 +8,7 @@ import torch as torch
 from torch.nn import functional as F
 import cv2
 import numpy as np
-from upscale_ncnn_py import UPSCALE
+#from upscale_ncnn_py import UPSCALE
 
 #from realcugan_ncnn_py import Realcugan
 
@@ -47,7 +47,7 @@ class UpscaleCUDA:
         
         return output.cpu().numpy()
 
-class UpscaleNCNN:
+'''class UpscaleNCNN:
     def __init__(self):
         #self.model = UPSCALE(gpuid=0, model=12,num_threads=2)
         pass
@@ -73,4 +73,4 @@ if __name__ == '__main__':
     
     plt.imsave('in.png',image_array)
     upscaled_image = upscale.UpscaleImage(image_array)
-    plt.imsave('out.png',upscaled_image)
+    plt.imsave('out.png',upscaled_image)'''
