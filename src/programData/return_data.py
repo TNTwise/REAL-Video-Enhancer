@@ -36,11 +36,11 @@ class VideoName:
 class ManageFiles:
     def create_folder(folderpath):
         if os.path.exists(folderpath) == False:
-            os.mkdir(folderpath)
+            os.system(f'mkdir "{folderpath}"')
 
     def create_file(filepath):
         if os.path.isfile(filepath) == False:
-            os.mknod(filepath)
+            os.system(f'touch "{filepath}"')
 
     def isfile(filepath):
         return os.path.isfile(filepath)
