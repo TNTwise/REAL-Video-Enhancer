@@ -64,7 +64,6 @@ class Settings:
             "videoQuality": "18",
             "FrameIncrements": "100",
             "Theme": "Dark",
-            "OutputDir": f"{homedir}/Videos/",
             "GPUUsage": "Default",
             "ModelDir": f"{thisdir}/models/",
             "RenderType": "Optimized",
@@ -77,13 +76,16 @@ class Settings:
             "DiscordRPC": "Enabled",
             "FrameIncrementsMode": "Automatic",
             "UpdateChannel": "Stable",
-            "DefaultRifeModel": f"rife-v4.6",
+            "DefaultRifeModel": f"rife-v4.15",
             "ignoreVramPopup": "False",
             "Notifications": "Enabled",
             "UHDResCutOff": "1080",
             "gpuID": "0",
         }
-
+        if returnOperatingSystem() == 'Linux':
+            default_settings["OutputDir"] = f"{homedir}/Videos/"
+        if returnOperatingSystem() == 'MacOS':
+            default_settings["OutputDir"] = f"{homedir}/Desktop/"
         for setting, default_value in default_settings.items():
             try:
                 setattr(self, setting, settings_dict[setting])
