@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QListWidget, QFileDialog, QListWidgetItem, QMessageB
 from PyQt5.QtGui import QPixmap,QIcon
 from PyQt5.QtCore import Qt, QSize, QEvent, QThread
 
+from src.programData.version import returnVersion
 try:
     import torch
     import torchvision
@@ -159,7 +160,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setMinimumSize(1000, 550)
         self.resize(1000, 550)
         self.on = True
+        self.localFile = True
         self.input_file=''
+        self.download_youtube_video_command = ''
         self.settings = Settings()
         try:
             self.thread2 = QThread()
@@ -187,12 +190,12 @@ class MainWindow(QtWidgets.QMainWindow):
             log(f'{e} {traceback_info}')
             print(f'{e} {traceback_info}')
         try:
-                
-            self.ui.installModelsProgressBar.setMaximum(100)
-            self.localFile = True
+
+            
+            
             src.misc.onProgramStart.onApplicationStart(self)
             src.misc.onProgramStart.bindButtons(self)
-            self.download_youtube_video_command = ''
+            
             self.file_drop_widget = FileDropWidget(self)
             self.ui.verticalTabWidget.setFocusPolicy(Qt.ClickFocus)
             self.pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
@@ -209,6 +212,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.themeCombo.setCurrentText(settings.Theme)
             self.ui.themeCombo.currentTextChanged.connect(lambda: switch_theme(self.ui.themeCombo.currentText()))
             self.ui.frameIncrementsModeCombo.setCurrentText(self.settings.FrameIncrementsMode)
+            
+            self.addLinetoLogs(f'Current Version: {returnVersion()}')
+            self.ui.installModelsProgressBar.setMaximum(100)
             
             selFrameIncrementsMode(self)
             if self.gpuMemory == None:
