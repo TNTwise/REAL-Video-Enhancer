@@ -4,6 +4,7 @@ import re
 import subprocess
 import shutil
 import src.programData.thisdir
+import platform
 
 thisdir = src.programData.thisdir.thisdir()
 
@@ -211,3 +212,9 @@ class HardwareInfo:
         vram = get_dedicated_vram()
 
         return vram
+
+def returnOperatingSystem():
+    os = platform.system()
+    if os == 'Darwin':
+        return 'MacOS'
+    return os

@@ -3,7 +3,16 @@ import src.programData.thisdir
 
 thisdir = src.programData.thisdir.thisdir()
 import src.programData.checks as checks
+import src.programData.return_data as return_data
 
+def returnCorrectLinkBasedOnOS(link):
+    if return_data.returnOperatingSystem() == 'Linux':
+        return link
+    
+    if return_data.returnOperatingSystem() == 'MacOS':
+        if 'rife-ncnn-vulkan' in link:
+            return link.replace('rife-ncnn-vulkan','rife-ncnn-vulkan-macos-bin')
+        return link.replace('-ubuntu','-macos')
 
 def returnModelList(
     self, settings
@@ -33,7 +42,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/realsr/") == False
     ):
         install_modules_dict[
-            "https://github.com/nihui/realsr-ncnn-vulkan/releases/download/20220728/realsr-ncnn-vulkan-20220728-ubuntu.zip"
+            returnCorrectLinkBasedOnOS("https://github.com/nihui/realsr-ncnn-vulkan/releases/download/20220728/realsr-ncnn-vulkan-20220728-ubuntu.zip")
         ] = "realsr-ncnn-vulkan-20220728-ubuntu.zip"
 
     if (
@@ -41,7 +50,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/rife/") == False
     ):
         install_modules_dict[
-            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan"
+            returnCorrectLinkBasedOnOS("https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan")
         ] = "rife-ncnn-vulkan"
 
     if (
@@ -49,7 +58,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/realesrgan") == False
     ):
         install_modules_dict[
-            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/realesrgan-ncnn-vulkan-20220424-ubuntu.zip"
+            returnCorrectLinkBasedOnOS("https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/realesrgan-ncnn-vulkan-20220424-ubuntu.zip")
         ] = "realesrgan-ncnn-vulkan-20220424-ubuntu.zip"
 
     if (
@@ -57,7 +66,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/waifu2x") == False
     ):
         install_modules_dict[
-            "https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip"
+            returnCorrectLinkBasedOnOS("https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip")
         ] = "waifu2x-ncnn-vulkan-20220728-ubuntu.zip"
 
     if (
@@ -65,7 +74,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/ifrnet") == False
     ):
         install_modules_dict[
-            "https://github.com/nihui/ifrnet-ncnn-vulkan/releases/download/20220720/ifrnet-ncnn-vulkan-20220720-ubuntu.zip"
+            returnCorrectLinkBasedOnOS("https://github.com/nihui/ifrnet-ncnn-vulkan/releases/download/20220720/ifrnet-ncnn-vulkan-20220720-ubuntu.zip")
         ] = "ifrnet-ncnn-vulkan-20220720-ubuntu.zip"
 
     if (
@@ -73,7 +82,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/realcugan") == False
     ):
         install_modules_dict[
-            "https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip"
+            returnCorrectLinkBasedOnOS("https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip")
         ] = "realcugan-ncnn-vulkan-20220728-ubuntu.zip"
     if (
         self.ui.RifeCUDACheckBox.isChecked() == True
@@ -95,7 +104,7 @@ def returnModelList(
             or checks.check_for_updated_binary("rife-ncnn-vulkan") == False
         ):
             install_modules_dict[
-                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan"
+                returnCorrectLinkBasedOnOS("https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan")
             ] = "rife-ncnn-vulkan"
         if os.path.exists(f"{settings.ModelDir}/rife/{i}") == False:
             install_modules_dict[
@@ -107,7 +116,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/rife") == False
     ):
         install_modules_dict[
-            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan"
+            returnCorrectLinkBasedOnOS("https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan")
         ] = "rife-ncnn-vulkan"
         install_modules_dict[
             f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz"
@@ -117,7 +126,7 @@ def returnModelList(
         ] = f"rife-v4.6-ensemble.tar.gz"
     if len(install_modules_dict) == 0 and len(os.listdir(f"{settings.ModelDir}/")) == 0:
         install_modules_dict[
-            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan"
+            returnCorrectLinkBasedOnOS("https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan")
         ] = "rife-ncnn-vulkan"
         install_modules_dict[
             f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz"
@@ -132,12 +141,23 @@ def returnModelList(
     ):
         pass
     else:
-        install_modules_dict.update(
+        if return_data.returnOperatingSystem() == 'Linux':
+            install_modules_dict.update(
+            
             {
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/glxinfo": "glxinfo",
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg": "ffmpeg",
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/yt-dlp_linux": "yt-dlp_linux",
             }
+            
         )
-
+        if return_data.returnOperatingSystem() == 'MacOS':
+            install_modules_dict.update(
+            
+            {
+                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/glxinfo": "glxinfo",
+                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg-macos-bin": "ffmpeg",
+                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/yt-dlp_macos": "yt-dlp_linux",
+            }
+            )
     return install_modules_dict
