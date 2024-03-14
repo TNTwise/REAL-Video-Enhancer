@@ -29,7 +29,7 @@ def rife_checkboxes(self):
         (self.ui.rife413, "rife-v4.13"),
         (self.ui.rife413lite, "rife-v4.13-lite"),
         (self.ui.rife414, "rife-v4.14"),
-        (self.ui.rife414, "rife-v4.15"),
+        (self.ui.rife415, "rife-v4.15"),
     ]
     # new models
 
