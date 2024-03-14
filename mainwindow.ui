@@ -759,7 +759,7 @@
                  </property>
                  <widget class="QWidget" name="NCNNTab">
                   <attribute name="title">
-                   <string>NCNN (AMD/Intel/Nvidia)</string>
+                   <string>NCNN (AMD/Intel/Nvidia) (Linux/MacOS)</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout">
                    <item>
@@ -768,28 +768,28 @@
                       <bool>true</bool>
                      </property>
                      <property name="text">
-                      <string>RealCUGAN</string>
+                      <string>RealCUGAN (Upscale Animation + Custom Models)</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCheckBox">
                      <property name="text">
-                      <string>RealESRGAN</string>
+                      <string>RealESRGAN (Upscale Animation)</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="Waifu2xCheckBox">
                      <property name="text">
-                      <string>Waifu2X</string>
+                      <string>Waifu2X (Upscale Animation)</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealSRCheckBox">
                      <property name="text">
-                      <string>RealSR</string>
+                      <string>RealSR (Upscale General)</string>
                      </property>
                     </widget>
                    </item>
@@ -798,14 +798,14 @@
                      <item>
                       <widget class="QCheckBox" name="RifeCheckBox">
                        <property name="text">
-                        <string>RIFE</string>
+                        <string>RIFE (Interpolate General)</string>
                        </property>
                       </widget>
                      </item>
                      <item>
                       <widget class="QPushButton" name="RifeSettings">
                        <property name="text">
-                        <string>Settings</string>
+                        <string>Extra Models</string>
                        </property>
                       </widget>
                      </item>
@@ -817,7 +817,7 @@
                       <bool>true</bool>
                      </property>
                      <property name="text">
-                      <string>IFRNET</string>
+                      <string>IFRNET (Interpolate General)</string>
                      </property>
                     </widget>
                    </item>
@@ -893,20 +893,20 @@
                  </widget>
                  <widget class="QWidget" name="CUDATab">
                   <attribute name="title">
-                   <string>CUDA (Nvidia Only)</string>
+                   <string>CUDA (Nvidia Only) (Linux)</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout">
                    <item>
                     <widget class="QCheckBox" name="RifeCUDACheckBox">
                      <property name="text">
-                      <string>RIFE</string>
+                      <string>RIFE (Interpolate General)</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCUDACheckBox">
                      <property name="text">
-                      <string>RealESRGAN</string>
+                      <string>RealESRGAN (Upscale Animation)</string>
                      </property>
                     </widget>
                    </item>
