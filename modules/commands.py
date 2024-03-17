@@ -189,13 +189,14 @@ def get_video_from_link(self, thread):
                 file.write(chunk)
 
 
-def extractAudio(self, videopath, renderdir, videoName, thread):
+def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if '-ncnn-vulkan' in self.AI:
         self.ncnn = True
         self.cuda = False
     if '-cuda' in self.AI:
         self.ncnn = False
         self.cuda = True
+        os.system(f'mkdir -p "{renderdir}/{videoName}_temp/output_frames/0/"')
     self.file_drop_widget.hide()
     global height
     global width
@@ -208,7 +209,7 @@ def extractAudio(self, videopath, renderdir, videoName, thread):
         self.aspectratio = self.videowidth / self.videoheight
     except:
         self.aspectratio = 1920 / 1080
-    os.system(f'mkdir -p "{renderdir}/{videoName}_temp/output_frames/0"')
+    
     if self.localFile == True or self.youtubeFile == False:
         thread.log.emit("[Extracting Audio]")
         os.system(
@@ -232,7 +233,7 @@ def extractFramesAndAudio(
 
         if check_for_write_permissions(settings.OutputDir) == False:
             self.showDialogBox(
-                f"{e}\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory."
+                f"No write permissions!\n\nThis most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory."
             )
 
         # i need to clean this up lol
@@ -258,7 +259,7 @@ def extractFramesAndAudio(
             f"{renderdir}/{videoName}_temp/input_frames"
         )
 
-        extractAudio(self, videopath, renderdir, videoName, thread)
+        cudaAndNCNN(self, videopath, renderdir, videoName, thread)
         if settings.Image_Type != ".webp":
             ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 -vf "scale=w={self.videowidth}:h={self.videoheight}" "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y '
         else:
@@ -283,6 +284,7 @@ def extractFramesAndAudio(
             f"{renderdir}/{videoName}_temp/output_frames/0/"
         )
         self.start_time = time.time()
+        
         log(f"End of start function")
     except Exception as e:
         traceback_info = traceback.format_exc()

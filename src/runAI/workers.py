@@ -495,7 +495,7 @@ class interpolation(QObject):
 
     def finishRenderSetup(self):  # 3rd and final call, called from interpolate.py
         if "cuda" in self.main.AI:
-            extractAudio(
+            cudaAndNCNN(
                 self.main,
                 self.main.input_file,
                 self.main.settings.RenderDir,
@@ -688,7 +688,7 @@ class upscale(QObject):
 
     def finishRenderSetup(self):  # 3rd and final call, called from upscale.py
         if "cuda" in self.main.AI:
-            extractAudio(
+            cudaAndNCNN(
                 self.main,
                 self.main.input_file,
                 self.main.settings.RenderDir,

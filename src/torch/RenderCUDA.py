@@ -208,13 +208,14 @@ class Interpolation(Render):
     
     def __init__(self, main, input_file, output_file, times):
         super(Interpolation, self).__init__(main, input_file, output_file, interpolationIncrease=times,resIncrease=1)
-        self.interpolate_process = Rife(
+        '''self.interpolate_process = Rife(
             interpolation_factor=self.interpolation_factor,
             interpolate_method="rife4.14",
             width=self.originalWidth,
             height=self.originalHeight,
             half=True,
-        )
+            )'''
+        self.interpolation_process = RifeTRT()
     def proc_image(self, frame1, frame2):
         self.interpolate_process.run(frame1, frame2)
 

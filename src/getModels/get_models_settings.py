@@ -113,8 +113,10 @@ class Worker(QObject):
                     f.extractall(f"{settings.ModelDir}/rife/")
 
         for i in os.listdir(f"{thisdir}/files/"):
-            if ".txt" not in i:
-                os.remove(f"{thisdir}/files/{i}")
+            if os.path.isfile(i):
+                if ".txt" not in i:
+                    
+                    os.remove(f"{thisdir}/files/{i}")
         try:
             for i in os.listdir(f"{settings.ModelDir}/rife/"):
                 if (

@@ -37,7 +37,7 @@ class VideoName:
 class ManageFiles:
     def create_folder(folderpath):
         if os.path.exists(folderpath) == False:
-            os.system(f'mkdir "{folderpath}"')
+            os.system(f'mkdir -p "{folderpath}"')
 
     def create_file(filepath):
         if os.path.isfile(filepath) == False:
