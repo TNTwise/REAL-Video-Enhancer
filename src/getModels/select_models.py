@@ -412,8 +412,7 @@ def excepthook(type, value, traceback):
     error_message = f"An unhandled exception occurred: {value}"
     log(f"ERROR: Unhandled exception! {traceback},{type},{error_message}")
     exit()
-    
-    
+
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
 
 

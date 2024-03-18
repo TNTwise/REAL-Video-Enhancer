@@ -34,7 +34,7 @@ def modelOptions(self):
     self.ui.Rife_Times.clear()
     self.ui.FPSPreview.setText("RES:")
     self.ui.ensembleHelpButton.hide()
-    
+
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Model.addItems(["realesrgan-anime-4x"])
     self.ui.Rife_Times.setEnabled(True)
@@ -59,4 +59,6 @@ def modelOptions(self):
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
-    self.ui.RifeStart.clicked.connect(lambda: upscale.start_upscale(self, "realesrgan-cuda"))
+    self.ui.RifeStart.clicked.connect(
+        lambda: upscale.start_upscale(self, "realesrgan-cuda")
+    )

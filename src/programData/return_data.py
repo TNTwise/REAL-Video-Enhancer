@@ -213,8 +213,9 @@ class HardwareInfo:
 
         return vram
 
+
 def returnOperatingSystem():
     operating_system = platform.system()
-    if operating_system == 'Darwin':
-        return 'MacOS'
+    if operating_system == "Darwin":
+        return "MacOS"
     return operating_system

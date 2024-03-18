@@ -14,24 +14,26 @@ from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
 from .UpscaleImage import UpscaleCUDA
+
+
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
 # def
 class Render:
-    def __init__(self, main, input_file, output_file, interpolationIncrease=1, resIncrease=1):
+    def __init__(
+        self, main, input_file, output_file, interpolationIncrease=1, resIncrease=1
+    ):
         self.main = main
 
         self.readBuffer = Queue(maxsize=50)
         self.writeBuffer = Queue(maxsize=50)
         self.interpolation_factor = round(interpolationIncrease)
         self.prevFrame = None
-        
-        
-        
+
         self.input_file = input_file
         self.output_file = output_file
-        
+
         cap = cv2.VideoCapture(input_file)
         self.initialFPS = cap.get(cv2.CAP_PROP_FPS)
         self.originalWidth = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -39,9 +41,9 @@ class Render:
         self.originalHeight = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.outputHeight = self.originalHeight * resIncrease
         self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        
+
         self.finalFPS = self.initialFPS * self.interpolation_factor
-        
+
         self.settings = Settings()
 
     def extractFramesToBytes(self):
@@ -59,8 +61,7 @@ class Render:
             f"{self.originalWidth}x{self.originalHeight}",
             "-",
         ]
-        
-        
+
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -84,7 +85,6 @@ class Render:
 
             self.readBuffer.put(frame)
 
-        
     def finish_render(self):
         self.writeBuffer.put(None)
 
@@ -205,17 +205,20 @@ class Render:
                 tb = traceback.format_exc()
                 print(f"Something went wrong with the writebuffer: {e},{tb}")
 
+
 class Interpolation(Render):
-    
-    def __init__(self, main, input_file, output_file,model, times):
-        super(Interpolation, self).__init__(main, input_file, output_file,interpolationIncrease=times,resIncrease=1)
+    def __init__(self, main, input_file, output_file, model, times):
+        super(Interpolation, self).__init__(
+            main, input_file, output_file, interpolationIncrease=times, resIncrease=1
+        )
         self.interpolate_process = Rife(
             interpolation_factor=self.interpolation_factor,
             interpolate_method=model,
             width=self.originalWidth,
             height=self.originalHeight,
             half=True,
-            )
+        )
+
     def proc_image(self, frame1, frame2):
         self.interpolate_process.run(frame1, frame2)
 
@@ -263,31 +266,25 @@ class Interpolation(Render):
 
             self.prevFrame = frame
 
+
 class Upscaling(Render):
-    
-    def __init__(self,
-                 main,
-                 input_file,
-                 output_file,
-                 resIncrease,
-                 model_path):
-        super(Upscaling, self).__init__(main,
-                                        input_file,
-                                        output_file,
-                                        interpolationIncrease=1,
-                                        resIncrease=resIncrease)
+    def __init__(self, main, input_file, output_file, resIncrease, model_path):
+        super(Upscaling, self).__init__(
+            main,
+            input_file,
+            output_file,
+            interpolationIncrease=1,
+            resIncrease=resIncrease,
+        )
         self.model_path = model_path
-        
-    
 
     def procUpscaleThread(self):
         self.frame = 0
-        self.upscaleMethod = UpscaleCUDA(self.originalWidth,
-                                         self.originalHeight,
-                                         self.model_path)
-        
+        self.upscaleMethod = UpscaleCUDA(
+            self.originalWidth, self.originalHeight, self.model_path
+        )
+
         while True:
-            
             frame = self.readBuffer.get()
 
             if frame is None:
@@ -296,12 +293,9 @@ class Upscaling(Render):
                 self.writeBuffer.put(None)
                 break  # done with proc
 
-            
             result = self.upscaleMethod.UpscaleImage(frame)
-            
+
             self.writeBuffer.put(result)
             self.prevFrame = result
-            
-            self.frame += 1
 
-            
+            self.frame += 1

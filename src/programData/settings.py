@@ -82,9 +82,9 @@ class Settings:
             "UHDResCutOff": "1080",
             "gpuID": "0",
         }
-        if returnOperatingSystem() == 'Linux':
+        if returnOperatingSystem() == "Linux":
             default_settings["OutputDir"] = f"{homedir}/Videos/"
-        if returnOperatingSystem() == 'MacOS':
+        if returnOperatingSystem() == "MacOS":
             default_settings["OutputDir"] = f"{homedir}/Desktop/"
         for setting, default_value in default_settings.items():
             try:

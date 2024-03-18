@@ -26,6 +26,7 @@ except:
     pass
 from modules.commands import returnOutputFile
 from modules.handelModel import handleModel
+
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
@@ -41,15 +42,18 @@ class pb2X(QObject):
         self.videoName = VideoName.return_video_name(f"{self.input_file}")
 
         self.main = main
-    def numpy_array_to_pixmap(self,numpy_array):
-    # Assuming the NumPy array has shape (height, width, channels)
+
+    def numpy_array_to_pixmap(self, numpy_array):
+        # Assuming the NumPy array has shape (height, width, channels)
         numpy_array = np.ascontiguousarray(numpy_array)
         height, width, channels = numpy_array.shape
         bytes_per_line = channels * width
 
         # Create a QImage from the NumPy array
-        q_image = QImage(numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888)
-        
+        q_image = QImage(
+            numpy_array.data, width, height, bytes_per_line, QImage.Format_RGB888
+        )
+
         # Create a QPixmap from the QImage
         pixmap = QPixmap.fromImage(q_image)
 
@@ -210,7 +214,9 @@ class pb2X(QObject):
                                 # print(e)
                                 pass
                             self.image_progress.emit("1")
-                            self.main.pixMap = self.numpy_array_to_pixmap(self.main.imageDisplay)
+                            self.main.pixMap = self.numpy_array_to_pixmap(
+                                self.main.imageDisplay
+                            )
                             width = self.main.width()
                             height = self.main.height()
                             self.main.width1 = int(width / 1.6)
@@ -653,7 +659,7 @@ class interpolation(QObject):
                     self.main.encoder,
                 )
 
-        if self.main.AI == 'rife-cuda':
+        if self.main.AI == "rife-cuda":
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
@@ -662,18 +668,18 @@ class interpolation(QObject):
                 self.main.input_file,
                 output_file,
                 self.main.ui.Rife_Model.currentText(),
-                self.main.times
+                self.main.times,
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procInterpThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            #logThread1 = Thread(target=self.main.renderAI.log)
+            # logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()
             procThread1.start()
             renderThread1.start()
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-            #logThread1.start()
+            # logThread1.start()
             self.main.output_file = output_file
             print("Done")
 
@@ -715,11 +721,13 @@ class upscale(QObject):
         settings = Settings()
         self.main.endNum = 0
         self.main.paused = False
-        if '-ncnn-vulkan' in self.main.AI:
+        if "-ncnn-vulkan" in self.main.AI:
             self.main.frame_increments_of_interpolation = calculateFrameIncrements(self)
             img_type = self.main.settings.Image_Type.replace(".", "")
             self.input_frames = len(
-                os.listdir(f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames/")
+                os.listdir(
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames/"
+                )
             )
             self.main.frame_count = self.input_frames
 
@@ -829,31 +837,30 @@ class upscale(QObject):
                     )
                 else:
                     pass
-        
-        if self.main.AI == 'realesrgan-cuda':
+
+        if self.main.AI == "realesrgan-cuda":
             model_path = handleModel(self.main.AI)
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
             self.main.renderAI = RenderCUDA.Upscaling(
-                self.main, 
-                self.main.input_file, 
+                self.main,
+                self.main.input_file,
                 output_file,
                 int(self.main.ui.Rife_Times.currentText()[0]),
-                model_path
+                model_path,
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            #logThread1 = Thread(target=self.main.renderAI.log)
+            # logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()
             procThread1.start()
             renderThread1.start()
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-            
+
             self.main.output_file = output_file
             print("Done")
-
 
         self.finished.emit()

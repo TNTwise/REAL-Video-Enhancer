@@ -190,10 +190,10 @@ def get_video_from_link(self, thread):
 
 
 def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
-    if '-ncnn-vulkan' in self.AI:
+    if "-ncnn-vulkan" in self.AI:
         self.ncnn = True
         self.cuda = False
-    if '-cuda' in self.AI:
+    if "-cuda" in self.AI:
         self.ncnn = False
         self.cuda = True
         os.system(f'mkdir -p "{renderdir}/{videoName}_temp/output_frames/0/"')
@@ -209,7 +209,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
         self.aspectratio = self.videowidth / self.videoheight
     except:
         self.aspectratio = 1920 / 1080
-    
+
     if self.localFile == True or self.youtubeFile == False:
         thread.log.emit("[Extracting Audio]")
         os.system(
@@ -251,8 +251,6 @@ def extractFramesAndAudio(
 
         # gets the fps
 
-        
-
         # Create files
         return_data.ManageFiles.create_folder(f"{renderdir}/{videoName}_temp/")
         return_data.ManageFiles.create_folder(
@@ -284,7 +282,7 @@ def extractFramesAndAudio(
             f"{renderdir}/{videoName}_temp/output_frames/0/"
         )
         self.start_time = time.time()
-        
+
         log(f"End of start function")
     except Exception as e:
         traceback_info = traceback.format_exc()

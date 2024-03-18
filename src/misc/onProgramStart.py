@@ -86,8 +86,12 @@ def bindButtons(self):
     self.ui.EncoderCombo.currentIndexChanged.connect(lambda: selEncoder(self))
     # apparently adding multiple currentindexchanged causes a memory leak unless i sleep, idk why it does this but im kinda dumb
     self.ui.ESRGANModelSelectButton.clicked.connect(
-        lambda: self.openFileNameDialog("Model", [".bin"])
+        lambda: self.openFileNameDialog("NCNN Model", [".bin"])
     )
+    self.ui.PyTorchModelSelectButton.clicked.connect(
+        lambda: self.openFileNameDialog("CUDA Model", [".pkl",".pth",".pt"])
+    )
+
     self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
     self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
     self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
@@ -244,6 +248,8 @@ def hideChainModeButtons(self):
 
 def onApplicationStart(self):
     # this is kind of a mess
+    if torch_version:
+        os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
     import modules.Rife as rife
     import modules.ESRGAN as esrgan
     from PyQt5.QtGui import QIntValidator, QIcon
@@ -342,23 +348,19 @@ def set_model_params(self):
     # not efficient but im lazy so cry abt it
     # placeholder
     if torch_version == True:
-        
         self.ui.modelTabWidget.setTabEnabled(1, True)
         cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
         if cuda_rife_installed == True:
-        
             self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
-        
+
         cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
         if cuda_esrgan_installed == True:
-        
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
 
     else:
-            
-            self.ui.modelTabWidget.setTabEnabled(1, False)
+        self.ui.modelTabWidget.setTabEnabled(1, False)
     self.ui.modeCombo.clear()
     upscale_list = []
     for i in range(self.ui.modeCombo.count()):

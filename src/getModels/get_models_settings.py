@@ -115,7 +115,6 @@ class Worker(QObject):
         for i in os.listdir(f"{thisdir}/files/"):
             if os.path.isfile(i):
                 if ".txt" not in i:
-                    
                     os.remove(f"{thisdir}/files/{i}")
         try:
             for i in os.listdir(f"{settings.ModelDir}/rife/"):
