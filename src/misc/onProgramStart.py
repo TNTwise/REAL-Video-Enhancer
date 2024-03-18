@@ -248,13 +248,14 @@ def hideChainModeButtons(self):
 
 def onApplicationStart(self):
     # this is kind of a mess
+    thisdir = src.programData.thisdir.thisdir()
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
     import modules.Rife as rife
     import modules.ESRGAN as esrgan
     from PyQt5.QtGui import QIntValidator, QIcon
 
-    thisdir = src.programData.thisdir.thisdir()
+    
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
     hideChainModeButtons(self)
