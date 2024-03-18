@@ -16,9 +16,9 @@ except:
     torch_version = False
 
 
-def open_link():
+def open_link(urll):
     url = QUrl(
-        r"https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!"
+        urll
     )
     QDesktopServices.openUrl(url)
 
@@ -28,7 +28,8 @@ def bindButtons(self):
     self.ui.RifeSettings.clicked.connect(
         lambda: src.getModels.get_models_settings.get_rife(self)
     )
-    self.ui.esrganHelpModel.clicked.connect(open_link)
+    self.ui.esrganHelpModel.clicked.connect(lambda: open_link(r"https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!"))
+    self.ui.cudaArchSupportButton.clicked.connect(lambda: open_link(r"https://github.com/chaiNNer-org/spandrel?tab=readme-ov-file#model-architecture-support"))
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
     self.ui.gpuIDSpinBox.valueChanged.connect(lambda: change_GPU_ID(self))

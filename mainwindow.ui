@@ -768,14 +768,14 @@
                       <bool>true</bool>
                      </property>
                      <property name="text">
-                      <string>RealCUGAN (Upscale Animation + Custom Models)</string>
+                      <string>RealCUGAN (Upscale Animation)</string>
                      </property>
                     </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCheckBox">
                      <property name="text">
-                      <string>RealESRGAN (Upscale Animation)</string>
+                      <string>RealESRGAN (Upscale Animation + Custom Models)</string>
                      </property>
                     </widget>
                    </item>
@@ -922,7 +922,14 @@
                      <item>
                       <widget class="QPushButton" name="PyTorchModelSelectButton">
                        <property name="text">
-                        <string>Select PKL/PTH/PT file</string>
+                        <string>Select PTH/PT file</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="cudaArchSupportButton">
+                       <property name="text">
+                        <string>Arch Support?</string>
                        </property>
                       </widget>
                      </item>
