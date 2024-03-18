@@ -33,6 +33,7 @@ except Exception as e:
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
+    import modules.CustomModelsCUDA as CustomModelsCUDA
     import numpy as np
 
 
@@ -306,16 +307,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == "Vapoursynth-RIFE":
             VapoursynthRifeNCNN.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
-            try:
-                rifeCUDA.modelOptions(self)
-            except:
-                pass
-        if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
-            try:
-                RealESRGANCUDA.modelOptions(self)
-            except:
-                pass
+        
+
         if self.ui.AICombo.currentText() == "IFRNET":
             ifrnet.modelOptions(self)
 
@@ -324,6 +317,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "RealSR":
             realsr.modelOptions(self)
+        if torch_version:
+            if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
+                rifeCUDA.modelOptions(self)
+            
+            if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
+                RealESRGANCUDA.modelOptions(self)
+                
+            if self.ui.AICombo.currentText() == "Custom CUDA models":
+                CustomModelsCUDA.modelOptions(self)
 
     def switchMode(self):
         self.ui.AICombo.clear()
@@ -650,7 +652,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.ensembleHelpButton.hide()
 
     def greyOutRealSRTimes(self):
-        if self.ui.AICombo.currentText() == "RealESRGAN":
+        if self.ui.AICombo.currentText() == "RealESRGAN" or "Custom CUDA models":
             if (
                 self.ui.Rife_Model.currentText() == "Default"
                 or self.ui.Rife_Model.currentText() == "General"

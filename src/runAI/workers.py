@@ -862,5 +862,28 @@ class upscale(QObject):
 
             self.main.output_file = output_file
             print("Done")
+        if self.main.AI == "custom-models-cuda":
+            model_path = handleModel(self.main.AI,self.main.ui.Rife_Model.currentText())
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
+            self.main.renderAI = RenderCUDA.Upscaling(
+                self.main,
+                self.main.input_file,
+                output_file,
+                int(self.main.ui.Rife_Times.currentText()[0]),
+                model_path,
+            )
+            self.main.renderAI.extractFramesToBytes()
+            readThread1 = Thread(target=self.main.renderAI.readThread)
+            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
+            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+            # logThread1 = Thread(target=self.main.renderAI.log)
+            readThread1.start()
+            procThread1.start()
+            renderThread1.start()
+            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
+            self.main.output_file = output_file
+            print("Done")
         self.finished.emit()

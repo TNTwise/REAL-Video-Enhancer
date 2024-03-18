@@ -251,6 +251,7 @@ def onApplicationStart(self):
     thisdir = src.programData.thisdir.thisdir()
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
+        
     import modules.Rife as rife
     import modules.ESRGAN as esrgan
     from PyQt5.QtGui import QIntValidator, QIcon
@@ -359,6 +360,9 @@ def set_model_params(self):
         if cuda_esrgan_installed == True:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
+
+        if len(os.listdir(f"{thisdir}/models/custom-models-cuda")) > 0:
+            self.model_labels["Custom CUDA models"] = "upscaling"
 
     else:
         self.ui.modelTabWidget.setTabEnabled(1, False)
