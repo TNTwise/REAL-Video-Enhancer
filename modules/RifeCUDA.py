@@ -37,7 +37,7 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("2X")
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.addItem("8X")
-    self.ui.Rife_Model.addItems(["rife-v4.14-cuda"])
+    self.ui.Rife_Model.addItems(["rife4.14"])
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.hide()
     if self.output_folder == "":

@@ -25,7 +25,7 @@ try:
 except:
     pass
 from modules.commands import returnOutputFile
-
+from modules.handelModel import handleModel
 thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
@@ -658,7 +658,11 @@ class interpolation(QObject):
                 self.main, self.main.videoName, self.main.encoder
             )
             self.main.renderAI = RenderCUDA.Interpolation(
-                self.main, self.main.input_file, output_file, self.main.times
+                self.main,
+                self.main.input_file,
+                output_file,
+                self.main.ui.Rife_Model.currentText(),
+                self.main.times
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -825,7 +829,9 @@ class upscale(QObject):
                     )
                 else:
                     pass
+        
         if self.main.AI == 'realesrgan-cuda':
+            model_path = handleModel(self.main.AI)
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
@@ -833,7 +839,8 @@ class upscale(QObject):
                 self.main, 
                 self.main.input_file, 
                 output_file,
-                int(self.main.ui.Rife_Times.currentText()[0])
+                int(self.main.ui.Rife_Times.currentText()[0]),
+                model_path
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -848,5 +855,5 @@ class upscale(QObject):
             self.main.output_file = output_file
             print("Done")
 
-        self.finished.emit()
+
         self.finished.emit()

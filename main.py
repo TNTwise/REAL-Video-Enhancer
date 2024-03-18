@@ -387,8 +387,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                 self.times = float(self.ui.FPSTo.value())/float(self.ui.FPSFrom.value())
                                 print(self.times)
                             print('help me')
-                except Exception as e:
-                    print(e)
+                except:
+                    pass
             if self.render == 'esrgan':
                 if self.input_file != '':
                     try:
@@ -411,20 +411,25 @@ class MainWindow(QtWidgets.QMainWindow):
                     except Exception as e:
                         tb = traceback.format_exc()
                         log(f'{str(e)} {tb}')
-                        print(e,tb)
+                        #(e,tb)
                         pass
             self.ui.logsPreview.clear()
         except Exception as e:
             tb = traceback.format_exc()
             log(f'{str(e)} {tb}')
-            print(e,tb)
+            #print(e,tb)
             pass
     
     def reportProgress(self, files_processed):
         files_processed = int(files_processed)
         
         try:
-            self.currentRenderFPS =  round((files_processed / (time.time() - self.start_time)), 3)
+            
+            if time.time() - self.start_time == 0:
+                self.currentRenderFPS = None
+            else:    
+                self.currentRenderFPS =  round((files_processed / (time.time() - self.start_time)), 3)
+                
             if self.ncnn:
                 
                 
@@ -500,7 +505,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.processedPreview.setText(f'Files Processed: {files_processed} / {int(self.filecount)}')
                 
         except Exception as e:
-            print(e)
+            #print(e)
             pass
     def runPB(self):
         
@@ -540,7 +545,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.imageSpacerFrame.hide()
             if '-ncnn-vulkan' in self.AI:
                 try:
-                    img = Image.open(self.imageDisplay)
+                    
                     
                     
                     
@@ -553,7 +558,7 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 self.pixMap = self.pixMap.scaled(self.width1,self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap) # sets image preview image
-            except Exception as e:
+            except:
                 #print(f'Something went wrong with image preview pixmap: {e}')
                 pass
         if step == '3':

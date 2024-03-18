@@ -60,7 +60,7 @@ class Render:
             "-",
         ]
         
-
+        
         self.process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -176,6 +176,7 @@ class Render:
             "copy",
             f"{self.output_file}",
         ]
+        log(command)
         print(command)
         self.writeProcess = subprocess.Popen(
             command,
@@ -206,16 +207,15 @@ class Render:
 
 class Interpolation(Render):
     
-    def __init__(self, main, input_file, output_file, times):
-        super(Interpolation, self).__init__(main, input_file, output_file, interpolationIncrease=times,resIncrease=1)
-        '''self.interpolate_process = Rife(
+    def __init__(self, main, input_file, output_file,model, times):
+        super(Interpolation, self).__init__(main, input_file, output_file,interpolationIncrease=times,resIncrease=1)
+        self.interpolate_process = Rife(
             interpolation_factor=self.interpolation_factor,
-            interpolate_method="rife4.14",
+            interpolate_method=model,
             width=self.originalWidth,
             height=self.originalHeight,
             half=True,
-            )'''
-        self.interpolation_process = RifeTRT()
+            )
     def proc_image(self, frame1, frame2):
         self.interpolate_process.run(frame1, frame2)
 
@@ -265,18 +265,27 @@ class Interpolation(Render):
 
 class Upscaling(Render):
     
-    def __init__(self, main, input_file, output_file, resIncrease):
-        super(Upscaling, self).__init__(main, input_file, output_file, interpolationIncrease=1,resIncrease=resIncrease)
-        
+    def __init__(self,
+                 main,
+                 input_file,
+                 output_file,
+                 resIncrease,
+                 model_path):
+        super(Upscaling, self).__init__(main,
+                                        input_file,
+                                        output_file,
+                                        interpolationIncrease=1,
+                                        resIncrease=resIncrease)
+        self.model_path = model_path
         
     
 
     def procUpscaleThread(self):
         self.frame = 0
         self.upscaleMethod = UpscaleCUDA(self.originalWidth,
-                                         self.originalHeight)
+                                         self.originalHeight,
+                                         self.model_path)
         
-        #self.upscaleMethod = UpscaleNCNN()
         while True:
             
             frame = self.readBuffer.get()

@@ -16,10 +16,12 @@ import numpy as np
 class UpscaleCUDA:
     def __init__(self,
                  width,
-                 height):
+                 height,
+                 model):
         self.width = width
         self.height = height
-        self.model = ModelLoader().load_from_file(f"{thisdir}/models/realesrgan-cuda/realesr-animevideov3.pth")
+        
+        self.model = ModelLoader().load_from_file(model)
         assert isinstance(self.model, ImageModelDescriptor)
         self.model.eval() # gonna have to put cuda back in here lmfaooooooo
         self.cuda_available = torch.cuda.is_available()
