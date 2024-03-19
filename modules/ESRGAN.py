@@ -36,10 +36,7 @@ def modelOptions(self):
     self.ui.Rife_Model.addItem("Animation")
     self.ui.EnsembleCheckBox.hide()
     self.ui.ensembleHelpButton.hide()
-    for i in os.listdir(f"{settings.ModelDir}realesrgan/models/"):
-        if (os.path.splitext(i)[1])[1:] == "bin":
-            if i not in default_models():
-                self.ui.Rife_Model.addItem(i.replace(".bin", ""))
+    
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

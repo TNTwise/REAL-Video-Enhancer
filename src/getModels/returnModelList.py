@@ -47,7 +47,15 @@ def returnModelList(
                 "https://github.com/nihui/realsr-ncnn-vulkan/releases/download/20220728/realsr-ncnn-vulkan-20220728-ubuntu.zip"
             )
         ] = "realsr-ncnn-vulkan-20220728-ubuntu.zip"
-
+    if (
+        self.ui.CustomModelsNCNNCheckBox.isChecked()
+        and os.path.exists(f"{settings.ModelDir}/custom-models-ncnn/") == False
+    ):
+        install_modules_dict[
+            returnCorrectLinkBasedOnOS(
+                "https://github.com/TNTwise/Universal-NCNN-Upscaler/releases/download/20240218/upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
+            )
+        ] = "upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
     if (
         self.ui.RifeCheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/rife/") == False

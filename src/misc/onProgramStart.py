@@ -262,7 +262,7 @@ def onApplicationStart(self):
     set_model_params(self)
     hideChainModeButtons(self)
     # get esrgan models
-    if not (self.ui.RealESRGANCheckBox.isChecked()):
+    if not (self.ui.CustomModelsNCNNCheckBox.isChecked()):
         self.ui.ESRGANModelSelectButton.hide()
         self.ui.label_20.hide()
         self.ui.esrganHelpModel.hide()
@@ -348,6 +348,11 @@ def set_model_params(self):
         if "IFRNET" == i:
             self.ui.CainCheckBox.setChecked(True)
             self.model_labels["IFRNET"] = "interpolation"
+        if "Custom NCNN Models" == i:
+            if len(os.listdir(f"{thisdir}/models/custom_models_ncnn/models/")) > 0:
+                
+                self.model_labels["Custom NCNN models"] = "upscaling"
+            self.ui.CustomModelsNCNNCheckBox.setChecked(True)
     # not efficient but im lazy so cry abt it
     # placeholder
     if torch_version == True:
@@ -362,7 +367,7 @@ def set_model_params(self):
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
 
-        if len(os.listdir(f"{thisdir}/models/custom-models-cuda")) > 0:
+        if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
             self.model_labels["Custom CUDA models"] = "upscaling"
 
     else:

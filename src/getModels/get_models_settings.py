@@ -106,6 +106,10 @@ class Worker(QObject):
                 )
                 os.system(
                     f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
+                    
+                )
+                os.system(
+                    f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
                 )
 
             if ".tar.gz" in i:
@@ -208,6 +212,12 @@ def remove_unchecked(self):
 
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/rife-cuda/"')
+
+    if self.ui.RifeCUDACheckBox.isChecked() == False:
+        os.system(f'rm -rf "{self.settings.ModelDir}/realesrgan-cuda/"')
+    
+    if self.ui.RifeCUDACheckBox.isChecked() == False:
+        os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
 
 
 def run_install_models_from_settings(self):

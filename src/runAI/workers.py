@@ -803,6 +803,24 @@ class upscale(QObject):
                     "-g",
                     f"{self.main.ui.gpuIDSpinBox.value()}",
                 ]
+            if self.main.AI == "custom-models-ncnn-vulkan":
+                command = [
+                    f"{settings.ModelDir}custom_models_ncnn/upscayl-bin",
+                    "-i",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
+                    "-o",
+                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
+                    "-j",
+                    f"1:{settings.VRAM}:2",
+                    "-f",
+                    str(img_type),
+                    "-m",
+                    f"{settings.ModelDir}custom_models_ncnn/models/{self.main.ui.Rife_Model.currentText()}",
+                    "-g",
+                    f"{self.main.ui.gpuIDSpinBox.value()}",
+                    "-s",
+                    f"{self.main.ui.Rife_Times.currentText()}"
+                ]
             if (
                 settings.RenderType == "Optimized"
                 and self.main.frame_count > self.main.frame_increments_of_interpolation

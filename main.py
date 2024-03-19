@@ -81,7 +81,7 @@ import modules.IFRNET as ifrnet
 import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
-
+import modules.CustomModelsNCNN as CustomModelsNCNN
 
 import src.misc.onProgramStart
 from src.runAI.ETA import *
@@ -317,6 +317,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "RealSR":
             realsr.modelOptions(self)
+        
+        if self.ui.AICombo.currentText() == "Custom NCNN models":
+            CustomModelsNCNN.modelOptions(self)
+
         if torch_version:
             if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
                 rifeCUDA.modelOptions(self)
@@ -652,7 +656,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.ensembleHelpButton.hide()
 
     def greyOutRealSRTimes(self):
-        if self.ui.AICombo.currentText() == "RealESRGAN" or "Custom CUDA models":
+        if self.ui.AICombo.currentText() == "RealESRGAN":
             if (
                 self.ui.Rife_Model.currentText() == "Default"
                 or self.ui.Rife_Model.currentText() == "General"
@@ -664,7 +668,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 if index >= 0:
                     self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
-            else:
+        if self.ui.AICombo.currentText() == "Custom CUDA models" or self.ui.AICombo.currentText() ==  "Custom NCNN models":
+            if len(self.ui.Rife_Model.currentText()) > 0 :
                 self.ui.Rife_Times.clear()
                 model = self.ui.Rife_Model.currentText().lower()
                 if "1x" in model or "x1" in model:
@@ -685,7 +690,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("2X")
                     self.ui.Rife_Times.addItem("3X")
                     self.ui.Rife_Times.addItem("4X")
-                self.ui.Rife_Times.setEnabled(True)
+            self.ui.Rife_Times.setEnabled(True)
 
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
@@ -740,7 +745,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if (os.path.splitext(input_file)[1])[1:] == "bin":
                 if os.path.isfile(input_file):
                     if os.path.basename(input_file) in os.listdir(
-                        f"{settings.ModelDir}/realesrgan/models/"
+                        f"{settings.ModelDir}/custom_models_ncnn/models/"
                     ):
                         alreadyModel(self)
                         return
@@ -760,7 +765,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if (os.path.splitext(input_file)[1])[1:] == "param":
                 if os.path.isfile(input_file):
                     if os.path.basename(input_file) in os.listdir(
-                        f"{settings.ModelDir}/realesrgan/models/"
+                        f"{settings.ModelDir}/custom_models_ncnn/models/"
                     ):
                         alreadyModel(self)
                         return
@@ -771,8 +776,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 notAModel(self)
                 return
             param = input_file
-            os.system(f'cp "{bin}" "{settings.ModelDir}/realesrgan/models/"')
-            os.system(f'cp "{param}" "{settings.ModelDir}/realesrgan/models/"')
+            os.system(f'cp "{bin}" "{settings.ModelDir}/custom_models_ncnn/models/"')
+            os.system(f'cp "{param}" "{settings.ModelDir}/custom_models_ncnn/models/"')
         if type_of_file == "CUDA Model":
             os.system(f'cp "{input_file}" "{thisdir}/models/custom-models-cuda"')
     def openFolderDialog(self):

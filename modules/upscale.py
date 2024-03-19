@@ -47,7 +47,7 @@ def initializeUpscale(
 
             realESRGAN_Model = self.ui.Rife_Model.currentText()
             realESRGAN_Times = self.ui.Rife_Times.currentText()[0]
-            if AI == "realesrgan-ncnn-vulkan":
+            if AI == "realesrgan-ncnn-vulkan" or "custom-models-ncnn-vulkan":
                 if self.ui.gpuIDSpinBox.value() == -1:
                     self.showDialogBox(
                         "ESRGAN does not support CPU inference, using GPU inference instead."

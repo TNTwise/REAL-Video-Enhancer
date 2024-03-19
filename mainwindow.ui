@@ -775,7 +775,7 @@
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCheckBox">
                      <property name="text">
-                      <string>RealESRGAN (Upscale Animation + Custom Models)</string>
+                      <string>RealESRGAN (Upscale Animation)</string>
                      </property>
                     </widget>
                    </item>
@@ -822,6 +822,13 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QCheckBox" name="CustomModelsNCNNCheckBox">
+                     <property name="text">
+                      <string>Custom Models (Upscale Custom)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QCheckBox" name="RifeVSCheckBox">
                      <property name="enabled">
                       <bool>false</bool>
@@ -863,7 +870,7 @@
                      <item>
                       <widget class="QLabel" name="label_20">
                        <property name="text">
-                        <string>Import ESRGAN NCNN Model</string>
+                        <string>Import Custom NCNN Model</string>
                        </property>
                       </widget>
                      </item>

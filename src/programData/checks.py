@@ -181,6 +181,8 @@ def check_for_individual_models():
             return_list.append("RealSR")
         if os.path.exists(f"{thisdir}/models/vapoursynth-rife/"):
             return_list.append("Vapoursynth-RIFE")
+        if os.path.exists(f"{thisdir}/models/custom_models_ncnn/"):
+            return_list.append("Custom NCNN Models")
         if len(return_list) > 0:
             return return_list
 

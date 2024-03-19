@@ -367,7 +367,9 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         os.system(
                             f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
                         )
-
+                        os.system(
+                               f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
+                             )
                     if ".tar.gz" in i:
                         with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                             f.extractall(f"{settings.ModelDir}/rife/")
