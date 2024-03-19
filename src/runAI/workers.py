@@ -45,7 +45,7 @@ class pb2X(QObject):
 
     def numpy_array_to_pixmap(self, numpy_array):
         # Assuming the NumPy array has shape (height, width, channels)
-        numpy_array = np.ascontiguousarray(numpy_array)
+        
         height, width, channels = numpy_array.shape
         bytes_per_line = channels * width
 
@@ -203,7 +203,7 @@ class pb2X(QObject):
                 try:
                     while self.main.CudaRenderFinished == False:
                         try:
-                            sleep(0.1)
+                            sleep(0.5)
                             self.main.files_processed = (
                                 self.main.renderAI.returnFrameCount()
                             )
@@ -232,9 +232,9 @@ class pb2X(QObject):
                             self.image_progress.emit("2")
                         except Exception as e:
                             traceback_info = traceback.format_exc()
-                            print(
+                            '''print(
                                 f"Soemthing went wrong with cuda image preview {e} {traceback_info}"
-                            )
+                            )'''
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
                 print("CUDA render finished")
