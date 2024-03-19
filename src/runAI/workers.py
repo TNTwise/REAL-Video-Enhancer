@@ -203,7 +203,7 @@ class pb2X(QObject):
                 try:
                     while self.main.CudaRenderFinished == False:
                         try:
-                            sleep(0.5)
+                            sleep(0.1)
                             self.main.files_processed = (
                                 self.main.renderAI.returnFrameCount()
                             )
@@ -539,7 +539,7 @@ class interpolation(QObject):
             divisor = self.main.times / 2
             try:
                 self.log.emit(
-                    f'Transitions detected: {str(int(len(os.listdir(f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/transitions/"))//divisor))}'
+                    f'Transitions detected: {len(self.main.transitionFrames)}'
                 )
             except:
                 self.log.emit(f"Transitions detected: 0")

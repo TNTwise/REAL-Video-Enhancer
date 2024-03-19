@@ -30,7 +30,6 @@ class Render:
         self.writeBuffer = Queue(maxsize=50)
         self.interpolation_factor = round(interpolationIncrease)
         self.prevFrame = None
-
         self.input_file = input_file
         self.output_file = output_file
 
@@ -89,10 +88,9 @@ class Render:
         self.writeBuffer.put(None)
 
     def returnLatestFrame(self):
-        try:
+        if self.prevFrame:
             return self.prevFrame
-        except:
-            print("No frame to return!")
+        
 
     def returnFrameCount(self):
         try:
@@ -197,9 +195,9 @@ class Render:
                     self.main.output_file = self.output_file
                     self.main.CudaRenderFinished = True
                     break
-                self.main.imageDisplay = frame
+                
                 frame = np.ascontiguousarray(frame)
-
+                self.main.imageDisplay = frame
                 self.writeProcess.stdin.buffer.write(frame.tobytes())
             except Exception as e:
                 tb = traceback.format_exc()

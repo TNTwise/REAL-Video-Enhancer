@@ -37,12 +37,12 @@ class TransitionDetection:
 
     def find_timestamps(self):
         if self.settings.SceneChangeDetectionMode.lower() == "enabled":
+            
+            os.system(f'mkdir -p "{self.full_render_dir}/transitions/"')
+            
             if self.settings.SceneChangeMethod == "ffmpeg":
                 # This will get the timestamps of the scene changes, and for every scene change timestamp, i can times it by the fps count to get its current frame, and after interpolation, double it and replace it and it -1 frame with the transition frame stored in the transitions folder
-                try:
-                    os.mkdir(f"{self.full_render_dir}/transitions/")
-                except:
-                    pass
+                
                 # self.main.addLinetoLogs('Detecting Transitions')
 
                 if (

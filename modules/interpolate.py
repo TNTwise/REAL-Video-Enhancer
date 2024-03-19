@@ -1,7 +1,6 @@
 import src.programData.return_data as return_data
 import os
 from src.programData.settings import *
-import src.runAI.transition_detection
 from src.programData.return_data import *
 from src.misc.messages import *
 from src.runAI.discord_rpc import *
