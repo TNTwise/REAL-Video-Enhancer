@@ -410,7 +410,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             self.ui.FPSTo.setMinimum(fps * 2)
 
                             self.ui.FPSTo.setValue((fps) * int(self.times))
-                            print((self.amountFrames / self.ui.FPSFrom.value()))
+                            #print((self.amountFrames / self.ui.FPSFrom.value()))
                             math.ceil(
                                 self.ui.FPSTo.value()
                                 * (self.amountFrames / self.ui.FPSFrom.value())
@@ -418,8 +418,8 @@ class MainWindow(QtWidgets.QMainWindow):
                             self.times = float(self.ui.FPSTo.value()) / float(
                                 self.ui.FPSFrom.value()
                             )
-                            print(self.times)
-                        print("help me")
+                            #print(self.times)
+                        
                 except:
                     pass
             if self.render == "esrgan":
@@ -540,7 +540,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.removeLastLineInLogs("FPS: ")
                     self.addLinetoLogs(f"FPS: {self.currentRenderFPS}")
                 except Exception as e:
-                    print(e)
+                    #print(e)
                     self.ETA = None
 
                 self.i = 2
@@ -669,7 +669,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
         if self.ui.AICombo.currentText() == "Custom CUDA models" or self.ui.AICombo.currentText() ==  "Custom NCNN models":
-            if len(self.ui.Rife_Model.currentText()) > 0 :
+            if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()
                 model = self.ui.Rife_Model.currentText().lower()
                 if "1x" in model or "x1" in model:
@@ -691,6 +691,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("3X")
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
+            
 
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
@@ -713,7 +714,7 @@ class MainWindow(QtWidgets.QMainWindow):
             f"{homedir}",
             f"{type_of_file} files ({files});;All files (*.*)",
         )[0]
-        print(input_file)
+        #print(input_file)
         if type_of_file == "Video":
             try:
                 self.input_file = input_file
@@ -750,8 +751,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         alreadyModel(self)
                         return
 
-                    if self.ui.AICombo.currentText() == "RealESRGAN":
-                        esrgan.modelOptions(self)
+                    if self.ui.AICombo.currentText() == "Custom NCNN models":
+                        CustomModelsNCNN.modelOptions(self)
             else:
                 notAModel(self)
                 return
@@ -770,8 +771,8 @@ class MainWindow(QtWidgets.QMainWindow):
                         alreadyModel(self)
                         return
 
-                    if self.ui.AICombo.currentText() == "RealESRGAN":
-                        esrgan.modelOptions(self)
+                    if self.ui.AICombo.currentText() == "Custom NCNN models":
+                        CustomModelsNCNN.modelOptions(self)
             else:
                 notAModel(self)
                 return
@@ -779,6 +780,8 @@ class MainWindow(QtWidgets.QMainWindow):
             os.system(f'cp "{bin}" "{settings.ModelDir}/custom_models_ncnn/models/"')
             os.system(f'cp "{param}" "{settings.ModelDir}/custom_models_ncnn/models/"')
         if type_of_file == "CUDA Model":
+            if self.ui.AICombo.currentText() == "Custom CUDA models":
+                        CustomModelsCUDA.modelOptions(self)
             os.system(f'cp "{input_file}" "{thisdir}/models/custom-models-cuda"')
     def openFolderDialog(self):
         output_folder = QFileDialog.getExistingDirectory(self, "Open Folder")
@@ -876,7 +879,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.RifeResume.hide()
             self.ui.QueueButton.hide()
             self.ui.centerLabel.show()
-            self.greyOutRealSRTimes()
+            
             self.addLinetoLogs(f"Finished! Output video: {self.output_file}")
             self.setDisableEnable(False)
             self.ui.RifePB.setValue(self.ui.RifePB.maximum())
@@ -1017,7 +1020,7 @@ def excepthook(type, value, extraceback):
     print("Traceback:")
     traceback.print_tb(extraceback)
     tb = traceback.format_exc()
-    print(tb)
+    #print(tb)
     # Optionally, you can extract and print the file name
     file_name = extraceback.tb_frame.f_code.co_filename
     print(f"Exception occurred in file: {file_name}")

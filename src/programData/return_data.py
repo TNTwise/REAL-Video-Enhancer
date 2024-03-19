@@ -74,7 +74,7 @@ def get_vram_amount():
         return int(vram_amount // 1000)
     except Exception as e:
         # Handle any exceptions that may occur (e.g., nvidia-smi not found, error running the command)
-        print(f"Error: {e}")
+        #print(f"Error: {e}")
         return get_integrated_vram()
 
 

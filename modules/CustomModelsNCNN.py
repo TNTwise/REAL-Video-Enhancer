@@ -38,7 +38,7 @@ def modelOptions(self):
         if 'bin' in i:
 
             self.ui.Rife_Model.addItem(i.replace('.bin',''))
-    self.greyOutRealSRTimes()
+    
     
     self.ui.EnsembleCheckBox.hide()
    
@@ -46,7 +46,8 @@ def modelOptions(self):
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:
         pass
-    self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
+    self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRealSRTimes)
+    self.greyOutRealSRTimes()
     self.ui.Rife_Times.setCurrentIndex(0)
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
@@ -57,6 +58,7 @@ def modelOptions(self):
         pass
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
+    self.ui.Rife_Model.setEnabled(True)
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
     self.ui.RifeStart.clicked.connect(
         lambda: upscale.start_upscale(self, "custom-models-ncnn-vulkan")

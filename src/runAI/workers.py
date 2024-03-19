@@ -815,11 +815,13 @@ class upscale(QObject):
                     "-f",
                     str(img_type),
                     "-m",
-                    f"{settings.ModelDir}custom_models_ncnn/models/{self.main.ui.Rife_Model.currentText()}",
+                    f"{settings.ModelDir}custom_models_ncnn/models/",
+                    "-n",
+                    f"{self.main.ui.Rife_Model.currentText()}",
                     "-g",
                     f"{self.main.ui.gpuIDSpinBox.value()}",
                     "-s",
-                    f"{self.main.ui.Rife_Times.currentText()}"
+                    f"{self.main.ui.Rife_Times.currentText()[0]}"
                 ]
             if (
                 settings.RenderType == "Optimized"
