@@ -139,6 +139,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="CustomModelsNCNNCheckBox">
+             <property name="text">
+              <string>Custom NCNN Models (Upscale Custom)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="RifeVSCheckBox">
              <property name="enabled">
               <bool>false</bool>
