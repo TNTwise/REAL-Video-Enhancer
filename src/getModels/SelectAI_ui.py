@@ -111,7 +111,7 @@ class Ui_MainWindow(object):
         self.label_13.setText(_translate("MainWindow", "Models:"))
         self.InstallButton.setText(_translate("MainWindow", "Install"))
         self.RifeCheckBox.setText(_translate("MainWindow", "RIFE (Interpolate General)"))
-        self.RifeSettings.setText(_translate("MainWindow", "Settings"))
+        self.RifeSettings.setText(_translate("MainWindow", "Extra Models"))
         self.RealESRGANCheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
         self.RealSRCheckBox.setText(_translate("MainWindow", "RealSR (Upscale General)"))
         self.Waifu2xCheckBox.setText(_translate("MainWindow", "Waifu2X  (Upscale Animation)"))

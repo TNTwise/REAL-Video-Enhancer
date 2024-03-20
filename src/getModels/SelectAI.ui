@@ -88,7 +88,7 @@
              <item>
               <widget class="QPushButton" name="RifeSettings">
                <property name="text">
-                <string>Settings</string>
+                <string>Extra Models</string>
                </property>
               </widget>
              </item>
