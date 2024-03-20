@@ -111,11 +111,14 @@ class Render:
             print("No frame to return!")
 
     def log(self):
-        sleep(1)
+        
         while not self.main.CudaRenderFinished:
             try:
                 for line in iter(self.writeProcess.stderr.readline, b""):
-                    log(line)
+                    if not self.main.CudaRenderFinished:
+                        log(line)
+                    else:
+                        break
                     # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
                     # self.frame = int(self.frame.replace('frame=',''))
 
