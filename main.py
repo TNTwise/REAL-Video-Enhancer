@@ -230,13 +230,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.installModelsProgressBar.setMaximum(100)
 
             selFrameIncrementsMode(self)
-            if self.gpuMemory == None:
-                cannot_detect_vram(self)
-            else:
-                pass
-            if int(HardwareInfo.get_video_memory_linux()) < 4:
-                if settings.ignoreVramPopup == "False":
-                    not_enough_vram(self)
+            
             if check_for_write_permissions(self.settings.OutputDir) == False:
                 no_perms(self)
                 try:

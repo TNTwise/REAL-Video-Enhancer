@@ -223,14 +223,10 @@ def settingsStart(self):
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
     self.gpuMemory = settings.VRAM
-    if self.gpuMemory != "None":
-        self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
+    
+    self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
 
-    else:
-        if settings.VRAM == "None":
-            cannot_detect_vram(self)
-        self.ui.gpuThreadingSpinBox.setValue(1)
-
+    
 
 def hideChainModeButtons(self):
     self.ui.TimesInterpolationLabel.hide()
