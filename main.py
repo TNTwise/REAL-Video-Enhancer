@@ -628,12 +628,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def setEnsembleMode(self):
         if os.path.exists(
                 f"{self.settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble"
-        ) or self.main.AI == 'rife-cuda':
+        ) or  "rife4" in self.ui.Rife_Model.currentText():
                 self.ui.EnsembleCheckBox.show()
                 self.ui.ensembleHelpButton.show()
 
     def greyOutRifeTimes(self):
-        if "v4" in self.ui.Rife_Model.currentText():
+        
+        if "v4" in self.ui.Rife_Model.currentText() or "rife4" in self.ui.Rife_Model.currentText():
             self.ui.Rife_Times.setEnabled(True)
             
             self.setEnsembleMode()
@@ -641,6 +642,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.FPSTo.show()
 
         else:
+            print('legacy model')
             self.ui.FPSFrom.hide()
             self.ui.FPSTo.hide()
             self.ui.Rife_Times.setCurrentText("2X")
@@ -851,7 +853,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(True)
-        if "v4" in self.ui.Rife_Model.currentText().lower():
+        if "v4" in self.ui.Rife_Model.currentText().lower() or 'rife4' in self.ui.Rife_Model.currentText().lower():
             self.ui.Rife_Times.setDisabled(mode)
 
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
