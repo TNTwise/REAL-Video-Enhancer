@@ -373,10 +373,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 log("Couldnt grab resolution in showChangeInFPS")
 
         try:
-            try:
+            if self.localFile == True:
                 self.videoProperties()
-            except Exception as e:
-                print(e)
+            
             fps = self.fps
 
             if self.render == "rife":

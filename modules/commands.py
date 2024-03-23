@@ -244,7 +244,7 @@ def extractFramesAndAudio(
         global height
         global width
 
-        self.fps = VideoName.return_video_framerate(f"{self.input_file}")
+        
 
         # Calculate the aspect ratio
         self.videoName = videoName
@@ -258,6 +258,7 @@ def extractFramesAndAudio(
         )
 
         cudaAndNCNN(self, videopath, renderdir, videoName, thread)
+        self.fps = VideoName.return_video_framerate(f"{self.input_file}")
         if settings.Image_Type != ".webp":
             ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -q:v 1 -vf "scale=w={self.videowidth}:h={self.videoheight}" "{renderdir}/{videoName}_temp/input_frames/%08d{self.settings.Image_Type}" -y '
         else:
