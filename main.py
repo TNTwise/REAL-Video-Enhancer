@@ -40,8 +40,8 @@ if torch_version:
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
-except Exception as e:
-    print(e)
+except:
+    pass
 import src.programData.thisdir
 
 import src.programData.checks as checks
@@ -373,9 +373,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 log("Couldnt grab resolution in showChangeInFPS")
 
         try:
-            if self.localFile == True:
+            try:
                 self.videoProperties()
-
+            except Exception as e:
+                print(e)
             fps = self.fps
 
             if self.render == "rife":
@@ -412,7 +413,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             )
                             # print(self.times)
 
-                except:
+                except Exception as e:
                     pass
             if self.render == "esrgan":
                 if self.input_file != "":
@@ -444,7 +445,6 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             tb = traceback.format_exc()
             log(f"{str(e)} {tb}")
-            # print(e,tb)
             pass
 
     def reportProgress(self, files_processed):
@@ -532,7 +532,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.removeLastLineInLogs("FPS: ")
                     self.addLinetoLogs(f"FPS: {self.currentRenderFPS}")
                 except Exception as e:
-                    # print(e)
                     self.ETA = None
 
                 self.i = 2
@@ -543,7 +542,6 @@ class MainWindow(QtWidgets.QMainWindow):
             )
 
         except Exception as e:
-            # print(e)
             pass
 
     def runPB(self):
@@ -581,14 +579,12 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.pixMap = QPixmap(self.imageDisplay)
                 except:
                     pass
-                    # print('Cannot open image!')
 
         if step == "2":
             try:
                 self.pixMap = self.pixMap.scaled(self.width1, self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap)  # sets image preview image
             except:
-                # print(f'Something went wrong with image preview pixmap: {e}')
                 pass
         if step == "3":
             self.ui.imageSpacerFrame.show()
@@ -642,7 +638,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.FPSTo.show()
 
         else:
-            print('legacy model')
             self.ui.FPSFrom.hide()
             self.ui.FPSTo.hide()
             self.ui.Rife_Times.setCurrentText("2X")
@@ -713,14 +708,12 @@ class MainWindow(QtWidgets.QMainWindow):
             f"{homedir}",
             f"{type_of_file} files ({files});;All files (*.*)",
         )[0]
-        # print(input_file)
         if type_of_file == "Video":
             try:
                 self.input_file = input_file
                 cap = cv2.VideoCapture(self.input_file)
                 # Check if the file can be opened successfully
                 if cap.isOpened():
-                    print(f"{self.input_file} is a video file.")
                     cap.release()
                     self.download_youtube_video_command = ""
                     self.localFile = True
@@ -733,7 +726,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
                         self.addLinetoLogs(f"Input file = {self.input_file}")
                 else:
-                    print(f"{self.input_file} is not a video file.")
                     not_a_video(self)
             except Exception as e:
                 traceback_info = traceback.format_exc()
@@ -800,7 +792,6 @@ class MainWindow(QtWidgets.QMainWindow):
                         else:
                             output_folder = f"/{permissions_dir}"
                     self.output_folder = output_folder
-                    print(output_folder + " set Outputdir")
                 else:
                     no_perms_change_setting(self)
             except:
@@ -994,7 +985,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 if i != " ":
                     display_text += "\n"
             else:
-                # print(i)
                 pass
         self.ui.logsPreview.clear()
 
@@ -1020,7 +1010,6 @@ def excepthook(type, value, extraceback):
     print("Traceback:")
     traceback.print_tb(extraceback)
     tb = traceback.format_exc()
-    # print(tb)
     # Optionally, you can extract and print the file name
     file_name = extraceback.tb_frame.f_code.co_filename
     print(f"Exception occurred in file: {file_name}")
