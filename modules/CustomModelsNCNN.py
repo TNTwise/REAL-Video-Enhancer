@@ -35,13 +35,11 @@ def modelOptions(self):
     self.ui.FPSPreview.setText("RES:")
     self.ui.ensembleHelpButton.hide()
     for i in os.listdir(f"{thisdir}/models/custom_models_ncnn/models/"):
-        if 'bin' in i:
+        if "bin" in i:
+            self.ui.Rife_Model.addItem(i.replace(".bin", ""))
 
-            self.ui.Rife_Model.addItem(i.replace('.bin',''))
-    
-    
     self.ui.EnsembleCheckBox.hide()
-   
+
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:

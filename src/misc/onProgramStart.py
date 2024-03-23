@@ -17,9 +17,7 @@ except:
 
 
 def open_link(urll):
-    url = QUrl(
-        urll
-    )
+    url = QUrl(urll)
     QDesktopServices.openUrl(url)
 
 
@@ -28,8 +26,16 @@ def bindButtons(self):
     self.ui.RifeSettings.clicked.connect(
         lambda: src.getModels.get_models_settings.get_rife(self)
     )
-    self.ui.esrganHelpModel.clicked.connect(lambda: open_link(r"https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!"))
-    self.ui.cudaArchSupportButton.clicked.connect(lambda: open_link(r"https://github.com/chaiNNer-org/spandrel?tab=readme-ov-file#model-architecture-support"))
+    self.ui.esrganHelpModel.clicked.connect(
+        lambda: open_link(
+            r"https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!"
+        )
+    )
+    self.ui.cudaArchSupportButton.clicked.connect(
+        lambda: open_link(
+            r"https://github.com/chaiNNer-org/spandrel?tab=readme-ov-file#model-architecture-support"
+        )
+    )
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
     self.ui.gpuIDSpinBox.valueChanged.connect(lambda: change_GPU_ID(self))
@@ -90,7 +96,7 @@ def bindButtons(self):
         lambda: self.openFileNameDialog("NCNN Model", [".bin"])
     )
     self.ui.PyTorchModelSelectButton.clicked.connect(
-        lambda: self.openFileNameDialog("CUDA Model", [".pkl",".pth",".pt"])
+        lambda: self.openFileNameDialog("CUDA Model", [".pkl", ".pth", ".pt"])
     )
 
     self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
@@ -223,10 +229,9 @@ def settingsStart(self):
     self.ui.RenderPathLabel.setText(f"{settings.RenderDir}")
     self.ui.gpuIDSpinBox.setValue(int(settings.gpuID))
     self.gpuMemory = settings.VRAM
-    
+
     self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
 
-    
 
 def hideChainModeButtons(self):
     self.ui.TimesInterpolationLabel.hide()
@@ -248,12 +253,11 @@ def onApplicationStart(self):
     thisdir = src.programData.thisdir.thisdir()
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
-        
+
     import modules.Rife as rife
     import modules.ESRGAN as esrgan
     from PyQt5.QtGui import QIntValidator, QIcon
 
-    
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
     hideChainModeButtons(self)
@@ -346,7 +350,6 @@ def set_model_params(self):
             self.model_labels["IFRNET"] = "interpolation"
         if "Custom NCNN Models" == i:
             if len(os.listdir(f"{thisdir}/models/custom_models_ncnn/models/")) > 0:
-                
                 self.model_labels["Custom NCNN models"] = "upscaling"
             self.ui.CustomModelsNCNNCheckBox.setChecked(True)
     # not efficient but im lazy so cry abt it

@@ -58,9 +58,6 @@ def get_vram_amount():
     return 2
 
 
-
-
-
 def ceildiv(a, b):
     return -(a // -b)
 

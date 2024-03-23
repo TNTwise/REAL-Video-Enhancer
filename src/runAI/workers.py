@@ -45,7 +45,7 @@ class pb2X(QObject):
 
     def numpy_array_to_pixmap(self, numpy_array):
         # Assuming the NumPy array has shape (height, width, channels)
-        
+
         height, width, channels = numpy_array.shape
         bytes_per_line = channels * width
 
@@ -232,9 +232,9 @@ class pb2X(QObject):
                             self.image_progress.emit("2")
                         except Exception as e:
                             traceback_info = traceback.format_exc()
-                            '''print(
+                            """print(
                                 f"Soemthing went wrong with cuda image preview {e} {traceback_info}"
-                            )'''
+                            )"""
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
                 print("CUDA render finished")
@@ -539,7 +539,7 @@ class interpolation(QObject):
             divisor = self.main.times / 2
             try:
                 self.log.emit(
-                    f'Transitions detected: {len(self.main.transitionFrames)}'
+                    f"Transitions detected: {len(self.main.transitionFrames)}"
                 )
             except:
                 self.log.emit(f"Transitions detected: 0")
@@ -669,6 +669,7 @@ class interpolation(QObject):
                 output_file,
                 self.main.ui.Rife_Model.currentText(),
                 self.main.times,
+                self.main.ui.EnsembleCheckBox.isChecked()
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -678,7 +679,7 @@ class interpolation(QObject):
             readThread1.start()
             procThread1.start()
             renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+            self.main.renderAI.log() 
             # logThread1.start()
             self.main.output_file = output_file
             print("Done")
@@ -821,7 +822,7 @@ class upscale(QObject):
                     "-g",
                     f"{self.main.ui.gpuIDSpinBox.value()}",
                     "-s",
-                    f"{self.main.ui.Rife_Times.currentText()[0]}"
+                    f"{self.main.ui.Rife_Times.currentText()[0]}",
                 ]
             if (
                 settings.RenderType == "Optimized"
@@ -883,7 +884,9 @@ class upscale(QObject):
             self.main.output_file = output_file
             print("Done")
         if self.main.AI == "custom-models-cuda":
-            model_path = handleModel(self.main.AI,self.main.ui.Rife_Model.currentText())
+            model_path = handleModel(
+                self.main.AI, self.main.ui.Rife_Model.currentText()
+            )
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )

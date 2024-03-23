@@ -37,9 +37,10 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("2X")
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.addItem("8X")
+    for i in os.listdir(f'{thisdir}/models/rife-cuda/'): pass
     self.ui.Rife_Model.addItems(["rife4.14"])
     self.ui.Rife_Times.setEnabled(True)
-    self.ui.EnsembleCheckBox.hide()
+    self.ui.EnsembleCheckBox.show()
     if self.output_folder == "":
         outputpath = settings.OutputDir
     else:

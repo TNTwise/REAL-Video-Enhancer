@@ -112,12 +112,9 @@ class Settings:
         try:
             self.VRAM = settings_dict["VRAM"]
         except:
-            if HardwareInfo.get_video_memory_linux() == None:
-                self.write_to_settings_file("VRAM", f"2")
-            elif HardwareInfo.get_video_memory_linux() >= 1:
-                self.write_to_settings_file("VRAM", f"2")
-            elif HardwareInfo.get_video_memory_linux() < 2:
-                self.write_to_settings_file("VRAM", "1")
+            
+            self.write_to_settings_file("VRAM", f"2")
+            
             self.readSettings()
 
     def change_setting(self, setting, svalue):

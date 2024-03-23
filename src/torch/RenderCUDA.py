@@ -90,7 +90,6 @@ class Render:
     def returnLatestFrame(self):
         if self.prevFrame:
             return self.prevFrame
-        
 
     def returnFrameCount(self):
         try:
@@ -111,7 +110,6 @@ class Render:
             print("No frame to return!")
 
     def log(self):
-        
         while not self.main.CudaRenderFinished:
             try:
                 for line in iter(self.writeProcess.stderr.readline, b""):
@@ -198,7 +196,7 @@ class Render:
                     self.main.output_file = self.output_file
                     self.main.CudaRenderFinished = True
                     break
-                
+
                 frame = np.ascontiguousarray(frame)
                 self.main.imageDisplay = frame
                 self.writeProcess.stdin.buffer.write(frame.tobytes())
@@ -208,7 +206,13 @@ class Render:
 
 
 class Interpolation(Render):
-    def __init__(self, main, input_file, output_file, model, times):
+    def __init__(self, 
+                 main,
+                 input_file, 
+                 output_file, 
+                 model, 
+                 times, 
+                 ensemble):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1
         )
@@ -217,6 +221,7 @@ class Interpolation(Render):
             interpolate_method=model,
             width=self.originalWidth,
             height=self.originalHeight,
+            ensemble=ensemble,
             half=True,
         )
 

@@ -191,7 +191,7 @@ def get_video_from_link(self, thread):
 
 def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if self.localFile == False:
-            get_video_from_link(self, thread)
+        get_video_from_link(self, thread)
     if "-ncnn-vulkan" in self.AI:
         self.ncnn = True
         self.cuda = False
@@ -243,7 +243,6 @@ def extractFramesAndAudio(
         # Gets the width and height
         global height
         global width
-        
 
         self.fps = VideoName.return_video_framerate(f"{self.input_file}")
 

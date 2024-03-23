@@ -106,7 +106,6 @@ class Worker(QObject):
                 )
                 os.system(
                     f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
-                    
                 )
                 os.system(
                     f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
@@ -215,7 +214,7 @@ def remove_unchecked(self):
 
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/realesrgan-cuda/"')
-    
+
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
 
