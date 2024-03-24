@@ -72,6 +72,6 @@ def check_for_write_permissions(dir):
         return False
     else:
         if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
-            print("has access")
+            
             return True
         return False

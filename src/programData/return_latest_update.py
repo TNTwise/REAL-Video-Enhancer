@@ -17,7 +17,6 @@ class return_latest(QObject):
         QThread.__init__(self, parent)
 
     def run(self):
-        print("h")
         if check_if_online(True):
             try:
                 latest_beta = return_latest_git_ver(
