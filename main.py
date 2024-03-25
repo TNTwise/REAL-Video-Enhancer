@@ -13,9 +13,11 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QProgressBar,
+    QGraphicsOpacityEffect
+    
 )
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt, QSize, QEvent, QThread
+from PyQt5.QtCore import Qt, QSize, QEvent, QThread, QPropertyAnimation, QEasingCurve
 
 from src.programData.version import returnVersion
 
@@ -177,88 +179,80 @@ class MainWindow(QtWidgets.QMainWindow):
         self.localFile = True
         self.input_file = ""
         self.download_youtube_video_command = ""
+        #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
-        try:
-            self.thread2 = QThread()
-            # Step 3: Create a worker object
-            worker = return_latest()
+        self.thread2 = QThread()
+        # Step 3: Create a worker object
+        worker = return_latest()
 
-            # Step 4: Move worker to the thread
-            worker.moveToThread(self.thread2)
-            # Step 5: Connect signals and slots
-            self.thread2.started.connect(worker.run)
-            worker.finished.connect(self.thread2.quit)
-            worker.finished.connect(worker.deleteLater)
-            self.thread2.finished.connect(self.thread2.deleteLater)
-            worker.progress.connect(self.addVersionstoLogs)
-            # Step 6: Start the thread
+        # Step 4: Move worker to the thread
+        worker.moveToThread(self.thread2)
+        # Step 5: Connect signals and slots
+        self.thread2.started.connect(worker.run)
+        worker.finished.connect(self.thread2.quit)
+        worker.finished.connect(worker.deleteLater)
+        self.thread2.finished.connect(self.thread2.deleteLater)
+        worker.progress.connect(self.addVersionstoLogs)
+        # Step 6: Start the thread
 
-            self.thread2.start()
+        self.thread2.start()
+        self.addLinetoLogs(f"Current Version: {returnVersion()}")
+        
+        
+        src.misc.onProgramStart.onApplicationStart(self)
+        src.misc.onProgramStart.bindButtons(self)
 
-        except Exception as e:
-            self.showDialogBox(e)
-            traceback_info = traceback.format_exc()
-            log(f"{e} {traceback_info}")
-            log(f"{e} {traceback_info}")
-        try:
-            src.misc.onProgramStart.onApplicationStart(self)
-            src.misc.onProgramStart.bindButtons(self)
+        self.file_drop_widget = FileDropWidget(self)
+        self.ui.verticalTabWidget.setFocusPolicy(Qt.ClickFocus)
+        self.pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
+        scaled_pixmap = self.pixmap.scaled(
+            self.size() / 2, Qt.KeepAspectRatio, Qt.SmoothTransformation
+        )
+        self.file_drop_widget.setPixmap(scaled_pixmap)
 
-            self.file_drop_widget = FileDropWidget(self)
-            self.ui.verticalTabWidget.setFocusPolicy(Qt.ClickFocus)
-            self.pixmap = QPixmap(f"{thisdir}/icons/Dragndrop.png")
-            scaled_pixmap = self.pixmap.scaled(
-                self.size() / 2, Qt.KeepAspectRatio, Qt.SmoothTransformation
-            )
-            self.file_drop_widget.setPixmap(scaled_pixmap)
+        # self.label.setPixmap(self.pixmap)
+        # self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        # self.file_drop_widget.setScaledContents(True)
+        self.file_drop_widget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
+        self.ui.imageFormLayout.addWidget(self.file_drop_widget)
 
-            # self.label.setPixmap(self.pixmap)
-            # self.label.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            # self.file_drop_widget.setScaledContents(True)
-            self.file_drop_widget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
-            self.ui.imageFormLayout.addWidget(self.file_drop_widget)
+        self.ui.themeCombo.setCurrentText(settings.Theme)
+        self.ui.themeCombo.currentTextChanged.connect(
+            lambda: switch_theme(self.ui.themeCombo.currentText())
+        )
+        self.ui.frameIncrementsModeCombo.setCurrentText(
+            self.settings.FrameIncrementsMode
+        )
 
-            self.ui.themeCombo.setCurrentText(settings.Theme)
-            self.ui.themeCombo.currentTextChanged.connect(
-                lambda: switch_theme(self.ui.themeCombo.currentText())
-            )
-            self.ui.frameIncrementsModeCombo.setCurrentText(
-                self.settings.FrameIncrementsMode
-            )
+        
+        self.ui.installModelsProgressBar.setMaximum(100)
 
-            self.addLinetoLogs(f"Current Version: {returnVersion()}")
-            self.ui.installModelsProgressBar.setMaximum(100)
+        selFrameIncrementsMode(self)
 
-            selFrameIncrementsMode(self)
-
-            if check_for_write_permissions(self.settings.OutputDir) == False:
-                no_perms(self)
-                try:
-                    os.mkdir(f"{homedir}/Videos/")
-                except:
-                    pass
-                if check_for_write_permissions(f"{homedir}/Videos/"):
-                    self.settings.change_setting("OutputDir", f"{homedir}/Videos/")
-                else:
-                    no_perms_anywhere(self, self.settings.OutputDir)
-            if check_for_write_permissions(self.settings.RenderDir) == False:
-                no_perms(self)
-                try:
-                    os.mkdir(f"{thisdir}/renders/")
-                except:
-                    pass
-                if check_for_write_permissions(f"{thisdir}/renders/"):
-                    self.settings.change_setting("RenderDir", f"{thisdir}/renders/")
-                else:
-                    no_perms_anywhere(self, settings.RenderDir)
-
-        except Exception as e:
-            self.showDialogBox(e)
-            traceback_info = traceback.format_exc()
-            log(traceback_info)
-            log(f"{e} {traceback_info}")
+        if check_for_write_permissions(self.settings.OutputDir) == False:
+            no_perms(self)
+            try:
+                os.mkdir(f"{homedir}/Videos/")
+            except:
+                pass
+            if check_for_write_permissions(f"{homedir}/Videos/"):
+                self.settings.change_setting("OutputDir", f"{homedir}/Videos/")
+            else:
+                no_perms_anywhere(self, self.settings.OutputDir)
+        if check_for_write_permissions(self.settings.RenderDir) == False:
+            no_perms(self)
+            try:
+                os.mkdir(f"{thisdir}/renders/")
+            except:
+                pass
+            if check_for_write_permissions(f"{thisdir}/renders/"):
+                self.settings.change_setting("RenderDir", f"{thisdir}/renders/")
+            else:
+                no_perms_anywhere(self, settings.RenderDir)
+        
+        
         self.show()
-
+        
     def resizeEvent(self, event):
         # Resize the pixmap to maintain the aspect ratio
         try:
@@ -345,7 +339,16 @@ class MainWindow(QtWidgets.QMainWindow):
                 pid = process.info["pid"]
 
                 return pid
+    def fadeIn(self, widget, duration=500):
+        opacity_effect = QGraphicsOpacityEffect(widget)
+        widget.setGraphicsEffect(opacity_effect)
 
+        self.animation = QPropertyAnimation(opacity_effect, b"opacity")
+        self.animation.setDuration(duration)
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+        self.animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
+        self.animation.start()
     def resume_render(self):
         self.ui.RifeResume.hide()  # show resume button
 
