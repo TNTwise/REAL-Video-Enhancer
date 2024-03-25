@@ -83,5 +83,5 @@ def rife_cuda_checkboxes(self):
                 self.ui.rife414CUDA.setChecked(True)
             if i == 'rife414-lite':
                 self.ui.rife414liteCUDA.setChecked(True)
-            if i == 'rife45':
+            if i == 'rife415':
                 self.ui.rife415CUDA.setChecked(True)
