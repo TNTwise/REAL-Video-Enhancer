@@ -18,6 +18,7 @@ import os
 from modules.commands import *
 import math
 import src.programData.checks as checks
+import subprocess
 
 try:
     import src.torch.RenderCUDA as RenderCUDA
