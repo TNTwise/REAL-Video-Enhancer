@@ -50,6 +50,8 @@ def modelOptions(self):
             model_list.append("rife4.14-lite")
         if i == 'rife415':
             model_list.append("rife4.15")
+        if i == 'rife416-lite':
+            model_list.append("rife4.16-lite")
     model_list.sort()
     self.ui.Rife_Model.addItems(model_list)
     self.ui.Rife_Times.setEnabled(True)

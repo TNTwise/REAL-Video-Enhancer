@@ -389,16 +389,16 @@
           <item row="1" column="6">
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QCheckBox" name="rife413lite">
+             <widget class="QCheckBox" name="rife412lite">
               <property name="text">
-               <string>Rife-V4.13-lite</string>
+               <string>Rife-V4.12-lite</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="QCheckBox" name="rife412lite">
+             <widget class="QCheckBox" name="rife413lite">
               <property name="text">
-               <string>Rife-V4.12-lite</string>
+               <string>Rife-V4.13-lite</string>
               </property>
              </widget>
             </item>
@@ -409,6 +409,13 @@
               </property>
               <property name="text">
                <string>Rife-V4.14-lite</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="rife416lite">
+              <property name="text">
+               <string>Rife-V4.16-lite</string>
               </property>
              </widget>
             </item>

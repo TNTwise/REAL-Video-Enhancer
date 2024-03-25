@@ -24,12 +24,13 @@ def cudaRifeModels(self,install_modules_dict: dict = {}):
         if self.ui.rife414CUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife414") == False:
             install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14.pkl"] = "rife4.14.pkl"
             
-        if self.ui.rife414liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife414-litel") == False:
+        if self.ui.rife414liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife414-lite") == False:
             install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14-lite.pkl"] = "rife4.14-lite.pkl"
         if self.ui.rife415CUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife415") == False:
             install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"] = "rife4.15.pkl"
 
-
+        if self.ui.rife416liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife41y-lite") == False:
+            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.16-lite.pkl"] = "rife4.16-lite.pkl"
 def returnModelList(
     self, settings
 ):  # make sure names match up on both selectAI.ui and main.ui
