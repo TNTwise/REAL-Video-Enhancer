@@ -26,6 +26,10 @@ from src.getModels.returnModelList import *
 thisdir = src.programData.thisdir.thisdir()
 rife_install_list = []
 
+def handleCUDAModels(model: str = ""):
+        if 'rife' and 'pkl' in model:
+            os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+            os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
 
 class Worker(QObject):
     finished = pyqtSignal()
@@ -34,7 +38,7 @@ class Worker(QObject):
     def __init__(self, parent):
         self.main = parent
         QThread.__init__(self, None)
-
+    
     @pyqtSlot()
     def install_modules(self):
         rife_install_list = []
@@ -187,11 +191,7 @@ class ChooseModels(QtWidgets.QMainWindow):
             for option in rife_install_list:
                 f.write(option + "\n")
 
-def handleCUDAModels(model: str = ""):
-    print('MOVED RIFE MODELLLLLL\n\n\n\n\n')
-    if 'rife' and '.pkl' in model:
-        os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
-        os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+
 
 
 def remove_unchecked(self):

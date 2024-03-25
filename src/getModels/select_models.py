@@ -29,7 +29,11 @@ from src.programData.settings import *
 settings = Settings()
 from src.getModels.returnModelList import *
 from src.misc.log import log
-
+def handleCUDAModels(model: str = ""):
+    
+    if 'rife' and 'pkl' in model:
+        os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+        os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
 try:
     import torch
     import torchvision
@@ -131,7 +135,7 @@ class Worker(QObject):
                 if ".tar.gz" in i:
                     with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                         f.extractall(f"{settings.ModelDir}/rife/")
-
+                handleCUDAModels(i)
             for i in os.listdir(f"{thisdir}/files/"):
                 if ".txt" not in i:
                     os.remove(f"{thisdir}/files/{i}")
@@ -324,9 +328,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui.gbLabel.setText(f"{downloaded_data_gb}/{total_data_gb}GB")
 
         def start_main(self):
-            try:
+            
                 for i in os.listdir(f"{thisdir}/files/"):
-                    handleCUDAModels(i)
                     if os.path.exists(f"{thisdir}/bin/") == False:
                         os.mkdir(f"{thisdir}/bin/")
                     if i == "ffmpeg":
@@ -374,7 +377,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     if ".tar.gz" in i:
                         with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                             f.extractall(f"{settings.ModelDir}/rife/")
-
+                    handleCUDAModels(i)
                 clear_files()
                 if check_for_individual_models != None:
                     if check_if_online():
@@ -387,10 +390,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     failed_download(self)
 
                     exit()
-            except Exception as e:
-                traceback_info = traceback.format_exc()
-                log(f"ERROR: {e} {traceback_info}")
-                self.main.showDialogBox(e)
+            
+                
 
     if install_modules_dict:
         window = Downloading()
@@ -409,11 +410,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
         msg.setText(f"No models selected!")
         exit()
-def handleCUDAModels(model: str = ""):
-    
-    if 'rife' and '.pkl' in model:
-        os.system(f'mkdir "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
-        os.system(f'mv "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+
 
 def excepthook(type, value, traceback):
     error_message = f"An unhandled exception occurred: {value}"

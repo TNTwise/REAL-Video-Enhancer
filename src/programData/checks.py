@@ -183,6 +183,10 @@ def check_for_individual_models():
             return_list.append("Vapoursynth-RIFE")
         if os.path.exists(f"{thisdir}/models/custom_models_ncnn/"):
             return_list.append("Custom NCNN Models")
+        if os.path.exists(f"{thisdir}/models/rife-cuda/"):
+            return_list.append("rife-cuda")
+        if os.path.exists(f"{thisdir}/models/realesrgan-cuda/"):
+            return_list.append("realesrgan-cuda")
         if len(return_list) > 0:
             return return_list
 

@@ -178,7 +178,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.on = True
         self.localFile = True
         self.input_file = ""
+        self.output_folder = ""
         self.download_youtube_video_command = ""
+        
         #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
