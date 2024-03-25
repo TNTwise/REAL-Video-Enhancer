@@ -717,29 +717,30 @@ class MainWindow(QtWidgets.QMainWindow):
             f"{type_of_file} files ({files});;All files (*.*)",
         )[0]
         if type_of_file == "Video":
-            try:
-                self.input_file = input_file
-                cap = cv2.VideoCapture(self.input_file)
-                # Check if the file can be opened successfully
-                if cap.isOpened():
-                    cap.release()
-                    self.download_youtube_video_command = ""
-                    self.localFile = True
-                    self.videoName = VideoName.return_video_name(f"{self.input_file}")
-                    if '"' in self.input_file:
-                        quotes(self)
-                        self.input_file = ""
+            if input_file != "":
+                try:
+                    self.input_file = input_file
+                    cap = cv2.VideoCapture(self.input_file)
+                    # Check if the file can be opened successfully
+                    if cap.isOpened():
+                        cap.release()
+                        self.download_youtube_video_command = ""
+                        self.localFile = True
+                        self.videoName = VideoName.return_video_name(f"{self.input_file}")
+                        if '"' in self.input_file:
+                            quotes(self)
+                            self.input_file = ""
+                        else:
+                            self.showChangeInFPS()
+
+                            self.addLinetoLogs(f"Input file = {self.input_file}")
                     else:
-                        self.showChangeInFPS()
+                        not_a_video(self)
+                except Exception as e:
+                    traceback_info = traceback.format_exc()
+                    log(f"{e} {traceback_info}")
 
-                        self.addLinetoLogs(f"Input file = {self.input_file}")
-                else:
-                    not_a_video(self)
-            except Exception as e:
-                traceback_info = traceback.format_exc()
-                log(f"{e} {traceback_info}")
-
-                # success!
+                    # success!
 
         if type_of_file == "NCNN Model":
             if (os.path.splitext(input_file)[1])[1:] == "bin":

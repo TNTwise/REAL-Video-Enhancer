@@ -17,18 +17,21 @@ class VideoName:
         return os.path.basename(videopath)
 
     def return_video_framerate(videopath):
-        video = cv2.VideoCapture(videopath)
-        return video.get(cv2.CAP_PROP_FPS)
+        if os.path.exists(videopath):
+            video = cv2.VideoCapture(videopath)
+            return video.get(cv2.CAP_PROP_FPS)
 
     def return_video_frame_count(videopath):
-        video = cv2.VideoCapture(videopath)
-        return video.get(cv2.CAP_PROP_FRAME_COUNT)
+        if os.path.exists(videopath):
+            video = cv2.VideoCapture(videopath)
+            return video.get(cv2.CAP_PROP_FRAME_COUNT)
 
     def return_video_resolution(videopath):
-        video = cv2.VideoCapture(videopath)
-        width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-        height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-        return [width, height]
+        if os.path.exists(videopath):
+            video = cv2.VideoCapture(videopath)
+            width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+            height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+            return [width, height]
 
 
 class ManageFiles:
