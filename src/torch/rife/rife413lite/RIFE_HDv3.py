@@ -46,12 +46,12 @@ class Model:
         if rank <= 0:
             if torch.cuda.is_available():
                 self.flownet.load_state_dict(
-                    convert(torch.load("{}/flownet.pkl".format(path))), False
+                    convert(torch.load("{}/rife4.13-lite.pkl".format(path))), False
                 )
             else:
                 self.flownet.load_state_dict(
                     convert(
-                        torch.load("{}/flownet.pkl".format(path), map_location="cpu")
+                        torch.load("{}/rife4.13-lite.pkl".format(path), map_location="cpu")
                     ),
                     False,
                 )

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>859</height>
+    <height>885</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -904,11 +904,78 @@
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout">
                    <item>
-                    <widget class="QCheckBox" name="RifeCUDACheckBox">
-                     <property name="text">
-                      <string>RIFE (Interpolate General)</string>
-                     </property>
-                    </widget>
+                    <layout class="QHBoxLayout" name="horizontalLayout_18">
+                     <item>
+                      <widget class="QCheckBox" name="RifeCUDACheckBox">
+                       <property name="text">
+                        <string>RIFE (Interpolate General)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QScrollArea" name="rifeCUDAModels">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>125</height>
+                        </size>
+                       </property>
+                       <property name="verticalScrollBarPolicy">
+                        <enum>Qt::ScrollBarAlwaysOn</enum>
+                       </property>
+                       <property name="widgetResizable">
+                        <bool>true</bool>
+                       </property>
+                       <widget class="QWidget" name="scrollAreaWidgetContents">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>0</y>
+                          <width>242</width>
+                          <height>162</height>
+                         </rect>
+                        </property>
+                        <layout class="QVBoxLayout" name="verticalLayout_9">
+                         <item>
+                          <widget class="QCheckBox" name="rife46CUDA">
+                           <property name="text">
+                            <string>Rife4.6</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QCheckBox" name="rife413liteCUDA">
+                           <property name="text">
+                            <string>Rife4.13-lite</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QCheckBox" name="rife414CUDA">
+                           <property name="text">
+                            <string>Rife4.14</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QCheckBox" name="rife414liteCUDA">
+                           <property name="text">
+                            <string>Rife4.14-lite</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QCheckBox" name="rife415CUDA">
+                           <property name="text">
+                            <string>Rife-4.15</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </widget>
+                     </item>
+                    </layout>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCUDACheckBox">

@@ -44,8 +44,7 @@ def initializeInterpolation(
             try:
                 start_discordRPC(self, "Interpolating")
             except Exception as e:
-                print("No Discord Installation")
-                print(e)
+                log("No Discord Installation")
         # set UI
 
         self.ui.ETAPreview.setText("ETA:")

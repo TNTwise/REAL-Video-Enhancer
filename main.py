@@ -132,7 +132,7 @@ class FileDropWidget(QLabel):
             cap = cv2.VideoCapture(file_path)
             # Check if the file can be opened successfully
             if cap.isOpened():
-                print(f"{file_path} is a video file.")
+                log(f"{file_path} is a video file.")
                 cap.release()
                 # success!
                 self.main.input_file = item.text()
@@ -150,7 +150,7 @@ class FileDropWidget(QLabel):
                     self.main.ui.logsPreview.clear()
                     self.main.addLinetoLogs(f"Input file = {item.text()}")
             else:
-                print(f"{file_path} is not a video file.")
+                log(f"{file_path} is not a video file.")
 
                 not_a_video(self.main)
         except Exception as e:
@@ -199,7 +199,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
             log(f"{e} {traceback_info}")
-            print(f"{e} {traceback_info}")
+            log(f"{e} {traceback_info}")
         try:
             src.misc.onProgramStart.onApplicationStart(self)
             src.misc.onProgramStart.bindButtons(self)
@@ -255,7 +255,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             self.showDialogBox(e)
             traceback_info = traceback.format_exc()
-            print(traceback_info)
+            log(traceback_info)
             log(f"{e} {traceback_info}")
         self.show()
 
@@ -267,7 +267,7 @@ class MainWindow(QtWidgets.QMainWindow):
             )
             self.file_drop_widget.setPixmap(scaled_pixmap)
         except Exception as e:
-            print("ResizeEvent FAILED!")
+            log("ResizeEvent FAILED!")
             log(f"resizeEvent failed! {e}")
 
     def restore_default_settings(self):
@@ -402,7 +402,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             self.ui.FPSTo.setMinimum(fps * 2)
 
                             self.ui.FPSTo.setValue((fps) * int(self.times))
-                            # print((self.amountFrames / self.ui.FPSFrom.value()))
+                            # log((self.amountFrames / self.ui.FPSFrom.value()))
                             math.ceil(
                                 self.ui.FPSTo.value()
                                 * (self.amountFrames / self.ui.FPSFrom.value())
@@ -410,7 +410,7 @@ class MainWindow(QtWidgets.QMainWindow):
                             self.times = float(self.ui.FPSTo.value()) / float(
                                 self.ui.FPSFrom.value()
                             )
-                            # print(self.times)
+                            # log(self.times)
 
                 except Exception as e:
                     pass
@@ -813,7 +813,7 @@ class MainWindow(QtWidgets.QMainWindow):
         result = msg_box.exec_()
 
     def ignoreButtonClicked(self):
-        print("Ignore button clicked!")
+        log("Ignore button clicked!")
 
     def cuganDenoiseLevel(self):
         if self.ui.AICombo.currentText() == "RealCUGAN":
@@ -1004,14 +1004,14 @@ except Exception as e:
 
 def excepthook(type, value, extraceback):
     frame = extraceback.tb_frame
-    print(f"Exception Type: {type}")
-    print(f"Exception Value: {value}")
-    print("Traceback:")
+    log(f"Exception Type: {type}")
+    log(f"Exception Value: {value}")
+    log("Traceback:")
     traceback.print_tb(extraceback)
     tb = traceback.format_exc()
-    # Optionally, you can extract and print the file name
+    # Optionally, you can extract and log the file name
     file_name = extraceback.tb_frame.f_code.co_filename
-    print(f"Exception occurred in file: {file_name}")
+    log(f"Exception occurred in file: {file_name}")
 
     function_name = frame.f_code.co_name
     error_message = f"An unhandled exception occurred: {value}"

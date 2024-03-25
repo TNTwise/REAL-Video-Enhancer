@@ -1,6 +1,6 @@
 import os
 import src.programData.thisdir
-
+from src.misc.log import log
 homedir = os.path.expanduser(r"~")
 thisdir = src.programData.thisdir.thisdir()
 
@@ -36,7 +36,7 @@ def check_for_write_permissions(dir):
         for i in directories_with_permissions:
             if dir[-1] != "/":
                 dir += "/"
-            print(
+            log(
                 f"Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}"
             )
 
@@ -59,7 +59,7 @@ def check_for_write_permissions(dir):
                     else:
                         dir = f"/{permissions_dir}"
 
-                print(
+                log(
                     f"Checking dir: {i.lower()} is in or equal to Selected Dir: {dir.lower()}"
                 )
                 if (

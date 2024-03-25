@@ -42,7 +42,6 @@ class Settings:
             tb = tb.split("\n")[-10:]
 
             log(f"RECURSION OVERFLOW!!! {tb}{e}")
-            print(tb, e)
             exit()
 
     def write_to_settings_file(self, description, option):
@@ -104,7 +103,6 @@ class Settings:
 
             except Exception as e:
                 log(e)
-                print(e)
                 self.write_to_settings_file(setting, default_value)
 
                 self.readSettings()

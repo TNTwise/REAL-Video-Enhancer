@@ -43,7 +43,7 @@ def initializeUpscale(
                 try:
                     start_discordRPC(self, "Upscaling")
                 except:
-                    print("No discord on this machine")
+                    log("No discord on this machine")
 
             realESRGAN_Model = self.ui.Rife_Model.currentText()
             realESRGAN_Times = self.ui.Rife_Times.currentText()[0]

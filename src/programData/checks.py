@@ -35,7 +35,7 @@ def check_if_online(dont_check=False):
     except Exception as e:
         traceback_info = traceback.format_exc()
         log(f"ERROR: {e} {traceback_info}")
-        print(f"{e}")
+        log(f"{e}")
         if dont_check == False:
             msg = QMessageBox()
             msg.setWindowTitle(" ")
@@ -116,12 +116,12 @@ def check_if_enough_space(input_file, render, times):
     resolution_multiplier = math.ceil(resolution[1] * resolution[0])
 
     # 1080p = 1, make adjustments for other resolutions
-    print(f"{resolution_multiplier} {frame_count}  {multiplier}  ")
+    log(f"{resolution_multiplier} {frame_count}  {multiplier}  ")
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.RenderDir)
     if settings.RenderType == "Classic":
         # calculates the anount of storage necessary for the original extraction, in bits
-        print(f"{full_extraction_size} KB")
+        log(f"{full_extraction_size} KB")
 
         # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == "esrgan":

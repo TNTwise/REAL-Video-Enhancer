@@ -46,7 +46,6 @@ class Worker(QObject):
         os.system(f'touch "{thisdir}/models.txt"')
         with open(f"{thisdir}/models.txt", "r") as f:
             for i in f.readlines():
-                print(i)
                 i = i.replace("\n", "")
                 rife_install_list.append(i)
                 if "v4" in i:
@@ -54,7 +53,6 @@ class Worker(QObject):
         if len(rife_install_list) == 0 and self.main.ui.RifeCheckBox.isChecked():
             rife_install_list.append("rife-v4.6")
         install_modules_dict = returnModelList(self.main, settings)
-        print(install_modules_dict)
         log(install_modules_dict)
         total_size_in_bytes = 0
         data_downloaded = 0
@@ -81,7 +79,6 @@ class Worker(QObject):
                     pass
                 os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
 
-                print("moving rife")
                 os.system(
                     f'mv -f "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"'
                 )
@@ -114,7 +111,8 @@ class Worker(QObject):
             if ".tar.gz" in i:
                 with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                     f.extractall(f"{settings.ModelDir}/rife/")
-
+            
+            handleCUDAModels(i)
         for i in os.listdir(f"{thisdir}/files/"):
             if os.path.isfile(i):
                 if ".txt" not in i:
@@ -189,6 +187,12 @@ class ChooseModels(QtWidgets.QMainWindow):
             for option in rife_install_list:
                 f.write(option + "\n")
 
+def handleCUDAModels(model: str = ""):
+    print('MOVED RIFE MODELLLLLL\n\n\n\n\n')
+    if 'rife' and '.pkl' in model:
+        os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+        os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+
 
 def remove_unchecked(self):
     if self.ui.RifeCheckBox.isChecked() == False:
@@ -218,6 +222,7 @@ def remove_unchecked(self):
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
 
+    
 
 def run_install_models_from_settings(self):
     try:
@@ -250,7 +255,6 @@ def run_install_models_from_settings(self):
                 self.thread5.start()
 
     except Exception as e:
-        print(e)
         traceback_info = traceback.format_exc()
         log(f"ERROR {e} {traceback_info}")
         return 0

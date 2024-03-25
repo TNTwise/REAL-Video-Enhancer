@@ -67,7 +67,7 @@ class Worker(QObject):
                         response.headers.get("content-length", 0)
                     )
             except:
-                print("Not Installing!")
+                log("Not Installing!")
                 exit()
             if check_if_enough_space_for_install(total_size_in_bytes) == False:
                 return 0
@@ -155,7 +155,7 @@ def install_icons(self):
     if os.path.exists(f"{thisdir}/icons/") == False:
         if check_if_online():
             try:
-                print("Downloaded Icons")
+                log("Downloaded Icons")
                 url = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/icons.zip"
                 local_filename = url.split("/")[-1]
                 r = requests.get(url)
@@ -212,7 +212,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
         def next(self):
             global install_modules_dict
             install_modules_dict = returnModelList(self, settings)
-            print(install_modules_dict)
+            log(install_modules_dict)
 
             QApplication.closeAllWindows()
 
@@ -247,7 +247,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                             checkbox.setChecked(True)
 
                     for i in f.readlines():
-                        print(i)
+                        log(i)
                         i = i.replace("\n", "")
                         for checkbox, option_name in rife_checkboxes(self):
                             if option_name in i:
@@ -326,6 +326,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
         def start_main(self):
             try:
                 for i in os.listdir(f"{thisdir}/files/"):
+                    handleCUDAModels(i)
                     if os.path.exists(f"{thisdir}/bin/") == False:
                         os.mkdir(f"{thisdir}/bin/")
                     if i == "ffmpeg":
@@ -338,7 +339,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                         os.system(f'chmod +x "{thisdir}/files/glxinfo"')
                         os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
 
-                    print(i)
+                    log(i)
                     if ".zip" in i:
                         with ZipFile(f"{thisdir}/files/{i}", "r") as zip_ref:
                             name = i.replace(".zip", "")
@@ -352,7 +353,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                                             "-ncnn-vulkan", ""
                                         )
                                     )
-                                    print(original_ai_name)
+                                    log(original_ai_name)
                                 except:
                                     pass
                             else:
@@ -408,7 +409,11 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
         msg.setText(f"No models selected!")
         exit()
-
+def handleCUDAModels(model: str = ""):
+    
+    if 'rife' and '.pkl' in model:
+        os.system(f'mkdir "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+        os.system(f'mv "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
 
 def excepthook(type, value, traceback):
     error_message = f"An unhandled exception occurred: {value}"

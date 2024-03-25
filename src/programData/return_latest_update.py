@@ -33,5 +33,4 @@ class return_latest(QObject):
                 pass
         else:
             self.finished.emit()
-            print("why")
             return "why"

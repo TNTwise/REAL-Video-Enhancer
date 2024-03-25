@@ -7,7 +7,7 @@ from PyQt5.QtGui import QDesktopServices
 import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
-
+from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
 try:
     import torch
 
@@ -313,6 +313,9 @@ def onApplicationStart(self):
 
     # call settings specific changes to GUI
     settingsStart(self)
+
+    # enables cuda rife models
+    rife_cuda_checkboxes(self)
 
 
 def set_model_params(self):

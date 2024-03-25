@@ -98,7 +98,7 @@ class TransitionDetection:
                                 )
                             cv2.imwrite(output_file, frame)
                 self.timestamps = timestamps
-                print(timestamps)
+                log(timestamps)
                 cap.release()
             return self.timestamps
 
@@ -137,7 +137,6 @@ class TransitionDetection:
         except Exception as e:
             tb = traceback.format_exc()
             log(str(e) + str(tb))
-            print(e, tb)
 
     def merge_frames(self, iteration=None):
         if iteration == None:

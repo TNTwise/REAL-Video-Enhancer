@@ -3,7 +3,7 @@ from time import sleep
 import signal
 from contextlib import contextmanager
 import os
-
+from src.misc.log import *
 
 class TimeoutException(Exception):
     pass
@@ -34,7 +34,7 @@ def start_discordRPC(self, mode="Interpolating"):
                             f"{os.getenv('HOME')}/.config/discord/{client_id}", ipc_path
                         )
             except:
-                print("Not flatpak")
+                log("Not flatpak")
             self.RPC = Presence(client_id)  # Initialize the client class
             self.RPC.connect()  # Start the handshake loop
 
@@ -45,4 +45,4 @@ def start_discordRPC(self, mode="Interpolating"):
     # The presence will stay on as long as the program is running
     # Can only update rich presence every 15 seconds
     except TimeoutException as e:
-        print("Timed out!")
+        log("Timed out!")

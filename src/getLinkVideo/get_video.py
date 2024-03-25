@@ -156,7 +156,7 @@ class GetLinkedWindow(QMainWindow):
                     return int(duration_parts[0])
             return None
         except Exception as e:
-            print("Error:", e)
+            log("Error:", e)
             return None
 
     def get_youtube_video_name(self, url):
@@ -171,7 +171,7 @@ class GetLinkedWindow(QMainWindow):
                 return video_name
             return None
         except Exception as e:
-            print("Error:", e)
+            log("Error:", e)
             return None
 
     def end_DownloadofData(self, dict_res_id_fps):
@@ -184,7 +184,7 @@ class GetLinkedWindow(QMainWindow):
         self.ui.qualityCombo.show()
 
         self.dict_res_id_fps = dict_res_id_fps
-        print(self.dict_res_id_fps)
+        log(self.dict_res_id_fps)
 
     def gen_youtubedlp_command(self):
         self.input_file = self.input_file.replace(

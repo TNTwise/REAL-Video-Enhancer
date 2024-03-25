@@ -121,7 +121,6 @@ class pb2X(QObject):
                                     )
 
                                 except:
-                                    # print('i really gotta fix this')
                                     pass
                             if self.settings.RenderType == "Optimized":
                                 try:
@@ -138,7 +137,6 @@ class pb2X(QObject):
                                 except Exception as e:
                                     self.main.files_processed = 0
                                     tb = traceback.format_exc()
-                                    # print(f'{e},{tb}')
 
                             else:
                                 files_processed = len(
@@ -151,7 +149,6 @@ class pb2X(QObject):
                             try:
                                 self.progress.emit(self.main.files_processed)
                             except Exception as e:
-                                # print(e)
                                 pass
 
                             sleep(0.1)
@@ -196,7 +193,7 @@ class pb2X(QObject):
                     else:
                         pass
                         # log('No render folder exists!')
-                        # print('No render folder exists!')
+                        # log('No render folder exists!')
             if "cuda" in self.main.AI:
                 self.main.CudaRenderFinished = False
                 self.main.imageDisplay = None
@@ -211,7 +208,7 @@ class pb2X(QObject):
                             try:
                                 self.progress.emit(self.main.files_processed)
                             except Exception as e:
-                                # print(e)
+                                # log(e)
                                 pass
                             self.image_progress.emit("1")
                             self.main.pixMap = self.numpy_array_to_pixmap(
@@ -232,12 +229,12 @@ class pb2X(QObject):
                             self.image_progress.emit("2")
                         except Exception as e:
                             traceback_info = traceback.format_exc()
-                            """print(
+                            """log(
                                 f"Soemthing went wrong with cuda image preview {e} {traceback_info}"
                             )"""
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
-                print("CUDA render finished")
+                log("CUDA render finished")
 
             sleep(1)
             self.finished.emit()
@@ -274,7 +271,7 @@ class downloadVideo(QObject):
                 for line in stdout_lines:
                     if "FPS" in line:
                         fps_index = line.find("FPS")
-                        # print(fps_index)
+                        # log(fps_index)
                         break
                 for line in reversed(stdout_lines):
                     if "Premium" in line:
@@ -284,7 +281,7 @@ class downloadVideo(QObject):
                         resolutions_list.append(res)
                         id = line[:3]
                         fps = line[fps_index : fps_index + 3]
-                        # print(fps)
+                        # log(fps)
                         self.dict_res_id_fps[res] = [id, fps]
                         self.addRes.emit(res)
                     if "mp4" in line:
@@ -295,7 +292,7 @@ class downloadVideo(QObject):
                                 resolutions_list.append(res)
                                 id = line[:3]
                                 fps = line[fps_index : fps_index + 3]
-                                # print(fps)
+                                # log(fps)
                                 self.dict_res_id_fps[res] = [id, fps]
                                 self.addRes.emit(res)
 
@@ -348,7 +345,7 @@ def optimized_render(self, command):
         ceildiv(self.main.frame_count, self.main.frame_increments_of_interpolation)
     )
     self.main.interpolation_sessions = interpolation_sessions
-    # print(interpolation_sessions)
+    # log(interpolation_sessions)
     fc_thread = Thread(target=lambda: frameCountThread(self))
     fc_thread.start()
     sleep(1)
@@ -367,7 +364,6 @@ def calculateFrameIncrements(self):
 
         cap = cv2.VideoCapture(self.main.input_file)
         if not cap.isOpened():
-            print("Error opening video file")
             log("ERROR: Could not open video file")
             return
 
@@ -379,7 +375,6 @@ def calculateFrameIncrements(self):
 
         # divisor = len(str(int(width)))
         frame_increments_of_interpolation = int((duration_seconds))
-        print(frame_increments_of_interpolation)
         log(f"Frames per video increment: {frame_increments_of_interpolation}")
         if int(frame_increments_of_interpolation) <= 100:
             frame_increments_of_interpolation = 100
@@ -594,7 +589,6 @@ class interpolation(QObject):
                 if "v4" in model:
                     command.append("-n")
                     command.append(str(math.ceil(self.input_frames * times)))
-                    print(command)
                 if (
                     settings.RenderType == "Optimized"
                     and self.main.frame_count
@@ -682,7 +676,7 @@ class interpolation(QObject):
             self.main.renderAI.log() 
             # logThread1.start()
             self.main.output_file = output_file
-            print("Done")
+            log("Done")
 
         self.finished.emit()
 
@@ -746,7 +740,7 @@ class upscale(QObject):
                 ]
                 for i in self.main.realESRGAN_Model.split(" "):
                     command.append(i)
-                    print(command)
+                    log(command)
 
             if self.main.AI == "waifu2x-ncnn-vulkan":
                 command = [
@@ -882,7 +876,7 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
-            print("Done")
+            log("Done")
         if self.main.AI == "custom-models-cuda":
             model_path = handleModel(
                 self.main.AI, self.main.ui.Rife_Model.currentText()
@@ -908,5 +902,5 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
-            print("Done")
+            log("Done")
         self.finished.emit()

@@ -1,11 +1,8 @@
 import cv2
 import os
-import re
-import subprocess
-import shutil
 import src.programData.thisdir
 import platform
-
+from src.misc.log import log
 thisdir = src.programData.thisdir.thisdir()
 
 
@@ -86,25 +83,25 @@ def returnCodec(codec):
 
 def returnCRFFactor(crffactor, encoder):
     if "av1" in encoder:
-        print("av1 crf")
+        log("av1 crf")
         crf = int(crffactor) + 12
 
     elif "vp9" in encoder.lower():
-        print("vp9 crf")
+        log("vp9 crf")
         crf = int(crffactor) + 12
 
     elif "265" in encoder.lower():
-        print("265 crf")
+        log("265 crf")
         crf = int(crffactor) + 5
 
     elif "prores" in encoder.lower():
-        print("prores crf")
+        log("prores crf")
         crf = int(crffactor) + 5
 
     elif "lossless" in encoder.lower():
         return ""
     else:
-        print("264 crf")
+        log("264 crf")
         crf = crffactor
         "10"
         "14"
@@ -151,23 +148,12 @@ def returnContainer(codec):
         return "mkv"
     if "av1" in codec.lower() or codec == "libaom-av1":
         return "mkv"
-    print("codec:Fallback")
+    log("codec:Fallback")
     return "mkv"
 
 
-class HardwareInfo:
-    def get_video_memory_linux():
-        card = 0
-        while card < 10:
-            if os.path.exists(f"/sys/class/drm/card{card}/device/mem_info_vram_total"):
-                return read_vram(card)
-            else:
-                card += 1
-                continue
 
-        vram = get_dedicated_vram()
-
-        return vram
+        
 
 
 def returnOperatingSystem():

@@ -76,7 +76,7 @@ class Render:
                 self.process.terminate()
                 self.readingDone = True
                 self.readBuffer.put(None)
-                print("done with read")
+                log("done with read")
                 break
             frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
                 (self.originalHeight, self.originalWidth, 3)
@@ -95,19 +95,19 @@ class Render:
         try:
             return self.frame
         except:
-            print("No frame to return!")
+            log("No frame to return!")
 
     def returnFrameRate(self):
         try:
             return self.frameRate
         except:
-            print("No framerate to return!")
+            log("No framerate to return!")
 
     def returnPercentageDone(self):
         try:
             return self.frame / self.frame_count
         except:  # noqa: E722
-            print("No frame to return!")
+            log("No frame to return!")
 
     def log(self):
         while not self.main.CudaRenderFinished:
@@ -125,21 +125,21 @@ class Render:
             except Exception as e:
                 pass
                 # tb = traceback.format_exc()
-                # print(tb,e)
+                # log(tb,e)
                 # log(f'{tb},{e}')
-        print("Done with logging")
+        log("Done with logging")
         log("done with logging thread for cuda")
 
     # save
 
     def FFmpegOut(self):
-        print("saving")
+        log("saving")
         try:
             crf = return_data.returnCRFFactor(
                 self.settings.videoQuality, self.settings.Encoder
             )
         except Exception as e:
-            print(f"unable to set crf {e}")
+            log(f"unable to set crf {e}")
 
         command = [
             f"{thisdir}/bin/ffmpeg",
@@ -176,7 +176,7 @@ class Render:
             f"{self.output_file}",
         ]
         log(command)
-        print(command)
+        log(command)
         self.writeProcess = subprocess.Popen(
             command,
             stdin=subprocess.PIPE,
@@ -192,7 +192,7 @@ class Render:
                 if frame is None:
                     self.writeProcess.stdin.close()
                     self.writeProcess.wait()
-                    print("done with save")
+                    log("done with save")
                     self.main.output_file = self.output_file
                     self.main.CudaRenderFinished = True
                     break
@@ -202,7 +202,7 @@ class Render:
                 self.writeProcess.stdin.buffer.write(frame.tobytes())
             except Exception as e:
                 tb = traceback.format_exc()
-                print(f"Something went wrong with the writebuffer: {e},{tb}")
+                log(f"Something went wrong with the writebuffer: {e},{tb}")
 
 
 class Interpolation(Render):
@@ -251,7 +251,7 @@ class Interpolation(Render):
             frame = self.readBuffer.get()
 
             if frame is None:
-                print("done with proc")
+                log("done with proc")
                 self.writeBuffer.put(self.prevFrame)
                 self.writeBuffer.put(None)
                 break  # done with proc
@@ -294,7 +294,7 @@ class Upscaling(Render):
             frame = self.readBuffer.get()
 
             if frame is None:
-                print("done with proc")
+                log("done with proc")
                 self.writeBuffer.put(frame)
                 self.writeBuffer.put(None)
                 break  # done with proc

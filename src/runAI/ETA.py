@@ -24,7 +24,6 @@ def calculateETA(self):
     remaining_iterations = self.filecount - completed_iterations
     remaining_time = remaining_iterations * time_per_iteration
     remaining_time = int(remaining_time)
-    # Print the estimated time remaining
     # convert to hours, minutes, and seconds
     hours, minutes, seconds = convertTime(remaining_time)
     return f"ETA: {hours}:{minutes}:{seconds}"

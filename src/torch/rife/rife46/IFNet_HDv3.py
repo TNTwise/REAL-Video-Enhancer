@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.rife.warplayer import warp
+from src.torch.rife.warplayer import warp
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

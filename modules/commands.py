@@ -264,7 +264,7 @@ def extractFramesAndAudio(
         else:
             ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{videopath}" -c:v libwebp -vf "scale=w={self.videowidth}:h={self.videoheight}" -q:v 100 "{renderdir}/{videoName}_temp/input_frames/%08d.webp" -y '
         global output
-        print(run_subprocess_with_realtime_output(thread, self, ffmpeg_cmd, True))
+        log(run_subprocess_with_realtime_output(thread, self, ffmpeg_cmd, True))
 
         global interpolation_sessions
         self.input_frames = len(

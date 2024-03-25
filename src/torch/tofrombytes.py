@@ -66,7 +66,6 @@ class Render:
                 self.process.terminate()
                 self.readingDone = True
                 self.readBuffer.put(None)
-                print("done with read")
                 break
             frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
                 (self.height, self.width, 3)
