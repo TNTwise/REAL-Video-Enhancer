@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import (
     
 )
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import Qt, QSize, QEvent, QThread, QPropertyAnimation, QEasingCurve
+from PyQt5.QtCore import Qt, QSize, QEvent, QThread, QPropertyAnimation, QEasingCurve, QRect
 
 from src.programData.version import returnVersion
 
@@ -341,7 +341,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pid = process.info["pid"]
 
                 return pid
-    def fadeIn(self, widget, duration=500):
+    def fadeIn(self, widget, duration=250):
         opacity_effect = QGraphicsOpacityEffect(widget)
         widget.setGraphicsEffect(opacity_effect)
 
@@ -573,7 +573,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
-
+    
     def imageViewer(self, step):
         if step == "1":
             self.ui.centerLabel.hide()
@@ -602,21 +602,25 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.VideoOptionsFrame.show()
             self.ui.GeneralOptionsFrame.hide()
             self.ui.InstallModelsFrame.hide()
+            self.fadeIn(self.ui.VideoOptionsFrame)
         if item.text() == "Render Options":
             self.ui.RenderOptionsFrame.show()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.hide()
             self.ui.InstallModelsFrame.hide()
+            self.fadeIn(self.ui.RenderOptionsFrame)
         if item.text() == "General":
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.show()
             self.ui.InstallModelsFrame.hide()
+            self.fadeIn(self.ui.GeneralOptionsFrame)
         if item.text() == "Manage Models":
             self.ui.RenderOptionsFrame.hide()
             self.ui.VideoOptionsFrame.hide()
             self.ui.GeneralOptionsFrame.hide()
             self.ui.InstallModelsFrame.show()
+            self.fadeIn(self.ui.InstallModelsFrame)
             try:
                 self.get_models_from_dir("rife")
             except:

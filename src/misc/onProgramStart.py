@@ -153,6 +153,8 @@ def bindButtons(self):
     )
 
 
+    #Bind animations
+    
 def settingsStart(self):
     settings = Settings()
     self.settings = Settings()
