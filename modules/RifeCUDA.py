@@ -37,18 +37,21 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("2X")
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.addItem("8X")
+    model_list = []
     for i in os.listdir(f'{thisdir}/models/rife-cuda/'): 
         if i == 'rife46':
-            self.ui.Rife_Model.addItem("rife4.6")
+            model_list.append("rife4.6")
         if i == 'rife413-lite':
-            self.ui.Rife_Model.addItem("rife4.13-lite")
+            model_list.append("rife4.13-lite")
 
         if i == 'rife414':
-            self.ui.Rife_Model.addItem("rife4.14")
+           model_list.append("rife4.14")
         if i == 'rife414-lite':
-            self.ui.Rife_Model.addItem("rife4.14-lite")
+            model_list.append("rife4.14-lite")
         if i == 'rife415':
-            self.ui.Rife_Model.addItem("rife4.15")
+            model_list.append("rife4.15")
+    model_list.sort()
+    self.ui.Rife_Model.addItems(model_list)
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.show()
     if self.output_folder == "":
