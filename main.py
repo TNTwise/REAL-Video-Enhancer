@@ -458,9 +458,10 @@ class MainWindow(QtWidgets.QMainWindow):
             if time.time() - self.start_time == 0:
                 self.currentRenderFPS = None
             else:
-                self.currentRenderFPS = round(
-                    (files_processed / (time.time() - self.start_time)), 3
-                )
+                    self.currentRenderFPS = round(
+                        (files_processed / (time.time() - self.start_time)), 3
+                    )
+                    
 
             if self.ncnn:
                 # fc is the total file count after interpolation
@@ -504,15 +505,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     ):
                         videos_rendered += 1
                 if self.settings.RenderType == "Optimized":
-                    self.removeLastLineInLogs("Video segments created: ")
-                    if videos_rendered == self.interpolation_sessions:
-                        self.addLinetoLogs(
-                            f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}"
-                        )
-                    else:
-                        self.addLinetoLogs(
-                            f"Video segments created: {videos_rendered}/{self.interpolation_sessions}"
-                        )
+                    try:
+                        self.removeLastLineInLogs("Video segments created: ")
+                        if videos_rendered == self.interpolation_sessions:
+                            self.addLinetoLogs(
+                                f"Video segments created: {self.interpolation_sessions}/{self.interpolation_sessions}"
+                            )
+                        else:
+                            self.addLinetoLogs(
+                                f"Video segments created: {videos_rendered}/{self.interpolation_sessions}"
+                            )
+                    except:
+                        pass
                 self.removeLastLineInLogs("FPS: ")
                 self.addLinetoLogs(f"FPS: {self.currentRenderFPS}")
 
@@ -546,7 +550,7 @@ class MainWindow(QtWidgets.QMainWindow):
             )
 
         except Exception as e:
-            pass
+            print(e)
 
     def runPB(self):
         self.addLast = False
