@@ -36,7 +36,7 @@ def initializeInterpolation(
         self.AI = AI
         self.rifeThread = QThread()
         model = self.ui.Rife_Model.currentText()
-        self.rifeWorker = workers.interpolation(self, model)
+        
 
         self.setDisableEnable(True)
 
@@ -58,11 +58,13 @@ def initializeInterpolation(
                 model += "-ensemble"
             else:
                 ensembleModelDoesntExist(self)
-
+        
         self.ui.logsPreview.clear()
 
         # Step 4: Move worker to the thread
+        self.rifeWorker = workers.interpolation(self, model)
         self.rifeWorker.moveToThread(self.rifeThread)
+        
         # Step 5: Connect signals and slots
         self.rifeThread.started.connect(self.rifeWorker.finishRenderSetup)
         self.rifeWorker.finished.connect(self.rifeThread.quit)
