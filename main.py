@@ -469,6 +469,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 if (
                     self.i == 1
                 ):  # put every gui change that happens on start of render here
+                    
                     if "v4" in self.ui.Rife_Model.currentText().lower():
                         self.times = float(self.ui.FPSTo.value()) / float(
                             self.ui.FPSFrom.value()
@@ -488,6 +489,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.original_filecount = (
                         self.filecount / self.times
                     )  # this makes the original file count. which is the file count before interpolation
+                    
                     self.i = 2
                 self.filecount = int(self.original_filecount) * self.times
 

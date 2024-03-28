@@ -104,12 +104,13 @@ def start_interpolation(
                     initializeInterpolation(self, AI)
                 else:
                     pass
-            if has_enough_space:
-                initializeInterpolation(self, AI)
-            elif not_enough_storage(self, predicted_space, total_space):
-                initializeInterpolation(self, AI)
             else:
-                pass
+                if has_enough_space:
+                    initializeInterpolation(self, AI)  # this is default interpolate option
+                elif not_enough_storage(self, predicted_space, total_space):
+                    initializeInterpolation(self, AI)
+                else:
+                    pass
         else:
             no_input_file(self)
 

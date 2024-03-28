@@ -483,7 +483,26 @@ def frameCountThread(self):
         traceb = traceback.format_exc()
         log(f"{str(e)}, {traceb}")
 
+def setupTransitions(self):
+    if (
+            self.main.settings.SceneChangeDetectionMode == "Enabled"
+            and self.main.settings.Encoder != "Lossless"
+        ):
+            self.log.emit("Detecting Transitions")
 
+            self.main.transitionDetection = (
+                src.runAI.transition_detection.TransitionDetection(self.main)
+            )
+            self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
+            if "-ncnn-vulkan" in self.main.AI:
+                self.main.transitionDetection.get_frame_num(self.main.times)
+            divisor = self.main.times / 2
+            try:
+                self.log.emit(
+                    f"Transitions detected: {len(self.main.transitionFrames)}"
+                )
+            except:
+                self.log.emit(f"Transitions detected: 0")
 class interpolation(QObject):
     finished = pyqtSignal()
     log = pyqtSignal(str)
@@ -520,25 +539,8 @@ class interpolation(QObject):
                     self.main.times = (
                         self.main.ui.FPSTo.value() / self.main.ui.FPSFrom.value()
                     )
-        if (
-            self.main.settings.SceneChangeDetectionMode == "Enabled"
-            and self.main.settings.Encoder != "Lossless"
-        ):
-            self.log.emit("Detecting Transitions")
-
-            self.main.transitionDetection = (
-                src.runAI.transition_detection.TransitionDetection(self.main)
-            )
-            self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
-            if "-ncnn-vulkan" in self.main.AI:
-                self.main.transitionDetection.get_frame_num(self.main.times)
-            divisor = self.main.times / 2
-            try:
-                self.log.emit(
-                    f"Transitions detected: {len(self.main.transitionFrames)}"
-                )
-            except:
-                self.log.emit(f"Transitions detected: 0")
+        setupTransitions(self)
+        self.main.start_time = time.time()
         self.Render(
             self.model, self.main.times, self.main.input_file, self.main.output_folder
         )
@@ -710,7 +712,7 @@ class upscale(QObject):
                 self.main.input_file,
                 1,
             )
-
+        self.main.start_time = time.time()
         self.realESRGAN()
 
     def realESRGAN(self):

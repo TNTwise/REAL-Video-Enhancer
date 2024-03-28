@@ -221,7 +221,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
         )  # do same here i think maybe
     else:
         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-    self.start_time = time.time()
+    
 
 
 def extractFramesAndAudio(
@@ -284,7 +284,7 @@ def extractFramesAndAudio(
         return_data.ManageFiles.create_folder(
             f"{renderdir}/{videoName}_temp/output_frames/0/"
         )
-        self.start_time = time.time()
+        
 
         log(f"End of start function")
     except Exception as e:
