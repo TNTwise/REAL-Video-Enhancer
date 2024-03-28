@@ -109,20 +109,11 @@ def start_upscale(self, AI):  # command linked directly to upscale buttons
                     self.input_file, self.render, self.times
                 )
             )
-            if not has_enough_output_space:
-                if not_enough_output_storage(
+            if (has_enough_output_space or not_enough_output_storage(
                     self, predicted_output_space, total_output_space
-                ):
+                )) and (has_enough_space or not_enough_storage(self, predicted_space, total_space)):
+                     
                     initializeUpscale(self, AI)
-                else:
-                    pass
-            else:
-                if has_enough_space:
-                    initializeUpscale(self, AI) # this is default upscale option
-                elif not_enough_storage(self, predicted_space, total_space):
-                    initializeUpscale(self, AI)
-                else:
-                    pass
 
         else:
             no_input_file(self)

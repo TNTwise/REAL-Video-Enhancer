@@ -97,20 +97,13 @@ def start_interpolation(
                     self.input_file, self.render, self.times
                 )
             )
-            if not has_enough_output_space:
-                if not_enough_output_storage(
+            if (has_enough_output_space or not_enough_output_storage(
                     self, predicted_output_space, total_output_space
-                ):
+                )) and (has_enough_space or not_enough_storage(self, predicted_space, total_space)):
+                     
                     initializeInterpolation(self, AI)
-                else:
-                    pass
-            else:
-                if has_enough_space:
-                    initializeInterpolation(self, AI)  # this is default interpolate option
-                elif not_enough_storage(self, predicted_space, total_space):
-                    initializeInterpolation(self, AI)
-                else:
-                    pass
+            
+            
         else:
             no_input_file(self)
 
