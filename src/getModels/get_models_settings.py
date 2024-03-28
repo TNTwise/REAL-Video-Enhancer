@@ -41,6 +41,10 @@ class Worker(QObject):
     
     @pyqtSlot()
     def install_modules(self):
+        for i in os.listdir(f"{thisdir}/files/"):
+                if os.path.isfile(i):
+                    if ".txt" not in i:
+                        os.remove(f"{thisdir}/files/{i}")
         rife_install_list = []
         for i in os.listdir(f"{thisdir}/files/"):
             if ".txt" not in i:
@@ -76,6 +80,7 @@ class Worker(QObject):
                     )  # sends back data to main thread
 
         for i in os.listdir(f"{thisdir}/files/"):
+            
             if i == "rife-ncnn-vulkan":
                 try:
                     os.mkdir(f"{settings.ModelDir}/rife/")
@@ -117,10 +122,8 @@ class Worker(QObject):
                     f.extractall(f"{settings.ModelDir}/rife/")
             
             handleCUDAModels(i)
-        for i in os.listdir(f"{thisdir}/files/"):
-            if os.path.isfile(i):
-                if ".txt" not in i:
-                    os.remove(f"{thisdir}/files/{i}")
+            
+        
         try:
             for i in os.listdir(f"{settings.ModelDir}/rife/"):
                 if (
@@ -137,6 +140,7 @@ class Worker(QObject):
                         pass
         except:
             log("Rife not installed, but tried to remove anyway!")
+        
         self.finished.emit()
 
 
@@ -261,6 +265,11 @@ def run_install_models_from_settings(self):
 
 
 def endDownload(self):
+    for i in os.listdir(f"{thisdir}/files/"):
+        if ".txt" not in i:
+            log(f'deleted {i}')
+            os.system(f'rm -rf "{thisdir}/files/{i}"')
+    log('==============================Finished model download============================')
     self.setDisableEnable(False)
     # restart_app(self)
     programstart.onApplicationStart(self)

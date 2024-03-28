@@ -391,7 +391,8 @@ def set_model_params(self):
             if value == "upscaling":
                 self.ui.modeCombo.addItem("Upscaling")
                 break
-    if "Interpolation and Upscaling" not in upscale_list:
+    # benching this idea for now
+    '''if "Interpolation and Upscaling" not in upscale_list: 
         interp_bool = False
         upscale_bool = False
 
@@ -402,6 +403,6 @@ def set_model_params(self):
                 interp_bool = True
             if interp_bool == True and upscale_bool == True:
                 self.ui.modeCombo.addItem("Interpolation and Upscaling")
-                break
+                break'''
 
     self.switchMode()
