@@ -100,10 +100,6 @@ from PIL import Image
 import src.runAI.FPS as FPS
 
 
-def switch_theme(value):
-    settings = Settings()
-    settings.change_setting("Theme", f"{value}")
-    theme.set_theme(app)
 
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
@@ -179,7 +175,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
-        
+        self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
+        self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
         #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
@@ -217,10 +214,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.file_drop_widget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.ui.imageFormLayout.addWidget(self.file_drop_widget)
 
-        self.ui.themeCombo.setCurrentText(settings.Theme)
-        self.ui.themeCombo.currentTextChanged.connect(
-            lambda: switch_theme(self.ui.themeCombo.currentText())
-        )
+        
         self.ui.frameIncrementsModeCombo.setCurrentText(
             self.settings.FrameIncrementsMode
         )
