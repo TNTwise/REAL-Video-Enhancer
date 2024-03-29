@@ -875,17 +875,19 @@ class MainWindow(QtWidgets.QMainWindow):
         ignore_button.clicked.connect(ignore_function)
 
         result = msg_box.exec_()
-
     def ignoreButtonClicked(self):
         log("Ignore button clicked!")
 
     def cuganDenoiseLevel(self):
-        if self.ui.AICombo.currentText() == "RealCUGAN":
-            if int(self.ui.Rife_Times.currentText()[0]) > 2:
-                self.ui.denoiseLevelSpinBox.setValue(0)
-                self.ui.denoiseLevelSpinBox.setSingleStep(3)
-            else:
-                self.ui.denoiseLevelSpinBox.setSingleStep(1)
+        try:
+            if self.ui.AICombo.currentText() == "RealCUGAN":
+                if int(self.ui.Rife_Times.currentText()[0]) > 2:
+                    self.ui.denoiseLevelSpinBox.setValue(0)
+                    self.ui.denoiseLevelSpinBox.setSingleStep(3)
+                else:
+                    self.ui.denoiseLevelSpinBox.setSingleStep(1)
+        except:
+            pass
 
     def incrementcuganDenoiseLevel(self):
         if self.ui.AICombo.currentText() == "RealCUGAN":
@@ -906,10 +908,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Input_video_rife_url.setDisabled(mode)
         self.ui.Output_folder_rife.setDisabled(mode)
         self.ui.Rife_Model.setDisabled(mode)
-        self.ui.Rife_Times.setDisabled(True)
-        if "v4" in self.ui.Rife_Model.currentText().lower() or 'rife4' in self.ui.Rife_Model.currentText().lower():
-            self.ui.Rife_Times.setDisabled(mode)
-
+        self.ui.Rife_Times.setDisabled(mode)
+        try:
+            if self.AI == 'rife-ncnn-vulkan' and not "v4" in self.ui.Rife_Model.currentText().lower():
+                self.ui.Rife_Times.setDisabled(True)
+        except:
+            pass
         self.ui.verticalTabWidget.tabBar().setDisabled(mode)
         self.ui.denoiseLevelSpinBox.setDisabled(mode)
         self.ui.InstallModelsFrame.setDisabled(mode)
