@@ -175,8 +175,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
-        self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
-        self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
+        #self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
+        #self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
         #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
