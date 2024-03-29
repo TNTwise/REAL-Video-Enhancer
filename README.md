@@ -28,6 +28,16 @@
   <li> Preview that shows latest frame that has been rendered. </li>
   <li> Enhancing straight from a YouTube link or a video URL.  </li>
 </ul>
+## Benchmarks: (NCNN)
+| RX 6650 XT | Ensemble False | Ensemble True | 
+|--|--|--|
+| rife-v2.0 - v2.4  | 12.341 fps | -
+| rife-v3.0 - v4.1 | 10.646 fps | -
+| rife-v4.0 - v4.5 | 32.504 fps | -
+| rife-v4.6 | 31.154 fps | 18.078 fps
+| rife-v4.7 - v4.9 | 27.924 fps | 15.463 fps
+| rife-v4.10 - v4.15 | 22.801 fps | 12.981 fps
+| rife-v4.16-lite | 31.205 fps | 19.381 fps
 
 ## Confused on anything?
 - Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>
