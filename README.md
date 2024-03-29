@@ -34,7 +34,7 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
 | RX 6650 XT | Ensemble False | Ensemble True | 
 |--|--|--|
 | rife-v2.0 - v2.4  | 12.341 fps | -
-| rife-v3.0 - v4.1 | 10.646 fps | -
+| rife-v3.0 - v3.1 | 10.646 fps | -
 | rife-v4.0 - v4.5 | 32.504 fps | -
 | rife-v4.6 | 31.154 fps | 18.078 fps
 | rife-v4.7 - v4.9 | 27.924 fps | 15.463 fps
