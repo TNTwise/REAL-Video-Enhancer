@@ -88,7 +88,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/realesrgan-ncnn-vulkan-20220424-ubuntu.zip"
             )
-        ] = "realesrgan-ncnn-vulkan-20220424-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("realesrgan-ncnn-vulkan-20220424-ubuntu.zip")
 
     if (
         self.ui.Waifu2xCheckBox.isChecked() == True
