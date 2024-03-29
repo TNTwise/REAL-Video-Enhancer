@@ -93,7 +93,10 @@ class Worker(QObject):
                 )
             if ".zip" in i:
                 with ZipFile(f"{thisdir}/files/{i}", "r") as zip_ref:
+                    zip_ref.extractall(f"{thisdir}/files/")
                     name = i.replace(".zip", "")
+                    if return_data.returnOperatingSystem() == "MacOS":
+                        name=name.replace('ubuntu','macos')
                     if "-ncnn-vulkan" in name:
                         original_ai_name_ncnn_vulkan = re.findall(
                             r"[\w]*-ncnn-vulkan", name
@@ -105,7 +108,7 @@ class Worker(QObject):
                         original_ai_name = name
                         original_ai_name_ncnn_vulkan = name
 
-                    zip_ref.extractall(f"{thisdir}/files/")
+                    
 
                 os.system(
                     f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'

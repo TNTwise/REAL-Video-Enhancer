@@ -60,7 +60,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/nihui/realsr-ncnn-vulkan/releases/download/20220728/realsr-ncnn-vulkan-20220728-ubuntu.zip"
             )
-        ] = "realsr-ncnn-vulkan-20220728-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("realsr-ncnn-vulkan-20220728-ubuntu.zip")
     if (
         self.ui.CustomModelsNCNNCheckBox.isChecked()
         and os.path.exists(f"{settings.ModelDir}/custom_models_ncnn/") == False
@@ -69,7 +69,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/TNTwise/Universal-NCNN-Upscaler/releases/download/20240218/upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
             )
-        ] = "upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip")
     if (
         self.ui.RifeCheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/rife/") == False
@@ -98,7 +98,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/nihui/waifu2x-ncnn-vulkan/releases/download/20220728/waifu2x-ncnn-vulkan-20220728-ubuntu.zip"
             )
-        ] = "waifu2x-ncnn-vulkan-20220728-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("waifu2x-ncnn-vulkan-20220728-ubuntu.zip")
 
     if (
         self.ui.CainCheckBox.isChecked() == True
@@ -108,7 +108,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/nihui/ifrnet-ncnn-vulkan/releases/download/20220720/ifrnet-ncnn-vulkan-20220720-ubuntu.zip"
             )
-        ] = "ifrnet-ncnn-vulkan-20220720-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("ifrnet-ncnn-vulkan-20220720-ubuntu.zip")
 
     if (
         self.ui.RealCUGANCheckBox.isChecked() == True
@@ -118,7 +118,7 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/nihui/realcugan-ncnn-vulkan/releases/download/20220728/realcugan-ncnn-vulkan-20220728-ubuntu.zip"
             )
-        ] = "realcugan-ncnn-vulkan-20220728-ubuntu.zip"
+        ] = returnCorrectLinkBasedOnOS("realcugan-ncnn-vulkan-20220728-ubuntu.zip")
     if (
         self.ui.RifeCUDACheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/rife-cuda") == False
