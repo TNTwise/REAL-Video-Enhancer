@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (
     QGraphicsOpacityEffect
     
 )
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import QPixmap, QIcon, QPainter, QBrush
 from PyQt5.QtCore import Qt, QSize, QEvent, QThread, QPropertyAnimation, QEasingCurve, QRect
 
 from src.programData.version import returnVersion
@@ -105,7 +105,6 @@ def switch_theme(value):
     settings.change_setting("Theme", f"{value}")
     theme.set_theme(app)
 
-
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
@@ -180,8 +179,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
-        self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
-        self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
+        
         #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
@@ -255,7 +253,12 @@ class MainWindow(QtWidgets.QMainWindow):
         
         
         self.show()
-        
+    def set_default_background_color(self,widget):
+        # Get the default background color
+        default_background_color = widget.palette().color(widget.backgroundRole())
+
+        # Set the background color to its default value
+        widget.setStyleSheet(f"background-color: rgb({default_background_color.red()}, {default_background_color.green()}, {default_background_color.blue()});") 
     def resizeEvent(self, event):
         # Resize the pixmap to maintain the aspect ratio
         try:
@@ -580,7 +583,52 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
-    
+    def round_preview(self):
+        """Return a ``QPixmap`` from *imgdata* masked with a smooth circle.
+
+        *imgdata* are the raw image bytes, *imgtype* denotes the image type.
+
+        The returned image will have a size of *size* × *size* pixels.
+
+        """
+        # Load image and convert to 32-bit ARGB (adds an alpha channel):
+        image = QImage.fromData(imgdata, imgtype)
+        image.convertToFormat(QImage.Format_ARGB32)
+
+        # Crop image to a square:
+        imgsize = min(image.width(), image.height())
+        rect = QRect(
+            (image.width() - imgsize) / 2,
+            (image.height() - imgsize) / 2,
+            imgsize,
+            imgsize,
+        )
+        image = image.copy(rect)
+
+        # Create the output image with the same dimensions and an alpha channel
+        # and make it completely transparent:
+        out_img = QImage(imgsize, imgsize, QImage.Format_ARGB32)
+        out_img.fill(Qt.transparent)
+
+        # Create a texture brush and paint a circle with the original image onto
+        # the output image:
+        brush = QBrush(image)        # Create texture brush
+        painter = QPainter(out_img)  # Paint the output image
+        painter.setBrush(brush)      # Use the image texture brush
+        painter.setPen(Qt.NoPen)     # Don't draw an outline
+        painter.setRenderHint(QPainter.Antialiasing, True)  # Use AA
+        painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
+        painter.end()                # We are done (segfault if you forget this)
+
+        # Convert the image to a pixmap and rescale it.  Take pixel ratio into
+        # account to get a sharp image on retina displays:
+        pr = Qt.QWindow().devicePixelRatio()
+        pm = QPixmap.fromImage(out_img)
+        pm.setDevicePixelRatio(pr)
+        size *= pr
+        pm = pm.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        return pm
     def imageViewer(self, step):
         if step == "1":
             
@@ -597,8 +645,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 
                 self.pixMap = self.pixMap.scaled(self.width1, self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap)  # sets image preview image
-                self.ui.imagePreview.setMaximumSize(self.width1, self.height1)
-                self.ui.imagePreview.setStyleSheet("background-color: lightblue; border-radius: 100px;")
+                #self.ui.imagePreview.setMaximumSize(self.width1, self.height1)
+                #self.ui.imagePreview.setStyleSheet("background-color: lightblue; border-radius: 100px;")
+                #self.round_preview()
             except:
                 pass
         if step == "3":
