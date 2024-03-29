@@ -28,6 +28,7 @@
   <li> Preview that shows latest frame that has been rendered. </li>
   <li> Enhancing straight from a YouTube link or a video URL.  </li>
 </ul>
+
 ## Benchmarks: (NCNN)
 | RX 6650 XT | Ensemble False | Ensemble True | 
 |--|--|--|
