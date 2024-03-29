@@ -180,7 +180,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
-        
+        self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
+        self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
         #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
@@ -582,6 +583,7 @@ class MainWindow(QtWidgets.QMainWindow):
     
     def imageViewer(self, step):
         if step == "1":
+            
             self.ui.centerLabel.hide()
             self.ui.imageSpacerFrame.hide()
             if "-ncnn-vulkan" in self.AI:
@@ -592,8 +594,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if step == "2":
             try:
+                
                 self.pixMap = self.pixMap.scaled(self.width1, self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap)  # sets image preview image
+                self.ui.imagePreview.setMaximumSize(self.width1, self.height1)
+                self.ui.imagePreview.setStyleSheet("background-color: lightblue; border-radius: 100px;")
             except:
                 pass
         if step == "3":

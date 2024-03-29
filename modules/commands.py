@@ -205,6 +205,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     global height
     global width
     width, height = return_data.VideoName.return_video_resolution(videopath)
+    
     video = cv2.VideoCapture(self.input_file)
     try:
         self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)

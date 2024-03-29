@@ -8,7 +8,7 @@ def set_theme(app):
     settings = Settings()
     if settings.Theme == "Dark":
         app.setStyle("Fusion")
-
+        
         # Now use a palette to switch to dark colors:
         palette = QPalette()
         palette.setColor(QPalette.Window, QColor(53, 53, 53))
