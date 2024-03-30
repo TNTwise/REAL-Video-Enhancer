@@ -1,0 +1,363 @@
+
+name: build-prerelease
+
+# Controls when the workflow will run
+
+on:
+  #schedule:
+  #  - cron: "0 0 * * *"
+  
+ 
+  
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+  
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-Cuda:
+    # The type of runner that the job will run on
+    #runs-on: self-hosted-22.04 
+    runs-on: ubuntu-22.04 
+    permissions: write-all  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+   
+      - uses: actions/checkout@v3
+      
+      - name: Checkout code
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
+        
+      # Runs a single command using the runners shell
+      - name: Log
+        run: ls
+      - name: Get last release
+        id: last_release
+        
+        run: |
+          cd REAL-Video-Enhancer-BETA
+          last_release_tag=$(git describe --tags --abbrev=0)
+          last_release_date=$(git log -1 --format="%aI" $last_release_tag)
+          echo "::set-output name=last_release_date::$last_release_date"
+
+      - name: Calculate time difference
+        id: calculate_time
+        run: |
+          current_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          last_release_date=${{ steps.last_release.outputs.last_release_date }}
+          current_timestamp=$(date -d "$current_date" +%s)
+          release_timestamp=$(date -d "$last_release_date" +%s)
+          time_difference=$((current_timestamp - release_timestamp))
+          echo "::set-output name=time_difference::$time_difference"
+
+      - name: Display time difference
+        run: |
+          time_difference=${{ steps.calculate_time.outputs.time_difference }}
+          echo "Time since last release: $((time_difference / 86400)) days"
+
+      # Runs a set of commands using the runners shell
+      - name: Get latest version
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
+        
+      - name: Install python dependencies
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel torch torchvision && sudo apt install libnotify-bin -y  &&  pip install --force --no-cache --pre --extra-index-url https://marcelotduarte.github.io/packages/ cx_Freeze
+        
+      - name: Compile to executable
+        run: cd REAL-Video-Enhancer && make
+
+      - name: Clone appimage repo
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
+
+      - name: Move files
+        run: mkdir -p REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer/dist/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/main REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/REAL-Video-Enhancer      
+      - name: Move QT Files
+        run: | 
+          wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+          ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
+          rm -rf squashfs-root/usr/bin 
+          mv squashfs-root/usr/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/
+          rm -rf squashfs-root/
+          
+      #- name: Make appimage
+       # run: chmod +x REAL-Video-Enhancer-AppImage/appimagetool-x86_64.AppImage && cd REAL-Video-Enhancer-AppImage/ && XZ_OPT=-9e ./appimagetool-x86_64.AppImage --comp xz  REAL-Video-Enhancer.AppDir/ 
+      
+      #  uses: actions/upload-artifact@v3
+      #  with:
+      #    name: REAL-Video-Enhancer
+      #    path: REAL-Video-Enhancer-AppImage/squashfs-root/usr/REAL-Video-Enhancer.tar.xz
+      - name: Generate version and tag
+        id: version_tag
+        run: |
+          version=$(python -c "from datetime import datetime; print(str(datetime.now()).split(' ')[0].replace('-',''))")
+          tag=$(python -c "import random, string; print(''.join(random.choices(string.ascii_letters, k=8)))")
+          commitlog=$(cd REAL-Video-Enhancer && git log --since="24 hours ago" --pretty=format:"%h - %s")
+          echo "Version=$version"
+          echo "Tag=$version"
+          echo "CommitLog=$commitlog"
+          echo "::set-output name=version::$version"
+          echo "::set-output name=tag::$version"
+          echo "::set-output name=commitlog::$commitlog"
+      - name: Make Commit Log
+      
+        run: |
+             cd REAL-Video-Enhancer 
+             time_difference=${{ 604800 }}
+             hours=$((time_difference / 3600)) # Convert seconds to hours
+             git log --since="$hours hours ago" --pretty=format:"%h - %s" >> ../output.log
+      - name: Build project # This would actually build your project, using zip for an example artifact
+        run: |
+          zip --junk-paths  REAL-Video-Enhancer-Appimage README.md README.md
+      - name: hella compress this shit
+        run: |
+             cd REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/
+             tar -cf - * | xz -9e > REAL-Video-Enhancer-x86_64.AppImage.tar.xz 
+             cd ../../../../
+             mv REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/REAL-Video-Enhancer-x86_64.AppImage.tar.xz  .
+             mv REAL-Video-Enhancer-x86_64.AppImage.tar.xz REAL-Video-Enhancer-CUDA.tar.xz
+      - name: Save CUDA Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-CUDA.tar.xz
+          path: REAL-Video-Enhancer-CUDA.tar.xz
+  build-MacOS:
+    # The type of runner that the job will run on
+    runs-on: macos-12
+    permissions: write-all  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: checks
+        run: | 
+          mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
+          brew reinstall postgresql
+          cp -r /usr/local/Cellar/postgresql@14/14.11/lib/postgresql@14/* /Applications/Postgres.app/Contents/Versions/9.6/lib/
+          
+
+          brew update
+          brew reinstall libiodbc
+          export LDFLAGS="-L/usr/local/opt/libiodbc/lib"
+          export CPPFLAGS="-I/usr/local/opt/libiodbc/include"
+          export PKG_CONFIG_PATH="/usr/local/opt/libiodbc/lib/pkgconfig"
+      - uses: actions/checkout@v3
+       
+      - name: Checkout code
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
+        
+      # Runs a single command using the runners shell
+      - name: Log
+        run: ls
+      - name: Get last release
+        id: last_release
+        
+        run: |
+          cd REAL-Video-Enhancer-BETA
+          last_release_tag=$(git describe --tags --abbrev=0)
+          last_release_date=$(git log -1 --format="%aI" $last_release_tag)
+          echo "::set-output name=last_release_date::$last_release_date"
+
+
+
+
+      # Runs a set of commands using the runners shell
+      - name: Get latest version
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
+      - name: Generate version and tag
+        id: version_tag
+        run: |
+          version=$(python -c "from datetime import datetime; print(str(datetime.now()).split(' ')[0].replace('-',''))")
+          tag=$(python -c "import random, string; print(''.join(random.choices(string.ascii_letters, k=8)))")
+          commitlog=$(cd REAL-Video-Enhancer && git log --since="24 hours ago" --pretty=format:"%h - %s")
+          echo "Version=$version"
+          echo "Tag=$version"
+          echo "CommitLog=$commitlog"
+          echo "::set-output name=version::$version"
+          echo "::set-output name=tag::$version"
+          echo "::set-output name=commitlog::$commitlog"
+      - name: Make Commit Log
+      
+        run: |
+             cd REAL-Video-Enhancer 
+             time_difference=${{ 604800 }}
+             hours=$((time_difference / 3600)) # Convert seconds to hours
+             git log --since="$hours hours ago" --pretty=format:"%h - %s" >> ../output.log
+      - name: Install python dependencies
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt  
+        
+      - name: Compile to executable
+        run: |
+          
+          cd REAL-Video-Enhancer
+          
+          
+                    
+          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
+          rm -rf dist
+          rm -rf build
+          mkdir dist
+          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
+          python3 -m PyQt5.uic.pyuic src/getModels/SelectModels.ui > src/getModels/SelectModels.py
+          python3 -m PyQt5.uic.pyuic src/getModels/Download.ui > src/getModels/Download.py
+          python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
+          python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
+          python3 -m PyInstaller --onefile main.py 
+
+      
+      - name: compress archive
+        run: |
+          cp -r REAL-Video-Enhancer/dist/ bin/
+          cd bin
+          mv main REAL-Video-Enhancer
+          tar -caf REAL-Video-Enhancer.tar.xz *
+          cd ../
+          mv bin/REAL-Video-Enhancer.tar.xz .
+          mv REAL-Video-Enhancer.tar.xz REAL-Video-Enhancer-MacOS-x86_64.tar.xz
+       
+      
+      - name: Save Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-MacOS-x86_64.tar.xz
+          path: REAL-Video-Enhancer-MacOS-x86_64.tar.xz
+          
+  build-NCNN:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-20.04
+    permissions: write-all  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      
+      - uses: actions/checkout@v3
+      
+      - name: Checkout code
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
+        
+      # Runs a single command using the runners shell
+      - name: Log
+        run: ls
+      - name: Get last release
+        id: last_release
+        
+        run: |
+          cd REAL-Video-Enhancer-BETA
+          last_release_tag=$(git describe --tags --abbrev=0)
+          last_release_date=$(git log -1 --format="%aI" $last_release_tag)
+          echo "::set-output name=last_release_date::$last_release_date"
+
+      - name: Calculate time difference
+        id: calculate_time
+        run: |
+          current_date=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          last_release_date=${{ steps.last_release.outputs.last_release_date }}
+          current_timestamp=$(date -d "$current_date" +%s)
+          release_timestamp=$(date -d "$last_release_date" +%s)
+          time_difference=$((current_timestamp - release_timestamp))
+          echo "::set-output name=time_difference::$time_difference"
+
+      - name: Display time difference
+        run: |
+          time_difference=${{ steps.calculate_time.outputs.time_difference }}
+          echo "Time since last release: $((time_difference / 86400)) days"
+
+      # Runs a set of commands using the runners shell
+      - name: Get latest version
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
+        
+      - name: Install python dependencies
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt && python3 -m pip uninstall PyQt5 -y && python3 -m  pip install py-notifier notify2 pillow python-magic testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil PyQt5==5.12 loguru sympy && sudo apt install libnotify-bin -y 
+        
+      - name: Compile to executable
+        run: cd REAL-Video-Enhancer && make
+
+      - name: Clone appimage repo
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
+
+      - name: Move files
+        run: mkdir -p REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer/dist/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/main REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/REAL-Video-Enhancer      
+      - name: Move QT Files
+        run: | 
+          wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+          chmod +x linuxdeployqt-continuous-x86_64.AppImage
+          ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
+          rm -rf squashfs-root/usr/bin 
+          mv squashfs-root/usr/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/
+          rm -rf squashfs-root/
+          
+      - name: Make appimage
+        run: chmod +x REAL-Video-Enhancer-AppImage/appimagetool-x86_64.AppImage && cd REAL-Video-Enhancer-AppImage/ && ./appimagetool-x86_64.AppImage REAL-Video-Enhancer.AppDir/ 
+      - name: Make archive
+        run: |
+          python3 -m pip uninstall PyQt5 -y && sudo apt install python3-pyqt5 -y
+          mkdir archive-build && cd archive-build
+          git clone https://github.com/TNTwise/REAL-Video-Enhancer.git && cd REAL-Video-Enhancer && make && mv dist/main dist/REAL-Video-Enhancer
+          rm -rf bin/
+          mkdir bin/
+          cp -r dist/* bin/
+      - name: compress archive
+        run: |
+          cp -r archive-build/REAL-Video-Enhancer/bin/ bin/
+          tar -caf REAL-Video-Enhancer.tar.xz bin/
+         
+       
+        
+      - name: Save AppImage as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-Appimage
+          path: REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer-x86_64.AppImage
+          
+      - name: Save Flatpak Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-FLATPAK.tar.xz
+          path: REAL-Video-Enhancer.tar.xz
+      #- name: Log
+      #  run: ls
+  Release:
+    needs: [build-NCNN, build-Cuda, build-MacOS]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+     
+          
+      - name: Generate version and tag
+        id: version_tag
+        run: |
+          version=$(python -c "from datetime import datetime; print(str(datetime.now()).split(' ')[0].replace('-',''))")
+          tag=$(python -c "import random, string; print(''.join(random.choices(string.ascii_letters, k=8)))")
+          echo "Version=$version"
+          echo "Tag=$version"
+          echo "::set-output name=version::$version"
+          echo "::set-output name=tag::$version"
+      
+      - name: Create Release and Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Pre-Release Build
+          tag_name: prerelease
+          body: ${{ steps.version_tag.outputs.tag }}
+          draft: false
+          prerelease: true
+          
+          files: |
+              artifacts/REAL-Video-Enhancer-Appimage/REAL-Video-Enhancer-x86_64.AppImage
+              artifacts/REAL-Video-Enhancer-MacOS-x86_64.tar.xz/REAL-Video-Enhancer-MacOS-x86_64.tar.xz
+              artifacts/REAL-Video-Enhancer-CUDA.tar.xz/REAL-Video-Enhancer-CUDA.tar.xz
+              
+              
+        
+
+     
