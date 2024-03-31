@@ -27,7 +27,7 @@ class UpscaleCUDA:
 
         self.model = ModelLoader().load_from_file(model)
         assert isinstance(self.model, ImageModelDescriptor)
-        self.model.eval()  # gonna have to put cuda back in here lmfaooooooo
+        self.model.cuda().eval()  # gonna have to put cuda back in here lmfaooooooo
         self.cuda_available = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.cuda_available else "cpu")
 
