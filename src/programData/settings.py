@@ -111,9 +111,8 @@ class Settings:
         try:
             self.VRAM = settings_dict["VRAM"]
         except:
-            
             self.write_to_settings_file("VRAM", f"2")
-            
+
             self.readSettings()
 
     def change_setting(self, setting, svalue):
@@ -291,11 +290,14 @@ def Notifications(self):
         settings.change_setting("Notifications", "Enabled")
     else:
         settings.change_setting("Notifications", "Disabled")
-        
+
+
 def halfPrecision(self):
     settings = Settings()
-    settings.change_setting("HalfPrecision", f"{self.ui.halfPrecisionCheckBox.isChecked()}")
-    
+    settings.change_setting(
+        "HalfPrecision", f"{self.ui.halfPrecisionCheckBox.isChecked()}"
+    )
+
 
 def uninstallAPP(self):
     if uninstallMessage(self):

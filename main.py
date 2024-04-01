@@ -13,11 +13,18 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QLabel,
     QProgressBar,
-    QGraphicsOpacityEffect
-    
+    QGraphicsOpacityEffect,
 )
 from PyQt5.QtGui import QPixmap, QIcon, QPainter, QBrush
-from PyQt5.QtCore import Qt, QSize, QEvent, QThread, QPropertyAnimation, QEasingCurve, QRect
+from PyQt5.QtCore import (
+    Qt,
+    QSize,
+    QEvent,
+    QThread,
+    QPropertyAnimation,
+    QEasingCurve,
+    QRect,
+)
 
 from src.programData.version import returnVersion
 
@@ -100,7 +107,6 @@ from PIL import Image
 import src.runAI.FPS as FPS
 
 
-
 class FileDropWidget(QLabel):
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
@@ -175,9 +181,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
-        #self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
-        #self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
-        #self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
+        # self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
+        # self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
+        # self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
         self.settings = Settings()
         self.thread2 = QThread()
         # Step 3: Create a worker object
@@ -195,8 +201,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.thread2.start()
         self.addLinetoLogs(f"Current Version: {returnVersion()}")
-        
-        
+
         src.misc.onProgramStart.onApplicationStart(self)
         src.misc.onProgramStart.bindButtons(self)
 
@@ -214,12 +219,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.file_drop_widget.setAlignment(Qt.AlignCenter | Qt.AlignVCenter)
         self.ui.imageFormLayout.addWidget(self.file_drop_widget)
 
-        
         self.ui.frameIncrementsModeCombo.setCurrentText(
             self.settings.FrameIncrementsMode
         )
 
-        
         self.ui.installModelsProgressBar.setMaximum(100)
 
         selFrameIncrementsMode(self)
@@ -244,15 +247,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.settings.change_setting("RenderDir", f"{thisdir}/renders/")
             else:
                 no_perms_anywhere(self, settings.RenderDir)
-        
-        
+
         self.show()
-    def set_default_background_color(self,widget):
+
+    def set_default_background_color(self, widget):
         # Get the default background color
         default_background_color = widget.palette().color(widget.backgroundRole())
 
         # Set the background color to its default value
-        widget.setStyleSheet(f"background-color: rgb({default_background_color.red()}, {default_background_color.green()}, {default_background_color.blue()});") 
+        widget.setStyleSheet(
+            f"background-color: rgb({default_background_color.red()}, {default_background_color.green()}, {default_background_color.blue()});"
+        )
+
     def resizeEvent(self, event):
         # Resize the pixmap to maintain the aspect ratio
         try:
@@ -339,6 +345,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 pid = process.info["pid"]
 
                 return pid
+
     def fadeIn(self, widget, duration=250):
         opacity_effect = QGraphicsOpacityEffect(widget)
         widget.setGraphicsEffect(opacity_effect)
@@ -349,6 +356,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.animation.setEndValue(1)
         self.animation.setEasingCurve(QEasingCurve.Type.InOutQuad)
         self.animation.start()
+
     def resume_render(self):
         self.ui.RifeResume.hide()  # show resume button
 
@@ -378,7 +386,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             if self.localFile == True:
                 self.videoProperties()
-            
+
             fps = self.fps
 
             if self.render == "rife":
@@ -456,10 +464,9 @@ class MainWindow(QtWidgets.QMainWindow):
             if time.time() - self.start_time == 0:
                 self.currentRenderFPS = None
             else:
-                    self.currentRenderFPS = round(
-                        (files_processed / (time.time() - self.start_time)), 3
-                    )
-                    
+                self.currentRenderFPS = round(
+                    (files_processed / (time.time() - self.start_time)), 3
+                )
 
             if self.ncnn:
                 # fc is the total file count after interpolation
@@ -467,7 +474,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 if (
                     self.i == 1
                 ):  # put every gui change that happens on start of render here
-                    
                     if "v4" in self.ui.Rife_Model.currentText().lower():
                         self.times = float(self.ui.FPSTo.value()) / float(
                             self.ui.FPSFrom.value()
@@ -487,7 +493,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.original_filecount = (
                         self.filecount / self.times
                     )  # this makes the original file count. which is the file count before interpolation
-                    
+
                     self.i = 2
                 self.filecount = int(self.original_filecount) * self.times
 
@@ -577,6 +583,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
+
     def round_preview(self):
         """Return a ``QPixmap`` from *imgdata* masked with a smooth circle.
 
@@ -606,13 +613,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Create a texture brush and paint a circle with the original image onto
         # the output image:
-        brush = QBrush(image)        # Create texture brush
+        brush = QBrush(image)  # Create texture brush
         painter = QPainter(out_img)  # Paint the output image
-        painter.setBrush(brush)      # Use the image texture brush
-        painter.setPen(Qt.NoPen)     # Don't draw an outline
+        painter.setBrush(brush)  # Use the image texture brush
+        painter.setPen(Qt.NoPen)  # Don't draw an outline
         painter.setRenderHint(QPainter.Antialiasing, True)  # Use AA
         painter.drawEllipse(0, 0, imgsize, imgsize)  # Actually draw the circle
-        painter.end()                # We are done (segfault if you forget this)
+        painter.end()  # We are done (segfault if you forget this)
 
         # Convert the image to a pixmap and rescale it.  Take pixel ratio into
         # account to get a sharp image on retina displays:
@@ -623,9 +630,9 @@ class MainWindow(QtWidgets.QMainWindow):
         pm = pm.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
         return pm
+
     def imageViewer(self, step):
         if step == "1":
-            
             self.ui.centerLabel.hide()
             self.ui.imageSpacerFrame.hide()
             if "-ncnn-vulkan" in self.AI:
@@ -636,12 +643,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if step == "2":
             try:
-                
                 self.pixMap = self.pixMap.scaled(self.width1, self.height1)
                 self.ui.imagePreview.setPixmap(self.pixMap)  # sets image preview image
-                #self.ui.imagePreview.setMaximumSize(self.width1, self.height1)
-                #self.ui.imagePreview.setStyleSheet("background-color: lightblue; border-radius: 100px;")
-                #self.round_preview()
+                # self.ui.imagePreview.setMaximumSize(self.width1, self.height1)
+                # self.ui.imagePreview.setStyleSheet("background-color: lightblue; border-radius: 100px;")
+                # self.round_preview()
             except:
                 pass
         if step == "3":
@@ -684,17 +690,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.label_19.hide()
 
     def setEnsembleMode(self):
-        if os.path.exists(
+        if (
+            os.path.exists(
                 f"{self.settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble"
-        ) or  "rife4" in self.ui.Rife_Model.currentText():
-                self.ui.EnsembleCheckBox.show()
-                self.ui.ensembleHelpButton.show()
+            )
+            or "rife4" in self.ui.Rife_Model.currentText()
+        ):
+            self.ui.EnsembleCheckBox.show()
+            self.ui.ensembleHelpButton.show()
 
     def greyOutRifeTimes(self):
-        
-        if "v4" in self.ui.Rife_Model.currentText() or "rife4" in self.ui.Rife_Model.currentText():
+        if (
+            "v4" in self.ui.Rife_Model.currentText()
+            or "rife4" in self.ui.Rife_Model.currentText()
+        ):
             self.ui.Rife_Times.setEnabled(True)
-            
+
             self.setEnsembleMode()
             self.ui.FPSFrom.show()
             self.ui.FPSTo.show()
@@ -780,7 +791,9 @@ class MainWindow(QtWidgets.QMainWindow):
                         cap.release()
                         self.download_youtube_video_command = ""
                         self.localFile = True
-                        self.videoName = VideoName.return_video_name(f"{self.input_file}")
+                        self.videoName = VideoName.return_video_name(
+                            f"{self.input_file}"
+                        )
                         if '"' in self.input_file:
                             quotes(self)
                             self.input_file = ""
@@ -875,6 +888,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ignore_button.clicked.connect(ignore_function)
 
         result = msg_box.exec_()
+
     def ignoreButtonClicked(self):
         log("Ignore button clicked!")
 
@@ -910,7 +924,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.Rife_Model.setDisabled(mode)
         self.ui.Rife_Times.setDisabled(mode)
         try:
-            if self.AI == 'rife-ncnn-vulkan' and not "v4" in self.ui.Rife_Model.currentText().lower():
+            if (
+                self.AI == "rife-ncnn-vulkan"
+                and not "v4" in self.ui.Rife_Model.currentText().lower()
+            ):
                 self.ui.Rife_Times.setDisabled(True)
         except:
             pass

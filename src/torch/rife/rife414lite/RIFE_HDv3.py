@@ -49,7 +49,9 @@ class Model:
             else:
                 self.flownet.load_state_dict(
                     convert(
-                        torch.load("{}/rife4.14-lite.pkl".format(path), map_location="cpu")
+                        torch.load(
+                            "{}/rife4.14-lite.pkl".format(path), map_location="cpu"
+                        )
                     ),
                     False,
                 )

@@ -73,19 +73,20 @@ def rife_pin_functions(self):
         self.ui.rife414lite.stateChanged.connect(self.checkbox_state_changed)
         self.ui.rife414lite.setEnabled(True)
 
+
 def rife_cuda_checkboxes(self):
     if os.path.exists(f"{thisdir}/models/rife-cuda/"):
         for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
-            if i == 'rife46':
+            if i == "rife46":
                 self.ui.rife46CUDA.setChecked(True)
-                
-            if i == 'rife413-lite':
+
+            if i == "rife413-lite":
                 self.ui.rife413liteCUDA.setChecked(True)
-            if i == 'rife414':
+            if i == "rife414":
                 self.ui.rife414CUDA.setChecked(True)
-            if i == 'rife414-lite':
+            if i == "rife414-lite":
                 self.ui.rife414liteCUDA.setChecked(True)
-            if i == 'rife415':
+            if i == "rife415":
                 self.ui.rife415CUDA.setChecked(True)
-            if i == 'rife416-lite':
+            if i == "rife416-lite":
                 self.ui.rife416liteCUDA.setChecked(True)

@@ -103,7 +103,6 @@ def check_if_enough_space_output_disk(input_file, render, times):
 
 
 def check_if_enough_space(input_file, render, times):
-    
     settings = Settings()
     img_type = settings.Image_Type
     if img_type == ".jpg":

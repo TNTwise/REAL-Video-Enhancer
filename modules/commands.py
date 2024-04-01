@@ -205,7 +205,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     global height
     global width
     width, height = return_data.VideoName.return_video_resolution(videopath)
-    
+
     video = cv2.VideoCapture(self.input_file)
     try:
         self.videowidth = video.get(cv2.CAP_PROP_FRAME_WIDTH)
@@ -222,7 +222,6 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
         )  # do same here i think maybe
     else:
         os.system(f'mv "{thisdir}/audio.m4a" "{renderdir}/{videoName}_temp/audio.m4a"')
-    
 
 
 def extractFramesAndAudio(
@@ -246,8 +245,6 @@ def extractFramesAndAudio(
         # Gets the width and height
         global height
         global width
-
-        
 
         # Calculate the aspect ratio
         self.videoName = videoName
@@ -285,7 +282,6 @@ def extractFramesAndAudio(
         return_data.ManageFiles.create_folder(
             f"{renderdir}/{videoName}_temp/output_frames/0/"
         )
-        
 
         log(f"End of start function")
     except Exception as e:

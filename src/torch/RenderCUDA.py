@@ -115,7 +115,7 @@ class Render:
                 for line in iter(self.writeProcess.stderr.readline, b""):
                     if not self.main.CudaRenderFinished:
                         log(line)
-                        #print(line)
+                        # print(line)
                     else:
                         break
                     # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
@@ -154,7 +154,6 @@ class Render:
             f"{self.outputWidth}x{self.outputHeight}",
             "-r",
             f"{self.finalFPS}",
-            
             "-i",
             "-",
         ]
@@ -207,14 +206,7 @@ class Render:
 
 
 class Interpolation(Render):
-    def __init__(self, 
-                 main,
-                 input_file, 
-                 output_file, 
-                 model, 
-                 times, 
-                 ensemble,
-                 half):
+    def __init__(self, main, input_file, output_file, model, times, ensemble, half):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1
         )
@@ -276,7 +268,7 @@ class Interpolation(Render):
 
 
 class Upscaling(Render):
-    def __init__(self, main, input_file, output_file, resIncrease, model_path,half):
+    def __init__(self, main, input_file, output_file, resIncrease, model_path, half):
         super(Upscaling, self).__init__(
             main,
             input_file,
@@ -290,7 +282,7 @@ class Upscaling(Render):
     def procUpscaleThread(self):
         self.frame = 0
         self.upscaleMethod = UpscaleCUDA(
-            self.originalWidth, self.originalHeight, self.model_path,self.half
+            self.originalWidth, self.originalHeight, self.model_path, self.half
         )
 
         while True:

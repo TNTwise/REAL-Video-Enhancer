@@ -483,26 +483,27 @@ def frameCountThread(self):
         traceb = traceback.format_exc()
         log(f"{str(e)}, {traceb}")
 
+
 def setupTransitions(self):
     if (
-            self.main.settings.SceneChangeDetectionMode == "Enabled"
-            and self.main.settings.Encoder != "Lossless"
-        ):
-            self.log.emit("Detecting Transitions")
+        self.main.settings.SceneChangeDetectionMode == "Enabled"
+        and self.main.settings.Encoder != "Lossless"
+    ):
+        self.log.emit("Detecting Transitions")
 
-            self.main.transitionDetection = (
-                src.runAI.transition_detection.TransitionDetection(self.main)
-            )
-            self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
-            if "-ncnn-vulkan" in self.main.AI:
-                self.main.transitionDetection.get_frame_num(self.main.times)
-            divisor = self.main.times / 2
-            try:
-                self.log.emit(
-                    f"Transitions detected: {len(self.main.transitionFrames)}"
-                )
-            except:
-                self.log.emit(f"Transitions detected: 0")
+        self.main.transitionDetection = (
+            src.runAI.transition_detection.TransitionDetection(self.main)
+        )
+        self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
+        if "-ncnn-vulkan" in self.main.AI:
+            self.main.transitionDetection.get_frame_num(self.main.times)
+        divisor = self.main.times / 2
+        try:
+            self.log.emit(f"Transitions detected: {len(self.main.transitionFrames)}")
+        except:
+            self.log.emit(f"Transitions detected: 0")
+
+
 class interpolation(QObject):
     finished = pyqtSignal()
     log = pyqtSignal(str)
@@ -667,7 +668,7 @@ class interpolation(QObject):
                 self.main.ui.Rife_Model.currentText(),
                 self.main.times,
                 self.main.ui.EnsembleCheckBox.isChecked(),
-                bool(self.main.ui.halfPrecisionCheckBox.isChecked())
+                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -677,7 +678,7 @@ class interpolation(QObject):
             readThread1.start()
             procThread1.start()
             renderThread1.start()
-            self.main.renderAI.log() 
+            self.main.renderAI.log()
             # logThread1.start()
             self.main.output_file = output_file
             log("Done")

@@ -38,19 +38,19 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.addItem("8X")
     model_list = []
-    for i in os.listdir(f'{thisdir}/models/rife-cuda/'): 
-        if i == 'rife46':
+    for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
+        if i == "rife46":
             model_list.append("rife4.6")
-        if i == 'rife413-lite':
+        if i == "rife413-lite":
             model_list.append("rife4.13-lite")
 
-        if i == 'rife414':
-           model_list.append("rife4.14")
-        if i == 'rife414-lite':
+        if i == "rife414":
+            model_list.append("rife4.14")
+        if i == "rife414-lite":
             model_list.append("rife4.14-lite")
-        if i == 'rife415':
+        if i == "rife415":
             model_list.append("rife4.15")
-        if i == 'rife416-lite':
+        if i == "rife416-lite":
             model_list.append("rife4.16-lite")
     model_list.sort()
     self.ui.Rife_Model.addItems(model_list)

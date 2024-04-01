@@ -29,11 +29,18 @@ from src.programData.settings import *
 settings = Settings()
 from src.getModels.returnModelList import *
 from src.misc.log import log
+
+
 def handleCUDAModels(model: str = ""):
-    
-    if 'rife' and 'pkl' in model:
-        os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
-        os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+    if "rife" and "pkl" in model:
+        os.system(
+            f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        )
+        os.system(
+            f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        )
+
+
 try:
     import torch
     import torchvision
@@ -114,7 +121,7 @@ class Worker(QObject):
                         zip_ref.extractall(f"{thisdir}/files/")
                         name = i.replace(".zip", "")
                         if return_data.returnOperatingSystem() == "MacOS":
-                            name=name.replace('ubuntu','macos')
+                            name = name.replace("ubuntu", "macos")
                         if "-ncnn-vulkan" in name:
                             original_ai_name_ncnn_vulkan = re.findall(
                                 r"[\w]*-ncnn-vulkan", name
@@ -125,7 +132,6 @@ class Worker(QObject):
                         else:
                             original_ai_name = name
                             original_ai_name_ncnn_vulkan = name
-
 
                     os.system(
                         f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'
@@ -330,70 +336,65 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui.gbLabel.setText(f"{downloaded_data_gb}/{total_data_gb}GB")
 
         def start_main(self):
-            
-                for i in os.listdir(f"{thisdir}/files/"):
-                    if os.path.exists(f"{thisdir}/bin/") == False:
-                        os.mkdir(f"{thisdir}/bin/")
-                    if i == "ffmpeg":
-                        os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
-                        os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
-                    if i == "yt-dlp_linux":
-                        os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
-                        os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
-                    if i == "glxinfo":
-                        os.system(f'chmod +x "{thisdir}/files/glxinfo"')
-                        os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
+            for i in os.listdir(f"{thisdir}/files/"):
+                if os.path.exists(f"{thisdir}/bin/") == False:
+                    os.mkdir(f"{thisdir}/bin/")
+                if i == "ffmpeg":
+                    os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
+                    os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
+                if i == "yt-dlp_linux":
+                    os.system(f'chmod +x "{thisdir}/files/yt-dlp_linux"')
+                    os.system(f'mv "{thisdir}/files/yt-dlp_linux" "{thisdir}/bin/"')
+                if i == "glxinfo":
+                    os.system(f'chmod +x "{thisdir}/files/glxinfo"')
+                    os.system(f'mv "{thisdir}/files/glxinfo" "{thisdir}/bin/"')
 
-                    log(i)
-                    if ".zip" in i:
-                        with ZipFile(f"{thisdir}/files/{i}", "r") as zip_ref:
-                            name = i.replace(".zip", "")
-                            if "-ncnn-vulkan" in name:
-                                try:
-                                    original_ai_name_ncnn_vulkan = re.findall(
-                                        r"[\w]*-ncnn-vulkan", name
-                                    )[0]
-                                    original_ai_name = (
-                                        original_ai_name_ncnn_vulkan.replace(
-                                            "-ncnn-vulkan", ""
-                                        )
-                                    )
-                                    log(original_ai_name)
-                                except:
-                                    pass
-                            else:
-                                original_ai_name = name
-                                original_ai_name_ncnn_vulkan = name
+                log(i)
+                if ".zip" in i:
+                    with ZipFile(f"{thisdir}/files/{i}", "r") as zip_ref:
+                        name = i.replace(".zip", "")
+                        if "-ncnn-vulkan" in name:
+                            try:
+                                original_ai_name_ncnn_vulkan = re.findall(
+                                    r"[\w]*-ncnn-vulkan", name
+                                )[0]
+                                original_ai_name = original_ai_name_ncnn_vulkan.replace(
+                                    "-ncnn-vulkan", ""
+                                )
+                                log(original_ai_name)
+                            except:
+                                pass
+                        else:
+                            original_ai_name = name
+                            original_ai_name_ncnn_vulkan = name
 
-                            zip_ref.extractall(f"{thisdir}/files/")
+                        zip_ref.extractall(f"{thisdir}/files/")
 
-                        os.system(
-                            f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'
-                        )
-                        os.system(
-                            f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
-                        )
-                        os.system(
-                            f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
-                        )
-                    if ".tar.gz" in i:
-                        with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
-                            f.extractall(f"{settings.ModelDir}/rife/")
-                    handleCUDAModels(i)
-                clear_files()
-                if check_for_individual_models != None:
-                    if check_if_online():
-                        QApplication.closeAllWindows()
+                    os.system(
+                        f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'
+                    )
+                    os.system(
+                        f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
+                    )
+                    os.system(
+                        f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
+                    )
+                if ".tar.gz" in i:
+                    with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
+                        f.extractall(f"{settings.ModelDir}/rife/")
+                handleCUDAModels(i)
+            clear_files()
+            if check_for_individual_models != None:
+                if check_if_online():
+                    QApplication.closeAllWindows()
 
-                        return 0
-                    else:
-                        exit()
+                    return 0
                 else:
-                    failed_download(self)
-
                     exit()
-            
-                
+            else:
+                failed_download(self)
+
+                exit()
 
     if install_modules_dict:
         window = Downloading()

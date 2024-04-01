@@ -16,21 +16,61 @@ def returnCorrectLinkBasedOnOS(link):
         return link.replace("-ubuntu", "-macos")
 
 
-def cudaRifeModels(self,install_modules_dict: dict = {}):
-        if self.ui.rife46CUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife46") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.6.pkl"] = "rife4.6.pkl"
-        if self.ui.rife413liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife413-lite") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.13-lite.pkl"] = "rife4.13-lite.pkl"
-        if self.ui.rife414CUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife414") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14.pkl"] = "rife4.14.pkl"
-            
-        if self.ui.rife414liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife414-lite") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14-lite.pkl"] = "rife4.14-lite.pkl"
-        if self.ui.rife415CUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife415") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"] = "rife4.15.pkl"
+def cudaRifeModels(self, install_modules_dict: dict = {}):
+    modelDict = {}
+    if (
+        self.ui.rife46CUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife46") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.6.pkl"
+        ] = "rife4.6.pkl"
+    elif (
+        self.ui.rife413liteCUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife413-lite") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.13-lite.pkl"
+        ] = "rife4.13-lite.pkl"
+    elif (
+        self.ui.rife414CUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife414") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14.pkl"
+        ] = "rife4.14.pkl"
 
-        if self.ui.rife416liteCUDA.isChecked() and os.path.exists(f"{thisdir}/models/rife-cuda/rife41y-lite") == False:
-            install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.16-lite.pkl"] = "rife4.16-lite.pkl"
+    elif (
+        self.ui.rife414liteCUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife414-lite") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.14-lite.pkl"
+        ] = "rife4.14-lite.pkl"
+    elif (
+        self.ui.rife415CUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife415") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"
+        ] = "rife4.15.pkl"
+
+    elif (
+        self.ui.rife416liteCUDA.isChecked()
+        and os.path.exists(f"{thisdir}/models/rife-cuda/rife416-lite") == False
+    ):
+        modelDict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.16-lite.pkl"
+        ] = "rife4.16-lite.pkl"
+    # remove unwanted models
+    items= []
+    for key,item in modelDict.items():
+        items.append(item.replace(".pkl","").replace(".",""))
+    for i in os.listdir(f'{thisdir}/models/rife-cuda/'):
+        if i not in items:
+            os.system(f'rm -rf "{thisdir}/models/rife-cuda/{i}"')
+            
+    install_modules_dict.update(modelDict)
 def returnModelList(
     self, settings
 ):  # make sure names match up on both selectAI.ui and main.ui
@@ -69,7 +109,9 @@ def returnModelList(
             returnCorrectLinkBasedOnOS(
                 "https://github.com/TNTwise/Universal-NCNN-Upscaler/releases/download/20240218/upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
             )
-        ] = returnCorrectLinkBasedOnOS("upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip")
+        ] = returnCorrectLinkBasedOnOS(
+            "upscayl-custom_models_ncnn-ncnn-vulkan-20240218-ubuntu.zip"
+        )
     if (
         self.ui.RifeCheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/rife/") == False
@@ -123,7 +165,9 @@ def returnModelList(
         self.ui.RifeCUDACheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/rife-cuda") == False
     ):
-        install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"] = "rife4.15.pkl"
+        install_modules_dict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"
+        ] = "rife4.15.pkl"
     if (
         self.ui.RealESRGANCUDACheckBox.isChecked() == True
         and os.path.exists(f"{settings.ModelDir}/realesrgan-cuda") == False
@@ -196,5 +240,5 @@ def returnModelList(
                     "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/yt-dlp_macos": "yt-dlp_linux",
                 }
             )
-    cudaRifeModels(self,install_modules_dict)
+    cudaRifeModels(self, install_modules_dict)
     return install_modules_dict

@@ -205,3 +205,9 @@ def cantDetectUpscaleTimes(self):
     self.showDialogBox(
         f"Could not detect the current custom model's upscale multiplier.\nPlease select the correct one manually."
     )
+
+
+def halfPrecision_help(self):
+    self.showDialogBox(
+        f"Half precision can increase performance while saving VRAM, but may decrease quality based on the model."
+    )

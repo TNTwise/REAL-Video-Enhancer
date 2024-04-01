@@ -36,7 +36,6 @@ def initializeInterpolation(
         self.AI = AI
         self.rifeThread = QThread()
         model = self.ui.Rife_Model.currentText()
-        
 
         self.setDisableEnable(True)
 
@@ -58,13 +57,13 @@ def initializeInterpolation(
                 model += "-ensemble"
             else:
                 ensembleModelDoesntExist(self)
-        
+
         self.ui.logsPreview.clear()
 
         # Step 4: Move worker to the thread
         self.rifeWorker = workers.interpolation(self, model)
         self.rifeWorker.moveToThread(self.rifeThread)
-        
+
         # Step 5: Connect signals and slots
         self.rifeThread.started.connect(self.rifeWorker.finishRenderSetup)
         self.rifeWorker.finished.connect(self.rifeThread.quit)
@@ -99,13 +98,17 @@ def start_interpolation(
                     self.input_file, self.render, self.times
                 )
             )
-            if (has_enough_output_space or not_enough_output_storage(
+            if (
+                has_enough_output_space
+                or not_enough_output_storage(
                     self, predicted_output_space, total_output_space
-                )) and (has_enough_space or not_enough_storage(self, predicted_space, total_space)):
-                     
-                    initializeInterpolation(self, AI)
-            
-            
+                )
+            ) and (
+                has_enough_space
+                or not_enough_storage(self, predicted_space, total_space)
+            ):
+                initializeInterpolation(self, AI)
+
         else:
             no_input_file(self)
 

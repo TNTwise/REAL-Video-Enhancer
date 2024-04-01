@@ -1,6 +1,7 @@
 import os
 import src.programData.thisdir
 from src.misc.log import log
+
 homedir = os.path.expanduser(r"~")
 thisdir = src.programData.thisdir.thisdir()
 
@@ -72,6 +73,5 @@ def check_for_write_permissions(dir):
         return False
     else:
         if os.access(dir, os.R_OK) and os.access(dir, os.W_OK):
-            
             return True
         return False

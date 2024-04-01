@@ -8,6 +8,7 @@ import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
+
 try:
     import torch
 
@@ -61,7 +62,7 @@ def bindButtons(self):
             "Video", [".mp4", ".mkv", ".webm", ".mov", ".webm", "avi"]
         )
     )
-    
+
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
 
     # link buttons
@@ -83,6 +84,7 @@ def bindButtons(self):
     self.ui.renderTypeHelpButton.clicked.connect(lambda: render_help(self))
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
+    self.ui.halfPrecisionHelpButton.clicked.connect(lambda: halfPrecision_help(self))
     self.ui.imageComboBox.currentIndexChanged.connect(
         lambda: settings.change_setting(
             "Image_Type", f"{self.ui.imageComboBox.currentText()}"
@@ -122,40 +124,27 @@ def bindButtons(self):
         self.ui.NotificationsCheckBox.hide()
         settings.change_setting("Notifications", "Disabled")
     self.ui.uninstallButton.clicked.connect(lambda: uninstallAPP(self))
-    self.ui.sceneChangeSensativityButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.encoderHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.imageHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.gpuThreadingHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.renderTypeHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.frameIncrementHelp.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.esrganHelpModel.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.ensembleHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.UHDModeHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
-    self.ui.gpuIDHelpButton.setIcon(
-        QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
-    )
+
+    helpButtons = [
+        self.ui.sceneChangeSensativityButton,
+        self.ui.encoderHelpButton,
+        self.ui.imageHelpButton,
+        self.ui.gpuThreadingHelpButton,
+        self.ui.renderTypeHelpButton,
+        self.ui.frameIncrementHelp,
+        self.ui.esrganHelpModel,
+        self.ui.ensembleHelpButton,
+        self.ui.UHDModeHelpButton,
+        self.ui.gpuIDHelpButton,
+        self.ui.halfPrecisionHelpButton,
+    ]
+    icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
+    for button in helpButtons:
+        button.setIcon(icon)
+
+    # Bind animations
 
 
-    #Bind animations
-    
 def settingsStart(self):
     settings = Settings()
     self.settings = Settings()
@@ -396,7 +385,7 @@ def set_model_params(self):
                 self.ui.modeCombo.addItem("Upscaling")
                 break
     # benching this idea for now
-    '''if "Interpolation and Upscaling" not in upscale_list: 
+    """if "Interpolation and Upscaling" not in upscale_list: 
         interp_bool = False
         upscale_bool = False
 
@@ -407,6 +396,6 @@ def set_model_params(self):
                 interp_bool = True
             if interp_bool == True and upscale_bool == True:
                 self.ui.modeCombo.addItem("Interpolation and Upscaling")
-                break'''
+                break"""
 
     self.switchMode()

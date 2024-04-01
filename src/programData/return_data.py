@@ -3,6 +3,7 @@ import os
 import src.programData.thisdir
 import platform
 from src.misc.log import log
+
 thisdir = src.programData.thisdir.thisdir()
 
 
@@ -17,16 +18,19 @@ class VideoName:
         return os.path.basename(videopath)
 
     def return_video_framerate(videopath):
-            video = cv2.VideoCapture(videopath)
-            return video.get(cv2.CAP_PROP_FPS)
+        video = cv2.VideoCapture(videopath)
+        return video.get(cv2.CAP_PROP_FPS)
+
     def return_video_frame_count(videopath):
-            video = cv2.VideoCapture(videopath)
-            return video.get(cv2.CAP_PROP_FRAME_COUNT)
+        video = cv2.VideoCapture(videopath)
+        return video.get(cv2.CAP_PROP_FRAME_COUNT)
+
     def return_video_resolution(videopath):
-            video = cv2.VideoCapture(videopath)
-            width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
-            height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            return [width, height]
+        video = cv2.VideoCapture(videopath)
+        width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
+        height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        return [width, height]
+
 
 class ManageFiles:
     def create_folder(folderpath):
@@ -147,10 +151,6 @@ def returnContainer(codec):
         return "mkv"
     log("codec:Fallback")
     return "mkv"
-
-
-
-        
 
 
 def returnOperatingSystem():

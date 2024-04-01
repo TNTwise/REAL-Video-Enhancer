@@ -21,7 +21,7 @@ import numpy as np
 
 
 class UpscaleCUDA:
-    def __init__(self, width, height, model,half):
+    def __init__(self, width, height, model, half):
         self.width = width
         self.height = height
 
@@ -40,6 +40,7 @@ class UpscaleCUDA:
             if self.half:
                 torch.set_default_dtype(torch.float16)
                 self.model.half()
+
     @torch.inference_mode()
     def UpscaleImage(self, frame):
         with torch.no_grad():

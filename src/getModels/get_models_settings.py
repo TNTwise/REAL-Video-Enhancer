@@ -26,10 +26,16 @@ from src.getModels.returnModelList import *
 thisdir = src.programData.thisdir.thisdir()
 rife_install_list = []
 
+
 def handleCUDAModels(model: str = ""):
-        if 'rife' and 'pkl' in model:
-            os.system(f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
-            os.system(f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" ')
+    if "rife" and "pkl" in model:
+        os.system(
+            f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        )
+        os.system(
+            f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        )
+
 
 class Worker(QObject):
     finished = pyqtSignal()
@@ -38,13 +44,13 @@ class Worker(QObject):
     def __init__(self, parent):
         self.main = parent
         QThread.__init__(self, None)
-    
+
     @pyqtSlot()
     def install_modules(self):
         for i in os.listdir(f"{thisdir}/files/"):
-                if os.path.isfile(i):
-                    if ".txt" not in i:
-                        os.remove(f"{thisdir}/files/{i}")
+            if os.path.isfile(i):
+                if ".txt" not in i:
+                    os.remove(f"{thisdir}/files/{i}")
         rife_install_list = []
         for i in os.listdir(f"{thisdir}/files/"):
             if ".txt" not in i:
@@ -80,7 +86,6 @@ class Worker(QObject):
                     )  # sends back data to main thread
 
         for i in os.listdir(f"{thisdir}/files/"):
-            
             if i == "rife-ncnn-vulkan":
                 try:
                     os.mkdir(f"{settings.ModelDir}/rife/")
@@ -96,7 +101,7 @@ class Worker(QObject):
                     zip_ref.extractall(f"{thisdir}/files/")
                     name = i.replace(".zip", "")
                     if return_data.returnOperatingSystem() == "MacOS":
-                        name=name.replace('ubuntu','macos')
+                        name = name.replace("ubuntu", "macos")
                     if "-ncnn-vulkan" in name:
                         original_ai_name_ncnn_vulkan = re.findall(
                             r"[\w]*-ncnn-vulkan", name
@@ -107,8 +112,6 @@ class Worker(QObject):
                     else:
                         original_ai_name = name
                         original_ai_name_ncnn_vulkan = name
-
-                    
 
                 os.system(
                     f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'
@@ -123,10 +126,9 @@ class Worker(QObject):
             if ".tar.gz" in i:
                 with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                     f.extractall(f"{settings.ModelDir}/rife/")
-            
+
             handleCUDAModels(i)
-            
-        
+
         try:
             for i in os.listdir(f"{settings.ModelDir}/rife/"):
                 if (
@@ -143,7 +145,7 @@ class Worker(QObject):
                         pass
         except:
             log("Rife not installed, but tried to remove anyway!")
-        
+
         self.finished.emit()
 
 
@@ -199,8 +201,6 @@ class ChooseModels(QtWidgets.QMainWindow):
                 f.write(option + "\n")
 
 
-
-
 def remove_unchecked(self):
     if self.ui.RifeCheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/rife/"')
@@ -229,7 +229,6 @@ def remove_unchecked(self):
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
 
-    
 
 def run_install_models_from_settings(self):
     try:
@@ -270,9 +269,11 @@ def run_install_models_from_settings(self):
 def endDownload(self):
     for i in os.listdir(f"{thisdir}/files/"):
         if ".txt" not in i:
-            log(f'deleted {i}')
+            log(f"deleted {i}")
             os.system(f'rm -rf "{thisdir}/files/{i}"')
-    log('==============================Finished model download============================')
+    log(
+        "==============================Finished model download============================"
+    )
     self.setDisableEnable(False)
     # restart_app(self)
     programstart.onApplicationStart(self)
