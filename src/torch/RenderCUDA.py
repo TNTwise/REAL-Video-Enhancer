@@ -115,7 +115,7 @@ class Render:
                 for line in iter(self.writeProcess.stderr.readline, b""):
                     if not self.main.CudaRenderFinished:
                         log(line)
-                        print(line)
+                        #print(line)
                     else:
                         break
                     # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
@@ -213,7 +213,8 @@ class Interpolation(Render):
                  output_file, 
                  model, 
                  times, 
-                 ensemble):
+                 ensemble,
+                 half):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1
         )
@@ -223,7 +224,7 @@ class Interpolation(Render):
             width=self.originalWidth,
             height=self.originalHeight,
             ensemble=ensemble,
-            half=True,
+            half=half,
         )
 
     def proc_image(self, frame1, frame2):
