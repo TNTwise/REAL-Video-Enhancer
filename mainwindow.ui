@@ -1253,6 +1253,20 @@
                  </property>
                 </widget>
                </item>
+               <item row="9" column="3">
+                <widget class="QCheckBox" name="halfPrecisionCheckBox">
+                 <property name="text">
+                  <string>Half Precision (RTX 20 series and up)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="9" column="4">
+                <widget class="QPushButton" name="halfPrecisionHelpButton">
+                 <property name="text">
+                  <string/>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>

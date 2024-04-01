@@ -80,6 +80,7 @@ class Settings:
             "Notifications": "Enabled",
             "UHDResCutOff": "1080",
             "gpuID": "0",
+            "HalfPrecision": "False",
         }
         if returnOperatingSystem() == "Linux":
             default_settings["OutputDir"] = f"{homedir}/Videos/"
@@ -290,7 +291,11 @@ def Notifications(self):
         settings.change_setting("Notifications", "Enabled")
     else:
         settings.change_setting("Notifications", "Disabled")
-
+        
+def halfPrecision(self):
+    settings = Settings()
+    settings.change_setting("HalfPrecision", f"{self.ui.halfPrecisionCheckBox.isChecked()}")
+    
 
 def uninstallAPP(self):
     if uninstallMessage(self):

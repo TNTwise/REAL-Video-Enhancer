@@ -53,6 +53,7 @@ def bindButtons(self):
     self.ui.sceneChangeDetectionCheckBox.stateChanged.connect(
         lambda: selSceneDetectionMode(self)
     )
+    self.ui.halfPrecisionCheckBox.stateChanged.connect(lambda: halfPrecision(self))
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
 
     self.ui.Input_video_rife.clicked.connect(
@@ -60,7 +61,7 @@ def bindButtons(self):
             "Video", [".mp4", ".mkv", ".webm", ".mov", ".webm", "avi"]
         )
     )
-
+    
     self.ui.Output_folder_rife.clicked.connect(self.openFolderDialog)
 
     # link buttons
@@ -167,7 +168,10 @@ def settingsStart(self):
 
     if settings.SceneChangeMethod == "pyscenedetect":
         self.ui.sceneChangeMethodComboBox.setCurrentIndex(1)
-
+    if settings.HalfPrecision == "False":
+        self.ui.halfPrecisionCheckBox.setChecked(False)
+    else:
+        self.ui.halfPrecisionCheckBox.setChecked(True)
     self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
     if self.encoder == "264":
         self.ui.EncoderCombo.setCurrentIndex(0)

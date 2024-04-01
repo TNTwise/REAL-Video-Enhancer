@@ -21,7 +21,7 @@ import numpy as np
 
 
 class UpscaleCUDA:
-    def __init__(self, width, height, model):
+    def __init__(self, width, height, model,half):
         self.width = width
         self.height = height
 
@@ -30,24 +30,37 @@ class UpscaleCUDA:
         self.model.cuda().eval()  # gonna have to put cuda back in here lmfaooooooo
         self.cuda_available = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.cuda_available else "cpu")
-
+        self.isCudaAvailable = torch.cuda.is_available()
+        self.half = half
+        if self.isCudaAvailable:
+            # self.stream = [torch.cuda.Stream() for _ in range(self.nt)]
+            # self.currentStream = 0
+            torch.backends.cudnn.enabled = True
+            torch.backends.cudnn.benchmark = True
+            if self.half:
+                torch.set_default_dtype(torch.float16)
+                self.model.half()
     @torch.inference_mode()
-    def UpscaleImage(self, npArr):
-        image = (
-            torch.from_numpy(npArr)
-            .to(self.device, non_blocking=True)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .float()
-            / 255.0
-        )
-        image = image.contiguous(memory_format=torch.channels_last)
+    def UpscaleImage(self, frame):
+        with torch.no_grad():
+            frame = (
+                torch.from_numpy(frame)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                .float()
+                .mul_(1 / 255)
+            )
+            if self.isCudaAvailable:
+                # torch.cuda.set_stream(self.stream[self.currentStream])
+                frame = frame.cuda(non_blocking=True)
+                if self.half:
+                    frame = frame.half()
+            frame = frame.contiguous(memory_format=torch.channels_last)
 
-        output = self.model(image)
-        # output = output[:, :, : self.width, : self.height]
-        output = output.squeeze(0).permute(1, 2, 0).mul_(255).clamp_(0, 255).byte()
+            output = self.model(frame)
+            output = output.squeeze(0).permute(1, 2, 0).mul_(255).byte()
 
-        return output.cpu().numpy()
+            return output.cpu().numpy()
 
 
 """class UpscaleNCNN:

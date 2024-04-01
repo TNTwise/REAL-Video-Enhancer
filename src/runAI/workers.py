@@ -680,7 +680,7 @@ class interpolation(QObject):
             # logThread1.start()
             self.main.output_file = output_file
             log("Done")
-
+        self.currentRenderFPS = 0
         self.finished.emit()
 
 
@@ -867,6 +867,7 @@ class upscale(QObject):
                 output_file,
                 int(self.main.ui.Rife_Times.currentText()[0]),
                 model_path,
+                bool(settings.HalfPrecision),
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -893,6 +894,7 @@ class upscale(QObject):
                 output_file,
                 int(self.main.ui.Rife_Times.currentText()[0]),
                 model_path,
+                bool(settings.HalfPrecision),
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -906,4 +908,5 @@ class upscale(QObject):
 
             self.main.output_file = output_file
             log("Done")
+        self.currentRenderFPS = 0
         self.finished.emit()
