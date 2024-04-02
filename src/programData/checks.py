@@ -42,7 +42,7 @@ def check_if_online(dont_check=False):
             msg.setText(
                 f"You are offline, please connect to the internet to download the models."
             )
-            sys.exit(msg.exec_())
+            msg.exec_()
         pass
 
     return online
