@@ -195,6 +195,7 @@ class Render:
                     log("done with save")
                     self.main.output_file = self.output_file
                     self.main.CudaRenderFinished = True
+                    torch.cuda.empty_cache()
                     break
 
                 frame = np.ascontiguousarray(frame)
