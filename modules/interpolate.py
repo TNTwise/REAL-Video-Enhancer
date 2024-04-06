@@ -98,16 +98,18 @@ def start_interpolation(
                     self.input_file, self.render, self.times
                 )
             )
-            if (
+            if 'cuda' not in AI:
+                if (
+                    has_enough_space
+                    or not_enough_storage(self, predicted_space, total_space)
+                ):
+                    initializeInterpolation(self, AI)
+            elif(
                 has_enough_output_space
-                or not_enough_output_storage(
-                    self, predicted_output_space, total_output_space
-                )
-            ) and (
-                has_enough_space
-                or not_enough_storage(self, predicted_space, total_space)
-            ):
-                initializeInterpolation(self, AI)
+                    or not_enough_output_storage(self, predicted_space, total_space)
+                ):
+                    initializeInterpolation(self, AI)
+                
 
         else:
             no_input_file(self)

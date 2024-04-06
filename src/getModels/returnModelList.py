@@ -73,6 +73,7 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
             "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.16-lite.pkl"
             ] = "rife4.16-lite.pkl"
         items.append("rife4.16-lite.pkl")
+        
     # remove unwanted models
     
     items2 = []

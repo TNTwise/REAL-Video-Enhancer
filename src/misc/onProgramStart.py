@@ -37,6 +37,20 @@ def bindButtons(self):
             r"https://github.com/chaiNNer-org/spandrel?tab=readme-ov-file#model-architecture-support"
         )
     )
+    
+    self.ui.discordButton.clicked.connect(
+        lambda: open_link(
+            r"https://discord.gg/mRReVBMQtN"
+        )
+    
+    )
+    self.ui.githubButton.clicked.connect(
+        lambda: open_link(
+            r"https://github.com/TNTwise/REAL-Video-Enhancer"
+        )
+    
+    )
+    
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
     self.ui.gpuIDSpinBox.valueChanged.connect(lambda: change_GPU_ID(self))
