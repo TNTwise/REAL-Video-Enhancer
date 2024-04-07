@@ -539,6 +539,10 @@ class MainWindow(QtWidgets.QMainWindow):
                         * self.times
                     )
                     self.filecount = fc
+                    self.original_filecount = (
+                        fc / self.times
+                    )
+                    self.filecount = fc
                     self.ui.RifePB.setMaximum(self.filecount)
                 try:
                     ETA = calculateETA(self)
@@ -550,6 +554,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 self.i = 2
                 self.ui.RifePB.setValue(files_processed)
+                self.filecount = int(self.original_filecount) * self.times
 
             self.ui.processedPreview.setText(
                 f"Files Processed: {files_processed} / {int(self.filecount)}"
