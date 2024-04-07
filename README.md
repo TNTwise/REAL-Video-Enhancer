@@ -22,8 +22,8 @@
 </p>
 <h1>Features: </h1>
 <ul>
-  <li> __NEW__ CUDA support. </li>
-  <li> __NEW__ MacOS support. </li>
+  <li> NEW! CUDA support. </li>
+  <li> NEW! MacOS support. </li>
   <li>Support for Ubuntu 20.04+ on AppImage and Flatpak. </li>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
