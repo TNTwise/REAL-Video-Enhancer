@@ -50,6 +50,12 @@ def bindButtons(self):
         )
     
     )
+    self.ui.customModelsButton.clicked.connect(
+        lambda: open_link(
+            r"https://openmodeldb.info/"
+        )
+    
+    )
     
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1194</width>
-    <height>892</height>
+    <height>925</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -944,7 +944,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>110</width>
+                          <width>303</width>
                           <height>186</height>
                          </rect>
                         </property>
@@ -1010,6 +1010,13 @@
                       <widget class="QLabel" name="label_22">
                        <property name="text">
                         <string>Import custom Upscaling model: </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="customModelsButton">
+                       <property name="text">
+                        <string>Custom Models</string>
                        </property>
                       </widget>
                      </item>
