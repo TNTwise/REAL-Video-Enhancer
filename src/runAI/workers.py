@@ -195,6 +195,8 @@ class pb2X(QObject):
                         pass
                         # log('No render folder exists!')
                         # log('No render folder exists!')
+                log("NCNN Preview thread finished")
+                
             if "cuda" in self.main.AI:
                 self.main.CudaRenderFinished = False
                 self.main.imageDisplay = None
@@ -235,7 +237,7 @@ class pb2X(QObject):
                             )"""
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
-                log("CUDA render finished")
+                log("CUDA Preview thread finished")
 
             sleep(1)
             self.finished.emit()
@@ -639,12 +641,13 @@ class interpolation(QObject):
                 == False
             ):
                 show_on_no_output_files(self.main)
-
+                return
             else:
                 if settings.SceneChangeDetectionMode == "Enabled":
                     self.main.transitionDetection.merge_frames()
                 if settings.RenderType != "Optimized":
                     self.log.emit("[Merging Frames]")
+                log("Before output")
                 self.main.output_file = end(
                     self,
                     self.main,
@@ -656,7 +659,7 @@ class interpolation(QObject):
                     self.main.videoQuality,
                     self.main.encoder,
                 )
-
+                log("After output")
         if self.main.AI == "rife-cuda":
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
@@ -681,7 +684,7 @@ class interpolation(QObject):
             self.main.renderAI.log()
             # logThread1.start()
             self.main.output_file = output_file
-            log("Done")
+        log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()
 
@@ -882,7 +885,6 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
-            log("Done")
         if self.main.AI == "custom-models-cuda":
             model_path = handleModel(
                 self.main.AI, self.main.ui.Rife_Model.currentText()
@@ -909,6 +911,6 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
-            log("Done")
+        log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()

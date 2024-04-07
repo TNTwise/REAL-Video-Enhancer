@@ -444,29 +444,10 @@ def end(
                 pass
             os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
             os.system(f'rm -rf "{thisdir}/{self.input_file}"')
-            try:
-                for i in os.listdir(f"{thisdir}"):
-                    if os.path.isfile(os.path.join(thisdir, i)):
-                        if ".{return_data.returnContainer(encoder)}" in i:
-                            os.system(f'rm -rf "{thisdir}/{i}"')
-
-            except Exception as e:
-                log(str(e))
+            
             os.chdir(thisdir)
-            self.output_file = output_video_file
-            log(f"Finished Render, output_file={output_video_file}")
-
-            if settings.Notifications == "Enabled":
-                try:
-                    notification(
-                        "REAL Video Enhancer",
-                        message="Render Finished",
-                        app_name="REAL-Video-Enhancer",
-                    )
-                except Exception as e:
-                    log(f"ERROR: Notification Failed! {e}")
-
             return output_video_file
+            
         log(f"Failed Render, output_file=Null")
         return None
     except Exception as e:

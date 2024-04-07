@@ -75,13 +75,13 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
         items.append("rife4.16-lite.pkl")
         
     # remove unwanted models
-    
-    items2 = []
-    for item in items:
-        items2.append(item.replace(".pkl","").replace(".",""))
-    for i in os.listdir(f'{thisdir}/models/rife-cuda/'):
-        if i not in items2:
-            os.system(f'rm -rf "{thisdir}/models/rife-cuda/{i}"')
+    if os.path.exists(f'{thisdir}/models/rife-cuda/'):
+        items2 = []
+        for item in items:
+            items2.append(item.replace(".pkl","").replace(".",""))
+        for i in os.listdir(f'{thisdir}/models/rife-cuda/'):
+            if i not in items2:
+                os.system(f'rm -rf "{thisdir}/models/rife-cuda/{i}"')
             
     install_modules_dict.update(modelDict)
 def returnModelList(
