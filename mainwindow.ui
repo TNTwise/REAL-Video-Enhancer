@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1194</width>
-    <height>925</height>
+    <width>1251</width>
+    <height>971</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -824,7 +824,7 @@
                      <item>
                       <widget class="QLabel" name="label_20">
                        <property name="text">
-                        <string>Import Custom NCNN Model</string>
+                        <string>Import Custom NCNN Model (requires restart)</string>
                        </property>
                       </widget>
                      </item>
@@ -885,7 +885,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>303</width>
+                          <width>399</width>
                           <height>186</height>
                          </rect>
                         </property>
@@ -946,34 +946,41 @@
                     </widget>
                    </item>
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_17">
+                    <layout class="QVBoxLayout" name="verticalLayout_7">
+                     <property name="sizeConstraint">
+                      <enum>QLayout::SetMinAndMaxSize</enum>
+                     </property>
                      <item>
-                      <widget class="QLabel" name="label_22">
-                       <property name="text">
-                        <string>Import custom Upscaling model: </string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="customModelsButton">
-                       <property name="text">
-                        <string>Custom Models</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="PyTorchModelSelectButton">
-                       <property name="text">
-                        <string>Select PTH/PT file</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QPushButton" name="cudaArchSupportButton">
-                       <property name="text">
-                        <string>Arch Support?</string>
-                       </property>
-                      </widget>
+                      <layout class="QHBoxLayout" name="horizontalLayout_17">
+                       <item>
+                        <widget class="QLabel" name="label_22">
+                         <property name="text">
+                          <string>Import Custom Upscaling Model (restart required)</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="customModelsButton">
+                         <property name="text">
+                          <string>Custom Models</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="PyTorchModelSelectButton">
+                         <property name="text">
+                          <string>Select PTH/PT file</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="cudaArchSupportButton">
+                         <property name="text">
+                          <string>Arch Support?</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
                      </item>
                     </layout>
                    </item>
