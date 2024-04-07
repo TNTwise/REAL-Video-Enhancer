@@ -379,8 +379,8 @@ def calculateFrameIncrements(self):
         # divisor = len(str(int(width)))
         frame_increments_of_interpolation = int((duration_seconds))
         log(f"Frames per video increment: {frame_increments_of_interpolation}")
-        if int(frame_increments_of_interpolation) <= 100:
-            frame_increments_of_interpolation = 100
+        if int(frame_increments_of_interpolation) <= 250:
+            frame_increments_of_interpolation = 250
         return int(frame_increments_of_interpolation)
 
 

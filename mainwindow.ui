@@ -885,7 +885,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>399</width>
+                          <width>110</width>
                           <height>186</height>
                          </rect>
                         </property>
@@ -1027,7 +1027,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="6" column="1">
                 <spacer name="verticalSpacer_5">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1040,7 +1040,7 @@
                  </property>
                 </spacer>
                </item>
-               <item row="4" column="1">
+               <item row="7" column="1">
                 <spacer name="verticalSpacer_2">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1053,7 +1053,7 @@
                  </property>
                 </spacer>
                </item>
-               <item row="5" column="1">
+               <item row="8" column="1">
                 <spacer name="horizontalSpacer_2">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1066,21 +1066,21 @@
                  </property>
                 </spacer>
                </item>
-               <item row="6" column="0">
+               <item row="9" column="0">
                 <widget class="QLabel" name="OutputDirectoryLabel">
                  <property name="text">
                   <string>TextLabel</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
+               <item row="9" column="1">
                 <widget class="QPushButton" name="OutputDirectoryButton">
                  <property name="text">
                   <string>Output Directory</string>
                  </property>
                 </widget>
                </item>
-               <item row="7" column="1">
+               <item row="10" column="1">
                 <spacer name="verticalSpacer">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1093,14 +1093,14 @@
                  </property>
                 </spacer>
                </item>
-               <item row="8" column="1">
+               <item row="11" column="1">
                 <widget class="QPushButton" name="logButton">
                  <property name="text">
                   <string>Show Logs</string>
                  </property>
                 </widget>
                </item>
-               <item row="9" column="1">
+               <item row="12" column="1">
                 <spacer name="horizontalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1113,14 +1113,14 @@
                  </property>
                 </spacer>
                </item>
-               <item row="10" column="1">
+               <item row="13" column="1">
                 <widget class="QPushButton" name="resetSettingsButton">
                  <property name="text">
                   <string>Reset Settings</string>
                  </property>
                 </widget>
                </item>
-               <item row="11" column="1">
+               <item row="14" column="1">
                 <spacer name="horizontalSpacer_4">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1133,14 +1133,14 @@
                  </property>
                 </spacer>
                </item>
-               <item row="12" column="1">
+               <item row="15" column="1">
                 <widget class="QPushButton" name="uninstallButton">
                  <property name="text">
                   <string>Uninstall</string>
                  </property>
                 </widget>
                </item>
-               <item row="13" column="1">
+               <item row="17" column="1">
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1152,6 +1152,24 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="3" column="1">
+                <layout class="QHBoxLayout" name="horizontalLayout_22">
+                 <item>
+                  <widget class="QPushButton" name="githubButton">
+                   <property name="text">
+                    <string>Github</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="discordButton">
+                   <property name="text">
+                    <string>Discord</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -1272,7 +1290,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>Scene Change Detection Sensativity</string>
+                  <string>Scene Change Detection Sensativity (ffmpeg only)</string>
                  </property>
                 </widget>
                </item>
@@ -1680,35 +1698,7 @@
      </widget>
     </item>
     <item row="0" column="0">
-     <layout class="QHBoxLayout" name="horizontalLayout_21">
-      <item>
-       <spacer name="horizontalSpacer_5">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="githubButton">
-        <property name="text">
-         <string>Github</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="discordButton">
-        <property name="text">
-         <string>Discord</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <layout class="QHBoxLayout" name="horizontalLayout_21"/>
     </item>
    </layout>
   </widget>
