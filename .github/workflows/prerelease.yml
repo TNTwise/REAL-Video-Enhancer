@@ -138,7 +138,6 @@ jobs:
         run: | 
           mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
           brew reinstall postgresql
-          cp -r /usr/local/Cellar/postgresql@14/14.11/lib/postgresql@14/* /Applications/Postgres.app/Contents/Versions/9.6/lib/
           
 
           brew update
