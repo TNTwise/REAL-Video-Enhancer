@@ -1,10 +1,12 @@
 import os
 import torch
 import numpy as np
-import src.programData.thisdir
 
-thisdir = src.programData.thisdir.thisdir()
-
+try:
+    import src.programData.thisdir
+    thisdir = src.programData.thisdir.thisdir()
+except:
+    thisdir = f"{os.path.expanduser(r'~')}/.local/share/REAL-Video-Enhancer"
 from torch.nn import functional as F
 
 

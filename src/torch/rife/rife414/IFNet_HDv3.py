@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from src.torch.rife.warplayer import warp
-
+try:
+    from src.torch.rife.warplayer import warp
+except:
+    from rife.warplayer import warp
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
