@@ -4,6 +4,7 @@ import numpy as np
 
 try:
     import src.programData.thisdir
+
     thisdir = src.programData.thisdir.thisdir()
 except:
     thisdir = f"{os.path.expanduser(r'~')}/.local/share/REAL-Video-Enhancer"

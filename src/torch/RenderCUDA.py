@@ -234,9 +234,8 @@ class Interpolation(Render):
 
     def procInterpThread(self):
         self.frame = 0
-        
+
         while True:
-            
             if self.main.settings.SceneChangeDetectionMode == "Enabled":
                 if len(self.main.transitionFrames) > 0:
                     self.transition_frame = self.main.transitionFrames[0]

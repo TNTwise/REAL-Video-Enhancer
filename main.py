@@ -539,9 +539,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         * self.times
                     )
                     self.filecount = fc
-                    self.original_filecount = (
-                        fc / self.times
-                    )
+                    self.original_filecount = fc / self.times
                     self.filecount = fc
                     self.ui.RifePB.setMaximum(self.filecount)
                 try:
@@ -588,8 +586,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
-
-    
 
     def imageViewer(self, step):
         if step == "1":

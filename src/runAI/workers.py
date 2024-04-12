@@ -196,7 +196,7 @@ class pb2X(QObject):
                         # log('No render folder exists!')
                         # log('No render folder exists!')
                 log("NCNN Preview thread finished")
-                
+
             if "cuda" in self.main.AI:
                 self.main.CudaRenderFinished = False
                 self.main.imageDisplay = None

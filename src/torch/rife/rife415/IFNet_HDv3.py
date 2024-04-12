@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 try:
     from src.torch.rife.warplayer import warp
 except:

@@ -456,7 +456,6 @@ def end(
             self.output_file = output_video_file
             log(f"Finished Render, output_file={output_video_file}")
 
-            
             return output_video_file
         log(f"Failed Render, output_file=Null")
         return None
