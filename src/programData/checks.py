@@ -27,10 +27,10 @@ def check_if_models_exist(thisdir):
         return False
 
 
-def check_if_online(dont_check=False):
+def check_if_online(dont_check=False,url="https://raw.githubusercontent.com/"):
     online = False
     try:
-        requests.get("https://raw.githubusercontent.com/")
+        requests.get(url)
         online = True
     except Exception as e:
         traceback_info = traceback.format_exc()
