@@ -16,7 +16,12 @@ from PyQt5.QtGui import QIcon
 import src.misc.messages
 import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
-
+try:
+    import cupy
+    import modules.GMFSSCUDA as GMFSSCUDA
+    gmfss=True
+except:
+    gmfss=False
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from src.misc.messages import *
@@ -213,7 +218,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             install_icons(self)
             self.ui.setupUi(self)
             self.pinFunctions()
-
+            self.ui.GMFSSCUDACheckBox.setEnabled(gmfss)
             self.show()
 
         def showDialogBox(self, message, displayInfoIcon=False):
@@ -246,6 +251,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui = SelectModels.Ui_MainWindow()
             self.ui.setupUi(self)
             self.pinFunctions()
+            
             self.show()
             self.main = parent
 
@@ -302,6 +308,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             super(Downloading, self).__init__()
             self.ui = DownloadUI.Ui_MainWindow()
             self.ui.setupUi(self)
+            
             self.show()
             self.nextfunction()
             self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))

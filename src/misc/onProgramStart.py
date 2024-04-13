@@ -8,7 +8,12 @@ import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
-
+try:
+    import cupy
+    import modules.GMFSSCUDA as GMFSSCUDA
+    gmfss=True
+except:
+    gmfss=False
 try:
     import torch
 
@@ -375,9 +380,11 @@ def set_model_params(self):
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
             
-        if cuda_gmfss_installed == True:
+        if cuda_gmfss_installed == True and gmfss:
             self.ui.GMFSSCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
+        else:
+            self.ui.GMFSSCUDACheckBox.setDisabled(True)
         if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
             self.model_labels["Custom CUDA models"] = "upscaling"
 

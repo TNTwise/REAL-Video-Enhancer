@@ -30,7 +30,7 @@ from src.programData.version import returnVersion
 
 
 try:
-    import cupy
+    
     import torch
     import torchvision
 
@@ -40,12 +40,17 @@ try:
 except Exception as e:
     log(f"ncnn_verson {e}")
     torch_version = False
-
+try:
+    import cupy
+    import modules.GMFSSCUDA as GMFSSCUDA
+    gmfss=True
+except:
+    gmfss=False
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import modules.CustomModelsCUDA as CustomModelsCUDA
-    import modules.GMFSSCUDA as GMFSSCUDA
+    
     import numpy as np
 
 
@@ -316,9 +321,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "Custom NCNN models":
             CustomModelsNCNN.modelOptions(self)
-        
-        if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
-            GMFSSCUDA.modelOptions(self)
+        if gmfss:
+            if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
+                GMFSSCUDA.modelOptions(self)
 
         if torch_version:
             if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
