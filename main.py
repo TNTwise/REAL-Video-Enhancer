@@ -28,7 +28,9 @@ from PyQt5.QtCore import (
 
 from src.programData.version import returnVersion
 
+
 try:
+    import cupy
     import torch
     import torchvision
 
@@ -43,6 +45,7 @@ if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import modules.CustomModelsCUDA as CustomModelsCUDA
+    import modules.GMFSSCUDA as GMFSSCUDA
     import numpy as np
 
 
@@ -91,6 +94,7 @@ import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
 import modules.CustomModelsNCNN as CustomModelsNCNN
+
 
 import src.misc.onProgramStart
 from src.runAI.ETA import *
@@ -312,6 +316,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "Custom NCNN models":
             CustomModelsNCNN.modelOptions(self)
+        
+        if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
+            GMFSSCUDA.modelOptions(self)
 
         if torch_version:
             if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
@@ -539,7 +546,9 @@ class MainWindow(QtWidgets.QMainWindow):
                         * self.times
                     )
                     self.filecount = fc
-                    self.original_filecount = fc / self.times
+                    self.original_filecount = (
+                        fc / self.times
+                    )
                     self.filecount = fc
                     self.ui.RifePB.setMaximum(self.filecount)
                 try:
@@ -586,6 +595,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
+
+    
 
     def imageViewer(self, step):
         if step == "1":

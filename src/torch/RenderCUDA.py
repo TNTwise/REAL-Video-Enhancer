@@ -14,7 +14,7 @@ from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
 from .UpscaleImage import UpscaleCUDA
-
+from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 
 # read
 # Calculate eta by time remaining divided by speed
@@ -207,31 +207,49 @@ class Render:
 
 
 class Interpolation(Render):
-    def __init__(self, main, input_file, output_file, model, times, ensemble, half):
+    def __init__(self, main, method, input_file, output_file, model, times, ensemble, half):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1
         )
-        self.interpolate_process = Rife(
-            interpolation_factor=self.interpolation_factor,
-            interpolate_method=model,
-            width=self.originalWidth,
-            height=self.originalHeight,
-            ensemble=ensemble,
-            half=half,
-        )
-
-    def proc_image(self, frame1, frame2):
-        self.interpolate_process.run(frame1, frame2)
-
-        self.writeBuffer.put(frame1)
+        self.method = method
+        self.model = model
+        self.ensemble = ensemble
+        self.half = half
+        self.handleMethod()
+    def handleMethod(self):
+        if 'rife' in self.model:
+            self.interpolate_process = Rife(
+                interpolation_factor=self.interpolation_factor,
+                interpolate_method=self.model,
+                width=self.originalWidth,
+                height=self.originalHeight,
+                ensemble=self.ensemble,
+                half=self.half,
+            )
+        if 'gmfss' in self.model:
+            self.interpolate_process = GMFSS(
+                interpolation_factor=self.interpolation_factor,
+                width=self.originalWidth,
+                height=self.originalHeight,
+                ensemble=self.ensemble,
+                half=self.half,
+            )
+    
+    def proc_image(self, frame0,frame1):
+        self.interpolate_process.run1(frame0,frame1)
+        
         self.frame += 1
+        self.writeBuffer.put(frame0)
+        
+            
         for i in range(self.interpolation_factor - 1):
             result = self.interpolate_process.make_inference(
                 (i + 1) * 1.0 / (self.interpolation_factor)
             )
             self.frame += 1
             self.writeBuffer.put(result)
-
+        
+        
     def procInterpThread(self):
         self.frame = 0
 
@@ -244,7 +262,7 @@ class Interpolation(Render):
             else:
                 self.transition_frame = -1
             frame = self.readBuffer.get()
-
+            
             if frame is None:
                 log("done with proc")
                 self.writeBuffer.put(self.prevFrame)
@@ -252,18 +270,19 @@ class Interpolation(Render):
                 break  # done with proc
 
             if self.prevFrame is None:
+                self.interpolate_process.run(frame)
                 self.prevFrame = frame
                 continue
 
-            if self.frame != self.transition_frame - self.interpolation_factor:
-                self.proc_image(self.prevFrame, frame)
-
-            else:
+            if self.frame == self.transition_frame - self.interpolation_factor:
+                
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
 
                 self.frame += self.interpolation_factor
                 self.transition_frame = self.main.transitionFrames.pop(0)
+            else:
+                self.proc_image(self.prevFrame,frame)
 
             self.prevFrame = frame
 

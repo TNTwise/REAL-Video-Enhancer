@@ -666,6 +666,7 @@ class interpolation(QObject):
             )
             self.main.renderAI = RenderCUDA.Interpolation(
                 self.main,
+                'rife',
                 self.main.input_file,
                 output_file,
                 self.main.ui.Rife_Model.currentText(),
@@ -684,6 +685,33 @@ class interpolation(QObject):
             self.main.renderAI.log()
             # logThread1.start()
             self.main.output_file = output_file
+        
+        if self.main.AI == "gmfss-cuda":
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
+            self.main.renderAI = RenderCUDA.Interpolation(
+                self.main,
+                'gmfss',
+                self.main.input_file,
+                output_file,
+                self.main.ui.Rife_Model.currentText(),
+                self.main.times,
+                self.main.ui.EnsembleCheckBox.isChecked(),
+                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+            )
+            self.main.renderAI.extractFramesToBytes()
+            readThread1 = Thread(target=self.main.renderAI.readThread)
+            procThread1 = Thread(target=self.main.renderAI.procInterpThread)
+            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+            # logThread1 = Thread(target=self.main.renderAI.log)
+            readThread1.start()
+            procThread1.start()
+            renderThread1.start()
+            self.main.renderAI.log()
+            # logThread1.start()
+            self.main.output_file = output_file
+        
         log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()

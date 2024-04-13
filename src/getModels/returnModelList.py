@@ -180,6 +180,13 @@ def returnModelList(
         install_modules_dict[
             "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/realesrgan-cuda.zip"
         ] = "realesrgan-cuda.zip"
+    if (
+        self.ui.GMFSSCUDACheckBox.isChecked() == True
+        and os.path.exists(f"{settings.ModelDir}/gmfss-cuda") == False
+    ):
+        install_modules_dict[
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/gmfss-fortuna-union.zip"
+        ] = "gmfss-cuda.zip"
     for i in rife_install_list:
         if (
             os.path.exists(f"{settings.ModelDir}/rife/rife-ncnn-vulkan") == False

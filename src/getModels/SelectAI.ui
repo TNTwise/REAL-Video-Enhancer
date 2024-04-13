@@ -189,9 +189,9 @@
                 <property name="geometry">
                  <rect>
                   <x>0</x>
-                  <y>-69</y>
-                  <width>873</width>
-                  <height>192</height>
+                  <y>0</y>
+                  <width>900</width>
+                  <height>186</height>
                  </rect>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -242,6 +242,13 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="GMFSSCUDACheckBox">
+             <property name="text">
+              <string>GMFSS (Interpolate Animation)</string>
+             </property>
+            </widget>
            </item>
            <item>
             <widget class="QCheckBox" name="RealESRGANCUDACheckBox">

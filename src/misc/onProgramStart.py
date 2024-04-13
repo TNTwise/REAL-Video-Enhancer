@@ -260,8 +260,7 @@ def onApplicationStart(self):
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
 
-    import modules.Rife as rife
-    import modules.ESRGAN as esrgan
+    
     from PyQt5.QtGui import QIntValidator, QIcon
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
@@ -366,6 +365,7 @@ def set_model_params(self):
     if torch_version == True:
         self.ui.modelTabWidget.setTabEnabled(1, True)
         cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
+        cuda_gmfss_installed = os.path.exists(f"{thisdir}/models/gmfss-cuda")
         if cuda_rife_installed == True:
             self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
@@ -374,7 +374,10 @@ def set_model_params(self):
         if cuda_esrgan_installed == True:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
-
+            
+        if cuda_gmfss_installed == True:
+            self.ui.GMFSSCUDACheckBox.setChecked(cuda_rife_installed)
+            self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
         if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
             self.model_labels["Custom CUDA models"] = "upscaling"
 

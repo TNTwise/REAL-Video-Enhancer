@@ -885,7 +885,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>110</width>
+                          <width>399</width>
                           <height>186</height>
                          </rect>
                         </property>
@@ -937,6 +937,13 @@
                       </widget>
                      </item>
                     </layout>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="GMFSSCUDACheckBox">
+                     <property name="text">
+                      <string>GMFSS (Interpolate Animation)</string>
+                     </property>
+                    </widget>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCUDACheckBox">

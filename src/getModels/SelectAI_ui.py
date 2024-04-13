@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/pax/REAL-Video-Enhancer/src/getModels/SelectAI.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -36,9 +36,7 @@ class Ui_MainWindow(object):
         self.installModelsProgressBar.setProperty("value", 0)
         self.installModelsProgressBar.setTextVisible(False)
         self.installModelsProgressBar.setInvertedAppearance(False)
-        self.installModelsProgressBar.setTextDirection(
-            QtWidgets.QProgressBar.TopToBottom
-        )
+        self.installModelsProgressBar.setTextDirection(QtWidgets.QProgressBar.TopToBottom)
         self.installModelsProgressBar.setObjectName("installModelsProgressBar")
         self.gridLayout.addWidget(self.installModelsProgressBar, 5, 0, 1, 1)
         self.modelsTabWidget = QtWidgets.QTabWidget(self.InstallModelsFrame)
@@ -86,9 +84,45 @@ class Ui_MainWindow(object):
         self.CUDATab.setObjectName("CUDATab")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.CUDATab)
         self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
         self.RifeCUDACheckBox = QtWidgets.QCheckBox(self.CUDATab)
         self.RifeCUDACheckBox.setObjectName("RifeCUDACheckBox")
-        self.verticalLayout.addWidget(self.RifeCUDACheckBox)
+        self.horizontalLayout.addWidget(self.RifeCUDACheckBox)
+        self.rifeCUDAModels = QtWidgets.QScrollArea(self.CUDATab)
+        self.rifeCUDAModels.setMaximumSize(QtCore.QSize(16777215, 125))
+        self.rifeCUDAModels.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.rifeCUDAModels.setWidgetResizable(True)
+        self.rifeCUDAModels.setObjectName("rifeCUDAModels")
+        self.scrollAreaWidgetContents = QtWidgets.QWidget()
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 900, 186))
+        self.scrollAreaWidgetContents.setObjectName("scrollAreaWidgetContents")
+        self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_9.setObjectName("verticalLayout_9")
+        self.rife46CUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife46CUDA.setObjectName("rife46CUDA")
+        self.verticalLayout_9.addWidget(self.rife46CUDA)
+        self.rife413liteCUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife413liteCUDA.setObjectName("rife413liteCUDA")
+        self.verticalLayout_9.addWidget(self.rife413liteCUDA)
+        self.rife414CUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife414CUDA.setObjectName("rife414CUDA")
+        self.verticalLayout_9.addWidget(self.rife414CUDA)
+        self.rife414liteCUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife414liteCUDA.setObjectName("rife414liteCUDA")
+        self.verticalLayout_9.addWidget(self.rife414liteCUDA)
+        self.rife415CUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife415CUDA.setObjectName("rife415CUDA")
+        self.verticalLayout_9.addWidget(self.rife415CUDA)
+        self.rife416liteCUDA = QtWidgets.QCheckBox(self.scrollAreaWidgetContents)
+        self.rife416liteCUDA.setObjectName("rife416liteCUDA")
+        self.verticalLayout_9.addWidget(self.rife416liteCUDA)
+        self.rifeCUDAModels.setWidget(self.scrollAreaWidgetContents)
+        self.horizontalLayout.addWidget(self.rifeCUDAModels)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.GMFSSCUDACheckBox = QtWidgets.QCheckBox(self.CUDATab)
+        self.GMFSSCUDACheckBox.setObjectName("GMFSSCUDACheckBox")
+        self.verticalLayout.addWidget(self.GMFSSCUDACheckBox)
         self.RealESRGANCUDACheckBox = QtWidgets.QCheckBox(self.CUDATab)
         self.RealESRGANCUDACheckBox.setObjectName("RealESRGANCUDACheckBox")
         self.verticalLayout.addWidget(self.RealESRGANCUDACheckBox)
@@ -112,42 +146,23 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(_translate("MainWindow", "REAL Video Enhancer"))
         self.label_13.setText(_translate("MainWindow", "Models:"))
         self.InstallButton.setText(_translate("MainWindow", "Install"))
-        self.RifeCheckBox.setText(
-            _translate("MainWindow", "RIFE (Interpolate General)")
-        )
+        self.RifeCheckBox.setText(_translate("MainWindow", "RIFE (Interpolate General)"))
         self.RifeSettings.setText(_translate("MainWindow", "Extra Models"))
-        self.RealESRGANCheckBox.setText(
-            _translate("MainWindow", "RealESRGAN (Upscale Animation)")
-        )
-        self.RealSRCheckBox.setText(
-            _translate("MainWindow", "RealSR (Upscale General)")
-        )
-        self.Waifu2xCheckBox.setText(
-            _translate("MainWindow", "Waifu2X  (Upscale Animation)")
-        )
-        self.RealCUGANCheckBox.setText(
-            _translate("MainWindow", "RealCUGAN (Upscale Animation)")
-        )
-        self.CainCheckBox.setText(
-            _translate("MainWindow", "IFRNET (Interpolate General)")
-        )
-        self.CustomModelsNCNNCheckBox.setText(
-            _translate("MainWindow", "Custom NCNN Models (Upscale Custom)")
-        )
-        self.RifeVSCheckBox.setText(
-            _translate("MainWindow", "VS-Rife (Interpolate General)")
-        )
-        self.modelsTabWidget.setTabText(
-            self.modelsTabWidget.indexOf(self.NCNNTab),
-            _translate("MainWindow", "NCNN (AMD/Intel/Nvidia)"),
-        )
-        self.RifeCUDACheckBox.setText(
-            _translate("MainWindow", "RIFE (Interpolate General)")
-        )
-        self.RealESRGANCUDACheckBox.setText(
-            _translate("MainWindow", "RealESRGAN (Upscale Animation)")
-        )
-        self.modelsTabWidget.setTabText(
-            self.modelsTabWidget.indexOf(self.CUDATab),
-            _translate("MainWindow", "CUDA (Nvidia Only)"),
-        )
+        self.RealESRGANCheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
+        self.RealSRCheckBox.setText(_translate("MainWindow", "RealSR (Upscale General)"))
+        self.Waifu2xCheckBox.setText(_translate("MainWindow", "Waifu2X  (Upscale Animation)"))
+        self.RealCUGANCheckBox.setText(_translate("MainWindow", "RealCUGAN (Upscale Animation)"))
+        self.CainCheckBox.setText(_translate("MainWindow", "IFRNET (Interpolate General)"))
+        self.CustomModelsNCNNCheckBox.setText(_translate("MainWindow", "Custom NCNN Models (Upscale Custom)"))
+        self.RifeVSCheckBox.setText(_translate("MainWindow", "VS-Rife (Interpolate General)"))
+        self.modelsTabWidget.setTabText(self.modelsTabWidget.indexOf(self.NCNNTab), _translate("MainWindow", "NCNN (AMD/Intel/Nvidia)"))
+        self.RifeCUDACheckBox.setText(_translate("MainWindow", "RIFE (Interpolate General)"))
+        self.rife46CUDA.setText(_translate("MainWindow", "Rife4.6"))
+        self.rife413liteCUDA.setText(_translate("MainWindow", "Rife4.13-lite"))
+        self.rife414CUDA.setText(_translate("MainWindow", "Rife4.14"))
+        self.rife414liteCUDA.setText(_translate("MainWindow", "Rife4.14-lite"))
+        self.rife415CUDA.setText(_translate("MainWindow", "Rife4.15"))
+        self.rife416liteCUDA.setText(_translate("MainWindow", "Rife4.16-lite"))
+        self.GMFSSCUDACheckBox.setText(_translate("MainWindow", "GMFSS (Interpolate Animation)"))
+        self.RealESRGANCUDACheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
+        self.modelsTabWidget.setTabText(self.modelsTabWidget.indexOf(self.CUDATab), _translate("MainWindow", "CUDA (Nvidia Only)"))
