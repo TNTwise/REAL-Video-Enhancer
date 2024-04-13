@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1251</width>
-    <height>971</height>
+    <width>1389</width>
+    <height>973</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -885,8 +885,8 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>399</width>
-                          <height>186</height>
+                          <width>479</width>
+                          <height>192</height>
                          </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -939,11 +939,35 @@
                     </layout>
                    </item>
                    <item>
-                    <widget class="QCheckBox" name="GMFSSCUDACheckBox">
-                     <property name="text">
-                      <string>GMFSS (Interpolate Animation)</string>
-                     </property>
-                    </widget>
+                    <layout class="QHBoxLayout" name="horizontalLayout_24">
+                     <item>
+                      <widget class="QPushButton" name="GMFSSHelpButton">
+                       <property name="text">
+                        <string/>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QCheckBox" name="GMFSSCUDACheckBox">
+                       <property name="text">
+                        <string>GMFSS (Interpolate Animation)</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_5">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
                    </item>
                    <item>
                     <widget class="QCheckBox" name="RealESRGANCUDACheckBox">

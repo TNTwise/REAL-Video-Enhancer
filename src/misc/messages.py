@@ -211,3 +211,8 @@ def halfPrecision_help(self):
     self.showDialogBox(
         f"Half precision can increase performance while saving VRAM, but may decrease quality based on the model."
     )
+
+def gmfss_help(self):
+    self.showDialogBox(
+        f"GMFSS requires CuPy, please install it via PIP to use GMFSS."
+    )

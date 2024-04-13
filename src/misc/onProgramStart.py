@@ -101,6 +101,7 @@ def bindButtons(self):
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRifeTimes)
     self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
     self.ui.halfPrecisionHelpButton.clicked.connect(lambda: halfPrecision_help(self))
+    self.ui.GMFSSHelpButton.clicked.connect(lambda: gmfss_help(self))
     self.ui.imageComboBox.currentIndexChanged.connect(
         lambda: settings.change_setting(
             "Image_Type", f"{self.ui.imageComboBox.currentText()}"
@@ -153,6 +154,7 @@ def bindButtons(self):
         self.ui.UHDModeHelpButton,
         self.ui.gpuIDHelpButton,
         self.ui.halfPrecisionHelpButton,
+        self.ui.GMFSSHelpButton,
     ]
     icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
     for button in helpButtons:
