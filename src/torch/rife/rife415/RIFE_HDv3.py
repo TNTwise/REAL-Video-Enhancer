@@ -10,17 +10,9 @@ class Model:
     def __init__(self, local_rank=-1):
         self.flownet = IFNet()
         self.device()
-        self.optimG = AdamW(self.flownet.parameters(), lr=1e-6, weight_decay=1e-4)
-        self.version = 4.8
-        # self.vgg = VGGPerceptualLoss().to(device)
-        if local_rank != -1:
-            self.flownet = DDP(
-                self.flownet, device_ids=[local_rank], output_device=local_rank
-            )
+        
 
-    def train(self):
-        self.flownet.train()
-
+    
     def eval(self):
         self.flownet.eval()
 

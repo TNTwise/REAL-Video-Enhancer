@@ -139,20 +139,15 @@ class IFNet(nn.Module):
         ensemble=False,
     ):
         
-        if not torch.is_tensor(timestep):
-            timestep = (img0[:, :1].clone() * 0 + 1) * timestep
-        else:
-            timestep = timestep.repeat(1, 1, img0.shape[2], img0.shape[3])
+        timestep = (img0[:, :1].clone() * 0 + 1) * timestep
+        
         f0 = self.encode(img0[:, :3])
         f1 = self.encode(img1[:, :3])
-        flow_list = []
-        merged = []
-        mask_list = []
+        
         warped_img0 = img0
         warped_img1 = img1
         flow = None
         mask = None
-        loss_cons = 0
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
@@ -208,8 +203,6 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            mask_list.append(mask)
-            flow_list.append(flow)
             warped_img0 = warp(img0, flow[:, :2])
             warped_img1 = warp(img1, flow[:, 2:4])
             
