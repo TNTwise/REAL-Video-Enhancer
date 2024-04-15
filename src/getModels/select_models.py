@@ -16,6 +16,7 @@ from PyQt5.QtGui import QIcon
 import src.misc.messages
 import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
+from src.misc.log import log
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
@@ -34,7 +35,7 @@ from src.programData.settings import *
 
 settings = Settings()
 from src.getModels.returnModelList import *
-from src.misc.log import log
+
 import src.getModels.googleDriveDownload as GDrive
 
 def handleCUDAModels(model: str = ""):

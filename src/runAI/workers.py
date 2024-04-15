@@ -23,8 +23,8 @@ import subprocess
 try:
     import src.torch.RenderCUDA as RenderCUDA
     import numpy as np
-except:
-    pass
+except Exception as e:
+    print(e)
 from modules.commands import returnOutputFile
 from modules.handelModel import handleModel
 

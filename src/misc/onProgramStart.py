@@ -17,7 +17,8 @@ except Exception as e:
     log(e)
 try:
     import torch
-
+    import torchvision
+    import spandrel
     torch_version = True
 except:
     torch_version = False

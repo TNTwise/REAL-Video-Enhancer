@@ -33,7 +33,7 @@ try:
     
     import torch
     import torchvision
-
+    import spandrel
     torch_version = True
     log("torch_version")
 

@@ -6,16 +6,15 @@ from .rife.rife import *
 from src.programData.thisdir import thisdir
 
 thisdir = thisdir()
-import sys
-from threading import Thread
 import cv2
-import re
 from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
 from .UpscaleImage import UpscaleCUDA
-from src.torch.gmfss.gmfss_fortuna_union import GMFSS
-
+try:
+    from src.torch.gmfss.gmfss_fortuna_union import GMFSS
+except Exception as e:
+    log(e)
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -238,7 +237,6 @@ class Interpolation(Render):
     def proc_image(self, frame0,frame1):
         self.interpolate_process.run1(frame0,frame1)
         
-        self.frame += 1
         self.writeBuffer.put(frame0)
         
             
@@ -246,28 +244,24 @@ class Interpolation(Render):
             result = self.interpolate_process.make_inference(
                 (i + 1) * 1.0 / (self.interpolation_factor)
             )
-            self.frame += 1
             self.writeBuffer.put(result)
         
         
     def procInterpThread(self):
         self.frame = 0
+        self.TransitionQueue = Queue()
+        [self.TransitionQueue.put(i) for i in self.main.transitionFrames] 
 
-        while True:
-            if self.main.settings.SceneChangeDetectionMode == "Enabled":
-                if len(self.main.transitionFrames) > 0:
-                    self.transition_frame = self.main.transitionFrames[0]
-                else:
-                    self.transition_frame = -1
-            else:
+        # get first frame in transition queue
+        self.transition_frame = self.TransitionQueue.get()
+        
+        if not self.main.settings.SceneChangeDetectionMode == "Enabled":
                 self.transition_frame = -1
+        while frame is not None:
+            
             frame = self.readBuffer.get()
             
-            if frame is None:
-                log("done with proc")
-                self.writeBuffer.put(self.prevFrame)
-                self.writeBuffer.put(None)
-                break  # done with proc
+                
 
             if self.prevFrame is None:
                 self.interpolate_process.run(frame)
@@ -279,13 +273,17 @@ class Interpolation(Render):
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
 
-                self.frame += self.interpolation_factor
-                self.transition_frame = self.main.transitionFrames.pop(0)
+                
+                self.transition_frame = self.TransitionQueue.get()
             else:
                 self.proc_image(self.prevFrame,frame)
 
+            self.frame += self.interpolation_factor
             self.prevFrame = frame
-
+        log("done with proc")
+        self.writeBuffer.put(self.prevFrame)
+        self.writeBuffer.put(None)
+         # done with proc
 
 class Upscaling(Render):
     def __init__(self, main, input_file, output_file, resIncrease, model_path, half):
@@ -305,14 +303,10 @@ class Upscaling(Render):
             self.originalWidth, self.originalHeight, self.model_path, self.half
         )
 
-        while True:
+        while frame is not None:
             frame = self.readBuffer.get()
 
-            if frame is None:
-                log("done with proc")
-                self.writeBuffer.put(frame)
-                self.writeBuffer.put(None)
-                break  # done with proc
+                
 
             result = self.upscaleMethod.UpscaleImage(frame)
 
@@ -320,3 +314,7 @@ class Upscaling(Render):
             self.prevFrame = result
 
             self.frame += 1
+        
+        log("done with proc")
+        self.writeBuffer.put(frame)
+        self.writeBuffer.put(None)
