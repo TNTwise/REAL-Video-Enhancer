@@ -185,7 +185,7 @@ def returnModelList(
         and os.path.exists(f"{settings.ModelDir}/gmfss-cuda") == False
     ):
         install_modules_dict[
-            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/gmfss-fortuna-union.zip"
+            "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/gmfss-cuda.zip"
         ] = "gmfss-cuda.zip"
     for i in rife_install_list:
         if (

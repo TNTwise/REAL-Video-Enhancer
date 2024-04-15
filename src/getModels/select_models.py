@@ -20,8 +20,9 @@ try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
     gmfss=True
-except:
+except Exception as e:
     gmfss=False
+    log(e)
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from src.misc.messages import *

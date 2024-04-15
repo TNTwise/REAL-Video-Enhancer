@@ -12,8 +12,9 @@ try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
     gmfss=True
-except:
+except Exception as e:
     gmfss=False
+    log(e)
 try:
     import torch
 
@@ -385,7 +386,8 @@ def set_model_params(self):
         if cuda_gmfss_installed == True and gmfss:
             self.ui.GMFSSCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
-        else:
+            self.ui.GMFSSCUDACheckBox.setDisabled(False)
+        elif not gmfss:
             self.ui.GMFSSCUDACheckBox.setDisabled(True)
         if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
             self.model_labels["Custom CUDA models"] = "upscaling"
