@@ -105,21 +105,16 @@ class IFNet(nn.Module):
 
     def forward(
         self,
-        x,
+        img0,img1,
         timestep=0.5,
         scale_list=[8, 4, 2, 1],
         training=False,
         fastmode=True,
         ensemble=False,
     ):
-        if training == False:
-            channel = x.shape[1] // 2
-            img0 = x[:, :channel]
-            img1 = x[:, channel:]
-        if not torch.is_tensor(timestep):
-            timestep = (x[:, :1].clone() * 0 + 1) * timestep
-        else:
-            timestep = timestep.repeat(1, 1, img0.shape[2], img0.shape[3])
+        
+        timestep = (img0[:, :1].clone() * 0 + 1) * timestep
+        
         flow_list = []
         merged = []
         mask_list = []
@@ -170,20 +165,8 @@ class IFNet(nn.Module):
                     m0 = (m0 + (-m1)) / 2
                 flow = flow + f0
                 mask = mask + m0
-            mask_list.append(mask)
-            flow_list.append(flow)
             warped_img0 = warp(img0, flow[:, :2])
             warped_img1 = warp(img1, flow[:, 2:4])
-            merged.append((warped_img0, warped_img1))
-        mask_list[3] = torch.sigmoid(mask_list[3])
-        merged[3] = merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
-        if not fastmode:
-            print("contextnet is removed")
-            """
-            c0 = self.contextnet(img0, flow[:, :2])
-            c1 = self.contextnet(img1, flow[:, 2:4])
-            tmp = self.unet(img0, img1, warped_img0, warped_img1, mask, flow, c0, c1)
-            res = tmp[:, :3] * 2 - 1
-            merged[3] = torch.clamp(merged[3] + res, 0, 1)
-            """
-        return flow_list, mask_list[3], merged
+        mask = torch.sigmoid(mask)
+        
+        return warped_img0 * mask + warped_img1 * (1 - mask)
