@@ -44,18 +44,17 @@ class Model:
         if rank <= 0:
             if torch.cuda.is_available():
                 self.flownet.load_state_dict(
-                    convert(torch.load("{}/rife4.15.pkl".format(path))), False
+                    convert(torch.load("{}/rife4.14.pkl".format(path))), False
                 )
             else:
                 self.flownet.load_state_dict(
                     convert(
-                        torch.load("{}/rife4.15.pkl".format(path), map_location="cpu")
+                        torch.load("{}/rife4.14.pkl".format(path), map_location="cpu")
                     ),
                     False,
                 )
 
     def inference(self, img0, img1, timestep=0.5, scale=1.0, ensemble=False):
-        imgs = torch.cat((img0, img1), 1)
         scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
-        _, _, merged = self.flownet(imgs, timestep, scale_list, ensemble=ensemble)
-        return merged[3]
+        
+        return self.flownet(img0, img1, timestep, scale_list, ensemble=ensemble)
