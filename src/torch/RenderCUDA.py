@@ -15,7 +15,7 @@ import src.programData.return_data as return_data
 from time import sleep
 from .UpscaleImage import UpscaleCUDA
 from src.torch.gmfss.gmfss_fortuna_union import GMFSS
-from collections import deque
+
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -253,19 +253,14 @@ class Interpolation(Render):
     def procInterpThread(self):
         self.frame = 0
 
-        #create a transition queue and put all items from transition frames into the queue
-        self.TransitionQueue = Queue()
-        [self.TransitionQueue.put(i) for i in self.main.TransitionFrames] 
-
-        # get first frame in transition queue
-        self.transition_frame = self.TransitionQueue.get()
-        
-        if not self.main.settings.SceneChangeDetectionMode == "Enabled":
-                self.transition_frame = -1
         while True:
-
-            
-
+            if self.main.settings.SceneChangeDetectionMode == "Enabled":
+                if len(self.main.transitionFrames) > 0:
+                    self.transition_frame = self.main.transitionFrames[0]
+                else:
+                    self.transition_frame = -1
+            else:
+                self.transition_frame = -1
             frame = self.readBuffer.get()
             
             if frame is None:
@@ -279,17 +274,17 @@ class Interpolation(Render):
                 self.prevFrame = frame
                 continue
 
-            if self.frame == self.transition_frame - self.interpolation_factor: # Run on transitions
+            if self.frame == self.transition_frame - self.interpolation_factor:
+                
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
 
-                self.transition_frame = self.TransitionQueue.get()
                 self.frame += self.interpolation_factor
-                
+                self.transition_frame = self.main.transitionFrames.pop(0)
             else:
                 self.proc_image(self.prevFrame,frame)
 
-            self.prevFrame = frame # set last frame to interpolate off of
+            self.prevFrame = frame
 
 
 class Upscaling(Render):
