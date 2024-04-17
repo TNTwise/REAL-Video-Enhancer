@@ -311,7 +311,6 @@ class Upscaling(Render):
 
             if frame is None:
                 log("done with proc")
-                self.writeBuffer.put(frame)
                 self.writeBuffer.put(None)
                 break  # done with proc
 

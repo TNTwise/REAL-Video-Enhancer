@@ -33,3 +33,6 @@ def thisdir():
         return f"{homedir}/.local/share/REAL-Video-Enhancer"
     if operating_system == "Darwin":
         return f"{homedir}/Library/REAL-Video-Enhancer"
+    
+    if operating_system == "Windows":
+        return os.path.join("C:\\","Program Files (x86)")

@@ -212,11 +212,11 @@ def returnModelList(
             )
         ] = "rife-ncnn-vulkan"
         install_modules_dict[
-            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz"
-        ] = f"rife-v4.6.tar.gz"
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15.tar.gz"
+        ] = f"rife-v4.15.tar.gz"
         install_modules_dict[
-            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6-ensemble.tar.gz"
-        ] = f"rife-v4.6-ensemble.tar.gz"
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
+        ] = f"rife-v4.15-ensemble.tar.gz"
     if len(install_modules_dict) == 0 and len(os.listdir(f"{settings.ModelDir}/")) == 0:
         install_modules_dict[
             returnCorrectLinkBasedOnOS(
@@ -224,11 +224,11 @@ def returnModelList(
             )
         ] = "rife-ncnn-vulkan"
         install_modules_dict[
-            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6.tar.gz"
-        ] = f"rife-v4.6.tar.gz"
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15.tar.gz"
+        ] = f"rife-v4.15.tar.gz"
         install_modules_dict[
-            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.6-ensemble.tar.gz"
-        ] = f"rife-v4.6-ensemble.tar.gz"
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
+        ] = f"rife-v4.15-ensemble.tar.gz"
     if (
         os.path.isfile(f"{thisdir}/bin/ffmpeg")
         and os.path.isfile(f"{thisdir}/bin/glxinfo")
