@@ -663,10 +663,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setEnsembleMode(self):
         if (
-            os.path.exists(
-                f"{self.settings.ModelDir}/rife/{self.ui.Rife_Model.currentText()}-ensemble"
-            )
-            or "rife4" in self.ui.Rife_Model.currentText()
+            os.path.exists(os.path.join(f"{self.settings.ModelDir}","rife",f"{self.ui.Rife_Model.currentText()}-ensemble"))
+            and "rife4" in self.ui.Rife_Model.currentText()
         ):
             self.ui.EnsembleCheckBox.show()
             self.ui.ensembleHelpButton.show()
