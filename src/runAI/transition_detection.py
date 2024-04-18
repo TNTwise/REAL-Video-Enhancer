@@ -143,7 +143,7 @@ class TransitionDetection:
             # os.system(f'cp "{self.full_render_dir}/transitions/"* "{self.full_render_dir}/output_frames/0/"')
 
             os.chdir(f"{self.full_render_dir}/transitions/")
-            for i in os.listdir(os.path.join()):
+            for i in os.listdir():
                 if os.path.isfile(f"{self.full_render_dir}/output_frames/0/{i}"):
                     os.system(f'cp {i} "{self.full_render_dir}/output_frames/0/"')
 
