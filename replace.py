@@ -12,7 +12,7 @@ def replace_linux_paths(file_path):
     # Replace Linux paths with os.path.join or an OS-agnostic option
     for line in content:
         
-        if 'os.listdir' in line:
+        if 'with open' in line:
             pattern = r'\((.*?)\)'
 
             matches = re.findall(pattern, line)
@@ -22,7 +22,7 @@ def replace_linux_paths(file_path):
                 
                 
                 i = i.replace("/",'",f"')
-            line = line.replace(f'os.listdir({matches[0]})',f'os.listdir(os.path.join({i}))')
+            line = line.replace(f'with open({matches[0]})',f'with open((os.path.join({i})))')
 
         replaced_content.append(line)
     with open(file_path, 'w') as f:
