@@ -47,12 +47,12 @@ class Worker(QObject):
 
     @pyqtSlot()
     def install_modules(self):
-        for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+        for i in os.listdir(f"{thisdir}/files/"):
             if os.path.isfile(i):
                 if ".txt" not in i:
                     os.remove(f"{thisdir}/files/{i}")
         rife_install_list = []
-        for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+        for i in os.listdir(f"{thisdir}/files/"):
             if ".txt" not in i:
                 os.system(f'rm -rf "{thisdir}/files/{i}"')
         settings = Settings()
@@ -85,7 +85,7 @@ class Worker(QObject):
                         data_downloaded / total_size_in_bytes
                     )  # sends back data to main thread
 
-        for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+        for i in os.listdir(f"{thisdir}/files/"):
             if i == "rife-ncnn-vulkan":
                 try:
                     os.mkdir(f"{settings.ModelDir}/rife/")
@@ -130,7 +130,7 @@ class Worker(QObject):
             handleCUDAModels(i)
 
         try:
-            for i in os.listdir(os.path.join(f"{settings.ModelDir}",f"rife",f"")):
+            for i in os.listdir(f"{settings.ModelDir}/rife/"):
                 if (
                     i not in rife_install_list
                     and i != "rife-ncnn-vulkan"
@@ -176,9 +176,9 @@ class ChooseModels(QtWidgets.QMainWindow):
         rife_pin_functions(self)
 
         for checkbox, option_name in rife_checkboxes(self):
-            if option_name in os.listdir(os.path.join(f"{self.settings.ModelDir}",f"rife",f"")):
+            if option_name in os.listdir(f"{self.settings.ModelDir}/rife/"):
                 checkbox.setChecked(True)
-        for i in os.listdir(os.path.join(f"{self.settings.ModelDir}",f"rife",f"")):
+        for i in os.listdir(f"{self.settings.ModelDir}/rife/"):
             if (
                 os.path.isfile(f"{self.settings.ModelDir}/rife/{i}") == False
                 and i not in rife.default_models()
@@ -267,7 +267,7 @@ def run_install_models_from_settings(self):
 
 
 def endDownload(self):
-    for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+    for i in os.listdir(f"{thisdir}/files/"):
         if ".txt" not in i:
             log(f"deleted {i}")
             os.system(f'rm -rf "{thisdir}/files/{i}"')

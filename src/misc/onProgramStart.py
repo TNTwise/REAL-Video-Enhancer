@@ -222,7 +222,7 @@ def settingsStart(self):
         self.ui.sceneChangeSensativityButton.hide()
         self.ui.sceneChangeLineEdit.hide()
 
-    if os.path.exists(os.path.join(f"{settings.RenderDir}")) == False:
+    if os.path.exists(f"{settings.RenderDir}") == False:
         settings.change_setting("RenderDir", f"{thisdir}")
 
     if settings.Notifications == "Enabled":
@@ -373,13 +373,13 @@ def set_model_params(self):
     # placeholder
     if torch_version == True:
         self.ui.modelTabWidget.setTabEnabled(1, True)
-        cuda_rife_installed = os.path.exists(os.path.join(f"{thisdir}",f"models",f"rife-cuda"))
-        cuda_gmfss_installed = os.path.exists(os.path.join(f"{thisdir}",f"models",f"gmfss-cuda"))
+        cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
+        cuda_gmfss_installed = os.path.exists(f"{thisdir}/models/gmfss-cuda")
         if cuda_rife_installed == True:
             self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
 
-        cuda_esrgan_installed = os.path.exists(os.path.join(f"{thisdir}",f"models",f"realesrgan-cuda"))
+        cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
         if cuda_esrgan_installed == True:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"

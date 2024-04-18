@@ -268,7 +268,7 @@ def extractFramesAndAudio(
 
         global interpolation_sessions
         self.input_frames = len(
-            os.listdir(os.path.join(f"{settings.RenderDir}",f"{self.videoName}_temp",f"input_frames",f""))
+            os.listdir(f"{settings.RenderDir}/{self.videoName}_temp/input_frames/")
         )
         global frame_count
         self.filecount = 0
@@ -445,7 +445,7 @@ def end(
             os.system(f'rm -rf "{renderdir}/{videoName}_temp/"')
             os.system(f'rm -rf "{thisdir}/{self.input_file}"')
             try:
-                for i in os.listdir(os.path.join(f"{thisdir}")):
+                for i in os.listdir(f"{thisdir}"):
                     if os.path.isfile(os.path.join(thisdir, i)):
                         if ".{return_data.returnContainer(encoder)}" in i:
                             os.system(f'rm -rf "{thisdir}/{i}"')

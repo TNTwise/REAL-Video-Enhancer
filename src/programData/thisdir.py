@@ -15,10 +15,8 @@ if operating_system == "Linux":
     flatpak = False
     if "FLATPAK_ID" in os.environ:
         flatpak = True
-if operating_system == "Windows":
-    if not os.path.exists(os.path.join(f"{homedir}",r"REAL-Video-Enhancer")):
-	    os.makedirs(os.path.join(f"{homedir}",r"REAL-Video-Enhancer"))
-        
+
+
 def thisdir():
     if operating_system == "Linux":
         if flatpak == True:
@@ -37,4 +35,4 @@ def thisdir():
         return f"{homedir}/Library/REAL-Video-Enhancer"
     
     if operating_system == "Windows":
-        return os.path.join(os.path.join(f"{homedir}",r"REAL-Video-Enhancer"))
+        return os.path.join("C:\\","Program Files (x86)")

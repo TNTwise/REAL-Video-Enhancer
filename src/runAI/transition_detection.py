@@ -107,7 +107,7 @@ class TransitionDetection:
         settings = Settings()
         try:
             if self.settings.SceneChangeDetection != "Off":
-                transitions = os.listdir(os.path.join(f"{self.full_render_dir}",f"transitions",f""))
+                transitions = os.listdir(f"{self.full_render_dir}/transitions/")
                 if not os.path.exists(f"{self.full_render_dir}/transitions/temp/"):
                     os.mkdir(f"{self.full_render_dir}/transitions/temp/")
                 for iteration, i in enumerate(transitions):
@@ -149,7 +149,7 @@ class TransitionDetection:
 
             os.chdir(f"{self.thisdir}/")
         else:
-            for i in os.listdir(os.path.join(f"{self.full_render_dir}",f"transitions",f"")):
+            for i in os.listdir(f"{self.full_render_dir}/transitions/"):
                 if os.path.isfile(f"{self.full_render_dir}/output_frames/{i}.mp4"):
                     try:
                         os.removedirs(

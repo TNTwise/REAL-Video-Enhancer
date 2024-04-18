@@ -7,7 +7,7 @@ import re
 import src.programData.thisdir
 
 thisdir = src.programData.thisdir.thisdir()
-if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"renders",f"")))) == False:
+if os.path.exists(f"{thisdir}/renders/") == False:
     os.mkdir(f"{thisdir}/renders/")
 from zipfile import ZipFile
 from PyQt5 import QtWidgets
@@ -98,11 +98,11 @@ class Worker(QObject):
                         self.intReady.emit(
                             [int(data_downloaded), total_size_in_bytes]
                         )  # sends back data to main thread# sends back data to main thread
-            if os.path.exists(os.path.join(os.path.join(os.path.join(f"{settings.ModelDir}")))) == False:
+            if os.path.exists(f"{settings.ModelDir}") == False:
                 os.mkdir(f"{settings.ModelDir}")
 
-            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
-                if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"bin",f"")))) == False:
+            for i in os.listdir(f"{thisdir}/files/"):
+                if os.path.exists(f"{thisdir}/bin/") == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
                     os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
@@ -151,7 +151,7 @@ class Worker(QObject):
                     with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                         f.extractall(f"{settings.ModelDir}/rife/")
                 handleCUDAModels(i)
-            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+            for i in os.listdir(f"{thisdir}/files/"):
                 if ".txt" not in i:
                     os.remove(f"{thisdir}/files/{i}")
             self.finished.emit()
@@ -162,7 +162,7 @@ class Worker(QObject):
 
 
 def clear_files():
-    for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
+    for i in os.listdir(f"{thisdir}/files/"):
         if ".txt" not in i:
             try:
                 os.remove(f"{thisdir}/files/{i}")
@@ -171,7 +171,7 @@ def clear_files():
 
 
 def install_icons(self):
-    if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"icons",f"")))) == False:
+    if os.path.exists(f"{thisdir}/icons/") == False:
         if check_if_online(True):
             try:
                 log("Downloaded Icons")
@@ -273,7 +273,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             try:
                 with open(f"{thisdir}/models.txt", "r") as f:
                     for checkbox, option_name in rife_checkboxes(self):
-                        if option_name in os.listdir(os.path.join(f"{thisdir}",f"models",f"rife",f"")):
+                        if option_name in os.listdir(f"{thisdir}/models/rife/"):
                             checkbox.setChecked(True)
 
                     for i in f.readlines():
@@ -355,8 +355,8 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui.gbLabel.setText(f"{downloaded_data_gb}/{total_data_gb}GB")
 
         def start_main(self):
-            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
-                if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"bin",f"")))) == False:
+            for i in os.listdir(f"{thisdir}/files/"):
+                if os.path.exists(f"{thisdir}/bin/") == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
                     os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
@@ -422,7 +422,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
         if os.path.isfile(f"{settings.ModelDir}/rife/rife-ncnn-vulkan") == True:
             QApplication.closeAllWindows()
         else:
-            for file in os.listdir(os.path.join(f"{thisdir}",f"files")):
+            for file in os.listdir(f"{thisdir}/files"):
                 if ".txt" not in file:
                     os.system(f'rm -rf "{thisdir}/files/{file}"')
             # this happens if program abruptly stops while downloading

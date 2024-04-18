@@ -214,5 +214,5 @@ def halfPrecision_help(self):
 
 def gmfss_help(self):
     self.showDialogBox(
-        f"GMFSS requires CuPy, Install CUDA on your machine via your package manager to use GMFSS."
+        f"GMFSS requires CuPy, please install it via PIP to use GMFSS."
     )
