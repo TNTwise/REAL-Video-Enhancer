@@ -2,7 +2,7 @@ import torch
 from torch.optim import AdamW
 from torch.nn.parallel import DistributedDataParallel as DDP
 from .IFNet_HDv3 import *
-
+import os
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
@@ -44,12 +44,12 @@ class Model:
         if rank <= 0:
             if torch.cuda.is_available():
                 self.flownet.load_state_dict(
-                    convert(torch.load("{}/rife4.14.pkl".format(path))), False
+                    convert(torch.load(os.path.join(path,"rife4.14.pkl"))), False
                 )
             else:
                 self.flownet.load_state_dict(
                     convert(
-                        torch.load("{}/rife4.14.pkl".format(path), map_location="cpu")
+                        torch.load(os.path.join(path,"rife4.14.pkl"), map_location="cpu")
                     ),
                     False,
                 )
