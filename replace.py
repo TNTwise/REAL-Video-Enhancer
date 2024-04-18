@@ -37,5 +37,7 @@ def print_differences(file_path, old_content, new_content):
 
 # Example usage
   # Replace with the path to your file
-replace_linux_paths(sys.argv[1])
+for i in (os.listdir(sys.argv[1])):    
+    if '.py' in i:
+        replace_linux_paths(f'{sys.argv[1]}/{i}')
 

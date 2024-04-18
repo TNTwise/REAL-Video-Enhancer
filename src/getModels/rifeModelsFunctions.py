@@ -75,7 +75,7 @@ def rife_pin_functions(self):
 
 
 def rife_cuda_checkboxes(self):
-    if os.path.exists(f"{thisdir}/models/rife-cuda/"):
+    if os.path.exists(os.path.join(os.path.join(f"{thisdir}",f"models",f"rife-cuda",f""))):
         for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
             if i == "rife46":
                 self.ui.rife46CUDA.setChecked(True)
