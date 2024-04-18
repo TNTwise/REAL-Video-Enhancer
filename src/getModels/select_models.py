@@ -7,7 +7,7 @@ import re
 import src.programData.thisdir
 
 thisdir = src.programData.thisdir.thisdir()
-if os.path.exists(f"{thisdir}/renders/") == False:
+if os.path.exists(os.path.join(f"{thisdir}",f"renders",f"")) == False:
     os.mkdir(f"{thisdir}/renders/")
 from zipfile import ZipFile
 from PyQt5 import QtWidgets
@@ -98,11 +98,11 @@ class Worker(QObject):
                         self.intReady.emit(
                             [int(data_downloaded), total_size_in_bytes]
                         )  # sends back data to main thread# sends back data to main thread
-            if os.path.exists(f"{settings.ModelDir}") == False:
+            if os.path.exists(os.path.join(f"{settings.ModelDir}")) == False:
                 os.mkdir(f"{settings.ModelDir}")
 
             for i in os.listdir(f"{thisdir}/files/"):
-                if os.path.exists(f"{thisdir}/bin/") == False:
+                if os.path.exists(os.path.join(f"{thisdir}",f"bin",f"")) == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
                     os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
@@ -171,7 +171,7 @@ def clear_files():
 
 
 def install_icons(self):
-    if os.path.exists(f"{thisdir}/icons/") == False:
+    if os.path.exists(os.path.join(f"{thisdir}",f"icons",f"")) == False:
         if check_if_online(True):
             try:
                 log("Downloaded Icons")
@@ -356,7 +356,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
 
         def start_main(self):
             for i in os.listdir(f"{thisdir}/files/"):
-                if os.path.exists(f"{thisdir}/bin/") == False:
+                if os.path.exists(os.path.join(f"{thisdir}",f"bin",f"")) == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
                     os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
