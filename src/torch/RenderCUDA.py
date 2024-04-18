@@ -279,7 +279,7 @@ class Interpolation(Render):
                 
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
-
+                print('transition implemented')
                 self.frame += self.interpolation_factor
                 self.transition_frame = self.main.transitionFrames.pop(0)
             else:

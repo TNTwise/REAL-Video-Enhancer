@@ -416,6 +416,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         if (
                             "Rife" in self.ui.AICombo.currentText()
                             and "v4" in self.ui.Rife_Model.currentText()
+                            and 'cuda' not in self.ui.AICombo.currentText().lower()
                         ):
                             self.ui.FPSPreview.setText(f"FPS:")
                             self.ui.FPSFrom.setMinimum(fps)

@@ -93,7 +93,7 @@ def returnModelList(
 
     except Exception as e:
         if self.ui.RifeCheckBox.isChecked():
-            rife_install_list.append("rife-v4.6")
+            rife_install_list.append("rife-v4.15")
 
     install_modules_dict = {}
 
