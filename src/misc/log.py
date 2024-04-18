@@ -24,7 +24,7 @@ try:
 except:
     if len(os.listdir(f"{thisdir}/logs/")) > 4:
         oldest_file = min(
-            os.listdir(f"{thisdir}/logs/"),
+            os.listdir(os.path.join(f"{thisdir}",f"logs",f"")),
             key=lambda x: os.path.getctime(os.path.join(f"{thisdir}/logs/", x)),
         )
         os.remove(f"{thisdir}/logs/{oldest_file}")

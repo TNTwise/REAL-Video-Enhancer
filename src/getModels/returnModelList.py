@@ -69,7 +69,7 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
         items2 = []
         for item in items:
             items2.append(item.replace(".pkl", "").replace(".", ""))
-        for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
+        for i in os.listdir(os.path.join(f"{thisdir}",f"models",f"rife-cuda",f"")):
             if i not in items2:
                 os.system(f'rm -rf "{thisdir}/models/rife-cuda/{i}"')
 

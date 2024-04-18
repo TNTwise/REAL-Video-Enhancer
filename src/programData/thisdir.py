@@ -18,7 +18,6 @@ if operating_system == "Linux":
 if operating_system == "Windows":
     if not os.path.exists(os.path.join(f"{homedir}",r"REAL-Video-Enhancer")):
 	    os.makedirs(os.path.join(f"{homedir}",r"REAL-Video-Enhancer"))
-print(os.path.join("C:\\","Program Files (x86)","REAL-Video-Enhancer"))
         
 def thisdir():
     if operating_system == "Linux":

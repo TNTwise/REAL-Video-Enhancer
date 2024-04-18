@@ -34,7 +34,7 @@ def modelOptions(self):
     self.ui.Rife_Times.clear()
     self.ui.FPSPreview.setText("RES:")
     self.ui.ensembleHelpButton.hide()
-    for i in os.listdir(f"{thisdir}/models/custom_models_ncnn/models/"):
+    for i in os.listdir(os.path.join(f"{thisdir}",f"models",f"custom_models_ncnn",f"models",f"")):
         if "bin" in i:
             self.ui.Rife_Model.addItem(i.replace(".bin", ""))
 

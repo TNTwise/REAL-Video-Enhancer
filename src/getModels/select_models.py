@@ -101,7 +101,7 @@ class Worker(QObject):
             if os.path.exists(os.path.join(os.path.join(os.path.join(f"{settings.ModelDir}")))) == False:
                 os.mkdir(f"{settings.ModelDir}")
 
-            for i in os.listdir(f"{thisdir}/files/"):
+            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
                 if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"bin",f"")))) == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
@@ -151,7 +151,7 @@ class Worker(QObject):
                     with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                         f.extractall(f"{settings.ModelDir}/rife/")
                 handleCUDAModels(i)
-            for i in os.listdir(f"{thisdir}/files/"):
+            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
                 if ".txt" not in i:
                     os.remove(f"{thisdir}/files/{i}")
             self.finished.emit()
@@ -162,7 +162,7 @@ class Worker(QObject):
 
 
 def clear_files():
-    for i in os.listdir(f"{thisdir}/files/"):
+    for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
         if ".txt" not in i:
             try:
                 os.remove(f"{thisdir}/files/{i}")
@@ -273,7 +273,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             try:
                 with open(f"{thisdir}/models.txt", "r") as f:
                     for checkbox, option_name in rife_checkboxes(self):
-                        if option_name in os.listdir(f"{thisdir}/models/rife/"):
+                        if option_name in os.listdir(os.path.join(f"{thisdir}",f"models",f"rife",f"")):
                             checkbox.setChecked(True)
 
                     for i in f.readlines():
@@ -355,7 +355,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui.gbLabel.setText(f"{downloaded_data_gb}/{total_data_gb}GB")
 
         def start_main(self):
-            for i in os.listdir(f"{thisdir}/files/"):
+            for i in os.listdir(os.path.join(f"{thisdir}",f"files",f"")):
                 if os.path.exists(os.path.join(os.path.join(os.path.join(f"{thisdir}",f"bin",f"")))) == False:
                     os.mkdir(f"{thisdir}/bin/")
                 if i == "ffmpeg":
@@ -422,7 +422,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
         if os.path.isfile(f"{settings.ModelDir}/rife/rife-ncnn-vulkan") == True:
             QApplication.closeAllWindows()
         else:
-            for file in os.listdir(f"{thisdir}/files"):
+            for file in os.listdir(os.path.join(f"{thisdir}",f"files")):
                 if ".txt" not in file:
                     os.system(f'rm -rf "{thisdir}/files/{file}"')
             # this happens if program abruptly stops while downloading
