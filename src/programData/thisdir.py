@@ -35,4 +35,4 @@ def thisdir():
         return f"{homedir}/Library/REAL-Video-Enhancer"
     
     if operating_system == "Windows":
-        return os.path.join("C:\\","Program Files (x86)")
+        return os.path.join(os.path.join(f"{homedir}",r"REAL-Video-Enhancer"))
