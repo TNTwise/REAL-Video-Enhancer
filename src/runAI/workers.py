@@ -410,12 +410,13 @@ def frameCountThread(self):
         self.main.vid_resolution = f"{width}x{height}"
         encoder = return_data.returnCodec(self.main.settings.Encoder)
         with open(
-            f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/videos.txt",
+            os.path.join(f"{self.main.settings.RenderDir}",f"{self.main.videoName}_temp","output_frames","videos.txt"),
             "w",
         ) as f:
             for m in range(interpolation_sessions):
+                
                 f.write(
-                    f"file '{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-m}.{return_data.returnContainer(encoder)}'\n"
+                    f"file '{os.path.join(f"{self.main.settings.RenderDir}",f"{self.main.videoName}_temp","output_frames",f"{interpolation_sessions-m}.{return_data.returnContainer(encoder)}")}'\n"
                 )
         if encoder != "copy" and self.main.render == "rife":
             vf = f'-vf "scale=w={width}:h={height},setsar=1"'
@@ -427,7 +428,7 @@ def frameCountThread(self):
                 if (
                     len(
                         os.listdir(
-                            f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/"
+                            os.path.join(f"{self.main.settings.RenderDir}",f"{self.main.videoName}_temp","output_frames","0")
                         )
                     )
                     >= self.main.frame_increments_of_interpolation
@@ -444,7 +445,7 @@ def frameCountThread(self):
                         # total_frames_rendered = frame_count+frame_increments_of_interpolation
                         while j <= total_frames_rendered:
                             if os.path.isfile(
-                                f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}"
+                                 os.path.join(f"{self.main.settings.RenderDir}",f"{self.main.videoName}_temp","output_frames","0",f"{str(increment).zfill(8)}{self.main.settings.Image_Type}")
                             ):  # check if the file exists, prevents rendering issuess
                                 increment += 1
                                 j += 1
@@ -455,7 +456,7 @@ def frameCountThread(self):
                         # Sadly i need this unoptimized check here, otherwise frames can get skipped, i tried my best
                         while j <= self.main.frame_increments_of_interpolation:
                             if os.path.isfile(
-                                f"{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/{str(increment).zfill(8)}{self.main.settings.Image_Type}"
+                                os.path.join(f"{self.main.settings.RenderDir}",f"{self.main.videoName}_temp","output_frames","0",f"{str(increment).zfill(8)}{self.main.settings.Image_Type}")
                             ):  # check if the file exists, prevents rendering issuess
                                 increment += 1
                                 j += 1
@@ -463,8 +464,9 @@ def frameCountThread(self):
                             else:
                                 sleep(0.1)
                     transitionDetectionClass.merge_frames()
+                    
                     os.system(
-                        f'"{thisdir}/bin/ffmpeg" -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)}  {returnCRFFactor(self.main.settings.videoQuality,self.main.settings.Encoder)}  -pix_fmt yuv420p  "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/{interpolation_sessions-iteration}.{return_data.returnContainer(self.main.settings.Encoder)}"  -y'
+                        f'"{os.path.join(f"{thisdir}","bin","ffmpeg")}" -start_number {self.main.frame_increments_of_interpolation*iteration} -framerate {self.main.fps*self.main.times} -i "{self.main.settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/%08d{self.main.settings.Image_Type}" {vf}  -frames:v  {self.main.frame_increments_of_interpolation} -c:v {return_data.returnCodec(self.main.settings.Encoder)}  {returnCRFFactor(self.main.settings.videoQuality,self.main.settings.Encoder)}  -pix_fmt yuv420p  "{os.path.join({self.main.settings.RenderDir},f"{self.main.videoName}_temp","output_frames",f"{interpolation_sessions-iteration}.{return_data.returnContainer(self.main.settings.Encoder)}")}"  -y'
                     )
                     iteration += 1
                     if iteration == interpolation_sessions:

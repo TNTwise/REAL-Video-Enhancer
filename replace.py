@@ -13,7 +13,8 @@ def replace_linux_paths(file_path):
     for line in content:
         
         if 'with open' in line:
-            pattern = r'\((.*?)\)'
+            print(file_path,line)
+            '''pattern = r'\((.*?)\)'
 
             matches = re.findall(pattern, line)
     
@@ -26,7 +27,7 @@ def replace_linux_paths(file_path):
 
         replaced_content.append(line)
     with open(file_path, 'w') as f:
-        f.writelines(replaced_content)
+        f.writelines(replaced_content)'''
 def print_differences(file_path, old_content, new_content):
     # Compute the differences between the original and modified content
     diff = difflib.unified_diff(old_content.splitlines(), new_content.splitlines(), lineterm='')

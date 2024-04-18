@@ -18,6 +18,8 @@ current_time = datetime.datetime.today().strftime("%Y-%m-%d:%H:%M:%S")
 from src.programData.thisdir import thisdir
 
 thisdir = thisdir()
+with open(os.path.join(f"{thisdir}","logs",f"log_{current_time}.txt"), "w") as f:
+    f.write(" ")
 try:
     os.mkdir(f"{thisdir}/logs/")
 
@@ -40,7 +42,7 @@ def log(log):
         # Initialize count if the error is encountered for the first time
         error_count.append(log)
 
-        with open(f"{thisdir}/logs/log_{current_time}.txt", "a") as f:
+        with open(os.path.join(f"{thisdir}","logs",f"log_{current_time}.txt"), "a") as f:
             f.write(str(log) + "\n")
 
 
