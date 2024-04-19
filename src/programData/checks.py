@@ -16,6 +16,15 @@ import traceback
 
 
 def check_if_models_exist(thisdir):
+    """
+    Checks if essential models required by the program exist.
+
+    Args:
+        thisdir (str): Path to the directory.
+
+    Returns:
+        bool: True if all models exist, False otherwise.
+    """
     if (
         os.path.exists(f"{thisdir}/models/")
         and os.path.exists(f"{thisdir}/models/rife/")
@@ -27,7 +36,17 @@ def check_if_models_exist(thisdir):
         return False
 
 
-def check_if_online(dont_check=False,url="https://raw.githubusercontent.com/"):
+def check_if_online(dont_check=False, url="https://raw.githubusercontent.com/"):
+    """
+    Checks if the system is connected to the internet.
+
+    Args:
+        dont_check (bool, optional): If True, won't show a message box when offline. Defaults to False.
+        url (str, optional): URL to check for internet connectivity. Defaults to "https://raw.githubusercontent.com/".
+
+    Returns:
+        bool: True if online, False otherwise.
+    """
     online = False
     try:
         requests.get(url)
@@ -36,7 +55,7 @@ def check_if_online(dont_check=False,url="https://raw.githubusercontent.com/"):
         traceback_info = traceback.format_exc()
         log(f"ERROR: {e} {traceback_info}")
         log(f"{e}")
-        if dont_check == False:
+        if not dont_check:
             msg = QMessageBox()
             msg.setWindowTitle(" ")
             msg.setText(
@@ -49,21 +68,56 @@ def check_if_online(dont_check=False,url="https://raw.githubusercontent.com/"):
 
 
 def check_if_free_space(RenderDir):
+    """
+    Checks the free space on the disk.
+
+    Args:
+        RenderDir (str): Path to the directory to check for free space.
+
+    Returns:
+        int: Amount of free space in bytes.
+    """
     return shutil.disk_usage(f"{RenderDir}").free
 
 
 def check_if_enough_space_for_install(size_in_bytes):
+    """
+    Checks if there's enough free space on the disk for installation.
+
+    Args:
+        size_in_bytes (int): Size of the data to be installed in bytes.
+
+    Returns:
+        bool: True if enough space, False otherwise.
+    """
     free_space = shutil.disk_usage(f"{thisdir}").free
     return free_space > size_in_bytes
 
 
 def check_if_flatpak():
+    """
+    Checks if the application is running within Flatpak environment.
+
+    Returns:
+        bool: True if running in Flatpak, False otherwise.
+    """
     if "FLATPAK_ID" in os.environ:
         return True
     return False
 
 
 def check_if_enough_space_output_disk(input_file, render, times):
+    """
+    Checks if there's enough space on the output disk for processing.
+
+    Args:
+        input_file (str): Path to the input file.
+        render (str): Type of rendering.
+        times (int): Interpolation factor.
+
+    Returns:
+        tuple: A tuple containing a boolean indicating if enough space, required size, and available space in GB.
+    """
     settings = Settings()
     img_type = settings.Image_Type
     if img_type == ".jpg":
@@ -76,23 +130,16 @@ def check_if_enough_space_output_disk(input_file, render, times):
     frame_count = VideoName.return_video_frame_count(input_file)
     resolution_multiplier = math.ceil(resolution[1] * resolution[0])
 
-    # 1080p = 1, make adjustments for other resolutions
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.OutputDir)
     if settings.RenderType == "Classic":
-        # calculates the anount of storage necessary for the original extraction, in bits
-
-        # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == "esrgan":
             rnd = round(resolution * 0.001)
-
             full_size = full_extraction_size * times * rnd
-
             return full_size < free_space, full_size / (1024**3), free_space / (1024**3)
 
         if render == "rife":
             full_size = full_extraction_size * times
-
             return full_size < free_space, full_size / (1024**3), free_space / (1024**3)
     else:
         return (
@@ -103,6 +150,17 @@ def check_if_enough_space_output_disk(input_file, render, times):
 
 
 def check_if_enough_space(input_file, render, times):
+    """
+    Checks if there's enough space on the rendering disk for processing.
+
+    Args:
+        input_file (str): Path to the input file.
+        render (str): Type of rendering.
+        times (int): Interpolation factor.
+
+    Returns:
+        tuple: A tuple containing a boolean indicating if enough space, required size, and available space in GB.
+    """
     settings = Settings()
     img_type = settings.Image_Type
     if img_type == ".jpg":
@@ -115,15 +173,9 @@ def check_if_enough_space(input_file, render, times):
     frame_count = VideoName.return_video_frame_count(input_file)
     resolution_multiplier = math.ceil(resolution[1] * resolution[0])
 
-    # 1080p = 1, make adjustments for other resolutions
-    log(f"{resolution_multiplier} {frame_count}  {multiplier}  ")
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.RenderDir)
     if settings.RenderType == "Classic":
-        # calculates the anount of storage necessary for the original extraction, in bits
-        log(f"{full_extraction_size} KB")
-
-        # add full_extraction_size to itself times the multiplier of the interpolation amount for rife
         if render == "esrgan":
             rnd = round(resolution * 0.001)
             if rnd < 1:
@@ -165,6 +217,12 @@ def check_if_enough_space(input_file, render, times):
 
 
 def check_for_individual_models():
+    """
+    Checks for individual models in the program directory.
+
+    Returns:
+        list: List of available models.
+    """
     return_list = []
     if os.path.exists(f"{thisdir}/models/"):
         if os.path.exists(f"{thisdir}/models/rife/"):
@@ -194,6 +252,12 @@ def check_for_individual_models():
 
 
 def check_for_each_binary():
+    """
+    Checks for required binaries in the program directory.
+
+    Returns:
+        bool: True if all binaries exist, False otherwise.
+    """
     if (
         os.path.isfile(f"{thisdir}/bin/ffmpeg")
         and os.path.isfile(f"{thisdir}/bin/yt-dlp_linux")
@@ -204,6 +268,16 @@ def check_for_each_binary():
 
 
 def check_for_updated_binary(binary, returnVersion=False):
+    """
+    Checks for updated binary.
+
+    Args:
+        binary (str): Name of the binary.
+        returnVersion (bool, optional): If True, returns the version of the binary. Defaults to False.
+
+    Returns:
+        bool: True if binary is updated, False otherwise.
+    """
     try:
         import hashlib
     except Exception as e:
@@ -225,7 +299,6 @@ def check_for_updated_binary(binary, returnVersion=False):
         ]
         log(f"Current sha256 rife: {CURRENTrifencnnvulkansha256}")
         log(f"New sha256 rife: {NEWrifencnnvulkansha256list[-1]}")
-        # this is to check version, like this version will support up to 4.14-lite
         if returnVersion:
             if CURRENTrifencnnvulkansha256 in NEWrifencnnvulkansha256list:
                 return 1

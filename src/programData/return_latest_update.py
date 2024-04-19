@@ -10,6 +10,9 @@ def return_latest_git_ver(url):
 
 
 class return_latest(QObject):
+    """
+    Returns latest version of stable and beta versions
+    """
     finished = pyqtSignal()
     progress = pyqtSignal(list)
 
@@ -33,4 +36,4 @@ class return_latest(QObject):
                 pass
         else:
             self.finished.emit()
-            return "why"
+            return None

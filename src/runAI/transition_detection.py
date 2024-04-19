@@ -26,35 +26,52 @@ class TransitionDetection:
         self.input_file = originalSelf.input_file
         self.videoName = originalSelf.videoName
 
-        # self.main = originalSelf
         self.thisdir = src.programData.thisdir.thisdir()
         self.fps = originalSelf.fps
         self.full_render_dir = f"{self.render_directory}/{self.videoName}_temp"
-        self.main = originalSelf
+        self.times = originalSelf.times
         ManageFiles.create_folder(f"{self.full_render_dir}")
         ManageFiles.create_folder(f"{self.full_render_dir}/transitions")
         # Change scene\,0.6 to edit how much scene detections it does, do this for both ffmpeg commands
 
     def find_timestamps(self):
+        """
+        Find timestamps and save images of transitions to copy back into original frame folder
+
+        This is written really poorly lmao, but it works :)
+        """
+
+
+
         if self.settings.SceneChangeDetectionMode.lower() == "enabled":
             os.system(f'mkdir -p "{self.full_render_dir}/transitions/"')
 
             if self.settings.SceneChangeMethod == "ffmpeg":
                 # This will get the timestamps of the scene changes, and for every scene change timestamp, i can times it by the fps count to get its current frame, and after interpolation, double it and replace it and it -1 frame with the transition frame stored in the transitions folder
 
-                # self.main.addLinetoLogs('Detecting Transitions')
 
                 if (
                     self.settings.Image_Type == ".jpg"
                     or self.settings.Image_Type == ".png"
                 ):
-                    ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 1 "{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"'
+                    ffmpeg_cmd = [f"{thisdir}/bin/ffmpeg",
+                                   "-i",
+                                   f"{self.input_file}",
+                                     f"-filter_complex",
+                                     f"select=\'gt(scene\\,{self.settings.SceneChangeDetection})\',metadata=print",
+                                     "-vsync",
+                                     "vfr",
+                                     "-q:v",
+                                     "1",
+                                     ]
                 if self.settings.Image_Type == ".webp":
-                    ffmpeg_cmd = f'"{thisdir}/bin/ffmpeg" -i "{self.input_file}" -filter_complex "select=\'gt(scene\\,{self.settings.SceneChangeDetection})\',metadata=print" -vsync vfr -q:v 100 "{self.full_render_dir}/transitions/%07d.png"'
+                    ffmpeg_cmd.append(f"{self.full_render_dir}/transitions/%07d.png")
+                else:
+                    ffmpeg_cmd.append(f"{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}")
+
                 output = subprocess.check_output(
-                    ffmpeg_cmd, shell=True, stderr=subprocess.STDOUT
+                    ffmpeg_cmd, shell=False, stderr=subprocess.STDOUT
                 )
-                # self.main.addLinetoLogs(f'Transitions detected: {len(os.listdir(f"{self.full_render_dir}/transitions/"))}')
                 # Decode the output as UTF-8 and split it into lines
                 output_lines = output.decode("utf-8").split("\n")
                 # Create a list to store the timestamps
@@ -68,7 +85,7 @@ class TransitionDetection:
                         timestamps.append(
                             math.ceil(
                                 round(float(timestamp) * float(self.fps))
-                                * self.main.times
+                                * self.times
                             )
                         )
                 self.timestamps = timestamps
@@ -80,7 +97,7 @@ class TransitionDetection:
                 frame_nums = detect(f"{self.input_file}", ContentDetector())
                 cap = cv2.VideoCapture(f"{self.input_file}")
                 for i, scene in enumerate(frame_nums):
-                    num = math.ceil(scene[0].get_frames() * self.main.times)
+                    num = math.ceil(scene[0].get_frames() * self.times)
                     if num != 0:
                         timestamps.append(num)
 
@@ -88,8 +105,7 @@ class TransitionDetection:
                         ret, frame = cap.read()
                         if ret:
                             if (
-                                settings.Image_Type == ".jpg"
-                                or settings.Image_Type == ".png"
+                                settings.Image_Type != ".webp"
                             ):
                                 output_file = f"{self.full_render_dir}/transitions/{i:07d}{self.settings.Image_Type}"
                             else:
@@ -111,7 +127,7 @@ class TransitionDetection:
                 if not os.path.exists(f"{self.full_render_dir}/transitions/temp/"):
                     os.mkdir(f"{self.full_render_dir}/transitions/temp/")
                 for iteration, i in enumerate(transitions):
-                    if settings.Image_Type == ".jpg" or settings.Image_Type == ".png":
+                    if settings.Image_Type != ".webp":
                         # os.system(f'"{thisdir}/bin/ffmpeg" -i "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" -pix_fmt yuv444p "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"')
                         os.system(
                             f'mv "{self.full_render_dir}/transitions/{str(str(iteration+1).zfill(7))}{settings.Image_Type}" "{self.full_render_dir}/transitions/temp/{self.timestamps[iteration]}{settings.Image_Type}"'

@@ -9,23 +9,28 @@ thisdir = src.programData.thisdir.thisdir()
 
 class Fps:
     def return_video_fps(videopath):
+        """Returns the frames per second (FPS) of the video."""
         video = cv2.VideoCapture(rf"{videopath}")
         return video.get(cv2.CAP_PROP_FPS)
 
 
 class VideoName:
     def return_video_name(videopath):
+        """Returns the name of the video file."""
         return os.path.basename(videopath)
 
     def return_video_framerate(videopath):
+        """Returns the frame rate of the video."""
         video = cv2.VideoCapture(videopath)
         return video.get(cv2.CAP_PROP_FPS)
 
     def return_video_frame_count(videopath):
+        """Returns the total number of frames in the video."""
         video = cv2.VideoCapture(videopath)
         return video.get(cv2.CAP_PROP_FRAME_COUNT)
 
     def return_video_resolution(videopath):
+        """Returns the resolution (width and height) of the video."""
         video = cv2.VideoCapture(videopath)
         width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -34,29 +39,26 @@ class VideoName:
 
 class ManageFiles:
     def create_folder(folderpath):
+        """Creates a folder if it doesn't exist."""
         if os.path.exists(folderpath) == False:
             os.system(f'mkdir -p "{folderpath}"')
 
     def create_file(filepath):
+        """Creates a file if it doesn't exist."""
         if os.path.isfile(filepath) == False:
             os.system(f'touch "{filepath}"')
 
     def isfile(filepath):
+        """Checks if a file exists."""
         return os.path.isfile(filepath)
 
     def isfolder(folderpath):
+        """Checks if a folder exists."""
         return os.path.exists(folderpath)
 
 
-def read_vram(card):
-    return 2
-
-
-def get_vram_amount():
-    return 2
-
-
 def ceildiv(a, b):
+    """Returns the ceiling of the division of two numbers."""
     return -(a // -b)
 
 
@@ -64,6 +66,7 @@ import multiprocessing
 
 
 def returnCodec(codec):
+    """Returns the codec based on the given codec type."""
     if codec == "264":
         return "libx264"
     if codec == "265":
@@ -83,6 +86,7 @@ def returnCodec(codec):
 
 
 def returnCRFFactor(crffactor, encoder):
+    """Returns the Constant Rate Factor (CRF) factor based on the encoder and CRF factor."""
     if "av1" in encoder:
         log("av1 crf")
         crf = int(crffactor) + 12
@@ -137,6 +141,7 @@ pair these to quality settings
 
 
 def returnContainer(codec):
+    """Returns the container format based on the codec."""
     if "264" in codec or codec == "libx264":
         return "mp4"
     if "265" in codec or codec == "libx265":
@@ -154,6 +159,10 @@ def returnContainer(codec):
 
 
 def returnOperatingSystem():
+    """
+    Returns the current operating system that the program is running on.
+    Instead of Darwin, it will return MacOS.
+    """
     operating_system = platform.system()
     if operating_system == "Darwin":
         return "MacOS"

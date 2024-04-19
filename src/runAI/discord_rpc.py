@@ -24,6 +24,9 @@ def time_limit(seconds):
 
 
 def start_discordRPC(self, mode="Interpolating"):
+    """
+    Attempts to connect to discord for RPC support
+    """
     try:
         with time_limit(2):
             client_id = "1120814311246405743"  # ID for rpc

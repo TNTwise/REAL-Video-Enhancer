@@ -3,6 +3,9 @@ from time import sleep
 
 
 def convertTime(remaining_time):
+    """
+    Converts seconds to hours, minutes and seconds
+    """
     hours = remaining_time // 3600
     remaining_time -= 3600 * hours
     minutes = remaining_time // 60
@@ -16,6 +19,14 @@ def convertTime(remaining_time):
 
 
 def calculateETA(self):
+    """
+    Calculates ETA
+
+    Gets the time for every frame rendered by taking the 
+    elapsed time / completed iterations (files)
+    remaining time = remaining iterations (files) * time per iteration
+    
+    """
     completed_iterations = int(self.files_processed)
 
     # Estimate the remaining time

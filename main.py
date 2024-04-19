@@ -113,7 +113,6 @@ from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *
 from PIL import Image
-import src.runAI.FPS as FPS
 
 
 class FileDropWidget(QLabel):
@@ -499,9 +498,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     total_input_files = fc / self.times
                     total_output_files = fc
                     self.ui.RifePB.setMaximum(total_output_files)
-                    # self.ui.QueueButton.show()
-                    # fpsThread = Thread(target=lambda: FPS.runRenderFPSThread(self))
-                    # fpsThread.start()
 
                     self.original_filecount = (
                         self.filecount / self.times
@@ -914,31 +910,30 @@ class MainWindow(QtWidgets.QMainWindow):
         if "cuda" in self.AI:
             while self.CudaRenderFinished == False:
                 sleep(1)
-        if len(self.QueueList) == 0:
-            self.file_drop_widget.show()
-            self.ui.QueueListWidget.hide()
-            try:
-                self.RPC.clear(pid=os.getpid())
-            except:
-                pass
-            self.ui.RifePause.hide()
-            self.ui.RifeResume.hide()
-            self.ui.QueueButton.hide()
-            self.ui.centerLabel.show()
+        self.file_drop_widget.show()
+        self.ui.QueueListWidget.hide()
+        try:
+            self.RPC.clear(pid=os.getpid())
+        except:
+            pass
+        self.ui.RifePause.hide()
+        self.ui.RifeResume.hide()
+        self.ui.QueueButton.hide()
+        self.ui.centerLabel.show()
 
-            self.addLinetoLogs(f"Finished! Output video: {self.output_file}")
-            self.setDisableEnable(False)
-            self.ui.RifePB.setValue(self.ui.RifePB.maximum())
-            self.ui.ETAPreview.setText("ETA: 00:00:00")
-            self.ui.imagePreview.clear()
+        self.addLinetoLogs(f"Finished! Output video: {self.output_file}")
+        self.setDisableEnable(False)
+        self.ui.RifePB.setValue(self.ui.RifePB.maximum())
+        self.ui.ETAPreview.setText("ETA: 00:00:00")
+        self.ui.imagePreview.clear()
 
-            self.ui.imageSpacerFrame.show()
+        self.ui.imageSpacerFrame.show()
 
-            remaining_time = int(time.time() - self.start_time)
+        remaining_time = int(time.time() - self.start_time)
 
-            hours, minutes, seconds = convertTime(remaining_time)
+        hours, minutes, seconds = convertTime(remaining_time)
 
-            self.addLinetoLogs(f"Total Time: {hours}:{minutes}:{seconds}")
+        self.addLinetoLogs(f"Total Time: {hours}:{minutes}:{seconds}")
 
     def showDialogBox(self, message, displayInfoIcon=False):
         icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Info.png")

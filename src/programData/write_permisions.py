@@ -7,20 +7,25 @@ thisdir = src.programData.thisdir.thisdir()
 
 
 def check_for_write_permissions(dir):
+    """
+    Checks for write permissions in the current directory.
+
+    Also reads the flatpak-info file to see if the directory is in the current allowed r/w dirs.
+    Args:
+        - the directory to check if permissions are in
+    """
+
+
     i = 2  # change this to 1 to debug flatpak
     if "FLATPAK_ID" in os.environ or i == 1:
         import subprocess
 
-        command = f"cat /.flatpak-info"  # this is for actual flatpak
-        # command = 'flatpak info --show-permissions io.github.tntwise.REAL-Video-Enhancer'
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        output = result.stdout.split("\n")
-        output_2 = []
-        for i in output:
-            if len(i) > 0 and i != "\n":
-                output_2.append(i)
+        with open("/.flatpak-info", 'r') as f:
+            result = f.readlines()
+        
+        
         directories_with_permissions = []
-        for i in output_2:
+        for i in result:
             if "filesystems=" in i:
                 i = i.split(";")
                 s = []
@@ -49,8 +54,7 @@ def check_for_write_permissions(dir):
                 return True
             else:
                 if "/run/user/1000/doc/" in dir:
-                    dir = dir.replace("/run/user/1000/doc/", "")
-                    dir = dir.split("/")
+                    dir = dir.replace("/run/user/1000/doc/", "").split("/")
                     permissions_dir = ""
                     for index in range(len(dir)):
                         if index != 0:

@@ -18,6 +18,11 @@ if operating_system == "Linux":
 
 
 def thisdir():
+
+    """
+    Sets the current working directory for the app
+    """
+
     if operating_system == "Linux":
         if flatpak == True:
             if (

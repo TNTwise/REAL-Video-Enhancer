@@ -1,6 +1,5 @@
 from src.programData.settings import *
 from src.misc.messages import *
-import src.queue.queue as queue
 import src.programData.checks as checks
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
