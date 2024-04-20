@@ -269,7 +269,8 @@ def onApplicationStart(self):
     thisdir = src.programData.thisdir.thisdir()
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
-
+        
+    os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)

@@ -658,56 +658,45 @@ class interpolation(QObject):
                     self.main.encoder,
                 )
                 log("After output")
-        if self.main.AI == "rife-cuda":
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            self.main.renderAI = RenderCUDA.Interpolation(
-                self.main,
-                "rife",
-                self.main.input_file,
-                output_file,
-                self.main.ui.Rife_Model.currentText(),
-                self.main.times,
-                self.main.ui.EnsembleCheckBox.isChecked(),
-                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-            )
-            self.main.renderAI.extractFramesToBytes()
-            readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procInterpThread)
-            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
-            readThread1.start()
-            procThread1.start()
-            renderThread1.start()
-            self.main.renderAI.log()
-            # logThread1.start()
-            self.main.output_file = output_file
+        if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
+            if self.main.AI == "rife-cuda":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Interpolation(
+                    self.main,
+                    "rife",
+                    self.main.input_file,
+                    output_file,
+                    self.main.ui.Rife_Model.currentText(),
+                    self.main.times,
+                    self.main.ui.EnsembleCheckBox.isChecked(),
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                )
+                
 
-        if self.main.AI == "gmfss-cuda":
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            self.main.renderAI = RenderCUDA.Interpolation(
-                self.main,
-                "gmfss",
-                self.main.input_file,
-                output_file,
-                self.main.ui.Rife_Model.currentText(),
-                self.main.times,
-                self.main.ui.EnsembleCheckBox.isChecked(),
-                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-            )
+            if self.main.AI == "gmfss-cuda":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Interpolation(
+                    self.main,
+                    "gmfss",
+                    self.main.input_file,
+                    output_file,
+                    self.main.ui.Rife_Model.currentText(),
+                    self.main.times,
+                    self.main.ui.EnsembleCheckBox.isChecked(),
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procInterpThread)
             renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
             readThread1.start()
             procThread1.start()
             renderThread1.start()
             self.main.renderAI.log()
-            # logThread1.start()
             self.main.output_file = output_file
 
         log("Done")
@@ -887,103 +876,94 @@ class upscale(QObject):
                 else:
                     pass
 
-        if self.main.AI == "realesrgan-cuda":
-            model_path = handleModel(self.main.AI)
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            self.main.renderAI = RenderCUDA.Upscaling(
-                self.main,
-                self.main.input_file,
-                output_file,
-                int(self.main.ui.Rife_Times.currentText()[0]),
-                model_path,
-                bool(settings.HalfPrecision),
-            )
-            self.main.renderAI.extractFramesToBytes()
-            readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
-            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
-            readThread1.start()
-            procThread1.start()
-            renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+        if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
+            if self.main.AI == "realesrgan-cuda":
+                model_path = handleModel(self.main.AI)
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model_path,
+                    bool(settings.HalfPrecision),
+                )
+                
+            if self.main.AI == "custom-models-cuda":
+                model_path = handleModel(
+                    self.main.AI, self.main.ui.Rife_Model.currentText()
+                )
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model_path,
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                )
+                
 
-            self.main.output_file = output_file
-        if self.main.AI == "custom-models-cuda":
-            model_path = handleModel(
-                self.main.AI, self.main.ui.Rife_Model.currentText()
-            )
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            self.main.renderAI = RenderCUDA.Upscaling(
-                self.main,
-                self.main.input_file,
-                output_file,
-                int(self.main.ui.Rife_Times.currentText()[0]),
-                model_path,
-                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-            )
-            self.main.renderAI.extractFramesToBytes()
-            readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
-            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
-            readThread1.start()
-            procThread1.start()
-            renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-
-            self.main.output_file = output_file
-
-        if self.main.AI == "realesrgan-ncnn-python-cuda":
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            if self.main.ui.Rife_Model.currentText() == "Animation":
-                model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}")
-            else:
-                model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"{self.main.ui.Rife_Model.currentText()}")
-            self.main.renderAI = RenderCUDA.Upscaling(
-                self.main,
-                self.main.input_file,
-                output_file,
-                int(self.main.ui.Rife_Times.currentText()[0]),
-                model,
-                bool(settings.HalfPrecision),
-                method=self.main.AI,
-                threads=int(settings.VRAM),
-            )
-            self.main.renderAI.extractFramesToBytes()
-            readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
-            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
-            readThread1.start()
-            procThread1.start()
-            renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-
-            self.main.output_file = output_file
-        if self.main.AI == "realsr-ncnn-python-cuda":
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
+            if self.main.AI == "realesrgan-ncnn-python-cuda":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                if self.main.ui.Rife_Model.currentText() == "Animation":
+                    model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}")
+                else:
+                    model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"{self.main.ui.Rife_Model.currentText()}")
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model,
+                    bool(settings.HalfPrecision),
+                    method=self.main.AI,
+                    threads=int(settings.VRAM),
+                )
+                
             
-            model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
-            
-            self.main.renderAI = RenderCUDA.Upscaling(
-                self.main,
-                self.main.input_file,
-                output_file,
-                int(self.main.ui.Rife_Times.currentText()[0]),
-                model,
-                bool(settings.HalfPrecision),
-                method=self.main.AI,
-                threads=int(settings.VRAM),
-            )
+            if self.main.AI == "realsr-ncnn-python-cuda":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                
+                model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
+                
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model,
+                    bool(settings.HalfPrecision),
+                    method=self.main.AI,
+                    threads=int(settings.VRAM),
+                )
+                
+            if self.main.AI == "custom-models-ncnn-python-cuda":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                
+                model = os.path.join(f"{settings.ModelDir}","custom_models_ncnn",f"models",f"{self.main.ui.Rife_Model.currentText()}")
+                
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model,
+                    bool(settings.HalfPrecision),
+                    method=self.main.AI,
+                    threads=int(settings.VRAM),
+                )
+                
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
@@ -992,37 +972,9 @@ class upscale(QObject):
             readThread1.start()
             procThread1.start()
             renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
-
+            self.main.renderAI.log()
             self.main.output_file = output_file
-        if self.main.AI == "custom-models-ncnn-python-cuda":
-            output_file = returnOutputFile(
-                self.main, self.main.videoName, self.main.encoder
-            )
-            
-            model = os.path.join(f"{settings.ModelDir}","custom_models_ncnn",f"models",f"{self.main.ui.Rife_Model.currentText()}")
-            
-            self.main.renderAI = RenderCUDA.Upscaling(
-                self.main,
-                self.main.input_file,
-                output_file,
-                int(self.main.ui.Rife_Times.currentText()[0]),
-                model,
-                bool(settings.HalfPrecision),
-                method=self.main.AI,
-                threads=int(settings.VRAM),
-            )
-            self.main.renderAI.extractFramesToBytes()
-            readThread1 = Thread(target=self.main.renderAI.readThread)
-            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
-            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
-            # logThread1 = Thread(target=self.main.renderAI.log)
-            readThread1.start()
-            procThread1.start()
-            renderThread1.start()
-            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
-            self.main.output_file = output_file
         log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()

@@ -55,6 +55,7 @@ def modelOptions(self):
         if "ensemble" not in i:
             models.append(i)
     models.sort()
+    self.ui.EnsembleCheckBox.show()
     if len(self.get_models_from_dir("rife")) > 0:
         self.ui.Rife_Model.addItems(models)
         model_list = []
@@ -74,6 +75,7 @@ def modelOptions(self):
             model_list = []
             for model in models:
                 if "ensemble" in model:
+                    
                     pass
                 else:
                     model_list.append(model)
