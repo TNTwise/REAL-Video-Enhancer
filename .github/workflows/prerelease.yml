@@ -60,9 +60,13 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get latest version
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
-        
+      - name: install libomp
+        run: |
+         sudo apt install -y libomp5 libvulkan-dev -y
+         cd /usr/lib
+         sudo ln -s libomp.so libomp.so.5
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel torch torchvision && sudo apt install libnotify-bin -y  &&  pip install --force --no-cache --pre --extra-index-url https://marcelotduarte.github.io/packages/ cx_Freeze
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl sympy PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel torch torchvision && sudo apt install libnotify-bin -y  &&  pip install --force --no-cache --pre --extra-index-url https://marcelotduarte.github.io/packages/ cx_Freeze
         
       - name: Compile to executable
         run: cd REAL-Video-Enhancer && make
@@ -188,7 +192,7 @@ jobs:
              hours=$((time_difference / 3600)) # Convert seconds to hours
              git log --since="$hours hours ago" --pretty=format:"%h - %s" >> ../output.log
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt  
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt  && python3 -m pip install https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20/upscale_ncnn_py-1.2.0-cp311-none-macosx_11_0_universal2.whl
         
       - name: Compile to executable
         run: |
@@ -271,7 +275,7 @@ jobs:
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
         
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt && python3 -m pip uninstall PyQt5 -y && python3 -m  pip install py-notifier notify2 pillow python-magic testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil PyQt5==5.12 loguru sympy && sudo apt install libnotify-bin -y 
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt && python3 -m pip uninstall PyQt5 -y && python3 -m  pip install sympy https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20/upscale_ncnn_py-1.2.0-cp38-none-manylinux1_x86_64.whl py-notifier notify2 pillow python-magic testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil PyQt5==5.12 loguru sympy && sudo apt install libnotify-bin -y 
         
       - name: Compile to executable
         run: cd REAL-Video-Enhancer && make
