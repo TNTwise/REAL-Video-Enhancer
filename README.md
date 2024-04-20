@@ -63,6 +63,7 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
   <li> <a rel="noopener noreferrer" href="https://github.com/bilibili/ailab/tree/main/Real-CUGAN" target="_blank" >REAL-Cugan</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter (For CUDA implementation code)</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/Final2x/realesrgan-ncnn-py" target="_blank">RealESRGAN NCNN python </a></li>
   
 </ul>
 
