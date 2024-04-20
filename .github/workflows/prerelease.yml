@@ -1,4 +1,4 @@
-softprops/action-gh-release@v1
+
 name: build-prerelease
 
 # Controls when the workflow will run
