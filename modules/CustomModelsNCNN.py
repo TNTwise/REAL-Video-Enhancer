@@ -59,5 +59,5 @@ def modelOptions(self):
     self.ui.Rife_Model.setEnabled(True)
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
     self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(self, "custom-models-ncnn-vulkan")
+        lambda: upscale.start_upscale(self, "custom-models-ncnn-python-cuda")
     )

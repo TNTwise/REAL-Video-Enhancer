@@ -15,25 +15,7 @@ from src.programData.write_permisions import *
 import traceback
 
 
-def check_if_models_exist(thisdir):
-    """
-    Checks if essential models required by the program exist.
 
-    Args:
-        thisdir (str): Path to the directory.
-
-    Returns:
-        bool: True if all models exist, False otherwise.
-    """
-    if (
-        os.path.exists(f"{thisdir}/models/")
-        and os.path.exists(f"{thisdir}/models/rife/")
-        and os.path.exists(f"{thisdir}/models/realesrgan/")
-        and os.path.exists(f"{thisdir}/models/waifu2x/")
-    ):
-        return True
-    else:
-        return False
 
 
 def check_if_online(dont_check=False, url="https://raw.githubusercontent.com/"):

@@ -2,7 +2,7 @@ from src.programData.settings import *
 from src.misc.messages import *
 import src.programData.checks as checks
 from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtGui import QDesktopServices,QIntValidator, QIcon
 import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
@@ -125,7 +125,6 @@ def bindButtons(self):
 
     self.ui.Input_video_rife_url.clicked.connect(lambda: get_linked_video(self))
     self.ui.VidQualityCombo.currentIndexChanged.connect(lambda: selVidQuality(self))
-    self.ui.QueueButton.clicked.connect(lambda: queue.addToQueue(self))
     self.ui.defaultRifeModel.currentIndexChanged.connect(
         lambda: settings.change_setting(
             "DefaultRifeModel", f"{self.ui.defaultRifeModel.currentText()}"
@@ -271,20 +270,15 @@ def onApplicationStart(self):
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
 
-    from PyQt5.QtGui import QIntValidator, QIcon
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
     hideChainModeButtons(self)
     # get esrgan models
-    if not (self.ui.CustomModelsNCNNCheckBox.isChecked()):
-        self.ui.ESRGANModelSelectButton.hide()
-        self.ui.label_20.hide()
-        self.ui.esrganHelpModel.hide()
-    else:
-        self.ui.ESRGANModelSelectButton.show()
-        self.ui.label_20.show()
-        self.ui.esrganHelpModel.show()
+    
+    self.ui.ESRGANModelSelectButton.show()
+    self.ui.label_20.show()
+    self.ui.esrganHelpModel.show()
     self.input_file = ""
 
     self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))
@@ -366,10 +360,9 @@ def set_model_params(self):
         if "IFRNET" == i:
             self.ui.CainCheckBox.setChecked(True)
             self.model_labels["IFRNET"] = "interpolation"
-        if "Custom NCNN Models" == i:
-            if len(os.listdir(f"{thisdir}/models/custom_models_ncnn/models/")) > 0:
+    
+    if len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
                 self.model_labels["Custom NCNN models"] = "upscaling"
-            self.ui.CustomModelsNCNNCheckBox.setChecked(True)
     # not efficient but im lazy so cry abt it
     # placeholder
     if torch_version == True:
