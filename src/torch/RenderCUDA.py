@@ -316,9 +316,9 @@ class Upscaling(Render):
         self.method = method
         self.resIncrease = resIncrease
         self.threads = threads
-
-    def procUpscaleThread(self):
         self.frame = 0
+        self.handleModel()
+    def handleModel(self):
         if "cuda" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleCUDA(
                 self.originalWidth, self.originalHeight, self.model_path, self.half
@@ -327,6 +327,9 @@ class Upscaling(Render):
             self.upscaleMethod = UpscaleNCNN(
                 model=self.model_path, num_threads=self.threads, scale=self.resIncrease
             )
+    def procUpscaleThread(self):
+        
+        
         while True:
             frame = self.readBuffer.get()
 

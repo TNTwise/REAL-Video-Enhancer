@@ -967,6 +967,34 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
+        if self.main.AI == "realsr-ncnn-python-cuda":
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
+            
+            model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
+            
+            self.main.renderAI = RenderCUDA.Upscaling(
+                self.main,
+                self.main.input_file,
+                output_file,
+                int(self.main.ui.Rife_Times.currentText()[0]),
+                model,
+                bool(settings.HalfPrecision),
+                method=self.main.AI,
+                threads=int(settings.VRAM),
+            )
+            self.main.renderAI.extractFramesToBytes()
+            readThread1 = Thread(target=self.main.renderAI.readThread)
+            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
+            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+            # logThread1 = Thread(target=self.main.renderAI.log)
+            readThread1.start()
+            procThread1.start()
+            renderThread1.start()
+            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+
+            self.main.output_file = output_file
         log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()
