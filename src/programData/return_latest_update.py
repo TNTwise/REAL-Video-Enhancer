@@ -13,6 +13,7 @@ class return_latest(QObject):
     """
     Returns latest version of stable and beta versions
     """
+
     finished = pyqtSignal()
     progress = pyqtSignal(list)
 

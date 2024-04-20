@@ -22,10 +22,10 @@ def calculateETA(self):
     """
     Calculates ETA
 
-    Gets the time for every frame rendered by taking the 
+    Gets the time for every frame rendered by taking the
     elapsed time / completed iterations (files)
     remaining time = remaining iterations (files) * time per iteration
-    
+
     """
     completed_iterations = int(self.files_processed)
 

@@ -566,7 +566,6 @@ class interpolation(QObject):
             self.main.frame_increments_of_interpolation = int(
                 calculateFrameIncrements(self)
             )
-            
 
             if self.main.AI == "rife-ncnn-vulkan":
                 if int(self.main.videoheight) > int(settings.UHDResCutOff):
@@ -665,7 +664,7 @@ class interpolation(QObject):
             )
             self.main.renderAI = RenderCUDA.Interpolation(
                 self.main,
-                'rife',
+                "rife",
                 self.main.input_file,
                 output_file,
                 self.main.ui.Rife_Model.currentText(),
@@ -684,14 +683,14 @@ class interpolation(QObject):
             self.main.renderAI.log()
             # logThread1.start()
             self.main.output_file = output_file
-        
+
         if self.main.AI == "gmfss-cuda":
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
             self.main.renderAI = RenderCUDA.Interpolation(
                 self.main,
-                'gmfss',
+                "gmfss",
                 self.main.input_file,
                 output_file,
                 self.main.ui.Rife_Model.currentText(),
@@ -710,7 +709,7 @@ class interpolation(QObject):
             self.main.renderAI.log()
             # logThread1.start()
             self.main.output_file = output_file
-        
+
         log("Done")
         self.main.currentRenderFPS = 0
         self.finished.emit()
@@ -938,9 +937,8 @@ class upscale(QObject):
             self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
 
             self.main.output_file = output_file
-            
+
         if self.main.AI == "realesrgan-ncnn-python-cuda":
-            
             output_file = returnOutputFile(
                 self.main, self.main.videoName, self.main.encoder
             )
@@ -956,7 +954,7 @@ class upscale(QObject):
                 model,
                 bool(settings.HalfPrecision),
                 method=self.main.AI,
-                threads=int(settings.VRAM)
+                threads=int(settings.VRAM),
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)

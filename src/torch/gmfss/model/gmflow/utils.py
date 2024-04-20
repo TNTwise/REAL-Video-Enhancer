@@ -3,10 +3,11 @@ import torch
 from .position import PositionEmbeddingSine
 
 
-def split_feature(feature,
-                  num_splits=2,
-                  channel_last=False,
-                  ):
+def split_feature(
+    feature,
+    num_splits=2,
+    channel_last=False,
+):
     if channel_last:  # [B, H, W, C]
         b, h, w, c = feature.size()
         assert h % num_splits == 0 and w % num_splits == 0
@@ -15,8 +16,11 @@ def split_feature(feature,
         h_new = h // num_splits
         w_new = w // num_splits
 
-        feature = feature.view(b, num_splits, h // num_splits, num_splits, w // num_splits, c
-                               ).permute(0, 1, 3, 2, 4, 5).reshape(b_new, h_new, w_new, c)  # [B*K*K, H/K, W/K, C]
+        feature = (
+            feature.view(b, num_splits, h // num_splits, num_splits, w // num_splits, c)
+            .permute(0, 1, 3, 2, 4, 5)
+            .reshape(b_new, h_new, w_new, c)
+        )  # [B*K*K, H/K, W/K, C]
     else:  # [B, C, H, W]
         b, c, h, w = feature.size()
         assert h % num_splits == 0 and w % num_splits == 0
@@ -25,30 +29,40 @@ def split_feature(feature,
         h_new = h // num_splits
         w_new = w // num_splits
 
-        feature = feature.view(b, c, num_splits, h // num_splits, num_splits, w // num_splits
-                               ).permute(0, 2, 4, 1, 3, 5).reshape(b_new, c, h_new, w_new)  # [B*K*K, C, H/K, W/K]
+        feature = (
+            feature.view(b, c, num_splits, h // num_splits, num_splits, w // num_splits)
+            .permute(0, 2, 4, 1, 3, 5)
+            .reshape(b_new, c, h_new, w_new)
+        )  # [B*K*K, C, H/K, W/K]
 
     return feature
 
 
-def merge_splits(splits,
-                 num_splits=2,
-                 channel_last=False,
-                 ):
+def merge_splits(
+    splits,
+    num_splits=2,
+    channel_last=False,
+):
     if channel_last:  # [B*K*K, H/K, W/K, C]
         b, h, w, c = splits.size()
         new_b = b // num_splits // num_splits
 
         splits = splits.view(new_b, num_splits, num_splits, h, w, c)
-        merge = splits.permute(0, 1, 3, 2, 4, 5).contiguous().view(
-            new_b, num_splits * h, num_splits * w, c)  # [B, H, W, C]
+        merge = (
+            splits.permute(0, 1, 3, 2, 4, 5)
+            .contiguous()
+            .view(new_b, num_splits * h, num_splits * w, c)
+        )  # [B, H, W, C]
     else:  # [B*K*K, C, H/K, W/K]
         b, c, h, w = splits.size()
         new_b = b // num_splits // num_splits
 
         splits = splits.view(new_b, num_splits, num_splits, c, h, w)
-        merge = splits.permute(0, 3, 1, 4, 2, 5).contiguous().view(
-            new_b, c, num_splits * h, num_splits * w)  # [B, C, H, W]
+        merge = (
+            splits.permute(0, 3, 1, 4, 2, 5)
+            .contiguous()
+            .view(new_b, c, num_splits * h, num_splits * w)
+        )  # [B, C, H, W]
 
     return merge
 
@@ -56,8 +70,12 @@ def merge_splits(splits,
 def normalize_img(img0, img1):
     # loaded images are in [0, 255]
     # normalize by ImageNet mean and std
-    mean = torch.tensor([0.485, 0.456, 0.406], dtype=img1.dtype, device=img1.device).view(1, 3, 1, 1)
-    std = torch.tensor([0.229, 0.224, 0.225], dtype=img1.dtype, device=img1.device).view(1, 3, 1, 1)
+    mean = torch.tensor(
+        [0.485, 0.456, 0.406], dtype=img1.dtype, device=img1.device
+    ).view(1, 3, 1, 1)
+    std = torch.tensor(
+        [0.229, 0.224, 0.225], dtype=img1.dtype, device=img1.device
+    ).view(1, 3, 1, 1)
     img0 = (img0 - mean) / std
     img1 = (img1 - mean) / std
 

@@ -17,12 +17,14 @@ import src.misc.messages
 import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
 from src.misc.log import log
+
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
-    gmfss=True
+
+    gmfss = True
 except Exception as e:
-    gmfss=False
+    gmfss = False
     log(e)
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
@@ -37,6 +39,7 @@ settings = Settings()
 from src.getModels.returnModelList import *
 
 import src.getModels.googleDriveDownload as GDrive
+
 
 def handleCUDAModels(model: str = ""):
     if "rife" and "pkl" in model:
@@ -190,16 +193,17 @@ def install_icons(self):
                 traceback_log = traceback.format_exc()
                 log(f"ERROR: {e} {traceback_log}")
                 failed_download(self)
-        elif check_if_online(dont_check=False,
-                             url='https://drive.google.com/'):
-            log('Couldnt connect to github, attempting to use google drive')
+        elif check_if_online(dont_check=False, url="https://drive.google.com/"):
+            log("Couldnt connect to github, attempting to use google drive")
             msg = QMessageBox()
             msg.setWindowTitle(" ")
             msg.setText(
                 f"Couldnt connect to GitHub! Attempting to download from Google Drive!\n(Please wait until the main window shows up, this will download in the backgroud.))"
             )
             msg.exec_()
-            GDrive.download_file_from_google_drive('1nOh01QQmet606W95ABBShrg5hFOuRwbo', f'{thisdir}/files/models.tar.gz')
+            GDrive.download_file_from_google_drive(
+                "1nOh01QQmet606W95ABBShrg5hFOuRwbo", f"{thisdir}/files/models.tar.gz"
+            )
         else:
             failed_download(self)
     os.chdir(f"{thisdir}")
@@ -253,7 +257,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui = SelectModels.Ui_MainWindow()
             self.ui.setupUi(self)
             self.pinFunctions()
-            
+
             self.show()
             self.main = parent
 
@@ -310,7 +314,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             super(Downloading, self).__init__()
             self.ui = DownloadUI.Ui_MainWindow()
             self.ui.setupUi(self)
-            
+
             self.show()
             self.nextfunction()
             self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))

@@ -7,17 +7,20 @@ import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
+
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
-    gmfss=True
+
+    gmfss = True
 except Exception as e:
-    gmfss=False
+    gmfss = False
     log(e)
 try:
     import torch
     import torchvision
     import spandrel
+
     torch_version = True
 except:
     torch_version = False
@@ -268,7 +271,6 @@ def onApplicationStart(self):
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
 
-    
     from PyQt5.QtGui import QIntValidator, QIcon
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
@@ -382,7 +384,7 @@ def set_model_params(self):
         if cuda_esrgan_installed == True:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
-            
+
         if cuda_gmfss_installed == True and gmfss:
             self.ui.GMFSSCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"

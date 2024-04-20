@@ -317,7 +317,7 @@ def returnOutputFile(self, videoName, encoder):
 
         else:
             output_video_file = f"{outputpath}/{videoName}_{round(self.fps*self.times)}fps.{return_data.returnContainer(encoder)}"
-    
+
     if self.render == "esrgan":  # add upscale/realesrgan resolution bump here
         self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
         upscaled_res = f"{int(width*self.resIncrease)}x{int(height*self.resIncrease)}"

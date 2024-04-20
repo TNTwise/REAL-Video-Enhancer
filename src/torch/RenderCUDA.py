@@ -21,6 +21,8 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
+
+
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -212,7 +214,9 @@ class Render:
 
 
 class Interpolation(Render):
-    def __init__(self, main, method, input_file, output_file, model, times, ensemble, half):
+    def __init__(
+        self, main, method, input_file, output_file, model, times, ensemble, half
+    ):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1
         )
@@ -221,8 +225,9 @@ class Interpolation(Render):
         self.ensemble = ensemble
         self.half = half
         self.handleMethod()
+
     def handleMethod(self):
-        if 'rife' in self.model:
+        if "rife" in self.model:
             self.interpolate_process = Rife(
                 interpolation_factor=self.interpolation_factor,
                 interpolate_method=self.model,
@@ -231,7 +236,7 @@ class Interpolation(Render):
                 ensemble=self.ensemble,
                 half=self.half,
             )
-        if 'gmfss' in self.model:
+        if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
                 interpolation_factor=self.interpolation_factor,
                 width=self.originalWidth,
@@ -239,22 +244,20 @@ class Interpolation(Render):
                 ensemble=self.ensemble,
                 half=self.half,
             )
-    
-    def proc_image(self, frame0,frame1):
-        self.interpolate_process.run1(frame0,frame1)
-        
+
+    def proc_image(self, frame0, frame1):
+        self.interpolate_process.run1(frame0, frame1)
+
         self.frame += 1
         self.writeBuffer.put(frame0)
-        
-            
+
         for i in range(self.interpolation_factor - 1):
             result = self.interpolate_process.make_inference(
                 (i + 1) * 1.0 / (self.interpolation_factor)
             )
             self.frame += 1
             self.writeBuffer.put(result)
-        
-        
+
     def procInterpThread(self):
         self.frame = 0
 
@@ -267,7 +270,7 @@ class Interpolation(Render):
             else:
                 self.transition_frame = -1
             frame = self.readBuffer.get()
-            
+
             if frame is None:
                 log("done with proc")
                 self.writeBuffer.put(self.prevFrame)
@@ -279,19 +282,28 @@ class Interpolation(Render):
                 continue
 
             if self.frame == self.transition_frame - self.interpolation_factor:
-                
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
                 self.frame += self.interpolation_factor
                 self.transition_frame = self.main.transitionFrames.pop(0)
             else:
-                self.proc_image(self.prevFrame,frame)
+                self.proc_image(self.prevFrame, frame)
 
             self.prevFrame = frame
 
 
 class Upscaling(Render):
-    def __init__(self, main, input_file, output_file, resIncrease, model_path, half, method="cuda",threads=2):
+    def __init__(
+        self,
+        main,
+        input_file,
+        output_file,
+        resIncrease,
+        model_path,
+        half,
+        method="cuda",
+        threads=2,
+    ):
         super(Upscaling, self).__init__(
             main,
             input_file,
@@ -303,7 +315,8 @@ class Upscaling(Render):
         self.half = half
         self.method = method
         self.resIncrease = resIncrease
-        self.threads=threads
+        self.threads = threads
+
     def procUpscaleThread(self):
         self.frame = 0
         if "cuda" in self.method and "ncnn" not in self.method:
@@ -312,7 +325,7 @@ class Upscaling(Render):
             )
         if "ncnn" in self.method:
             self.upscaleMethod = UpscaleNCNN(
-                model=self.model_path,num_threads=self.threads,scale=self.resIncrease
+                model=self.model_path, num_threads=self.threads, scale=self.resIncrease
             )
         while True:
             frame = self.readBuffer.get()

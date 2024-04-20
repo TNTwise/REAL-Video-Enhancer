@@ -30,10 +30,10 @@ from src.programData.version import returnVersion
 
 
 try:
-    
     import torch
     import torchvision
     import spandrel
+
     torch_version = True
     log("torch_version")
 
@@ -43,17 +43,19 @@ except Exception as e:
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
-    gmfss=True
+
+    gmfss = True
 except:
-    gmfss=False
+    gmfss = False
 if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import modules.CustomModelsCUDA as CustomModelsCUDA
-    
+
     import numpy as np
 
 from upscale_ncnn_py import UPSCALE
+
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
@@ -415,7 +417,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         if (
                             "Rife" in self.ui.AICombo.currentText()
                             and "v4" in self.ui.Rife_Model.currentText()
-                            and 'cuda' not in self.ui.AICombo.currentText().lower()
+                            and "cuda" not in self.ui.AICombo.currentText().lower()
                         ):
                             self.ui.FPSPreview.setText(f"FPS:")
                             self.ui.FPSFrom.setMinimum(fps)
@@ -548,9 +550,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         * self.times
                     )
                     self.filecount = fc
-                    self.original_filecount = (
-                        fc / self.times
-                    )
+                    self.original_filecount = fc / self.times
                     self.filecount = fc
                     self.ui.RifePB.setMaximum(self.filecount)
                 try:
@@ -597,8 +597,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.thread.start()
 
         # Final resets
-
-    
 
     def imageViewer(self, step):
         if step == "1":
@@ -660,7 +658,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def setEnsembleMode(self):
         if (
-            os.path.exists(os.path.join(f"{self.settings.ModelDir}","rife",f"{self.ui.Rife_Model.currentText()}-ensemble"))
+            os.path.exists(
+                os.path.join(
+                    f"{self.settings.ModelDir}",
+                    "rife",
+                    f"{self.ui.Rife_Model.currentText()}-ensemble",
+                )
+            )
             and "rife4" in self.ui.Rife_Model.currentText()
         ):
             self.ui.EnsembleCheckBox.show()

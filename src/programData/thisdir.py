@@ -18,7 +18,6 @@ if operating_system == "Linux":
 
 
 def thisdir():
-
     """
     Sets the current working directory for the app
     """
@@ -38,6 +37,6 @@ def thisdir():
         return f"{homedir}/.local/share/REAL-Video-Enhancer"
     if operating_system == "Darwin":
         return f"{homedir}/Library/REAL-Video-Enhancer"
-    
+
     if operating_system == "Windows":
-        return os.path.join(os.path.join(f"{homedir}",r"REAL-Video-Enhancer"))
+        return os.path.join(os.path.join(f"{homedir}", r"REAL-Video-Enhancer"))

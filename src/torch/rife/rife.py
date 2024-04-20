@@ -135,8 +135,10 @@ class Rife:
         output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
 
         return output
+
     def cacheFrame(self):
         self.I0 = self.I1.clone()
+
     def pad_frame(self):
         self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
         self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
@@ -168,8 +170,9 @@ class Rife:
 
         self.I1 = self.processFrame(I1)
         return True
+
     @torch.inference_mode()
-    def run1(self,I0,I1):
+    def run1(self, I0, I1):
         self.I0 = (
             torch.from_numpy(I0)
             .to(self.device, non_blocking=True)

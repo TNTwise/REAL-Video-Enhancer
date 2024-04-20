@@ -10,9 +10,7 @@ class Model:
     def __init__(self, local_rank=-1):
         self.flownet = IFNet()
         self.device()
-        
 
-    
     def eval(self):
         self.flownet.eval()
 
@@ -48,5 +46,5 @@ class Model:
 
     def inference(self, img0, img1, timestep=0.5, scale=1.0, ensemble=False):
         scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
-        
+
         return self.flownet(img0, img1, timestep, scale_list, ensemble=ensemble)

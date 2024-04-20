@@ -34,11 +34,6 @@ def save_response_content(response, destination):
                 f.write(chunk)
 
 
-
-    
-    
-
-
 if __name__ == "__main__":
     if len(sys.argv) >= 3:
         file_id = sys.argv[1]
@@ -47,5 +42,5 @@ if __name__ == "__main__":
         file_id = "TAKE_ID_FROM_SHAREABLE_LINK"
         destination = "DESTINATION_FILE_ON_YOUR_DISK"
     print(f"dowload {file_id} to {destination}")
-    
+
     download_file_from_google_drive(file_id, destination)

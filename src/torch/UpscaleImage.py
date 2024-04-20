@@ -1,4 +1,3 @@
-
 try:
     from src.programData.thisdir import thisdir
 
@@ -9,18 +8,18 @@ try:
     import torch as torch
     from torch.nn import functional as F
     from spandrel import (
-    ImageModelDescriptor,
-    ModelDescriptor,
-    ModelLoader,
-    MaskedImageModelDescriptor,
-)
+        ImageModelDescriptor,
+        ModelDescriptor,
+        ModelLoader,
+        MaskedImageModelDescriptor,
+    )
 
 except:
     pass
 import numpy as np
 
-#from realsr_ncnn_vulkan_python import *
-#from realsr_ncnn_vulkan_python import *
+# from realsr_ncnn_vulkan_python import *
+# from realsr_ncnn_vulkan_python import *
 
 
 class UpscaleCUDA:
@@ -65,4 +64,3 @@ class UpscaleCUDA:
             output = output.squeeze(0).permute(1, 2, 0).mul_(255).byte()
 
             return output.cpu().numpy()
-

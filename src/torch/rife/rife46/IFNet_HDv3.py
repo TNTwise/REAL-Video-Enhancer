@@ -105,16 +105,16 @@ class IFNet(nn.Module):
 
     def forward(
         self,
-        img0,img1,
+        img0,
+        img1,
         timestep=0.5,
         scale_list=[8, 4, 2, 1],
         training=False,
         fastmode=True,
         ensemble=False,
     ):
-        
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
-        
+
         flow_list = []
         merged = []
         mask_list = []
@@ -168,5 +168,5 @@ class IFNet(nn.Module):
             warped_img0 = warp(img0, flow[:, :2])
             warped_img1 = warp(img1, flow[:, 2:4])
         mask = torch.sigmoid(mask)
-        
+
         return warped_img0 * mask + warped_img1 * (1 - mask)

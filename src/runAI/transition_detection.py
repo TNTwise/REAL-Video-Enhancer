@@ -41,33 +41,33 @@ class TransitionDetection:
         This is written really poorly lmao, but it works :)
         """
 
-
-
         if self.settings.SceneChangeDetectionMode.lower() == "enabled":
             os.system(f'mkdir -p "{self.full_render_dir}/transitions/"')
 
             if self.settings.SceneChangeMethod == "ffmpeg":
                 # This will get the timestamps of the scene changes, and for every scene change timestamp, i can times it by the fps count to get its current frame, and after interpolation, double it and replace it and it -1 frame with the transition frame stored in the transitions folder
 
-
                 if (
                     self.settings.Image_Type == ".jpg"
                     or self.settings.Image_Type == ".png"
                 ):
-                    ffmpeg_cmd = [f"{thisdir}/bin/ffmpeg",
-                                   "-i",
-                                   f"{self.input_file}",
-                                     f"-filter_complex",
-                                     f"select=\'gt(scene\\,{self.settings.SceneChangeDetection})\',metadata=print",
-                                     "-vsync",
-                                     "vfr",
-                                     "-q:v",
-                                     "1",
-                                     ]
+                    ffmpeg_cmd = [
+                        f"{thisdir}/bin/ffmpeg",
+                        "-i",
+                        f"{self.input_file}",
+                        f"-filter_complex",
+                        f"select='gt(scene\\,{self.settings.SceneChangeDetection})',metadata=print",
+                        "-vsync",
+                        "vfr",
+                        "-q:v",
+                        "1",
+                    ]
                 if self.settings.Image_Type == ".webp":
                     ffmpeg_cmd.append(f"{self.full_render_dir}/transitions/%07d.png")
                 else:
-                    ffmpeg_cmd.append(f"{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}")
+                    ffmpeg_cmd.append(
+                        f"{self.full_render_dir}/transitions/%07d{self.settings.Image_Type}"
+                    )
 
                 output = subprocess.check_output(
                     ffmpeg_cmd, shell=False, stderr=subprocess.STDOUT
@@ -84,8 +84,7 @@ class TransitionDetection:
                         timestamp = str(timestamp.split(":")[1])
                         timestamps.append(
                             math.ceil(
-                                round(float(timestamp) * float(self.fps))
-                                * self.times
+                                round(float(timestamp) * float(self.fps)) * self.times
                             )
                         )
                 self.timestamps = timestamps
@@ -104,9 +103,7 @@ class TransitionDetection:
                         cap.set(cv2.CAP_PROP_POS_FRAMES, scene[0].get_frames())
                         ret, frame = cap.read()
                         if ret:
-                            if (
-                                settings.Image_Type != ".webp"
-                            ):
+                            if settings.Image_Type != ".webp":
                                 output_file = f"{self.full_render_dir}/transitions/{i:07d}{self.settings.Image_Type}"
                             else:
                                 output_file = (

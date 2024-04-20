@@ -15,15 +15,13 @@ def check_for_write_permissions(dir):
         - the directory to check if permissions are in
     """
 
-
     i = 2  # change this to 1 to debug flatpak
     if "FLATPAK_ID" in os.environ or i == 1:
         import subprocess
 
-        with open("/.flatpak-info", 'r') as f:
+        with open("/.flatpak-info", "r") as f:
             result = f.readlines()
-        
-        
+
         directories_with_permissions = []
         for i in result:
             if "filesystems=" in i:

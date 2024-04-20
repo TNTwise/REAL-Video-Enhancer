@@ -2,6 +2,7 @@ import os
 import torch
 import cupy
 from torch.nn import functional as F
+
 try:
     import src.programData.thisdir
 
@@ -38,8 +39,7 @@ class GMFSS:
     def handle_model(self):
         torch.set_float32_matmul_precision("medium")
 
-        
-        modelDir = os.path.join(f"{thisdir}","models","gmfss-cuda")
+        modelDir = os.path.join(f"{thisdir}", "models", "gmfss-cuda")
 
         modelType = "union"
 
@@ -89,10 +89,8 @@ class GMFSS:
 
     @torch.inference_mode()
     def make_inference(self, n):
-        
         if self.isCudaAvailable:
             torch.cuda.set_stream(self.stream[self.current_stream])
-        
 
         timestep = torch.tensor(
             (n + 1) * 1.0 / (self.interpolation_factor + 1),
@@ -126,7 +124,7 @@ class GMFSS:
             .float()
             .mul_(1 / 255)
         )
-        
+
         if self.isCudaAvailable and self.half:
             frame = frame.half()
 
@@ -134,6 +132,7 @@ class GMFSS:
             frame = F.pad(frame, [0, self.padding[1], 0, self.padding[3]])
 
         return frame.contiguous(memory_format=torch.channels_last)
+
     def pad_frame(self):
         self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
         self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
@@ -146,8 +145,9 @@ class GMFSS:
 
         self.I1 = self.processFrame(I1)
         return True
+
     @torch.inference_mode()
-    def run1(self,I0,I1):
+    def run1(self, I0, I1):
         self.I0 = (
             torch.from_numpy(I0)
             .to(self.device, non_blocking=True)

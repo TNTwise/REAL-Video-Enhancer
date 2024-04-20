@@ -35,14 +35,12 @@ def modelOptions(self):
     self.ui.FPSPreview.setText("FPS:")
     self.ui.ensembleHelpButton.hide()
     self.ui.Rife_Times.addItem("2X")
-    
-    
-    model_list = ['gmfss-fortuna']
-    
+
+    model_list = ["gmfss-fortuna"]
+
     self.ui.Rife_Model.addItems(model_list)
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.show()
-    
 
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
