@@ -943,9 +943,9 @@ class upscale(QObject):
                 self.main, self.main.videoName, self.main.encoder
             )
             if self.main.ui.Rife_Model.currentText() == "Animation":
-                model = f"{settings.ModelDir}realesrgan/models/realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}"
+                model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}")
             else:
-                model = f"{settings.ModelDir}realesrgan/models/{self.main.ui.Rife_Model.currentText()}"
+                model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"{self.main.ui.Rife_Model.currentText()}")
             self.main.renderAI = RenderCUDA.Upscaling(
                 self.main,
                 self.main.input_file,
