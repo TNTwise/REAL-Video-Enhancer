@@ -9,3 +9,5 @@ psutil
 Pillow
 scenedetect
 pyinstaller
+numpy
+sympy

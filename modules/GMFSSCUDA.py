@@ -42,10 +42,7 @@ def modelOptions(self):
     self.ui.Rife_Model.addItems(model_list)
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.show()
-    if self.output_folder == "":
-        outputpath = settings.OutputDir
-    else:
-        outputpath = self.output_folder
+    
 
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

@@ -2,18 +2,21 @@ import subprocess
 import numpy as np
 from queue import Queue
 
-from .rife.rife import *
+
 from src.programData.thisdir import thisdir
 
 thisdir = thisdir()
-import sys
-from threading import Thread
 import cv2
-import re
 from src.programData.settings import *
 import src.programData.return_data as return_data
 from time import sleep
-from .UpscaleImage import UpscaleCUDA
+
+try:
+    from .rife.rife import *
+    from .UpscaleImage import UpscaleCUDA
+    from .UpscaleImageNCNN import UpscaleNCNN
+except:
+    from .UpscaleImageNCNN import UpscaleNCNN
 try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
@@ -288,7 +291,7 @@ class Interpolation(Render):
 
 
 class Upscaling(Render):
-    def __init__(self, main, input_file, output_file, resIncrease, model_path, half):
+    def __init__(self, main, input_file, output_file, resIncrease, model_path, half, method="cuda",threads=2):
         super(Upscaling, self).__init__(
             main,
             input_file,
@@ -298,13 +301,19 @@ class Upscaling(Render):
         )
         self.model_path = model_path
         self.half = half
-
+        self.method = method
+        self.resIncrease = resIncrease
+        self.threads=threads
     def procUpscaleThread(self):
         self.frame = 0
-        self.upscaleMethod = UpscaleCUDA(
-            self.originalWidth, self.originalHeight, self.model_path, self.half
-        )
-
+        if "cuda" in self.method and "ncnn" not in self.method:
+            self.upscaleMethod = UpscaleCUDA(
+                self.originalWidth, self.originalHeight, self.model_path, self.half
+            )
+        if "ncnn" in self.method:
+            self.upscaleMethod = UpscaleNCNN(
+                model=self.model_path,num_threads=self.threads,scale=self.resIncrease
+            )
         while True:
             frame = self.readBuffer.get()
 

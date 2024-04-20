@@ -20,11 +20,9 @@ import math
 import src.programData.checks as checks
 import subprocess
 
-try:
-    import src.torch.RenderCUDA as RenderCUDA
-    import numpy as np
-except Exception as e:
-    print(e)
+import src.torch.RenderCUDA as RenderCUDA
+import numpy as np
+
 from modules.commands import returnOutputFile
 from modules.handelModel import handleModel
 
@@ -197,7 +195,7 @@ class pb2X(QObject):
                         # log('No render folder exists!')
                 log("NCNN Preview thread finished")
 
-            if "cuda" in self.main.AI:
+            if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
                 self.main.CudaRenderFinished = False
                 self.main.imageDisplay = None
                 try:
@@ -518,7 +516,7 @@ class interpolation(QObject):
         QThread.__init__(self, parent)
 
     def finishRenderSetup(self):  # 3rd and final call, called from interpolate.py
-        if "cuda" in self.main.AI:
+        if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
             cudaAndNCNN(
                 self.main,
                 self.main.input_file,
@@ -553,6 +551,7 @@ class interpolation(QObject):
         settings = Settings()
         self.log.emit(f"Starting {str(round(self.main.times,1))[:3]}X Render")
         self.log.emit(f"Model: {self.main.ui.Rife_Model.currentText()}")
+        vram = int(calculateVRAM(self))
         if "-ncnn-vulkan" in self.main.AI:
             self.input_frames = len(
                 os.listdir(
@@ -567,7 +566,7 @@ class interpolation(QObject):
             self.main.frame_increments_of_interpolation = int(
                 calculateFrameIncrements(self)
             )
-            vram = int(calculateVRAM(self))
+            
 
             if self.main.AI == "rife-ncnn-vulkan":
                 if int(self.main.videoheight) > int(settings.UHDResCutOff):
@@ -728,7 +727,7 @@ class upscale(QObject):
         QThread.__init__(self, parent)
 
     def finishRenderSetup(self):  # 3rd and final call, called from upscale.py
-        if "cuda" in self.main.AI:
+        if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
             cudaAndNCNN(
                 self.main,
                 self.main.input_file,
@@ -927,6 +926,37 @@ class upscale(QObject):
                 int(self.main.ui.Rife_Times.currentText()[0]),
                 model_path,
                 bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+            )
+            self.main.renderAI.extractFramesToBytes()
+            readThread1 = Thread(target=self.main.renderAI.readThread)
+            procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)
+            renderThread1 = Thread(target=self.main.renderAI.FFmpegOut)
+            # logThread1 = Thread(target=self.main.renderAI.log)
+            readThread1.start()
+            procThread1.start()
+            renderThread1.start()
+            self.main.renderAI.log()  ## <<<<<<<<<<<<<<<<<<<<<<<, bug here, it doesnt stop after render, so going to have to fix this later.
+
+            self.main.output_file = output_file
+            
+        if self.main.AI == "realesrgan-ncnn-python-cuda":
+            
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
+            if self.main.ui.Rife_Model.currentText() == "Animation":
+                model = f"{settings.ModelDir}realesrgan/models/realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}"
+            else:
+                model = f"{settings.ModelDir}realesrgan/models/{self.main.ui.Rife_Model.currentText()}"
+            self.main.renderAI = RenderCUDA.Upscaling(
+                self.main,
+                self.main.input_file,
+                output_file,
+                int(self.main.ui.Rife_Times.currentText()[0]),
+                model,
+                bool(settings.HalfPrecision),
+                method=self.main.AI,
+                threads=int(settings.VRAM)
             )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)

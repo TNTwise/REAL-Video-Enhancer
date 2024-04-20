@@ -317,8 +317,9 @@ def returnOutputFile(self, videoName, encoder):
 
         else:
             output_video_file = f"{outputpath}/{videoName}_{round(self.fps*self.times)}fps.{return_data.returnContainer(encoder)}"
-        self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
+    
     if self.render == "esrgan":  # add upscale/realesrgan resolution bump here
+        self.resIncrease = int(self.ui.Rife_Times.currentText()[0])
         upscaled_res = f"{int(width*self.resIncrease)}x{int(height*self.resIncrease)}"
         if (
             return_data.ManageFiles.isfile(
@@ -413,7 +414,7 @@ def end(
                 output_video_file = f"{outputpath}/{videoName}_{upscaled_res}.{return_data.returnContainer(encoder)}"
         output_video_file = output_video_file.replace("#", "")
 
-        if "cuda" in self.AI:
+        if "cuda" in self.AI or "ncnn-python" in self.AI:
             return output_video_file
 
         if settings.RenderType == "Optimized" and os.path.exists(

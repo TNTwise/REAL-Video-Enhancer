@@ -53,7 +53,7 @@ if torch_version:
     
     import numpy as np
 
-
+from upscale_ncnn_py import UPSCALE
 homedir = os.path.expanduser(r"~")
 try:
     os.system(f'mkdir -p "{homedir}/Videos/"')
@@ -907,7 +907,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def endRife(
         self,
     ):  # Crashes most likely due to the fact that it is being ran in a different thread
-        if "cuda" in self.AI:
+        if "cuda" in self.AI or "ncnn-python" in self.AI:
             while self.CudaRenderFinished == False:
                 sleep(1)
         self.file_drop_widget.show()
