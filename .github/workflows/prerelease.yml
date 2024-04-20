@@ -1,4 +1,4 @@
-
+softprops/action-gh-release@v1
 name: build-prerelease
 
 # Controls when the workflow will run
@@ -350,8 +350,7 @@ jobs:
           echo "::set-output name=tag::$version"
       
       - name: Create Release and Upload Release Asset
-        uses: "marvinpinto/action-automatic-releases@latest"
-        with:
+        uses: softprops/action-gh-release@v1        with:
           name: Pre-Release Build
           tag_name: prerelease
           body: ${{ steps.version_tag.outputs.tag }}
