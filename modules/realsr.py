@@ -49,7 +49,7 @@ def modelOptions(self):
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
     self.greyOutRealSRTimes()
     self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(self, "realsr-ncnn-python-cuda")
+        lambda: upscale.start_upscale(self, "realsr-ncnn-python")
     )
     self.ui.Rife_Times.clear()
     self.ui.denoiseLevelLabel.hide()

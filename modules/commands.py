@@ -197,7 +197,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if "-ncnn-vulkan" in self.AI:
         self.ncnn = True
         self.cuda = False
-    if "-cuda" in self.AI:
+    if "-cuda" in self.AI or "-ncnn-python" in self.AI:
         self.ncnn = False
         self.cuda = True
         os.system(f'mkdir -p "{renderdir}/{videoName}_temp/output_frames/0/"')

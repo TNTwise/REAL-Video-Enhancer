@@ -908,7 +908,7 @@ class upscale(QObject):
                 )
                 
 
-            if self.main.AI == "realesrgan-ncnn-python-cuda":
+            if self.main.AI == "realesrgan-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
@@ -928,7 +928,7 @@ class upscale(QObject):
                 )
                 
             
-            if self.main.AI == "realsr-ncnn-python-cuda":
+            if self.main.AI == "realsr-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
@@ -946,7 +946,7 @@ class upscale(QObject):
                     threads=int(settings.VRAM),
                 )
                 
-            if self.main.AI == "custom-models-ncnn-python-cuda":
+            if self.main.AI == "custom-models-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )

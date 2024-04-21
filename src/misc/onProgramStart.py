@@ -38,7 +38,7 @@ def bindButtons(self):
     )
     self.ui.esrganHelpModel.clicked.connect(
         lambda: open_link(
-            r"https://github.com/upscayl/upscayl/wiki/%F0%9F%96%A5%EF%B8%8F-Model-Conversion%E2%80%89%E2%80%93%E2%80%89Get-more-models!"
+            "https://github.com/upscayl/upscayl/wiki/Model-Conversion-Guide"
         )
     )
     self.ui.cudaArchSupportButton.clicked.connect(
