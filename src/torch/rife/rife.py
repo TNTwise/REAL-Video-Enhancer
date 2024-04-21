@@ -20,12 +20,14 @@ class Rife:
         height,
         interpolate_method,
         ensemble=False,
+        
         nt=1,
         UHD=False,
     ):
         self.interpolation_factor = interpolation_factor
+        
         self.half = half
-        self.UHD = UHD
+        
         self.scale = 1.0
         self.width = width
         self.height = height
@@ -33,6 +35,8 @@ class Rife:
         self.ensemble = ensemble
         self.nt = nt
 
+        self.UHD = self.width > 1920 or self.height > 1080
+        
         self.handle_model()
 
     def handle_model(self):
@@ -115,15 +119,18 @@ class Rife:
         if self.cuda_available:
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
-            if self.half:
+            if self.half and not self.UHD:
                 torch.set_default_dtype(torch.float16)
+                
 
         self.model = Model()
         self.model.load_model(modelDir, -1)
         self.model.eval()
 
-        if self.cuda_available and self.half:
+        if self.cuda_available and self.half and not self.UHD:
             self.model.half()
+        
+            
 
         self.model.device()
         self.I0 = None
@@ -143,24 +150,7 @@ class Rife:
         self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
         self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
 
-    @torch.inference_mode()
-    def processFrame(self, frame):
-        frame = (
-            torch.from_numpy(frame)
-            .to(self.device, non_blocking=True)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .float()
-            .mul_(1 / 255)
-            .half()
-            if self.half
-            else frame
-        )
-
-        if self.padding != (0, 0, 0, 0):
-            frame = F.pad(frame, [0, self.padding[1], 0, self.padding[3]])
-
-        return frame.contiguous(memory_format=torch.channels_last)
+    
 
     @torch.inference_mode()
     def run(self, I1):
@@ -190,9 +180,9 @@ class Rife:
             / 255.0
         )
 
-        if self.cuda_available and self.half:
+        if self.cuda_available and self.half and not self.UHD:
             self.I0 = self.I0.half()
             self.I1 = self.I1.half()
-
+        
         if self.padding != (0, 0, 0, 0):
             self.pad_frame()

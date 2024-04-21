@@ -24,12 +24,16 @@ class Model:
     def eval(self):
         self.flownet.eval()
 
-    def device(self):
-        self.flownet.to(device)
+    def device(self,device1=None):
+        if device1 == None:
+            self.flownet.to(device)
+        else:
+            self.flownet.to(device)
 
     def half(self):
         self.flownet.half()
 
+    
     def load_model(self, path, rank=0):
         def convert(param):
             if rank == -1:
