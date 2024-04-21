@@ -25,10 +25,7 @@ class Model:
         self.flownet.eval()
 
     def device(self,device1=None):
-        if device1 == None:
-            self.flownet.to(device)
-        else:
-            self.flownet.to(device)
+        self.flownet.to(device)
 
     def half(self):
         self.flownet.half()
