@@ -7,7 +7,7 @@ import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
-
+from src.programData.version import returnVersion
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
@@ -15,7 +15,6 @@ try:
     gmfss = True
 except Exception as e:
     gmfss = False
-    log(e)
 try:
     import torch
     import torchvision
@@ -267,6 +266,9 @@ def hideChainModeButtons(self):
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
+    log("Program Version: " + returnVersion() + 
+        "\n====================================================================")
+    
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
         
