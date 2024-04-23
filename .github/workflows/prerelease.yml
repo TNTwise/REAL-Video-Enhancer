@@ -69,7 +69,7 @@ jobs:
          cd /usr/lib
          sudo ln -s libomp.so libomp.so.5
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl  https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl sympy PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel torch==2.0.0+cu117 torchvision==0.15 && sudo apt install libnotify-bin -y  
+        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl  https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl sympy PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel https://download.pytorch.org/whl/cpu/torch-2.0.0%2Bcpu-cp310-cp310-linux_x86_64.whl https://download.pytorch.org/whl/cu117/torch-2.0.0%2Bcu117-cp310-cp310-linux_x86_64.whl torchvision==0.15 && sudo apt install libnotify-bin -y  
         
       - name: Compile to executable
         run: |
