@@ -72,7 +72,18 @@ jobs:
         run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl sympy PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel torch torchvision && sudo apt install libnotify-bin -y  &&  pip install --force --no-cache --pre --extra-index-url https://marcelotduarte.github.io/packages/ cx_Freeze
         
       - name: Compile to executable
-        run: cd REAL-Video-Enhancer && make
+        run: |
+          cd REAL-Video-Enhancer
+          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
+          rm -rf dist
+          rm -rf build
+          mkdir dist
+          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
+          python3 -m PyQt5.uic.pyuic src/getModels/SelectModels.ui > src/getModels/SelectModels.py
+          python3 -m PyQt5.uic.pyuic src/getModels/Download.ui > src/getModels/Download.py
+          python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
+          python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
+          python3 -m cx_Freeze -c main.py --target-dir dist/ --packages=torch,torchvision
 
       - name: Clone appimage repo
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
