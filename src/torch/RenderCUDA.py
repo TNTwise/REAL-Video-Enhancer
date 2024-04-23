@@ -14,9 +14,10 @@ from time import sleep
 try:
     from .rife.rife import *
     from .UpscaleImage import UpscaleCUDA
-    from .UpscaleImageNCNN import UpscaleNCNN
+    
 except:
-    from .UpscaleImageNCNN import UpscaleNCNN
+    pass
+from .UpscaleImageNCNN import UpscaleNCNN, UpscaleCuganNCNN
 try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
@@ -299,10 +300,12 @@ class Upscaling(Render):
         input_file,
         output_file,
         resIncrease,
-        model_path,
-        half,
+        model_path="",
+        half=True,
         method="cuda",
         threads=2,
+        cugan_noise=0,
+        ncnn_gpu=0
     ):
         super(Upscaling, self).__init__(
             main,
@@ -317,15 +320,25 @@ class Upscaling(Render):
         self.resIncrease = resIncrease
         self.threads = threads
         self.frame = 0
+        self.cugan_noise = cugan_noise
+        self.ncnn_gpu=ncnn_gpu
         self.handleModel()
     def handleModel(self):
         if "cuda" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleCUDA(
                 self.originalWidth, self.originalHeight, self.model_path, self.half
             )
-        if "ncnn" in self.method:
+        if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(
-                model=self.model_path, num_threads=self.threads, scale=self.resIncrease
+                gpuid=self.ncnn_gpu,model=self.model_path, num_threads=self.threads, scale=self.resIncrease
+            )
+        if "cugan" in self.method and "ncnn" in self.method:
+            self.upscaleMethod = UpscaleCuganNCNN(
+                gpuid=self.ncnn_gpu,
+                models_path = os.path.join(f"{thisdir}","models","realcugan","models-se"),
+                model="models-se",
+                num_threads=self.threads,
+                scale=self.resIncrease
             )
     def procUpscaleThread(self):
         

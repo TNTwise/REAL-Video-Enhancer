@@ -46,7 +46,7 @@ def modelOptions(self):
         pass
     self.ui.Rife_Model.setEnabled(True)
     self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(self, "realcugan-ncnn-vulkan")
+        lambda: upscale.start_upscale(self, "realcugan-ncnn-python")
     )
     self.ui.Rife_Times.clear()
     self.ui.Rife_Times.currentIndexChanged.connect(self.cuganDenoiseLevel)

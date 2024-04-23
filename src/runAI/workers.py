@@ -925,6 +925,8 @@ class upscale(QObject):
                     bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
+                    ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
+                    
                 )
                 
             
@@ -944,6 +946,26 @@ class upscale(QObject):
                     bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
+                    ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
+                )
+            if self.main.AI == "realcugan-ncnn-python":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                
+                #model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
+                
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    
+                    half=bool(settings.HalfPrecision),
+                    method=self.main.AI,
+                    threads=int(settings.VRAM),
+                    ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
+                    cugan_noise=str(self.main.ui.denoiseLevelSpinBox.value())
                 )
                 
             if self.main.AI == "custom-models-ncnn-python":
