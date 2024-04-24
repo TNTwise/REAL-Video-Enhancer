@@ -17,7 +17,6 @@ except Exception as e:
     gmfss = False
 try:
     import torch
-    import torchvision
     import spandrel
 
     torch_version = True

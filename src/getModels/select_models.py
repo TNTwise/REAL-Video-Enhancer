@@ -53,7 +53,6 @@ def handleCUDAModels(model: str = ""):
 
 try:
     import torch
-    import torchvision
 
     torch_version = True
 
