@@ -69,7 +69,10 @@ jobs:
          cd /usr/lib
          sudo ln -s libomp.so libomp.so.5
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt &&  python3 -m  pip install https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl  https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl sympy PyQt5 py-notifier notify2 pillow  testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil loguru sympy pyinstaller spandrel https://download.pytorch.org/whl/cu117/torch-2.0.0%2Bcu117-cp310-cp310-linux_x86_64.whl torchvision==0.15 cupy-cuda12x && sudo apt install libnotify-bin -y  
+        run: |
+          cd REAL-Video-Enhancer
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-CUDA-Linux.txt
         
       - name: Compile to executable
         run: |
@@ -206,7 +209,10 @@ jobs:
              hours=$((time_difference / 3600)) # Convert seconds to hours
              git log --since="$hours hours ago" --pretty=format:"%h - %s" >> ../output.log
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt  && python3 -m pip install https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp311-none-macosx_11_0_universal2.whl https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp311-none-macosx_11_0_universal2.whl
+        run: |
+          cd REAL-Video-Enhancer
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-MAC.txt
         
       - name: Compile to executable
         run: |
@@ -289,7 +295,10 @@ jobs:
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
         
       - name: Install python dependencies
-        run: cd REAL-Video-Enhancer && python3 -m pip install -r requirements.txt && python3 -m pip uninstall PyQt5 -y && python3 -m  pip install https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp38-none-manylinux1_x86_64.whl sympy https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp38-none-manylinux1_x86_64.whl py-notifier notify2 pillow python-magic testresources requests opencv-python-headless pypresence pyuic5-tool cx_FREEZE psutil PyQt5==5.12 loguru sympy && sudo apt install libnotify-bin -y 
+        run: |
+          cd REAL-Video-Enhancer
+          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements-NCNN-Linux.txt
         
       - name: Compile to executable
         run: cd REAL-Video-Enhancer && make
@@ -299,14 +308,8 @@ jobs:
 
       - name: Move files
         run: mkdir -p REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer/dist/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/ && mv REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/main REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/bin/REAL-Video-Enhancer      
-      - name: Move QT Files
-        run: | 
-          wget https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-          chmod +x linuxdeployqt-continuous-x86_64.AppImage
-          ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
-          rm -rf squashfs-root/usr/bin 
-          mv squashfs-root/usr/* REAL-Video-Enhancer-AppImage/REAL-Video-Enhancer.AppDir/usr/
-          rm -rf squashfs-root/
+      
+          
           
       - name: Make appimage
         run: chmod +x REAL-Video-Enhancer-AppImage/appimagetool-x86_64.AppImage && cd REAL-Video-Enhancer-AppImage/ && ./appimagetool-x86_64.AppImage REAL-Video-Enhancer.AppDir/ 
