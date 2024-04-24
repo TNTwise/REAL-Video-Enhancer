@@ -53,7 +53,8 @@ def handleCUDAModels(model: str = ""):
 
 try:
     import torch
-
+    import torchvision
+    import spandrel
     torch_version = True
 
 except Exception as e:

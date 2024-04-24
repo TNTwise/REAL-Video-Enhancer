@@ -31,6 +31,7 @@ from src.programData.version import returnVersion
 
 try:
     import torch
+    import torchvision
     import spandrel
 
     torch_version = True
