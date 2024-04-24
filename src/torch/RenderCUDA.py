@@ -143,12 +143,10 @@ class Render:
 
     def FFmpegOut(self):
         log("saving")
-        try:
-            crf = return_data.returnCRFFactor(
-                self.settings.videoQuality, self.settings.Encoder
-            )
-        except Exception as e:
-            log(f"unable to set crf {e}")
+        crf = return_data.returnCRFFactor(
+            self.settings.videoQuality, self.settings.Encoder
+        )
+        
 
         command = [
             f"{thisdir}/bin/ffmpeg",
@@ -195,7 +193,6 @@ class Render:
         )
 
         while True:
-            try:
                 frame = self.writeBuffer.get()
                 if frame is None:
                     self.writeProcess.stdin.close()
@@ -209,9 +206,7 @@ class Render:
                 frame = np.ascontiguousarray(frame)
                 self.main.imageDisplay = frame
                 self.writeProcess.stdin.buffer.write(frame.tobytes())
-            except Exception as e:
-                tb = traceback.format_exc()
-                log(f"Something went wrong with the writebuffer: {e},{tb}")
+            
 
 
 class Interpolation(Render):

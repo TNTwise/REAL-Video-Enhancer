@@ -4,3 +4,4 @@ https://download.pytorch.org/whl/cu117/torch-2.0.0%2Bcu117-cp310-cp310-linux_x86
 spandrel 
 torchvision==0.15
 cupy-cuda12x
+fastrlock
