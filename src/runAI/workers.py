@@ -672,22 +672,24 @@ class interpolation(QObject):
                     self.main.times,
                     self.main.ui.EnsembleCheckBox.isChecked(),
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark
                 )
-                
+
 
             if self.main.AI == "gmfss-cuda":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
                 self.main.renderAI = RenderCUDA.Interpolation(
-                    self.main,
-                    "gmfss",
-                    self.main.input_file,
-                    output_file,
-                    self.main.ui.Rife_Model.currentText(),
-                    self.main.times,
-                    self.main.ui.EnsembleCheckBox.isChecked(),
-                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                self.main,
+                "gmfss",
+                self.main.input_file,
+                output_file,
+                self.main.ui.Rife_Model.currentText(),
+                self.main.times,
+                self.main.ui.EnsembleCheckBox.isChecked(),
+                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                benchmark=self.main.benchmark
                 )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -889,8 +891,9 @@ class upscale(QObject):
                     int(self.main.ui.Rife_Times.currentText()[0]),
                     model_path,
                     bool(settings.HalfPrecision),
+                    benchmark=self.main.benchmark
                 )
-                
+
             if self.main.AI == "custom-models-cuda":
                 model_path = handleModel(
                     self.main.AI, self.main.ui.Rife_Model.currentText()
@@ -905,8 +908,9 @@ class upscale(QObject):
                     int(self.main.ui.Rife_Times.currentText()[0]),
                     model_path,
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark
                 )
-                
+
 
             if self.main.AI == "realesrgan-ncnn-python":
                 output_file = returnOutputFile(
@@ -926,17 +930,18 @@ class upscale(QObject):
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
-                    
+                    benchmark=self.main.benchmark
+
                 )
-                
-            
+
+
             if self.main.AI == "realsr-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
-                
+
                 model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
-                
+
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
@@ -947,34 +952,36 @@ class upscale(QObject):
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
+                    benchmark=self.main.benchmark
                 )
             if self.main.AI == "realcugan-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
-                
+
                 #model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
-                
+
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
                     output_file,
                     int(self.main.ui.Rife_Times.currentText()[0]),
-                    
+
                     half=bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
-                    cugan_noise=str(self.main.ui.denoiseLevelSpinBox.value())
+                    cugan_noise=str(self.main.ui.denoiseLevelSpinBox.value()),
+                    benchmark=self.main.benchmark
                 )
-                
+
             if self.main.AI == "custom-models-ncnn-python":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
-                
+
                 model = os.path.join(f"{settings.ModelDir}","custom_models_ncnn",f"models",f"{self.main.ui.Rife_Model.currentText()}")
-                
+
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
@@ -984,8 +991,9 @@ class upscale(QObject):
                     bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
+                    benchmark=self.main.benchmark
                 )
-                
+
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)

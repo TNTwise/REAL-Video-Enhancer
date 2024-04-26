@@ -191,6 +191,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.input_file = ""
         self.output_folder = ""
         self.download_youtube_video_command = ""
+        self.benchmark = False
+        for i in sys.argv: # parse args
+            if '--benchmark' == i:
+                self.benchmark = True
+
         # self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
         # self.ui.imagePreview.setStyleSheet("border-radius: 10px;")
         # self.fadeIn(self.ui.verticalTabWidget) # < issues with qtextedit, adding in later
@@ -1104,6 +1109,8 @@ def apply_decorator_to_all_functions(module):
 
 # Applying the decorator to all functions in the current module
 apply_decorator_to_all_functions(globals())
+
+
 
 app = QtWidgets.QApplication(sys.argv)
 

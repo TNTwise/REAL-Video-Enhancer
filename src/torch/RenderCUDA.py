@@ -30,7 +30,7 @@ from src.torch.tensorRT import RifeTensorRT
 # def
 class Render:
     def __init__(
-        self, main, input_file, output_file, interpolationIncrease=1, resIncrease=1
+        self, main, input_file, output_file, interpolationIncrease=1, resIncrease=1,benchmark=False
     ):
         self.main = main
 
@@ -50,7 +50,7 @@ class Render:
         self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         self.finalFPS = self.initialFPS * self.interpolation_factor
-
+        self.benchmark=benchmark
         self.settings = Settings()
 
     def extractFramesToBytes(self):
@@ -147,41 +147,65 @@ class Render:
             self.settings.videoQuality, self.settings.Encoder
         )
 
-
-        command = [
-            f"{thisdir}/bin/ffmpeg",
-            "-f",
-            "rawvideo",
-            "-pix_fmt",
-            "rgb24",
-            "-vcodec",
-            "rawvideo",
-            "-s",
-            f"{self.outputWidth}x{self.outputHeight}",
-            "-r",
-            f"{self.finalFPS}",
-            "-i",
-            "-",
-        ]
-        encoder_list = return_data.returnCodec(self.settings.Encoder).split(" ")
-        if os.path.isfile(
-            f"{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a"
-        ):
-            command += [
+        if not self.benchmark:
+            command = [
+                f"{thisdir}/bin/ffmpeg",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-vcodec",
+                "rawvideo",
+                "-s",
+                f"{self.outputWidth}x{self.outputHeight}",
+                "-r",
+                f"{self.finalFPS}",
                 "-i",
-                f"{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a",
+                "-",
             ]
-        command += ["-c:v"]
-        command += encoder_list
-        command += [
-            f"-crf",
-            f'{crf.replace("-crf","")}',
-            "-pix_fmt",
-            "yuv420p",
-            "-c:a",
-            "copy",
-            f"{self.output_file}",
-        ]
+            encoder_list = return_data.returnCodec(self.settings.Encoder).split(" ")
+            if os.path.isfile(
+                f"{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a"
+            ):
+                command += [
+                    "-i",
+                    f"{self.settings.RenderDir}/{self.main.videoName}_temp/audio.m4a",
+                ]
+            command += ["-c:v"]
+            command += encoder_list
+            command += [
+                f"-crf",
+                f'{crf.replace("-crf","")}',
+                "-pix_fmt",
+                "yuv420p",
+                "-c:a",
+                "copy",
+                f"{self.output_file}",
+            ]
+        else:
+            command = [
+                            f"{thisdir}/bin/ffmpeg",
+                            "-y",
+                            "-v",
+                            "warning",
+                            "-stats",
+                            "-f",
+                            "rawvideo",
+                            "-vcodec",
+                            "rawvideo",
+                            "-s",
+                            f"{self.outputWidth}x{self.outputHeight}",
+                            "-pix_fmt",
+                            f"yuv420p",
+                            "-r",
+                            str(self.finalFPS),
+                            "-i",
+                            "-",
+                            "-benchmark",
+                            "-f",
+                            "null",
+                            "-",
+                        ]
         log(command)
         self.writeProcess = subprocess.Popen(
             command,
@@ -211,10 +235,10 @@ class Render:
 
 class Interpolation(Render):
     def __init__(
-        self, main, method, input_file, output_file, model, times, ensemble, half
+        self, main, method, input_file, output_file, model, times, ensemble, half, benchmark
     ):
         super(Interpolation, self).__init__(
-            main, input_file, output_file, interpolationIncrease=times, resIncrease=1
+            main, input_file, output_file, interpolationIncrease=times, resIncrease=1,benchmark=benchmark
         )
         self.method = method
         self.model = model
@@ -299,7 +323,8 @@ class Upscaling(Render):
         method="cuda",
         threads=2,
         cugan_noise=0,
-        ncnn_gpu=0
+        ncnn_gpu=0,
+        benchmark=False
     ):
         super(Upscaling, self).__init__(
             main,
@@ -307,6 +332,7 @@ class Upscaling(Render):
             output_file,
             interpolationIncrease=1,
             resIncrease=resIncrease,
+            benchmark=benchmark
         )
         self.model_path = model_path
         self.half = half

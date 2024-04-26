@@ -27,7 +27,7 @@ class RifeTensorRT:
                 ensemble: bool = False,
                 precision: str = "fp16",
                 trt_max_workspace_size: int = 1,
-                num_streams: int = 1,
+                num_streams: int = 2,
                 ):
 
         self.width = width
@@ -46,6 +46,8 @@ class RifeTensorRT:
         self.half = precision
         self.index = -1
         self.index_lock = Lock()
+        self.stream = [torch.cuda.Stream(device=self.device) for _ in range(self.num_streams)]
+        self.stream_lock = [Lock() for _ in range(self.num_streams)]
         self.trt_engine_path = os.path.join(
                     os.getcwd(),
                     (
@@ -122,6 +124,7 @@ class RifeTensorRT:
         torch.save(flownet, self.trt_engine_path)
         del flownet
         torch.cuda.empty_cache()
+
     def run1(self, I0, I1):
                 self.I0 = self.frame_to_tensor(I0, self.device)
                 self.I1 = self.frame_to_tensor(I1, self.device)
@@ -142,20 +145,22 @@ class RifeTensorRT:
         with self.index_lock:
             index = (self.index + 1) % self.num_streams
             local_index = index
-        timestep = torch.full((1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device)
-        timestep = timestep.to(memory_format=torch.channels_last)
-        if self.half:
-            timestep = timestep.half()
 
-        output = self.inference[local_index](self.I0, self.I1, timestep)
-        output = output[:, :, : self.height, : self.width]
-        output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
+        with self.stream_lock[local_index], torch.cuda.stream(self.stream[local_index]):
+            timestep = torch.full((1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device)
+            timestep = timestep.to(memory_format=torch.channels_last)
+            if self.half:
+                timestep = timestep.half()
 
-        return output
+            output = self.inference[local_index](self.I0, self.I1, timestep)
+            output = output[:, :, : self.height, : self.width]
+            output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
+
+            return output
 
     def frame_to_tensor(self,frame, device: torch.device) -> torch.Tensor:
             array = frame
-            return torch.from_numpy(array).permute(2, 0, 1).unsqueeze(0).to(device, memory_format=torch.channels_last) / 255.0
+            return torch.from_numpy(array).permute(2, 0, 1).unsqueeze(0).to(device, memory_format=torch.channels_last)  / 255.0
 
 if __name__ == '__main__':
     rifetrt = RifeTensorRT()
