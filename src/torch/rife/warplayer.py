@@ -5,6 +5,9 @@ backwarp_tenGrid = {}
 
 
 def warp(tenInput, tenFlow):
+    orig_dtype = tenInput.dtype
+
+
     k = (str(tenFlow.device), str(tenFlow.size()))
     if k not in backwarp_tenGrid:
         tenHorizontal = (
@@ -27,11 +30,11 @@ def warp(tenInput, tenFlow):
         1,
     )
 
-    g = (backwarp_tenGrid[k] + tenFlow).permute(0, 2, 3, 1)
+    g = (backwarp_tenGrid[k] + tenFlow).permute(0, 2, 3, 1).to(orig_dtype)
     return torch.nn.functional.grid_sample(
-        input=tenInput.half(),
-        grid=g.half(),
+        input=tenInput.to(orig_dtype),
+        grid=g,
         mode="bilinear",
         padding_mode="border",
         align_corners=True,
-    ).half()
+    ).to(orig_dtype)
