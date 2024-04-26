@@ -22,7 +22,7 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
-from src.torch.tensorRT import RifeTensorRT
+from src.torch.rife.tensorRT import RifeTensorRT
 
 # read
 # Calculate eta by time remaining divided by speed

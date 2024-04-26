@@ -18,6 +18,7 @@ try:
     thisdir = thisdir()
 except:
     thisdir = os.getcwd()
+
 class RifeTensorRT:
     def __init__(self,
                 model: str = "rife414.pkl",
@@ -90,12 +91,8 @@ class RifeTensorRT:
 
 
 
+        from src.torch.rife.rife46.IFNet_HDv3 import IFNet
 
-        try:
-            from rife.rife414.IFNet_HDv3 import IFNet
-        except:
-            from src.torch.rife.rife414.IFNet_HDv3 import IFNet
-        print(os.path.join(thisdir,"models","rife-cuda",model_name.replace(".",""), model_name+".pkl"))
         state_dict = torch.load(os.path.join(thisdir,"models","rife-cuda",model_name.replace(".",""), model_name+".pkl"), map_location="cpu")
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k}
 
