@@ -14,7 +14,7 @@ from time import sleep
 try:
     from .rife.rife import *
     from .UpscaleImage import UpscaleCUDA
-    
+
 except:
     pass
 from .UpscaleImageNCNN import UpscaleNCNN, UpscaleCuganNCNN
@@ -22,7 +22,7 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
-
+from src.torch.tensorRT import RifeTensorRT
 
 # read
 # Calculate eta by time remaining divided by speed
@@ -146,7 +146,7 @@ class Render:
         crf = return_data.returnCRFFactor(
             self.settings.videoQuality, self.settings.Encoder
         )
-        
+
 
         command = [
             f"{thisdir}/bin/ffmpeg",
@@ -206,7 +206,7 @@ class Render:
                 frame = np.ascontiguousarray(frame)
                 self.main.imageDisplay = frame
                 self.writeProcess.stdin.buffer.write(frame.tobytes())
-            
+
 
 
 class Interpolation(Render):
@@ -224,13 +224,12 @@ class Interpolation(Render):
 
     def handleMethod(self):
         if "rife" in self.model:
-            self.interpolate_process = Rife(
-                interpolation_factor=self.interpolation_factor,
-                interpolate_method=self.model,
+            self.interpolate_process = RifeTensorRT(
+                model=self.model,
                 width=self.originalWidth,
                 height=self.originalHeight,
                 ensemble=self.ensemble,
-                half=self.half,
+                precision=self.half,
             )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
@@ -336,8 +335,8 @@ class Upscaling(Render):
                 scale=self.resIncrease
             )
     def procUpscaleThread(self):
-        
-        
+
+
         while True:
             frame = self.readBuffer.get()
 

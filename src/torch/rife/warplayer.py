@@ -29,9 +29,9 @@ def warp(tenInput, tenFlow):
 
     g = (backwarp_tenGrid[k] + tenFlow).permute(0, 2, 3, 1)
     return torch.nn.functional.grid_sample(
-        input=tenInput,
-        grid=g,
+        input=tenInput.half(),
+        grid=g.half(),
         mode="bilinear",
         padding_mode="border",
         align_corners=True,
-    )
+    ).half()
