@@ -9,7 +9,6 @@ import tensorrt
 import torch
 from torch.autograd.function import InplaceFunction
 import torch.nn.functional as F
-import vapoursynth as vs
 from torch_tensorrt.fx import LowerSetting
 from torch_tensorrt.fx.lower import Lowerer
 from torch_tensorrt.fx.utils import LowerPrecision
