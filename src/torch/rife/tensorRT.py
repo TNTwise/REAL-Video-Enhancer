@@ -19,70 +19,7 @@ try:
 except:
     thisdir = os.getcwd()
 
-def handle_model(interpolate_method):
-            if interpolate_method == "rife4.14":
-                from .rife414.IFNet_HDv3 import IFNet
 
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}", "models", "rife-cuda", "rife414", "rife4.14.pkl"
-                    )
-                )
-
-            if interpolate_method == "rife4.6":
-                from .rife46.IFNet_HDv3 import IFNet
-
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}", "models", "rife-cuda", "rife46", "rife4.6.pkl"
-                    )
-                )
-            if interpolate_method == "rife4.13-lite":
-                from .rife413lite.IFNet_HDv3 import IFNet
-
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}",
-                        "models",
-                        "rife-cuda",
-                        "rife413-lite",
-                        "rife4.13-lite.pkl",
-                    )
-                )
-            if interpolate_method == "rife4.14-lite":
-                from .rife414lite.IFNet_HDv3 import IFNet
-
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}",
-                        "models",
-                        "rife-cuda",
-                        "rife414-lite",
-                        "rife4.14-lite.pkl",
-                    )
-                )
-
-            if interpolate_method == "rife4.15":
-                from .rife415.IFNet_HDv3 import IFNet
-
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}", "models", "rife-cuda", "rife415", "rife4.15.pkl"
-                    )
-                )
-            if interpolate_method == "rife4.16-lite":
-                from .rife416lite.IFNet_HDv3 import IFNet
-
-                modelDir = os.path.dirname(
-                    os.path.join(
-                        f"{thisdir}",
-                        "models",
-                        "rife-cuda",
-                        "rife416-lite",
-                        "rife4.16-lite.pkl",
-                    )
-                )
-            return modelDir
 class RifeTensorRT:
     def __init__(self,
                 model: str = "rife414.pkl",
@@ -91,7 +28,7 @@ class RifeTensorRT:
                 scale: int = 1,
                 ensemble: bool = False,
                 precision: str = "fp16",
-                trt_max_workspace_size: int = 1,
+                trt_max_workspace_size: int = 30,
                 num_streams: int = 1,
                 ):
 
@@ -132,6 +69,71 @@ class RifeTensorRT:
             self.generateEngine()
 
         self.inference = [torch.load(self.trt_engine_path) for _ in range(self.num_streams)]
+    def handle_model(self,interpolate_method):
+                    if interpolate_method == "rife4.14":
+                        from .rife414.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}", "models", "rife-cuda", "rife414", "rife4.14.pkl"
+                            )
+                        )
+
+                    if interpolate_method == "rife4.6":
+                        from .rife46.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}", "models", "rife-cuda", "rife46", "rife4.6.pkl"
+                            )
+                        )
+                    if interpolate_method == "rife4.13-lite":
+                        from .rife413lite.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}",
+                                "models",
+                                "rife-cuda",
+                                "rife413-lite",
+                                "rife4.13-lite.pkl",
+                            )
+                        )
+                    if interpolate_method == "rife4.14-lite":
+                        from .rife414lite.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}",
+                                "models",
+                                "rife-cuda",
+                                "rife414-lite",
+                                "rife4.14-lite.pkl",
+                            )
+                        )
+
+                    if interpolate_method == "rife4.15":
+                        from .rife415.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}", "models", "rife-cuda", "rife415", "rife4.15.pkl"
+                            )
+                        )
+                    if interpolate_method == "rife4.16-lite":
+                        from .rife416lite.IFNet_HDv3 import IFNet
+
+                        modelDir = os.path.dirname(
+                            os.path.join(
+                                f"{thisdir}",
+                                "models",
+                                "rife-cuda",
+                                "rife416-lite",
+                                "rife4.16-lite.pkl",
+                            )
+                        )
+                    self.i = IFNet()
+                    self.modelDir = modelDir
 
     def pad_frame(self):
         tmp = max(128, int(128 / self.scale))
@@ -155,12 +157,12 @@ class RifeTensorRT:
 
 
 
-        model = handle_model(self.model)
+        self.handle_model(self.model)
 
-        state_dict = torch.load(model, map_location="cpu")
+        state_dict = torch.load(os.path.join(self.modelDir,self.model+".pkl"), map_location="cpu")
         state_dict = {k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k}
 
-        flownet = IFNet()
+        flownet = self.i
         flownet.load_state_dict(state_dict, strict=False)
         flownet.eval().to(device, memory_format=torch.channels_last)
 
