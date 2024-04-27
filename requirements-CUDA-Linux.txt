@@ -5,5 +5,5 @@ spandrel
 torchvision==0.15
 cupy-cuda12x
 fastrlock
-torch_tensorrt
+torch-tensorrt
 tensorrt
