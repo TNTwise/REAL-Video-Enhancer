@@ -2,6 +2,6 @@ https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/re
 https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-04-20-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl
 https://download.pytorch.org/whl/cu117/torch-2.0.1%2Bcu117-cp310-cp310-linux_x86_64.whl
 spandrel
-torchvision==0.15.1
+torchvision==0.15.2
 cupy-cuda11x
 fastrlock
