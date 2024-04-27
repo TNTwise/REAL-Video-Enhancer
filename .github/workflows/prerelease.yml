@@ -73,7 +73,7 @@ jobs:
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          pythone -m pip install torch-tensorrt -f https://github.com/NVIDIA/Torch-TensorRT/releases
+          python3 -m pip install torch-tensorrt -f https://github.com/NVIDIA/Torch-TensorRT/releases
         
       - name: Compile to executable
         run: |
