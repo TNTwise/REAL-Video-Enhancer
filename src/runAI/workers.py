@@ -665,7 +665,7 @@ class interpolation(QObject):
                 )
                 self.main.renderAI = RenderCUDA.Interpolation(
                     self.main,
-                    "rife",
+                    "rife-cuda",
                     self.main.input_file,
                     output_file,
                     self.main.ui.Rife_Model.currentText(),
@@ -675,6 +675,21 @@ class interpolation(QObject):
                     benchmark=self.main.benchmark
                 )
 
+            if self.main.AI == "rife-cuda-trt":
+                                output_file = returnOutputFile(
+                                    self.main, self.main.videoName, self.main.encoder
+                                )
+                                self.main.renderAI = RenderCUDA.Interpolation(
+                                    self.main,
+                                    "rife-cuda-trt",
+                                    self.main.input_file,
+                                    output_file,
+                                    self.main.ui.Rife_Model.currentText(),
+                                    self.main.times,
+                                    self.main.ui.EnsembleCheckBox.isChecked(),
+                                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                                    benchmark=self.main.benchmark
+                                )
 
             if self.main.AI == "gmfss-cuda":
                 output_file = returnOutputFile(

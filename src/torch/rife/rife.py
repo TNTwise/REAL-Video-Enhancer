@@ -10,70 +10,7 @@ except:
     thisdir = f"{os.path.expanduser(r'~')}/.local/share/REAL-Video-Enhancer"
 from torch.nn import functional as F
 
-def handle_model(interpolate_method):
-        if interpolate_method == "rife4.14":
-            from .rife414.RIFE_HDv3 import Model
 
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}", "models", "rife-cuda", "rife414", "rife4.14.pkl"
-                )
-            )
-
-        if interpolate_method == "rife4.6":
-            from .rife46.RIFE_HDv3 import Model
-
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}", "models", "rife-cuda", "rife46", "rife4.6.pkl"
-                )
-            )
-        if interpolate_method == "rife4.13-lite":
-            from .rife413lite.RIFE_HDv3 import Model
-
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}",
-                    "models",
-                    "rife-cuda",
-                    "rife413-lite",
-                    "rife4.13-lite.pkl",
-                )
-            )
-        if interpolate_method == "rife4.14-lite":
-            from .rife414lite.RIFE_HDv3 import Model
-
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}",
-                    "models",
-                    "rife-cuda",
-                    "rife414-lite",
-                    "rife4.14-lite.pkl",
-                )
-            )
-
-        if interpolate_method == "rife4.15":
-            from .rife415.RIFE_HDv3 import Model
-
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}", "models", "rife-cuda", "rife415", "rife4.15.pkl"
-                )
-            )
-        if interpolate_method == "rife4.16-lite":
-            from .rife416lite.RIFE_HDv3 import Model
-
-            modelDir = os.path.dirname(
-                os.path.join(
-                    f"{thisdir}",
-                    "models",
-                    "rife-cuda",
-                    "rife416-lite",
-                    "rife4.16-lite.pkl",
-                )
-            )
-        return modelDir
 class Rife:
     def __init__(
         self,
@@ -87,6 +24,7 @@ class Rife:
         nt=1,
         UHD=False,
     ):
+        self.interpolation_factor = interpolation_factor
 
         self.half = half
 
@@ -99,9 +37,71 @@ class Rife:
 
         self.UHD = self.width > 1920 or self.height > 1080
 
-        modelDir = handle_model()
+        self.handle_model()
 
+    def handle_model(self):
+        if self.interpolate_method == "rife4.14":
+            from .rife414.RIFE_HDv3 import Model
 
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}", "models", "rife-cuda", "rife414", "rife4.14.pkl"
+                )
+            )
+
+        if self.interpolate_method == "rife4.6":
+            from .rife46.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}", "models", "rife-cuda", "rife46", "rife4.6.pkl"
+                )
+            )
+        if self.interpolate_method == "rife4.13-lite":
+            from .rife413lite.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}",
+                    "models",
+                    "rife-cuda",
+                    "rife413-lite",
+                    "rife4.13-lite.pkl",
+                )
+            )
+        if self.interpolate_method == "rife4.14-lite":
+            from .rife414lite.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}",
+                    "models",
+                    "rife-cuda",
+                    "rife414-lite",
+                    "rife4.14-lite.pkl",
+                )
+            )
+
+        if self.interpolate_method == "rife4.15":
+            from .rife415.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}", "models", "rife-cuda", "rife415", "rife4.15.pkl"
+                )
+            )
+        if self.interpolate_method == "rife4.16-lite":
+            from .rife416lite.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}",
+                    "models",
+                    "rife-cuda",
+                    "rife416-lite",
+                    "rife4.16-lite.pkl",
+                )
+            )
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")
 
@@ -137,8 +137,11 @@ class Rife:
 
     @torch.inference_mode()
     def make_inference(self, n):
-
-        output = self.model.inference(self.I0, self.I1, n, self.scale, self.ensemble)
+        timestep = torch.full((1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device)
+        timestep = timestep.to(memory_format=torch.channels_last)
+        if self.half:
+                timestep = timestep.half()
+        output = self.model.inference(self.I0, self.I1, timestep=timestep)
         output = output[:, :, : self.height, : self.width]
         output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
 

@@ -56,6 +56,6 @@ class Model:
                     False,
                 )
 
-    def inference(self, img0, img1, timestep=0.5, scale=1.0, ensemble=False):
-        scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
-        return self.flownet(img0, img1, timestep, scale_list, ensemble=ensemble)
+    def inference(self, img0, img1, timestep=0.5):
+
+        return self.flownet(img0, img1, timestep)

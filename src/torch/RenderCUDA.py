@@ -22,8 +22,10 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
-from src.torch.rife.tensorRT import RifeTensorRT
-
+try:
+    from src.torch.rife.tensorRT import RifeTensorRT
+except:
+    pass
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
@@ -34,8 +36,8 @@ class Render:
     ):
         self.main = main
 
-        self.readBuffer = Queue(maxsize=250)
-        self.writeBuffer = Queue(maxsize=250)
+        self.readBuffer = Queue(maxsize=50)
+        self.writeBuffer = Queue(maxsize=50)
         self.interpolation_factor = round(interpolationIncrease)
         self.prevFrame = None
         self.input_file = input_file
@@ -235,7 +237,16 @@ class Render:
 
 class Interpolation(Render):
     def __init__(
-        self, main, method, input_file, output_file, model, times, ensemble, half, benchmark
+        self,
+        main,
+        method,
+        input_file,
+        output_file,
+        model,
+        times,
+        ensemble,
+        half,
+        benchmark
     ):
         super(Interpolation, self).__init__(
             main, input_file, output_file, interpolationIncrease=times, resIncrease=1,benchmark=benchmark
@@ -247,15 +258,23 @@ class Interpolation(Render):
         self.handleMethod()
 
     def handleMethod(self):
-        if "rife" in self.model:
+        if "rife-cuda" == self.method:
+            self.interpolate_process = Rife(
+                            interpolation_factor=self.interpolation_factor,
+                            interpolate_method=self.model,
+                            width=self.originalWidth,
+                            height=self.originalHeight,
+                            ensemble=self.ensemble,
+                            half=self.half,
+                        )
+        if "rife-cuda-trt" == self.method:
             self.interpolate_process = RifeTensorRT(
-                model=self.model,
-                width=self.originalWidth,
-                height=self.originalHeight,
-                ensemble=self.ensemble,
-                precision=self.half,
-            )
-            self.main.start_time = time.time()
+                            model=self.model,
+                            width=self.originalWidth,
+                            height=self.originalHeight,
+                            ensemble=self.ensemble,
+                            precision=self.half,
+                        )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
                 interpolation_factor=self.interpolation_factor,
@@ -264,7 +283,7 @@ class Interpolation(Render):
                 ensemble=self.ensemble,
                 half=self.half,
             )
-
+        self.main.start_time = time.time()
     def proc_image(self, frame0, frame1):
         self.interpolate_process.run1(frame0, frame1)
 

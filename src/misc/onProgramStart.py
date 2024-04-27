@@ -15,6 +15,13 @@ try:
     gmfss = True
 except Exception as e:
     gmfss = False
+
+try:
+    import tensorrt
+    from torch_tensorrt.fx import LowerSetting
+    tensorRT = True
+except:
+    tensorRT = False
 try:
     import torch
     import torchvision
@@ -375,6 +382,8 @@ def set_model_params(self):
         if cuda_rife_installed == True:
             self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
+            if tensorRT:
+                self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
 
         cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
         if cuda_esrgan_installed == True:

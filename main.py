@@ -101,7 +101,7 @@ import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
 import modules.CustomModelsNCNN as CustomModelsNCNN
-
+import modules.RifeTRT as rifeTRT
 
 import src.misc.onProgramStart
 from src.runAI.ETA import *
@@ -334,6 +334,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if torch_version:
             if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
                 rifeCUDA.modelOptions(self)
+
+            if self.ui.AICombo.currentText() == "Rife TensorRT (Nvidia only)":
+                rifeTRT.modelOptions(self)
 
             if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
                 RealESRGANCUDA.modelOptions(self)

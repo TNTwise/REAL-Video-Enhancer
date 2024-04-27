@@ -26,7 +26,7 @@ homedir = os.path.expanduser(r"~")
 def modelOptions(self):
     settings = Settings()
     self.times = 2
-    log("Model: RIFE-CUDA")
+    log("Model: RIFE-TRT")
     self.render = "rife"
 
     self.ui.FPSToSign.hide()
@@ -80,4 +80,4 @@ def modelOptions(self):
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
-    self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self, "rife-cuda"))
+    self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self, "rife-cuda-trt"))
