@@ -73,7 +73,6 @@ jobs:
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          python3 -m pip install 
           
       - name: Compile to executable
         run: |
