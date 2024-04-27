@@ -28,7 +28,7 @@ class RifeTensorRT:
                 scale: int = 1,
                 ensemble: bool = False,
                 precision: str = "fp16",
-                trt_max_workspace_size: int = 30,
+                trt_max_workspace_size: int = 1,
                 num_streams: int = 1,
                 ):
 

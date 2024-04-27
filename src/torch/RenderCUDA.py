@@ -2,7 +2,7 @@ import subprocess
 import numpy as np
 from queue import Queue
 
-
+import time
 from src.programData.thisdir import thisdir
 
 thisdir = thisdir()
@@ -255,6 +255,7 @@ class Interpolation(Render):
                 ensemble=self.ensemble,
                 precision=self.half,
             )
+            self.main.start_time = time.time()
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
                 interpolation_factor=self.interpolation_factor,
