@@ -5,5 +5,4 @@ spandrel
 torchvision==0.15
 cupy-cuda12x
 fastrlock
-torch-tensorrt -f https://github.com/NVIDIA/Torch-TensorRT/releases
 tensorrt 
