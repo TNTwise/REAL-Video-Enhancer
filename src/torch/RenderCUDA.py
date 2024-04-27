@@ -34,8 +34,8 @@ class Render:
     ):
         self.main = main
 
-        self.readBuffer = Queue(maxsize=50)
-        self.writeBuffer = Queue(maxsize=50)
+        self.readBuffer = Queue(maxsize=250)
+        self.writeBuffer = Queue(maxsize=250)
         self.interpolation_factor = round(interpolationIncrease)
         self.prevFrame = None
         self.input_file = input_file

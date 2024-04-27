@@ -51,8 +51,8 @@ class RifeTensorRT:
         self.stream = [torch.cuda.Stream(device=self.device) for _ in range(self.num_streams)]
         self.stream_lock = [Lock() for _ in range(self.num_streams)]
         self.trt_engine_path = os.path.join(
-                    os.getcwd(),
-                    (
+            thisdir,"models","rife-cuda","rife-trt-engines",
+                        (
                         f"{model}"
                         + f"_{self.device_name}"
                         + f"_trt-{self.trt_version}"

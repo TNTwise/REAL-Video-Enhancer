@@ -266,19 +266,19 @@ def hideChainModeButtons(self):
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
-    log("Program Version: " + returnVersion() + 
+    log("Program Version: " + returnVersion() +
         "\n====================================================================")
-    
+
     if torch_version:
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
-        
-    os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
 
+    os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
+    os.makedirs(os.path.join(f"{thisdir}","models","rife-cuda","rife-trt-engines"), exist_ok=True)
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
     hideChainModeButtons(self)
     # get esrgan models
-    
+
     self.ui.ESRGANModelSelectButton.show()
     self.ui.label_20.show()
     self.ui.esrganHelpModel.show()
@@ -363,7 +363,7 @@ def set_model_params(self):
         if "IFRNET" == i:
             self.ui.CainCheckBox.setChecked(True)
             self.model_labels["IFRNET"] = "interpolation"
-    
+
     if len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
                 self.model_labels["Custom NCNN models"] = "upscaling"
     # not efficient but im lazy so cry abt it
@@ -408,7 +408,7 @@ def set_model_params(self):
                 self.ui.modeCombo.addItem("Upscaling")
                 break
     # benching this idea for now
-    """if "Interpolation and Upscaling" not in upscale_list: 
+    """if "Interpolation and Upscaling" not in upscale_list:
         interp_bool = False
         upscale_bool = False
 
