@@ -6,7 +6,7 @@ pypresence
 pyuic5-tool
 cx-Freeze
 psutil
-pillow==10.2.0
+pillow
 scenedetect
 pyinstaller
 numpy
