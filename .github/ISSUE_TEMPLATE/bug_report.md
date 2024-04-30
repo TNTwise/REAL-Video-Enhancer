@@ -33,7 +33,7 @@ Logs folder on AppImage: ``/home/$USER/.local/share/REAL-Video-Enhancer/logs/``
  - Version [e.g. AppImage or Flatpak]
  
 **GPU**
-Please state your GPU, support on NVIDIA is difficult as I lack testing hardware, please be understanding if it is a problem relating to NVIDIA.
+Please state your GPU, and what you are using to render (cuda, ncnn, etc.)
 
 
 **Additional context**
