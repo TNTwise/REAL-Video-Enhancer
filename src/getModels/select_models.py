@@ -193,19 +193,21 @@ def install_icons(self):
                 traceback_log = traceback.format_exc()
                 log(f"ERROR: {e} {traceback_log}")
                 failed_download(self)
-        elif check_if_online(dont_check=False, url="https://drive.google.com/"):
-            log("Couldnt connect to github, attempting to use google drive")
-            msg = QMessageBox()
-            msg.setWindowTitle(" ")
-            msg.setText(
-                f"Couldnt connect to GitHub! Attempting to download from Google Drive!\n(Please wait until the main window shows up, this will download in the backgroud.))"
-            )
-            msg.exec_()
-            GDrive.download_file_from_google_drive(
-                "1nOh01QQmet606W95ABBShrg5hFOuRwbo", f"{thisdir}/files/models.tar.gz"
-            )
+                exit()
+            '''elif check_if_online(dont_check=False, url="https://drive.google.com/"):
+                            log("Couldnt connect to github, attempting to use google drive")
+                            msg = QMessageBox()
+                            msg.setWindowTitle(" ")
+                            msg.setText(
+                                f"Couldnt connect to GitHub! Attempting to download from Google Drive!\n(Please wait until the main window shows up, this will download in the backgroud.))"
+                            )
+                            msg.exec_()
+                            GDrive.download_file_from_google_drive(
+                                "1nOh01QQmet606W95ABBShrg5hFOuRwbo", f"{thisdir}/files/models.tar.gz"
+                            )'''
         else:
             failed_download(self)
+            exit()
     os.chdir(f"{thisdir}")
 
 

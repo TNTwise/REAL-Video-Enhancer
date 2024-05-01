@@ -713,8 +713,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models"
-            or self.ui.AICombo.currentText() == "Custom NCNN models"
+            self.ui.AICombo.currentText() == "Custom NCNN models"
         ):
             if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()
@@ -738,6 +737,17 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("3X")
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
+        if (
+            self.ui.AICombo.currentText() == "Custom CUDA models"
+        ):
+            from spandrel import ModelLoader
+            from modules.handelModel import handleModel
+            model_path = handleModel(
+                                "custom-models-cuda", self.ui.Rife_Model.currentText()
+                            )
+            model = ModelLoader().load_from_file(model_path)
+            self.ui.Rife_Times.addItem(f"{model.scale}X")
+
 
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
