@@ -36,7 +36,11 @@ class RifeTensorRT:
         self.height = height
         self.scale = scale
 
-        self.pad_frame()
+        # padding
+        self.ph = ((self.height - 1) // 64 + 1) * 64
+        self.pw = ((self.width - 1) // 64 + 1) * 64
+        self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+        
 
         self.num_streams = num_streams
         self.ensemble = ensemble
@@ -50,6 +54,7 @@ class RifeTensorRT:
         self.index_lock = Lock()
         self.stream = [torch.cuda.Stream(device=self.device) for _ in range(self.num_streams)]
         self.stream_lock = [Lock() for _ in range(self.num_streams)]
+        
         self.trt_engine_path = os.path.join(
             thisdir,"models","rife-cuda","rife-trt-engines",
                         (
@@ -69,7 +74,7 @@ class RifeTensorRT:
             self.generateEngine()
 
         self.inference = [torch.load(self.trt_engine_path) for _ in range(self.num_streams)]
-    @torch.inference_mode()
+    
     def handle_model(self,interpolate_method):
                     if interpolate_method == "rife4.14":
                         from .rife414.IFNet_HDv3 import IFNet
@@ -136,11 +141,7 @@ class RifeTensorRT:
                     self.i = IFNet(scale=self.scale,ensemble=self.ensemble)
                     self.modelDir = modelDir
     @torch.inference_mode()
-    def pad_frame(self):
-        tmp = max(128, int(128 / self.scale))
-        self.pw = ((self.width - 1) // tmp + 1) * tmp
-        self.ph = ((self.height - 1) // tmp + 1) * tmp
-        self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+    
     @torch.inference_mode()
     def generateEngine(self):
         # temp
@@ -182,18 +183,24 @@ class RifeTensorRT:
         torch.save(flownet, self.trt_engine_path)
         del flownet
         torch.cuda.empty_cache()
+        
+    def pad_frame(self):
+        self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
+        self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
+        
     @torch.inference_mode()
     def run1(self, I0, I1):
                 self.I0 = self.frame_to_tensor(I0, self.device)
                 self.I1 = self.frame_to_tensor(I1, self.device)
-                self.I0 = F.pad(self.I0, self.padding)
-                self.I1 = F.pad(self.I1, self.padding)
+                
 
                 if self.half:
                     self.I0 = self.I0.half()
                     self.I1 = self.I1.half()
 
-
+                if self.padding != (0, 0, 0, 0):
+                    self.I0 = F.pad(self.I0, self.padding)
+                    self.I1 = F.pad(self.I1, self.padding)
 
     @torch.inference_mode()
     def make_inference(self, n):
@@ -215,6 +222,7 @@ class RifeTensorRT:
             output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
 
             return output
+        
     @torch.inference_mode()
     def frame_to_tensor(self,frame, device: torch.device) -> torch.Tensor:
             array = frame
