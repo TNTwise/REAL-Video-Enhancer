@@ -20,6 +20,7 @@ except:
 
 
 class RifeTensorRT:
+    @torch.inference_mode()
     def __init__(self,
                 model: str = "rife414.pkl",
                 width: int = 1920,
@@ -68,6 +69,7 @@ class RifeTensorRT:
             self.generateEngine()
 
         self.inference = [torch.load(self.trt_engine_path) for _ in range(self.num_streams)]
+    @torch.inference_mode()
     def handle_model(self,interpolate_method):
                     if interpolate_method == "rife4.14":
                         from .rife414.IFNet_HDv3 import IFNet
@@ -133,13 +135,13 @@ class RifeTensorRT:
                         )
                     self.i = IFNet()
                     self.modelDir = modelDir
-
+    @torch.inference_mode()
     def pad_frame(self):
         tmp = max(128, int(128 / self.scale))
         self.pw = ((self.width - 1) // tmp + 1) * tmp
         self.ph = ((self.height - 1) // tmp + 1) * tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-
+    @torch.inference_mode()
     def generateEngine(self):
         # temp
         trt_max_workspace_size = 1
@@ -186,7 +188,7 @@ class RifeTensorRT:
         torch.save(flownet, self.trt_engine_path)
         del flownet
         torch.cuda.empty_cache()
-
+    @torch.inference_mode()
     def run1(self, I0, I1):
                 self.I0 = self.frame_to_tensor(I0, self.device)
                 self.I1 = self.frame_to_tensor(I1, self.device)
@@ -219,7 +221,7 @@ class RifeTensorRT:
             output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
 
             return output
-
+    @torch.inference_mode()
     def frame_to_tensor(self,frame, device: torch.device) -> torch.Tensor:
             array = frame
             return torch.from_numpy(array).permute(2, 0, 1).unsqueeze(0).to(device, memory_format=torch.channels_last)  / 255.0
