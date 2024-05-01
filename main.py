@@ -738,15 +738,16 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models"
+            self.ui.AICombo.currentText() == "Custom CUDA models" and self.ui.Rife_Model.currentText()
         ):
-            from spandrel import ModelLoader
-            from modules.handelModel import handleModel
-            model_path = handleModel(
-                                "custom-models-cuda", self.ui.Rife_Model.currentText()
-                            )
-            model = ModelLoader().load_from_file(model_path)
-            self.ui.Rife_Times.addItem(f"{model.scale}X")
+                from spandrel import ModelLoader
+                from modules.handelModel import handleModel
+                model_path = handleModel(
+                                    "custom-models-cuda", self.ui.Rife_Model.currentText()
+                                )
+                model = ModelLoader().load_from_file(model_path)
+                if self.ui.Rife_Times.count() < 1:
+                    self.ui.Rife_Times.addItem(f"{model.scale}X")
 
 
         if self.ui.AICombo.currentText() == "Waifu2X":

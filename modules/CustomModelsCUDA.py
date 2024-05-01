@@ -36,7 +36,6 @@ def modelOptions(self):
     self.ui.ensembleHelpButton.hide()
 
     self.ui.Rife_Model.addItems(os.listdir(f"{thisdir}/models/custom-models-cuda"))
-    self.greyOutRealSRTimes()
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.hide()
 
