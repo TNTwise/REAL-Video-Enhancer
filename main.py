@@ -33,6 +33,8 @@ try:
     import torch
     import torchvision
     import spandrel
+    from spandrel import ModelLoader
+    from modules.handelModel import handleModel
 
     torch_version = True
     log("torch_version")
@@ -51,6 +53,7 @@ if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import modules.CustomModelsCUDA as CustomModelsCUDA
+    
 
     import numpy as np
 
@@ -740,8 +743,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if (
             self.ui.AICombo.currentText() == "Custom CUDA models" and self.ui.Rife_Model.currentText()
         ):
-                from spandrel import ModelLoader
-                from modules.handelModel import handleModel
+                
                 model_path = handleModel(
                                     "custom-models-cuda", self.ui.Rife_Model.currentText()
                                 )
