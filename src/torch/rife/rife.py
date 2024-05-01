@@ -123,7 +123,7 @@ class Rife:
                 torch.set_default_dtype(torch.float16)
 
 
-        self.model = Model()
+        self.model = Model(scale=self.scale,ensemble=self.ensemble)
         self.model.load_model(modelDir, -1)
         self.model.eval()
 

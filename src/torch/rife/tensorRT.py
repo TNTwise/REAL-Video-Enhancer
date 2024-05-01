@@ -133,7 +133,7 @@ class RifeTensorRT:
                                 "rife4.16-lite.pkl",
                             )
                         )
-                    self.i = IFNet()
+                    self.i = IFNet(scale=self.scale,ensemble=self.ensemble)
                     self.modelDir = modelDir
     @torch.inference_mode()
     def pad_frame(self):
@@ -145,15 +145,9 @@ class RifeTensorRT:
     def generateEngine(self):
         # temp
         trt_max_workspace_size = 1
-        fp16 = self.half
-        scale = self.scale
-        ensemble = self.ensemble
-        model_name = self.model
-        device = self.device
-        w = self.width
-        h = self.height
+        
 
-        if fp16:
+        if self.half:
                 torch.set_default_dtype(torch.half)
 
 
@@ -165,11 +159,11 @@ class RifeTensorRT:
 
         flownet = self.i
         flownet.load_state_dict(state_dict, strict=False)
-        flownet.eval().to(device, memory_format=torch.channels_last)
+        flownet.eval().to(self.device, memory_format=torch.channels_last)
 
 
         lower_setting = LowerSetting(
-            lower_precision=LowerPrecision.FP16 if fp16 else LowerPrecision.FP32,
+            lower_precision=LowerPrecision.FP16 if self.half else LowerPrecision.FP32,
             min_acc_module_size=1,
             max_workspace_size=trt_max_workspace_size,
             dynamic_batch=False,
@@ -180,9 +174,9 @@ class RifeTensorRT:
         flownet = lowerer(
             flownet,
             [
-                torch.zeros((1, 3, self.ph, self.pw), device=device).to(memory_format=torch.channels_last),
-                torch.zeros((1, 3, self.ph, self.pw), device=device).to(memory_format=torch.channels_last),
-                torch.zeros((1, 1, self.ph, self.pw), device=device).to(memory_format=torch.channels_last),
+                torch.zeros((1, 3, self.ph, self.pw), device=self.device).to(memory_format=torch.channels_last),
+                torch.zeros((1, 3, self.ph, self.pw), device=self.device).to(memory_format=torch.channels_last),
+                torch.zeros((1, 1, self.ph, self.pw), device=self.device).to(memory_format=torch.channels_last),
             ],
         )
         torch.save(flownet, self.trt_engine_path)

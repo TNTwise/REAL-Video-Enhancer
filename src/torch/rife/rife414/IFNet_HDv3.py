@@ -130,7 +130,7 @@ class IFNet(nn.Module):
         # self.unet = Unet()
         self.scale_list=[8 / scale, 4 / scale, 2 / scale, 1 / scale]
 
-        self.ensemble=False
+        self.ensemble=ensemble
 
     def forward(
         self,
