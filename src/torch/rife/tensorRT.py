@@ -56,7 +56,7 @@ class RifeTensorRT:
         self.stream_lock = [Lock() for _ in range(self.num_streams)]
         
         self.trt_engine_path = os.path.join(
-            thisdir,"models","rife-cuda","rife-trt-engines",
+            thisdir,"models","rife-trt-engines",
                         (
                         f"{model}"
                         + f"_{self.device_name}"

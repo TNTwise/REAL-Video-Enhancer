@@ -280,7 +280,7 @@ def onApplicationStart(self):
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
 
     os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
-    os.makedirs(os.path.join(f"{thisdir}","models","rife-cuda","rife-trt-engines"), exist_ok=True)
+    
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
     hideChainModeButtons(self)
@@ -383,7 +383,9 @@ def set_model_params(self):
             self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
             if tensorRT:
+                os.makedirs(os.path.join(f"{thisdir}","models","rife-trt-engines"), exist_ok=True)
                 self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
+                
 
         cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
         if cuda_esrgan_installed == True:

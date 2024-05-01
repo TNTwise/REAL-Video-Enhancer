@@ -26,7 +26,7 @@ homedir = os.path.expanduser(r"~")
 def modelOptions(self):
     settings = Settings()
     self.times = 1
-    log("Model: ESRGAN")
+    log("Model: ESRGAN CUDA")
     self.render = "esrgan"
 
     self.ui.FPSToSign.hide()
