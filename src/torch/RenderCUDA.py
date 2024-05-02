@@ -236,6 +236,7 @@ class Render:
 
 
 class Interpolation(Render):
+    @torch.inference_mode()
     def __init__(
         self,
         main,
@@ -256,7 +257,7 @@ class Interpolation(Render):
         self.ensemble = ensemble
         self.half = half
         self.handleMethod()
-
+    @torch.inference_mode()
     def handleMethod(self):
         if "rife-cuda" == self.method:
             self.interpolate_process = Rife(
@@ -296,8 +297,9 @@ class Interpolation(Render):
             )
             self.frame += 1
             self.writeBuffer.put(result)
-
+    @torch.inference_mode()
     def procInterpThread(self):
+        
         self.frame = 0
 
         while True:
@@ -332,6 +334,7 @@ class Interpolation(Render):
 
 
 class Upscaling(Render):
+    @torch.inference_mode()
     def __init__(
         self,
         main,
@@ -363,6 +366,7 @@ class Upscaling(Render):
         self.cugan_noise = cugan_noise
         self.ncnn_gpu=ncnn_gpu
         self.handleModel()
+    @torch.inference_mode()
     def handleModel(self):
         if "cuda" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleCUDA(
@@ -380,6 +384,7 @@ class Upscaling(Render):
                 num_threads=self.threads,
                 scale=self.resIncrease
             )
+    @torch.inference_mode()
     def procUpscaleThread(self):
 
 

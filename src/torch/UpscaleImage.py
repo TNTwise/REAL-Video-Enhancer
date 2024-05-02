@@ -23,6 +23,7 @@ import numpy as np
 
 
 class UpscaleCUDA:
+    @torch.inference_mode()
     def __init__(self, width, height, model, half):
         self.width = width
         self.height = height
