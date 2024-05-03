@@ -35,7 +35,14 @@ def handleCUDAModels(model: str = ""):
         os.system(
             f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
         )
-
+def deleteDownloaded():
+        for i in os.listdir(f"{thisdir}/files/"):
+            if os.path.isfile(i):
+                if ".txt" not in i:
+                    os.remove(f"{thisdir}/files/{i}")
+        for i in os.listdir(f"{thisdir}/files/"):
+            if ".txt" not in i:
+                os.system(f'rm -rf "{thisdir}/files/{i}"')
 
 class Worker(QObject):
     finished = pyqtSignal()
@@ -44,17 +51,13 @@ class Worker(QObject):
     def __init__(self, parent):
         self.main = parent
         QThread.__init__(self, None)
-
+    
     @pyqtSlot()
     def install_modules(self):
-        for i in os.listdir(f"{thisdir}/files/"):
-            if os.path.isfile(i):
-                if ".txt" not in i:
-                    os.remove(f"{thisdir}/files/{i}")
+        
+        deleteDownloaded()
         rife_install_list = []
-        for i in os.listdir(f"{thisdir}/files/"):
-            if ".txt" not in i:
-                os.system(f'rm -rf "{thisdir}/files/{i}"')
+       
         settings = Settings()
 
         os.system(f'touch "{thisdir}/models.txt"')
@@ -267,10 +270,7 @@ def run_install_models_from_settings(self):
 
 
 def endDownload(self):
-    for i in os.listdir(f"{thisdir}/files/"):
-        if ".txt" not in i:
-            log(f"deleted {i}")
-            os.system(f'rm -rf "{thisdir}/files/{i}"')
+    deleteDownloaded()
     log(
         "==============================Finished model download============================"
     )

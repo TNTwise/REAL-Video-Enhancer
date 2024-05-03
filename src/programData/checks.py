@@ -250,7 +250,7 @@ def check_for_individual_models():
             return_list.append("Vapoursynth-RIFE")
         if os.path.exists(f"{thisdir}/models/custom_models_ncnn/") and len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
             return_list.append("Custom NCNN Models")
-        if os.path.exists(f"{thisdir}/models/span") and len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
+        if os.path.exists(f"{thisdir}/models/span"):
             return_list.append("SPAN (NCNN)")
         if isCUDA():
 

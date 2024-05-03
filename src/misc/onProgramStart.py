@@ -383,6 +383,8 @@ def set_model_params(self):
         if "custom-cuda-models" == i:
             self.model_labels["Custom CUDA models"] = "upscaling"
 
+        if "SPAN (NCNN)" == i:
+            self.model_labels["SPAN (NCNN)"] = "upscaling"
     
     self.ui.modeCombo.clear()
     upscale_list = []

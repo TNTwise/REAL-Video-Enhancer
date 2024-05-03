@@ -34,7 +34,6 @@ def modelOptions(self):
     self.ui.Rife_Model.addItem("2x-ModernSpanimationV1")
     self.ui.Rife_Model.addItem("4xSPANkendata")
     self.ui.Rife_Model.addItem("ClearReality4x")
-    self.ui.Rife_Model.addItem("")
     self.ui.EnsembleCheckBox.hide()
     self.ui.EnsembleCheckBox.hide()
     self.ui.FPSFrom.hide()

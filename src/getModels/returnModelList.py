@@ -213,8 +213,8 @@ def returnModelList(
         self.ui.SPANNCNNCheckBox.isChecked() == True
         and os.path.exists(os.path.join(f"{settings.ModelDir}", f"span")) == False
     ):
-        install_modules_dict["https://github.com/TNTwise/SPAN-ncnn-vulkan/releases/download/20240407-055745/span-ncnn-vulkan-20240407-055745-RVE.zip"
-                             ] = "span-ncnn-vulkan.zip"
+        install_modules_dict["https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/span-ncnn-vulkan-20240407-ubuntu.zip"
+                             ] = returnCorrectLinkBasedOnOS("span-ncnn-vulkan-20240407-ubuntu.zip")
     
     for i in rife_install_list:
         if (

@@ -331,7 +331,7 @@ class MainWindow(QtWidgets.QMainWindow):
             CustomModelsNCNN.modelOptions(self)
         
         if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
-                GMFSSCUDA.modelOptions(self)
+            GMFSSCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
             rifeCUDA.modelOptions(self)
@@ -716,8 +716,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 if index >= 0:
                     self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
+            return
         if (
-            self.ui.AICombo.currentText() == "Custom NCNN models" or "SPAN (NCNN)"
+            self.ui.AICombo.currentText() == "Custom NCNN models" or self.ui.AICombo.currentText() ==  "SPAN (NCNN)"
         ):
             if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()
