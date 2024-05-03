@@ -261,8 +261,7 @@ def check_for_individual_models():
 
             if os.path.exists(f"{thisdir}/models/realesrgan-cuda/"):
                 return_list.append("realesrgan-cuda")
-
-            if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
+            if os.path.exists(f"{thisdir}/models/custom-models-cuda/") and len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
                 return_list.append("custom-cuda-models")
 
             if isCUPY():
