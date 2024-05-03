@@ -384,6 +384,7 @@ def set_model_params(self):
             self.model_labels["Custom CUDA models"] = "upscaling"
 
         if "SPAN (NCNN)" == i:
+            self.ui.SPANNCNNCheckBox.setChecked(True)
             self.model_labels["SPAN (NCNN)"] = "upscaling"
     
     self.ui.modeCombo.clear()

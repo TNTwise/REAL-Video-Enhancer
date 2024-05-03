@@ -232,6 +232,9 @@ def remove_unchecked(self):
     if self.ui.RifeCUDACheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
 
+    if self.ui.SPANNCNNCheckBox.isChecked() == False:
+        os.system(f'rm -rf "{self.settings.ModelDir}/span/"')
+
 
 def run_install_models_from_settings(self):
     try:
