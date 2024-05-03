@@ -47,12 +47,13 @@ def modelOptions(self):
     except:
         pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
-    self.greyOutRealSRTimes()
+    
     self.ui.RifeStart.clicked.connect(
         lambda: upscale.start_upscale(
             self, "realesrgan-ncnn-python"
         )  
     )
+    self.greyOutRealSRTimes()
     self.ui.Rife_Times.clear()
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
@@ -60,6 +61,7 @@ def modelOptions(self):
     self.ui.Rife_Times.addItem("2X")
     self.ui.Rife_Times.addItem("3X")
     self.ui.Rife_Times.addItem("4X")
+    self.ui.Rife_Times.setEnabled(True)
     self.ui.Rife_Times.setCurrentIndex(0)
 
 
