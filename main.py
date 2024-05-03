@@ -104,19 +104,19 @@ import modules.CUGAN as cugan
 import modules.realsr as realsr
 import modules.VapoursynthRifeNCNN as VapoursynthRifeNCNN
 import modules.CustomModelsNCNN as CustomModelsNCNN
+import modules.SPANNCNN as span
+
 
 import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
 
-import modules.interpolate as interpolate
-import modules.upscale as upscale
+
 
 
 from src.programData.return_data import *
 from src.programData.checks import *
 from src.programData.return_latest_update import *
-from PIL import Image
 
 
 class FileDropWidget(QLabel):
@@ -329,22 +329,24 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "Custom NCNN models":
             CustomModelsNCNN.modelOptions(self)
-        if gmfss:
-            if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
+        
+        if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
                 GMFSSCUDA.modelOptions(self)
 
-        if torch_version:
-            if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
-                rifeCUDA.modelOptions(self)
+        if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
+            rifeCUDA.modelOptions(self)
 
-            if self.ui.AICombo.currentText() == "Rife TensorRT (Nvidia only)":
-                rifeCUDA.modelOptions(self,trt=True)
+        if self.ui.AICombo.currentText() == "Rife TensorRT (Nvidia only)":
+            rifeCUDA.modelOptions(self,trt=True)
 
-            if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
-                RealESRGANCUDA.modelOptions(self)
+        if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
+            RealESRGANCUDA.modelOptions(self)
 
-            if self.ui.AICombo.currentText() == "Custom CUDA models":
-                CustomModelsCUDA.modelOptions(self)
+        if self.ui.AICombo.currentText() == "Custom CUDA models":
+            CustomModelsCUDA.modelOptions(self)
+        
+        if self.ui.AICombo.currentText() == "SPAN (NCNN)":
+            span.modelOptions(self)
 
     def switchMode(self):
         self.ui.AICombo.clear()
@@ -702,7 +704,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.ensembleHelpButton.hide()
 
     def greyOutRealSRTimes(self):
-        if self.ui.AICombo.currentText() == "RealESRGAN":
+        if self.ui.AICombo.currentText() == "RealESRGAN (NCNN)":
             if (
                 self.ui.Rife_Model.currentText() == "Default"
                 or self.ui.Rife_Model.currentText() == "General"
@@ -715,7 +717,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.removeItem(index)
                 self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom NCNN models"
+            self.ui.AICombo.currentText() == "Custom NCNN models" or "SPAN (NCNN)"
         ):
             if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()

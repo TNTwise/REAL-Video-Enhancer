@@ -766,21 +766,7 @@ class upscale(QObject):
             )
             self.main.frame_count = self.input_frames
 
-            if self.main.AI == "realesrgan-ncnn-vulkan":
-                command = [
-                    f"{settings.ModelDir}/realesrgan/realesrgan-ncnn-vulkan",
-                    "-i",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                    "-o",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                    "-j",
-                    f"1:{settings.VRAM}:2",
-                    "-f",
-                    str(img_type),
-                ]
-                for i in self.main.realESRGAN_Model.split(" "):
-                    command.append(i)
-                    log(command)
+            
 
             if self.main.AI == "waifu2x-ncnn-vulkan":
                 command = [
@@ -802,62 +788,7 @@ class upscale(QObject):
                     "-g",
                     f"{self.main.ui.gpuIDSpinBox.value()}",
                 ]
-            if self.main.AI == "realcugan-ncnn-vulkan":
-                command = [
-                    f"{settings.ModelDir}/realcugan/realcugan-ncnn-vulkan",
-                    "-i",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                    "-o",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                    "-s",
-                    str(int(self.main.ui.Rife_Times.currentText()[0])),
-                    "-n",
-                    str(self.main.ui.denoiseLevelSpinBox.value()),
-                    "-j",
-                    f"1:{settings.VRAM}:2",
-                    "-f",
-                    str(img_type),
-                    "-m",
-                    f"{settings.ModelDir}realcugan/{self.main.ui.Rife_Model.currentText()}",
-                    "-g",
-                    f"{self.main.ui.gpuIDSpinBox.value()}",
-                ]
-            if self.main.AI == "realsr-ncnn-vulkan":
-                command = [
-                    f"{settings.ModelDir}realsr/realsr-ncnn-vulkan",
-                    "-i",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                    "-o",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                    "-j",
-                    f"1:{settings.VRAM}:2",
-                    "-f",
-                    str(img_type),
-                    "-m",
-                    f"{settings.ModelDir}realsr/models-{self.main.ui.Rife_Model.currentText()}",
-                    "-g",
-                    f"{self.main.ui.gpuIDSpinBox.value()}",
-                ]
-            if self.main.AI == "custom-models-ncnn-vulkan":
-                command = [
-                    f"{settings.ModelDir}custom_models_ncnn/upscayl-bin",
-                    "-i",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames",
-                    "-o",
-                    f"{settings.RenderDir}/{self.main.videoName}_temp/output_frames/0/",
-                    "-j",
-                    f"1:{settings.VRAM}:2",
-                    "-f",
-                    str(img_type),
-                    "-m",
-                    f"{settings.ModelDir}custom_models_ncnn/models/",
-                    "-n",
-                    f"{self.main.ui.Rife_Model.currentText()}",
-                    "-g",
-                    f"{self.main.ui.gpuIDSpinBox.value()}",
-                    "-s",
-                    f"{self.main.ui.Rife_Times.currentText()[0]}",
-                ]
+            
             if (
                 settings.RenderType == "Optimized"
                 and self.main.frame_count > self.main.frame_increments_of_interpolation
@@ -1004,6 +935,25 @@ class upscale(QObject):
                     int(self.main.ui.Rife_Times.currentText()[0]),
                     model,
                     bool(settings.HalfPrecision),
+                    method=self.main.AI,
+                    threads=int(settings.VRAM),
+                    benchmark=self.main.benchmark
+                )
+            
+            if self.main.AI == "span-ncnn-python":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+
+                model = os.path.join(f"{settings.ModelDir}","span",f"models",f"{self.main.ui.Rife_Model.currentText()}")
+
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    main=self.main,
+                    input_file=self.main.input_file,
+                    output_file=output_file,
+                    resIncrease=int(self.main.ui.Rife_Times.currentText()[0]),
+                    model_path=model,
+                    half=bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     benchmark=self.main.benchmark
