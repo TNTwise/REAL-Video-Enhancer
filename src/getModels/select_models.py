@@ -18,14 +18,6 @@ import src.getModels.SelectModels as SelectModels
 import src.getModels.Download as DownloadUI
 from src.misc.log import log
 
-try:
-    import cupy
-    import modules.GMFSSCUDA as GMFSSCUDA
-
-    gmfss = True
-except Exception as e:
-    gmfss = False
-    log(e)
 global rife_install_list
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, pyqtSlot
 from src.misc.messages import *
@@ -51,14 +43,6 @@ def handleCUDAModels(model: str = ""):
         )
 
 
-try:
-    import torch
-    import torchvision
-    import spandrel
-    torch_version = True
-
-except Exception as e:
-    torch_version = False
 
 import src.getModels.SelectAI as SelectAI
 import traceback
@@ -226,7 +210,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             install_icons(self)
             self.ui.setupUi(self)
             self.pinFunctions()
-            self.ui.GMFSSCUDACheckBox.setEnabled(gmfss)
+            self.ui.GMFSSCUDACheckBox.setEnabled(isCUPY())
             self.show()
 
         def showDialogBox(self, message, displayInfoIcon=False):
@@ -240,7 +224,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             msg.exec_()
 
         def pinFunctions(self):
-            self.ui.modelsTabWidget.setTabEnabled(1, torch_version)
+            self.ui.modelsTabWidget.setTabEnabled(1, isCUDA())
             self.ui.InstallButton.clicked.connect(self.next)
             self.ui.RifeSettings.clicked.connect(lambda: choose_models(self))
 

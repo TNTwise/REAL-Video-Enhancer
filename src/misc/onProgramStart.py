@@ -335,20 +335,20 @@ def set_model_params(self):
     self.model_labels = {}
     self.ui.RifeSettings.setEnabled(False)
     for i in models_installed:
-        if "Rife" == i:
+        if "Rife-ncnn" == i:
             self.ui.RifeCheckBox.setChecked(True)
             self.model_labels["Rife (NCNN)"] = "interpolation"
             self.ui.RifeSettings.setEnabled(True)
-        if "RealESRGAN" == i:
+        if "RealESRGAN-ncnn" == i:
             self.ui.RealESRGANCheckBox.setChecked(True)
             self.model_labels["RealESRGAN (NCNN)"] = "upscaling"
-        if "RealCUGAN" == i:
+        if "RealCUGAN-ncnn" == i:
             self.ui.RealCUGANCheckBox.setChecked(True)
             self.model_labels["RealCUGAN (NCNN)"] = "upscaling"
-        if "RealSR" == i:
+        if "RealSR-ncnn" == i:
             self.ui.RealSRCheckBox.setChecked(True)
             self.model_labels["RealSR (NCNN)"] = "upscaling"
-        if "Waifu2X" == i:
+        if "Waifu2X-ncnn" == i:
             self.ui.Waifu2xCheckBox.setChecked(True)
             self.model_labels["Waifu2X (NCNN)"] = "upscaling"
 

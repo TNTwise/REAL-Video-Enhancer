@@ -734,6 +734,20 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="QCheckBox" name="RealSRCheckBox">
+                     <property name="text">
+                      <string>RealSR (Upscale General)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="SPANNCNNCheckBox">
+                     <property name="text">
+                      <string>SPAN (Upscale General)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QCheckBox" name="Waifu2xCheckBox">
                      <property name="text">
                       <string>Waifu2X (Upscale Animation)</string>
@@ -741,9 +755,12 @@
                     </widget>
                    </item>
                    <item>
-                    <widget class="QCheckBox" name="RealSRCheckBox">
+                    <widget class="QCheckBox" name="CainCheckBox">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
                      <property name="text">
-                      <string>RealSR (Upscale General)</string>
+                      <string>IFRNET (Interpolate General)</string>
                      </property>
                     </widget>
                    </item>
@@ -765,17 +782,6 @@
                      </item>
                     </layout>
                    </item>
-                   <item>
-                    <widget class="QCheckBox" name="CainCheckBox">
-                     <property name="enabled">
-                      <bool>true</bool>
-                     </property>
-                     <property name="text">
-                      <string>IFRNET (Interpolate General)</string>
-                     </property>
-                    </widget>
-                   </item>
-                   
                    <item>
                     <widget class="QCheckBox" name="RifeVSCheckBox">
                      <property name="enabled">

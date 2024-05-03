@@ -235,17 +235,17 @@ def check_for_individual_models():
     return_list = []
     if os.path.exists(f"{thisdir}/models/"):
         if os.path.exists(f"{thisdir}/models/rife/"):
-            return_list.append("Rife")
+            return_list.append("Rife-ncnn")
         if os.path.exists(f"{thisdir}/models/realesrgan/"):
-            return_list.append("RealESRGAN")
+            return_list.append("RealESRGAN-ncnn")
         if os.path.exists(f"{thisdir}/models/waifu2x/"):
-            return_list.append("Waifu2X")
+            return_list.append("Waifu2X-ncnn")
         if os.path.exists(f"{thisdir}/models/realcugan/"):
-            return_list.append("RealCUGAN")
+            return_list.append("RealCUGAN-ncnn")
         if os.path.exists(f"{thisdir}/models/ifrnet/"):
-            return_list.append("IFRNET")
+            return_list.append("IFRNET-ncnn")
         if os.path.exists(f"{thisdir}/models/realsr/"):
-            return_list.append("RealSR")
+            return_list.append("RealSR-ncnn")
         if os.path.exists(f"{thisdir}/models/vapoursynth-rife/"):
             return_list.append("Vapoursynth-RIFE")
         if os.path.exists(f"{thisdir}/models/custom_models_ncnn/") and len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:

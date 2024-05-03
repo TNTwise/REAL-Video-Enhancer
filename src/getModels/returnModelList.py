@@ -209,6 +209,13 @@ def returnModelList(
         install_modules_dict[
             "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/gmfss-cuda.zip"
         ] = "gmfss-cuda.zip"
+    if (
+        self.ui.SPANNCNNCheckBox.isChecked() == True
+        and os.path.exists(os.path.join(f"{settings.ModelDir}", f"span")) == False
+    ):
+        install_modules_dict["https://github.com/TNTwise/SPAN-ncnn-vulkan/releases/download/20240407-055745/span-ncnn-vulkan-20240407-055745-RVE.zip"
+                             ] = "span-ncnn-vulkan.zip"
+    
     for i in rife_install_list:
         if (
             os.path.exists(

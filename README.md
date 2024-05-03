@@ -68,4 +68,13 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
   
 </ul>
 
+# Custom models used:
+
+<ul>
+  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-SPANkendata" target="_blank" >4x-SPANkendata by Crustaceous D</a> </li>
+  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-ClearRealityV1" target="_blank" >4x-ClearRealityV1 by Kim2091</a> </li>
+  
+  
+</ul>
+
 
