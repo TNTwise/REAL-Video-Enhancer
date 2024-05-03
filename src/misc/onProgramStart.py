@@ -8,28 +8,6 @@ from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
 from src.programData.version import returnVersion
-try:
-    import cupy
-    import modules.GMFSSCUDA as GMFSSCUDA
-
-    gmfss = True
-except Exception as e:
-    gmfss = False
-
-try:
-    import tensorrt
-    from torch_tensorrt.fx import LowerSetting
-    tensorRT = True
-except:
-    tensorRT = False
-try:
-    import torch
-    import torchvision
-    import spandrel
-
-    torch_version = True
-except:
-    torch_version = False
 
 
 def open_link(urll):
@@ -269,15 +247,22 @@ def hideChainModeButtons(self):
     self.ui.AIUpscalingComboBox.hide()
     self.ui.AIUpscalingLabel.hide()
 
-
+def cuda_shit(self):
+    if checks.isCUDA(): # shit to do on cuda ver
+        self.ui.modelTabWidget.setTabEnabled(1, True)
+        os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
+        # shit to do if cupy
+        if checks.isCUPY():
+            self.ui.GMFSSCUDACheckBox.setDisabled(False)
+    else:
+        self.ui.modelTabWidget.setTabEnabled(1, False)
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
     log("Program Version: " + returnVersion() +
         "\n====================================================================")
 
-    if torch_version:
-        os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
+        
 
     os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
     
@@ -310,6 +295,9 @@ def onApplicationStart(self):
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
 
+    cuda_shit(self)
+
+    
     os.system(
         "ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0"
     )  # Enables discord RPC on flatpak
@@ -349,60 +337,53 @@ def set_model_params(self):
     for i in models_installed:
         if "Rife" == i:
             self.ui.RifeCheckBox.setChecked(True)
-            self.model_labels["Rife"] = "interpolation"
+            self.model_labels["Rife (NCNN)"] = "interpolation"
             self.ui.RifeSettings.setEnabled(True)
         if "RealESRGAN" == i:
             self.ui.RealESRGANCheckBox.setChecked(True)
-            self.model_labels["RealESRGAN"] = "upscaling"
+            self.model_labels["RealESRGAN (NCNN)"] = "upscaling"
         if "RealCUGAN" == i:
             self.ui.RealCUGANCheckBox.setChecked(True)
-            self.model_labels["RealCUGAN"] = "upscaling"
+            self.model_labels["RealCUGAN (NCNN)"] = "upscaling"
         if "RealSR" == i:
             self.ui.RealSRCheckBox.setChecked(True)
-            self.model_labels["RealSR"] = "upscaling"
+            self.model_labels["RealSR (NCNN)"] = "upscaling"
         if "Waifu2X" == i:
             self.ui.Waifu2xCheckBox.setChecked(True)
-            self.model_labels["Waifu2X"] = "upscaling"
+            self.model_labels["Waifu2X (NCNN)"] = "upscaling"
 
         if "Vapoursynth-RIFE" == i:
             self.ui.VapoursynthRIFECheckBox.setChecked(True)
             self.model_labels["Vapoursynth-RIFE"] = "interpolation"
         if "IFRNET" == i:
             self.ui.CainCheckBox.setChecked(True)
-            self.model_labels["IFRNET"] = "interpolation"
-
-    if len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
-                self.model_labels["Custom NCNN models"] = "upscaling"
-    # not efficient but im lazy so cry abt it
-    # placeholder
-    if torch_version == True:
-        self.ui.modelTabWidget.setTabEnabled(1, True)
-        cuda_rife_installed = os.path.exists(f"{thisdir}/models/rife-cuda")
-        cuda_gmfss_installed = os.path.exists(f"{thisdir}/models/gmfss-cuda")
-        if cuda_rife_installed == True:
-            self.ui.RifeCUDACheckBox.setChecked(cuda_rife_installed)
+            self.model_labels["IFRNET (NCNN)"] = "interpolation"
+        
+        
+        if "rife-cuda" == i:
+            self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
-            if tensorRT:
-                os.makedirs(os.path.join(f"{thisdir}","models","rife-trt-engines"), exist_ok=True)
-                self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
-                
 
-        cuda_esrgan_installed = os.path.exists(f"{thisdir}/models/realesrgan-cuda")
-        if cuda_esrgan_installed == True:
+        if "rife-cuda-trt" == i:
+            os.makedirs(os.path.join(f"{thisdir}","models","rife-trt-engines"), exist_ok=True)
+            self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
+
+        if "Custom NCNN Models" == i:
+            self.model_labels["Custom NCNN models"] = "upscaling"
+        
+        if "realesrgan-cuda" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
 
-        if cuda_gmfss_installed == True and gmfss:
-            self.ui.GMFSSCUDACheckBox.setChecked(cuda_rife_installed)
+        if "gfmss-cuda" == i:
+            self.ui.GMFSSCUDACheckBox.setChecked(True)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
-            self.ui.GMFSSCUDACheckBox.setDisabled(False)
-        elif not gmfss:
-            self.ui.GMFSSCUDACheckBox.setDisabled(True)
-        if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
+            
+    
+        if "custom-cuda-models" == i:
             self.model_labels["Custom CUDA models"] = "upscaling"
 
-    else:
-        self.ui.modelTabWidget.setTabEnabled(1, False)
+    
     self.ui.modeCombo.clear()
     upscale_list = []
     for i in range(self.ui.modeCombo.count()):

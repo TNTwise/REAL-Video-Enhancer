@@ -13,8 +13,28 @@ import shutil
 from src.misc.log import *
 from src.programData.write_permisions import *
 import traceback
+try:
+        import cupy
+        import modules.GMFSSCUDA as GMFSSCUDA
 
+        gmfss = True
+except Exception as e:
+        gmfss = False
+try:
+    import torch
+    import torchvision
+    import spandrel
 
+    cuda = True
+except:
+    cuda = False
+
+try:
+    import tensorrt
+    from torch_tensorrt.fx import LowerSetting
+    tensorRT = True
+except:
+    tensorRT = False
 
 
 
@@ -196,7 +216,14 @@ def check_if_enough_space(input_file, render, times):
             full_extraction_size * 5 / (1024**3),
             free_space / (1024**3),
         )
+def isCUDA():
+   return cuda
 
+def isTensorRT():
+    return tensorRT
+
+def isCUPY():
+    return gmfss
 
 def check_for_individual_models():
     """
@@ -221,14 +248,28 @@ def check_for_individual_models():
             return_list.append("RealSR")
         if os.path.exists(f"{thisdir}/models/vapoursynth-rife/"):
             return_list.append("Vapoursynth-RIFE")
-        if os.path.exists(f"{thisdir}/models/custom_models_ncnn/"):
+        if os.path.exists(f"{thisdir}/models/custom_models_ncnn/") and len(os.listdir(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"))) > 0:
             return_list.append("Custom NCNN Models")
-        if os.path.exists(f"{thisdir}/models/rife-cuda/"):
-            return_list.append("rife-cuda")
-        if os.path.exists(f"{thisdir}/models/realesrgan-cuda/"):
-            return_list.append("realesrgan-cuda")
+        if isCUDA():
+
+            if os.path.exists(f"{thisdir}/models/rife-cuda/"):
+                return_list.append("rife-cuda")
+                if isTensorRT():
+                    return_list.append("rife-cuda-trt")
+
+            if os.path.exists(f"{thisdir}/models/realesrgan-cuda/"):
+                return_list.append("realesrgan-cuda")
+
+            if len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0:
+                return_list.append("custom-cuda-models")
+
+            if isCUPY():
+                if os.path.exists(f"{thisdir}/models/gfmss-cuda/"):
+                    return_list.append("gfmss-cuda")
+            
+
         if len(return_list) > 0:
-            return return_list
+                return return_list
 
     return None
 
@@ -290,3 +331,5 @@ def check_for_updated_binary(binary, returnVersion=False):
             return True
         return False
     return True  # if the path doesnt exist, just return true
+
+

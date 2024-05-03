@@ -306,25 +306,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.models_dir = f"{thisdir}/models/"
 
     def switchUI(self):
-        if self.ui.AICombo.currentText() == "Rife":
+        if self.ui.AICombo.currentText() == "Rife (NCNN)":
             rife.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "RealESRGAN":
+        if self.ui.AICombo.currentText() == "RealESRGAN (NCNN)":
             esrgan.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "Waifu2X":
+        if self.ui.AICombo.currentText() == "Waifu2X (NCNN)":
             Waifu2X.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Vapoursynth-RIFE":
             VapoursynthRifeNCNN.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "IFRNET":
+        if self.ui.AICombo.currentText() == "IFRNET (NCNN)":
             ifrnet.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "RealCUGAN":
+        if self.ui.AICombo.currentText() == "RealCUGAN (NCNN)":
             cugan.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "RealSR":
+        if self.ui.AICombo.currentText() == "RealSR (NCNN)":
             realsr.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Custom NCNN models":
