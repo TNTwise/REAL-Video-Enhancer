@@ -47,7 +47,7 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
 
 ## Confused on anything?
 - Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>
-## Download the Latest Beta release here:
+## Download the Latest PRE-Release release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease">https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease</a>
 
 # Software used:
