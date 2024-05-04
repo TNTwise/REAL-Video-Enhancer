@@ -33,6 +33,8 @@
 
 ## Benchmarks: (NCNN)
 Benchmarks done with 1920x1080 video, default settings using JPG image extraction.<br/>
+
+|                     RIFE                    |
 | RX 6650 XT | Ensemble False | Ensemble True | 
 |--|--|--|
 | rife-v2.0 - v2.4  | 12.341 fps | -
