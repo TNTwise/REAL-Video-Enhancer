@@ -23,7 +23,7 @@ thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-def modelOptions(self,trt=False):
+def modelOptions(self, trt=False):
     settings = Settings()
     self.times = 2
     log("Model: RIFE-CUDA")
@@ -80,7 +80,7 @@ def modelOptions(self,trt=False):
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
-    
+
     cmd = "rife-cuda-trt" if trt else "rife-cuda"
-    
+
     self.ui.RifeStart.clicked.connect(lambda: start_interpolation(self, cmd))

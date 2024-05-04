@@ -5,7 +5,7 @@ from src.torch.rife.warplayer import warp
 # from train_log.refine import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-torch.fx.wrap('warp')
+torch.fx.wrap("warp")
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -118,7 +118,7 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self,scale=1,ensemble=False):
+    def __init__(self, scale=1, ensemble=False):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 8, c=128)
         self.block1 = IFBlock(8 + 4 + 8, c=96)
@@ -129,12 +129,12 @@ class IFNet(nn.Module):
         # self.unet = Unet()
         self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
         self.ensemble = ensemble
+
     def forward(
         self,
         img0,
         img1,
         timestep=0.5,
-
     ):
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
         f0 = self.encode(img0[:, :3])

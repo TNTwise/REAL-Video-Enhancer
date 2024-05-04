@@ -672,39 +672,39 @@ class interpolation(QObject):
                     self.main.times,
                     self.main.ui.EnsembleCheckBox.isChecked(),
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
 
             if self.main.AI == "rife-cuda-trt":
-                                output_file = returnOutputFile(
-                                    self.main, self.main.videoName, self.main.encoder
-                                )
-                                self.main.renderAI = RenderCUDA.Interpolation(
-                                    self.main,
-                                    "rife-cuda-trt",
-                                    self.main.input_file,
-                                    output_file,
-                                    self.main.ui.Rife_Model.currentText(),
-                                    self.main.times,
-                                    self.main.ui.EnsembleCheckBox.isChecked(),
-                                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-                                    benchmark=self.main.benchmark
-                                )
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Interpolation(
+                    self.main,
+                    "rife-cuda-trt",
+                    self.main.input_file,
+                    output_file,
+                    self.main.ui.Rife_Model.currentText(),
+                    self.main.times,
+                    self.main.ui.EnsembleCheckBox.isChecked(),
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark,
+                )
 
             if self.main.AI == "gmfss-cuda":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
                 )
                 self.main.renderAI = RenderCUDA.Interpolation(
-                self.main,
-                "gmfss",
-                self.main.input_file,
-                output_file,
-                self.main.ui.Rife_Model.currentText(),
-                self.main.times,
-                self.main.ui.EnsembleCheckBox.isChecked(),
-                bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-                benchmark=self.main.benchmark
+                    self.main,
+                    "gmfss",
+                    self.main.input_file,
+                    output_file,
+                    self.main.ui.Rife_Model.currentText(),
+                    self.main.times,
+                    self.main.ui.EnsembleCheckBox.isChecked(),
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark,
                 )
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
@@ -766,8 +766,6 @@ class upscale(QObject):
             )
             self.main.frame_count = self.input_frames
 
-            
-
             if self.main.AI == "waifu2x-ncnn-vulkan":
                 command = [
                     f"{settings.ModelDir}/waifu2x/waifu2x-ncnn-vulkan",
@@ -788,7 +786,7 @@ class upscale(QObject):
                     "-g",
                     f"{self.main.ui.gpuIDSpinBox.value()}",
                 ]
-            
+
             if (
                 settings.RenderType == "Optimized"
                 and self.main.frame_count > self.main.frame_increments_of_interpolation
@@ -825,11 +823,12 @@ class upscale(QObject):
                     pass
 
         if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
+            output_file = returnOutputFile(
+                self.main, self.main.videoName, self.main.encoder
+            )
             if self.main.AI == "realesrgan-cuda":
                 model_path = handleModel(self.main.AI)
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
-                )
+
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
@@ -837,15 +836,12 @@ class upscale(QObject):
                     int(self.main.ui.Rife_Times.currentText()[0]),
                     model_path,
                     bool(settings.HalfPrecision),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
 
             if self.main.AI == "custom-models-cuda":
                 model_path = handleModel(
                     self.main.AI, self.main.ui.Rife_Model.currentText()
-                )
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
                 )
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
@@ -854,18 +850,24 @@ class upscale(QObject):
                     int(self.main.ui.Rife_Times.currentText()[0]),
                     model_path,
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
-
 
             if self.main.AI == "realesrgan-ncnn-python":
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
-                )
                 if self.main.ui.Rife_Model.currentText() == "Animation":
-                    model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}")
+                    model = os.path.join(
+                        f"{settings.ModelDir}",
+                        "realesrgan",
+                        "models",
+                        f"realesr-animevideov3-x{self.main.ui.Rife_Times.currentText()[0]}",
+                    )
                 else:
-                    model = os.path.join(f"{settings.ModelDir}","realesrgan","models",f"{self.main.ui.Rife_Model.currentText()}")
+                    model = os.path.join(
+                        f"{settings.ModelDir}",
+                        "realesrgan",
+                        "models",
+                        f"{self.main.ui.Rife_Model.currentText()}",
+                    )
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
@@ -876,17 +878,16 @@ class upscale(QObject):
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
-                    benchmark=self.main.benchmark
-
+                    benchmark=self.main.benchmark,
                 )
-
 
             if self.main.AI == "realsr-ncnn-python":
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
+                model = os.path.join(
+                    f"{settings.ModelDir}",
+                    "realsr",
+                    f"models-{self.main.ui.Rife_Model.currentText()}",
+                    "x4",
                 )
-
-                model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
 
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
@@ -898,35 +899,31 @@ class upscale(QObject):
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
             if self.main.AI == "realcugan-ncnn-python":
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
-                )
-
-                #model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
+                # model = os.path.join(f"{settings.ModelDir}","realsr",f"models-{self.main.ui.Rife_Model.currentText()}","x4")
 
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
                     self.main.input_file,
                     output_file,
                     int(self.main.ui.Rife_Times.currentText()[0]),
-
                     half=bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
                     cugan_noise=str(self.main.ui.denoiseLevelSpinBox.value()),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
 
             if self.main.AI == "custom-models-ncnn-python":
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
+                model = os.path.join(
+                    f"{settings.ModelDir}",
+                    "custom_models_ncnn",
+                    f"models",
+                    f"{self.main.ui.Rife_Model.currentText()}",
                 )
-
-                model = os.path.join(f"{settings.ModelDir}","custom_models_ncnn",f"models",f"{self.main.ui.Rife_Model.currentText()}")
 
                 self.main.renderAI = RenderCUDA.Upscaling(
                     self.main,
@@ -937,15 +934,16 @@ class upscale(QObject):
                     bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
-                    benchmark=self.main.benchmark
-                )
-            
-            if self.main.AI == "span-ncnn-python":
-                output_file = returnOutputFile(
-                    self.main, self.main.videoName, self.main.encoder
+                    benchmark=self.main.benchmark,
                 )
 
-                model = os.path.join(f"{settings.ModelDir}","span",f"models",f"{self.main.ui.Rife_Model.currentText()}")
+            if self.main.AI == "span-ncnn-python":
+                model = os.path.join(
+                    f"{settings.ModelDir}",
+                    "span",
+                    f"models",
+                    f"{self.main.ui.Rife_Model.currentText()}",
+                )
 
                 self.main.renderAI = RenderCUDA.Upscaling(
                     main=self.main,
@@ -956,7 +954,7 @@ class upscale(QObject):
                     half=bool(settings.HalfPrecision),
                     method=self.main.AI,
                     threads=int(settings.VRAM),
-                    benchmark=self.main.benchmark
+                    benchmark=self.main.benchmark,
                 )
 
             self.main.renderAI.extractFramesToBytes()

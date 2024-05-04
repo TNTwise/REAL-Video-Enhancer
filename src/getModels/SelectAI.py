@@ -182,7 +182,7 @@ class Ui_MainWindow(object):
         self.RealCUGANCheckBox.setText(_translate("MainWindow", "RealCUGAN (Upscale Animation)"))
         self.RealESRGANCheckBox.setText(_translate("MainWindow", "RealESRGAN (Upscale Animation)"))
         self.RealSRCheckBox.setText(_translate("MainWindow", "RealSR (Upscale Realistic)"))
-        self.SPANNCNNCheckBox.setText(_translate("MainWindow", "SPAN (Upscale General)"))
+        self.SPANNCNNCheckBox.setText(_translate("MainWindow", "SPAN (Upscale General + Animation)"))
         self.Waifu2xCheckBox.setText(_translate("MainWindow", "Waifu2X  (Upscale Animation)"))
         self.label_2.setText(_translate("MainWindow", "INTERPOLATE"))
         self.CainCheckBox.setText(_translate("MainWindow", "IFRNET (Interpolate General)"))

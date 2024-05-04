@@ -53,7 +53,6 @@ if torch_version:
     import modules.RifeCUDA as rifeCUDA
     import modules.RealESRGANCUDA as RealESRGANCUDA
     import modules.CustomModelsCUDA as CustomModelsCUDA
-    
 
     import numpy as np
 
@@ -110,8 +109,6 @@ import modules.SPANNCNN as span
 import src.misc.onProgramStart
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
-
-
 
 
 from src.programData.return_data import *
@@ -194,8 +191,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.output_folder = ""
         self.download_youtube_video_command = ""
         self.benchmark = False
-        for i in sys.argv: # parse args
-            if '--benchmark' == i:
+        for i in sys.argv:  # parse args
+            if "--benchmark" == i:
                 self.benchmark = True
 
         # self.ui.logsPreview.setStyleSheet("color: white; background-color: rgb(32,28,28); border-radius: 10px;")
@@ -329,7 +326,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "Custom NCNN models":
             CustomModelsNCNN.modelOptions(self)
-        
+
         if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
             GMFSSCUDA.modelOptions(self)
 
@@ -337,14 +334,14 @@ class MainWindow(QtWidgets.QMainWindow):
             rifeCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Rife TensorRT (Nvidia only)":
-            rifeCUDA.modelOptions(self,trt=True)
+            rifeCUDA.modelOptions(self, trt=True)
 
         if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
             RealESRGANCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Custom CUDA models":
             CustomModelsCUDA.modelOptions(self)
-        
+
         if self.ui.AICombo.currentText() == "SPAN (NCNN)":
             span.modelOptions(self)
 
@@ -718,7 +715,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.ui.Rife_Times.setEnabled(True)
             return
         if (
-            self.ui.AICombo.currentText() == "Custom NCNN models" or self.ui.AICombo.currentText() ==  "SPAN (NCNN)"
+            self.ui.AICombo.currentText() == "Custom NCNN models"
+            or self.ui.AICombo.currentText() == "SPAN (NCNN)"
         ):
             if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()
@@ -743,16 +741,15 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models" and self.ui.Rife_Model.currentText()
+            self.ui.AICombo.currentText() == "Custom CUDA models"
+            and self.ui.Rife_Model.currentText()
         ):
-                
-                model_path = handleModel(
-                                    "custom-models-cuda", self.ui.Rife_Model.currentText()
-                                )
-                model = ModelLoader().load_from_file(model_path)
-                if self.ui.Rife_Times.count() < 1:
-                    self.ui.Rife_Times.addItem(f"{model.scale}X")
-
+            model_path = handleModel(
+                "custom-models-cuda", self.ui.Rife_Model.currentText()
+            )
+            model = ModelLoader().load_from_file(model_path)
+            if self.ui.Rife_Times.count() < 1:
+                self.ui.Rife_Times.addItem(f"{model.scale}X")
 
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
@@ -1127,7 +1124,6 @@ def apply_decorator_to_all_functions(module):
 
 # Applying the decorator to all functions in the current module
 apply_decorator_to_all_functions(globals())
-
 
 
 app = QtWidgets.QApplication(sys.argv)

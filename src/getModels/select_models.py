@@ -43,7 +43,6 @@ def handleCUDAModels(model: str = ""):
         )
 
 
-
 import src.getModels.SelectAI as SelectAI
 import traceback
 
@@ -178,7 +177,7 @@ def install_icons(self):
                 log(f"ERROR: {e} {traceback_log}")
                 failed_download(self)
                 exit()
-            '''elif check_if_online(dont_check=False, url="https://drive.google.com/"):
+            """elif check_if_online(dont_check=False, url="https://drive.google.com/"):
                             log("Couldnt connect to github, attempting to use google drive")
                             msg = QMessageBox()
                             msg.setWindowTitle(" ")
@@ -188,7 +187,7 @@ def install_icons(self):
                             msg.exec_()
                             GDrive.download_file_from_google_drive(
                                 "1nOh01QQmet606W95ABBShrg5hFOuRwbo", f"{thisdir}/files/models.tar.gz"
-                            )'''
+                            )"""
         else:
             failed_download(self)
             exit()

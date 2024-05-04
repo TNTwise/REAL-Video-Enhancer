@@ -2,7 +2,7 @@ from src.programData.settings import *
 from src.misc.messages import *
 import src.programData.checks as checks
 from PyQt5.QtCore import QUrl
-from PyQt5.QtGui import QDesktopServices,QIntValidator, QIcon
+from PyQt5.QtGui import QDesktopServices, QIntValidator, QIcon
 import os
 from src.misc.log import *
 from src.getLinkVideo.get_video import *
@@ -247,8 +247,9 @@ def hideChainModeButtons(self):
     self.ui.AIUpscalingComboBox.hide()
     self.ui.AIUpscalingLabel.hide()
 
+
 def cuda_shit(self):
-    if checks.isCUDA(): # shit to do on cuda ver
+    if checks.isCUDA():  # shit to do on cuda ver
         self.ui.modelTabWidget.setTabEnabled(1, True)
         os.system(f'mkdir -p "{thisdir}/models/custom-models-cuda"')
         # shit to do if cupy
@@ -256,16 +257,24 @@ def cuda_shit(self):
             self.ui.GMFSSCUDACheckBox.setDisabled(False)
     else:
         self.ui.modelTabWidget.setTabEnabled(1, False)
+
+
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
-    log("Program Version: " + returnVersion() +
-        "\n====================================================================")
+    log(
+        "Program Version: "
+        + returnVersion()
+        + "\n===================================================================="
+    )
 
-        
-
-    os.makedirs(os.path.join(f"{thisdir}","models","custom_models_ncnn","models"), exist_ok=True)
-    os.makedirs(os.path.join(f"{thisdir}","models","custom-models-cuda"), exist_ok=True)
+    os.makedirs(
+        os.path.join(f"{thisdir}", "models", "custom_models_ncnn", "models"),
+        exist_ok=True,
+    )
+    os.makedirs(
+        os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
+    )
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
     set_model_params(self)
@@ -298,7 +307,6 @@ def onApplicationStart(self):
 
     cuda_shit(self)
 
-    
     os.system(
         "ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0"
     )  # Enables discord RPC on flatpak
@@ -359,19 +367,20 @@ def set_model_params(self):
         if "IFRNET" == i:
             self.ui.CainCheckBox.setChecked(True)
             self.model_labels["IFRNET (NCNN)"] = "interpolation"
-        
-        
+
         if "rife-cuda" == i:
             self.ui.RifeCUDACheckBox.setChecked(True)
             self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
 
         if "rife-cuda-trt" == i:
-            os.makedirs(os.path.join(f"{thisdir}","models","rife-trt-engines"), exist_ok=True)
+            os.makedirs(
+                os.path.join(f"{thisdir}", "models", "rife-trt-engines"), exist_ok=True
+            )
             self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
 
         if "Custom NCNN Models" == i:
             self.model_labels["Custom NCNN models"] = "upscaling"
-        
+
         if "realesrgan-cuda" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
@@ -379,15 +388,14 @@ def set_model_params(self):
         if "gfmss-cuda" == i:
             self.ui.GMFSSCUDACheckBox.setChecked(True)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
-            
-    
+
         if "custom-cuda-models" == i:
             self.model_labels["Custom CUDA models"] = "upscaling"
 
         if "SPAN (NCNN)" == i:
             self.ui.SPANNCNNCheckBox.setChecked(True)
             self.model_labels["SPAN (NCNN)"] = "upscaling"
-    
+
     self.ui.modeCombo.clear()
     upscale_list = []
     for i in range(self.ui.modeCombo.count()):

@@ -47,11 +47,9 @@ def modelOptions(self):
     except:
         pass
     self.ui.Rife_Model.currentIndexChanged.connect((self.greyOutRealSRTimes))
-    
+
     self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(
-            self, "realesrgan-ncnn-python"
-        )  
+        lambda: upscale.start_upscale(self, "realesrgan-ncnn-python")
     )
     self.greyOutRealSRTimes()
     self.ui.Rife_Times.clear()

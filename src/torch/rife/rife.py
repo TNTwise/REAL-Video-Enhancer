@@ -20,7 +20,6 @@ class Rife:
         height,
         interpolate_method,
         ensemble=False,
-
         nt=1,
         UHD=False,
     ):
@@ -122,25 +121,24 @@ class Rife:
             if self.half and not self.UHD:
                 torch.set_default_dtype(torch.float16)
 
-
-        self.model = Model(scale=self.scale,ensemble=self.ensemble)
+        self.model = Model(scale=self.scale, ensemble=self.ensemble)
         self.model.load_model(modelDir, -1)
         self.model.eval()
 
         if self.cuda_available and self.half and not self.UHD:
             self.model.half()
 
-
-
         self.model.device()
         self.I0 = None
 
     @torch.inference_mode()
     def make_inference(self, n):
-        timestep = torch.full((1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device)
+        timestep = torch.full(
+            (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
+        )
         timestep = timestep.to(memory_format=torch.channels_last)
         if self.half:
-                timestep = timestep.half()
+            timestep = timestep.half()
         output = self.model.inference(self.I0, self.I1, timestep=timestep)
         output = output[:, :, : self.height, : self.width]
         output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
@@ -153,8 +151,6 @@ class Rife:
     def pad_frame(self):
         self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
         self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
-
-
 
     @torch.inference_mode()
     def run(self, I1):

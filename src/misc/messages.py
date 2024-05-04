@@ -214,4 +214,6 @@ def halfPrecision_help(self):
 
 
 def gmfss_help(self):
-    self.showDialogBox(f"GMFSS requires CUDA to be installed natively, please install CUDA via your package manager.")
+    self.showDialogBox(
+        f"GMFSS requires CUDA to be installed natively, please install CUDA via your package manager."
+    )

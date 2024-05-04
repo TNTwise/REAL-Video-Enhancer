@@ -75,7 +75,6 @@ def modelOptions(self):
             model_list = []
             for model in models:
                 if "ensemble" in model:
-                    
                     pass
                 else:
                     model_list.append(model)

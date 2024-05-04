@@ -7,7 +7,8 @@ try:
 except:
     from rife.warplayer import warp
 
-torch.fx.wrap('warp')
+torch.fx.wrap("warp")
+
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -119,7 +120,7 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self,scale=1,ensemble=False):
+    def __init__(self, scale=1, ensemble=False):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
         self.block1 = IFBlock(8 + 4 + 16, c=128)
@@ -128,19 +129,16 @@ class IFNet(nn.Module):
         self.encode = Head()
         # self.contextnet = Contextnet()
         # self.unet = Unet()
-        self.scale_list=[8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
 
-        self.ensemble=ensemble
+        self.ensemble = ensemble
 
     def forward(
         self,
         img0,
         img1,
         timestep=0.5,
-
-
     ):
-
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
 
         f0 = self.encode(img0[:, :3])

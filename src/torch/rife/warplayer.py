@@ -7,7 +7,6 @@ backwarp_tenGrid = {}
 def warp(tenInput, tenFlow):
     orig_dtype = tenInput.dtype
 
-
     k = (str(tenFlow.device), str(tenFlow.size()))
     if k not in backwarp_tenGrid:
         tenHorizontal = (

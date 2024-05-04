@@ -33,13 +33,12 @@ class UpscaleCUDA:
 
         self.isCudaAvailable = torch.cuda.is_available()
         self.half = half
-        
+
         self.device = torch.device("cuda" if self.isCudaAvailable else "cpu")
         self.model = (
             self.model.eval().cuda() if self.isCudaAvailable else self.model.eval()
         )
 
-        
         if self.isCudaAvailable:
             # self.stream = [torch.cuda.Stream() for _ in range(self.nt)]
             # self.currentStream = 0

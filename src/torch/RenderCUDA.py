@@ -18,6 +18,7 @@ try:
 except:
     pass
 from .UpscaleImageNCNN import UpscaleNCNN, UpscaleCuganNCNN
+
 try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
@@ -26,13 +27,21 @@ try:
     from src.torch.rife.tensorRT import RifeTensorRT
 except:
     pass
+
+
 # read
 # Calculate eta by time remaining divided by speed
 # add scenedetect by if frame_num in transitions in proc_frames
 # def
 class Render:
     def __init__(
-        self, main, input_file, output_file, interpolationIncrease=1, resIncrease=1,benchmark=False
+        self,
+        main,
+        input_file,
+        output_file,
+        interpolationIncrease=1,
+        resIncrease=1,
+        benchmark=False,
     ):
         self.main = main
 
@@ -52,7 +61,7 @@ class Render:
         self.frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
         self.finalFPS = self.initialFPS * self.interpolation_factor
-        self.benchmark=benchmark
+        self.benchmark = benchmark
         self.settings = Settings()
 
     def extractFramesToBytes(self):
@@ -186,28 +195,28 @@ class Render:
             ]
         else:
             command = [
-                            f"{thisdir}/bin/ffmpeg",
-                            "-y",
-                            "-v",
-                            "warning",
-                            "-stats",
-                            "-f",
-                            "rawvideo",
-                            "-vcodec",
-                            "rawvideo",
-                            "-s",
-                            f"{self.outputWidth}x{self.outputHeight}",
-                            "-pix_fmt",
-                            f"yuv420p",
-                            "-r",
-                            str(self.finalFPS),
-                            "-i",
-                            "-",
-                            "-benchmark",
-                            "-f",
-                            "null",
-                            "-",
-                        ]
+                f"{thisdir}/bin/ffmpeg",
+                "-y",
+                "-v",
+                "warning",
+                "-stats",
+                "-f",
+                "rawvideo",
+                "-vcodec",
+                "rawvideo",
+                "-s",
+                f"{self.outputWidth}x{self.outputHeight}",
+                "-pix_fmt",
+                f"yuv420p",
+                "-r",
+                str(self.finalFPS),
+                "-i",
+                "-",
+                "-benchmark",
+                "-f",
+                "null",
+                "-",
+            ]
         log(command)
         self.writeProcess = subprocess.Popen(
             command,
@@ -219,20 +228,19 @@ class Render:
         )
 
         while True:
-                frame = self.writeBuffer.get()
-                if frame is None:
-                    self.writeProcess.stdin.close()
-                    self.writeProcess.wait()
-                    log("done with save")
-                    self.main.output_file = self.output_file
-                    self.main.CudaRenderFinished = True
-                    torch.cuda.empty_cache()
-                    break
+            frame = self.writeBuffer.get()
+            if frame is None:
+                self.writeProcess.stdin.close()
+                self.writeProcess.wait()
+                log("done with save")
+                self.main.output_file = self.output_file
+                self.main.CudaRenderFinished = True
+                torch.cuda.empty_cache()
+                break
 
-                frame = np.ascontiguousarray(frame)
-                self.main.imageDisplay = frame
-                self.writeProcess.stdin.buffer.write(frame.tobytes())
-
+            frame = np.ascontiguousarray(frame)
+            self.main.imageDisplay = frame
+            self.writeProcess.stdin.buffer.write(frame.tobytes())
 
 
 class Interpolation(Render):
@@ -247,35 +255,41 @@ class Interpolation(Render):
         times,
         ensemble,
         half,
-        benchmark
+        benchmark,
     ):
         super(Interpolation, self).__init__(
-            main, input_file, output_file, interpolationIncrease=times, resIncrease=1,benchmark=benchmark
+            main,
+            input_file,
+            output_file,
+            interpolationIncrease=times,
+            resIncrease=1,
+            benchmark=benchmark,
         )
         self.method = method
         self.model = model
         self.ensemble = ensemble
         self.half = half
         self.handleMethod()
+
     @torch.inference_mode()
     def handleMethod(self):
         if "rife-cuda" == self.method:
             self.interpolate_process = Rife(
-                            interpolation_factor=self.interpolation_factor,
-                            interpolate_method=self.model,
-                            width=self.originalWidth,
-                            height=self.originalHeight,
-                            ensemble=self.ensemble,
-                            half=self.half,
-                        )
+                interpolation_factor=self.interpolation_factor,
+                interpolate_method=self.model,
+                width=self.originalWidth,
+                height=self.originalHeight,
+                ensemble=self.ensemble,
+                half=self.half,
+            )
         if "rife-cuda-trt" == self.method:
             self.interpolate_process = RifeTensorRT(
-                            model=self.model,
-                            width=self.originalWidth,
-                            height=self.originalHeight,
-                            ensemble=self.ensemble,
-                            precision=self.half,
-                        )
+                model=self.model,
+                width=self.originalWidth,
+                height=self.originalHeight,
+                ensemble=self.ensemble,
+                precision=self.half,
+            )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
                 interpolation_factor=self.interpolation_factor,
@@ -285,6 +299,7 @@ class Interpolation(Render):
                 half=self.half,
             )
         self.main.start_time = time.time()
+
     def proc_image(self, frame0, frame1):
         self.interpolate_process.run1(frame0, frame1)
 
@@ -297,9 +312,9 @@ class Interpolation(Render):
             )
             self.frame += 1
             self.writeBuffer.put(result)
+
     @torch.inference_mode()
     def procInterpThread(self):
-        
         self.frame = 0
 
         while True:
@@ -347,7 +362,7 @@ class Upscaling(Render):
         threads=2,
         cugan_noise=0,
         ncnn_gpu=0,
-        benchmark=False
+        benchmark=False,
     ):
         super(Upscaling, self).__init__(
             main,
@@ -355,7 +370,7 @@ class Upscaling(Render):
             output_file,
             interpolationIncrease=1,
             resIncrease=resIncrease,
-            benchmark=benchmark
+            benchmark=benchmark,
         )
         self.model_path = model_path
         self.half = half
@@ -364,8 +379,9 @@ class Upscaling(Render):
         self.threads = threads
         self.frame = 0
         self.cugan_noise = cugan_noise
-        self.ncnn_gpu=ncnn_gpu
+        self.ncnn_gpu = ncnn_gpu
         self.handleModel()
+
     @torch.inference_mode()
     def handleModel(self):
         if "cuda" in self.method and "ncnn" not in self.method:
@@ -374,20 +390,24 @@ class Upscaling(Render):
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(
-                gpuid=self.ncnn_gpu,model=self.model_path, num_threads=self.threads, scale=self.resIncrease
+                gpuid=self.ncnn_gpu,
+                model=self.model_path,
+                num_threads=self.threads,
+                scale=self.resIncrease,
             )
         if "cugan" in self.method and "ncnn" in self.method:
             self.upscaleMethod = UpscaleCuganNCNN(
                 gpuid=self.ncnn_gpu,
-                models_path = os.path.join(f"{thisdir}","models","realcugan","models-se"),
+                models_path=os.path.join(
+                    f"{thisdir}", "models", "realcugan", "models-se"
+                ),
                 model="models-se",
                 num_threads=self.threads,
-                scale=self.resIncrease
+                scale=self.resIncrease,
             )
+
     @torch.inference_mode()
     def procUpscaleThread(self):
-
-
         while True:
             frame = self.readBuffer.get()
 

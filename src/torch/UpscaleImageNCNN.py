@@ -11,14 +11,25 @@ class UpscaleNCNN:
     def UpscaleImage(self, image):
         return self.model.process_cv2(image)
 
-class UpscaleCuganNCNN:
-    def __init__(self,model="models-se",models_path="",num_threads=2,scale=2, gpuid=0,noise=0):
-        self.model = Realcugan(gpuid=gpuid,
-                               models_path=models_path,
-                               model=model,
-                               scale=scale,
-                               num_threads=num_threads,
-                               noise=noise)
 
-    def UpscaleImage(self,image):
-        return self.model.process_cv2(image) 
+class UpscaleCuganNCNN:
+    def __init__(
+        self,
+        model="models-se",
+        models_path="",
+        num_threads=2,
+        scale=2,
+        gpuid=0,
+        noise=0,
+    ):
+        self.model = Realcugan(
+            gpuid=gpuid,
+            models_path=models_path,
+            model=model,
+            scale=scale,
+            num_threads=num_threads,
+            noise=noise,
+        )
+
+    def UpscaleImage(self, image):
+        return self.model.process_cv2(image)

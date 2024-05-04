@@ -7,8 +7,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class Model:
-    def __init__(self, local_rank=-1,scale=1.0,ensemble=False):
-        self.flownet = IFNet(scale,ensemble)
+    def __init__(self, local_rank=-1, scale=1.0, ensemble=False):
+        self.flownet = IFNet(scale, ensemble)
         self.device()
         self.optimG = AdamW(self.flownet.parameters(), lr=1e-6, weight_decay=1e-4)
         self.version = 4.8
@@ -24,13 +24,12 @@ class Model:
     def eval(self):
         self.flownet.eval()
 
-    def device(self,device1=None):
+    def device(self, device1=None):
         self.flownet.to(device)
 
     def half(self):
         self.flownet.half()
 
-    
     def load_model(self, path, rank=0):
         def convert(param):
             if rank == -1:
