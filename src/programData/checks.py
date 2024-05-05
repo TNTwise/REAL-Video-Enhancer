@@ -13,7 +13,6 @@ import shutil
 from src.misc.log import *
 from src.programData.write_permisions import *
 import traceback
-
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA

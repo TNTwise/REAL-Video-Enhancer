@@ -64,6 +64,10 @@ class Render:
         self.benchmark = benchmark
         self.settings = Settings()
 
+
+        self.readProcess = None
+        self.writeProcess = None
+
     def extractFramesToBytes(self):
         command = [
             f"{thisdir}/bin/ffmpeg",
@@ -80,7 +84,7 @@ class Render:
             "-",
         ]
 
-        self.process = subprocess.Popen(
+        self.readProcess = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
@@ -89,10 +93,10 @@ class Render:
 
     def readThread(self):
         while True:
-            chunk = self.process.stdout.read(self.frame_size)
+            chunk = self.readProcess.stdout.read(self.frame_size)
             if len(chunk) < self.frame_size:
-                self.process.stdout.close()
-                self.process.terminate()
+                self.readProcess.stdout.close()
+                self.readProcess.terminate()
                 self.readingDone = True
                 self.readBuffer.put(None)
                 log("done with read")
@@ -106,49 +110,27 @@ class Render:
     def finish_render(self):
         self.writeBuffer.put(None)
 
-    def returnLatestFrame(self):
+    def returnLatestFrame(self) -> np.ndarray:
         if self.prevFrame:
             return self.prevFrame
 
-    def returnFrameCount(self):
+    def returnFrameCount(self) -> int:
         try:
             return self.frame
         except:
             log("No frame to return!")
 
-    def returnFrameRate(self):
-        try:
-            return self.frameRate
-        except:
-            log("No framerate to return!")
-
-    def returnPercentageDone(self):
-        try:
-            return self.frame / self.frame_count
-        except:  # noqa: E722
-            log("No frame to return!")
+    
 
     def log(self):
+
         while not self.main.CudaRenderFinished:
-            try:
+            if self.writeProcess:
                 for line in iter(self.writeProcess.stderr.readline, b""):
-                    if not self.main.CudaRenderFinished:
                         log(line)
-                        # print(line)
-                    else:
-                        break
-                    # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
-                    # self.frame = int(self.frame.replace('frame=',''))
+                
 
-                    # self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
-
-            except Exception as e:
-                pass
-                # tb = traceback.format_exc()
-                # log(tb,e)
-                # log(f'{tb},{e}')
         log("Done with logging")
-        log("done with logging thread for cuda")
 
     # save
 

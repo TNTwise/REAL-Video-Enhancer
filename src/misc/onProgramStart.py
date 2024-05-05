@@ -255,6 +255,9 @@ def cuda_shit(self):
         # shit to do if cupy
         if checks.isCUPY():
             self.ui.GMFSSCUDACheckBox.setDisabled(False)
+        else:
+            self.ui.GMFSSCUDACheckBox.setDisabled(True)
+
     else:
         self.ui.modelTabWidget.setTabEnabled(1, False)
 
@@ -285,7 +288,7 @@ def onApplicationStart(self):
     self.ui.label_20.show()
     self.ui.esrganHelpModel.show()
     self.input_file = ""
-
+    
     self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))
 
     self.switchUI()
@@ -322,6 +325,8 @@ def onApplicationStart(self):
     self.ui.QueueListWidget.hide()
     self.QueueList = []
     self.setDirectories()
+
+    
 
     # list every model downloaded, and add them to the list
     self.ui.SettingsMenus.setCurrentRow(0)
@@ -411,18 +416,6 @@ def set_model_params(self):
             if value == "upscaling":
                 self.ui.modeCombo.addItem("Upscaling")
                 break
-    # benching this idea for now
-    """if "Interpolation and Upscaling" not in upscale_list:
-        interp_bool = False
-        upscale_bool = False
-
-        for key, value in self.model_labels.items():
-            if value == "upscaling":
-                upscale_bool = True
-            if value == "interpolation":
-                interp_bool = True
-            if interp_bool == True and upscale_bool == True:
-                self.ui.modeCombo.addItem("Interpolation and Upscaling")
-                break"""
+    
 
     self.switchMode()
