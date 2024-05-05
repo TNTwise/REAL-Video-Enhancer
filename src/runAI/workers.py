@@ -497,7 +497,6 @@ def setupTransitions(self):
         self.main.transitionFrames = self.main.transitionDetection.find_timestamps()
         if "-ncnn-vulkan" in self.main.AI:
             self.main.transitionDetection.get_frame_num(self.main.times)
-        divisor = self.main.times / 2
         try:
             self.log.emit(f"Transitions detected: {len(self.main.transitionFrames)}")
         except:

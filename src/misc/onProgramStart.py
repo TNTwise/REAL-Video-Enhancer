@@ -148,7 +148,7 @@ def bindButtons(self):
         button.setIcon(icon)
 
     # Bind animations
-
+    self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))
 
 def settingsStart(self):
     settings = Settings()
@@ -261,6 +261,27 @@ def cuda_shit(self):
     else:
         self.ui.modelTabWidget.setTabEnabled(1, False)
 
+def setupSettings(self):
+    self.ui.VideoOptionsFrame.hide()
+    self.ui.RenderOptionsFrame.hide()
+    self.ui.GeneralOptionsFrame.hide()
+    self.ui.SettingsMenus.setCurrentRow(0)
+    self.ui.GeneralOptionsFrame.show()
+
+def hideUnusedFeatures(self):
+    self.ui.RifeResume.hide()
+    self.ui.RifePause.hide()
+    self.ui.QueueButton.hide()
+    self.ui.QueueListWidget.hide()
+
+def createDirectories():
+    os.makedirs(
+        os.path.join(f"{thisdir}", "models", "custom_models_ncnn", "models"),
+        exist_ok=True,
+    )
+    os.makedirs(
+        os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
+    )
 
 def onApplicationStart(self):
     # this is kind of a mess
@@ -271,15 +292,10 @@ def onApplicationStart(self):
         + "\n===================================================================="
     )
 
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models", "custom_models_ncnn", "models"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
-    )
+    createDirectories()
 
     self.ui.AICombo.clear()  # needs to be in this order, before SwitchUI is called
+
     set_model_params(self)
     hideChainModeButtons(self)
     # get esrgan models
@@ -289,12 +305,9 @@ def onApplicationStart(self):
     self.ui.esrganHelpModel.show()
     self.input_file = ""
     
-    self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))
+    
 
     self.switchUI()
-
-    if checks.check_for_updated_binary("rife-ncnn-vulkan", True) == 0:
-        outdated_binary(self, "rife-ncnn-vulkan")
 
     self.ui.installModelsProgressBar.setMaximum(100)
 
@@ -305,32 +318,31 @@ def onApplicationStart(self):
     self.output_folder = ""
 
     self.ui.InstallModelsFrame.hide()
-    self.ui.RifeResume.hide()
-    self.ui.RifePause.hide()
+    
 
     cuda_shit(self)
 
+    setupSettings(self)
+
+    hideUnusedFeatures(self)
     os.system(
         "ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0"
     )  # Enables discord RPC on flatpak
+    
     onlyInt = QIntValidator()
     onlyInt.setRange(0, 9)
     self.ui.sceneChangeLineEdit.setValidator(onlyInt)
 
-    self.ui.VideoOptionsFrame.hide()
-    self.ui.RenderOptionsFrame.hide()
-    self.ui.GeneralOptionsFrame.hide()
+    
 
-    self.ui.QueueButton.hide()
-    self.ui.QueueListWidget.hide()
+
+    
     self.QueueList = []
     self.setDirectories()
 
     
 
-    # list every model downloaded, and add them to the list
-    self.ui.SettingsMenus.setCurrentRow(0)
-    self.ui.GeneralOptionsFrame.show()
+    
 
     # call settings specific changes to GUI
     settingsStart(self)

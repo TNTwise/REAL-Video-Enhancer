@@ -223,7 +223,7 @@ def returnModelList(
                 os.path.join(f"{settings.ModelDir}", f"rife", f"rife-ncnn-vulkan")
             )
             == False
-            or checks.check_for_updated_binary("rife-ncnn-vulkan") == False
+            
         ):
             install_modules_dict[
                 returnCorrectLinkBasedOnOS(
