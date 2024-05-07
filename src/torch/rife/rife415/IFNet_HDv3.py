@@ -8,6 +8,7 @@ except:
     from rife.warplayer import warp
 
 
+torch.fx.wrap("warp")
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
@@ -118,25 +119,26 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self):
+    def __init__(self,scale=1,ensemble=False):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
         self.block1 = IFBlock(8 + 4 + 16, c=128)
         self.block2 = IFBlock(8 + 4 + 16, c=96)
         self.block3 = IFBlock(8 + 4 + 16, c=64)
         self.encode = Head()
+        
+        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.ensemble = ensemble
         # self.contextnet = Contextnet()
         # self.unet = Unet()
+        
 
     def forward(
         self,
         img0,
         img1,
         timestep=0.5,
-        scale_list=[8, 4, 2, 1],
-        training=False,
-        fastmode=True,
-        ensemble=False,
+        
     ):
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
 
@@ -153,13 +155,13 @@ class IFNet(nn.Module):
                 flow, mask = block[i](
                     torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
                     None,
-                    scale=scale_list[i],
+                    scale=self.scale_list[i],
                 )
-                if ensemble:
+                if self.ensemble:
                     f_, m_ = block[i](
                         torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
                         None,
-                        scale=scale_list[i],
+                        scale=self.scale_list[i],
                     )
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
@@ -179,9 +181,9 @@ class IFNet(nn.Module):
                         1,
                     ),
                     flow,
-                    scale=scale_list[i],
+                    scale=self.scale_list[i],
                 )
-                if ensemble:
+                if self.ensemble:
                     f_, m_ = block[i](
                         torch.cat(
                             (
@@ -195,7 +197,7 @@ class IFNet(nn.Module):
                             1,
                         ),
                         torch.cat((flow[:, 2:4], flow[:, :2]), 1),
-                        scale=scale_list[i],
+                        scale=self.scale_list[i],
                     )
                     fd = (fd + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (m0 + (-m_)) / 2
