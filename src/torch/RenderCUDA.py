@@ -123,13 +123,24 @@ class Render:
     
 
     def log(self):
-
         while not self.main.CudaRenderFinished:
-            if self.writeProcess:
+            try:
                 for line in iter(self.writeProcess.stderr.readline, b""):
+                    if not self.main.CudaRenderFinished:
                         log(line)
-                
+                        # print(line)
+                    else:
+                        break
+                    # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
+                    # self.frame = int(self.frame.replace('frame=',''))
 
+                    # self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
+
+            except Exception as e:
+                pass
+                # tb = traceback.format_exc()
+                # log(tb,e)
+                # log(f'{tb},{e}')
         log("Done with logging")
 
     # save
