@@ -13,6 +13,8 @@ from torch_tensorrt.fx import LowerSetting
 from torch_tensorrt.fx.lower import Lowerer
 from torch_tensorrt.fx.utils import LowerPrecision
 
+torch.set_float32_matmul_precision("medium")
+
 try:
     from src.programData.thisdir import thisdir
 
@@ -30,7 +32,7 @@ class RifeTensorRT:
         height: int = 1080,
         scale: int = 1,
         ensemble: bool = False,
-        precision: str = "fp16",
+        half: bool = False,
         trt_max_workspace_size: int = 1,
         num_streams: int = 1,
     ):
@@ -50,7 +52,8 @@ class RifeTensorRT:
         self.device_name = torch.cuda.get_device_name(self.device)
         self.trt_version = tensorrt.__version__
         self.dimensions = f"{self.pw}x{self.ph}"
-        self.half = precision
+        
+        self.half = half
         self.index = -1
         self.index_lock = Lock()
         self.stream = [

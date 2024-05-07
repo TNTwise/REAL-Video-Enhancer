@@ -281,7 +281,7 @@ class Interpolation(Render):
                 width=self.originalWidth,
                 height=self.originalHeight,
                 ensemble=self.ensemble,
-                precision=self.half,
+                half=self.half,
             )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
