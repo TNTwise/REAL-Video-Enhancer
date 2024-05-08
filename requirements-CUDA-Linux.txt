@@ -6,4 +6,4 @@ torchvision==0.15.2
 cupy-cuda11x
 fastrlock
 https://github.com/pytorch/TensorRT/releases/download/v1.4.0/torch_tensorrt-1.4.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
-tensorrt==8.6.1
+tensorrt==8.6.0
