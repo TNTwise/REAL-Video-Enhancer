@@ -73,6 +73,7 @@ jobs:
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
+          python3 -m pip install https://github.com/pytorch/TensorRT/releases/download/v1.4.0/torch_tensorrt-1.4.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl tensorrt==8.6.1
           
       - name: Compile to executable
         run: |
