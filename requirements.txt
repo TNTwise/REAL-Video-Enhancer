@@ -11,3 +11,4 @@ scenedetect
 pyinstaller
 numpy
 sympy
+importlib
