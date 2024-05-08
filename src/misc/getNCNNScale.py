@@ -3609,7 +3609,7 @@ class NcnnModel:
                     )
                     weight_dict["bias"] = NcnnWeight(bias_data)
         
-
+        
         elif len(layer.params.weight_order) != 0:
             error_msg = f"Load weights not added for {op_type} yet, please report"
             raise ValueError(error_msg)
