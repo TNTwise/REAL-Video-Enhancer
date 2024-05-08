@@ -67,7 +67,8 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Final2x/realesrgan-ncnn-py" target="_blank">RealESRGAN NCNN python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>
-  
+  <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/chaiNNer/blob/2aa0b46233ba8cd90d4bb405e2bc6e16a3430546/backend/src/nodes/impl/ncnn/model.py
+  " target="_blank">Chainner's NCNN Implementation (For scale detection with NCNN models)
 </ul>
 
 # Custom models used:

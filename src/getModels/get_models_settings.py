@@ -237,6 +237,9 @@ def remove_unchecked(self):
     if self.ui.SPANNCNNCheckBox.isChecked() == False:
         os.system(f'rm -rf "{self.settings.ModelDir}/span/"')
 
+    if self.ui.GMFSSCUDACheckBox.isChecked() == False:
+        os.system(f'rm -rf "{self.settings.ModelDir}/gmfss-cuda/"')
+
 
 def run_install_models_from_settings(self):
     try:
