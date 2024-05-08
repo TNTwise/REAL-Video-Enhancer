@@ -11,6 +11,7 @@ from pathlib import Path
 
 import numpy as np
 from typing import TypeVar
+import sys
 
 T = TypeVar("T")
 
@@ -390,7 +391,6 @@ class NcnnModel:
 
                 for line in paramf:
                     op_type, layer = model.parse_param_layer(line)
-                    layer.weight_data = model.load_layer_weights(binf, op_type, layer)
                     model.add_layer(layer)
 
                 binf.seek(0, os.SEEK_END)
@@ -734,7 +734,30 @@ class NcnnModelWrapper:
         self.fp: str = fp
 
     @staticmethod
-    def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
+    
+
+    @staticmethod
+    def get_nf_and_in_nc(layer: NcnnLayer) -> tuple[int, int]:
+        nf = layer.params[0].value
+        kernel_w = layer.params[1].value
+        try:
+            kernel_h = layer.params[11].value
+        except KeyError:
+            kernel_h = kernel_w
+        weight_data_size = layer.params[6].value
+
+        assert (
+            isinstance(nf, int)
+            and isinstance(kernel_w, int)
+            and isinstance(kernel_h, int)
+            and isinstance(weight_data_size, int)
+        ), "Out nc, kernel width and height, and weight data size must all be ints"
+        in_nc = weight_data_size // nf // kernel_w // kernel_h
+
+        return nf, in_nc
+    
+
+def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
         scale = 1.0
         in_nc = 0
         out_nc = 0
@@ -764,8 +787,7 @@ class NcnnModelWrapper:
             ):
                 if found_first_conv is not True:
                     nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
-                    if layer.weight_data["weight"].quantize_tag == DTYPE_FP16:
-                        fp = "fp16"
+                    
                     found_first_conv = True
 
                 scale /= checked_cast(int, layer.params[3].value)
@@ -789,27 +811,16 @@ class NcnnModelWrapper:
 
         return int(scale), in_nc, out_nc, nf, fp
 
-    @staticmethod
-    def get_nf_and_in_nc(layer: NcnnLayer) -> tuple[int, int]:
-        nf = layer.params[0].value
-        kernel_w = layer.params[1].value
-        try:
-            kernel_h = layer.params[11].value
-        except KeyError:
-            kernel_h = kernel_w
-        weight_data_size = layer.params[6].value
+try:
+    model_param = sys.argv[1]
 
-        assert (
-            isinstance(nf, int)
-            and isinstance(kernel_w, int)
-            and isinstance(kernel_h, int)
-            and isinstance(weight_data_size, int)
-        ), "Out nc, kernel width and height, and weight data size must all be ints"
-        in_nc = weight_data_size // nf // kernel_w // kernel_h
+except:
+    model_param = input("Enter param path here: ")
 
-        return nf, in_nc
-    
-model = NcnnModel()
-model = model.load_from_file('realesr-animevideov3-x2.param')
-scale=(NcnnModelWrapper.get_broadcast_data(model)[0])
+model = NcnnModel.load_from_file(model_param)
+scale=(get_broadcast_data(model)[0])
 print(scale)
+
+
+
+
