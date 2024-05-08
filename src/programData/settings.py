@@ -85,7 +85,7 @@ class Settings:
             "Notifications": "Enabled",
             "UHDResCutOff": "1080",
             "gpuID": "0",
-            "HalfPrecision": half,
+            "HalfPrecision": str(half),
         }
         if returnOperatingSystem() == "Linux":
             default_settings["OutputDir"] = f"{homedir}/Videos/"
