@@ -5,14 +5,17 @@ from fractions import Fraction
 from threading import Lock
 
 import numpy as np
-import tensorrt
-import torch
-from torch.autograd.function import InplaceFunction
-import torch.nn.functional as F
-from torch_tensorrt.fx import LowerSetting
-from torch_tensorrt.fx.lower import Lowerer
-from torch_tensorrt.fx.utils import LowerPrecision
+try:
+    import tensorrt
 
+    import torch
+    from torch.autograd.function import InplaceFunction
+    import torch.nn.functional as F
+    from torch_tensorrt.fx import LowerSetting
+    from torch_tensorrt.fx.lower import Lowerer
+    from torch_tensorrt.fx.utils import LowerPrecision
+except:
+    pass
 torch.set_float32_matmul_precision("medium")
 
 try:
