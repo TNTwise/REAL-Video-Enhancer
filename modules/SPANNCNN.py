@@ -58,5 +58,4 @@ def modelOptions(self):
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
     self.ui.Rife_Times.addItem("2X")
-    self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.setCurrentIndex(0)

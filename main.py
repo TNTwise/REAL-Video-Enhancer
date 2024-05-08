@@ -107,6 +107,7 @@ import modules.SPANNCNN as span
 
 
 import src.misc.onProgramStart
+from src.misc.getNCNNScale import returnScale
 from src.runAI.ETA import *
 from src.getLinkVideo.get_video import *
 
@@ -720,20 +721,29 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             if len(self.ui.Rife_Model.currentText()) > 0:
                 self.ui.Rife_Times.clear()
-                model = self.ui.Rife_Model.currentText().lower()
-                if "1x" in model or "x1" in model:
-                    self.ui.Rife_Times.addItem("1X")
-                    self.ui.Rife_Times.setCurrentText("1X")
-                elif "2x" in model or "x2" in model:
-                    self.ui.Rife_Times.addItem("2X")
-                    self.ui.Rife_Times.setCurrentText("2X")
-                elif "3x" in model or "x3" in model:
-                    self.ui.Rife_Times.addItem("3X")
-                    self.ui.Rife_Times.setCurrentText("3X")
-                elif "4x" in model or "x4" in model:
-                    self.ui.Rife_Times.addItem("4X")
-                    self.ui.Rife_Times.setCurrentText("4X")
-                else:
+                model = self.ui.Rife_Model.currentText()
+
+                if self.ui.AICombo.currentText() == "Custom NCNN models":
+                    modelPath = os.path.join(
+                    f"{settings.ModelDir}",
+                    "custom_models_ncnn",
+                    f"models",
+                    f"{self.ui.Rife_Model.currentText()}.param",
+                )
+
+                if self.ui.AICombo.currentText() == "SPAN (NCNN)":
+                    modelPath = os.path.join(
+                    f"{settings.ModelDir}",
+                    "span",
+                    f"models",
+                    f"{self.ui.Rife_Model.currentText()}.param",
+                )
+                    
+                try:
+                    scale = returnScale(modelPath)
+                    self.ui.Rife_Times.addItem(f"{scale}X")
+                except Exception as e:
+                    print(e)
                     cantDetectUpscaleTimes(self)
                     self.ui.Rife_Times.addItem("1X")
                     self.ui.Rife_Times.addItem("2X")
