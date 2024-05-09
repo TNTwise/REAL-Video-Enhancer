@@ -32,7 +32,6 @@ try:
 except Exception as e:
     
     half = False
-log(f"Half Precision: {half}")
 # im going to eventually redo this
 class CustomException(Exception):
     def __init__(self, additional_info):

@@ -37,6 +37,20 @@ try:
 except:
     tensorRT = False
 
+try:
+    import torch
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        half = torch
+        a = torch.tensor([1.0, 2.0, 3.0], device=device, dtype=torch.float16)
+        b = torch.tensor([4.0, 5.0, 6.0], device=device, dtype=torch.float16)
+        c = a + b
+    half = True
+except Exception as e:
+    
+    half = False
+    
+log(f'Half Precision: {half}')
 
 def check_if_online(dont_check=False, url="https://raw.githubusercontent.com/"):
     """
@@ -134,11 +148,10 @@ def check_if_enough_space_output_disk(input_file, render, times):
 
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.OutputDir)
+    if render == "esrgan":
+            return True
     if settings.RenderType == "Classic":
-        if render == "esrgan":
-            rnd = round(resolution * 0.001)
-            full_size = full_extraction_size * times * rnd
-            return full_size < free_space, full_size / (1024**3), free_space / (1024**3)
+        
 
         if render == "rife":
             full_size = full_extraction_size * times
@@ -228,7 +241,8 @@ def isTensorRT():
 
 def isCUPY():
     return gmfss
-
+def isHalf():
+    return half
 
 def check_for_individual_models():
     """
