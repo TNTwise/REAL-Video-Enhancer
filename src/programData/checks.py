@@ -37,18 +37,12 @@ try:
 except:
     tensorRT = False
 
-try:
-    import torch
-    if torch.cuda.is_available():
-        device = torch.device("cuda")
-        half = torch
-        a = torch.tensor([1.0, 2.0, 3.0], device=device, dtype=torch.float16)
-        b = torch.tensor([4.0, 5.0, 6.0], device=device, dtype=torch.float16)
-        c = a + b
-    half = True
-except Exception as e:
+if cuda: 
     
-    half = False
+    half=torch.cuda.is_bf16_supported()
+    
+
+    
     
 log(f'Half Precision: {half}')
 
