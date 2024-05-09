@@ -22,9 +22,17 @@ from sys import exit
 
 try:
     import torch
-    half = torch.cuda.has_half
-except:
+    if torch.cuda.is_available():
+        device = torch.device("cuda")
+        half = torch
+        a = torch.tensor([1.0, 2.0, 3.0], device=device, dtype=torch.float16)
+        b = torch.tensor([4.0, 5.0, 6.0], device=device, dtype=torch.float16)
+        c = a + b
+    half = True
+except Exception as e:
+    
     half = False
+log(f"Half Precision: {half}")
 # im going to eventually redo this
 class CustomException(Exception):
     def __init__(self, additional_info):
