@@ -40,7 +40,8 @@ except:
 if cuda: 
     
     half=torch.cuda.is_bf16_supported()
-    
+else:
+    half=False   
 
     
     
