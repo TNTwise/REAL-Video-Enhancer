@@ -22,7 +22,7 @@ from polygraphy.backend.common import BytesFromPath
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
 
-class UniversalTensorRT:
+class UpscaleTensorRT:
     def __init__(
         self,
         modelPath: str = "shufflecugan-tensorrt",
