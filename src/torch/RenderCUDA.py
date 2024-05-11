@@ -25,8 +25,10 @@ except:
     pass
 try:
     from src.torch.rife.tensorRT import RifeTensorRT
+    from src.torch.UpscaleImageTensorRT import UniversalTensorRT
 except:
     pass
+
 
 
 # read
@@ -373,8 +375,8 @@ class Upscaling(Render):
 
     def handleModel(self):
         if "cuda" in self.method and "ncnn" not in self.method:
-            self.upscaleMethod = UpscaleCUDA(
-                self.originalWidth, self.originalHeight, self.model_path, self.half
+            self.upscaleMethod = UniversalTensorRT(
+                width=self.originalWidth, height=self.originalHeight, modelPath=self.model_path, half=self.half
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(

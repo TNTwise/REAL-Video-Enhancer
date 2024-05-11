@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from fractions import Fraction
 from threading import Lock
 
 import numpy as np
