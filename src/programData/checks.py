@@ -144,7 +144,7 @@ def check_if_enough_space_output_disk(input_file, render, times):
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.OutputDir)
     if render == "esrgan":
-            return True
+            return True, True, True
     if settings.RenderType == "Classic":
         
 
