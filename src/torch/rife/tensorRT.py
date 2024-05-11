@@ -84,9 +84,8 @@ class RifeTensorRT:
         if not os.path.exists(self.trt_engine_path):
             self.generateEngine()
 
-        self.inference = [
-            torch.load(self.trt_engine_path) for _ in range(self.num_streams)
-        ]
+        self.inference = torch.load(self.trt_engine_path) 
+        
 
     def handle_model(self, interpolate_method):
         if interpolate_method == "rife4.14":
@@ -222,29 +221,24 @@ class RifeTensorRT:
 
     @torch.inference_mode()
     def make_inference(self, n):
-        with self.index_lock:
-            index = (self.index + 1) % self.num_streams
-            local_index = index
+       
+        timestep = torch.full(
+            (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
+        )
+        timestep = timestep.to(memory_format=torch.channels_last)
+        if self.half:
+            timestep = timestep.half()
 
-        with self.stream_lock[local_index], torch.cuda.stream(self.stream[local_index]):
-            timestep = torch.full(
-                (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
-            )
-            timestep = timestep.to(memory_format=torch.channels_last)
-            if self.half:
-                timestep = timestep.half()
+        output = self.inference(self.I0, self.I1, timestep)
+        output = output[:, :, : self.height, : self.width]
 
-            output = self.inference[local_index](self.I0, self.I1, timestep)
-            output = output[:, :, : self.height, : self.width]
-            output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
-
-            return output
+        return (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
-        array = frame
+       
         return (
-            torch.from_numpy(array)
+            torch.from_numpy(frame)
             .permute(2, 0, 1)
             .unsqueeze(0)
             .to(device, memory_format=torch.channels_last)
