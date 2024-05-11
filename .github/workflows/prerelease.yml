@@ -73,7 +73,7 @@ jobs:
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com tensorrt-libs==8.6.1 --force
+          pip install --no-cache-dir --extra-index-url https://pypi.nvidia.com tensorrt-libs==8.6.0 --force
           
       - name: Compile to executable
         run: |
