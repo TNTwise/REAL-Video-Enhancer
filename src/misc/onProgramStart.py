@@ -283,12 +283,8 @@ def createDirectories():
         os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
     )
 def exportTRTlibsToPATH(self):
-    try:
-        site_packages_dir = site.getsitepackages()[0]
-        #print(f'export LD_LIBRARY_PATH={site_packages_dir}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
-        os.system(f'export LD_LIBRARY_PATH={site_packages_dir}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
-    except:
-        os.system(f'export LD_LIBRARY_PATH=.libs/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
+    print(f'export LD_LIBRARY_PATH={os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
+    os.environ['LD_LIBRARY_PATH']=f'{os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
