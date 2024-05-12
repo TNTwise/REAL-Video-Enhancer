@@ -73,7 +73,11 @@ jobs:
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          
+      - name: Get latest polygraphy
+        run: |
+          git clone https://github.com/NVIDIA/TensorRT
+          cd TensorRT/tools/Polygraphy
+          make install
       - name: Compile to executable
         run: |
           cd REAL-Video-Enhancer
