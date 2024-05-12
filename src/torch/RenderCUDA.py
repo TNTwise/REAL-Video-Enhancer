@@ -24,6 +24,7 @@ try:
 except:
     pass
 try:
+    import tensorrt
     from src.torch.rife.tensorRT import RifeTensorRT
     from src.torch.UpscaleImageTensorRT import UniversalTensorRT
 except:

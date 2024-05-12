@@ -7,7 +7,6 @@ import numpy as np
 import logging
 # import torch_tensorrt as trt
 
-import tensorrt_libs
 import tensorrt
 from polygraphy.backend.trt import (
     TrtRunner,
