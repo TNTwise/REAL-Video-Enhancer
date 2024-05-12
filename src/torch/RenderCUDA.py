@@ -26,9 +26,10 @@ except:
 try:
     import tensorrt
     from src.torch.rife.tensorRT import RifeTensorRT
-    from src.torch.UpscaleImageTensorRT import UniversalTensorRT
-except:
-    pass
+    from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
+except Exception as e:
+    log(str(e))
+    
 
 
 

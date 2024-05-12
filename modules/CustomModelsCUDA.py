@@ -44,6 +44,7 @@ def modelOptions(self):
     except:
         pass
     self.ui.Rife_Model.currentIndexChanged.connect(self.greyOutRealSRTimes)
+    self.greyOutRealSRTimes()
     self.ui.Rife_Times.setCurrentIndex(0)
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
