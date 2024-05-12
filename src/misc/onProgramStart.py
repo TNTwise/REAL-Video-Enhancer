@@ -8,7 +8,7 @@ from src.misc.log import *
 from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
 from src.programData.version import returnVersion
-
+import site
 
 def open_link(urll):
     url = QUrl(urll)
@@ -282,7 +282,10 @@ def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
     )
-
+def exportTRTlibsToPATH(self):
+    site_packages_dir = site.getsitepackages()[0]
+    #print(f'export LD_LIBRARY_PATH={site_packages_dir}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
+    os.system(f'export LD_LIBRARY_PATH={site_packages_dir}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
@@ -298,6 +301,7 @@ def onApplicationStart(self):
 
     set_model_params(self)
     hideChainModeButtons(self)
+    exportTRTlibsToPATH(self)
     # get esrgan models
 
     self.ui.ESRGANModelSelectButton.show()
