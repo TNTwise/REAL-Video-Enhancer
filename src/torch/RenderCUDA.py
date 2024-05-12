@@ -375,11 +375,11 @@ class Upscaling(Render):
         self.handleModel()
 
     def handleModel(self):
-        if "cuda" in self.method and "ncnn" not in self.method:
+        if "cuda1" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleCUDA(
                 self.originalWidth, self.originalHeight, self.model_path, self.half
             )
-        if "tensorrt" in self.method and "ncnn" not in self.method:
+        if "cuda" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleTensorRT(
                 width=self.originalWidth, height=self.originalHeight, modelPath=self.model_path, half=self.half
             )
