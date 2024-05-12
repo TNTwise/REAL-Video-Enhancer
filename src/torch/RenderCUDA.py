@@ -23,13 +23,15 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
-try:
-    import tensorrt
-    from src.torch.rife.tensorRT import RifeTensorRT
-    from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
-except Exception as e:
-    log(str(e))
-    
+import tensorrt
+import polygraphy
+from polygraphy.backend.trt import *
+from polygraphy.backend.common import BytesFromPath
+from src.torch.rife.tensorRT import RifeTensorRT
+from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
+
+
+
 
 
 

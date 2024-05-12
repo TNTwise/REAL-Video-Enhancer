@@ -1087,23 +1087,29 @@ except Exception as e:
 
 
 def excepthook(type, value, extraceback):
-    frame = extraceback.tb_frame
+    # Extract the filename and line number where the exception occurred
+    filename = extraceback.tb_frame.f_code.co_filename
+    lineno = extraceback.tb_lineno
+
+    # Log the exception details
     log(f"Exception Type: {type}")
     log(f"Exception Value: {value}")
+    log(f"Exception occurred in file: {filename}, line {lineno}")
+
+    # Print the traceback
     log("Traceback:")
     traceback.print_tb(extraceback)
-    tb = traceback.format_exc()
-    # Optionally, you can extract and log the file name
-    file_name = extraceback.tb_frame.f_code.co_filename
-    log(f"Exception occurred in file: {file_name}")
 
-    function_name = frame.f_code.co_name
-    error_message = f"An unhandled exception occurred: {value}"
-    log(
-        f"ERROR: Unhandled exception! {traceback.extract_tb(extraceback)},{file_name},{function_name},{type},{error_message},{tb}"
-    )
+    # Format the traceback as a string
+    tb_str = traceback.format_exc()
+
+    # Log the formatted traceback
+    log(f"Traceback (formatted):\n{tb_str}")
+
+    # Display an error message to the user
+    error_message = f"An unhandled exception occurred: {value} (in {filename}, line {lineno})"
+    log(f"ERROR: {error_message}")
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
-
 
 import functools
 import inspect

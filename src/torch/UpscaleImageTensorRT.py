@@ -6,19 +6,21 @@ except:
 import numpy as np
 import logging
 # import torch_tensorrt as trt
-
-import tensorrt
-from polygraphy.backend.trt import (
-    TrtRunner,
-    engine_from_network,
-    network_from_onnx_path,
-    CreateConfig,
-    Profile,
-    EngineFromBytes,
-    SaveEngine,
-)
-from polygraphy.backend.common import BytesFromPath
-
+try:
+    import tensorrt
+    from polygraphy.backend.trt import (
+        TrtRunner,
+        engine_from_network,
+        network_from_onnx_path,
+        CreateConfig,
+        Profile,
+        EngineFromBytes,
+        SaveEngine,
+    )
+    from polygraphy.backend.common import BytesFromPath
+except Exception as e:
+    print(e)
+    
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
 
