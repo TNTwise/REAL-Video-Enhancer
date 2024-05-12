@@ -23,15 +23,25 @@ try:
     from src.torch.gmfss.gmfss_fortuna_union import GMFSS
 except:
     pass
-import tensorrt
-import polygraphy
-from polygraphy.backend.trt import *
-from polygraphy.backend.common import BytesFromPath
-from src.torch.rife.tensorRT import RifeTensorRT
-from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
+try:
+    import tensorrt
+    from src.torch.rife.tensorRT import RifeTensorRT
+    from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
+    from polygraphy.backend.trt import (
+    TrtRunner,
+    engine_from_network,
+    network_from_onnx_path,
+    CreateConfig,
+    Profile,
+    EngineFromBytes,
+    SaveEngine,
+    )
+    from polygraphy.backend.common import BytesFromPath
 
-
-
+except Exception as e:
+    log("Cant import UpscaleTRT!" + str(e))
+    
+    
 
 
 
