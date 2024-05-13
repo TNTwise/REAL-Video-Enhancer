@@ -36,13 +36,15 @@ try:
     tensorRT = True
 except:
     tensorRT = False
+try:
+    if cuda: 
+        
+        half=torch.cuda.is_bf16_supported()
+    else:
+        half=False   
 
-if cuda: 
-    
-    half=torch.cuda.is_bf16_supported()
-else:
-    half=False   
-
+except:
+    half=False
     
     
 log(f'Half Precision: {half}')
