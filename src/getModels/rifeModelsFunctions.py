@@ -34,6 +34,7 @@ def rife_checkboxes(self):
         (self.ui.rife416lite, "rife-v4.16-lite"),
     ]
     # new models
+    return rife_list
 
    
 

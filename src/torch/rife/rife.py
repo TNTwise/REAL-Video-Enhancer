@@ -141,7 +141,7 @@ class Rife:
             timestep = timestep.half()
         output = self.model.inference(self.I0, self.I1, timestep=timestep)
         output = output[:, :, : self.height, : self.width]
-        output = (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
+        output = (output[0]).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
 
         return output
 
