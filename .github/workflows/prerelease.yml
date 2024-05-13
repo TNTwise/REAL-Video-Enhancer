@@ -59,6 +59,7 @@ jobs:
         run: |
           time_difference=${{ steps.calculate_time.outputs.time_difference }}
           echo "Time since last release: $((time_difference / 86400)) days"
+      #python3 -m cx_Freeze -c main.py --target-dir dist/ --packages=torch,torchvision,cupy,fastrlock,tensorrt
 
       # Runs a set of commands using the runners shell
       - name: Get latest version
@@ -92,7 +93,6 @@ jobs:
           python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
           python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
           python3 -m PyInstaller main.py --collect-all nvidia --collect-all polygraphy --collect-all tensorrt --hidden-import upscale_ncnn_py.upscale_ncnn_py_wrapper --hidden-import realcugan_ncnn_py.realcugan_ncnn_py_wrapper
-#python3 -m cx_Freeze -c main.py --target-dir dist/ --packages=torch,torchvision,cupy,fastrlock,tensorrt
       - name: Clone appimage repo
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
 
