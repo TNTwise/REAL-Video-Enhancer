@@ -27,7 +27,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-     
+      - uses: Jimver/cuda-toolkit@v0.2.15
+        id: cuda-toolkit
+        with:
+          cuda: '12.1'
       - uses: actions/checkout@v3
       
       - name: Checkout code
@@ -78,17 +81,13 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get latest version
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
-      - name: install libomp
-        run: |
-         sudo apt install -y libomp5 libvulkan-dev -y
-         cd /usr/lib
-         sudo ln -s libomp.so libomp.so.5
+      
       - name: Install python dependencies
         run: |
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          sudo apt-get install nvidia-cuda-toolkit nvidia-cuda-toolkit-gcc -y
+          
       - name: Get latest polygraphy
         run: |
           git clone https://github.com/NVIDIA/TensorRT
