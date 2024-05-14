@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 from src.misc.log import log
 import os
+from src.misc.createDirectories import createDirectories,createFiles
+createDirectories()
+createFiles()
 import PyQt5
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import (

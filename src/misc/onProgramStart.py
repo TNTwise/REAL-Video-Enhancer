@@ -9,6 +9,7 @@ from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
 from src.programData.version import returnVersion
 import site
+from src.misc.createDirectories import createDirectories,createFiles
 
 def open_link(urll):
     url = QUrl(urll)
@@ -274,47 +275,7 @@ def hideUnusedFeatures(self):
     self.ui.QueueButton.hide()
     self.ui.QueueListWidget.hide()
 
-def createDirectories():
-    os.makedirs(
-        os.path.join(f"{thisdir}"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "files"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "bin"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "logs"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models"),
-        exist_ok=True,
-        
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "renders"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models", "custom_models_ncnn", "models"),
-        exist_ok=True,
-    )
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
-    )
-    
-    os.makedirs(
-        os.path.join(f"{thisdir}", "models", "custom-models-cuda"), exist_ok=True
-    )
+
 def exportTRTlibsToPATH(self):
     
     #print(f'export LD_LIBRARY_PATH={os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')

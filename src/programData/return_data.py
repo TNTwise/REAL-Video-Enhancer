@@ -42,12 +42,14 @@ class ManageFiles:
         """Creates a folder if it doesn't exist."""
         if os.path.exists(folderpath) == False:
             os.system(f'mkdir -p "{folderpath}"')
-
+            if not os.path.exists(folderpath):
+                os.mkdir(folderpath)
     def create_file(filepath):
         """Creates a file if it doesn't exist."""
         if os.path.isfile(filepath) == False:
             os.system(f'touch "{filepath}"')
-
+            if not os.path.isfile(filepath):
+                os.mknod(filepath)
     def isfile(filepath):
         """Checks if a file exists."""
         return os.path.isfile(filepath)
