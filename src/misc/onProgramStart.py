@@ -288,8 +288,7 @@ def exportTRTlibsToPATH(self):
     if getattr(sys, 'frozen', False):
         os.environ['LD_LIBRARY_PATH']=f'{os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
     else:
-         import site
-         site_packages = site.getsitepackages()
+         site_packages = site.getsitepackages()[0]
          os.environ['LD_LIBRARY_PATH']=f'{site_packages}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
 def onApplicationStart(self):
     # this is kind of a mess

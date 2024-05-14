@@ -68,6 +68,8 @@ class UpscaleTensorRT:
 
         self.isCudaAvailable = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.isCudaAvailable else "cpu")
+        self.trt_version = tensorrt.__version__
+        self.device_name = torch.cuda.get_device_name(self.device)
         if self.isCudaAvailable:
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
@@ -75,7 +77,8 @@ class UpscaleTensorRT:
                 torch.set_default_dtype(torch.float16)
 
         # TO:DO account for FP16/FP32
-        if not os.path.exists(modelPath.replace(".onnx", ".engine")):
+        self.enginePath = f'{modelPath.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}.engine'
+        if not os.path.exists(self.enginePath):
             toPrint = f"Model engine not found, creating engine for model: {modelPath}, this may take a while..."
             print((toPrint))
             logging.info(toPrint)
@@ -83,20 +86,20 @@ class UpscaleTensorRT:
                 # The low-latency case. For best performance, min == opt == max.
                 Profile().add(
                     "input",
-                    min=(1, 3, 8, 8),
+                    min=(1, 3, self.height, self.width),
                     opt=(1, 3, self.height, self.width),
-                    max=(1, 3, 1080, 1920),
+                    max=(1, 3, self.height, self.width),
                 ),
             ]
             self.engine = engine_from_network(
                 network_from_onnx_path(modelPath),
                 config=CreateConfig(fp16=self.half, profiles=profiles),
             )
-            self.engine = SaveEngine(self.engine, modelPath.replace(".onnx", ".engine"))
+            self.engine = SaveEngine(self.engine, self.enginePath)
 
         else:
             self.engine = EngineFromBytes(
-                BytesFromPath(modelPath.replace(".onnx", ".engine"))
+                BytesFromPath(self.enginePath)
             )
 
         self.runner = TrtRunner(self.engine)
@@ -116,12 +119,6 @@ class UpscaleTensorRT:
                     else frame
                 },
                 check_inputs=False,
-            )["output"]
-            .squeeze(0)
-            .permute(1, 2, 0)
-            .mul_(255)
-            .byte()
-            .cpu()
-            .numpy()
+            )["output"].squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
         )
 

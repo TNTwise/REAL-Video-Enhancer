@@ -247,7 +247,7 @@ class Render:
                 torch.cuda.empty_cache()
                 break
 
-            frame = np.ascontiguousarray(frame)
+            #frame = np.ascontiguousarray(frame)
             self.main.imageDisplay = frame
             self.writeProcess.stdin.buffer.write(frame.tobytes())
 
@@ -413,7 +413,7 @@ class Upscaling(Render):
                 num_threads=self.threads,
                 scale=self.resIncrease,
             )
-
+        self.main.start_time = time.time()
     def procUpscaleThread(self):
         while True:
             frame = self.readBuffer.get()

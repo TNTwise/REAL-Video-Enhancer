@@ -1,6 +1,6 @@
 from upscale_ncnn_py import UPSCALE
 from realcugan_ncnn_py import Realcugan
-
+import numpy as np
 
 class UpscaleNCNN:
     def __init__(self, model, num_threads, scale, gpuid=0):
@@ -9,7 +9,7 @@ class UpscaleNCNN:
         )
 
     def UpscaleImage(self, image):
-        return self.model.process_cv2(image)
+        return np.ascontiguousarray(self.model.process_cv2(image))
 
 
 class UpscaleCuganNCNN:
@@ -32,4 +32,4 @@ class UpscaleCuganNCNN:
         )
 
     def UpscaleImage(self, image):
-        return self.model.process_cv2(image)
+        return np.ascontiguousarray(self.model.process_cv2(image))

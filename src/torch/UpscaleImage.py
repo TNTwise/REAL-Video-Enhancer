@@ -66,6 +66,6 @@ class UpscaleCUDA:
             frame = frame.contiguous(memory_format=torch.channels_last)
 
             output = self.model(frame)
-            output = output.squeeze(0).permute(1, 2, 0).mul_(255).byte()
+            
 
-            return output.cpu().numpy()
+            return (output).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()

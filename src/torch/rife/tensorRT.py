@@ -231,7 +231,7 @@ class RifeTensorRT:
         output = self.inference(self.I0, self.I1, timestep)
         output = output[:, :, : self.height, : self.width]
 
-        return (output[0] * 255.0).byte().cpu().numpy().transpose(1, 2, 0)
+        return (output[0]).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
