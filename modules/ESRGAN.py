@@ -35,6 +35,7 @@ def modelOptions(self):
     self.ui.FPSPreview.setText("RES:")
     self.ui.Rife_Model.addItem("Animation")
     self.ui.EnsembleCheckBox.hide()
+    self.ui.ImageExtractionCheckBox.hide()
     self.ui.ensembleHelpButton.hide()
 
     self.ui.Rife_Model.setCurrentIndex(0)

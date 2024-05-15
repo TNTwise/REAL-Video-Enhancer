@@ -36,6 +36,7 @@ def modelOptions(self):
     self.ui.ensembleHelpButton.hide()
     self.ui.Rife_Times.addItem("2X")
     self.ui.EnsembleCheckBox.hide()
+    self.ui.ImageExtractionCheckBox.hide()
 
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

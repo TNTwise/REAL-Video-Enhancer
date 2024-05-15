@@ -80,6 +80,7 @@ def bindButtons(self):
     self.ui.gpuThreadingHelpButton.clicked.connect(lambda: vram_help(self))
     self.ui.logButton.clicked.connect(lambda: viewLogs(self))
     self.ui.RifeResume.clicked.connect(self.resume_render)
+    self.ui.ImageExtractionCheckBox.clicked.connect(self.TurnOffCustomFPSMultiplierIfImageExtraction)
     self.ui.sceneChangeSensativityButton.clicked.connect(
         lambda: show_scene_change_help(self)
     )

@@ -47,6 +47,7 @@ def modelOptions(self):
 
     self.greyOutRealSRTimes()
     self.ui.EnsembleCheckBox.hide()
+    self.ui.ImageExtractionCheckBox.hide()
     self.ui.RifeStart.clicked.connect(
         lambda: upscale.start_upscale(self, "waifu2x-ncnn-vulkan")
     )

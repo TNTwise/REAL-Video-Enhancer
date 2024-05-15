@@ -36,6 +36,7 @@ def modelOptions(self):
     self.ui.Rife_Model.addItem("ClearReality4x")
     self.ui.EnsembleCheckBox.hide()
     self.ui.EnsembleCheckBox.hide()
+    self.ui.ImageExtractionCheckBox.hide()
     self.ui.FPSFrom.hide()
     self.ui.FPSToSign.hide()
     self.ui.FPSTo.hide()

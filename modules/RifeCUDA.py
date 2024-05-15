@@ -60,6 +60,7 @@ def modelOptions(self, trt=False):
     self.ui.Rife_Model.addItems(model_list)
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.show()
+    self.ui.ImageExtractionCheckBox.hide()
     if self.output_folder == "":
         outputpath = settings.OutputDir
     else:

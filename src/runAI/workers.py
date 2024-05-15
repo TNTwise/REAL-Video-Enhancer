@@ -534,7 +534,7 @@ class interpolation(QObject):
 
             # run transition detection start
             if self.main.AI == "rife-ncnn-vulkan":
-                if "v4" in self.model:
+                if "v4" in self.model and self.main.ui.ImageExtractionCheckBox.isChecked():
                     self.main.times = (
                         self.main.ui.FPSTo.value() / self.main.ui.FPSFrom.value()
                     )
@@ -551,6 +551,7 @@ class interpolation(QObject):
         self.log.emit(f"Model: {self.main.ui.Rife_Model.currentText()}")
         vram = int(calculateVRAM(self))
         if "-ncnn-vulkan" in self.main.AI:
+            self.main.start_time = time.time()
             self.input_frames = len(
                 os.listdir(
                     f"{settings.RenderDir}/{self.main.videoName}_temp/input_frames/"

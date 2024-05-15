@@ -37,6 +37,7 @@ def modelOptions(self):
     self.ui.FPSToSign.hide()
     self.ui.FPSTo.hide()
     self.ui.ensembleHelpButton.hide()
+    self.ui.ImageExtractionCheckBox.hide()
     self.ui.Rife_Model.setCurrentIndex(0)
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
@@ -54,6 +55,6 @@ def modelOptions(self):
     self.ui.Rife_Times.clear()
     self.ui.denoiseLevelLabel.hide()
     self.ui.denoiseLevelSpinBox.hide()
-
+    
     self.ui.Rife_Times.addItem("4X")
     self.ui.Rife_Times.setCurrentIndex(0)

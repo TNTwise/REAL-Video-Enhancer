@@ -55,7 +55,11 @@ def modelOptions(self):
         if "ensemble" not in i:
             models.append(i)
     models.sort()
+
+    # Custom options
     self.ui.EnsembleCheckBox.show()
+    self.ui.ensembleHelpButton.show()
+    self.ui.ImageExtractionCheckBox.show()
     if len(self.get_models_from_dir("rife")) > 0:
         self.ui.Rife_Model.addItems(models)
         model_list = []

@@ -80,11 +80,18 @@ def initializeInterpolation(
         log(f"ERROR: {e} {traceback_info}")
         self.showDialogBox(e)
 
-
+def changeRifeToFrameExtraction(self,AI):
+    frameExtraction = self.ui.ImageExtractionCheckBox.isChecked()
+    if AI == "rife-ncnn-python" and frameExtraction:
+            AI = "rife-ncnn-vulkan"
+    return AI
 def start_interpolation(
     self, AI
 ):  # command directly connected to the rife start button
+    
+    AI = changeRifeToFrameExtraction(self,AI)
     try:
+        
         if self.input_file != "":
             self.render = "rife"
             has_enough_space, predicted_space, total_space = (
@@ -98,7 +105,7 @@ def start_interpolation(
                     self.input_file, self.render, self.times
                 )
             )
-            if "cuda" not in AI:
+            if "cuda" not in AI or "ncnn-python" not in AI:
                 if has_enough_space or not_enough_storage(
                     self, predicted_space, total_space
                 ):

@@ -39,7 +39,7 @@ def modelOptions(self):
             self.ui.Rife_Model.addItem(i.replace(".bin", ""))
 
     self.ui.EnsembleCheckBox.hide()
-
+    self.ui.ImageExtractionCheckBox.hide()
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
     except:

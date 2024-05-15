@@ -38,6 +38,7 @@ def modelOptions(self):
     self.ui.Rife_Model.addItems(os.listdir(f"{thisdir}/models/custom-models-cuda"))
     self.ui.Rife_Times.setEnabled(True)
     self.ui.EnsembleCheckBox.hide()
+    self.ui.ImageExtractionCheckBox.hide()
 
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()

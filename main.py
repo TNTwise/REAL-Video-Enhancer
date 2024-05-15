@@ -682,7 +682,16 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             self.ui.EnsembleCheckBox.show()
             self.ui.ensembleHelpButton.show()
-
+    def TurnOffCustomFPSMultiplierIfImageExtraction(self):
+        if self.ui.ImageExtractionCheckBox.isChecked():
+            self.ui.FPSTo.show()
+            self.ui.FPSFrom.show()
+            self.ui.FPSToSign.show()
+            
+        else:
+            self.ui.FPSTo.hide()
+            self.ui.FPSFrom.hide()
+            self.ui.FPSToSign.hide()
     def greyOutRifeTimes(self):
         if (
             "v4" in self.ui.Rife_Model.currentText()
@@ -691,8 +700,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.Rife_Times.setEnabled(True)
 
             self.setEnsembleMode()
-            self.ui.FPSFrom.show()
-            self.ui.FPSTo.show()
+            self.TurnOffCustomFPSMultiplierIfImageExtraction()
 
         else:
             self.ui.FPSFrom.hide()
@@ -939,6 +947,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.InstallModelsFrame.setDisabled(mode)
         self.ui.SettingsMenus.setDisabled(mode)
         self.ui.modeCombo.setDisabled(mode)
+        self.ui.ImageExtractionCheckBox.setDisabled(mode)
 
     def endRife(
         self,

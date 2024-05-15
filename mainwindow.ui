@@ -596,6 +596,13 @@
                    </widget>
                   </item>
                   <item>
+                   <widget class="QCheckBox" name="ImageExtractionCheckBox">
+                    <property name="text">
+                     <string>Image Extraction</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
                    <widget class="QLabel" name="denoiseLevelLabel">
                     <property name="text">
                      <string>Denoise level:</string>
@@ -885,7 +892,7 @@
                          <rect>
                           <x>0</x>
                           <y>0</y>
-                          <width>479</width>
+                          <width>126</width>
                           <height>192</height>
                          </rect>
                         </property>

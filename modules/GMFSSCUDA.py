@@ -34,6 +34,7 @@ def modelOptions(self):
     self.ui.Rife_Times.clear()
     self.ui.FPSPreview.setText("FPS:")
     self.ui.ensembleHelpButton.hide()
+    self.ui.ImageExtractionCheckBox.hide()
     self.ui.Rife_Times.addItem("2X")
 
     model_list = ["gmfss-fortuna"]
