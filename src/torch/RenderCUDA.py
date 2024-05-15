@@ -250,7 +250,7 @@ class Render:
 
             #frame = np.ascontiguousarray(frame)
             self.main.imageDisplay = frame
-            self.writeProcess.stdin.buffer.write(frame.tobytes())
+            self.writeProcess.stdin.buffer.write(frame)
 
 
 class Interpolation(Render):
