@@ -41,7 +41,7 @@ try:
 except Exception as e:
     log("Cant import UpscaleTRT!" + str(e))
     
-    
+from src.torch.rife.NCNN import RifeNCNN
 
 
 
@@ -144,6 +144,7 @@ class Render:
                 for line in iter(self.writeProcess.stderr.readline, b""):
                     if not self.main.CudaRenderFinished:
                         log(line)
+                        
                         # print(line)
                     else:
                         break
@@ -264,6 +265,8 @@ class Interpolation(Render):
         ensemble,
         half,
         benchmark,
+        ncnn_gpu=0,
+        threads=2,
     ):
         super(Interpolation, self).__init__(
             main,
@@ -277,9 +280,21 @@ class Interpolation(Render):
         self.model = model
         self.ensemble = ensemble
         self.half = half
+        self.ncnn_gpu = ncnn_gpu
+        self.threads = threads
         self.handleMethod()
 
     def handleMethod(self):
+        if "rife-ncnn-python" == self.method:
+            self.interpolate_process = RifeNCNN(
+                interpolation_factor=self.interpolation_factor,
+                interpolate_method=self.model,
+                width=self.originalWidth,
+                height=self.originalHeight,
+                ensemble=self.ensemble,
+                half=self.half,
+                ncnn_gpu=self.ncnn_gpu
+            )
         if "rife-cuda" == self.method:
             self.interpolate_process = Rife(
                 interpolation_factor=self.interpolation_factor,
@@ -306,6 +321,7 @@ class Interpolation(Render):
                 half=self.half,
             )
         self.main.start_time = time.time()
+        print('starting render')
 
     def proc_image(self, frame0, frame1):
         self.interpolate_process.run1(frame0, frame1)

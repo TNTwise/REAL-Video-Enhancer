@@ -1,2 +1,3 @@
 https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp38-none-manylinux1_x86_64.whl 
 https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp38-none-manylinux1_x86_64.whl
+https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/fastebs/rife_ncnn_vulkan_python-1.2.1-cp38-cp38-linux_x86_64.whl

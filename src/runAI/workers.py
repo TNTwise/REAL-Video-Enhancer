@@ -268,7 +268,6 @@ class downloadVideo(QObject):
                 stdout_lines = result.stdout.splitlines()
                 resolutions_list = []
                 self.dict_res_id_fps = {}
-                fps_list = []
                 for line in stdout_lines:
                     if "FPS" in line:
                         fps_index = line.find("FPS")
@@ -540,7 +539,7 @@ class interpolation(QObject):
                         self.main.ui.FPSTo.value() / self.main.ui.FPSFrom.value()
                     )
         setupTransitions(self)
-        self.main.start_time = time.time()
+        
         self.Render(
             self.model, self.main.times, self.main.input_file, self.main.output_folder
         )
@@ -658,6 +657,24 @@ class interpolation(QObject):
                 )
                 log("After output")
         if "cuda" in self.main.AI or "ncnn-python" in self.main.AI:
+            if self.main.AI == "rife-ncnn-python":
+                output_file = returnOutputFile(
+                    self.main, self.main.videoName, self.main.encoder
+                )
+                self.main.renderAI = RenderCUDA.Interpolation(
+                    self.main,
+                    "rife-ncnn-python",
+                    self.main.input_file,
+                    output_file,
+                    self.main.ui.Rife_Model.currentText(),
+                    self.main.times,
+                    self.main.ui.EnsembleCheckBox.isChecked(),
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark,
+                    threads=int(settings.VRAM),
+                    ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
+                )
+
             if self.main.AI == "rife-cuda":
                 output_file = returnOutputFile(
                     self.main, self.main.videoName, self.main.encoder
@@ -705,6 +722,7 @@ class interpolation(QObject):
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
                 )
+            self.main.start_time = time.time()
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procInterpThread)
@@ -714,6 +732,7 @@ class interpolation(QObject):
             renderThread1.start()
             self.main.renderAI.log()
             self.main.output_file = output_file
+            
 
         log("Done")
         self.main.currentRenderFPS = 0
@@ -955,7 +974,7 @@ class upscale(QObject):
                     threads=int(settings.VRAM),
                     benchmark=self.main.benchmark,
                 )
-
+            self.main.start_time = time.time()
             self.main.renderAI.extractFramesToBytes()
             readThread1 = Thread(target=self.main.renderAI.readThread)
             procThread1 = Thread(target=self.main.renderAI.procUpscaleThread)

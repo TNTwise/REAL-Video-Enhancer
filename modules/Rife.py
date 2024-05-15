@@ -47,7 +47,7 @@ def modelOptions(self):
     except:
         pass
     self.ui.RifeStart.clicked.connect(
-        lambda: interpolate.start_interpolation(self, "rife-ncnn-vulkan")
+        lambda: interpolate.start_interpolation(self, "rife-ncnn-python")
     )
     models2 = self.get_models_from_dir("rife")
     models = []
