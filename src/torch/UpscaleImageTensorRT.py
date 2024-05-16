@@ -59,7 +59,7 @@ class UpscaleTensorRT:
         self.height = height
         self.modelName = modelName
         self.nt = nt
-        
+        self.bf16 = False
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
         self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}.onnx')
         if not os.path.exists(self.locationOfOnnxModel):
@@ -73,9 +73,15 @@ class UpscaleTensorRT:
         model.eval().cuda()
         model.load_state_dict(state_dict, strict=True)
         input = torch.rand(1, 3, 256, 256).cuda()
-        if self.half:
-            model.half()
-            input = input.half()
+        
+        try:
+            if self.half:
+                model.half()
+                input = input.half()
+        except:
+            model.bfloat16()
+            input.bfloat16()
+            self.bf16 = True
         with torch.inference_mode():
             
            
@@ -112,7 +118,7 @@ class UpscaleTensorRT:
                 torch.set_default_dtype(torch.float16)
 
         # TO:DO account for FP16/FP32
-        self.enginePath = f'{self.locationOfOnnxModel.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}.engine'
+        self.enginePath = f'{self.locationOfOnnxModel.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}device={self.device_name}_bf16={self.bf16}.engine'
         if not os.path.exists(self.enginePath):
             toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
             print((toPrint))

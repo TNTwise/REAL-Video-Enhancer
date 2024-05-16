@@ -44,9 +44,13 @@ class UpscaleCUDA:
             # self.currentStream = 0
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
-            if self.half:
-                torch.set_default_dtype(torch.float16)
-                self.model.half()
+            try:
+                if self.half:
+                    torch.set_default_dtype(torch.float16)
+                    self.model.half()
+            except:
+                torch.set_default_dtype(torch.bfloat16)
+                self.model.bfloat16()
 
     @torch.inference_mode()
     def UpscaleImage(self, frame):
