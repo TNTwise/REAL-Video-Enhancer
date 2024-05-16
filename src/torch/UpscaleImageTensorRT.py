@@ -73,15 +73,15 @@ class UpscaleTensorRT:
         model.eval().cuda()
         model.load_state_dict(state_dict, strict=True)
         input = torch.rand(1, 3, 256, 256).cuda()
-        
-        try:
-            if self.half:
-                model.half()
-                input = input.half()
-        except:
-            model.bfloat16()
-            input.bfloat16()
-            self.bf16 = True
+        if self.half:
+            try:
+                
+                    model.half()
+                    input = input.half()
+            except:
+                model.bfloat16()
+                input.bfloat16()
+                self.bf16 = True
         with torch.inference_mode():
             
            
@@ -151,12 +151,15 @@ class UpscaleTensorRT:
         frame = (
             torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float().mul_(1 / 255)
         )
+        if self.half and not self.bf16:
+            frame = frame.half()
+        if  self.bf16:
+            frame = frame.bfloat16()
         return (
             self.runner.infer(
                 {
-                    "input": frame.half()
-                    if self.half and self.isCudaAvailable
-                    else frame
+                    "input": frame
+                    
                     
                 },
                 check_inputs=False,

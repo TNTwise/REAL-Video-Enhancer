@@ -33,6 +33,7 @@ class UpscaleCUDA:
 
         self.isCudaAvailable = torch.cuda.is_available()
         self.half = half
+        self.bf16 = False
 
         self.device = torch.device("cuda" if self.isCudaAvailable else "cpu")
         self.model = (
@@ -48,9 +49,11 @@ class UpscaleCUDA:
                 if self.half:
                     torch.set_default_dtype(torch.float16)
                     self.model.half()
+                    self.bf16 = False
             except:
                 torch.set_default_dtype(torch.bfloat16)
                 self.model.bfloat16()
+                self.bf16 = True
 
     @torch.inference_mode()
     def UpscaleImage(self, frame):
@@ -65,8 +68,10 @@ class UpscaleCUDA:
             if self.isCudaAvailable:
                 # torch.cuda.set_stream(self.stream[self.currentStream])
                 frame = frame.cuda(non_blocking=True)
-                if self.half:
+                if self.half and not self.bf16:
                     frame = frame.half()
+                if self.bf16:
+                    frame = frame.bfloat16()
             frame = frame.contiguous(memory_format=torch.channels_last)
 
             output = self.model(frame)
