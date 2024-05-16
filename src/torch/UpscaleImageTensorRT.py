@@ -75,7 +75,7 @@ class UpscaleTensorRT:
         input = torch.rand(1, 3, 256, 256)
         if self.half:
             model.half()
-            input.half()
+            input = input.half()
         with torch.inference_mode():
             
            
