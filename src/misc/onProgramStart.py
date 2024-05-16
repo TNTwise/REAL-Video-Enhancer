@@ -397,7 +397,7 @@ def set_model_params(self):
                 os.path.join(f"{thisdir}", "models", "rife-trt-engines"), exist_ok=True
             )
             self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
-
+        
         if "Custom NCNN Models" == i:
             self.model_labels["Custom NCNN models"] = "upscaling"
 
@@ -411,6 +411,9 @@ def set_model_params(self):
 
         if "custom-cuda-models" == i:
             self.model_labels["Custom CUDA models"] = "upscaling"
+        
+        if "custom-tensorrt-models" == i:
+            self.model_labels["Custom TensorRT models"] = "upscaling"
 
         if "SPAN (NCNN)" == i:
             self.ui.SPANNCNNCheckBox.setChecked(True)

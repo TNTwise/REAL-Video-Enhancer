@@ -289,7 +289,8 @@ def check_for_individual_models():
                 and len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0
             ):
                 return_list.append("custom-cuda-models")
-
+                if isTensorRT():
+                    return_list.append("custom-tensorrt-models")
             if isCUPY():
                 if os.path.exists(f"{thisdir}/models/gfmss-cuda/"):
                     return_list.append("gfmss-cuda")

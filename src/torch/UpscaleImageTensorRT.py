@@ -5,6 +5,10 @@ except:
     pass
 import numpy as np
 import logging
+import onnx
+import onnxruntime
+from src.programData.thisdir import thisdir as th
+thisdir = th()
 # import torch_tensorrt as trt
 try:
     import tensorrt
@@ -18,9 +22,11 @@ try:
         SaveEngine,
     )
     from polygraphy.backend.common import BytesFromPath
+    from spandrel import ModelLoader
 except Exception as e:
     print(e)
-    
+from src.misc.log import log
+
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
 
@@ -32,7 +38,7 @@ class UpscaleTensorRT:
         half: bool = False,
         width: int = 1920,
         height: int = 1080,
-        customModel: str = None,
+        modelName: str = None,
         nt: int = 1,
     ):
         """
@@ -44,26 +50,52 @@ class UpscaleTensorRT:
             half (bool): Whether to use half precision
             width (int): The width of the input frame
             height (int): The height of the input frame
-            customModel (str): The path to a custom model file
             nt (int): The number of threads to use
         """
-        self.upscaleMethod = modelPath
+        self.modelPath = modelPath
         self.upscaleFactor = upscaleFactor
         self.half = half
         self.width = width
         self.height = height
-        self.customModel = customModel
+        self.modelName = modelName
         self.nt = nt
-
+        
+        self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
+        self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}.onnx')
+        
+        self.pytorchExportToONNX()
         self.handleModel()
 
+    def pytorchExportToONNX(self): # Loads model via spandrel, and exports to onnx
+        model = ModelLoader().load_from_file(self.modelPath)
+        model = model.model
+        state_dict = model.state_dict()
+        model.eval()
+        model.load_state_dict(state_dict, strict=True)
+        
+        with torch.inference_mode():
+            
+           
+            torch.onnx.export(
+                model,
+                torch.rand(1, 3, 256, 256),
+                self.locationOfOnnxModel,
+                verbose=False,
+                opset_version=19,
+                input_names=["input"],
+                output_names=["output"],
+                dynamic_axes={
+                        "input": {0: "batch_size", 2: "width", 3: "height"},
+                        "output": {0: "batch_size", 2: "width", 3: "height"},
+                    }
+            )
     def handleModel(self):
         # Reusing the directML models for TensorRT since both require ONNX models
         
 
         
         
-        modelPath = '/home/pax/Downloads/2x_ModernSpanimationV1_fp16_op17.onnx'
+        
         
 
         self.isCudaAvailable = torch.cuda.is_available()
@@ -77,9 +109,9 @@ class UpscaleTensorRT:
                 torch.set_default_dtype(torch.float16)
 
         # TO:DO account for FP16/FP32
-        self.enginePath = f'{modelPath.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}.engine'
+        self.enginePath = f'{self.locationOfOnnxModel.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}.engine'
         if not os.path.exists(self.enginePath):
-            toPrint = f"Model engine not found, creating engine for model: {modelPath}, this may take a while..."
+            toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
             print((toPrint))
             logging.info(toPrint)
             profiles = [
@@ -92,7 +124,7 @@ class UpscaleTensorRT:
                 ),
             ]
             self.engine = engine_from_network(
-                network_from_onnx_path(modelPath),
+                network_from_onnx_path(self.locationOfOnnxModel),
                 config=CreateConfig(fp16=self.half, profiles=profiles),
             )
             self.engine = SaveEngine(self.engine, self.enginePath)

@@ -23,10 +23,10 @@ thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-def modelOptions(self):
+def modelOptions(self,trt=False):
     settings = Settings()
     self.times = 1
-    log("Model: CUSTOM CUDA")
+    log(f"Model: CUSTOM CUDA trt={trt}")
     self.render = "esrgan"
 
     self.ui.FPSToSign.hide()
@@ -57,6 +57,11 @@ def modelOptions(self):
     self.ui.FPSFrom.hide()
     self.ui.FPSTo.hide()
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
-    self.ui.RifeStart.clicked.connect(
+    if trt:
+        self.ui.RifeStart.clicked.connect(
+        lambda: upscale.start_upscale(self, "custom-models-cuda-tensorrt")
+    )
+    else:
+        self.ui.RifeStart.clicked.connect(
         lambda: upscale.start_upscale(self, "custom-models-cuda")
     )

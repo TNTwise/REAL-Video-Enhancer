@@ -345,6 +345,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         if self.ui.AICombo.currentText() == "Custom CUDA models":
             CustomModelsCUDA.modelOptions(self)
+        
+        if self.ui.AICombo.currentText() == "Custom TensorRT models":
+            CustomModelsCUDA.modelOptions(self,trt=True)
 
         if self.ui.AICombo.currentText() == "SPAN (NCNN)":
             span.modelOptions(self)
@@ -761,16 +764,19 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models"
-            and self.ui.Rife_Model.currentText()
+            self.ui.AICombo.currentText() == "Custom CUDA models" 
+            or self.ui.AICombo.currentText() == "Custom TensorRT models"
+            and len(self.ui.Rife_Model.currentText()) > 0
         ):
             model_path = handleModel(
                 "custom-models-cuda", self.ui.Rife_Model.currentText()
             )
-            model = ModelLoader().load_from_file(model_path)
-            if self.ui.Rife_Times.count() < 1:
-                self.ui.Rife_Times.addItem(f"{model.scale}X")
-
+            try:
+                model = ModelLoader().load_from_file(model_path)
+                if self.ui.Rife_Times.count() < 1:
+                    self.ui.Rife_Times.addItem(f"{model.scale}X")
+            except:
+                pass
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
                 self.ui.Rife_Times.setCurrentText("2X")

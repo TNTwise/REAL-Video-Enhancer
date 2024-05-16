@@ -41,6 +41,13 @@ def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir()}", "models", "custom-models-cuda"), exist_ok=True
     )
+
+    os.makedirs(
+        os.path.join(f"{thisdir()}", "models", "tensorrt-engines"), exist_ok=True
+    )
+    os.makedirs(
+        os.path.join(f"{thisdir()}", "models", "onnx-models"), exist_ok=True
+    )
 def createFiles():
     try:
         os.mknod(

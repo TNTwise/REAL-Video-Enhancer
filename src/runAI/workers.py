@@ -871,6 +871,20 @@ class upscale(QObject):
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
                 )
+            if self.main.AI == "custom-models-cuda-tensorrt":
+                model_path = handleModel(
+                    self.main.AI, self.main.ui.Rife_Model.currentText()
+                )
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model_path,
+                    bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
+                    benchmark=self.main.benchmark,
+                    method='tensorrt'
+                )
 
             if self.main.AI == "realesrgan-ncnn-python":
                 if self.main.ui.Rife_Model.currentText() == "Animation":
