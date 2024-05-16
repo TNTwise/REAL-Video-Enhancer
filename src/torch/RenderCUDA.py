@@ -384,6 +384,7 @@ class Upscaling(Render):
         cugan_noise=0,
         ncnn_gpu=0,
         benchmark=False,
+        modelName=""
     ):
         super(Upscaling, self).__init__(
             main,
@@ -401,6 +402,7 @@ class Upscaling(Render):
         self.frame = 0
         self.cugan_noise = cugan_noise
         self.ncnn_gpu = ncnn_gpu
+        self.modelName = modelName
         self.handleModel()
 
     def handleModel(self):
@@ -410,7 +412,7 @@ class Upscaling(Render):
             )
         if "tensorrt" in self.method and "ncnn" not in self.method:
             self.upscaleMethod = UpscaleTensorRT(
-                width=self.originalWidth, height=self.originalHeight, modelPath=self.model_path, half=self.half
+                width=self.originalWidth, height=self.originalHeight, modelPath=self.model_path, half=self.half,modelName = self.modelName
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(

@@ -62,8 +62,8 @@ class UpscaleTensorRT:
         
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
         self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}.onnx')
-        
-        self.pytorchExportToONNX()
+        if not os.path.exists(self.locationOfOnnxModel):
+            self.pytorchExportToONNX()
         self.handleModel()
 
     def pytorchExportToONNX(self): # Loads model via spandrel, and exports to onnx
@@ -81,7 +81,7 @@ class UpscaleTensorRT:
                 torch.rand(1, 3, 256, 256),
                 self.locationOfOnnxModel,
                 verbose=False,
-                opset_version=19,
+                opset_version=17,
                 input_names=["input"],
                 output_names=["output"],
                 dynamic_axes={
@@ -138,19 +138,26 @@ class UpscaleTensorRT:
         self.runner.activate()
 
     @torch.inference_mode()
-    def UpscaleImage(self, frame: np.ndarray) -> np.ndarray:
+    def UpscaleImage(self, frame: np.ndarray):
         frame = (
             torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float().mul_(1 / 255)
         )
-
         return (
             self.runner.infer(
                 {
                     "input": frame.half()
                     if self.half and self.isCudaAvailable
                     else frame
+                    
                 },
                 check_inputs=False,
-            )["output"].squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
+            )["output"]
+            .squeeze(0)
+            .permute(1, 2, 0)
+            .mul_(255)
+            .clamp(0, 255) # Clamped ONNX models seem to be ignored by the runner, it still outputs values outside of [0-255], weird
+            .byte()
+            .cpu()
+            .numpy()
         )
 

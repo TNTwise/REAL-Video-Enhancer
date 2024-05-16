@@ -883,7 +883,8 @@ class upscale(QObject):
                     model_path,
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
-                    method='tensorrt'
+                    method='tensorrt',
+                    modelName=self.main.ui.Rife_Model.currentText()
                 )
 
             if self.main.AI == "realesrgan-ncnn-python":
