@@ -28,7 +28,8 @@ from PyQt5.QtCore import (
     QEasingCurve,
     QRect,
 )
-
+from rife_ncnn_vulkan_python import Rife
+import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper
 from src.programData.version import returnVersion
 
 
