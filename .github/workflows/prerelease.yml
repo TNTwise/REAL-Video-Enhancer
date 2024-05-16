@@ -175,12 +175,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
+        # cp -r /usr/local/Cellar/postgresql@14/14.11_1/lib/postgresql@14/* /Applications/Postgres.app/Contents/Versions/9.6/lib/ - only if cx_freeze
       - name: checks
         run: | 
           mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
           brew reinstall postgresql
           
-          cp -r /usr/local/Cellar/postgresql@14/14.11_1/lib/postgresql@14/* /Applications/Postgres.app/Contents/Versions/9.6/lib/
+                      
           brew update
           brew reinstall libiodbc
           export LDFLAGS="-L/usr/local/opt/libiodbc/lib"
