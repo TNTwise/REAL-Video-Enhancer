@@ -72,13 +72,16 @@ class UpscaleTensorRT:
         state_dict = model.state_dict()
         model.eval()
         model.load_state_dict(state_dict, strict=True)
-        
+        input = torch.rand(1, 3, 256, 256)
+        if self.half:
+            model.half()
+            input.half()
         with torch.inference_mode():
             
            
             torch.onnx.export(
                 model,
-                torch.rand(1, 3, 256, 256),
+                input,
                 self.locationOfOnnxModel,
                 verbose=False,
                 opset_version=17,
@@ -157,6 +160,7 @@ class UpscaleTensorRT:
             .mul_(255)
             .clamp(0, 255) # Clamped ONNX models seem to be ignored by the runner, it still outputs values outside of [0-255], weird
             .byte()
+            .contiguous()
             .cpu()
             .numpy()
         )
