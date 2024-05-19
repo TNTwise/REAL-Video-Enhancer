@@ -10,7 +10,7 @@ from src.programData.thisdir import thisdir as th
 thisdir = th()
 # import torch_tensorrt as trt
 try:
-    import tensorrt
+    import tensorrt as trt
     from polygraphy.backend.trt import (
         TrtRunner,
         engine_from_network,
@@ -112,7 +112,7 @@ class UpscaleTensorRT:
 
         self.isCudaAvailable = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.isCudaAvailable else "cpu")
-        self.trt_version = tensorrt.__version__
+        self.trt_version = trt.__version__
         self.device_name = torch.cuda.get_device_name(self.device)
         if self.isCudaAvailable:
             torch.backends.cudnn.enabled = True
@@ -140,18 +140,56 @@ class UpscaleTensorRT:
                 config=CreateConfig(fp16=self.half, profiles=profiles),
             )
             self.engine = SaveEngine(self.engine, self.enginePath)
-
+            with TrtRunner(self.engine) as runner:
+                self.runner = runner
         else:
             self.engine = EngineFromBytes(
                 BytesFromPath(self.enginePath)
             )
+        
+        with open(self.enginePath, "rb") as f, trt.Runtime(trt.Logger(trt.Logger.INFO)) as runtime:
+            self.engine = runtime.deserialize_cuda_engine(f.read()) 
+            self.context = self.engine.create_execution_context()
+        
+        self.stream = torch.cuda.Stream()
+        self.dummyInput = torch.zeros(
+            (1, 3, self.height, self.width),
+            device=self.device,
+            dtype=torch.float16 if self.half else torch.float32,
+        )
 
-        self.runner = TrtRunner(self.engine)
-        self.runner.activate()
+        self.dummyOutput = torch.zeros(
+            (1, 3, self.height * self.upscaleFactor, self.width * self.upscaleFactor),
+            device=self.device,
+            dtype=torch.float16 if self.half else torch.float32,
+        )
+
+        self.bindings = [self.dummyInput.data_ptr(), self.dummyOutput.data_ptr()]
+
+        for i in range(self.engine.num_io_tensors):
+            self.context.set_tensor_address(self.engine.get_tensor_name(i), self.bindings[i])
+            tensor_name = self.engine.get_tensor_name(i)
+            if self.engine.get_tensor_mode(tensor_name) == trt.TensorIOMode.INPUT:
+                self.context.set_input_shape(tensor_name, self.dummyInput.shape)
 
     @torch.inference_mode()
     def UpscaleImage(self, frame: bytearray):
-        frame = bytesToTensor(frame=frame,
+        with torch.cuda.stream(self.stream):
+            self.dummyInput.copy_(
+                bytesToTensor(
+                              frame,
+                              half=self.half,
+                              bf16=self.bf16,
+                              width=self.width,
+                              height=self.height
+                              )
+                )
+            
+            self.context.execute_async_v3(stream_handle=self.stream.cuda_stream)
+            self.stream.synchronize()
+        
+            return self.dummyOutput.squeeze(0).permute(1, 2, 0).mul_(255).clamp(0, 255).contiguous().byte().cpu().numpy()
+        '''frame = bytesToTensor(frame=frame,
                       height=self.height,
                       width=self.width,
                       half=self.half,
@@ -174,4 +212,4 @@ class UpscaleTensorRT:
             .byte()
             .cpu()
             .numpy()
-        )
+        )'''
