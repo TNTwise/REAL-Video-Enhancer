@@ -3339,7 +3339,6 @@ class NcnnModel:
     def magic(self):
         return "7767517"
 
-    @staticmethod
     def load_from_file(param_path: str = "", bin_path: str = "") -> NcnnModel:
         if bin_path == "":
             bin_path = param_path.replace(".param", ".bin")
@@ -3363,7 +3362,6 @@ class NcnnModel:
 
         return model
 
-    @staticmethod
     def interp_layers(
         a: NcnnLayer, b: NcnnLayer, alpha_a: float
     ) -> tuple[NcnnLayer, bytes]:
@@ -3698,10 +3696,8 @@ class NcnnModelWrapper:
         self.out_nc: int = out_nc
         self.fp: str = fp
 
-    @staticmethod
     
 
-    @staticmethod
     def get_nf_and_in_nc(layer: NcnnLayer) -> tuple[int, int]:
         nf = layer.params[0].value
         kernel_w = layer.params[1].value
