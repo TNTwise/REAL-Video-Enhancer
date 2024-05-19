@@ -161,24 +161,21 @@ class Rife:
         self.I1 = self.processFrame(I1)
         return True
 
+    def bytesToFrame(self,frame):
+        return (
+            torch.frombuffer(frame, dtype=torch.uint8)
+                .reshape(self.height,self.width,3)
+                .to(self.device, non_blocking=True)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                .float()
+                .mul_(1/255)
+                )
+
     @torch.inference_mode()
     def run1(self, I0, I1):
-        self.I0 = (
-            torch.from_numpy(I0)
-            .to(self.device, non_blocking=True)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .float()
-            / 255.0
-        )
-        self.I1 = (
-            torch.from_numpy(I1)
-            .to(self.device, non_blocking=True)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .float()
-            / 255.0
-        )
+        self.I0 = self.bytesToFrame(I0)
+        self.I1 = self.bytesToFrame(I1)
 
         if self.cuda_available and self.half and not self.UHD:
             self.I0 = self.I0.half()

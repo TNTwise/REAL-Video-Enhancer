@@ -17,7 +17,7 @@ try:
 except:
     pass
 import numpy as np
-
+from  src.torch.inputToTorch import bytesToTensor
 # from realsr_ncnn_vulkan_python import *
 # from realsr_ncnn_vulkan_python import *
 
@@ -57,24 +57,23 @@ class UpscaleCUDA:
 
     @torch.inference_mode()
     def UpscaleImage(self, frame):
-        with torch.no_grad():
-            frame = (
-                torch.from_numpy(frame)
-                .permute(2, 0, 1)
-                .unsqueeze(0)
-                .float()
-                .mul_(1 / 255)
-            )
-            if self.isCudaAvailable:
-                # torch.cuda.set_stream(self.stream[self.currentStream])
-                frame = frame.cuda(non_blocking=True)
-                if self.half and not self.bf16:
-                    frame = frame.half()
-                if self.bf16:
-                    frame = frame.bfloat16()
-            frame = frame.contiguous(memory_format=torch.channels_last)
 
-            output = self.model(frame)
-            
+        frame = bytesToTensor(frame=frame,
+                      height=self.height,
+                      width=self.width,
+                      half=self.half,
+                      bf16=self.bf16)
 
-            return (output).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
+        if self.isCudaAvailable:
+            # torch.cuda.set_stream(self.stream[self.currentStream])
+            frame = frame.cuda(non_blocking=True)
+            if self.half and not self.bf16:
+                frame = frame.half()
+            if self.bf16:
+                frame = frame.bfloat16()
+        frame = frame.contiguous(memory_format=torch.channels_last)
+
+        output = self.model(frame)
+        
+
+        return (output).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()

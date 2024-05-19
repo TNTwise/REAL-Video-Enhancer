@@ -31,9 +31,13 @@ class RifeNCNN:
                            num_threads=threads,
                            model=self.modelPath,
                            uhd_mode=False)
+    def bytesToNpArray(self,bytes):
+        return np.ascontiguousarray(
+                np.frombuffer(bytes,dtype=np.uint8).reshape(self.height,self.width,3)
+            )
     def run1(self,i0,i1):
-        self.i0 = i0
-        self.i1 = i1
+        self.i0 = self.bytesToNpArray(i0)
+        self.i1 = self.bytesToNpArray(i1)
     def make_inference(self,n):
         return np.ascontiguousarray(self.render.process_cv2(self.i0,self.i1,timestep=n))
         

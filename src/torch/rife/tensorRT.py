@@ -235,9 +235,9 @@ class RifeTensorRT:
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
-       
+        frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(self.height,self.width,3)
         return (
-            torch.from_numpy(frame)
+            (frame)
             .permute(2, 0, 1)
             .unsqueeze(0)
             .to(device, memory_format=torch.channels_last)

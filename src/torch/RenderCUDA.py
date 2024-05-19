@@ -117,11 +117,8 @@ class Render:
                 self.readBuffer.put(None)
                 log("done with read")
                 break
-            frame = np.frombuffer(chunk, dtype=np.uint8).reshape(
-                (self.originalHeight, self.originalWidth, 3)
-            )
 
-            self.readBuffer.put(frame)
+            self.readBuffer.put(chunk)
 
     def finish_render(self):
         self.writeBuffer.put(None)
@@ -145,19 +142,13 @@ class Render:
                     if not self.main.CudaRenderFinished:
                         log(line)
                         
-                        # print(line)
                     else:
                         break
-                    # self.frame = re.findall(r'frame=\d+',line.replace(' ',''))[0].replace('frame=','')
-                    # self.frame = int(self.frame.replace('frame=',''))
-
-                    # self.frameRate = int(re.findall(r'frame=\d+',line.replace(' ','')))[0].replace('fps=','')
+                    
 
             except Exception as e:
                 pass
-                # tb = traceback.format_exc()
-                # log(tb,e)
-                # log(f'{tb},{e}')
+                
         log("Done with logging")
 
     # save
@@ -420,6 +411,8 @@ class Upscaling(Render):
                 model=self.model_path,
                 num_threads=self.threads,
                 scale=self.resIncrease,
+                width=self.originalWidth,
+                height=self.originalHeight
             )
         if "cugan" in self.method and "ncnn" in self.method:
             self.upscaleMethod = UpscaleCuganNCNN(
@@ -430,6 +423,8 @@ class Upscaling(Render):
                 model="models-se",
                 num_threads=self.threads,
                 scale=self.resIncrease,
+                width=self.originalWidth,
+                height=self.originalHeight
             )
         self.main.start_time = time.time()
     def procUpscaleThread(self):

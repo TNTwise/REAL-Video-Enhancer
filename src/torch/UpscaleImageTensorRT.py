@@ -26,6 +26,7 @@ try:
 except Exception as e:
     print(e)
 from src.misc.log import log
+from  src.torch.inputToTorch import bytesToTensor
 
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
@@ -147,14 +148,13 @@ class UpscaleTensorRT:
         self.runner.activate()
 
     @torch.inference_mode()
-    def UpscaleImage(self, frame: np.ndarray):
-        frame = (
-            torch.from_numpy(frame).permute(2, 0, 1).unsqueeze(0).float().mul_(1 / 255)
-        )
-        if self.half and not self.bf16:
-            frame = frame.half()
-        if  self.bf16:
-            frame = frame.bfloat16()
+    def UpscaleImage(self, frame: bytearray):
+        frame = bytesToTensor(frame=frame,
+                      height=self.height,
+                      width=self.width,
+                      half=self.half,
+                      bf16=self.bf16)
+        
         return (
             self.runner.infer(
                 {
@@ -167,7 +167,6 @@ class UpscaleTensorRT:
             .squeeze(0)
             .permute(1, 2, 0)
             .mul_(255)
-            .clamp(0, 255) # Clamped ONNX models seem to be ignored by the runner, it still outputs values outside of [0-255], weird
             .byte()
             .contiguous()
             .cpu()
