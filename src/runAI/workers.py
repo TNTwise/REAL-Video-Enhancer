@@ -231,9 +231,9 @@ class pb2X(QObject):
                             self.image_progress.emit("2")
                         except Exception as e:
                             traceback_info = traceback.format_exc()
-                            print(
+                            '''print(
                                 f"Soemthing went wrong with cuda image preview {e} {traceback_info}"
-                            )
+                            )'''
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
                 log("CUDA Preview thread finished")
@@ -707,6 +707,7 @@ class interpolation(QObject):
                     self.main.ui.EnsembleCheckBox.isChecked(),
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
+                    guiLog=self.log
                 )
 
             if self.main.AI == "gmfss-cuda":
@@ -885,7 +886,8 @@ class upscale(QObject):
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
                     method='tensorrt',
-                    modelName=self.main.ui.Rife_Model.currentText()
+                    modelName=self.main.ui.Rife_Model.currentText(),
+                    guiLog=self.log
                 )
 
             if self.main.AI == "realesrgan-ncnn-python":

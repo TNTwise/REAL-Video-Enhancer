@@ -258,6 +258,7 @@ class Interpolation(Render):
         benchmark,
         ncnn_gpu=0,
         threads=2,
+        guiLog=None,
     ):
         super(Interpolation, self).__init__(
             main,
@@ -267,6 +268,7 @@ class Interpolation(Render):
             resIncrease=1,
             benchmark=benchmark,
         )
+        self.guiLog = guiLog
         self.method = method
         self.model = model
         self.ensemble = ensemble
@@ -302,6 +304,7 @@ class Interpolation(Render):
                 height=self.originalHeight,
                 ensemble=self.ensemble,
                 half=self.half,
+                guiLog=self.guiLog
             )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
@@ -375,7 +378,8 @@ class Upscaling(Render):
         cugan_noise=0,
         ncnn_gpu=0,
         benchmark=False,
-        modelName=""
+        modelName="",
+        guiLog = None
     ):
         super(Upscaling, self).__init__(
             main,
@@ -394,6 +398,7 @@ class Upscaling(Render):
         self.cugan_noise = cugan_noise
         self.ncnn_gpu = ncnn_gpu
         self.modelName = modelName
+        self.guiLog = guiLog
         self.handleModel()
 
     def handleModel(self):
@@ -402,8 +407,14 @@ class Upscaling(Render):
                 self.originalWidth, self.originalHeight, self.model_path, self.half
             )
         if "tensorrt" in self.method and "ncnn" not in self.method:
+            
             self.upscaleMethod = UpscaleTensorRT(
-                width=self.originalWidth, height=self.originalHeight, modelPath=self.model_path, half=self.half,modelName = self.modelName
+                width=self.originalWidth, 
+                height=self.originalHeight, 
+                modelPath=self.model_path, 
+                half=self.half,
+                modelName = self.modelName,
+                guiLog = self.guiLog
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(

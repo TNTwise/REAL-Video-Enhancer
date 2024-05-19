@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import os
-from threading import Lock
 
-import numpy as np
 try:
     import tensorrt
 
@@ -37,6 +35,7 @@ class RifeTensorRT:
         half: bool = False,
         trt_max_workspace_size: int = 1,
         num_streams: int = 1,
+        guiLog = None
     ):
         self.width = width
         self.height = height
@@ -54,14 +53,9 @@ class RifeTensorRT:
         self.device_name = torch.cuda.get_device_name(self.device)
         self.trt_version = tensorrt.__version__
         self.dimensions = f"{self.pw}x{self.ph}"
-        
+        self.guiLog = guiLog
         self.half = half
-        self.index = -1
-        self.index_lock = Lock()
-        self.stream = [
-            torch.cuda.Stream(device=self.device) for _ in range(self.num_streams)
-        ]
-        self.stream_lock = [Lock() for _ in range(self.num_streams)]
+        
 
         self.trt_engine_path = os.path.join(
             thisdir,
@@ -156,6 +150,7 @@ class RifeTensorRT:
     @torch.inference_mode()
     def generateEngine(self):
         # temp
+        self.guiLog.emit("Building Engine, this may take a while...")
         trt_max_workspace_size = 1
 
         if self.half:

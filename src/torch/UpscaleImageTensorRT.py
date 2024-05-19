@@ -4,7 +4,6 @@ try:
 except:
     pass
 import numpy as np
-import logging
 import onnx
 import onnxruntime
 from src.programData.thisdir import thisdir as th
@@ -41,6 +40,7 @@ class UpscaleTensorRT:
         height: int = 1080,
         modelName: str = None,
         nt: int = 1,
+        guiLog = None,
     ):
         """
         Initialize the upscaler with the desired model
@@ -63,6 +63,7 @@ class UpscaleTensorRT:
         self.bf16 = False
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
         self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}.onnx')
+        self.guiLog = guiLog
         if not os.path.exists(self.locationOfOnnxModel):
             self.pytorchExportToONNX()
         self.handleModel()
@@ -83,6 +84,7 @@ class UpscaleTensorRT:
                 model.bfloat16()
                 input.bfloat16()
                 self.bf16 = True
+        self.guiLog.emit("Exporting ONNX")
         with torch.inference_mode():
             
            
@@ -122,8 +124,8 @@ class UpscaleTensorRT:
         self.enginePath = f'{self.locationOfOnnxModel.replace(".onnx", "")}_{self.width}x{self.height}_half={self.half}_tensorrtVer={self.trt_version}device={self.device_name}_bf16={self.bf16}.engine'
         if not os.path.exists(self.enginePath):
             toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
+            self.guiLog.emit("Building Engine, this may take a while...")
             print((toPrint))
-            logging.info(toPrint)
             profiles = [
                 # The low-latency case. For best performance, min == opt == max.
                 Profile().add(
