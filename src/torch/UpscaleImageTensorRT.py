@@ -160,7 +160,7 @@ class UpscaleTensorRT:
         return (
             self.runner.infer(
                 {
-                    "input": frame
+                    "input": frame.contiguous()
                     
                     
                 },
@@ -170,8 +170,8 @@ class UpscaleTensorRT:
             .permute(1, 2, 0)
             .mul_(255)
             .clamp(0,255) # gotta clamp
-            .byte()
             .contiguous()
+            .byte()
             .cpu()
             .numpy()
         )
