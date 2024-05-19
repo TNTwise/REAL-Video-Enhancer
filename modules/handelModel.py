@@ -5,7 +5,7 @@ thisdir = thisdir()
 
 
 def handleModel(AI, customModel=None):
-    if AI == "realesrgan-cuda":
+    if AI == "realesrgan-cuda" or AI == "realesrgan-cuda-tensorrt":
         return os.path.join(
             f"{thisdir}", "models", "realesrgan-cuda", "realesr-animevideov3.pth"
         )

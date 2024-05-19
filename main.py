@@ -344,6 +344,9 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
             RealESRGANCUDA.modelOptions(self)
 
+        if self.ui.AICombo.currentText() == "RealESRGAN TensorRT (Nvidia only)":
+            RealESRGANCUDA.modelOptions(self,trt=True)
+
         if self.ui.AICombo.currentText() == "Custom CUDA models":
             CustomModelsCUDA.modelOptions(self)
         

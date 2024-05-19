@@ -175,4 +175,3 @@ class UpscaleTensorRT:
             .cpu()
             .numpy()
         )
-

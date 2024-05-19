@@ -860,6 +860,22 @@ class upscale(QObject):
                     benchmark=self.main.benchmark,
                 )
 
+            if self.main.AI == "realesrgan-cuda-tensorrt":
+                model_path = handleModel(self.main.AI)
+
+                self.main.renderAI = RenderCUDA.Upscaling(
+                    self.main,
+                    self.main.input_file,
+                    output_file,
+                    int(self.main.ui.Rife_Times.currentText()[0]),
+                    model_path,
+                    bool(settings.HalfPrecision),
+                    benchmark=self.main.benchmark,
+                    method='tensorrt',
+                    modelName=self.main.ui.Rife_Model.currentText(),
+                    guiLog=self.log
+                )
+
             if self.main.AI == "custom-models-cuda":
                 model_path = handleModel(
                     self.main.AI, self.main.ui.Rife_Model.currentText()

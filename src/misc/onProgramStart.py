@@ -404,6 +404,10 @@ def set_model_params(self):
         if "realesrgan-cuda" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
+        
+        if "realesrgan-tensorrt" == i:
+            self.ui.RealESRGANCUDACheckBox.setChecked(True)
+            self.model_labels["RealESRGAN TensorRT (Nvidia only)"] = "upscaling"
 
         if "gfmss-cuda" == i:
             self.ui.GMFSSCUDACheckBox.setChecked(True)

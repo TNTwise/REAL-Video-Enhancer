@@ -284,6 +284,8 @@ def check_for_individual_models():
 
             if os.path.exists(f"{thisdir}/models/realesrgan-cuda/"):
                 return_list.append("realesrgan-cuda")
+                if isTensorRT():
+                    return_list.append("realesrgan-tensorrt")
             if (
                 os.path.exists(f"{thisdir}/models/custom-models-cuda/")
                 and len(os.listdir(f"{thisdir}/models/custom-models-cuda/")) > 0
