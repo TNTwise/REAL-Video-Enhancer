@@ -341,6 +341,7 @@ jobs:
           git clone https://github.com/TNTwise/REAL-Video-Enhancer.git && cd REAL-Video-Enhancer && make && mv dist/main dist/REAL-Video-Enhancer
           rm -rf bin/
           mkdir bin/
+          rm -rf dist/lib/cv2/qt
           cp -r dist/* bin/
       - name: compress archive
         run: |
