@@ -169,6 +169,7 @@ class UpscaleTensorRT:
             .squeeze(0)
             .permute(1, 2, 0)
             .mul_(255)
+            .clamp(0,255) # gotta clamp
             .byte()
             .contiguous()
             .cpu()
