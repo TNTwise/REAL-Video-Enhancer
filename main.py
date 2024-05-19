@@ -761,6 +761,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     scale = returnScale(modelPath)
                     self.ui.Rife_Times.addItem(f"{scale}X")
                 except Exception as e:
+                    log(f"Couldn't Detect Scale! {e}")
                     cantDetectUpscaleTimes(self)
                     self.ui.Rife_Times.addItem("1X")
                     self.ui.Rife_Times.addItem("2X")

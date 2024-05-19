@@ -47,4 +47,4 @@ class UpscaleCuganNCNN:
         image = np.ascontiguousarray(
                 np.frombuffer(image,dtype=np.uint8).reshape(self.height,self.width,3)
             )
-        return np.ascontiguousarray(self.model.process_bytes(image))
+        return np.ascontiguousarray(self.model.process_cv2(image))

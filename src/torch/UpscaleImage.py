@@ -63,7 +63,7 @@ class UpscaleCUDA:
                       width=self.width,
                       half=self.half,
                       bf16=self.bf16)
-
+       
         if self.isCudaAvailable:
             # torch.cuda.set_stream(self.stream[self.currentStream])
             frame = frame.cuda(non_blocking=True)
