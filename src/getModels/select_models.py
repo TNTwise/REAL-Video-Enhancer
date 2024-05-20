@@ -42,6 +42,14 @@ def handleCUDAModels(model: str = ""):
             f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
         )
 
+def deleteDownloaded():
+    for i in os.listdir(f"{thisdir}/files/"):
+        if os.path.isfile(i):
+            if ".txt" not in i:
+                os.remove(f"{thisdir}/files/{i}")
+    for i in os.listdir(f"{thisdir}/files/"):
+        if ".txt" not in i:
+            os.system(f'rm -rf "{thisdir}/files/{i}"')
 
 import src.getModels.SelectAI as SelectAI
 import traceback
@@ -137,9 +145,7 @@ class Worker(QObject):
                     with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                         f.extractall(f"{settings.ModelDir}/rife/")
                 handleCUDAModels(i)
-            for i in os.listdir(f"{thisdir}/files/"):
-                if ".txt" not in i:
-                    os.remove(f"{thisdir}/files/{i}")
+            deleteDownloaded()
             self.finished.emit()
         except Exception as e:
             traceback_info = traceback.format_exc()
@@ -147,13 +153,6 @@ class Worker(QObject):
             self.main.showDialogBox(e)
 
 
-def clear_files():
-    for i in os.listdir(f"{thisdir}/files/"):
-        if ".txt" not in i:
-            try:
-                os.remove(f"{thisdir}/files/{i}")
-            except:
-                os.system(f'rm -rf "{thisdir}/files/{i}"')
 
 
 def install_icons(self):
@@ -391,7 +390,7 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
                     with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
                         f.extractall(f"{settings.ModelDir}/rife/")
                 handleCUDAModels(i)
-            clear_files()
+            deleteDownloaded()
             if check_for_individual_models != None:
                 if check_if_online():
                     QApplication.closeAllWindows()

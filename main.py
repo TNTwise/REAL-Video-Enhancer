@@ -771,6 +771,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if (
             self.ui.AICombo.currentText() == "Custom CUDA models" 
             or self.ui.AICombo.currentText() == "Custom TensorRT models"
+            or self.ui.AICombo.currentText() == "RealESRGAN TensorRT"
             and len(self.ui.Rife_Model.currentText()) > 0
         ):
             model_path = handleModel(
@@ -778,10 +779,11 @@ class MainWindow(QtWidgets.QMainWindow):
             )
             try:
                 model = ModelLoader().load_from_file(model_path)
-                if self.ui.Rife_Times.count() < 1:
-                    self.ui.Rife_Times.addItem(f"{model.scale}X")
-            except:
-                pass
+                self.ui.Rife_Times.clear()
+                self.ui.Rife_Times.addItem(f"{model.scale}X")
+            except Exception as e:
+                print(e)
+                log(str(f"{e}"))
         if self.ui.AICombo.currentText() == "Waifu2X":
             if self.ui.Rife_Model.currentText() != "cunet":
                 self.ui.Rife_Times.setCurrentText("2X")
