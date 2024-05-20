@@ -414,7 +414,8 @@ class Upscaling(Render):
                 modelPath=self.model_path, 
                 half=self.half,
                 modelName = self.modelName,
-                guiLog = self.guiLog
+                guiLog = self.guiLog,
+                upscaleFactor=self.resIncrease
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(

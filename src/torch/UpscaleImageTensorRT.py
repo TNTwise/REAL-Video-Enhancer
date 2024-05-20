@@ -62,7 +62,7 @@ class UpscaleTensorRT:
         self.nt = nt
         self.bf16 = False
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
-        self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}.onnx')
+        self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}-half={self.half}-scale{self.upscaleFactor}.onnx')
         self.guiLog = guiLog
         if not os.path.exists(self.locationOfOnnxModel):
             self.pytorchExportToONNX()
