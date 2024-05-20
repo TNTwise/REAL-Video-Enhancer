@@ -265,6 +265,16 @@ def returnModelList(
         install_modules_dict[
             f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
         ] = f"rife-v4.15-ensemble.tar.gz"
+    try:
+        if len(os.listdir(f"{settings.ModelDir}/models/rife")) == 0:
+            install_modules_dict[
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15.tar.gz"
+        ] = f"rife-v4.15.tar.gz"
+        install_modules_dict[
+            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
+        ] = f"rife-v4.15-ensemble.tar.gz"
+    except:
+        pass
     if (
         os.path.isfile(f"{thisdir}/bin/ffmpeg")
         and os.path.isfile(f"{thisdir}/bin/glxinfo")

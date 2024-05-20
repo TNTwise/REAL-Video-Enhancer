@@ -91,6 +91,10 @@ class Worker(QObject):
                     )  # sends back data to main thread
 
         for i in os.listdir(f"{thisdir}/files/"):
+            print(i)
+            if ".tar.gz" in i:
+                with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
+                    f.extractall(f"{settings.ModelDir}/rife/")
             if i == "rife-ncnn-vulkan":
                 try:
                     os.mkdir(f"{settings.ModelDir}/rife/")
@@ -128,9 +132,7 @@ class Worker(QObject):
                     f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
                 )
 
-            if ".tar.gz" in i:
-                with tarfile.open(f"{thisdir}/files/{i}", "r") as f:
-                    f.extractall(f"{settings.ModelDir}/rife/")
+            
 
             handleCUDAModels(i)
 
@@ -140,6 +142,7 @@ class Worker(QObject):
                     i not in rife_install_list
                     and i != "rife-ncnn-vulkan"
                     and i in rife.default_models()
+                    and len(os.listdir(f"{settings.ModelDir}/rife/")) > 3
                 ):
                     os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
                     index = self.main.ui.defaultRifeModel.findText(i)
