@@ -6,7 +6,7 @@ spandrel
 torchvision==0.17
 cupy-cuda12x
 fastrlock
-https://github.com/pytorch/TensorRT/releases/download/v2.2.0/torch_tensorrt-2.2.0-cp38-cp38-manylinux_2_34_x86_64.whl
+torch_tensorrt
 tensorrt==8.6.0
 polygraphy
 onnx
