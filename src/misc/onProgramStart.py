@@ -278,13 +278,14 @@ def hideUnusedFeatures(self):
 
 
 def exportTRTlibsToPATH(self):
-    
+    '''
     #print(f'export LD_LIBRARY_PATH={os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
     if getattr(sys, 'frozen', False):
         os.environ['LD_LIBRARY_PATH']=f'{os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
     else:
          site_packages = site.getsitepackages()[0]
-         os.environ['LD_LIBRARY_PATH']=f'{site_packages}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
+         os.environ['LD_LIBRARY_PATH']=f'{site_packages}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'''
+    pass
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()

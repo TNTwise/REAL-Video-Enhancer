@@ -8,25 +8,17 @@ import onnx
 import onnxruntime
 from src.programData.thisdir import thisdir as th
 thisdir = th()
+import sys
+import site
 # import torch_tensorrt as trt
-try:
-    import tensorrt as trt
-    from polygraphy.backend.trt import (
-        TrtRunner,
-        engine_from_network,
-        network_from_onnx_path,
-        CreateConfig,
-        Profile,
-        EngineFromBytes,
-        SaveEngine,
-    )
-    from polygraphy.backend.common import BytesFromPath
-    from spandrel import ModelLoader
-except Exception as e:
-    print(e)
-from src.misc.log import log
-from  src.torch.inputToTorch import bytesToTensor
 
+from src.misc.log import log
+try:
+    from  src.torch.inputToTorch import bytesToTensor
+    import tensorrt as trt
+    from spandrel import ModelLoader
+except:
+    pass
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
 
@@ -53,6 +45,35 @@ class UpscaleTensorRT:
             height (int): The height of the input frame
             nt (int): The number of threads to use
         """
+        original_env = os.environ.copy()
+        if getattr(sys, 'frozen', False):
+            cuda_runtime_dir = os.path.join(os.getcwd(), '_internal', 'nvidia', 'cuda_runtime', 'lib')
+        else:
+            site_packages = site.getsitepackages()[0]
+            cuda_runtime_dir = os.path.join(site_packages, 'nvidia', 'cuda_runtime', 'lib')
+        os.environ['LD_LIBRARY_PATH'] = f'{cuda_runtime_dir}lib:$LD_LIBRARY_PATH'
+        
+        from polygraphy.backend.trt import (
+            TrtRunner,
+            engine_from_network,
+            network_from_onnx_path,
+            CreateConfig,
+            Profile,
+            EngineFromBytes,
+            SaveEngine,
+        )
+        from polygraphy.backend.common import BytesFromPath
+        
+        self.TrtRunner = TrtRunner
+        self.engine_from_network = engine_from_network
+        self.network_from_onnx_path = network_from_onnx_path
+        self.CreateConfig = CreateConfig
+        self.Profile = Profile
+        self.EngineFromBytes = EngineFromBytes
+        self.SaveEngine = SaveEngine
+        os.environ.clear()
+        os.environ.update(original_env)
+
         self.modelPath = modelPath
         self.upscaleFactor = upscaleFactor
         self.half = half
@@ -128,19 +149,19 @@ class UpscaleTensorRT:
             print((toPrint))
             profiles = [
                 # The low-latency case. For best performance, min == opt == max.
-                Profile().add(
+                self.Profile().add(
                     "input",
                     min=(1, 3, self.height, self.width),
                     opt=(1, 3, self.height, self.width),
                     max=(1, 3, self.height, self.width),
                 ),
             ]
-            self.engine = engine_from_network(
-                network_from_onnx_path(self.locationOfOnnxModel),
-                config=CreateConfig(fp16=self.half, profiles=profiles),
+            self.engine = self.engine_from_network(
+                self.network_from_onnx_path(self.locationOfOnnxModel),
+                config=self.CreateConfig(fp16=self.half, profiles=profiles),
             )
-            self.engine = SaveEngine(self.engine, self.enginePath)
-            with TrtRunner(self.engine) as runner:
+            self.engine = self.SaveEngine(self.engine, self.enginePath)
+            with self.TrtRunner(self.engine) as runner:
                 self.runner = runner
         
         

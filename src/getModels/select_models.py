@@ -94,10 +94,10 @@ class Worker(QObject):
                         )  # sends back data to main thread# sends back data to main thread
             if os.path.exists(f"{settings.ModelDir}") == False:
                 os.mkdir(f"{settings.ModelDir}")
-
-            for i in os.listdir(f"{thisdir}/files/"):
-                if os.path.exists(f"{thisdir}/bin/") == False:
+            if os.path.exists(f"{thisdir}/bin/") == False:
                     os.mkdir(f"{thisdir}/bin/")
+            for i in os.listdir(f"{thisdir}/files/"):
+                print(i)
                 if i == "ffmpeg":
                     os.system(f'chmod +x "{thisdir}/files/ffmpeg"')
                     os.system(f'mv "{thisdir}/files/ffmpeg" "{thisdir}/bin/"')
