@@ -7,7 +7,7 @@ torchvision==0.17
 cupy-cuda12x
 fastrlock
 torch_tensorrt
-tensorrt==8.6.0
+https://files.pythonhosted.org/packages/f5/c7/260676e8490eb768193f1c30c9e9c43fb916d316af057ff5547539634d52/tensorrt-8.6.0-cp38-none-manylinux_2_17_x86_64.whl
 polygraphy
 onnx
 onnxruntime
