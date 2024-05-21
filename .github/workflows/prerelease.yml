@@ -85,6 +85,7 @@ jobs:
       
       - name: Install python dependencies
         run: |
+          sudo apt install libgcc-9-dev -y
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
