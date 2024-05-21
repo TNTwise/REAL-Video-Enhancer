@@ -57,7 +57,7 @@ class UpscaleTensorRT:
             SaveEngine,
         )
         from polygraphy.backend.common import BytesFromPath
-        
+        self.clearTRTBullshit()
         self.TrtRunner = TrtRunner
         self.engine_from_network = engine_from_network
         self.network_from_onnx_path = network_from_onnx_path
@@ -80,7 +80,7 @@ class UpscaleTensorRT:
         if not os.path.exists(self.locationOfOnnxModel):
             self.pytorchExportToONNX()
         self.handleModel()
-        self.clearTRTBullshit()
+        
     def fixTRTBullshit(self):
         
         if getattr(sys, 'frozen', False):

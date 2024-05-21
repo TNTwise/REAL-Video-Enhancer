@@ -277,15 +277,7 @@ def hideUnusedFeatures(self):
     self.ui.QueueListWidget.hide()
 
 
-def exportTRTlibsToPATH(self):
-    '''
-    #print(f'export LD_LIBRARY_PATH={os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH')
-    if getattr(sys, 'frozen', False):
-        os.environ['LD_LIBRARY_PATH']=f'{os.getcwd()}/_internal/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'
-    else:
-         site_packages = site.getsitepackages()[0]
-         os.environ['LD_LIBRARY_PATH']=f'{site_packages}/nvidia/cuda_runtime/lib:$LD_LIBRARY_PATH'''
-    pass
+
 def onApplicationStart(self):
     # this is kind of a mess
     thisdir = src.programData.thisdir.thisdir()
@@ -301,7 +293,6 @@ def onApplicationStart(self):
 
     set_model_params(self)
     hideChainModeButtons(self)
-    exportTRTlibsToPATH(self)
     # get esrgan models
 
     self.ui.ESRGANModelSelectButton.show()
