@@ -4,7 +4,10 @@ from src.programData.thisdir import thisdir
 
 
 def createDirectories():
-    
+    os.makedirs(
+        os.path.join(f"{thisdir()}"),
+        exist_ok=True,
+    )
     os.makedirs(
         os.path.join(f"{thisdir()}", "files"),
         exist_ok=True,

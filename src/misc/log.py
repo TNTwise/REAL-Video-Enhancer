@@ -14,13 +14,13 @@ from PyQt5.QtWidgets import (
     QPlainTextEdit,
     QMessageBox,
 )
-
+from src.misc.createDirectories import createDirectories
 current_time = datetime.datetime.today().strftime("%Y-%m-%d:%H:%M:%S")
 from src.programData.thisdir import thisdir
 
 thisdir = thisdir()
 try:
-    os.mkdir(f"{thisdir}/logs/")
+    createDirectories()
 
 except:
     if len(os.listdir(f"{thisdir}/logs/")) > 4:
