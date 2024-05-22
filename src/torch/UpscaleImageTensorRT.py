@@ -49,7 +49,6 @@ class UpscaleTensorRT:
             height (int): The height of the input frame
             nt (int): The number of threads to use
         """
-        self.original_env = os.environ.copy()
         from polygraphy.backend.trt import (
             TrtRunner,
             engine_from_network,
