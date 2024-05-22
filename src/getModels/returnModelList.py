@@ -4,7 +4,7 @@ import src.programData.thisdir
 thisdir = src.programData.thisdir.thisdir()
 import src.programData.checks as checks
 import src.programData.return_data as return_data
-
+import shutil
 
 def returnCorrectLinkBasedOnOS(link):
     if return_data.returnOperatingSystem() == "Linux":
@@ -101,7 +101,9 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
             items2.append(item.replace(".pkl", "").replace(".", ""))
         for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
             if i not in items2:
-                os.system(f'rm -rf "{thisdir}/models/rife-cuda/{i}"')
+                shutil.rmtree(
+                    os.path.join(f"{thisdir}","models","rife-cuda",f"{i}")
+                    )
 
     install_modules_dict.update(modelDict)
 

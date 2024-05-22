@@ -256,7 +256,9 @@ def extractFramesAndAudio(
             )
 
         # i need to clean this up lol
-        #shutil.rmtree(f'rm -rf "{settings.RenderDir}/{videoName}_temp/"')
+        shutil.rmtree(
+            os.path.join(settings.RenderDir,f"{videoName}_temp")
+            )
         # Gets the width and height
         global height
         global width

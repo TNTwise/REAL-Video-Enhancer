@@ -29,11 +29,12 @@ rife_install_list = []
 
 def handleCUDAModels(model: str = ""):
     if "rife" and "pkl" in model:
-        os.system(
-            f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        os.makedirs(
+            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}" )
         )
-        os.system(
-            f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        shutil.copy(
+            os.path.join(f"{thisdir}","files",f"{model}"), 
+            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}")
         )
 
 
@@ -61,8 +62,8 @@ class Worker(QObject):
         rife_install_list = []
 
         settings = Settings()
-
-        os.system(f'touch "{thisdir}/models.txt"')
+        with open(f"{thisdir}/models.txt", "w") as f:
+            pass
         with open(f"{thisdir}/models.txt", "r") as f:
             for i in f.readlines():
                 i = i.replace("\n", "")
@@ -100,10 +101,14 @@ class Worker(QObject):
                     os.mkdir(f"{settings.ModelDir}/rife/")
                 except:
                     pass
-                os.system(f'chmod +x "{thisdir}/files/rife-ncnn-vulkan"')
+                os.chmod(
+                        os.path.join(thisdir,"files",i),
+                        0o755
+                        )
 
-                os.system(
-                    f'mv -f "{thisdir}/files/rife-ncnn-vulkan" "{settings.ModelDir}/rife/"'
+                os.rename(
+                        os.path.join(f"{thisdir}","files","rife-ncnn-vulkan"),
+                        os.path.join(f"{thisdir}","models","rife","rife-ncnn-vulkan")
                 )
             if ".zip" in i:
                 with ZipFile(f"{thisdir}/files/{i}", "r") as zip_ref:
@@ -122,15 +127,18 @@ class Worker(QObject):
                         original_ai_name = name
                         original_ai_name_ncnn_vulkan = name
 
-                os.system(
-                    f'mv "{thisdir}/files/{name}" "{settings.ModelDir}/{original_ai_name}"'
-                )
-                os.system(
-                    f'chmod +x "{settings.ModelDir}/{original_ai_name}/{original_ai_name_ncnn_vulkan}"'
-                )
-                os.system(
-                    f'chmod +x "{settings.ModelDir}/{original_ai_name}/upscayl-bin"'
-                )
+                try:
+                        os.rename(
+                            os.path.join(thisdir,"files",name),
+                            os.path.join(settings.ModelDir,original_ai_name)
+                            )
+                        os.chmod(
+                            os.path.join(settings.ModelDir,original_ai_name,original_ai_name_ncnn_vulkan),
+                            0o755
+                            )
+                except:
+                        pass
+                
 
             
 
@@ -144,7 +152,9 @@ class Worker(QObject):
                     and i in rife.default_models()
                     and len(os.listdir(f"{settings.ModelDir}/rife/")) > 3
                 ):
-                    os.system(f'rm -rf "{settings.ModelDir}/rife/{i}"')
+                    shutil.rmtree(
+                        os.path.join(f"{settings.ModelDir}","rife",f"{i}")
+                        )
                     index = self.main.ui.defaultRifeModel.findText(i)
 
                     if index != -1:

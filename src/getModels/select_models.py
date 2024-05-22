@@ -31,16 +31,18 @@ settings = Settings()
 from src.getModels.returnModelList import *
 
 import src.getModels.googleDriveDownload as GDrive
-
+import shutil
 
 def handleCUDAModels(model: str = ""):
     if "rife" and "pkl" in model:
-        os.system(
-            f'mkdir -p "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        os.makedirs(
+            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}" )
         )
-        os.system(
-            f'cp "{thisdir}/files/{model}" "{thisdir}/models/rife-cuda/{model.replace(".","").replace("pkl","")}" '
+        shutil.copy(
+            os.path.join(f"{thisdir}","files",f"{model}"), 
+            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}")
         )
+
 
 def deleteDownloaded():
     for i in os.listdir(f"{thisdir}/files/"):
@@ -136,8 +138,9 @@ class Worker(QObject):
                         os.path.join(thisdir,"files",i),
                         0o755
                         )
-                    os.system(
-                        f'mv "{thisdir}/files/rife-ncnn-vulkan" "{thisdir}/models/rife/"'
+                    os.rename(
+                        os.path.join(f"{thisdir}","files","rife-ncnn-vulkan"),
+                        os.path.join(f"{thisdir}","models","rife","rife-ncnn-vulkan")
                     )
 
                 if ".zip" in i:
