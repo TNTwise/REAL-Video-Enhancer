@@ -50,7 +50,6 @@ class UpscaleTensorRT:
             nt (int): The number of threads to use
         """
         self.original_env = os.environ.copy()
-        self.fixTRTBullshit()
         from polygraphy.backend.trt import (
             TrtRunner,
             engine_from_network,
@@ -62,7 +61,6 @@ class UpscaleTensorRT:
         )
         from polygraphy.backend.common import BytesFromPath
 
-        self.clearTRTBullshit()
         self.TrtRunner = TrtRunner
         self.engine_from_network = engine_from_network
         self.network_from_onnx_path = network_from_onnx_path
@@ -89,22 +87,7 @@ class UpscaleTensorRT:
             self.pytorchExportToONNX()
         self.handleModel()
 
-    def fixTRTBullshit(self):
-        if getattr(sys, "frozen", False):
-            cuda_runtime_dir = os.path.join(
-                os.getcwd(), "_internal", "nvidia", "cuda_runtime", "lib"
-            )
-        else:
-            site_packages = site.getsitepackages()[0]
-            cuda_runtime_dir = os.path.join(
-                site_packages, "nvidia", "cuda_runtime", "lib"
-            )
-        os.environ["LD_LIBRARY_PATH"] = f"{cuda_runtime_dir}:$LD_LIBRARY_PATH"
-
-    def clearTRTBullshit(self):
-        os.environ.clear()
-        os.environ.update(self.original_env)
-
+    
     def pytorchExportToONNX(self):  # Loads model via spandrel, and exports to onnx
         model = ModelLoader().load_from_file(self.modelPath)
         model = model.model

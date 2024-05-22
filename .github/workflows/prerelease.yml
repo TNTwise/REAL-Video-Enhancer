@@ -91,7 +91,7 @@ jobs:
           
       - name: Get latest polygraphy
         run: |
-          git clone https://github.com/NVIDIA/TensorRT
+          git clone https://github.com/TNTwise/TensorRT
           cd TensorRT/tools/Polygraphy
           make install
       - name: Compile to executable
