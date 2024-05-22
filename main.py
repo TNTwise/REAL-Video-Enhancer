@@ -869,12 +869,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 notAModel(self)
                 return
             param = input_file
-            os.system(f'cp "{bin}" "{settings.ModelDir}/custom_models_ncnn/models/"')
-            os.system(f'cp "{param}" "{settings.ModelDir}/custom_models_ncnn/models/"')
+            shutil.copy(bin, os.path.join(f'{settings.ModelDir}','custom_models_ncnn','models'))
+            shutil.copy(param, os.path.join(f'{settings.ModelDir}','custom_models_ncnn','models'))
         if type_of_file == "CUDA Model":
             if self.ui.AICombo.currentText() == "Custom CUDA models":
                 CustomModelsCUDA.modelOptions(self)
-            os.system(f'cp "{input_file}" "{thisdir}/models/custom-models-cuda"')
+            shutil.copy(input_file, os.path.join(f"{thisdir}","models","custom-models-cuda"))
 
     def openFolderDialog(self):
         output_folder = QFileDialog.getExistingDirectory(self, "Open Folder")
@@ -1037,8 +1037,8 @@ class MainWindow(QtWidgets.QMainWindow):
             event.accept()
             if self.input_file != "":
                 try:
-                    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
-                    os.system(f'rm -rf "{thisdir}/{self.videoName}"')
+                    shutil.rmtree(os.path.join(settings.RenderDir,f'{self.videoName}_temp'))
+                    shutil.rmtree(os.path.join(thisdir,self.videoName))
 
                 except Exception as e:
                     log(str(e))
@@ -1052,10 +1052,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     pass
 
                 try:
-                    os.system(f'rm -rf "{settings.RenderDir}/{self.videoName}_temp/"')
+                    shutil.rmtree(os.path.join(settings.RenderDir,f'{self.videoName}_temp'))
                 except:
                     pass
-                # os.system(f'kill -9 {os.getpid()}')
                 exit()
         else:
             event.ignore()
