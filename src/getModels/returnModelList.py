@@ -6,6 +6,7 @@ import src.programData.checks as checks
 import src.programData.return_data as return_data
 import shutil
 
+
 def returnCorrectLinkBasedOnOS(link):
     if return_data.returnOperatingSystem() == "Linux":
         return link
@@ -101,9 +102,7 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
             items2.append(item.replace(".pkl", "").replace(".", ""))
         for i in os.listdir(f"{thisdir}/models/rife-cuda/"):
             if i not in items2:
-                shutil.rmtree(
-                    os.path.join(f"{thisdir}","models","rife-cuda",f"{i}")
-                    )
+                shutil.rmtree(os.path.join(f"{thisdir}", "models", "rife-cuda", f"{i}"))
 
     install_modules_dict.update(modelDict)
 
@@ -225,7 +224,6 @@ def returnModelList(
                 os.path.join(f"{settings.ModelDir}", f"rife", f"rife-ncnn-vulkan")
             )
             == False
-            
         ):
             install_modules_dict[
                 returnCorrectLinkBasedOnOS(
@@ -270,8 +268,8 @@ def returnModelList(
     try:
         if len(os.listdir(f"{settings.ModelDir}/models/rife")) == 0:
             install_modules_dict[
-            f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15.tar.gz"
-        ] = f"rife-v4.15.tar.gz"
+                f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15.tar.gz"
+            ] = f"rife-v4.15.tar.gz"
         install_modules_dict[
             f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
         ] = f"rife-v4.15-ensemble.tar.gz"

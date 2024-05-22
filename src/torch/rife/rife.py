@@ -141,7 +141,16 @@ class Rife:
             timestep = timestep.half()
         output = self.model.inference(self.I0, self.I1, timestep=timestep)
         output = output[:, :, : self.height, : self.width]
-        output = (output[0]).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
+        output = (
+            (output[0])
+            .squeeze(0)
+            .permute(1, 2, 0)
+            .mul(255.0)
+            .byte()
+            .contiguous()
+            .cpu()
+            .numpy()
+        )
 
         return output
 
@@ -161,16 +170,16 @@ class Rife:
         self.I1 = self.processFrame(I1)
         return True
 
-    def bytesToFrame(self,frame):
+    def bytesToFrame(self, frame):
         return (
             torch.frombuffer(frame, dtype=torch.uint8)
-                .reshape(self.height,self.width,3)
-                .to(self.device, non_blocking=True)
-                .permute(2, 0, 1)
-                .unsqueeze(0)
-                .float()
-                .mul_(1/255)
-                )
+            .reshape(self.height, self.width, 3)
+            .to(self.device, non_blocking=True)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .float()
+            .mul_(1 / 255)
+        )
 
     @torch.inference_mode()
     def run1(self, I0, I1):

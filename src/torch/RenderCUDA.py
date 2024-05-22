@@ -28,21 +28,20 @@ try:
     from src.torch.rife.tensorRT import RifeTensorRT
     from src.torch.UpscaleImageTensorRT import UpscaleTensorRT
     from polygraphy.backend.trt import (
-    TrtRunner,
-    engine_from_network,
-    network_from_onnx_path,
-    CreateConfig,
-    Profile,
-    EngineFromBytes,
-    SaveEngine,
+        TrtRunner,
+        engine_from_network,
+        network_from_onnx_path,
+        CreateConfig,
+        Profile,
+        EngineFromBytes,
+        SaveEngine,
     )
     from polygraphy.backend.common import BytesFromPath
 
 except Exception as e:
     log("Cant import UpscaleTRT!" + str(e))
-    
-from src.torch.rife.NCNN import RifeNCNN
 
+from src.torch.rife.NCNN import RifeNCNN
 
 
 # read
@@ -79,7 +78,6 @@ class Render:
         self.finalFPS = self.initialFPS * self.interpolation_factor
         self.benchmark = benchmark
         self.settings = Settings()
-
 
         self.readProcess = None
         self.writeProcess = None
@@ -133,22 +131,19 @@ class Render:
         except:
             log("No frame to return!")
 
-    
-
     def log(self):
         while not self.main.CudaRenderFinished:
             try:
                 for line in iter(self.writeProcess.stderr.readline, b""):
                     if not self.main.CudaRenderFinished:
                         log(line)
-                        
+
                     else:
                         break
-                    
 
             except Exception as e:
                 pass
-                
+
         log("Done with logging")
 
     # save
@@ -239,7 +234,7 @@ class Render:
                 torch.cuda.empty_cache()
                 break
 
-            #frame = np.ascontiguousarray(frame)
+            # frame = np.ascontiguousarray(frame)
             self.main.imageDisplay = frame
             self.writeProcess.stdin.buffer.write(frame)
 
@@ -286,7 +281,7 @@ class Interpolation(Render):
                 height=self.originalHeight,
                 ensemble=self.ensemble,
                 half=self.half,
-                ncnn_gpu=self.ncnn_gpu
+                ncnn_gpu=self.ncnn_gpu,
             )
         if "rife-cuda" == self.method:
             self.interpolate_process = Rife(
@@ -304,7 +299,7 @@ class Interpolation(Render):
                 height=self.originalHeight,
                 ensemble=self.ensemble,
                 half=self.half,
-                guiLog=self.guiLog
+                guiLog=self.guiLog,
             )
         if "gmfss" in self.model:
             self.interpolate_process = GMFSS(
@@ -315,7 +310,7 @@ class Interpolation(Render):
                 half=self.half,
             )
         self.main.start_time = time.time()
-        print('starting render')
+        print("starting render")
 
     def proc_image(self, frame0, frame1):
         self.interpolate_process.run1(frame0, frame1)
@@ -379,7 +374,7 @@ class Upscaling(Render):
         ncnn_gpu=0,
         benchmark=False,
         modelName="",
-        guiLog = None
+        guiLog=None,
     ):
         super(Upscaling, self).__init__(
             main,
@@ -407,15 +402,14 @@ class Upscaling(Render):
                 self.originalWidth, self.originalHeight, self.model_path, self.half
             )
         if "tensorrt" in self.method and "ncnn" not in self.method:
-            
             self.upscaleMethod = UpscaleTensorRT(
-                width=self.originalWidth, 
-                height=self.originalHeight, 
-                modelPath=self.model_path, 
+                width=self.originalWidth,
+                height=self.originalHeight,
+                modelPath=self.model_path,
                 half=self.half,
-                modelName = self.modelName,
-                guiLog = self.guiLog,
-                upscaleFactor=self.resIncrease
+                modelName=self.modelName,
+                guiLog=self.guiLog,
+                upscaleFactor=self.resIncrease,
             )
         if "ncnn" in self.method and not "cugan" in self.method:
             self.upscaleMethod = UpscaleNCNN(
@@ -424,7 +418,7 @@ class Upscaling(Render):
                 num_threads=self.threads,
                 scale=self.resIncrease,
                 width=self.originalWidth,
-                height=self.originalHeight
+                height=self.originalHeight,
             )
         if "cugan" in self.method and "ncnn" in self.method:
             self.upscaleMethod = UpscaleCuganNCNN(
@@ -436,9 +430,10 @@ class Upscaling(Render):
                 num_threads=self.threads,
                 scale=self.resIncrease,
                 width=self.originalWidth,
-                height=self.originalHeight
+                height=self.originalHeight,
             )
         self.main.start_time = time.time()
+
     def procUpscaleThread(self):
         while True:
             frame = self.readBuffer.get()

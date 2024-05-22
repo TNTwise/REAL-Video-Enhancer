@@ -45,7 +45,9 @@ class pb2X(QObject):
     def numpy_array_to_pixmap(self, numpy_array):
         # Assuming the NumPy array has shape (height, width, channels)
         if isinstance(numpy_array, bytes):
-            numpy_array = np.frombuffer(numpy_array, dtype=np.int8).reshape(int(self.main.videoheight),int(self.main.videowidth),3)
+            numpy_array = np.frombuffer(numpy_array, dtype=np.int8).reshape(
+                int(self.main.videoheight), int(self.main.videowidth), 3
+            )
         height, width, channels = numpy_array.shape
         bytes_per_line = channels * width
 
@@ -231,9 +233,9 @@ class pb2X(QObject):
                             self.image_progress.emit("2")
                         except Exception as e:
                             traceback_info = traceback.format_exc()
-                            '''print(
+                            """print(
                                 f"Soemthing went wrong with cuda image preview {e} {traceback_info}"
-                            )'''
+                            )"""
                 except Exception as e:
                     log(f"Something went wrong with CUDA render: {e}")
                 log("CUDA Preview thread finished")
@@ -535,12 +537,15 @@ class interpolation(QObject):
 
             # run transition detection start
             if self.main.AI == "rife-ncnn-vulkan":
-                if "v4" in self.model and self.main.ui.ImageExtractionCheckBox.isChecked():
+                if (
+                    "v4" in self.model
+                    and self.main.ui.ImageExtractionCheckBox.isChecked()
+                ):
                     self.main.times = (
                         self.main.ui.FPSTo.value() / self.main.ui.FPSFrom.value()
                     )
         setupTransitions(self)
-        
+
         self.Render(
             self.model, self.main.times, self.main.input_file, self.main.output_folder
         )
@@ -707,7 +712,7 @@ class interpolation(QObject):
                     self.main.ui.EnsembleCheckBox.isChecked(),
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
-                    guiLog=self.log
+                    guiLog=self.log,
                 )
 
             if self.main.AI == "gmfss-cuda":
@@ -735,7 +740,6 @@ class interpolation(QObject):
             renderThread1.start()
             self.main.renderAI.log()
             self.main.output_file = output_file
-            
 
         log("Done")
         self.main.currentRenderFPS = 0
@@ -871,9 +875,9 @@ class upscale(QObject):
                     model_path,
                     bool(settings.HalfPrecision),
                     benchmark=self.main.benchmark,
-                    method='tensorrt',
+                    method="tensorrt",
                     modelName=self.main.ui.Rife_Model.currentText(),
-                    guiLog=self.log
+                    guiLog=self.log,
                 )
 
             if self.main.AI == "custom-models-cuda":
@@ -901,9 +905,9 @@ class upscale(QObject):
                     model_path,
                     bool(self.main.ui.halfPrecisionCheckBox.isChecked()),
                     benchmark=self.main.benchmark,
-                    method='tensorrt',
+                    method="tensorrt",
                     modelName=self.main.ui.Rife_Model.currentText(),
-                    guiLog=self.log
+                    guiLog=self.log,
                 )
 
             if self.main.AI == "realesrgan-ncnn-python":

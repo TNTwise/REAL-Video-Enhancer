@@ -17,7 +17,7 @@ try:
 except:
     pass
 import numpy as np
-from  src.torch.inputToTorch import bytesToTensor
+from src.torch.inputToTorch import bytesToTensor
 # from realsr_ncnn_vulkan_python import *
 # from realsr_ncnn_vulkan_python import *
 
@@ -57,13 +57,14 @@ class UpscaleCUDA:
 
     @torch.inference_mode()
     def UpscaleImage(self, frame):
+        frame = bytesToTensor(
+            frame=frame,
+            height=self.height,
+            width=self.width,
+            half=self.half,
+            bf16=self.bf16,
+        )
 
-        frame = bytesToTensor(frame=frame,
-                      height=self.height,
-                      width=self.width,
-                      half=self.half,
-                      bf16=self.bf16)
-       
         if self.isCudaAvailable:
             # torch.cuda.set_stream(self.stream[self.currentStream])
             frame = frame.cuda(non_blocking=True)
@@ -74,6 +75,14 @@ class UpscaleCUDA:
         frame = frame.contiguous(memory_format=torch.channels_last)
 
         output = self.model(frame)
-        
 
-        return (output).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
+        return (
+            (output)
+            .squeeze(0)
+            .permute(1, 2, 0)
+            .mul(255.0)
+            .byte()
+            .contiguous()
+            .cpu()
+            .numpy()
+        )

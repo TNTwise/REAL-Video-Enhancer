@@ -2,7 +2,6 @@ import os
 from src.programData.thisdir import thisdir
 
 
-
 def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir()}"),
@@ -27,7 +26,6 @@ def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir()}", "models"),
         exist_ok=True,
-        
     )
     os.makedirs(
         os.path.join(f"{thisdir()}", "renders"),
@@ -40,7 +38,7 @@ def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir()}", "models", "custom-models-cuda"), exist_ok=True
     )
-    
+
     os.makedirs(
         os.path.join(f"{thisdir()}", "models", "custom-models-cuda"), exist_ok=True
     )
@@ -48,15 +46,12 @@ def createDirectories():
     os.makedirs(
         os.path.join(f"{thisdir()}", "models", "tensorrt-engines"), exist_ok=True
     )
-    os.makedirs(
-        os.path.join(f"{thisdir()}", "models", "onnx-models"), exist_ok=True
-    )
+    os.makedirs(os.path.join(f"{thisdir()}", "models", "onnx-models"), exist_ok=True)
+
+
 def createFiles():
     try:
-        os.mknod(
-            os.path.join(f"{thisdir()}","files","settings.txt")  
-        )
+        os.mknod(os.path.join(f"{thisdir()}", "files", "settings.txt"))
     except:
         pass
     os.system(f'touch {os.path.join(f"{thisdir()}","files","settings.txt")}')
-    

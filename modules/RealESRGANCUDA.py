@@ -23,7 +23,7 @@ thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-def modelOptions(self,trt=False):
+def modelOptions(self, trt=False):
     settings = Settings()
     self.times = 1
     log("Model: ESRGAN CUDA")

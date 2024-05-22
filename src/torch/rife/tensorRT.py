@@ -35,7 +35,7 @@ class RifeTensorRT:
         half: bool = False,
         trt_max_workspace_size: int = 1,
         num_streams: int = 1,
-        guiLog = None
+        guiLog=None,
     ):
         self.width = width
         self.height = height
@@ -55,7 +55,6 @@ class RifeTensorRT:
         self.dimensions = f"{self.pw}x{self.ph}"
         self.guiLog = guiLog
         self.half = half
-        
 
         self.trt_engine_path = os.path.join(
             thisdir,
@@ -77,8 +76,7 @@ class RifeTensorRT:
         if not os.path.exists(self.trt_engine_path):
             self.generateEngine()
 
-        self.inference = torch.load(self.trt_engine_path) 
-        
+        self.inference = torch.load(self.trt_engine_path)
 
     def handle_model(self, interpolate_method):
         if interpolate_method == "rife4.14":
@@ -215,7 +213,6 @@ class RifeTensorRT:
 
     @torch.inference_mode()
     def make_inference(self, n):
-       
         timestep = torch.full(
             (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
         )
@@ -226,18 +223,25 @@ class RifeTensorRT:
         output = self.inference(self.I0, self.I1, timestep)
         output = output[:, :, : self.height, : self.width]
 
-        return (output[0]).squeeze(0).permute(1, 2, 0).mul(255.0).byte().contiguous().cpu().numpy()
+        return (
+            (output[0])
+            .squeeze(0)
+            .permute(1, 2, 0)
+            .mul(255.0)
+            .byte()
+            .contiguous()
+            .cpu()
+            .numpy()
+        )
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
-        frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(self.height,self.width,3)
-        return (
-            (frame)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .to(device, memory_format=torch.channels_last)
-            / 255.0
+        frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(
+            self.height, self.width, 3
         )
+        return (frame).permute(2, 0, 1).unsqueeze(0).to(
+            device, memory_format=torch.channels_last
+        ) / 255.0
 
 
 if __name__ == "__main__":

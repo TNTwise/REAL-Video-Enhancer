@@ -1,4 +1,5 @@
 import os
+
 try:
     import torch
 except:
@@ -7,20 +8,23 @@ import numpy as np
 import onnx
 import onnxruntime
 from src.programData.thisdir import thisdir as th
+
 thisdir = th()
 import sys
 import site
 # import torch_tensorrt as trt
 
 from src.misc.log import log
+
 try:
-    from  src.torch.inputToTorch import bytesToTensor
+    from src.torch.inputToTorch import bytesToTensor
     import tensorrt as trt
     from spandrel import ModelLoader
 except:
     pass
 # Apparently this can improve performance slightly
 torch.set_float32_matmul_precision("medium")
+
 
 class UpscaleTensorRT:
     def __init__(
@@ -32,7 +36,7 @@ class UpscaleTensorRT:
         height: int = 1080,
         modelName: str = None,
         nt: int = 1,
-        guiLog = None,
+        guiLog=None,
     ):
         """
         Initialize the upscaler with the desired model
@@ -57,6 +61,7 @@ class UpscaleTensorRT:
             SaveEngine,
         )
         from polygraphy.backend.common import BytesFromPath
+
         self.clearTRTBullshit()
         self.TrtRunner = TrtRunner
         self.engine_from_network = engine_from_network
@@ -75,26 +80,32 @@ class UpscaleTensorRT:
         self.nt = nt
         self.bf16 = False
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
-        self.locationOfOnnxModel = os.path.join(f'{self.onnxModelsPath}',f'{modelName}-half={self.half}-scale{self.upscaleFactor}.onnx')
+        self.locationOfOnnxModel = os.path.join(
+            f"{self.onnxModelsPath}",
+            f"{modelName}-half={self.half}-scale{self.upscaleFactor}.onnx",
+        )
         self.guiLog = guiLog
         if not os.path.exists(self.locationOfOnnxModel):
             self.pytorchExportToONNX()
         self.handleModel()
-        
+
     def fixTRTBullshit(self):
-        
-        if getattr(sys, 'frozen', False):
-            cuda_runtime_dir = os.path.join(os.getcwd(), '_internal', 'nvidia', 'cuda_runtime', 'lib')
+        if getattr(sys, "frozen", False):
+            cuda_runtime_dir = os.path.join(
+                os.getcwd(), "_internal", "nvidia", "cuda_runtime", "lib"
+            )
         else:
             site_packages = site.getsitepackages()[0]
-            cuda_runtime_dir = os.path.join(site_packages, 'nvidia', 'cuda_runtime', 'lib')
-        os.environ['LD_LIBRARY_PATH'] = f'{cuda_runtime_dir}:$LD_LIBRARY_PATH'
-        
+            cuda_runtime_dir = os.path.join(
+                site_packages, "nvidia", "cuda_runtime", "lib"
+            )
+        os.environ["LD_LIBRARY_PATH"] = f"{cuda_runtime_dir}:$LD_LIBRARY_PATH"
+
     def clearTRTBullshit(self):
         os.environ.clear()
         os.environ.update(self.original_env)
-        
-    def pytorchExportToONNX(self): # Loads model via spandrel, and exports to onnx
+
+    def pytorchExportToONNX(self):  # Loads model via spandrel, and exports to onnx
         model = ModelLoader().load_from_file(self.modelPath)
         model = model.model
         state_dict = model.state_dict()
@@ -103,17 +114,14 @@ class UpscaleTensorRT:
         input = torch.rand(1, 3, 256, 256).cuda()
         if self.half:
             try:
-                
-                    model.half()
-                    input = input.half()
+                model.half()
+                input = input.half()
             except:
                 model.bfloat16()
                 input.bfloat16()
                 self.bf16 = True
         self.guiLog.emit("Exporting ONNX")
         with torch.inference_mode():
-            
-           
             torch.onnx.export(
                 model,
                 input,
@@ -123,18 +131,13 @@ class UpscaleTensorRT:
                 input_names=["input"],
                 output_names=["output"],
                 dynamic_axes={
-                        "input": {0: "batch_size", 2: "width", 3: "height"},
-                        "output": {0: "batch_size", 2: "width", 3: "height"},
-                    }
+                    "input": {0: "batch_size", 2: "width", 3: "height"},
+                    "output": {0: "batch_size", 2: "width", 3: "height"},
+                },
             )
+
     def handleModel(self):
         # Reusing the directML models for TensorRT since both require ONNX models
-        
-
-        
-        
-        
-        
 
         self.isCudaAvailable = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.isCudaAvailable else "cpu")
@@ -149,7 +152,6 @@ class UpscaleTensorRT:
         # TO:DO account for FP16/FP32
         self.enginePath = f'{self.locationOfOnnxModel.replace(".onnx", "")}{self.width}x{self.height}_scaleFactor={self.upscaleFactor}_half={self.half}_tensorrtVer={self.trt_version}device={self.device_name}_bf16={self.bf16}.engine'
         if not os.path.exists(self.enginePath):
-            
             toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
             self.guiLog.emit("Building Engine, this may take a while...")
             print((toPrint))
@@ -167,15 +169,16 @@ class UpscaleTensorRT:
                 config=self.CreateConfig(fp16=self.half, profiles=profiles),
             )
             self.engine = self.SaveEngine(self.engine, self.enginePath)
-            
+
             with self.TrtRunner(self.engine) as runner:
                 self.runner = runner
-        
-            
-        with open(self.enginePath, "rb") as f, trt.Runtime(trt.Logger(trt.Logger.INFO)) as runtime:
-            self.engine = runtime.deserialize_cuda_engine(f.read()) 
+
+        with open(self.enginePath, "rb") as f, trt.Runtime(
+            trt.Logger(trt.Logger.INFO)
+        ) as runtime:
+            self.engine = runtime.deserialize_cuda_engine(f.read())
             self.context = self.engine.create_execution_context()
-        
+
         self.stream = torch.cuda.Stream()
         self.dummyInput = torch.zeros(
             (1, 3, self.height, self.width),
@@ -192,29 +195,40 @@ class UpscaleTensorRT:
         self.bindings = [self.dummyInput.data_ptr(), self.dummyOutput.data_ptr()]
 
         for i in range(self.engine.num_io_tensors):
-            self.context.set_tensor_address(self.engine.get_tensor_name(i), self.bindings[i])
+            self.context.set_tensor_address(
+                self.engine.get_tensor_name(i), self.bindings[i]
+            )
             tensor_name = self.engine.get_tensor_name(i)
             if self.engine.get_tensor_mode(tensor_name) == trt.TensorIOMode.INPUT:
                 self.context.set_input_shape(tensor_name, self.dummyInput.shape)
-        
+
     @torch.inference_mode()
     def UpscaleImage(self, frame: bytearray):
         with torch.cuda.stream(self.stream):
             self.dummyInput.copy_(
                 bytesToTensor(
-                              frame,
-                              half=self.half,
-                              bf16=self.bf16,
-                              width=self.width,
-                              height=self.height
-                              )
+                    frame,
+                    half=self.half,
+                    bf16=self.bf16,
+                    width=self.width,
+                    height=self.height,
                 )
-            
+            )
+
             self.context.execute_async_v3(stream_handle=self.stream.cuda_stream)
             self.stream.synchronize()
-        
-            return self.dummyOutput.squeeze(0).permute(1, 2, 0).mul_(255).clamp(0, 255).contiguous().byte().cpu().numpy()
-        '''frame = bytesToTensor(frame=frame,
+
+            return (
+                self.dummyOutput.squeeze(0)
+                .permute(1, 2, 0)
+                .mul_(255)
+                .clamp(0, 255)
+                .contiguous()
+                .byte()
+                .cpu()
+                .numpy()
+            )
+        """frame = bytesToTensor(frame=frame,
                       height=self.height,
                       width=self.width,
                       half=self.half,
@@ -237,4 +251,4 @@ class UpscaleTensorRT:
             .byte()
             .cpu()
             .numpy()
-        )'''
+        )"""

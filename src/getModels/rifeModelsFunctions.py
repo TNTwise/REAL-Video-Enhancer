@@ -36,8 +36,6 @@ def rife_checkboxes(self):
     # new models
     return rife_list
 
-   
-
 
 def rife_pin_functions(self):
     self.ui.rife.stateChanged.connect(self.checkbox_state_changed)

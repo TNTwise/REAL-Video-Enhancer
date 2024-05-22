@@ -13,6 +13,7 @@ import shutil
 from src.misc.log import *
 from src.programData.write_permisions import *
 import traceback
+
 try:
     import cupy
     import modules.GMFSSCUDA as GMFSSCUDA
@@ -37,17 +38,17 @@ try:
 except:
     tensorRT = False
 try:
-    if cuda: 
-        
-        half=torch.cuda.is_bf16_supported()
+    if cuda:
+        half = torch.cuda.is_bf16_supported()
     else:
-        half=False   
+        half = False
 
 except:
-    half=False
-    
-    
-log(f'Half Precision: {half}')
+    half = False
+
+
+log(f"Half Precision: {half}")
+
 
 def check_if_online(dont_check=False, url="https://raw.githubusercontent.com/"):
     """
@@ -146,10 +147,8 @@ def check_if_enough_space_output_disk(input_file, render, times):
     full_extraction_size = resolution_multiplier * frame_count * multiplier
     free_space = check_if_free_space(settings.OutputDir)
     if render == "esrgan":
-            return True, True, True
+        return True, True, True
     if settings.RenderType == "Classic":
-        
-
         if render == "rife":
             full_size = full_extraction_size * times
             return full_size < free_space, full_size / (1024**3), free_space / (1024**3)
@@ -238,8 +237,11 @@ def isTensorRT():
 
 def isCUPY():
     return gmfss
+
+
 def isHalf():
     return half
+
 
 def check_for_individual_models():
     """
@@ -317,5 +319,3 @@ def check_for_each_binary():
     ):
         return True
     return False
-
-

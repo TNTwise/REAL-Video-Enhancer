@@ -33,14 +33,25 @@ from src.getModels.returnModelList import *
 import src.getModels.googleDriveDownload as GDrive
 import shutil
 
+
 def handleCUDAModels(model: str = ""):
     if "rife" and "pkl" in model:
         os.makedirs(
-            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}" )
+            os.path.join(
+                f"{thisdir}",
+                "models",
+                "rife-cuda",
+                f"{model.replace('.','').replace('pkl','')}",
+            )
         )
         shutil.copy(
-            os.path.join(f"{thisdir}","files",f"{model}"), 
-            os.path.join(f"{thisdir}","models","rife-cuda",f"{model.replace('.','').replace('pkl','')}")
+            os.path.join(f"{thisdir}", "files", f"{model}"),
+            os.path.join(
+                f"{thisdir}",
+                "models",
+                "rife-cuda",
+                f"{model.replace('.','').replace('pkl','')}",
+            ),
         )
 
 
@@ -52,6 +63,7 @@ def deleteDownloaded():
     for i in os.listdir(f"{thisdir}/files/"):
         if ".txt" not in i:
             os.system(f'rm -rf "{thisdir}/files/{i}"')
+
 
 import src.getModels.SelectAI as SelectAI
 import traceback
@@ -97,50 +109,40 @@ class Worker(QObject):
             if os.path.exists(f"{settings.ModelDir}") == False:
                 os.mkdir(f"{settings.ModelDir}")
             if os.path.exists(f"{thisdir}/bin/") == False:
-                    os.mkdir(f"{thisdir}/bin/")
+                os.mkdir(f"{thisdir}/bin/")
             for i in os.listdir(f"{thisdir}/files/"):
                 if i == "ffmpeg":
-                    os.chmod(
-                        os.path.join(thisdir,"files","ffmpeg"),
-                        0o755
-                        )
-                    
+                    os.chmod(os.path.join(thisdir, "files", "ffmpeg"), 0o755)
+
                     os.rename(
-                        os.path.join(thisdir,"files","ffmpeg"),
-                        os.path.join(thisdir,"bin","ffmpeg")
-                        )
+                        os.path.join(thisdir, "files", "ffmpeg"),
+                        os.path.join(thisdir, "bin", "ffmpeg"),
+                    )
                 if i == "yt-dlp_linux":
-                    os.chmod(
-                        os.path.join(thisdir,"files",i),
-                        0o755
-                        )
-                    
+                    os.chmod(os.path.join(thisdir, "files", i), 0o755)
+
                     os.rename(
-                        os.path.join(thisdir,"files",i),
-                        os.path.join(thisdir,"bin",i)
-                        )
+                        os.path.join(thisdir, "files", i),
+                        os.path.join(thisdir, "bin", i),
+                    )
                 if i == "glxinfo":
-                    os.chmod(
-                        os.path.join(thisdir,"files",i),
-                        0o755
-                        )
-                    
+                    os.chmod(os.path.join(thisdir, "files", i), 0o755)
+
                     os.rename(
-                        os.path.join(thisdir,"files",i),
-                        os.path.join(thisdir,"bin",i)
-                        )
+                        os.path.join(thisdir, "files", i),
+                        os.path.join(thisdir, "bin", i),
+                    )
                 if i == "rife-ncnn-vulkan":
                     try:
                         os.mkdir(f"{settings.ModelDir}/rife/")
                     except:
                         pass
-                    os.chmod(
-                        os.path.join(thisdir,"files",i),
-                        0o755
-                        )
+                    os.chmod(os.path.join(thisdir, "files", i), 0o755)
                     os.rename(
-                        os.path.join(f"{thisdir}","files","rife-ncnn-vulkan"),
-                        os.path.join(f"{thisdir}","models","rife","rife-ncnn-vulkan")
+                        os.path.join(f"{thisdir}", "files", "rife-ncnn-vulkan"),
+                        os.path.join(
+                            f"{thisdir}", "models", "rife", "rife-ncnn-vulkan"
+                        ),
                     )
 
                 if ".zip" in i:
@@ -162,13 +164,17 @@ class Worker(QObject):
 
                     try:
                         os.rename(
-                            os.path.join(thisdir,"files",name),
-                            os.path.join(settings.ModelDir,original_ai_name)
-                            )
+                            os.path.join(thisdir, "files", name),
+                            os.path.join(settings.ModelDir, original_ai_name),
+                        )
                         os.chmod(
-                            os.path.join(settings.ModelDir,original_ai_name,original_ai_name_ncnn_vulkan),
-                            0o755
-                            )
+                            os.path.join(
+                                settings.ModelDir,
+                                original_ai_name,
+                                original_ai_name_ncnn_vulkan,
+                            ),
+                            0o755,
+                        )
                     except:
                         pass
                 if ".tar.gz" in i:
@@ -181,8 +187,6 @@ class Worker(QObject):
             traceback_info = traceback.format_exc()
             log(f"ERROR: {e} {traceback_info}")
             self.main.showDialogBox(e)
-
-
 
 
 def install_icons(self):
@@ -373,7 +377,6 @@ if check_for_individual_models() == None or check_for_each_binary() == False:
             self.ui.gbLabel.setText(f"{downloaded_data_gb}/{total_data_gb}GB")
 
         def start_main(self):
-            
             deleteDownloaded()
             if check_for_individual_models() != None:
                 if check_if_online():

@@ -19,12 +19,15 @@ from PyQt5.QtWidgets import (
 from src.programData.write_permisions import *
 import traceback
 from sys import exit
+
 try:
     import torch
-        
-    half=torch.cuda.is_bf16_supported()
+
+    half = torch.cuda.is_bf16_supported()
 except:
-    half=False
+    half = False
+
+
 # im going to eventually redo this
 class CustomException(Exception):
     def __init__(self, additional_info):
@@ -61,7 +64,7 @@ class Settings:
                     settings_dict[row[0]] = row[1]
                 except:
                     pass
-        
+
         default_settings = {
             "FixFFMpegCatchup": "Disabled",
             "Image_Type": ".jpg",

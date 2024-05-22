@@ -20,6 +20,7 @@ def checked_cast(t: type[T], value: object) -> T:
     assert isinstance(value, t), f"Value is {type(value)}, must be type {t}"
     return value
 
+
 schemaf = """
 {
   "AbsVal": {
@@ -3380,7 +3381,6 @@ class NcnnModel:
                 try:
                     weight_b = weights_b[weight_name]
                 except KeyError:
-                    
                     raise
 
                 assert (
@@ -3606,8 +3606,7 @@ class NcnnModel:
                         binf.read(scale_data_length * 4), np.float32
                     )
                     weight_dict["bias"] = NcnnWeight(bias_data)
-        
-        
+
         elif len(layer.params.weight_order) != 0:
             error_msg = f"Load weights not added for {op_type} yet, please report"
             raise ValueError(error_msg)
@@ -3696,8 +3695,6 @@ class NcnnModelWrapper:
         self.out_nc: int = out_nc
         self.fp: str = fp
 
-    
-
     def get_nf_and_in_nc(layer: NcnnLayer) -> tuple[int, int]:
         nf = layer.params[0].value
         kernel_w = layer.params[1].value
@@ -3716,64 +3713,62 @@ class NcnnModelWrapper:
         in_nc = weight_data_size // nf // kernel_w // kernel_h
 
         return nf, in_nc
-    
+
 
 def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
-        scale = 1.0
-        in_nc = 0
-        out_nc = 0
-        nf = 0
-        fp = "fp32"
-        pixel_shuffle = 1
-        found_first_conv = False
-        current_conv = None
+    scale = 1.0
+    in_nc = 0
+    out_nc = 0
+    nf = 0
+    fp = "fp32"
+    pixel_shuffle = 1
+    found_first_conv = False
+    current_conv = None
 
-        for i, layer in enumerate(model.layers):
-            if layer.op_type == "Interp":
-                try:
-                    if (
-                        model.layers[i + 1].op_type != "BinaryOp"
-                        and model.layers[i + 1].params[0].value != 0
-                    ):
-                        scale *= checked_cast(float, layer.params[1].value)
-                except IndexError:
+    for i, layer in enumerate(model.layers):
+        if layer.op_type == "Interp":
+            try:
+                if (
+                    model.layers[i + 1].op_type != "BinaryOp"
+                    and model.layers[i + 1].params[0].value != 0
+                ):
                     scale *= checked_cast(float, layer.params[1].value)
-            elif layer.op_type == "PixelShuffle":
-                scale *= checked_cast(int, layer.params[0].value)
-                pixel_shuffle *= checked_cast(int, layer.params[0].value)
-            elif layer.op_type in (
-                "Convolution",
-                "Convolution1D",
-                "ConvolutionDepthWise",
-            ):
-                if found_first_conv is not True:
-                    nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
-                    
-                    found_first_conv = True
+            except IndexError:
+                scale *= checked_cast(float, layer.params[1].value)
+        elif layer.op_type == "PixelShuffle":
+            scale *= checked_cast(int, layer.params[0].value)
+            pixel_shuffle *= checked_cast(int, layer.params[0].value)
+        elif layer.op_type in (
+            "Convolution",
+            "Convolution1D",
+            "ConvolutionDepthWise",
+        ):
+            if found_first_conv is not True:
+                nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
 
-                scale /= checked_cast(int, layer.params[3].value)
-                current_conv = layer
-            elif layer.op_type in ("Deconvolution", "DeconvolutionDepthWise"):
-                if found_first_conv is not True:
-                    nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
-                    found_first_conv = True
+                found_first_conv = True
 
-                scale *= checked_cast(int, layer.params[3].value)
-                current_conv = layer
+            scale /= checked_cast(int, layer.params[3].value)
+            current_conv = layer
+        elif layer.op_type in ("Deconvolution", "DeconvolutionDepthWise"):
+            if found_first_conv is not True:
+                nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
+                found_first_conv = True
 
-        assert (
-            current_conv is not None
-        ), "Cannot broadcast; model has no Convolution layers"
+            scale *= checked_cast(int, layer.params[3].value)
+            current_conv = layer
 
-        out_nc = checked_cast(int, current_conv.params[0].value) // pixel_shuffle**2
+    assert current_conv is not None, "Cannot broadcast; model has no Convolution layers"
 
-        assert scale >= 1, "Models with scale less than 1x not supported"
-        assert scale % 1 == 0, f"Model not supported, scale {scale} is not an integer"
+    out_nc = checked_cast(int, current_conv.params[0].value) // pixel_shuffle**2
 
-        return int(scale), in_nc, out_nc, nf, fp
+    assert scale >= 1, "Models with scale less than 1x not supported"
+    assert scale % 1 == 0, f"Model not supported, scale {scale} is not an integer"
+
+    return int(scale), in_nc, out_nc, nf, fp
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     try:
         model_param = sys.argv[1]
 
@@ -3781,13 +3776,11 @@ if __name__ == '__main__':
         model_param = input("Enter param path here: ")
 
     model = NcnnModel.load_from_file(model_param)
-    scale=(get_broadcast_data(model)[0])
+    scale = get_broadcast_data(model)[0]
     print(scale)
+
 
 def returnScale(modelParamPath: str = "") -> int:
     model = NcnnModel.load_from_file(modelParamPath)
-    scale=(get_broadcast_data(model)[0])
+    scale = get_broadcast_data(model)[0]
     return scale
-
-
-

@@ -58,4 +58,3 @@ class Model:
 
     def inference(self, img0, img1, timestep=0.5):
         return self.flownet(img0, img1, timestep)
-       

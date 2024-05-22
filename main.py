@@ -2,7 +2,8 @@
 
 from src.misc.log import log
 import os
-from src.misc.createDirectories import createDirectories,createFiles
+from src.misc.createDirectories import createDirectories, createFiles
+
 createDirectories()
 createFiles()
 import PyQt5
@@ -346,13 +347,13 @@ class MainWindow(QtWidgets.QMainWindow):
             RealESRGANCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "RealESRGAN TensorRT (Nvidia only)":
-            RealESRGANCUDA.modelOptions(self,trt=True)
+            RealESRGANCUDA.modelOptions(self, trt=True)
 
         if self.ui.AICombo.currentText() == "Custom CUDA models":
             CustomModelsCUDA.modelOptions(self)
-        
+
         if self.ui.AICombo.currentText() == "Custom TensorRT models":
-            CustomModelsCUDA.modelOptions(self,trt=True)
+            CustomModelsCUDA.modelOptions(self, trt=True)
 
         if self.ui.AICombo.currentText() == "SPAN (NCNN)":
             span.modelOptions(self)
@@ -690,16 +691,18 @@ class MainWindow(QtWidgets.QMainWindow):
         ):
             self.ui.EnsembleCheckBox.show()
             self.ui.ensembleHelpButton.show()
+
     def TurnOffCustomFPSMultiplierIfImageExtraction(self):
         if self.ui.ImageExtractionCheckBox.isChecked():
             self.ui.FPSTo.show()
             self.ui.FPSFrom.show()
             self.ui.FPSToSign.show()
-            
+
         else:
             self.ui.FPSTo.hide()
             self.ui.FPSFrom.hide()
             self.ui.FPSToSign.hide()
+
     def greyOutRifeTimes(self):
         if (
             "v4" in self.ui.Rife_Model.currentText()
@@ -744,20 +747,20 @@ class MainWindow(QtWidgets.QMainWindow):
 
                 if self.ui.AICombo.currentText() == "Custom NCNN models":
                     modelPath = os.path.join(
-                    f"{settings.ModelDir}",
-                    "custom_models_ncnn",
-                    f"models",
-                    f"{self.ui.Rife_Model.currentText()}.param",
-                )
+                        f"{settings.ModelDir}",
+                        "custom_models_ncnn",
+                        f"models",
+                        f"{self.ui.Rife_Model.currentText()}.param",
+                    )
 
                 if self.ui.AICombo.currentText() == "SPAN (NCNN)":
                     modelPath = os.path.join(
-                    f"{settings.ModelDir}",
-                    "span",
-                    f"models",
-                    f"{self.ui.Rife_Model.currentText()}.param",
-                )
-                    
+                        f"{settings.ModelDir}",
+                        "span",
+                        f"models",
+                        f"{self.ui.Rife_Model.currentText()}.param",
+                    )
+
                 try:
                     scale = returnScale(modelPath)
                     self.ui.Rife_Times.addItem(f"{scale}X")
@@ -770,7 +773,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models" 
+            self.ui.AICombo.currentText() == "Custom CUDA models"
             or self.ui.AICombo.currentText() == "Custom TensorRT models"
             or self.ui.AICombo.currentText() == "RealESRGAN TensorRT"
             and len(self.ui.Rife_Model.currentText()) > 0
@@ -869,12 +872,20 @@ class MainWindow(QtWidgets.QMainWindow):
                 notAModel(self)
                 return
             param = input_file
-            shutil.copy(bin, os.path.join(f'{settings.ModelDir}','custom_models_ncnn','models'))
-            shutil.copy(param, os.path.join(f'{settings.ModelDir}','custom_models_ncnn','models'))
+            shutil.copy(
+                bin,
+                os.path.join(f"{settings.ModelDir}", "custom_models_ncnn", "models"),
+            )
+            shutil.copy(
+                param,
+                os.path.join(f"{settings.ModelDir}", "custom_models_ncnn", "models"),
+            )
         if type_of_file == "CUDA Model":
             if self.ui.AICombo.currentText() == "Custom CUDA models":
                 CustomModelsCUDA.modelOptions(self)
-            shutil.copy(input_file, os.path.join(f"{thisdir}","models","custom-models-cuda"))
+            shutil.copy(
+                input_file, os.path.join(f"{thisdir}", "models", "custom-models-cuda")
+            )
 
     def openFolderDialog(self):
         output_folder = QFileDialog.getExistingDirectory(self, "Open Folder")
@@ -1037,8 +1048,10 @@ class MainWindow(QtWidgets.QMainWindow):
             event.accept()
             if self.input_file != "":
                 try:
-                    shutil.rmtree(os.path.join(settings.RenderDir,f'{self.videoName}_temp'))
-                    shutil.rmtree(os.path.join(thisdir,self.videoName))
+                    shutil.rmtree(
+                        os.path.join(settings.RenderDir, f"{self.videoName}_temp")
+                    )
+                    shutil.rmtree(os.path.join(thisdir, self.videoName))
 
                 except Exception as e:
                     log(str(e))
@@ -1052,7 +1065,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     pass
 
                 try:
-                    shutil.rmtree(os.path.join(settings.RenderDir,f'{self.videoName}_temp'))
+                    shutil.rmtree(
+                        os.path.join(settings.RenderDir, f"{self.videoName}_temp")
+                    )
                 except:
                     pass
                 exit()
@@ -1132,9 +1147,12 @@ def excepthook(type, value, extraceback):
     log(f"Traceback (formatted):\n{tb_str}")
 
     # Display an error message to the user
-    error_message = f"An unhandled exception occurred: {value} (in {filename}, line {lineno})"
+    error_message = (
+        f"An unhandled exception occurred: {value} (in {filename}, line {lineno})"
+    )
     log(f"ERROR: {error_message}")
     QMessageBox.critical(None, "Error", error_message, QMessageBox.Ok)
+
 
 import functools
 import inspect

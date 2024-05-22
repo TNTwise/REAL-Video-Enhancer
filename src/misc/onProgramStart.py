@@ -9,7 +9,8 @@ from src.getLinkVideo.get_video import *
 from src.getModels.rifeModelsFunctions import rife_cuda_checkboxes
 from src.programData.version import returnVersion
 import site
-from src.misc.createDirectories import createDirectories,createFiles
+from src.misc.createDirectories import createDirectories, createFiles
+
 
 def open_link(urll):
     url = QUrl(urll)
@@ -80,7 +81,9 @@ def bindButtons(self):
     self.ui.gpuThreadingHelpButton.clicked.connect(lambda: vram_help(self))
     self.ui.logButton.clicked.connect(lambda: viewLogs(self))
     self.ui.RifeResume.clicked.connect(self.resume_render)
-    self.ui.ImageExtractionCheckBox.clicked.connect(self.TurnOffCustomFPSMultiplierIfImageExtraction)
+    self.ui.ImageExtractionCheckBox.clicked.connect(
+        self.TurnOffCustomFPSMultiplierIfImageExtraction
+    )
     self.ui.sceneChangeSensativityButton.clicked.connect(
         lambda: show_scene_change_help(self)
     )
@@ -151,6 +154,7 @@ def bindButtons(self):
 
     # Bind animations
     self.setWindowIcon(QIcon(f"{thisdir}/icons/logo v1.png"))
+
 
 def settingsStart(self):
     settings = Settings()
@@ -263,6 +267,7 @@ def cuda_shit(self):
     else:
         self.ui.modelTabWidget.setTabEnabled(1, False)
 
+
 def setupSettings(self):
     self.ui.VideoOptionsFrame.hide()
     self.ui.RenderOptionsFrame.hide()
@@ -270,12 +275,12 @@ def setupSettings(self):
     self.ui.SettingsMenus.setCurrentRow(0)
     self.ui.GeneralOptionsFrame.show()
 
+
 def hideUnusedFeatures(self):
     self.ui.RifeResume.hide()
     self.ui.RifePause.hide()
     self.ui.QueueButton.hide()
     self.ui.QueueListWidget.hide()
-
 
 
 def onApplicationStart(self):
@@ -299,8 +304,6 @@ def onApplicationStart(self):
     self.ui.label_20.show()
     self.ui.esrganHelpModel.show()
     self.input_file = ""
-    
-    
 
     self.switchUI()
 
@@ -313,7 +316,6 @@ def onApplicationStart(self):
     self.output_folder = ""
 
     self.ui.InstallModelsFrame.hide()
-    
 
     cuda_shit(self)
 
@@ -323,21 +325,13 @@ def onApplicationStart(self):
     os.system(
         "ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-0"
     )  # Enables discord RPC on flatpak
-    
+
     onlyInt = QIntValidator()
     onlyInt.setRange(0, 9)
     self.ui.sceneChangeLineEdit.setValidator(onlyInt)
 
-    
-
-
-    
     self.QueueList = []
     self.setDirectories()
-
-    
-
-    
 
     # call settings specific changes to GUI
     settingsStart(self)
@@ -389,14 +383,14 @@ def set_model_params(self):
                 os.path.join(f"{thisdir}", "models", "rife-trt-engines"), exist_ok=True
             )
             self.model_labels["Rife TensorRT (Nvidia only)"] = "interpolation"
-        
+
         if "Custom NCNN Models" == i:
             self.model_labels["Custom NCNN models"] = "upscaling"
 
         if "realesrgan-cuda" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
-        
+
         if "realesrgan-tensorrt" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN TensorRT (Nvidia only)"] = "upscaling"
@@ -407,7 +401,7 @@ def set_model_params(self):
 
         if "custom-cuda-models" == i:
             self.model_labels["Custom CUDA models"] = "upscaling"
-        
+
         if "custom-tensorrt-models" == i:
             self.model_labels["Custom TensorRT models"] = "upscaling"
 
@@ -430,6 +424,5 @@ def set_model_params(self):
             if value == "upscaling":
                 self.ui.modeCombo.addItem("Upscaling")
                 break
-    
 
     self.switchMode()

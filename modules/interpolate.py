@@ -80,18 +80,19 @@ def initializeInterpolation(
         log(f"ERROR: {e} {traceback_info}")
         self.showDialogBox(e)
 
-def changeRifeToFrameExtraction(self,AI):
+
+def changeRifeToFrameExtraction(self, AI):
     frameExtraction = self.ui.ImageExtractionCheckBox.isChecked()
     if AI == "rife-ncnn-python" and frameExtraction:
-            AI = "rife-ncnn-vulkan"
+        AI = "rife-ncnn-vulkan"
     return AI
+
+
 def start_interpolation(
     self, AI
 ):  # command directly connected to the rife start button
-    
-    AI = changeRifeToFrameExtraction(self,AI)
+    AI = changeRifeToFrameExtraction(self, AI)
     try:
-        
         if self.input_file != "":
             self.render = "rife"
             has_enough_space, predicted_space, total_space = (

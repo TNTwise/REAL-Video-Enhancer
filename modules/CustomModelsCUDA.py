@@ -23,7 +23,7 @@ thisdir = src.programData.thisdir.thisdir()
 homedir = os.path.expanduser(r"~")
 
 
-def modelOptions(self,trt=False):
+def modelOptions(self, trt=False):
     settings = Settings()
     self.times = 1
     log(f"Model: CUSTOM CUDA trt={trt}")
@@ -59,9 +59,9 @@ def modelOptions(self,trt=False):
     # lambda: startRender(self.input_file,f'{outputpath}/{os.path.basename(self.input_file)}_{self.fps*self.times}fps.mp4',self.times)
     if trt:
         self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(self, "custom-models-cuda-tensorrt")
-    )
+            lambda: upscale.start_upscale(self, "custom-models-cuda-tensorrt")
+        )
     else:
         self.ui.RifeStart.clicked.connect(
-        lambda: upscale.start_upscale(self, "custom-models-cuda")
-    )
+            lambda: upscale.start_upscale(self, "custom-models-cuda")
+        )

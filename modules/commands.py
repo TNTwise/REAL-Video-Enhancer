@@ -200,9 +200,7 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if "-cuda" in self.AI or "-ncnn-python" in self.AI:
         self.ncnn = False
         self.cuda = True
-        os.makedirs(
-            os.path.join(renderdir,f'{videoName}_temp','output_frames','0')
-                    )
+        os.makedirs(os.path.join(renderdir, f"{videoName}_temp", "output_frames", "0"))
     self.file_drop_widget.hide()
     global height
     global width
@@ -220,24 +218,24 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if self.localFile == True or self.youtubeFile == False:
         thread.log.emit("[Extracting Audio]")
         command = [
-            os.path.join(f"{thisdir}","bin","ffmpeg"),
-             "-i" ,f"{videopath}",
-             "-vn",
-             "-c:a",
-             "aac",
-             "-b:a",
-             "320k",
-             os.path.join(f"{renderdir}",f"{videoName}_temp","audio.m4a"),
-               "-y"
+            os.path.join(f"{thisdir}", "bin", "ffmpeg"),
+            "-i",
+            f"{videopath}",
+            "-vn",
+            "-c:a",
+            "aac",
+            "-b:a",
+            "320k",
+            os.path.join(f"{renderdir}", f"{videoName}_temp", "audio.m4a"),
+            "-y",
         ]
         subprocess.run(command)
     else:
         os.rename(
-            os.path.join(f"{thisdir}","audio.m4a"), 
-            os.path.join(f"{renderdir}",f"{videoName}_temp","audio.m4a")
+            os.path.join(f"{thisdir}", "audio.m4a"),
+            os.path.join(f"{renderdir}", f"{videoName}_temp", "audio.m4a"),
         )
 
-    
 
 def extractFramesAndAudio(
     thread, self, renderdir, videoName, videopath, times
@@ -256,9 +254,7 @@ def extractFramesAndAudio(
             )
 
         # i need to clean this up lol
-        shutil.rmtree(
-            os.path.join(settings.RenderDir,f"{videoName}_temp")
-            )
+        shutil.rmtree(os.path.join(settings.RenderDir, f"{videoName}_temp"))
         # Gets the width and height
         global height
         global width
