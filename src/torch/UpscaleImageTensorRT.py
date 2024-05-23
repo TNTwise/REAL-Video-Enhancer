@@ -76,10 +76,11 @@ class UpscaleTensorRT:
         self.modelName = modelName
         self.nt = nt
         self.bf16 = False
+        self.onnxOpsetVersion = 18
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
         self.locationOfOnnxModel = os.path.join(
             f"{self.onnxModelsPath}",
-            f"{modelName}-half={self.half}-scale{self.upscaleFactor}.onnx",
+            f"{modelName}-half={self.half}-scale{self.upscaleFactor}-opset{self.onnxOpsetVersion}.onnx",
         )
         self.guiLog = guiLog
         if not os.path.exists(self.locationOfOnnxModel):
@@ -109,7 +110,7 @@ class UpscaleTensorRT:
                 input,
                 self.locationOfOnnxModel,
                 verbose=False,
-                opset_version=17,
+                opset_version=self.onnxOpsetVersion,
                 input_names=["input"],
                 output_names=["output"],
                 dynamic_axes={

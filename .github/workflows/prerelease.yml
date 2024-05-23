@@ -89,11 +89,7 @@ jobs:
           python3 -m pip install -r requirements-CUDA-Linux.txt
           python3 -m pip install importlib
           
-      - name: Get latest polygraphy
-        run: |
-          git clone https://github.com/TNTwise/TensorRT
-          cd TensorRT/tools/Polygraphy
-          make install
+      
       - name: Compile to executable
         run: |
           cd REAL-Video-Enhancer
