@@ -1,8 +1,10 @@
 import os
 from src.programData.thisdir import thisdir
+homedir = os.path.expanduser(r"~")
 
 
 def createDirectories():
+    
     os.makedirs(
         os.path.join(f"{thisdir()}"),
         exist_ok=True,

@@ -100,6 +100,7 @@ class Settings:
                 if setting in ["OutputDir", "RenderDir"] and not os.path.exists(
                     getattr(self, setting)
                 ):
+                    os.makedirs(default_value,exist_ok=True)
                     log(
                         f"This most likely means the output directory does not exist, in which create {homedir}/Videos, or you do not have permission to output there.\nEither set the output directory {homedir}/Videos or allow permission for the new directory."
                     )
