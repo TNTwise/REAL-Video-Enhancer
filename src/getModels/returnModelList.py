@@ -253,7 +253,7 @@ def returnModelList(
         install_modules_dict[
             f"https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-v4.15-ensemble.tar.gz"
         ] = f"rife-v4.15-ensemble.tar.gz"
-    if len(install_modules_dict) == 0 and len(os.listdir(f"{settings.ModelDir}/")) == 0:
+    if len(install_modules_dict) == 0 and len(os.listdir(f"{settings.ModelDir}/")) == 4:
         install_modules_dict[
             returnCorrectLinkBasedOnOS(
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife-ncnn-vulkan"
@@ -282,6 +282,8 @@ def returnModelList(
     ):
         pass
     else:
+        
+        
         if return_data.returnOperatingSystem() == "Linux":
             install_modules_dict.update(
                 {
@@ -299,4 +301,5 @@ def returnModelList(
                 }
             )
     cudaRifeModels(self, install_modules_dict)
+    print(install_modules_dict)
     return install_modules_dict

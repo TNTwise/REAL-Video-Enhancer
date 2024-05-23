@@ -1,7 +1,7 @@
 import os
 import csv
 import src.programData.thisdir
-
+import shutil
 thisdir = src.programData.thisdir.thisdir()
 from src.programData.return_data import *
 from src.misc.messages import *
@@ -310,5 +310,5 @@ def halfPrecision(self):
 
 def uninstallAPP(self):
     if uninstallMessage(self):
-        os.system(f'rm -rf "{thisdir}/"*')
+        shutil.rmtree(thisdir)
         exit()
