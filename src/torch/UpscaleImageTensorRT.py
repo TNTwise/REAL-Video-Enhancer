@@ -94,7 +94,7 @@ class UpscaleTensorRT:
         state_dict = model.state_dict()
         model.eval().cuda()
         model.load_state_dict(state_dict, strict=True)
-        input = torch.rand(1, 3, 256, 256).cuda()
+        input = torch.rand(1, 3, 20, 20).cuda()
         if self.half:
             try:
                 model.half()
