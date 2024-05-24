@@ -226,41 +226,34 @@ class ChooseModels(QtWidgets.QMainWindow):
             for option in rife_install_list:
                 f.write(option + "\n")
 
-
+def remove_model_from_dir(self,model):
+    try:
+        shutil.rmtree(os.path.join(f"{self.settings.ModelDir}",model))
+    except:
+            pass
 def remove_unchecked(self):
     if self.ui.RifeCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/rife/"')
-
+        remove_model_from_dir(self,"rife")
     if self.ui.RealESRGANCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/realesrgan/"')
-
+        remove_model_from_dir(self,"realesrgan")
     if self.ui.Waifu2xCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/waifu2x/"')
-
+        remove_model_from_dir(self,"waifu2x")
     if self.ui.CainCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/ifrnet/"')
-
+        remove_model_from_dir(self,"ifrnet")
     if self.ui.RealCUGANCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/realcugan/"')
-
+        remove_model_from_dir(self,"realcugan")
     if self.ui.RealSRCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/realsr/"')
-
+        remove_model_from_dir(self,"realsr")
     if self.ui.RifeCUDACheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/rife-cuda/"')
-
+        remove_model_from_dir(self,"rife-cuda")
+    if self.ui.RealESRGANCUDACheckBox.isChecked() == False:
+        remove_model_from_dir(self,"realesrgan-cuda")
     if self.ui.RifeCUDACheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/realesrgan-cuda/"')
-
-    if self.ui.RifeCUDACheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/custom_models_ncnn/"')
-
+        remove_model_from_dir(self,"custom_models_ncnn")
     if self.ui.SPANNCNNCheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/span/"')
-
+        remove_model_from_dir(self,"span")
     if self.ui.GMFSSCUDACheckBox.isChecked() == False:
-        os.system(f'rm -rf "{self.settings.ModelDir}/gmfss-cuda/"')
-
+        remove_model_from_dir(self,"gmfss-cuda")
 
 def run_install_models_from_settings(self):
     try:
