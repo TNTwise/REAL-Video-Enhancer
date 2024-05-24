@@ -28,26 +28,28 @@ rife_install_list = []
 
 
 def handleCUDAModels(model: str = ""):
-    if "rife" and "pkl" in model:
-        os.makedirs(
-            os.path.join(
-                f"{thisdir}",
-                "models",
-                "rife-cuda",
-                f"{model.replace('.','').replace('pkl','')}",
+    try:
+        if "rife" and "pkl" in model:
+            os.makedirs(
+                os.path.join(
+                    f"{thisdir}",
+                    "models",
+                    "rife-cuda",
+                    f"{model.replace('.','').replace('pkl','')}",
+                )
             )
-        )
-        shutil.copy(
-            os.path.join(f"{thisdir}", "files", f"{model}"),
-            os.path.join(
-                f"{thisdir}",
-                "models",
-                "rife-cuda",
-                f"{model.replace('.','').replace('pkl','')}",
-            ),
-        )
-
-
+            shutil.copy(
+                os.path.join(f"{thisdir}", "files", f"{model}"),
+                os.path.join(
+                    f"{thisdir}",
+                    "models",
+                    "rife-cuda",
+                    f"{model.replace('.','').replace('pkl','')}",
+                ),
+            )
+    except:
+        pass
+    
 def deleteDownloaded():
     for i in os.listdir(f"{thisdir}/files/"):
         if os.path.isfile(i):
