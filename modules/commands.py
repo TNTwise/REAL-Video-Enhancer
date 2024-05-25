@@ -200,7 +200,12 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
     if "-cuda" in self.AI or "-ncnn-python" in self.AI:
         self.ncnn = False
         self.cuda = True
-        os.makedirs(os.path.join(renderdir, f"{videoName}_temp", "output_frames", "0"))
+        try:
+            os.makedirs(
+                os.path.join(renderdir, f"{videoName}_temp", "output_frames", "0"),exist_ok=True
+                )
+        except:
+            pass
     self.file_drop_widget.hide()
     global height
     global width
