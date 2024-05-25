@@ -40,11 +40,11 @@ class UpscaleNCNN:
         mean_vals = []
         norm_vals = [255.0, 255.0, 255.0]
         mat_out.substract_mean_normalize(mean_vals, norm_vals)
-        arr = np.array(mat_out)
-        min_val = np.min(arr)
-        max_val = np.max(arr)
+        out = np.ascontiguousarray(mat_out)
+        min_val = np.min(out)
+        max_val = np.max(out)
         if min_val < 0 or max_val > 255:
-            out = ((arr - min_val) / (max_val - min_val)) * 255
+            out = ((out - min_val) / (max_val - min_val)) * 255
         output = out.transpose(1, 2, 0) 
         output = np.ascontiguousarray(output,dtype=np.uint8)
         return output
