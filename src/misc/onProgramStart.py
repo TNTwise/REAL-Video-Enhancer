@@ -61,6 +61,9 @@ def bindButtons(self):
         lambda: selSceneDetectionMode(self)
     )
     self.ui.halfPrecisionCheckBox.stateChanged.connect(lambda: halfPrecision(self))
+    # disable button if half is not supported
+    if not checks.halfPrecision(self):
+        self.ui.halfPrecisionCheckBox.setDisabled(True)
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
 
     self.ui.Input_video_rife.clicked.connect(
