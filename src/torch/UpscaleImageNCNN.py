@@ -37,11 +37,17 @@ class UpscaleNCNN:
         # Make sure the input and output names match the param file
         ex.input("data", mat_in)
         ret, mat_out = ex.extract("output")
-        out = np.array(mat_out)
-        # Transpose the output from `c, h, w` to `h, w, c` and put it back in 0-255 range
-        output = out.transpose(1, 2, 0) * 255
-        
-        return np.ascontiguousarray(output,dtype=np.uint8)
+        mean_vals = []
+        norm_vals = [255.0, 255.0, 255.0]
+        mat_out.substract_mean_normalize(mean_vals, norm_vals)
+        arr = np.array(mat_out)
+        min_val = np.min(arr)
+        max_val = np.max(arr)
+        if min_val < 0 or max_val > 255:
+            out = ((arr - min_val) / (max_val - min_val)) * 255
+        output = out.transpose(1, 2, 0) 
+        output = np.ascontiguousarray(output,dtype=np.uint8)
+        return output
         
 
 
