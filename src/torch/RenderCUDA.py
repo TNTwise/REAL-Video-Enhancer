@@ -315,7 +315,7 @@ class Interpolation(Render):
     def proc_image(self, frame1):
         if self.interpolate_process.run(frame1):
 
-            self.frame += 1
+            
             
 
             for i in range(self.interpolation_factor - 1):
@@ -324,7 +324,8 @@ class Interpolation(Render):
                 )
                 self.frame += 1
                 self.writeBuffer.put(result)
-            self.writeBuffer.put(frame1)
+        self.frame += 1
+        self.writeBuffer.put(frame1)
 
     def procInterpThread(self):
         self.frame = 0
@@ -345,9 +346,9 @@ class Interpolation(Render):
                 break  # done with proc
 
             
-
-            if self.frame == self.transition_frame - self.interpolation_factor:
-                for i in range(self.interpolation_factor):
+            #self.interpolate_process.clearCache()
+            if self.frame == self.transition_frame - self.interpolation_factor + 1:
+                for i in range(self.interpolation_factor + 1):
                     self.writeBuffer.put(frame)
                 self.frame += self.interpolation_factor
                 self.transition_frame = self.main.transitionFrames.pop(0)
