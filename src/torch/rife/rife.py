@@ -134,9 +134,8 @@ class Rife:
     @torch.inference_mode()
     def make_inference(self, n):
         timestep = torch.full(
-            (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
-        )
-        timestep = timestep.to(memory_format=torch.channels_last)
+            (1, 1, self.I1.shape[2], self.I1.shape[3]), n, device=self.device
+        ).to(memory_format=torch.channels_last)
         if self.half:
             timestep = timestep.half()
         output = self.model.inference(self.I0, self.I1, timestep=timestep)
@@ -159,24 +158,40 @@ class Rife:
         
         Overwrites frame
         """
-        self.i0 = None
+        
+        self.I0 = None
 
     def cacheFrame(self):
         self.I0 = self.I1.clone()
 
-    def pad_frame(self):
-        self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
-        self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
+    def pad_frame(self,frame):
+        return F.pad(frame, [0, self.padding[1], 0, self.padding[3]])
 
     @torch.inference_mode()
     def run(self, I1):
         if self.I0 is None:
-            self.I0 = self.bytesToFrame(I1)
+            self.I0 = self.bytesToPaddedFrame(I1)
+            print("Uncached frame")
+            return False
+        self.I1 = self.bytesToPaddedFrame(I1)
+        return True
 
-        self.I1 = self.processFrame(I1)
+    def bytesToPaddedFrame(self, frame):
+        
 
-    def bytesToFrame(self, frame):
-        return (
+        if self.half:
+            frame =  (
+            torch.frombuffer(frame, dtype=torch.uint8)
+            .reshape(self.height, self.width, 3)
+            .to(self.device, non_blocking=True)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .half()
+            .mul_(1 / 255)
+            )
+        #f32 
+        else:
+            frame = (
             torch.frombuffer(frame, dtype=torch.uint8)
             .reshape(self.height, self.width, 3)
             .to(self.device, non_blocking=True)
@@ -185,15 +200,7 @@ class Rife:
             .float()
             .mul_(1 / 255)
         )
-
-    @torch.inference_mode()
-    def run1(self, I0, I1):
-        self.I0 = self.bytesToFrame(I0)
-        self.I1 = self.bytesToFrame(I1)
-
-        if self.cuda_available and self.half and not self.UHD:
-            self.I0 = self.I0.half()
-            self.I1 = self.I1.half()
-
         if self.padding != (0, 0, 0, 0):
-            self.pad_frame()
+            frame = self.pad_frame(frame)
+    
+        return frame
