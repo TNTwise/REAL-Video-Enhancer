@@ -17,37 +17,47 @@ class UpscaleNCNN:
         self.net.load_model(model.replace('.param','.bin'))
         
 
-        
-
-    def ProcessNCNN(self,npArrayImage)-> np.asarray:
-        ex = self.net.create_extractor()
-        mat_in = ncnn.Mat.from_pixels(
-            npArrayImage,
+    def NCNNImageMatFromNP(self,npArray: np.array) -> ncnn.Mat:
+        return ncnn.Mat.from_pixels(
+            npArray,
             ncnn.Mat.PixelType.PIXEL_BGR,
             self.width,
             self.height,
         )
 
-        # norm
-        mean_vals = []
-        norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
-        mat_in.substract_mean_normalize(mean_vals, norm_vals)
+    def NormalizeImage(self,mat, norm_vals):
+            mean_vals = []
+            mat.substract_mean_normalize(mean_vals, norm_vals)
 
-        
-        # Make sure the input and output names match the param file
-        ex.input("data", mat_in)
-        ret, mat_out = ex.extract("output")
-        mean_vals = []
-        norm_vals = [255.0, 255.0, 255.0]
-        mat_out.substract_mean_normalize(mean_vals, norm_vals)
-        out = np.ascontiguousarray(mat_out)
-        min_val = np.min(out)
-        max_val = np.max(out)
+    def ClampNPArray(self,nparray: np.array) -> np.array:
+        min_val = np.min(nparray)
+        max_val = np.max(nparray)
         if min_val < 0 or max_val > 255:
-            out = ((out - min_val) / (max_val - min_val)) * 255
-        output = out.transpose(1, 2, 0) 
-        output = np.ascontiguousarray(output,dtype=np.uint8)
-        return output
+            nparray = ((nparray - min_val) / (max_val - min_val)) * 255
+        return nparray
+
+    def ProcessNCNN(self,frame: np.array)-> np.asarray:
+        ex = self.net.create_extractor()
+        frame = self.NCNNImageMatFromNP(frame)
+        # norm
+        self.NormalizeImage(
+                            mat=frame,
+                            norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0]
+                            )
+        # render frame
+        ex.input("data", frame)
+        ret, frame = ex.extract("output")
+
+        # norm
+        self.NormalizeImage(
+                            mat=frame,
+                            norm_vals=[255.0, 255.0, 255.0]
+                            )
+        
+        frame = np.ascontiguousarray(frame)
+        frame = self.ClampNPArray(frame)
+        frame = frame.transpose(1, 2, 0) 
+        return np.ascontiguousarray(frame,dtype=np.uint8)
         
 
 
