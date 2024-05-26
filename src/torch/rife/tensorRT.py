@@ -145,7 +145,6 @@ class RifeTensorRT:
         self.modelDir = modelDir
 
     @torch.inference_mode()
-    @torch.inference_mode()
     def generateEngine(self):
         # temp
         self.guiLog.emit("Building Engine, this may take a while...")
@@ -199,22 +198,30 @@ class RifeTensorRT:
         self.I1 = F.pad(self.I1, [0, self.padding[1], 0, self.padding[3]])
 
     @torch.inference_mode()
-    def run1(self, I0, I1):
-        self.I0 = self.frame_to_tensor(I0, self.device)
-        self.I1 = self.frame_to_tensor(I1, self.device)
+    def run(self, I1):
+        if self.I0 is None:
+            self.I0 = self.bytesToPaddedFrame(I1)
+            print("Uncached frame")
+            return False
+        self.I1 = self.bytesToPaddedFrame(I1)
+        return True
+    
+    def clearCache(self):
+        """
+        Clears cache when scene change is detected.
+        
+        Overwrites frame
+        """
+        
+        self.I0 = None
 
-        if self.half:
-            self.I0 = self.I0.half()
-            self.I1 = self.I1.half()
-
-        if self.padding != (0, 0, 0, 0):
-            self.I0 = F.pad(self.I0, self.padding)
-            self.I1 = F.pad(self.I1, self.padding)
-
+    def cacheFrame(self):
+        self.I0 = self.I1.clone()
+    
     @torch.inference_mode()
     def make_inference(self, n):
         timestep = torch.full(
-            (1, 1, self.I0.shape[2], self.I1.shape[3]), n, device=self.device
+            (1, 1, self.I1.shape[2], self.I1.shape[3]), n, device=self.device
         )
         timestep = timestep.to(memory_format=torch.channels_last)
         if self.half:
@@ -235,13 +242,36 @@ class RifeTensorRT:
         )
 
     @torch.inference_mode()
-    def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
-        frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(
-            self.height, self.width, 3
+    def bytesToPaddedFrame(self, frame):
+        
+
+        if self.half:
+            frame =  (
+            torch.frombuffer(frame, dtype=torch.uint8)
+            .reshape(self.height, self.width, 3)
+            .to(self.device, memory_format=torch.channels_last)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .half()
+            .mul_(1 / 255)
+            )
+        #f32 
+        else:
+            frame = (
+            torch.frombuffer(frame, dtype=torch.uint8)
+            .reshape(self.height, self.width, 3)
+            .to(self.device, memory_format=torch.channels_last)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .float()
+            .mul_(1 / 255)
         )
-        return (frame).permute(2, 0, 1).unsqueeze(0).to(
-            device, memory_format=torch.channels_last
-        ) / 255.0
+        if self.padding != (0, 0, 0, 0):
+            frame = self.pad_frame(frame)
+    
+        return frame
+    
+    
 
 
 if __name__ == "__main__":

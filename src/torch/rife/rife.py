@@ -163,7 +163,8 @@ class Rife:
 
     def cacheFrame(self):
         self.I0 = self.I1.clone()
-
+        
+    @torch.inference_mode()
     def pad_frame(self,frame):
         return F.pad(frame, [0, self.padding[1], 0, self.padding[3]])
 
@@ -175,7 +176,8 @@ class Rife:
             return False
         self.I1 = self.bytesToPaddedFrame(I1)
         return True
-
+    
+    @torch.inference_mode()
     def bytesToPaddedFrame(self, frame):
         
 
