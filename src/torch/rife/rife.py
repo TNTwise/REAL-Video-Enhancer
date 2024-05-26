@@ -151,8 +151,15 @@ class Rife:
             .cpu()
             .numpy()
         )
-
+        self.cacheFrame()
         return output
+    def clearCache(self):
+        """
+        Clears cache when scene change is detected.
+        
+        Overwrites frame
+        """
+        self.i0 = None
 
     def cacheFrame(self):
         self.I0 = self.I1.clone()
@@ -164,11 +171,9 @@ class Rife:
     @torch.inference_mode()
     def run(self, I1):
         if self.I0 is None:
-            self.I0 = self.processFrame(I1)
-            return False
+            self.I0 = self.bytesToFrame(I1)
 
         self.I1 = self.processFrame(I1)
-        return True
 
     def bytesToFrame(self, frame):
         return (

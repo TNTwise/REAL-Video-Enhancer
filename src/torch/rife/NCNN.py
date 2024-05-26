@@ -18,6 +18,7 @@ class RifeNCNN:
         threads=2,
         ncnn_gpu=0,
     ):
+        self.i0=None
         self.interpolation_factor = interpolation_factor
         self.interpolation_method = interpolate_method
         self.width = width
@@ -26,7 +27,15 @@ class RifeNCNN:
         self.half = half
         self.handleModel()
         self.createInterpolation(ncnn_gpu=ncnn_gpu, threads=threads)
-
+    def cacheFrame(self):
+        self.i0 = self.i1.copy()
+    def clearCache(self):
+        """
+        Clears cache when scene change is detected.
+        
+        Overwrites frame
+        """
+        self.i0 = None
     def handleModel(self):
         self.modelPath = os.path.join(
             thisdir, "models", "rife", self.interpolation_method
@@ -42,11 +51,18 @@ class RifeNCNN:
             np.frombuffer(bytes, dtype=np.uint8).reshape(self.height, self.width, 3)
         )
 
-    def run1(self, i0, i1):
-        self.i0 = self.bytesToNpArray(i0)
+    def run(self, i1):
+        if self.i0 is None:
+            print('Uncached Frame!')
+            self.i0 = self.bytesToNpArray(i1)
+            return False
+            
         self.i1 = self.bytesToNpArray(i1)
+        return True
 
     def make_inference(self, n):
-        return np.ascontiguousarray(
+        output =  np.ascontiguousarray(
             self.render.process_cv2(self.i0, self.i1, timestep=n)
         )
+        self.cacheFrame()
+        return output

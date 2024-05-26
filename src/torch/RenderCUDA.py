@@ -312,18 +312,19 @@ class Interpolation(Render):
         self.main.start_time = time.time()
         print("starting render")
 
-    def proc_image(self, frame0, frame1):
-        self.interpolate_process.run1(frame0, frame1)
+    def proc_image(self, frame1):
+        if self.interpolate_process.run(frame1):
 
-        self.frame += 1
-        self.writeBuffer.put(frame0)
-
-        for i in range(self.interpolation_factor - 1):
-            result = self.interpolate_process.make_inference(
-                (i + 1) * 1.0 / (self.interpolation_factor)
-            )
             self.frame += 1
-            self.writeBuffer.put(result)
+            
+
+            for i in range(self.interpolation_factor - 1):
+                result = self.interpolate_process.make_inference(
+                    (i + 1) * 1.0 / (self.interpolation_factor)
+                )
+                self.frame += 1
+                self.writeBuffer.put(result)
+            self.writeBuffer.put(frame1)
 
     def procInterpThread(self):
         self.frame = 0
@@ -340,23 +341,20 @@ class Interpolation(Render):
 
             if frame is None:
                 log("done with proc")
-                self.writeBuffer.put(self.prevFrame)
                 self.writeBuffer.put(None)
                 break  # done with proc
 
-            if self.prevFrame is None:
-                self.prevFrame = frame
-                continue
+            
 
             if self.frame == self.transition_frame - self.interpolation_factor:
                 for i in range(self.interpolation_factor):
                     self.writeBuffer.put(frame)
                 self.frame += self.interpolation_factor
                 self.transition_frame = self.main.transitionFrames.pop(0)
+                self.interpolate_process.clearCache()
             else:
-                self.proc_image(self.prevFrame, frame)
+                self.proc_image(frame)
 
-            self.prevFrame = frame
 
 
 class Upscaling(Render):
