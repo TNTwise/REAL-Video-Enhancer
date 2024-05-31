@@ -32,7 +32,11 @@ def modelOptions(self):
     self.ui.FPSPreview.setText("FPS:")
 
     self.ui.Rife_Times.addItem("2X")
+    self.ui.Rife_Times.addItem("3X")
     self.ui.Rife_Times.addItem("4X")
+    self.ui.Rife_Times.addItem("5X")
+    self.ui.Rife_Times.addItem("6X")
+    self.ui.Rife_Times.addItem("7X")
     self.ui.Rife_Times.addItem("8X")
     try:
         self.ui.Rife_Model.currentIndexChanged.disconnect()
