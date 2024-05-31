@@ -62,7 +62,7 @@ def bindButtons(self):
     )
     self.ui.halfPrecisionCheckBox.stateChanged.connect(lambda: halfPrecision(self))
     # disable button if half is not supported
-    if not checks.halfPrecision(self):
+    if checks.halfPrecision(self) == False:
         self.ui.halfPrecisionCheckBox.setDisabled(True)
     self.ui.RenderDirButton.clicked.connect(lambda: selRenderDir(self))
 
@@ -398,7 +398,7 @@ def set_model_params(self):
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
             self.model_labels["RealESRGAN TensorRT (Nvidia only)"] = "upscaling"
 
-        if "gfmss-cuda" == i:
+        if "gmfss-cuda" == i:
             self.ui.GMFSSCUDACheckBox.setChecked(True)
             self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
 

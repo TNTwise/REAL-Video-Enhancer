@@ -36,7 +36,8 @@ def modelOptions(self):
     self.ui.ensembleHelpButton.hide()
     self.ui.ImageExtractionCheckBox.hide()
     self.ui.Rife_Times.addItem("2X")
-
+    self.ui.Rife_Times.addItem("3X")
+    self.ui.Rife_Times.addItem("4X")
     model_list = ["gmfss-fortuna"]
 
     self.ui.Rife_Model.addItems(model_list)

@@ -19,8 +19,10 @@ try:
     import modules.GMFSSCUDA as GMFSSCUDA
 
     gmfss = True
+    log("CUPY Cuda Path: " + str(cupy.cuda.get_cuda_path()))
 except Exception as e:
     gmfss = False
+    log(str(e))
 try:
     import torch
     import torchvision
@@ -296,8 +298,8 @@ def check_for_individual_models():
                 if isTensorRT():
                     return_list.append("custom-tensorrt-models")
             if isCUPY():
-                if os.path.exists(f"{thisdir}/models/gfmss-cuda/"):
-                    return_list.append("gfmss-cuda")
+                if os.path.exists(f"{thisdir}/models/gmfss-cuda/"):
+                    return_list.append("gmfss-cuda")
 
         if len(return_list) > 0:
             return return_list
