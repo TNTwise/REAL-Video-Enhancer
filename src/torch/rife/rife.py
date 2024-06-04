@@ -164,10 +164,10 @@ class Rife:
     @torch.inference_mode()
     def run(self, I1):
         if self.I0 is None:
-            self.I0 = self.processFrame(I1)
+            self.I0 = self.bytesToFrame(I1)
             return False
 
-        self.I1 = self.processFrame(I1)
+        self.I1 = self.bytesToFrame(I1)
         return True
 
     def bytesToFrame(self, frame):

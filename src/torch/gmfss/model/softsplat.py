@@ -4,8 +4,6 @@ import collections
 import os
 import re
 import typing
-import sys
-import site 
 
 import cupy
 import torch
@@ -252,17 +250,12 @@ def cuda_kernel(strFunction: str, strKernel: str, objVariables: typing.Dict):
 
 
 # end
-def is_frozen():
-    return getattr(sys, 'frozen', False) 
+
 
 @cupy.memoize(for_each_device=True)
 def cuda_launch(strKey: str):
-    
-    if is_frozen():
-        cuda_path = os.path.join(os.getcwd(), "_internal", "nvidia", "cuda_runtime")
-    else:
-        site_packages = site.getsitepackages()[0]
-        cuda_path = os.path.join(site_packages, "nvidia", "cuda_runtime")
+    if "CUDA_HOME" not in os.environ:
+        os.environ["CUDA_HOME"] = cupy.cuda.get_cuda_path()
     # end
 
     return cupy.RawKernel(
@@ -270,8 +263,8 @@ def cuda_launch(strKey: str):
         objCudacache[strKey]["strFunction"],
         tuple(
             [
-                "-I " + cuda_path,
-                "-I " + cuda_path + "/include",
+                "-I " + os.environ["CUDA_HOME"],
+                "-I " + os.environ["CUDA_HOME"] + "/include",
             ]
         ),
     )
