@@ -4,7 +4,6 @@ https://download.pytorch.org/whl/cu121/torch-2.2.0%2Bcu121-cp310-cp310-linux_x86
 https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/fastebs/rife_ncnn_vulkan_python-1.2.1-cp310-cp310-linux_x86_64.whl
 spandrel
 torchvision==0.17
-cupy-cuda12x==12.3.0
 fastrlock
 https://github.com/pytorch/TensorRT/releases/download/v2.2.0/torch_tensorrt-2.2.0-cp310-cp310-manylinux_2_34_x86_64.whl
 tensorrt==8.6.0
