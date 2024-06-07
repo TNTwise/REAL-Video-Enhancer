@@ -259,10 +259,9 @@ def extractFramesAndAudio(
             )
 
         # i need to clean this up lol
-        try:
-            shutil.rmtree(os.path.join(settings.RenderDir, f"{videoName}_temp"))
-        except:
-            pass
+        
+        if os.path.exists(os.path.join(settings.RenderDir)): shutil.rmtree(os.path.join(settings.RenderDir, f"{videoName}_temp"))
+        
         # Gets the width and height
         global height
         global width
