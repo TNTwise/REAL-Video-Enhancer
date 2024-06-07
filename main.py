@@ -124,6 +124,7 @@ from src.programData.return_latest_update import *
 
 
 class FileDropWidget(QLabel):
+    
     def __init__(self, parent=None):
         super(FileDropWidget, self).__init__(parent)
         self.main = parent
@@ -182,7 +183,6 @@ class FileDropWidget(QLabel):
                 self.main.showDialogBox(str(e))
             traceback_info = traceback.format_exc()
             log(f"{e} {traceback_info}")
-
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
