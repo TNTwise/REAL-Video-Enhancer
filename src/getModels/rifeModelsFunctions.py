@@ -32,6 +32,7 @@ def rife_checkboxes(self):
         (self.ui.rife414lite, "rife-v4.14-lite"),
         (self.ui.rife415, "rife-v4.15"),
         (self.ui.rife416lite, "rife-v4.16-lite"),
+        (self.ui.rife417, "rife-v4.17"),
     ]
     # new models
     return rife_list
@@ -67,6 +68,7 @@ def rife_pin_functions(self):
     self.ui.rife415.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife416lite.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife414lite.stateChanged.connect(self.checkbox_state_changed)
+    self.ui.rife417.stateChanged.connect(self.checkbox_state_changed)
     self.ui.rife414lite.setEnabled(True)
 
 
