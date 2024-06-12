@@ -101,6 +101,15 @@ class Rife:
                     "rife4.16-lite.pkl",
                 )
             )
+
+        if self.interpolate_method == "rife4.17":
+            from .rife417.RIFE_HDv3 import Model
+
+            modelDir = os.path.dirname(
+                os.path.join(
+                    f"{thisdir}", "models", "rife-cuda", "rife417", "rife4.17.pkl"
+                )
+            )
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")
 

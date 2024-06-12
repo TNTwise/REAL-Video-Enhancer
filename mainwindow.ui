@@ -891,9 +891,9 @@
                         <property name="geometry">
                          <rect>
                           <x>0</x>
-                          <y>0</y>
-                          <width>126</width>
-                          <height>192</height>
+                          <y>-99</y>
+                          <width>475</width>
+                          <height>222</height>
                          </rect>
                         </property>
                         <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -936,6 +936,13 @@
                           <widget class="QCheckBox" name="rife416liteCUDA">
                            <property name="text">
                             <string>Rife4.16-lite</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QCheckBox" name="rife417CUDA">
+                           <property name="text">
+                            <string>Rife4.17</string>
                            </property>
                           </widget>
                          </item>

@@ -83,6 +83,17 @@ def cudaRifeModels(self, install_modules_dict: dict = {}):
                 "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.15.pkl"
             ] = "rife4.15.pkl"
         items.append("rife4.15.pkl")
+    if self.ui.rife417CUDA.isChecked():
+        if (
+            os.path.exists(
+                os.path.join(f"{thisdir}", f"models", f"rife-cuda", f"rife417")
+            )
+            == False
+        ):
+            modelDict[
+                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/rife4.17.pkl"
+            ] = "rife4.17.pkl"
+        items.append("rife4.17.pkl")
     if self.ui.rife416liteCUDA.isChecked():
         if (
             os.path.exists(
