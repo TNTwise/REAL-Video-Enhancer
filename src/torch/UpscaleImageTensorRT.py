@@ -6,7 +6,6 @@ except:
     pass
 import numpy as np
 import onnx
-import onnxruntime
 from src.programData.thisdir import thisdir as th
 
 thisdir = th()
