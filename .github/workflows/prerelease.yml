@@ -82,16 +82,14 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Get latest version
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.10' 
+      
       - name: Install python dependencies
         run: |
           sudo apt install libgcc-9-dev -y
           cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
           python3 -m pip install -r requirements-CUDA-Linux.txt
-          python3 -m pip install importlib
+          python3 -m pip install setuptools importlib
           
       
       - name: Compile to executable
