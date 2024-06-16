@@ -9,6 +9,6 @@ psutil
 pillow
 scenedetect
 pyinstaller
-numpy
+numpy==1.26.4
 sympy
 ncnn
