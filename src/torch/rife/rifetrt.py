@@ -1,4 +1,3 @@
-import onnxruntime
 
 # Load the ONNX model
 model_path = "path/to/your/model.onnx"
