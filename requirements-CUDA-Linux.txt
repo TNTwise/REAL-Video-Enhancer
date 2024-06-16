@@ -5,7 +5,7 @@ https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/disabl
 spandrel
 torchvision==0.17
 fastrlock
-https://github.com/pytorch/TensorRT/releases/download/v2.2.0/torch_tensorrt-2.2.0-cp38-cp38-manylinux_2_34_x86_64.whl
+torch-tensorrt==2.2.0
 tensorrt==8.6.1
 https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
 onnx
