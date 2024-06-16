@@ -30,7 +30,7 @@ jobs:
       
       - name: Checkout code
         
-        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git && python3 -m pip install https://github.com/pytorch/TensorRT/releases/download/v2.2.0/torch_tensorrt-2.2.0-cp38-cp38-manylinux_2_34_x86_64.whl
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git 
       
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@main
