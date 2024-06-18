@@ -1,6 +1,6 @@
-https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp38-none-manylinux1_x86_64.whl
-https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp38-none-manylinux1_x86_64.whl
-https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/disablesimplevk/rife_ncnn_vulkan_python-1.2.1-cp38-cp38-linux_x86_64.whl
+https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl
+https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl
+https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/disablesimplevk/rife_ncnn_vulkan_python-1.2.1-cp310-cp310-linux_x86_64.whl
 torch==2.3.1
 spandrel
 torchvision==0.17
@@ -8,6 +8,7 @@ fastrlock
 torch-tensorrt==2.3.0
 onnx
 https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
-tensorrt
-tensorrt_cu12
-tensorrt-cu12_libs
+tensorrt==10.0.1
+tensorrt_cu12==10.0.1
+tensorrt-cu12_libs==10.0.1
+tensorrt-cu12-bindings==10.0.1
