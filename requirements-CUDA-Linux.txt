@@ -10,5 +10,4 @@ onnx
 https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
 tensorrt==10.0.1
 tensorrt_cu12==10.0.1
-tensorrt-cu12-bindings
 tensorrt-cu12_libs==10.0.1
