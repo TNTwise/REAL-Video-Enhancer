@@ -1,6 +1,7 @@
 from upscale_ncnn_py import UPSCALE
 from realcugan_ncnn_py import Realcugan
 import numpy as np
+import ncnn
 import cv2
 class UpscaleNCNN:
     def __init__(self, model: str, num_threads, scale, gpuid=0, width=1920, height=1080):
