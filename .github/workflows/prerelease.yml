@@ -392,7 +392,7 @@ jobs:
           files: |
               artifacts/REAL-Video-Enhancer-Appimage/REAL-Video-Enhancer-x86_64.AppImage
               artifacts/REAL-Video-Enhancer-MacOS-x86_64.tar.xz/REAL-Video-Enhancer-MacOS-x86_64.tar.xz
-              artifacts/REAL-Video-Enhancer-CUDA.tar.xz/REAL-Video-Enhancer-CUDA.7z
+              artifacts/REAL-Video-Enhancer-CUDA.7z/REAL-Video-Enhancer-CUDA.7z
               
               
         
