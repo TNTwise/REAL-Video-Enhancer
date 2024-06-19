@@ -85,10 +85,10 @@ class UpscaleTensorRT:
         if not os.path.exists(self.locationOfOnnxModel):
             self.pytorchExportToONNX()
         self.handleModel()
-        
+
     def handlePrecision(self):
         pass
-    
+
     def pytorchExportToONNX(self):  # Loads model via spandrel, and exports to onnx
         model = ModelLoader().load_from_file(self.modelPath)
         model = model.model

@@ -10,7 +10,6 @@ except Exception as e:
     from rife.interpolate import interpolate
 
 
-
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
@@ -111,9 +110,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(
-            tmp, scale_factor=scale, mode="bilinear", align_corners=False
-        )
+        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask

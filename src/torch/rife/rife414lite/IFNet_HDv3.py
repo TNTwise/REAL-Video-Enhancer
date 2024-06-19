@@ -1,9 +1,14 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from src.torch.rife.warplayer import warp
+try:
+    from src.torch.rife.warplayer import warp
+    from src.torch.rife.interpolate import interpolate
+except Exception as e:
+    print(e)
+    from rife.warplayer import warp
+    from rife.interpolate import interpolate
 
-torch.fx.wrap("warp")
+
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -92,12 +97,12 @@ class IFBlock(nn.Module):
         )
 
     def forward(self, x, flow=None, scale=1):
-        x = F.interpolate(
+        x = interpolate(
             x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
         )
         if flow is not None:
             flow = (
-                F.interpolate(
+                interpolate(
                     flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
                 )
                 * 1.0
@@ -107,7 +112,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = F.interpolate(
+        tmp = interpolate(
             tmp, scale_factor=scale, mode="bilinear", align_corners=False
         )
         flow = tmp[:, :4] * scale

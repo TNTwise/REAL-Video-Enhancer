@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 try:
     from src.torch.rife.warplayer import warp
-except:
+    from src.torch.rife.interpolate import interpolate
+except Exception as e:
+    print(e)
     from rife.warplayer import warp
-
-torch.fx.wrap("warp")
+    from rife.interpolate import interpolate
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -96,24 +96,21 @@ class IFBlock(nn.Module):
         )
 
     def forward(self, x, flow=None, scale=1):
-        x = F.interpolate(
+        x = interpolate(
             x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
         )
         if flow is not None:
             flow = (
-                F.interpolate(
+                interpolate(
                     flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
                 )
-                * 1.0
                 / scale
             )
             x = torch.cat((x, flow), 1)
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = F.interpolate(
-            tmp, scale_factor=scale, mode="bilinear", align_corners=False
-        )
+        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask
@@ -127,11 +124,11 @@ class IFNet(nn.Module):
         self.block2 = IFBlock(8 + 4 + 16, c=96)
         self.block3 = IFBlock(8 + 4 + 16, c=64)
         self.encode = Head()
+
+        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.ensemble = ensemble
         # self.contextnet = Contextnet()
         # self.unet = Unet()
-        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
-
-        self.ensemble = ensemble
 
     def forward(
         self,
@@ -143,14 +140,11 @@ class IFNet(nn.Module):
 
         f0 = self.encode(img0[:, :3])
         f1 = self.encode(img1[:, :3])
-        flow_list = []
-        merged = []
-        mask_list = []
+
         warped_img0 = img0
         warped_img1 = img1
         flow = None
         mask = None
-        loss_cons = 0
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
@@ -206,8 +200,6 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            mask_list.append(mask)
-            flow_list.append(flow)
             warped_img0 = warp(img0, flow[:, :2])
             warped_img1 = warp(img1, flow[:, 2:4])
 

@@ -57,6 +57,7 @@ def handleCUDAModels(model: str = ""):
     except:
         pass
 
+
 def deleteDownloaded():
     for i in os.listdir(f"{thisdir}/files/"):
         if os.path.isfile(i):

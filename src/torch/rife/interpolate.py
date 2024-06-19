@@ -10,7 +10,9 @@ from torch.fx.node import Argument, Target
 from torch.library import custom_op, register_fake
 from torch_tensorrt.dynamo._SourceIR import SourceIR
 from torch_tensorrt.dynamo.conversion._ConversionContext import ConversionContext
-from torch_tensorrt.dynamo.conversion._ConverterRegistry import dynamo_tensorrt_converter
+from torch_tensorrt.dynamo.conversion._ConverterRegistry import (
+    dynamo_tensorrt_converter,
+)
 from torch_tensorrt.dynamo.conversion.converter_utils import enforce_tensor_types
 from torch_tensorrt.fx.converters.converter_utils import set_layer_name
 from torch_tensorrt.fx.types import TRTTensor
@@ -18,42 +20,54 @@ from torch_tensorrt.fx.types import TRTTensor
 
 @custom_op("vsrife::upsample_nearest1d", mutates_args=())
 def upsample_nearest1d(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest1d(input, output_size, scale_factors)
 
 
 @register_fake("vsrife::upsample_nearest1d")
 def upsample_nearest1d_fake(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest1d(input, output_size, scale_factors)
 
 
 @custom_op("vsrife::upsample_nearest2d", mutates_args=())
 def upsample_nearest2d(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest2d(input, output_size, scale_factors)
 
 
 @register_fake("vsrife::upsample_nearest2d")
 def upsample_nearest2d_fake(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest2d(input, output_size, scale_factors)
 
 
 @custom_op("vsrife::upsample_nearest3d", mutates_args=())
 def upsample_nearest3d(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest3d(input, output_size, scale_factors)
 
 
 @register_fake("vsrife::upsample_nearest3d")
 def upsample_nearest3d_fake(
-    input: torch.Tensor, output_size: Optional[Sequence[int]], scale_factors: Optional[Sequence[float]]
+    input: torch.Tensor,
+    output_size: Optional[Sequence[int]],
+    scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
     return torch._C._nn.upsample_nearest3d(input, output_size, scale_factors)
 
@@ -65,7 +79,9 @@ def upsample_linear1d(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_linear1d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_linear1d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @register_fake("vsrife::upsample_linear1d")
@@ -75,7 +91,9 @@ def upsample_linear1d_fake(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_linear1d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_linear1d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @custom_op("vsrife::upsample_bilinear2d", mutates_args=())
@@ -85,7 +103,9 @@ def upsample_bilinear2d(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_bilinear2d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_bilinear2d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @register_fake("vsrife::upsample_bilinear2d")
@@ -95,7 +115,9 @@ def upsample_bilinear2d_fake(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_bilinear2d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_bilinear2d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @custom_op("vsrife::upsample_trilinear3d", mutates_args=())
@@ -105,7 +127,9 @@ def upsample_trilinear3d(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_trilinear3d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_trilinear3d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @register_fake("vsrife::upsample_trilinear3d")
@@ -115,7 +139,9 @@ def upsample_trilinear3d_fake(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_trilinear3d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_trilinear3d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @custom_op("vsrife::upsample_bicubic2d", mutates_args=())
@@ -125,7 +151,9 @@ def upsample_bicubic2d(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_bicubic2d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_bicubic2d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 @register_fake("vsrife::upsample_bicubic2d")
@@ -135,7 +163,9 @@ def upsample_bicubic2d_fake(
     align_corners: bool,
     scale_factors: Optional[Sequence[float]],
 ) -> torch.Tensor:
-    return torch._C._nn.upsample_bicubic2d(input, output_size, align_corners, scale_factors)
+    return torch._C._nn.upsample_bicubic2d(
+        input, output_size, align_corners, scale_factors
+    )
 
 
 def upsample(
@@ -178,7 +208,9 @@ def upsample(
     return layer.get_output(0)
 
 
-def args_bounds_check(args: Tuple[Argument, ...], i: int, replacement: Optional[Any] = None) -> Any:
+def args_bounds_check(
+    args: Tuple[Argument, ...], i: int, replacement: Optional[Any] = None
+) -> Any:
     return args[i] if len(args) > i else replacement
 
 
@@ -326,8 +358,14 @@ def interpolate(
     else:
         raise ValueError("either size or scale_factor should be defined")
 
-    if recompute_scale_factor is not None and recompute_scale_factor and size is not None:
-        raise ValueError("recompute_scale_factor is not meaningful with an explicit size.")
+    if (
+        recompute_scale_factor is not None
+        and recompute_scale_factor
+        and size is not None
+    ):
+        raise ValueError(
+            "recompute_scale_factor is not meaningful with an explicit size."
+        )
 
     # "area" mode always requires an explicit size rather than scale factor.
     # Re-use the recompute_scale_factor code path.
@@ -341,13 +379,25 @@ def interpolate(
         if not torch.jit.is_scripting() and torch._C._get_tracing_state():
             # make scale_factor a tensor in tracing so constant doesn't get baked in
             output_size = [
-                (torch.floor((input.size(i + 2).float() * torch.tensor(scale_factors[i], dtype=torch.float32)).float()))
+                (
+                    torch.floor(
+                        (
+                            input.size(i + 2).float()
+                            * torch.tensor(scale_factors[i], dtype=torch.float32)
+                        ).float()
+                    )
+                )
                 for i in range(dim)
             ]
         elif torch.jit.is_scripting():
-            output_size = [int(math.floor(float(input.size(i + 2)) * scale_factors[i])) for i in range(dim)]
+            output_size = [
+                int(math.floor(float(input.size(i + 2)) * scale_factors[i]))
+                for i in range(dim)
+            ]
         else:
-            output_size = [torch.sym_int(input.size(i + 2) * scale_factors[i]) for i in range(dim)]
+            output_size = [
+                torch.sym_int(input.size(i + 2) * scale_factors[i]) for i in range(dim)
+            ]
         scale_factors = None
 
     if antialias and not (mode in ("bilinear", "bicubic") and input.ndim == 4):
@@ -381,11 +431,15 @@ def interpolate(
 
     if input.dim() == 3 and mode == "linear":
         assert align_corners is not None
-        return torch.ops.vsrife.upsample_linear1d(input, output_size, align_corners, scale_factors)
+        return torch.ops.vsrife.upsample_linear1d(
+            input, output_size, align_corners, scale_factors
+        )
     if input.dim() == 4 and mode == "bilinear":
         assert align_corners is not None
         if antialias:
-            return torch._C._nn._upsample_bilinear2d_aa(input, output_size, align_corners, scale_factors)
+            return torch._C._nn._upsample_bilinear2d_aa(
+                input, output_size, align_corners, scale_factors
+            )
         # Two levels are necessary to prevent TorchScript from touching
         # are_deterministic_algorithms_enabled.
         if not torch.jit.is_scripting():
@@ -393,18 +447,26 @@ def interpolate(
                 # Use slow decomp whose backward will be in terms of index_put
                 # importlib is required because the import cannot be top level
                 # (cycle) and cannot be nested (TS doesn't support)
-                return importlib.import_module("torch._decomp.decompositions")._upsample_linear_vec(
-                    input, output_size, align_corners, scale_factors
-                )
-        return torch.ops.vsrife.upsample_bilinear2d(input, output_size, align_corners, scale_factors)
+                return importlib.import_module(
+                    "torch._decomp.decompositions"
+                )._upsample_linear_vec(input, output_size, align_corners, scale_factors)
+        return torch.ops.vsrife.upsample_bilinear2d(
+            input, output_size, align_corners, scale_factors
+        )
     if input.dim() == 5 and mode == "trilinear":
         assert align_corners is not None
-        return torch.ops.vsrife.upsample_trilinear3d(input, output_size, align_corners, scale_factors)
+        return torch.ops.vsrife.upsample_trilinear3d(
+            input, output_size, align_corners, scale_factors
+        )
     if input.dim() == 4 and mode == "bicubic":
         assert align_corners is not None
         if antialias:
-            return torch._C._nn._upsample_bicubic2d_aa(input, output_size, align_corners, scale_factors)
-        return torch.ops.vsrife.upsample_bicubic2d(input, output_size, align_corners, scale_factors)
+            return torch._C._nn._upsample_bicubic2d_aa(
+                input, output_size, align_corners, scale_factors
+            )
+        return torch.ops.vsrife.upsample_bicubic2d(
+            input, output_size, align_corners, scale_factors
+        )
 
     if input.dim() == 3 and mode == "bilinear":
         raise NotImplementedError("Got 3D input, but bilinear mode needs 4D input")

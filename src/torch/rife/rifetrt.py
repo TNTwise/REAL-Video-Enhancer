@@ -1,4 +1,3 @@
-
 # Load the ONNX model
 model_path = "path/to/your/model.onnx"
 session = onnxruntime.InferenceSession(model_path)

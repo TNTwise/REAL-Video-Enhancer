@@ -202,8 +202,9 @@ def cudaAndNCNN(self, videopath, renderdir, videoName, thread):
         self.cuda = True
         try:
             os.makedirs(
-                os.path.join(renderdir, f"{videoName}_temp", "output_frames", "0"),exist_ok=True
-                )
+                os.path.join(renderdir, f"{videoName}_temp", "output_frames", "0"),
+                exist_ok=True,
+            )
         except:
             pass
     self.file_drop_widget.hide()
@@ -259,9 +260,10 @@ def extractFramesAndAudio(
             )
 
         # i need to clean this up lol
-        
-        if os.path.exists(os.path.join(settings.RenderDir, f"{videoName}_temp")): shutil.rmtree(os.path.join(settings.RenderDir, f"{videoName}_temp"))
-        
+
+        if os.path.exists(os.path.join(settings.RenderDir, f"{videoName}_temp")):
+            shutil.rmtree(os.path.join(settings.RenderDir, f"{videoName}_temp"))
+
         # Gets the width and height
         global height
         global width

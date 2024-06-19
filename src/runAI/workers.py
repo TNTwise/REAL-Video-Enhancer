@@ -972,7 +972,7 @@ class upscale(QObject):
                     ncnn_gpu=self.main.ui.gpuIDSpinBox.value(),
                     cugan_noise=str(self.main.ui.denoiseLevelSpinBox.value()),
                     benchmark=self.main.benchmark,
-                    model_path=''
+                    model_path="",
                 )
 
             if self.main.AI == "custom-models-ncnn-python":

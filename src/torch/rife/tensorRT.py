@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import os
 import math
+
 try:
     import tensorrt
 
@@ -21,6 +22,8 @@ except:
     thisdir = os.getcwd()
 
 from threading import Lock
+
+
 class RifeTensorRT:
     @torch.inference_mode()
     def __init__(
@@ -34,7 +37,7 @@ class RifeTensorRT:
         trt_max_workspace_size: int = 1,
         num_streams: int = 1,
         guiLog=None,
-        device_index: int = 0
+        device_index: int = 0,
     ):
         self.width = width
         self.height = height
@@ -72,9 +75,21 @@ class RifeTensorRT:
                 + f"_workspace-{trt_max_workspace_size}"
                 + f"_scale-{scale}"
                 + f"_ensemble-{ensemble}"
-                + (f"_workspace-{self.trt_workspace_size}" if self.trt_workspace_size > 0 else "")
-                + (f"_aux-{self.trt_max_aux_streams}" if self.trt_max_aux_streams is not None else "")
-                + (f"_level-{self.trt_optimization_level}" if self.trt_optimization_level is not None else "")
+                + (
+                    f"_workspace-{self.trt_workspace_size}"
+                    if self.trt_workspace_size > 0
+                    else ""
+                )
+                + (
+                    f"_aux-{self.trt_max_aux_streams}"
+                    if self.trt_max_aux_streams is not None
+                    else ""
+                )
+                + (
+                    f"_level-{self.trt_optimization_level}"
+                    if self.trt_optimization_level is not None
+                    else ""
+                )
                 + ".ep"
             ),
         )
@@ -165,7 +180,7 @@ class RifeTensorRT:
 
         if self.half:
             torch.set_default_dtype(torch.half)
-            
+
         self.handle_model(self.model)
 
         state_dict = torch.load(
@@ -179,30 +194,30 @@ class RifeTensorRT:
         flownet.load_state_dict(state_dict, strict=False)
         flownet.eval().to(self.device, memory_format=torch.channels_last)
         inputs = [
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
-                torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
-            ]
+            torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
+            torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
+            torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
+        ]
 
         flownet = torch_tensorrt.compile(
-                flownet,
-                ir="dynamo",
-                inputs=inputs,
-                enabled_precisions={self.dtype},
-                debug=False,
-                workspace_size=self.trt_workspace_size,
-                min_block_size=1,
-                max_aux_streams=None,
-                optimization_level=self.trt_optimization_level,
-                device=self.device,
-            )
+            flownet,
+            ir="dynamo",
+            inputs=inputs,
+            enabled_precisions={self.dtype},
+            debug=False,
+            workspace_size=self.trt_workspace_size,
+            min_block_size=1,
+            max_aux_streams=None,
+            optimization_level=self.trt_optimization_level,
+            device=self.device,
+        )
 
         torch_tensorrt.save(flownet, self.trt_engine_path, inputs=inputs)
 
-        #flownet = [torch.export.load(self.trt_engine_path).module() for _ in range(self.num_streams)]
-        
-        #self.index = -1
-        #self.index_lock = Lock()
+        # flownet = [torch.export.load(self.trt_engine_path).module() for _ in range(self.num_streams)]
+
+        # self.index = -1
+        # self.index_lock = Lock()
 
     def pad_frame(self):
         self.I0 = F.pad(self.I0, [0, self.padding[1], 0, self.padding[3]])
@@ -226,7 +241,6 @@ class RifeTensorRT:
         timestep = torch.full(
             (1, 1, self.ph, self.pw), n, dtype=self.dtype, device=self.device
         )
-        
 
         output = self.inference(self.I0, self.I1, timestep)
         output = output[:, :, : self.height, : self.width]
@@ -244,7 +258,6 @@ class RifeTensorRT:
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, device: torch.device) -> torch.Tensor:
-    
         frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(
             self.height, self.width, 3
         )
@@ -252,12 +265,14 @@ class RifeTensorRT:
             device, memory_format=torch.channels_last
         ) / 255.0
         return (
-        torch.stack(torch.frombuffer(frame, dtype=torch.uint8).reshape(
-            self.height, self.width, 3
-        ))
-        .unsqueeze(0)
-        .clamp(0.0, 1.0)
-    )
+            torch.stack(
+                torch.frombuffer(frame, dtype=torch.uint8).reshape(
+                    self.height, self.width, 3
+                )
+            )
+            .unsqueeze(0)
+            .clamp(0.0, 1.0)
+        )
 
 
 if __name__ == "__main__":

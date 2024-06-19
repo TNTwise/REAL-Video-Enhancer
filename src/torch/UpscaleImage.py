@@ -40,7 +40,7 @@ class UpscaleCUDA:
         self.model = (
             self.model.eval().cuda() if self.isCudaAvailable else self.model.eval()
         )
-        
+
         if self.isCudaAvailable:
             # self.stream = [torch.cuda.Stream() for _ in range(self.nt)]
             # self.currentStream = 0
@@ -48,7 +48,6 @@ class UpscaleCUDA:
             torch.backends.cudnn.benchmark = True
             if self.half:
                 try:
-                    
                     torch.set_default_dtype(torch.float16)
                     self.model.half()
                     self.bf16 = False
@@ -60,7 +59,8 @@ class UpscaleCUDA:
                 self.fp32 = True
                 torch.set_default_dtype(torch.float32)
                 self.bf16 = False
-                self.half=False
+                self.half = False
+
     @torch.inference_mode()
     def UpscaleImage(self, frame):
         frame = bytesToTensor(

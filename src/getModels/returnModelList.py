@@ -293,8 +293,6 @@ def returnModelList(
     ):
         pass
     else:
-        
-        
         if return_data.returnOperatingSystem() == "Linux":
             install_modules_dict.update(
                 {
