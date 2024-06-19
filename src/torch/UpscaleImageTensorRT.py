@@ -77,9 +77,13 @@ class UpscaleTensorRT:
         self.bf16 = False
         self.onnxOpsetVersion = 18
         self.onnxModelsPath = os.path.join(f"{thisdir}", "models", "onnx-models")
+        self.onnxName = f"{modelName}-half={self.half}-scale{self.upscaleFactor}-opset{self.onnxOpsetVersion}.onnx"
         self.locationOfOnnxModel = os.path.join(
             f"{self.onnxModelsPath}",
-            f"{modelName}-half={self.half}-scale{self.upscaleFactor}-opset{self.onnxOpsetVersion}.onnx",
+            f"{self.onnxName}",
+        )
+        self.localtionOfEngine = os.path.join(
+            f"{thisdir}", "models", "tensorrt-engines"
         )
         self.guiLog = guiLog
         if not os.path.exists(self.locationOfOnnxModel):
@@ -134,14 +138,17 @@ class UpscaleTensorRT:
                 torch.set_default_dtype(torch.float16)
 
         # TO:DO account for FP16/FP32
-        self.enginePath = (f'{self.locationOfOnnxModel.replace(".onnx", "")}'
-                           + f'{self.width}x{self.height}'
+        self.enginePath = (
+                           os.path.join(f'{self.localtionOfEngine}',
+                                        
+                           f'{self.onnxName.replace(".onnx", "")}'
+                           + f'_{self.width}x{self.height}'
                            + f'_scaleFactor={self.upscaleFactor}'
                            + f'_tensorrtVer={self.trt_version}'
                            + f'device={self.device_name}'
                            + f'_half={self.half}'
                            + f'_bf16={self.bf16}.engine'
-                           )
+                           ))
         if not os.path.exists(self.enginePath):
             toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
             self.guiLog.emit("Building Engine, this may take a while...")
