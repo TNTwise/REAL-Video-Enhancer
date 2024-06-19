@@ -102,7 +102,7 @@ jobs:
           python3 -m PyQt5.uic.pyuic src/getModels/Download.ui > src/getModels/Download.py
           python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
           python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
-          python3 -m PyInstaller main.py --collect-all nvidia --collect-all polygraphy --collect-all torch --collect-all tensorrt --hidden-import upscale_ncnn_py.upscale_ncnn_py_wrapper --hidden-import realcugan_ncnn_py.realcugan_ncnn_py_wrapper --hidden-import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper --collect-all tensorrt-cu12-bindings --collect-all tensorrt_libs
+          python3 -m PyInstaller main.py --collect-all nvidia --collect-all polygraphy --collect-all torch --collect-all tensorrt --hidden-import upscale_ncnn_py.upscale_ncnn_py_wrapper --hidden-import realcugan_ncnn_py.realcugan_ncnn_py_wrapper --hidden-import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper --collect-all tensorrt-cu12-bindings --collect-all tensorrt_libs --collect-all pytorch-triton --collect-all triton
       - name: Clone appimage repo
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
 
