@@ -178,8 +178,7 @@ class RifeTensorRT:
         # temp
         self.guiLog.emit("Building Engine, this may take a while...")
 
-        if self.half:
-            torch.set_default_dtype(torch.half)
+        
 
         self.handle_model(self.model)
 
@@ -192,7 +191,9 @@ class RifeTensorRT:
 
         flownet = self.i
         flownet.load_state_dict(state_dict, strict=False)
-        flownet.eval().to(self.device, memory_format=torch.channels_last)
+        flownet.eval().to(self.device)
+        if self.half:
+            flownet.half()
         inputs = [
             torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
             torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
@@ -262,17 +263,9 @@ class RifeTensorRT:
             self.height, self.width, 3
         )
         return (frame).permute(2, 0, 1).unsqueeze(0).to(
-            device, memory_format=torch.channels_last
+            device, 
         ) / 255.0
-        return (
-            torch.stack(
-                torch.frombuffer(frame, dtype=torch.uint8).reshape(
-                    self.height, self.width, 3
-                )
-            )
-            .unsqueeze(0)
-            .clamp(0.0, 1.0)
-        )
+        
 
 
 if __name__ == "__main__":
