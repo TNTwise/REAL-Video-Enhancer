@@ -62,6 +62,7 @@ class RifeTensorRT:
         self.trt_optimization_level = 5
         self.trt_workspace_size = 0
         self.trt_max_aux_streams = None
+        self.torch_trt_version = torch_tensorrt.__version__
         self.trt_engine_path = os.path.join(
             thisdir,
             "models",
@@ -70,6 +71,7 @@ class RifeTensorRT:
                 f"{model}"
                 + f"_{self.device_name}"
                 + f"_trt-{self.trt_version}"
+                + f"_torch_trt-{self.torch_trt_version}"
                 + f"_{self.dimensions}"
                 + f"_{self.half}"
                 + f"_workspace-{trt_max_workspace_size}"
