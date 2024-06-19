@@ -34,10 +34,11 @@ except:
 
 try:
     import tensorrt
-    from torch_tensorrt.fx import LowerSetting
+    import torch_tensorrt
 
     tensorRT = True
-except:
+except Exception as e:
+    log(str(e))
     tensorRT = False
 try:
     if cuda:
