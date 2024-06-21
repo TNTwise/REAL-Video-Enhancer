@@ -12,4 +12,3 @@ https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraph
 tensorrt==10.0.1
 tensorrt_cu12==10.0.1
 tensorrt-cu12_libs==10.0.1
-tensorrt-cu12-bindings==10.0.1
