@@ -309,11 +309,11 @@ def _is_integer(x) -> bool:
 
 def interpolate(
     input: torch.Tensor,
-    size: Sequence[int] | None = None,
-    scale_factor: float | None = None,
+    size: Sequence[int] = None,
+    scale_factor: float = None,
     mode: str = "nearest",
-    align_corners: bool | None = None,
-    recompute_scale_factor: bool | None = None,
+    align_corners: bool = None,
+    recompute_scale_factor: bool = None,
     antialias: bool = False,
 ) -> torch.Tensor:
     if mode in ("nearest", "area", "nearest-exact"):

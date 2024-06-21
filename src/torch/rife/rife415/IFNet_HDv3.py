@@ -1,13 +1,9 @@
 import torch
 import torch.nn as nn
 
-try:
-    from src.torch.rife.warplayer import warp
-    from src.torch.rife.interpolate import interpolate
-except Exception as e:
-    print(e)
-    from rife.warplayer import warp
-    from rife.interpolate import interpolate
+from src.torch.rife.warplayer import warp
+from src.torch.rife.interpolate import interpolate
+
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
