@@ -31,7 +31,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10
+          python-version: 3.10.14
 
       - name: Checkout code
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
