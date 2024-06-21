@@ -1,3 +1,4 @@
+https://pypi.nvidia.com/tensorrt-cu12-bindings/tensorrt_cu12_bindings-10.0.1-cp38-none-manylinux_2_17_x86_64.whl
 https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp38-cp38-linux_x86_64.whl
 https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp38-none-manylinux1_x86_64.whl
 https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp38-none-manylinux1_x86_64.whl
