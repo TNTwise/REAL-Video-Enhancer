@@ -334,22 +334,22 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.ui.AICombo.currentText() == "Custom NCNN models":
             CustomModelsNCNN.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "GMFSS Cuda (Nvidia only)":
+        if self.ui.AICombo.currentText() == "GMFSS CUDA (Nvidia only)":
             GMFSSCUDA.modelOptions(self)
 
-        if self.ui.AICombo.currentText() == "Rife Cuda (Nvidia only)":
+        if self.ui.AICombo.currentText() == "Rife CUDA/ROCm (Nvidia/AMD only)":
             rifeCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Rife TensorRT (Nvidia only)":
             rifeCUDA.modelOptions(self, trt=True)
 
-        if self.ui.AICombo.currentText() == "RealESRGAN Cuda (Nvidia only)":
+        if self.ui.AICombo.currentText() == "RealESRGAN CUDA/ROCm (Nvidia/AMD only)":
             RealESRGANCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "RealESRGAN TensorRT (Nvidia only)":
             RealESRGANCUDA.modelOptions(self, trt=True)
 
-        if self.ui.AICombo.currentText() == "Custom CUDA models":
+        if self.ui.AICombo.currentText() == "Custom CUDA/ROCm models (Nvidia/AMD only)":
             CustomModelsCUDA.modelOptions(self)
 
         if self.ui.AICombo.currentText() == "Custom TensorRT models":
@@ -773,7 +773,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.ui.Rife_Times.addItem("4X")
             self.ui.Rife_Times.setEnabled(True)
         if (
-            self.ui.AICombo.currentText() == "Custom CUDA models"
+            self.ui.AICombo.currentText() == "Custom CUDA/ROCm models (Nvidia/AMD only)"
             or self.ui.AICombo.currentText() == "Custom TensorRT models"
             or self.ui.AICombo.currentText() == "RealESRGAN TensorRT"
             and len(self.ui.Rife_Model.currentText()) > 0
@@ -881,7 +881,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 os.path.join(f"{settings.ModelDir}", "custom_models_ncnn", "models"),
             )
         if type_of_file == "CUDA Model":
-            if self.ui.AICombo.currentText() == "Custom CUDA models":
+            if self.ui.AICombo.currentText() == "Custom CUDA/ROCm models (Nvidia/AMD only)":
                 CustomModelsCUDA.modelOptions(self)
             shutil.copy(
                 input_file, os.path.join(f"{thisdir}", "models", "custom-models-cuda")

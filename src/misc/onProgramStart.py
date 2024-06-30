@@ -381,7 +381,7 @@ def set_model_params(self):
 
         if "rife-cuda" == i:
             self.ui.RifeCUDACheckBox.setChecked(True)
-            self.model_labels["Rife Cuda (Nvidia only)"] = "interpolation"
+            self.model_labels["Rife CUDA/ROCm (Nvidia/AMD only)"] = "interpolation"
 
         if "rife-cuda-trt" == i:
             os.makedirs(
@@ -394,7 +394,7 @@ def set_model_params(self):
 
         if "realesrgan-cuda" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
-            self.model_labels["RealESRGAN Cuda (Nvidia only)"] = "upscaling"
+            self.model_labels["RealESRGAN CUDA/ROCm (Nvidia/AMD only)"] = "upscaling"
 
         if "realesrgan-tensorrt" == i:
             self.ui.RealESRGANCUDACheckBox.setChecked(True)
@@ -402,10 +402,10 @@ def set_model_params(self):
 
         if "gmfss-cuda" == i:
             self.ui.GMFSSCUDACheckBox.setChecked(True)
-            self.model_labels["GMFSS Cuda (Nvidia only)"] = "interpolation"
+            self.model_labels["GMFSS CUDA (Nvidia only)"] = "interpolation"
 
         if "custom-cuda-models" == i:
-            self.model_labels["Custom CUDA models"] = "upscaling"
+            self.model_labels["Custom CUDA/ROCm models (Nvidia/AMD only)"] = "upscaling"
 
         if "custom-tensorrt-models" == i:
             self.model_labels["Custom TensorRT models"] = "upscaling"

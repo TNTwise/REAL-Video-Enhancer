@@ -1,8 +1,14 @@
 import torch
 import torch.nn as nn
 
-from src.torch.rife.warplayer import warp
-from src.torch.rife.interpolate import interpolate
+import torch.nn.functional as F
+try:
+    from src.torch.rife.warplayer import warp
+    from src.torch.rife.interpolate import interpolate
+except Exception as e:
+    print(e)
+    from src.torch.rife.warplayer import warp
+    interpolate = F.interpolate
 
 
 
