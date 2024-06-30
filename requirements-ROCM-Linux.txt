@@ -1,11 +1,9 @@
-https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.0.0%2B01cbe5045a-cp310-cp310-linux_x86_64.whl
+https://download.pytorch.org/whl/pytorch_triton_rocm-2.3.1-cp310-cp310-linux_x86_64.whl
 https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl
 https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl
 https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/disablesimplevk/rife_ncnn_vulkan_python-1.2.1-cp310-cp310-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/rocm6.1/torch-2.5.0.dev20240629%2Brocm6.1-cp310-cp310-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/rocm6.1/torchvision-0.20.0.dev20240629%2Brocm6.1-cp310-cp310-linux_x86_64.whl
-https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
-cupy-rocm-5-0
+https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp310-cp310-linux_x86_64.whl
+https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp310-cp310-linux_x86_64.whl
 spandrel
 fastrlock
 onnx
