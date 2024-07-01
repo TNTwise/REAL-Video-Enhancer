@@ -55,7 +55,7 @@ jobs:
         run: |
              cd dist/
              7z a -t7z -m0=lzma2 -mx=9 -ms=1536m -md=273m REAL-Video-Enhancer-x86_64.AppImage.7z *
-             cd ../../../../
+             cd ../
              mv dist/REAL-Video-Enhancer-x86_64.AppImage.7z REAL-Video-Enhancer-ROCm.7z
       - name: Save CUDA Archive as artifact
         uses: actions/upload-artifact@v3
