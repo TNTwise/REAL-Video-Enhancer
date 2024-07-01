@@ -309,6 +309,16 @@ def halfPrecision(self):
         "HalfPrecision", f"{self.ui.halfPrecisionCheckBox.isChecked()}"
     )
 
+def halfPrecisionROCm(self):
+    settings = Settings()
+    settings.change_setting(
+        "HalfPrecision", f"{self.ui.rocmHalfPrecisionCheckBox.isChecked()}"
+    )
+def setHIPGFXVersionSetting(self):
+    settings = Settings()
+    settings.change_setting("HSA_OVERRIDE_GFX_VERSION",self.ui.HSAGFXComboBox.currentText())
+    restart_app(self)
+
 def setHIPGFXVersion():
     settings = Settings()
     os.environ["HSA_OVERRIDE_GFX_VERSION"] = settings.HSA_OVERRIDE_GFX_VERSION

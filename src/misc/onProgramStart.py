@@ -44,6 +44,7 @@ def bindButtons(self):
     )
 
     self.ui.Rife_Times.currentIndexChanged.connect(self.showChangeInFPS)
+    self.ui.HSAGFXComboBox.currentIndexChanged.connect(lambda: setHIPGFXVersionSetting(self))
     self.ui.gpuThreadingSpinBox.valueChanged.connect(self.changeVRAM)
     self.ui.gpuIDSpinBox.valueChanged.connect(lambda: change_GPU_ID(self))
     self.ui.UHDResCutoffSpinBox.valueChanged.connect(lambda: change_UHD_res(self))
@@ -61,6 +62,7 @@ def bindButtons(self):
         lambda: selSceneDetectionMode(self)
     )
     self.ui.halfPrecisionCheckBox.stateChanged.connect(lambda: halfPrecision(self))
+    self.ui.rocmHalfPrecisionCheckBox.stateChanged.connect(lambda: halfPrecisionROCm(self))
     # disable button if half is not supported
     if checks.halfPrecision(self) == False:
         self.ui.halfPrecisionCheckBox.setDisabled(False)
@@ -100,6 +102,8 @@ def bindButtons(self):
     self.ui.imageHelpButton.clicked.connect(lambda: image_help(self))
     self.ui.halfPrecisionHelpButton.clicked.connect(lambda: halfPrecision_help(self))
     self.ui.GMFSSHelpButton.clicked.connect(lambda: gmfss_help(self))
+    self.ui.HSAGFXVersionHelpButton.clicked.connect(lambda: HSAGFXVersionHelp(self))
+    self.ui.rocmHalfPrecisionHelpButton.clicked.connect(lambda: halfPrecision_help(self))
     self.ui.imageComboBox.currentIndexChanged.connect(
         lambda: settings.change_setting(
             "Image_Type", f"{self.ui.imageComboBox.currentText()}"
@@ -152,6 +156,8 @@ def bindButtons(self):
         self.ui.gpuIDHelpButton,
         self.ui.halfPrecisionHelpButton,
         self.ui.GMFSSHelpButton,
+        self.ui.HSAGFXVersionHelpButton,
+        self.ui.rocmHalfPrecisionHelpButton
     ]
     icon = QIcon(f"{thisdir}/icons/Rife-ESRGAN-Video-Settings - Help.png")
     for button in helpButtons:
@@ -175,8 +181,10 @@ def settingsStart(self):
         self.ui.sceneChangeMethodComboBox.setCurrentIndex(1)
     if settings.HalfPrecision == "False":
         self.ui.halfPrecisionCheckBox.setChecked(False)
+        self.ui.rocmHalfPrecisionCheckBox.setChecked(False)
     else:
         self.ui.halfPrecisionCheckBox.setChecked(True)
+        self.ui.rocmHalfPrecisionCheckBox.setChecked(True)
     self.ui.sceneChangeLineEdit.setText(settings.SceneChangeDetection[2])
     if self.encoder == "264":
         self.ui.EncoderCombo.setCurrentIndex(0)
@@ -242,6 +250,8 @@ def settingsStart(self):
     self.gpuMemory = settings.VRAM
 
     self.ui.gpuThreadingSpinBox.setValue(int(self.gpuMemory))
+
+    self.ui.HSAGFXComboBox.setCurrentText(settings.HSA_OVERRIDE_GFX_VERSION)
 
 
 def hideChainModeButtons(self):
