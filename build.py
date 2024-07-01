@@ -51,7 +51,7 @@ def buildCUDALinux():
         "polygraphy",
         "--collect-all",
         "torch",
-        " --collect-all",
+        "--collect-all",
         "tensorrt",
         "--collect-all",
         "tensorrt-cu12-bindings",
