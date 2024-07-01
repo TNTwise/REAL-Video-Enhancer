@@ -53,10 +53,10 @@ jobs:
 
       - name: hella compress this shit
         run: |
-             cd REAL-Video-Enhancer/dist/
+             cd dist/
              7z a -t7z -m0=lzma2 -mx=9 -ms=1536m -md=273m REAL-Video-Enhancer-x86_64.AppImage.7z *
              cd ../../../../
-             mv REAL-Video-Enhancer/dist/REAL-Video-Enhancer-x86_64.AppImage.7z REAL-Video-Enhancer-ROCm.7z
+             mv dist/REAL-Video-Enhancer-x86_64.AppImage.7z REAL-Video-Enhancer-ROCm.7z
       - name: Save CUDA Archive as artifact
         uses: actions/upload-artifact@v3
         with:
@@ -132,30 +132,11 @@ jobs:
       - name: Get latest version
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
       
-      - name: Install python dependencies
+      - name: Install python dependencies and build
         run: |
-          sudo apt install libgcc-9-dev -y
           cd REAL-Video-Enhancer
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install -r requirements.txt
-          python3 -m pip install -r requirements-CUDA-Linux.txt
-          python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install importlib
+          python3 build.py --build_cuda
           
-      
-      - name: Compile to executable
-        run: |
-          cd REAL-Video-Enhancer
-          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
-          rm -rf dist
-          rm -rf build
-          mkdir dist
-          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
-          python3 -m PyQt5.uic.pyuic src/getModels/SelectModels.ui > src/getModels/SelectModels.py
-          python3 -m PyQt5.uic.pyuic src/getModels/Download.ui > src/getModels/Download.py
-          python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
-          python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
-          python3 -m PyInstaller main.py --collect-all nvidia --collect-all polygraphy --collect-all torch --collect-all tensorrt --hidden-import upscale_ncnn_py.upscale_ncnn_py_wrapper --hidden-import realcugan_ncnn_py.realcugan_ncnn_py_wrapper --hidden-import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper --collect-all tensorrt-cu12-bindings --collect-all tensorrt_libs --collect-all pytorch-triton --collect-all triton
       - name: Clone appimage repo
         run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-AppImage.git
 
