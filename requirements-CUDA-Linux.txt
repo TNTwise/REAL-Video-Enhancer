@@ -6,7 +6,6 @@ https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-c
 https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp310-cp310-linux_x86_64.whl
 https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp310-cp310-linux_x86_64.whl
 https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
-cupy-cuda12x
 spandrel
 fastrlock
 onnx
