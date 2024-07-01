@@ -1,10 +1,10 @@
 import os
 import subprocess
-import PyQt5.uic as uic
 import argparse
 
 def pipInstall(file):
-    command = ["python3", "-m", "pip", "install", "-r"].append(file)
+    command = ["python3", "-m", "pip", "install", "-r"]
+    command.append(file)
     subprocess.run(command)
 
 def installImportLib():
@@ -115,6 +115,7 @@ def buildNCNNMacOS():
 
 if __name__ == "__main__":
     pipInstall("requirements.txt")
+    import PyQt5.uic as uic
     buildenv()
     parser = argparse.ArgumentParser(
             description="Build RVE"
@@ -142,11 +143,11 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    if args.build_mac_ncnn():
+    if args.build_mac_ncnn:
         buildNCNNMacOS()
-    if args.build_rocm():
+    if args.build_rocm:
         buildROCmLinux()
-    if args.build_cuda():
+    if args.build_cuda:
         buildCUDALinux()
-    if args.build_ncnn():
+    if args.build_ncnn:
         buildNCNNLinux()
