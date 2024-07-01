@@ -90,6 +90,7 @@ class Settings:
             "UHDResCutOff": "1080",
             "gpuID": "0",
             "HalfPrecision": str(half),
+            "HSA_OVERRIDE_GFX_VERSION" : "11.0.0"
         }
         if returnOperatingSystem() == "Linux":
             default_settings["OutputDir"] = f"{homedir}/Videos/"
@@ -308,6 +309,9 @@ def halfPrecision(self):
         "HalfPrecision", f"{self.ui.halfPrecisionCheckBox.isChecked()}"
     )
 
+def setHIPGFXVersion():
+    settings = Settings()
+    os.environ["HSA_OVERRIDE_GFX_VERSION"] = settings.HSA_OVERRIDE_GFX_VERSION
 
 def uninstallAPP(self):
     if uninstallMessage(self):

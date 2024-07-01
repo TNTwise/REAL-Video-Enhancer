@@ -3,6 +3,7 @@
 from src.misc.log import log
 import os
 from src.misc.createDirectories import createDirectories, createFiles
+from src.programData.settings import *
 
 createDirectories()
 createFiles()
@@ -33,7 +34,7 @@ from PyQt5.QtCore import (
 from rife_ncnn_vulkan_python import Rife
 import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper
 from src.programData.version import returnVersion
-
+setHIPGFXVersion()
 
 try:
     import torch
@@ -90,7 +91,6 @@ import mainwindow
 import os
 from src.programData.write_permisions import *
 from threading import *
-from src.programData.settings import *
 from src.programData.return_data import *
 
 ManageFiles.create_folder(f"{thisdir}/files/")
