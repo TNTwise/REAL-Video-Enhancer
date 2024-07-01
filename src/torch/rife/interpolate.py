@@ -18,6 +18,7 @@ from torch_tensorrt.dynamo.conversion.converter_utils import enforce_tensor_type
 from torch_tensorrt.fx.converters.converter_utils import set_layer_name
 from torch_tensorrt.fx.types import TRTTensor
 
+
 @custom_op("vsrife::upsample_nearest1d", mutates_args=())
 def upsample_nearest1d(
     input: torch.Tensor,

@@ -34,6 +34,7 @@ from PyQt5.QtCore import (
 from rife_ncnn_vulkan_python import Rife
 import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper
 from src.programData.version import returnVersion
+
 setHIPGFXVersion()
 
 try:
@@ -881,7 +882,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 os.path.join(f"{settings.ModelDir}", "custom_models_ncnn", "models"),
             )
         if type_of_file == "CUDA Model":
-            if self.ui.AICombo.currentText() == "Custom CUDA/ROCm models (Nvidia/AMD only)":
+            if (
+                self.ui.AICombo.currentText()
+                == "Custom CUDA/ROCm models (Nvidia/AMD only)"
+            ):
                 CustomModelsCUDA.modelOptions(self)
             shutil.copy(
                 input_file, os.path.join(f"{thisdir}", "models", "custom-models-cuda")

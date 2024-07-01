@@ -16,6 +16,52 @@ on:
   
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  build-ROCm:
+   
+    # The type of runner that the job will run on
+    #runs-on: self-hosted-22.04 
+    runs-on: ubuntu-20.04 
+    permissions: write-all  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.10.14
+
+      - name: Checkout code
+        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@main
+        with:
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+          
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Install python dependencies and build
+        run: python3 build.py --build_rocm
+
+      - name: hella compress this shit
+        run: |
+             cd REAL-Video-Enhancer/dist/
+             7z a -t7z -m0=lzma2 -mx=9 -ms=1536m -md=273m REAL-Video-Enhancer-x86_64.AppImage.7z *
+             cd ../../../../
+             mv REAL-Video-Enhancer/dist/REAL-Video-Enhancer-x86_64.AppImage.7z REAL-Video-Enhancer-ROCm.7z
+      - name: Save CUDA Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-ROCm.7z
+          path: REAL-Video-Enhancer-ROCm.7z
   build-Cuda:
    
     # The type of runner that the job will run on
@@ -366,7 +412,7 @@ jobs:
       #- name: Log
       #  run: ls
   Release:
-    needs: [build-NCNN, build-Cuda, build-MacOS]
+    needs: [build-NCNN, build-Cuda, build-MacOS, build-ROCm]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -400,6 +446,7 @@ jobs:
               artifacts/REAL-Video-Enhancer-Appimage/REAL-Video-Enhancer-x86_64.AppImage
               artifacts/REAL-Video-Enhancer-MacOS-x86_64.tar.xz/REAL-Video-Enhancer-MacOS-x86_64.tar.xz
               artifacts/REAL-Video-Enhancer-CUDA.7z/REAL-Video-Enhancer-CUDA.7z
+              artifacts/REAL-Video-Enhancer-ROCm.7z/REAL-Video-Enhancer-ROCm.7z
               
               
         

@@ -180,8 +180,6 @@ class RifeTensorRT:
         # temp
         self.guiLog.emit("Building Engine, this may take a while...")
 
-        
-
         self.handle_model(self.model)
 
         state_dict = torch.load(
@@ -265,9 +263,8 @@ class RifeTensorRT:
             self.height, self.width, 3
         )
         return (frame).permute(2, 0, 1).unsqueeze(0).to(
-            device, 
+            device,
         ) / 255.0
-        
 
 
 if __name__ == "__main__":

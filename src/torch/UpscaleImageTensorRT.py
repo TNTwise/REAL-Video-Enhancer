@@ -138,17 +138,16 @@ class UpscaleTensorRT:
                 torch.set_default_dtype(torch.float16)
 
         # TO:DO account for FP16/FP32
-        self.enginePath = (
-                           os.path.join(f'{self.localtionOfEngine}',
-                                        
-                           f'{self.onnxName.replace(".onnx", "")}'
-                           + f'_{self.width}x{self.height}'
-                           + f'_scaleFactor={self.upscaleFactor}'
-                           + f'_tensorrtVer={self.trt_version}'
-                           + f'device={self.device_name}'
-                           + f'_half={self.half}'
-                           + f'_bf16={self.bf16}.engine'
-                           ))
+        self.enginePath = os.path.join(
+            f"{self.localtionOfEngine}",
+            f'{self.onnxName.replace(".onnx", "")}'
+            + f"_{self.width}x{self.height}"
+            + f"_scaleFactor={self.upscaleFactor}"
+            + f"_tensorrtVer={self.trt_version}"
+            + f"device={self.device_name}"
+            + f"_half={self.half}"
+            + f"_bf16={self.bf16}.engine",
+        )
         if not os.path.exists(self.enginePath):
             toPrint = f"Model engine not found, creating engine for model: {self.locationOfOnnxModel}, this may take a while..."
             self.guiLog.emit("Building Engine, this may take a while...")

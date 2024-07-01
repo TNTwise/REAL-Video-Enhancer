@@ -1,12 +1,14 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
 try:
     from src.torch.rife.warplayer import warp
     from src.torch.rife.interpolate import interpolate
 except Exception as e:
     print(e)
     from src.torch.rife.warplayer import warp
+
     interpolate = F.interpolate
 
 
@@ -89,9 +91,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(
-            tmp, scale_factor=scale, mode="bilinear", align_corners=False
-        )
+        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask

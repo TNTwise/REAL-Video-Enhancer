@@ -1,7 +1,8 @@
 from upscale_ncnn_py import UPSCALE
 from realcugan_ncnn_py import Realcugan
 import numpy as np
-#import ncnn
+
+# import ncnn
 import cv2
 
 
@@ -22,7 +23,7 @@ class UpscaleNCNN:
         self.net.load_model(model.replace('.param','.bin'))
         """
 
-    '''def NCNNImageMatFromNP(self, npArray: np.array) -> ncnn.Mat:
+    """def NCNNImageMatFromNP(self, npArray: np.array) -> ncnn.Mat:
         return ncnn.Mat.from_pixels(
             npArray,
             ncnn.Mat.PixelType.PIXEL_BGR,
@@ -56,7 +57,7 @@ class UpscaleNCNN:
         frame = np.ascontiguousarray(frame)
         frame = self.ClampNPArray(frame)
         frame = frame.transpose(1, 2, 0)
-        return np.ascontiguousarray(frame, dtype=np.uint8)'''
+        return np.ascontiguousarray(frame, dtype=np.uint8)"""
 
     def UpscaleImage(self, image):
         return np.ascontiguousarray(

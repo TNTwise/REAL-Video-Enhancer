@@ -218,6 +218,7 @@ def gmfss_help(self):
         f"GMFSS requires CUDA to be installed natively, please install CUDA via your package manager."
     )
 
+
 def HSAGFXVersionHelp(self):
     self.showDialogBox(
         f"This is an override to the HSA GFX version, which tricks ROCm into allowing many AMD cards to work.\nIf the program crashes while using ROCm, try changing this.\nIf it still crashes, your gpu is most likely not working entirely."
