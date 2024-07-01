@@ -43,8 +43,10 @@ Benchmarks done with 1920x1080 video, default settings using JPG image extractio
 | rife-v4.10 - v4.15 | 22.801 fps | 12.981 fps
 | rife-v4.16-lite | 31.205 fps | 19.381 fps
 
-## Confused on anything?
-- Visit the <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki">WIKI</a>
+# Building:
+```
+python3 build.py
+```
 ## Download the Latest PRE-Release release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease">https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease</a>
 
