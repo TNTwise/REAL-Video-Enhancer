@@ -861,7 +861,7 @@
                  </widget>
                  <widget class="QWidget" name="CUDATab">
                   <attribute name="title">
-                   <string>CUDA (Nvidia Only) (Linux)</string>
+                   <string>CUDA/ROCm (Nvidia/AMD Only) (Linux)</string>
                   </attribute>
                   <layout class="QVBoxLayout" name="verticalLayout">
                    <item>
