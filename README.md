@@ -4,8 +4,6 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
-### Want a windows version?
- - Use TAS! https://github.com/NevermindNilas/TheAnimeScripter 
 
 ### Now out on flathub!
 <a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer</a>
