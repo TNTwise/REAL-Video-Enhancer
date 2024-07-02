@@ -73,7 +73,7 @@ def buildCUDALinux():
 
 def buildROCmLinux():
     """
-    Builds REAL Video Enhancer with rocm, needs python 3.10
+    Builds REAL Video Enhancer with rocm, needs python 3.11
     """
 
     pipInstall("requirements-ROCM-Linux.txt")
