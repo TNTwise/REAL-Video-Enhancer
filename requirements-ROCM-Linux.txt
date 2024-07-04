@@ -1,9 +1,12 @@
-https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.0.0%2B01cbe5045a-cp311-cp311-linux_x86_64.whl
+pytorch_triton
+-i https://download.pytorch.org/whl/rocm5.7
+torch
+-i https://download.pytorch.org/whl/rocm5.7
+torchvision
+-i https://download.pytorch.org/whl/rocm5.7
 https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp311-none-manylinux1_x86_64.whl
 https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-05-11-rve/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl
 https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/disablesimplevk/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/rocm6.1/torch-2.5.0.dev20240629%2Brocm6.1-cp311-cp311-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/rocm6.1/torchvision-0.20.0.dev20240629%2Brocm6.1-cp311-cp311-linux_x86_64.whl
 spandrel
 fastrlock
 onnx
