@@ -1704,6 +1704,11 @@
                 <widget class="QComboBox" name="HSAGFXComboBox">
                  <item>
                   <property name="text">
+                   <string>None</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
                    <string>11.0.0</string>
                   </property>
                  </item>
@@ -1712,6 +1717,16 @@
                    <string>10.3.0</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>9.0.6</string>
+                  </property>
+                 </item> 
+                 <item>
+                  <property name="text">
+                   <string>9.0.0</string>
+                  </property>
+                 </item>                 
                 </widget>
                </item>
                <item row="14" column="6">
