@@ -137,7 +137,9 @@ class IFNet(nn.Module):
         self,
         img0,
         img1,
-        timestep=0.5,
+        timestep,
+        tenFlow_div, 
+        backwarp_tenGrid
     ):
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
         f0 = self.encode(img0[:, :3])
@@ -163,8 +165,8 @@ class IFNet(nn.Module):
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
-                wf0 = warp(f0, flow[:, :2])
-                wf1 = warp(f1, flow[:, 2:4])
+                wf0 = warp(f0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+                wf1 = warp(f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
                 fd, m0 = block[i](
                     torch.cat(
                         (
@@ -201,8 +203,8 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            warped_img0 = warp(img0, flow[:, :2])
-            warped_img1 = warp(img1, flow[:, 2:4])
+            warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
         mask = torch.sigmoid(mask)
 
         return warped_img0 * mask + warped_img1 * (1 - mask)
