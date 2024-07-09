@@ -12,6 +12,19 @@ except Exception as e:
 
     interpolate = F.interpolate
 
+class MyPixelShuffle(nn.Module):
+    def __init__(self, upscale_factor):
+        super(MyPixelShuffle, self).__init__()
+        self.upscale_factor = upscale_factor
+
+    def forward(self, x):
+        b, c, hh, hw = x.size()
+        out_channel = c // (self.upscale_factor**2)
+        h = hh * self.upscale_factor
+        w = hw * self.upscale_factor
+        x_view = x.view(b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw)
+        return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
+
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -95,7 +108,7 @@ class IFBlock(nn.Module):
             ResConv(c),
         )
         self.lastconv = nn.Sequential(
-            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), nn.PixelShuffle(2)
+            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), MyPixelShuffle(2)
         )
 
     def forward(self, x, flow=None, scale=1):
@@ -137,7 +150,9 @@ class IFNet(nn.Module):
         self,
         img0,
         img1,
-        timestep=0.5,
+        timestep,
+        tenFlow_div, 
+        backwarp_tenGrid
     ):
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
 
@@ -165,8 +180,8 @@ class IFNet(nn.Module):
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
-                wf0 = warp(f0, flow[:, :2])
-                wf1 = warp(f1, flow[:, 2:4])
+                wf0 = warp(f0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+                wf1 = warp(f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
                 fd, m0 = block[i](
                     torch.cat(
                         (
@@ -203,8 +218,8 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            warped_img0 = warp(img0, flow[:, :2])
-            warped_img1 = warp(img1, flow[:, 2:4])
+            warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
 
         mask = torch.sigmoid(mask)
 

@@ -112,23 +112,28 @@ class Rife:
             )
         # Apparently this can improve performance slightly
         torch.set_float32_matmul_precision("medium")
-
-        if self.UHD:
-            self.scale = 0.5
-
-        ph = ((self.height - 1) // 64 + 1) * 64
-        pw = ((self.width - 1) // 64 + 1) * 64
-        self.padding = (0, pw - self.width, 0, ph - self.height)
-
+        torch.set_grad_enabled(False)
         self.cuda_available = torch.cuda.is_available()
         self.device = torch.device("cuda" if self.cuda_available else "cpu")
-
-        torch.set_grad_enabled(False)
         if self.cuda_available:
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
+            self.dtype=torch.float32
             if self.half and not self.UHD:
                 torch.set_default_dtype(torch.float16)
+                self.dtype=torch.float16
+        if self.UHD:
+            self.scale = 0.5
+        
+
+        ph = ((self.height - 1) // 64 + 1) * 64
+        pw = ((self.width - 1) // 64 + 1) * 64
+        self.tenFlow_div = torch.tensor([(pw - 1.0) / 2.0, (ph - 1.0) / 2.0], dtype=self.dtype, device=self.device)
+
+        tenHorizontal = torch.linspace(-1.0, 1.0, pw, dtype=self.dtype, device=self.device).view(1, 1, 1, pw).expand(-1, -1, ph, -1)
+        tenVertical = torch.linspace(-1.0, 1.0, ph, dtype=self.dtype, device=self.device).view(1, 1, ph, 1).expand(-1, -1, -1, pw)
+        self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
+        self.padding = (0, pw - self.width, 0, ph - self.height)
 
         self.model = Model(scale=self.scale, ensemble=self.ensemble)
         self.model.load_model(modelDir, -1)
@@ -148,7 +153,7 @@ class Rife:
         timestep = timestep.to(memory_format=torch.channels_last)
         if self.half:
             timestep = timestep.half()
-        output = self.model.inference(self.I0, self.I1, timestep=timestep)
+        output = self.model.flownet(self.I0, self.I1, timestep=timestep,tenFlow_div=self.tenFlow_div, backwarp_tenGrid = self.backwarp_tenGrid)
         output = output[:, :, : self.height, : self.width]
         output = (
             (output[0])

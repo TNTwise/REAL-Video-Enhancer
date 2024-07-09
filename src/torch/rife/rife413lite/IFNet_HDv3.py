@@ -98,7 +98,7 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self):
+    def __init__(self, scale, ensemble):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 8, c=128)
         self.block1 = IFBlock(8 + 4 + 8, c=96)
@@ -113,6 +113,8 @@ class IFNet(nn.Module):
             nn.LeakyReLU(0.2, True),
             nn.ConvTranspose2d(32, 4, 4, 2, 1),
         )
+        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.ensemble = ensemble
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
@@ -120,11 +122,9 @@ class IFNet(nn.Module):
         self,
         img0,
         img1,
-        timestep=0.5,
-        scale_list=[8, 4, 2, 1],
-        training=False,
-        fastmode=True,
-        ensemble=False,
+        timestep,
+        tenFlow_div, 
+        backwarp_tenGrid
     ):
         if not torch.is_tensor(timestep):
             timestep = (img0[:, :1].clone() * 0 + 1) * timestep
@@ -142,19 +142,19 @@ class IFNet(nn.Module):
                 flow, mask = block[i](
                     torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
                     None,
-                    scale=scale_list[i],
+                    scale=self.scale_list[i],
                 )
-                if ensemble:
+                if self.ensemble:
                     f_, m_ = block[i](
                         torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
                         None,
-                        scale=scale_list[i],
+                        scale=self.scale_list[i],
                     )
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
-                wf0 = warp(f0, flow[:, :2])
-                wf1 = warp(f1, flow[:, 2:4])
+                wf0 = warp(f0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+                wf1 = warp(f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
                 fd, m0 = block[i](
                     torch.cat(
                         (
@@ -168,9 +168,9 @@ class IFNet(nn.Module):
                         1,
                     ),
                     flow,
-                    scale=scale_list[i],
+                    scale=self.scale_list[i],
                 )
-                if ensemble:
+                if self.ensemble:
                     f_, m_ = block[i](
                         torch.cat(
                             (
@@ -184,15 +184,15 @@ class IFNet(nn.Module):
                             1,
                         ),
                         torch.cat((flow[:, 2:4], flow[:, :2]), 1),
-                        scale=scale_list[i],
+                        scale=self.scale_list[i],
                     )
                     fd = (fd + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (m0 + (-m_)) / 2
                 else:
                     mask = m0
                 flow = flow + fd
-            warped_img0 = warp(img0, flow[:, :2])
-            warped_img1 = warp(img1, flow[:, 2:4])
+            warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
         mask = torch.sigmoid(mask)
 
         return warped_img0 * mask + warped_img1 * (1 - mask)
