@@ -56,4 +56,3 @@ class Model:
                     ),
                     False,
                 )
-
