@@ -38,16 +38,20 @@ class RifeTensorRT:
         num_streams: int = 1,
         guiLog=None,
         device_index: int = 0,
+        trt_min_shape: list[int] = [128, 128],
+        trt_opt_shape: list[int] = [1920, 1080],
+        trt_max_shape: list[int] = [1920, 1080],
     ):
         self.width = width
         self.height = height
         self.scale = scale
 
         # padding
-        tmp = max(32, int(32 / scale))
-        self.pw = math.ceil(self.width / tmp) * tmp
-        self.ph = math.ceil(self.height / tmp) * tmp
+        self.tmp = max(32, int(32 / scale))
+        self.pw = math.ceil(self.width / self.tmp) * self.tmp
+        self.ph = math.ceil(self.height / self.tmp) * self.tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+        
 
         self.num_streams = num_streams
         self.ensemble = ensemble
@@ -55,7 +59,6 @@ class RifeTensorRT:
         self.device = torch.device("cuda", device_index)
         self.device_name = torch.cuda.get_device_name(self.device)
         self.trt_version = tensorrt.__version__
-        self.dimensions = f"{self.pw}x{self.ph}"
         self.guiLog = guiLog
         self.half = half
         self.dtype = torch.half if self.half else torch.float
@@ -63,6 +66,24 @@ class RifeTensorRT:
         self.trt_workspace_size = 0
         self.trt_max_aux_streams = None
         self.torch_trt_version = torch_tensorrt.__version__
+        self.trt_min_shape = trt_min_shape
+        self.trt_max_shape =  trt_max_shape
+        self.trt_opt_shape = trt_opt_shape
+        self.tenFlow_div = torch.tensor([(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0], dtype=self.dtype, device=self.device)
+
+        tenHorizontal = torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device).view(1, 1, 1, self.pw).expand(-1, -1, self.ph, -1)
+        tenVertical = torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device).view(1, 1, self.ph, 1).expand(-1, -1, -1, self.pw)
+        self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
+        for i in range(2):
+            self.trt_min_shape[i] = math.ceil(max(self.trt_min_shape[i], 1) / self.tmp) * self.tmp
+            self.trt_opt_shape[i] = math.ceil(max(self.trt_opt_shape[i], 1) / self.tmp) * self.tmp
+            self.trt_max_shape[i] = math.ceil(max(self.trt_max_shape[i], 1) / self.tmp) * self.tmp
+
+        dimensions = (
+            f"min-{self.trt_min_shape[0]}x{self.trt_min_shape[1]}"
+            f"_opt-{self.trt_opt_shape[0]}x{self.trt_opt_shape[1]}"
+            f"_max-{self.trt_max_shape[0]}x{self.trt_max_shape[1]}"
+        )
         self.trt_engine_path = os.path.join(
             thisdir,
             "models",
@@ -72,7 +93,7 @@ class RifeTensorRT:
                 + f"_{self.device_name}"
                 + f"_trt-{self.trt_version}"
                 + f"_torch_trt-{self.torch_trt_version}"
-                + f"_{self.dimensions}"
+                + f"_{dimensions}"
                 + f"_{self.half}"
                 + f"_workspace-{trt_max_workspace_size}"
                 + f"_scale-{scale}"
@@ -92,14 +113,14 @@ class RifeTensorRT:
                     if self.trt_optimization_level is not None
                     else ""
                 )
-                + ".ep"
+                + ".ts"
             ),
         )
 
         if not os.path.exists(self.trt_engine_path):
             self.generateEngine()
 
-        self.inference = torch.export.load(self.trt_engine_path).module()
+        self.inference = torch.jit.load(self.trt_engine_path).eval()
 
     def handle_model(self, interpolate_method):
         if interpolate_method == "rife4.14":
@@ -178,6 +199,9 @@ class RifeTensorRT:
     @torch.inference_mode()
     def generateEngine(self):
         # temp
+        self.trt_min_shape.reverse()
+        self.trt_opt_shape.reverse()
+        self.trt_max_shape.reverse()
         self.guiLog.emit("Building Engine, this may take a while...")
 
         self.handle_model(self.model)
@@ -188,22 +212,68 @@ class RifeTensorRT:
         state_dict = {
             k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
         }
-
+        
         flownet = self.i
         flownet.load_state_dict(state_dict, strict=False)
         flownet.eval().to(self.device)
         if self.half:
             flownet.half()
         inputs = [
-            torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
-            torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
-            torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
+            torch_tensorrt.Input(
+                    min_shape=[1, 3] + self.trt_min_shape,
+                    opt_shape=[1, 3] + self.trt_opt_shape,
+                    max_shape=[1, 3] + self.trt_max_shape,
+                    dtype=self.dtype,
+                    name="img0",
+                ),
+                torch_tensorrt.Input(
+                    min_shape=[1, 3] + self.trt_min_shape,
+                    opt_shape=[1, 3] + self.trt_opt_shape,
+                    max_shape=[1, 3] + self.trt_max_shape,
+                    dtype=self.dtype,
+                    name="img1",
+                ),
+                torch_tensorrt.Input(
+                    min_shape=[1, 1] + self.trt_min_shape,
+                    opt_shape=[1, 1] + self.trt_opt_shape,
+                    max_shape=[1, 1] + self.trt_max_shape,
+                    dtype=self.dtype,
+                    name="timestep",
+                ),
+                torch_tensorrt.Input(
+                    min_shape=[2],
+                    opt_shape=[2],
+                    max_shape=[2],
+                    dtype=self.dtype,
+                    name="tenFlow_div",
+                ),
+                torch_tensorrt.Input(
+                    min_shape=[1, 2] + self.trt_min_shape,
+                    opt_shape=[1, 2] + self.trt_opt_shape,
+                    max_shape=[1, 2] + self.trt_max_shape,
+                    dtype=self.dtype,
+                    name="backwarp_tenGrid",
+                ),
         ]
 
-        flownet = torch_tensorrt.compile(
-            flownet,
-            ir="dynamo",
-            inputs=inputs,
+        example_tensors = tuple(i.example_tensor("opt_shape").to(self.device) for i in inputs)
+        _height = torch.export.Dim("height", min=self.trt_min_shape[0] // self.tmp, max=self.trt_max_shape[0] // self.tmp)
+        _width = torch.export.Dim("width", min=self.trt_min_shape[1] // self.tmp, max=self.trt_max_shape[1] // self.tmp)
+        dim_height = _height * self.tmp
+        dim_width = _width * self.tmp
+        dynamic_shapes = {
+            "img0": {2: dim_height, 3: dim_width},
+            "img1": {2: dim_height, 3: dim_width},
+            "timestep": {2: dim_height, 3: dim_width},
+            "tenFlow_div": {0: None},
+            "backwarp_tenGrid": {2: dim_height, 3: dim_width},
+        }
+
+        exported_program = torch.export.export(flownet, example_tensors, dynamic_shapes=dynamic_shapes)
+
+        flownet = torch_tensorrt.dynamo.compile(
+                exported_program,
+                inputs,
             enabled_precisions={self.dtype},
             debug=False,
             workspace_size=self.trt_workspace_size,
@@ -211,9 +281,10 @@ class RifeTensorRT:
             max_aux_streams=None,
             optimization_level=self.trt_optimization_level,
             device=self.device,
+            assume_dynamic_shape_support=True,
         )
 
-        torch_tensorrt.save(flownet, self.trt_engine_path, inputs=inputs)
+        torch_tensorrt.save(flownet, self.trt_engine_path, output_format="torchscript", inputs=example_tensors)
 
         # flownet = [torch.export.load(self.trt_engine_path).module() for _ in range(self.num_streams)]
 
@@ -243,7 +314,7 @@ class RifeTensorRT:
             (1, 1, self.ph, self.pw), n, dtype=self.dtype, device=self.device
         )
 
-        output = self.inference(self.I0, self.I1, timestep)
+        output = self.inference(self.I0, self.I1, timestep, self.tenFlow_div, self.backwarp_tenGrid)
         output = output[:, :, : self.height, : self.width]
 
         return (

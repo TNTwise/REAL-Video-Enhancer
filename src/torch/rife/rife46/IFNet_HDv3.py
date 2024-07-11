@@ -169,3 +169,4 @@ class IFNet(nn.Module):
             merged.append((warped_img0, warped_img1))
         mask_list[3] = torch.sigmoid(mask_list[3])
         return merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
+    

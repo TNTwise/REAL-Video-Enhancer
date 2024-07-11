@@ -72,7 +72,7 @@ class IFBlock(nn.Module):
             ResConv(c),
         )
         self.lastconv = nn.Sequential(
-            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), nn.PixelShuffle(2)
+            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), MyPixelShuffle(2)
         )
 
     def forward(self, x, flow=None, scale=1):
@@ -196,3 +196,15 @@ class IFNet(nn.Module):
         mask = torch.sigmoid(mask)
 
         return warped_img0 * mask + warped_img1 * (1 - mask)
+class MyPixelShuffle(nn.Module):
+    def __init__(self, upscale_factor):
+        super(MyPixelShuffle, self).__init__()
+        self.upscale_factor = upscale_factor
+
+    def forward(self, x):
+        b, c, hh, hw = x.size()
+        out_channel = c // (self.upscale_factor**2)
+        h = hh * self.upscale_factor
+        w = hw * self.upscale_factor
+        x_view = x.view(b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw)
+        return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
