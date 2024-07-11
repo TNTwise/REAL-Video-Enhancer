@@ -327,7 +327,7 @@ def setHIPGFXVersionSetting(self):
 
 def setHIPGFXVersion():
     settings = Settings()
-    if settings.HSA_OVERRIDE_GFX_VERSION != 'None':
+    if settings.HSA_OVERRIDE_GFX_VERSION != "None":
         os.environ["HSA_OVERRIDE_GFX_VERSION"] = settings.HSA_OVERRIDE_GFX_VERSION
 
 

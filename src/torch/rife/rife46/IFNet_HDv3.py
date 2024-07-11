@@ -105,14 +105,7 @@ class IFNet(nn.Module):
         self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
         self.ensemble = ensemble
 
-    def forward(
-        self,
-        img0,
-        img1,
-        timestep,
-        tenFlow_div, 
-        backwarp_tenGrid
-    ):
+    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         flow_list = []
         merged = []
         mask_list = []
@@ -169,4 +162,3 @@ class IFNet(nn.Module):
             merged.append((warped_img0, warped_img1))
         mask_list[3] = torch.sigmoid(mask_list[3])
         return merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
-    

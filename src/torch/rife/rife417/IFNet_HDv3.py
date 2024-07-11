@@ -116,6 +116,8 @@ class IFBlock(nn.Module):
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask
+
+
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
@@ -126,8 +128,11 @@ class MyPixelShuffle(nn.Module):
         out_channel = c // (self.upscale_factor**2)
         h = hh * self.upscale_factor
         w = hw * self.upscale_factor
-        x_view = x.view(b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw)
+        x_view = x.view(
+            b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw
+        )
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
+
 
 class IFNet(nn.Module):
     def __init__(self, scale=1, ensemble=False):
@@ -143,14 +148,7 @@ class IFNet(nn.Module):
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(
-        self,
-        img0,
-        img1,
-        timestep,
-        tenFlow_div, 
-        backwarp_tenGrid
-    ):
+    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         timestep = (img0[:, :1].clone() * 0 + 1) * timestep
 
         f0 = self.encode(img0[:, :3])
