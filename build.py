@@ -1638,7 +1638,6 @@ def buildNCNNMacOS():
     subprocess.run(command)
 
 if __name__ == "__main__":
-    fixEvalFrame()
     parser = argparse.ArgumentParser(
             description="Build RVE"
         )
@@ -1664,7 +1663,7 @@ if __name__ == "__main__":
         )
     
     args = parser.parse_args()
-    
+
     pipInstall("requirements.txt")
     import PyQt5.uic as uic
     buildenv()
@@ -1676,5 +1675,6 @@ if __name__ == "__main__":
         buildCUDALinux()
     if args.build_ncnn:
         buildNCNNLinux()
+    fixEvalFrame()
 
 
