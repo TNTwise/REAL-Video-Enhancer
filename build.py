@@ -1687,6 +1687,6 @@ if __name__ == "__main__":
         buildROCmLinux()
     if args.build_cuda:
         buildCUDALinux()
-        fixEvalFrame()
+        #fixEvalFrame()
     if args.build_ncnn:
         buildNCNNLinux()
