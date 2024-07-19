@@ -91,6 +91,12 @@ class HandleApplication:
             default=2,
         )
         parser.add_argument(
+            "--interpolateArch",
+            help="Arch used for interpolation when using PyTorch inference. (rife46,rife415)",
+            type=str,
+            default="rife413",
+        )
+        parser.add_argument(
             "-c",
             "--cpu",
             help="use only CPU for upscaling, instead of cuda. default=auto",

@@ -15,6 +15,7 @@ class InterpolateRifeTorch:
     def __init__(
         self,
         interpolateModelPath: str,
+        interpolateArch:str = "rife413",
         width: int = 1920,
         height: int = 1080,
         device: str = "cuda",
@@ -53,9 +54,16 @@ class InterpolateRifeTorch:
         )
 
         # detect what rife arch to use
-        model = loadInterpolationModel(state_dict)
-        architecture = model.getIFnet()
-        self.flownet = architecture(
+        match interpolateArch:
+            case "rife46":
+                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
+                model = IFNet
+
+            case "rife413":
+                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+                model = IFNet
+
+        self.flownet = model(
             scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
         )
 
