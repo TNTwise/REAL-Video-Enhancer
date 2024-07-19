@@ -155,6 +155,7 @@ class FFMpegRender:
         )
         for i in range(self.totalFrames - 1):
             chunk = self.readProcess.stdout.read(self.frameChunkSize)
+            chunk = self.frameSetupFunction(chunk)
             self.readQueue.put(chunk)
         self.readQueue.put(None)
         self.readingDone = True
@@ -179,11 +180,13 @@ class FFMpegRender:
                 text=True,
                 universal_newlines=True,
             )
-
+            i = 1
             while True:
                 frame = self.writeQueue.get()
+                
                 if frame is None:
                     break
+                i+=1
                 self.writeProcess.stdin.buffer.write(frame)
             self.writeProcess.stdin.close()
             self.writeProcess.wait()

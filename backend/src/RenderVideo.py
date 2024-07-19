@@ -94,7 +94,7 @@ class Render(FFMpegRender):
         """
         for i in range(self.totalFrames - 1):
             frame = self.readQueue.get()
-            frame = self.upscale(self.setupRender(frame))
+            frame = self.upscale(frame)
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
         print("Done with Upscale")
@@ -104,12 +104,11 @@ class Render(FFMpegRender):
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
-        self.frame0 = self.setupRender(self.readQueue.get())
+        self.frame0 = self.readQueue.get()
         while True:
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
-            frame1 = self.setupRender(frame1)
             for n in range(self.interpolateFactor):
                 frame = self.interpolate(
                     self.frame0, frame1, 1 / (self.interpolateFactor - n)

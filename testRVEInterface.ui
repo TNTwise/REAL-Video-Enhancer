@@ -211,7 +211,7 @@ QPushButton:disabled{
                        </size>
                       </property>
                       <property name="text">
-                       <string>Select Output File</string>
+                       <string>Select Output Folder</string>
                       </property>
                      </widget>
                     </item>
