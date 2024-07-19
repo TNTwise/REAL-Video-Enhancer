@@ -55,7 +55,9 @@ class InterpolateRifeTorch:
         # detect what rife arch to use
         model = loadInterpolationModel(state_dict)
         architecture = model.getIFnet()
-        self.flownet = architecture(scale=scale, ensemble=ensemble,dtype=self.dtype,device=self.device)
+        self.flownet = architecture(
+            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
+        )
 
         state_dict = {
             k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
@@ -74,7 +76,7 @@ class InterpolateRifeTorch:
             dtype=self.dtype,
             device=self.device,
         )
-        #if 4.6 v1
+        # if 4.6 v1
         tenHorizontal = (
             torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
             .view(1, 1, 1, self.pw)
@@ -89,13 +91,22 @@ class InterpolateRifeTorch:
         # required for v2
         h_mul = 2 / (self.pw - 1)
         v_mul = 2 / (self.ph - 1)
-        self.multiply = torch.Tensor([h_mul, v_mul]).to(device=self.device,dtype=self.dtype)
+        self.multiply = torch.Tensor([h_mul, v_mul]).to(
+            device=self.device, dtype=self.dtype
+        )
 
-        self.backwarp_tenGrid = torch.cat((
-            (torch.arange(self.pw) * h_mul - 1).reshape(1, 1, 1, -1).expand(-1, -1, self.ph, -1),
-            (torch.arange(self.ph) * v_mul - 1).reshape(1, 1, -1, 1).expand(-1, -1, -1, self.pw)
-        ), dim=1).to(device=self.device,dtype=self.dtype)
-        
+        self.backwarp_tenGrid = torch.cat(
+            (
+                (torch.arange(self.pw) * h_mul - 1)
+                .reshape(1, 1, 1, -1)
+                .expand(-1, -1, self.ph, -1),
+                (torch.arange(self.ph) * v_mul - 1)
+                .reshape(1, 1, -1, 1)
+                .expand(-1, -1, -1, self.pw),
+            ),
+            dim=1,
+        ).to(device=self.device, dtype=self.dtype)
+
         if self.backend == "tensorrt":
             import tensorrt
             import torch_tensorrt
@@ -142,8 +153,6 @@ class InterpolateRifeTorch:
                 trt_min_shape.reverse()
                 trt_opt_shape.reverse()
                 trt_max_shape.reverse()
-
-                
 
                 example_tensors = (
                     torch.zeros(
@@ -214,7 +223,7 @@ class InterpolateRifeTorch:
                         max_shape=[1, 2] + trt_max_shape,
                         dtype=self.dtype,
                         name="backwarp_tenGrid",
-                ),
+                    ),
                 ]
 
                 flownet = torch_tensorrt.dynamo.compile(

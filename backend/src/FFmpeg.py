@@ -180,13 +180,11 @@ class FFMpegRender:
                 text=True,
                 universal_newlines=True,
             )
-            i = 1
             while True:
                 frame = self.writeQueue.get()
-                
+
                 if frame is None:
                     break
-                i+=1
                 self.writeProcess.stdin.buffer.write(frame)
             self.writeProcess.stdin.close()
             self.writeProcess.wait()

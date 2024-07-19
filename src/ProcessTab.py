@@ -8,14 +8,14 @@ class ProcessTab:
     def __init__(
         self,
         parent,
-        inputFile:str,
-        outputPath:str,
-        videoWidth:int,
-        videoHeight:int,
-        videoFps:float,
-        videoFrameCount:int,
-        upscaleTimes:int,
-        interpolateTimes:int,
+        inputFile: str,
+        outputPath: str,
+        videoWidth: int,
+        videoHeight: int,
+        videoFps: float,
+        videoFrameCount: int,
+        upscaleTimes: int,
+        interpolateTimes: int,
     ):
         self.parent = parent
         self.inputFile = inputFile

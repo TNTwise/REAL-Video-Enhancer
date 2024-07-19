@@ -19,6 +19,7 @@ from src.util import (
 )
 from src.ProcessTab import ProcessTab
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -48,7 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.outputFileSelectButton.clicked.connect(self.openOutputFolder)
         # connect render button
         self.startRenderButton.clicked.connect(self.startRender)
-    
+
     # switch menus
     def switchToHomePage(self):
         self.stackedWidget.setCurrentWidget(self.homePage)
@@ -73,20 +74,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
-    
-    
+
     def startRender(self):
         processTab = ProcessTab(
-                                parent=self,
-                                inputFile=self.inputFile,
-                                outputPath="",
-                                videoWidth=self.videoWidth,
-                                videoHeight=self.videoHeight,
-                                videoFps=self.videoFps,
-                                videoFrameCount=self.videoFrameCount,
-                                upscaleTimes=self.upscaleTimes,
-                                interpolateTimes=self.interpolateTimes
-                                )
+            parent=self,
+            inputFile=self.inputFile,
+            outputPath="",
+            videoWidth=self.videoWidth,
+            videoHeight=self.videoHeight,
+            videoFps=self.videoFps,
+            videoFrameCount=self.videoFrameCount,
+            upscaleTimes=self.upscaleTimes,
+            interpolateTimes=self.interpolateTimes,
+        )
         processTab.run()
 
     # input file button
@@ -142,6 +142,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             directory=self.homeDir,
         )
         self.outputFileText.setText(self.outputFolder)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
