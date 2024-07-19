@@ -3,30 +3,12 @@ import torch.nn as nn
 
 import torch.nn.functional as F
 
-try:
-    from src.torch.rife.warplayer import warp
-    from src.torch.rife.interpolate import interpolate
-except Exception as e:
-    print(e)
-    from src.torch.rife.warplayer import warp
 
-    interpolate = F.interpolate
+from src.torch.rife.warplayer import warp
+
+interpolate = F.interpolate
 
 
-class MyPixelShuffle(nn.Module):
-    def __init__(self, upscale_factor):
-        super(MyPixelShuffle, self).__init__()
-        self.upscale_factor = upscale_factor
-
-    def forward(self, x):
-        b, c, hh, hw = x.size()
-        out_channel = c // (self.upscale_factor**2)
-        h = hh * self.upscale_factor
-        w = hw * self.upscale_factor
-        x_view = x.view(
-            b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw
-        )
-        return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -111,7 +93,7 @@ class IFBlock(nn.Module):
             ResConv(c),
         )
         self.lastconv = nn.Sequential(
-            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), MyPixelShuffle(2)
+            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), nn.PixelShuffle(2)
         )
 
     def forward(self, x, flow=None, scale=1):
@@ -150,7 +132,6 @@ class IFNet(nn.Module):
         # self.unet = Unet()
 
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
-        timestep = (img0[:, :1].clone() * 0 + 1) * timestep
 
         f0 = self.encode(img0[:, :3])
         f1 = self.encode(img1[:, :3])

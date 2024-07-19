@@ -73,6 +73,7 @@ class RifeTensorRT:
             dtype=self.dtype,
             device=self.device,
         )
+        self.handle_model(model)
 
         tenHorizontal = (
             torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
@@ -125,11 +126,7 @@ class RifeTensorRT:
                     if self.trt_max_aux_streams is not None
                     else ""
                 )
-                + (
-                    f"_level-{self.trt_optimization_level}"
-                    if self.trt_optimization_level is not None
-                    else ""
-                )
+                 
                 + ".ts"
             ),
         )
@@ -137,7 +134,7 @@ class RifeTensorRT:
         if not os.path.exists(self.trt_engine_path):
             self.generateEngine()
 
-        self.inference = torch.jit.load(self.trt_engine_path).eval()
+        self.inference = torch.jit.load(self.trt_engine_path)
 
     def handle_model(self, interpolate_method):
         if interpolate_method == "rife4.14":
@@ -210,116 +207,40 @@ class RifeTensorRT:
                     f"{thisdir}", "models", "rife-cuda", "rife417", "rife4.17.pkl"
                 )
             )
-        self.i = IFNet(scale=self.scale, ensemble=self.ensemble)
+        self.i = IFNet(scale=self.scale, ensemble=self.ensemble).to(device=self.device,dtype=self.dtype)
+        self.i.cuda().half()
         self.modelDir = modelDir
 
     @torch.inference_mode()
     def generateEngine(self):
-        # temp
-        self.trt_min_shape.reverse()
-        self.trt_opt_shape.reverse()
-        self.trt_max_shape.reverse()
-        self.guiLog.emit("Building Engine, this may take a while...")
-
-        self.handle_model(self.model)
-
-        state_dict = torch.load(
-            os.path.join(self.modelDir, self.model + ".pkl"), map_location="cpu"
-        )
-        state_dict = {
-            k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
-        }
-
-        flownet = self.i
-        flownet.load_state_dict(state_dict, strict=False)
-        flownet.eval().to(self.device)
-        if self.half:
-            flownet.half()
         inputs = [
-            torch_tensorrt.Input(
-                min_shape=[1, 3] + self.trt_min_shape,
-                opt_shape=[1, 3] + self.trt_opt_shape,
-                max_shape=[1, 3] + self.trt_max_shape,
-                dtype=self.dtype,
-                name="img0",
-            ),
-            torch_tensorrt.Input(
-                min_shape=[1, 3] + self.trt_min_shape,
-                opt_shape=[1, 3] + self.trt_opt_shape,
-                max_shape=[1, 3] + self.trt_max_shape,
-                dtype=self.dtype,
-                name="img1",
-            ),
-            torch_tensorrt.Input(
-                min_shape=[1, 1] + self.trt_min_shape,
-                opt_shape=[1, 1] + self.trt_opt_shape,
-                max_shape=[1, 1] + self.trt_max_shape,
-                dtype=self.dtype,
-                name="timestep",
-            ),
-            torch_tensorrt.Input(
-                min_shape=[2],
-                opt_shape=[2],
-                max_shape=[2],
-                dtype=self.dtype,
-                name="tenFlow_div",
-            ),
-            torch_tensorrt.Input(
-                min_shape=[1, 2] + self.trt_min_shape,
-                opt_shape=[1, 2] + self.trt_opt_shape,
-                max_shape=[1, 2] + self.trt_max_shape,
-                dtype=self.dtype,
-                name="backwarp_tenGrid",
-            ),
-        ]
-
-        example_tensors = tuple(
-            i.example_tensor("opt_shape").to(self.device) for i in inputs
-        )
-        _height = torch.export.Dim(
-            "height",
-            min=self.trt_min_shape[0] // self.tmp,
-            max=self.trt_max_shape[0] // self.tmp,
-        )
-        _width = torch.export.Dim(
-            "width",
-            min=self.trt_min_shape[1] // self.tmp,
-            max=self.trt_max_shape[1] // self.tmp,
-        )
-        dim_height = _height * self.tmp
-        dim_width = _width * self.tmp
-        dynamic_shapes = {
-            "img0": {2: dim_height, 3: dim_width},
-            "img1": {2: dim_height, 3: dim_width},
-            "timestep": {2: dim_height, 3: dim_width},
-            "tenFlow_div": {0: None},
-            "backwarp_tenGrid": {2: dim_height, 3: dim_width},
-        }
-
-        exported_program = torch.export.export(
-            flownet, example_tensors, dynamic_shapes=dynamic_shapes
-        )
-
-        flownet = torch_tensorrt.dynamo.compile(
-            exported_program,
-            inputs,
-            enabled_precisions={self.dtype},
-            debug=False,
-            workspace_size=self.trt_workspace_size,
-            min_block_size=1,
-            max_aux_streams=None,
-            optimization_level=self.trt_optimization_level,
-            device=self.device,
-            assume_dynamic_shape_support=True,
-        )
-
-        torch_tensorrt.save(
-            flownet,
-            self.trt_engine_path,
-            output_format="torchscript",
-            inputs=example_tensors,
-        )
-
+                    torch.zeros(
+                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
+                    ),
+                    torch.zeros(
+                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
+                    ),
+                    torch.zeros(
+                        (1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device
+                    ),
+                    torch.zeros((2,),dtype=self.dtype,device=self.device),
+                    torch.zeros(
+                        (1, 2, self.ph, self.pw), dtype=self.dtype, device=self.device
+                    )
+                ]
+        model = self.i
+        module = torch.jit.trace(model, inputs)
+        module = torch_tensorrt.compile(
+                    module,
+                    ir="ts",
+                    inputs=inputs,
+                    enabled_precisions={self.dtype},
+                    device=torch_tensorrt.Device(gpu_id=0),
+                    workspace_size=self.trt_workspace_size,
+                    truncate_long_and_double=True,
+                    min_block_size=1,
+                )
+        torch.jit.save(module, self.trt_engine_path)
         # flownet = [torch.export.load(self.trt_engine_path).module() for _ in range(self.num_streams)]
 
         # self.index = -1
