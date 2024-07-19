@@ -1,0 +1,11 @@
+numpy==1.24.4
+pillow
+torch==2.3.1 --index-url https://download.pytorch.org/whl/cu121
+torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121
+spandrel>=0.3.3
+pyinstaller
+onnx
+onnxruntime
+pnnx
+ncnn
+opencv-python
