@@ -292,7 +292,7 @@ class InterpolateRifeTorch:
             self.height, self.width, 3
         )
         return F.pad(
-            (frame).permute(2, 0, 1).unsqueeze(0).to(self.device, dtype=self.dtype)
+            (frame).permute(2, 0, 1).unsqueeze(0).to(self.device, dtype=self.dtype, non_blocking=True)
             / 255.0,
             self.padding,
         )
