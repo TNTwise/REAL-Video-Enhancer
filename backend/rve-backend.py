@@ -25,7 +25,7 @@ class HandleApplication:
             crf=self.args.crf,
             benchmark=self.args.benchmark,
             encoder=self.args.custom_encoder,
-            #misc settingss
+            # misc settingss
             sceneDetectMethod=self.args.sceneDetectMethod,
             sceneDetectSensitivity=self.args.sceneDetectSensitivity,
         )
@@ -109,13 +109,13 @@ class HandleApplication:
             "--sceneDetectMethod",
             help="Scene change detection to avoid interpolating transitions. (options=pyscenedetect, ffmpeg)",
             type=str,
-            default='pyscenedetect'
+            default="pyscenedetect",
         )
         parser.add_argument(
             "--sceneDetectSensitivity",
             help="Scene change detection sensitivity, lower number means it has a higher chance of detecting scene changes, with risk of detecting too many.",
             type=float,
-            default=3.0
+            default=3.0,
         )
         parser.add_argument(
             "--overwrite",

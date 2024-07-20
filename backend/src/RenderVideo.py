@@ -41,22 +41,22 @@ class Render(FFMpegRender):
         self,
         inputFile: str,
         outputFile: str,
-        #backend settings
+        # backend settings
         backend="pytorch",
         device="cuda",
         precision="float16",
-        #model settings
+        # model settings
         upscaleModel=None,
         interpolateModel=None,
         interpolateFactor: int = 1,
         interpolateArch: str = "rife413",
-        #ffmpeg settings
+        # ffmpeg settings
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
         benchmark: bool = False,
         overwrite: bool = False,
         crf: str = "18",
-        #misc
+        # misc
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
     ):
@@ -132,11 +132,13 @@ class Render(FFMpegRender):
                     self.writeQueue.put(frame)
             else:
                 # undo the setup done in ffmpeg thread
-                sc_detected_frame_np = self.undoSetup(self.frame0[:, :, : self.height, : self.width][0])
-                for n in range(self.interpolateFactor) :
-                    self.writeQueue.put(sc_detected_frame_np) 
+                sc_detected_frame_np = self.undoSetup(
+                    self.frame0[:, :, : self.height, : self.width][0]
+                )
+                for n in range(self.interpolateFactor):
+                    self.writeQueue.put(sc_detected_frame_np)
                 try:
-                    self.transitionFrame = self.transitionQueue.get_nowait() 
+                    self.transitionFrame = self.transitionQueue.get_nowait()
                 except:
                     self.transitionFrame = None
             self.frame0 = frame1
@@ -181,9 +183,11 @@ class Render(FFMpegRender):
 
     def setupInterpolate(self):
         if self.sceneDetectMethod != "none":
-            scdetect = SceneDetect(inputFile=self.inputFile,
-                                   sceneChangeSensitivity=self.sceneDetectSensitivty,
-                                   sceneChangeMethod=self.sceneDetectMethod)
+            scdetect = SceneDetect(
+                inputFile=self.inputFile,
+                sceneChangeSensitivity=self.sceneDetectSensitivty,
+                sceneChangeMethod=self.sceneDetectMethod,
+            )
             self.transitionQueue = scdetect.getTransitions()
         else:
             self.transitionQueue = None
