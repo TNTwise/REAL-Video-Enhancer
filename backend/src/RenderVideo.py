@@ -1,7 +1,11 @@
 from threading import Thread
+from queue import Queue
 
 from .FFmpeg import FFMpegRender
+from .SceneDetect import SceneDetect
 
+
+# try/except imports
 try:
     from .UpscaleNCNN import UpscaleNCNN, getNCNNScale
     from .InterpolateNCNN import InterpolateRIFENCNN
@@ -37,20 +41,26 @@ class Render(FFMpegRender):
         self,
         inputFile: str,
         outputFile: str,
+        #backend settings
+        backend="pytorch",
+        device="cuda",
+        precision="float16",
+        #model settings
+        upscaleModel=None,
+        interpolateModel=None,
         interpolateFactor: int = 1,
         interpolateArch: str = "rife413",
+        #ffmpeg settings
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
         benchmark: bool = False,
         overwrite: bool = False,
         crf: str = "18",
-        backend="pytorch",
-        interpolationMethod=None,
-        upscaleModel=None,
-        interpolateModel=None,
-        device="cuda",
-        precision="float16",
+        #misc
+        sceneDetectMethod: str = "pyscenedetect",
+        sceneDetectSensitivity: float = 3.0,
     ):
+        self.inputFile = inputFile
         self.backend = backend
         self.upscaleModel = upscaleModel
         self.interpolateModel = interpolateModel
@@ -61,6 +71,8 @@ class Render(FFMpegRender):
         self.interpolateFactor = interpolateFactor
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.frame0 = None
+        self.sceneDetectMethod = sceneDetectMethod
+        self.sceneDetectSensitivty = sceneDetectSensitivity
 
         self.getVideoProperties(inputFile)
         if upscaleModel:
@@ -99,25 +111,36 @@ class Render(FFMpegRender):
             frame = self.upscale(frame)
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
-        print("Done with Upscale")
 
     def renderInterpolate(self):
         """
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
+        self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.readQueue.get()
-        while True:
+
+        for frameNum in range(self.totalFrames - 1):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
-            for n in range(self.interpolateFactor):
-                frame = self.interpolate(
-                    self.frame0, frame1, 1 / (self.interpolateFactor - n)
-                )
-                self.writeQueue.put(frame)
-
+            if self.transitionFrame is None or frameNum + 3 != self.transitionFrame:
+                for n in range(self.interpolateFactor):
+                    frame = self.interpolate(
+                        self.frame0, frame1, 1 / (self.interpolateFactor - n)
+                    )
+                    self.writeQueue.put(frame)
+            else:
+                # undo the setup done in ffmpeg thread
+                sc_detected_frame_np = self.undoSetup(self.frame0[:, :, : self.height, : self.width][0])
+                for n in range(self.interpolateFactor) :
+                    self.writeQueue.put(sc_detected_frame_np) 
+                try:
+                    self.transitionFrame = self.transitionQueue.get_nowait() 
+                except:
+                    self.transitionFrame = None
             self.frame0 = frame1
+
         self.writeQueue.put(None)
         print("Done with interpolation")
 
@@ -127,6 +150,8 @@ class Render(FFMpegRender):
         Maps the self.upscaleTimes to the actual scale of the model
         Maps the self.setupRender function that can setup frames to be rendered
         Maps the self.upscale the upscale function in the respective backend.
+        For interpolation:
+        Mapss the self.undoSetup to the tensor_to_frame function, which undoes the prep done in the FFMpeg thread. Used for SCDetect
         """
         if self.backend == "pytorch" or self.backend == "tensorrt":
             upscalePytorch = UpscalePytorch(
@@ -155,6 +180,13 @@ class Render(FFMpegRender):
             self.upscale = upscaleNCNN.Upscale
 
     def setupInterpolate(self):
+        if self.sceneDetectMethod != "none":
+            scdetect = SceneDetect(inputFile=self.inputFile,
+                                   sceneChangeSensitivity=self.sceneDetectSensitivty,
+                                   sceneChangeMethod=self.sceneDetectMethod)
+            self.transitionQueue = scdetect.getTransitions()
+        else:
+            self.transitionQueue = None
         if self.backend == "ncnn":
             interpolateRifeNCNN = InterpolateRIFENCNN(
                 interpolateModelPath=self.interpolateModel,
@@ -162,6 +194,7 @@ class Render(FFMpegRender):
                 height=self.height,
             )
             self.setupRender = interpolateRifeNCNN.bytesToByteArray
+            self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifeNCNN.process
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
@@ -174,4 +207,5 @@ class Render(FFMpegRender):
                 backend=self.backend,
             )
             self.setupRender = interpolateRifePytorch.frame_to_tensor
+            self.undoSetup = interpolateRifePytorch.tensor_to_frame
             self.interpolate = interpolateRifePytorch.process

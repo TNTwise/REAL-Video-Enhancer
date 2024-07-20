@@ -48,9 +48,7 @@ class FFMpegRender:
         self.frameSetupFunction = frameSetupFunction
 
         self.writeOutPipe = self.outputFile == "PIPE"
-        self.totalFramesToRender = (
-            self.totalFrames - self.interpolateFactor
-        ) * self.interpolateFactor
+        
 
         self.readQueue = queue.Queue(maxsize=50)
         self.writeQueue = queue.Queue(maxsize=50)

@@ -25,6 +25,9 @@ class HandleApplication:
             crf=self.args.crf,
             benchmark=self.args.benchmark,
             encoder=self.args.custom_encoder,
+            #misc settingss
+            sceneDetectMethod=self.args.sceneDetectMethod,
+            sceneDetectSensitivity=self.args.sceneDetectSensitivity,
         )
 
     def handleArguments(self) -> argparse.ArgumentParser:
@@ -98,33 +101,21 @@ class HandleApplication:
             default="rife413",
         )
         parser.add_argument(
-            "-c",
-            "--cpu",
-            help="use only CPU for upscaling, instead of cuda. default=auto",
-            action="store_true",
-        )
-        parser.add_argument(
-            "-f",
-            "--format",
-            help="output image format (jpg/png/webp, auto=same as input, default=auto)",
-        )
-        parser.add_argument(
             "--half",
             help="half precision, only works with NVIDIA RTX 20 series and above.",
             action="store_true",
         )
         parser.add_argument(
-            "--bfloat16",
-            help="like half precision, but more intesive. This can be used with a wider range of models than half.",
-            action="store_true",
-        )
-
-        parser.add_argument(
-            "-e",
-            "--export",
-            help="Export PyTorch models to ONNX and NCNN. Options: (onnx/ncnn)",
-            default=None,
+            "--sceneDetectMethod",
+            help="Scene change detection to avoid interpolating transitions. (options=pyscenedetect, ffmpeg)",
             type=str,
+            default='pyscenedetect'
+        )
+        parser.add_argument(
+            "--sceneDetectSensitivity",
+            help="Scene change detection sensitivity, lower number means it has a higher chance of detecting scene changes, with risk of detecting too many.",
+            type=float,
+            default=3.0
         )
         parser.add_argument(
             "--overwrite",
