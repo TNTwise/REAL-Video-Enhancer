@@ -108,9 +108,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         inputFile, _ = QFileDialog.getOpenFileName(
             parent=self,
             caption="Select File",
-            directory=self.homeDir,
+            dir=self.homeDir,
             filter=fileFilter,
-            initialFilter=fileFilter,
         )
 
         if checkValidVideo(inputFile):
@@ -139,7 +138,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.outputFolder = QFileDialog.getExistingDirectory(
             self,
             caption="Select Output Directory",
-            directory=self.homeDir,
+            dir=self.homeDir,
         )
         self.outputFileText.setText(self.outputFolder)
 
