@@ -53,28 +53,6 @@ class InterpolateRifeTorch:
             interpolateModelPath, map_location=self.device, weights_only=True, mmap=True
         )
 
-        # detect what rife arch to use
-        match interpolateArch:
-            case "rife46":
-                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-                model = IFNet
-
-            case "rife413":
-                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
-                model = IFNet
-
-        self.flownet = model(
-            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
-        )
-
-        state_dict = {
-            k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
-        }
-        self.flownet.load_state_dict(state_dict=state_dict, strict=False)
-        self.flownet.eval().to(device=self.device)
-        if self.dtype == torch.float16:
-            self.flownet.half()
-
         tmp = max(32, int(32 / scale))
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
@@ -97,25 +75,46 @@ class InterpolateRifeTorch:
             .expand(-1, -1, -1, self.pw)
         )
         self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
+        
+        # detect what rife arch to use
+        match interpolateArch:
+            case "rife46":
+                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
 
-        # if v2
-        h_mul = 2 / (self.pw - 1)
-        v_mul = 2 / (self.ph - 1)
-        self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
-            device=self.device, dtype=self.dtype
+            case "rife413":
+                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+                # if v2
+                h_mul = 2 / (self.pw - 1)
+                v_mul = 2 / (self.ph - 1)
+                self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
+                    device=self.device, dtype=self.dtype
+                )
+
+                self.backwarp_tenGrid = torch.cat(
+                    (
+                        (torch.arange(self.pw) * h_mul - 1)
+                        .reshape(1, 1, 1, -1)
+                        .expand(-1, -1, self.ph, -1),
+                        (torch.arange(self.ph) * v_mul - 1)
+                        .reshape(1, 1, -1, 1)
+                        .expand(-1, -1, -1, self.pw),
+                    ),
+                    dim=1,
+                ).to(device=self.device, dtype=self.dtype)
+
+        self.flownet = IFNet(
+            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
         )
 
-        self.backwarp_tenGrid = torch.cat(
-            (
-                (torch.arange(self.pw) * h_mul - 1)
-                .reshape(1, 1, 1, -1)
-                .expand(-1, -1, self.ph, -1),
-                (torch.arange(self.ph) * v_mul - 1)
-                .reshape(1, 1, -1, 1)
-                .expand(-1, -1, -1, self.pw),
-            ),
-            dim=1,
-        ).to(device=self.device, dtype=self.dtype)
+        state_dict = {
+            k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
+        }
+        self.flownet.load_state_dict(state_dict=state_dict, strict=False)
+        self.flownet.eval().to(device=self.device)
+        if self.dtype == torch.float16:
+            self.flownet.half()
+
+        
 
         if self.backend == "tensorrt":
             import tensorrt

@@ -14,6 +14,7 @@ class HandleApplication:
             outputFile=self.args.output,
             interpolateModel=self.args.interpolateModel,
             interpolateFactor=self.args.interpolateFactor,
+            interpolateArch=self.args.interpolateArch,
             upscaleModel=self.args.upscaleModel,
             # backend settings
             device="cuda",
