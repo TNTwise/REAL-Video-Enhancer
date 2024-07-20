@@ -38,7 +38,7 @@ class Render(FFMpegRender):
         inputFile: str,
         outputFile: str,
         interpolateFactor: int = 1,
-        interpolateArch: str = 'rife413',
+        interpolateArch: str = "rife413",
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
         benchmark: bool = False,

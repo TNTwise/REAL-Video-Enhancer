@@ -145,14 +145,12 @@ class IFNet(nn.Module):
         # self.unet = Unet()
 
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
-        
         h, w = img0.shape[2], img0.shape[3]
         tenFlow_div = tenFlow_div.reshape(1, 2, 1, 1)
         multiply = tenFlow_div.reshape(1, 2, 1, 1)
         grid = backwarp_tenGrid
 
-
-        #cant be cached
+        # cant be cached
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, h, w))
         fs_2 = self.encode(imgs_2)

@@ -15,7 +15,7 @@ class InterpolateRifeTorch:
     def __init__(
         self,
         interpolateModelPath: str,
-        interpolateArch:str = "rife413",
+        interpolateArch: str = "rife413",
         width: int = 1920,
         height: int = 1080,
         device: str = "cuda",
@@ -75,7 +75,7 @@ class InterpolateRifeTorch:
             .expand(-1, -1, -1, self.pw)
         )
         self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
-        
+
         # detect what rife arch to use
         match interpolateArch:
             case "rife46":
@@ -83,6 +83,7 @@ class InterpolateRifeTorch:
 
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+
                 # if v2
                 h_mul = 2 / (self.pw - 1)
                 v_mul = 2 / (self.ph - 1)
@@ -113,8 +114,6 @@ class InterpolateRifeTorch:
         self.flownet.eval().to(device=self.device)
         if self.dtype == torch.float16:
             self.flownet.half()
-
-        
 
         if self.backend == "tensorrt":
             import tensorrt
@@ -299,7 +298,10 @@ class InterpolateRifeTorch:
             self.height, self.width, 3
         )
         return F.pad(
-            (frame).permute(2, 0, 1).unsqueeze(0).to(self.device, dtype=self.dtype, non_blocking=True)
+            (frame)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .to(self.device, dtype=self.dtype, non_blocking=True)
             / 255.0,
             self.padding,
         )

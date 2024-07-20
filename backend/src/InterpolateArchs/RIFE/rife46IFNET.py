@@ -12,7 +12,6 @@ from .warplayer import warp
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
@@ -95,7 +94,7 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self, scale=1, ensemble=False,dtype=torch.float32,device="cuda"):
+    def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda"):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
         self.block1 = IFBlock(8 + 4, c=128)

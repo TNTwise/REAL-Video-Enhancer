@@ -100,7 +100,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         > IMPLEMENT AFTER SELECT AI >  Last, It will enable the output select button, and auto create a default output file
 
         *NOTE
-        This function will set self.videoWidth, self.videoHeight, and self.videoFPS
+        This function will set self.videoWidth, self.videoHeight, and self.videoFps
 
         """
 

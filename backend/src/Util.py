@@ -10,6 +10,7 @@ def warnAndLog(message: str):
 
 
 def printAndLog(message: str):
+    message = message + '\n' + "---------------------"
     print(message)
     log(message=message)
 
