@@ -3,9 +3,9 @@ import os
 import subprocess
 from threading import Thread
 
-from PyQt6.QtGui import QImage
-from PyQt6.QtCore import QPropertyAnimation, QPoint, QThread
-from PyQt6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtGui import QImage
+from PySide6.QtCore import QPropertyAnimation, QPoint, QThread
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 
 # other imports

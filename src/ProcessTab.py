@@ -1,7 +1,7 @@
 import subprocess
 import os
 from threading import Thread
-from PyQt6.QtCore import QThread
+from PySide6.QtCore import QThread
 
 
 class ProcessTab:

@@ -1,6 +1,6 @@
 import subprocess
 import os
-
+from scenedetect import AdaptiveDetector
 from .Util import currentDirectory
 
 class SceneDetect:
@@ -20,6 +20,8 @@ class SceneDetect:
         self.sceneChangeMethod = sceneChangeMethod
 
     def getPySceneDetectTransitions(self) -> list[int]:
+        adaptiveDetector = AdaptiveDetector(adaptive_threshold=self.sceneChangeSsensitivity)
+        
         pass
 
     def getTransitions(self):
