@@ -124,7 +124,7 @@ class Render(FFMpegRender):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
-            if self.transitionFrame is None or frameNum + 3 != self.transitionFrame:
+            if self.transitionFrame is None or frameNum != self.transitionFrame:
                 for n in range(self.interpolateFactor):
                     frame = self.interpolate(
                         self.frame0, frame1, 1 / (self.interpolateFactor - n)
