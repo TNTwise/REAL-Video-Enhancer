@@ -4,7 +4,7 @@ import subprocess
 import queue
 import time
 
-from .Util import currentDirectory
+from .Util import currentDirectory, printAndLog
 
 
 class FFMpegRender:
@@ -53,6 +53,7 @@ class FFMpegRender:
         self.writeQueue = queue.Queue(maxsize=50)
 
     def getVideoProperties(self, inputFile: str = None):
+        printAndLog("Getting Video Properties...")
         if inputFile is None:
             cap = cv2.VideoCapture(self.inputFile)
         else:
@@ -69,6 +70,7 @@ class FFMpegRender:
         self.frameChunkSize = self.width * self.height * 3
 
     def getFFmpegReadCommand(self):
+        printAndLog("Generating FFmpeg READ command...")
         command = [
             f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
             "-i",
@@ -86,6 +88,7 @@ class FFMpegRender:
         return command
 
     def getFFmpegWriteCommand(self):
+        printAndLog("Generating FFmpeg WRITE command...")
         if not self.outputFile == "PIPE":
             if not self.benchmark:
                 # maybe i can split this so i can just use ffmpeg normally like with vspipe
@@ -116,7 +119,7 @@ class FFMpegRender:
                 for i in self.encoder.split():
                     command.append(i)
             else:
-                print("Using benchmark mode")
+                printAndLog("Using benchmark mode")
                 command = [
                     f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
                     "-y",
@@ -145,6 +148,7 @@ class FFMpegRender:
             return command
 
     def readinVideoFrames(self):
+        printAndLog("Starting Video Read")
         self.readProcess = subprocess.Popen(
             self.getFFmpegReadCommand(),
             stdout=subprocess.PIPE,
@@ -154,6 +158,7 @@ class FFMpegRender:
             chunk = self.readProcess.stdout.read(self.frameChunkSize)
             chunk = self.frameSetupFunction(chunk)
             self.readQueue.put(chunk)
+        printAndLog("Ending Video Read")
         self.readQueue.put(None)
         self.readingDone = True
         self.readProcess.stdout.close()
@@ -170,6 +175,7 @@ class FFMpegRender:
         ffmpeg -f rawvideo -pix_fmt rgb24 -s 1920x1080 -framerate 24 -i - -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a copy out.mp4
         """
         startTime = time.time()
+        print("Starting Write Out")
         if self.writeOutPipe == False:
             self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),
@@ -196,5 +202,5 @@ class FFMpegRender:
             process.stdin.close()
             process.wait()
 
-        renderTime = time.time() - startTime
-        print(f"Time to complete render: {round(renderTime, 2)}")
+        renderTime = time.time() - startTime    
+        printAndLog(f"Completed Write!\nTime to complete render: {round(renderTime, 2)}")

@@ -3808,48 +3808,7 @@ class UpscaleNCNN:
         self.width = width
         self.height = height
         self.scale = scale
-        """model = model + '.param'
-        self.net = ncnn.Net()
-        self.net.opt.use_vulkan_compute = True
-        self.net.load_param(model.replace('.bin','.param'))
-        self.net.load_model(model.replace('.param','.bin'))
-        """
-
-    """def NCNNImageMatFromNP(self, npArray: np.array) -> ncnn.Mat:
-        return ncnn.Mat.from_pixels(
-            npArray,
-            ncnn.Mat.PixelType.PIXEL_BGR,
-            self.width,
-            self.height,
-        )
-
-    def NormalizeImage(self, mat, norm_vals):
-        mean_vals = []
-        mat.substract_mean_normalize(mean_vals, norm_vals)
-
-    def ClampNPArray(self, nparray: np.array) -> np.array:
-        min_val = np.min(nparray)
-        max_val = np.max(nparray)
-        if min_val < 0 or max_val > 255:
-            nparray = ((nparray - min_val) / (max_val - min_val)) * 255
-        return nparray
-
-    def ProcessNCNN(self, frame: np.array) -> np.asarray:
-        ex = self.net.create_extractor()
-        frame = self.NCNNImageMatFromNP(frame)
-        # norm
-        self.NormalizeImage(mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0])
-        # render frame
-        ex.input("data", frame)
-        ret, frame = ex.extract("output")
-
-        # norm
-        self.NormalizeImage(mat=frame, norm_vals=[255.0, 255.0, 255.0])
-
-        frame = np.ascontiguousarray(frame)
-        frame = self.ClampNPArray(frame)
-        frame = frame.transpose(1, 2, 0)
-        return np.ascontiguousarray(frame, dtype=np.uint8)"""
+        
 
     def Upscale(self, imageChunk):
         output = self.model.process_bytes(imageChunk, self.width, self.height, 3)

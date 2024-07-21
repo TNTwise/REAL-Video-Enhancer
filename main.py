@@ -52,7 +52,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # switch menus
     def switchToHomePage(self):
-        self.stackedWidget.setCurrentWidget(self.homePage)
+        self.stackedWidget.setCurrentWidget(self.homePage)  
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
         self.moreBtn.setChecked(False)

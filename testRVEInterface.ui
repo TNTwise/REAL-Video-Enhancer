@@ -149,6 +149,14 @@ QPushButton:disabled{
 	background-color:#343b47;
 	color:gray;
 }
+QComboBox{
+background-color:#2c313c;
+	text-align:left;
+	padding:5px 10px;
+	border-radius: 10px;
+color:white;
+}
+
 </string>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -232,9 +240,23 @@ QPushButton:disabled{
                   </widget>
                  </item>
                  <item>
+                  <widget class="QComboBox" name="methodComboBox">
+                   <item>
+                    <property name="text">
+                     <string>Interpolate</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Upscale</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
                   <spacer name="verticalSpacer_2">
                    <property name="orientation">
-                    <enum>Qt::Vertical</enum>
+                    <enum>Qt::Orientation::Vertical</enum>
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
@@ -350,7 +372,7 @@ background-color:#16191d
          </layout>
         </widget>
        </item>
-       <item alignment="Qt::AlignBottom">
+       <item alignment="Qt::AlignmentFlag::AlignBottom">
         <widget class="QWidget" name="bottomMenuContainer" native="true">
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
@@ -419,7 +441,7 @@ background-color:#16191d
       </layout>
      </widget>
     </item>
-    <item row="0" column="0" alignment="Qt::AlignLeft">
+    <item row="0" column="0" alignment="Qt::AlignmentFlag::AlignLeft">
      <widget class="QWidget" name="leftMenuContainer" native="true">
       <property name="styleSheet">
        <string notr="true"/>
@@ -431,7 +453,7 @@ background-color:#16191d
        <property name="rightMargin">
         <number>0</number>
        </property>
-       <item alignment="Qt::AlignLeft">
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QWidget" name="leftMenuSubContainer" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="rightMargin">
@@ -522,7 +544,7 @@ background-color:#16191d
           <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -556,7 +578,7 @@ background-color:#16191d
                 </size>
                </property>
                <property name="contextMenuPolicy">
-                <enum>Qt::NoContextMenu</enum>
+                <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
                </property>
                <property name="styleSheet">
                 <string notr="true">text-align:left;

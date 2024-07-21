@@ -3,7 +3,7 @@ from queue import Queue
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
-
+from .Util import printAndLog
 
 # try/except imports
 try:
@@ -75,12 +75,15 @@ class Render(FFMpegRender):
         self.sceneDetectSensitivty = sceneDetectSensitivity
 
         self.getVideoProperties(inputFile)
+        printAndLog("Using backend: " + self.backend)
         if upscaleModel:
             self.setupUpscale()
             self.renderThread = Thread(target=self.renderUpscale)
+            printAndLog("Using Upscaling Model: " + self.interpolateModel)
         if interpolateModel:
             self.setupInterpolate()
             self.renderThread = Thread(target=self.renderInterpolate)
+            printAndLog("Using Interpolation Model: " + self.interpolateModel)
 
         super().__init__(
             inputFile=inputFile,
@@ -106,17 +109,19 @@ class Render(FFMpegRender):
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
+        printAndLog("Starting Upscale")
         for i in range(self.totalFrames - 1):
             frame = self.readQueue.get()
             frame = self.upscale(frame)
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
-
+        printAndLog("Finished Upscale")
     def renderInterpolate(self):
         """
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
+        printAndLog("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.readQueue.get()
 
@@ -144,7 +149,7 @@ class Render(FFMpegRender):
             self.frame0 = frame1
 
         self.writeQueue.put(None)
-        print("Done with interpolation")
+        printAndLog("Finished Interpolation")
 
     def setupUpscale(self):
         """
@@ -155,6 +160,7 @@ class Render(FFMpegRender):
         For interpolation:
         Mapss the self.undoSetup to the tensor_to_frame function, which undoes the prep done in the FFMpeg thread. Used for SCDetect
         """
+        printAndLog("Setting up Upscale")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             upscalePytorch = UpscalePytorch(
                 self.upscaleModel,
@@ -182,7 +188,10 @@ class Render(FFMpegRender):
             self.upscale = upscaleNCNN.Upscale
 
     def setupInterpolate(self):
+        printAndLog("Setting up Interpolation")
+        
         if self.sceneDetectMethod != "none":
+            printAndLog("Detecting Transitions")
             scdetect = SceneDetect(
                 inputFile=self.inputFile,
                 sceneChangeSensitivity=self.sceneDetectSensitivty,

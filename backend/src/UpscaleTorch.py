@@ -122,18 +122,6 @@ class UpscalePytorch:
             .mul_(1 / 255)
         )
 
-    def loadImage(self, imagePath: str) -> torch.Tensor:
-        image = cv2.imread(imagePath)
-        imageTensor = (
-            torch.from_numpy(image)
-            .to(device=self.device, dtype=self.dtype)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .mul_(1 / 255)
-        )
-
-        return imageTensor.to(device=self.device, dtype=self.dtype)
-
     def tensorToNPArray(self, image: torch.Tensor) -> np.array:
         return image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
 

@@ -3,7 +3,6 @@ from tqdm import tqdm
 import cv2
 from queue import Queue
 
-from .Util import printAndLog
 
 
 class SceneDetect:
@@ -48,7 +47,7 @@ class SceneDetect:
 
     def getTransitions(self) -> Queue:
         "Method that returns a list of ints where the scene changes are."
-        printAndLog("Detecting Transitions")
+        
         if self.sceneChangeMethod == "pyscenedetect":
             return self.getPySceneDetectTransitions()
 
