@@ -137,7 +137,7 @@ class Render(FFMpegRender):
                 )
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(sc_detected_frame_np)
-                try:
+                try: # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
                 except:
                     self.transitionFrame = None

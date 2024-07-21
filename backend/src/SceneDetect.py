@@ -43,7 +43,7 @@ class SceneDetect:
             #    sceneChangeList += detectedFrameList
             match len(detectedFrameList):
                 case 1:
-                    sceneChangeStack.put(detectedFrameList[0])
+                    sceneChangeStack.put(detectedFrameList[0] - 1)
         return sceneChangeStack
 
     def getTransitions(self) -> Queue:
