@@ -3808,7 +3808,6 @@ class UpscaleNCNN:
         self.width = width
         self.height = height
         self.scale = scale
-        
 
     def Upscale(self, imageChunk):
         output = self.model.process_bytes(imageChunk, self.width, self.height, 3)

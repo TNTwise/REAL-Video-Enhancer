@@ -5,6 +5,7 @@ cwd = os.getcwd()
 with open(os.path.join(cwd, "log.txt"), "w") as f:
     pass
 
+
 def warnAndLog(message: str):
     warnings.warn(message)
     log("WARN: " + message)

@@ -116,19 +116,8 @@ background-color:#16191d
               <string notr="true">QWidget{
 background-color:#16191d
 
-}</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_3">
-              <item row="0" column="0">
-               <widget class="QWidget" name="videoInfoContainer" native="true">
-                <property name="maximumSize">
-                 <size>
-                  <width>16000</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QLineEdit{
+}
+QLineEdit{
 background-color:#2c313c;
 border-radius: 10px;
 }
@@ -158,6 +147,18 @@ color:white;
 }
 
 </string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QWidget" name="videoInfoContainer" native="true">
+                <property name="maximumSize">
+                 <size>
+                  <width>16000</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_7">
                  <item>
@@ -345,12 +346,46 @@ background-color:#16191d
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="morePage">
+            <widget class="QWidget" name="downloadPage">
              <property name="styleSheet">
               <string notr="true">QWidget{
 background-color:#16191d
 
-}</string>
+}
+QCheckBox{
+color:white;
+
+}
+QLineEdit{
+background-color:#2c313c;
+border-radius: 10px;
+}
+
+QPushButton{
+    background-color:#2c313c;
+	text-align:left;
+	padding:5px 10px;
+	border-radius: 10px;
+}
+QPushButton:checked{
+	background-color:#676e7b;
+}
+QPushButton:hover{
+	background-color:#343b47;
+}
+QPushButton:disabled{
+	background-color:#343b47;
+	color:gray;
+}
+QComboBox{
+background-color:#2c313c;
+	text-align:left;
+	padding:5px 10px;
+	border-radius: 10px;
+color:white;
+}
+
+</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="0" column="0">
@@ -363,6 +398,29 @@ background-color:#16191d
                 <property name="text">
                  <string>More</string>
                 </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QWidget" name="modelSelectContainer" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_10">
+                 <item>
+                  <widget class="QCheckBox" name="spanCheckBox">
+                   <property name="text">
+                    <string>Span</string>
+                   </property>
+                   <property name="checked">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="downloadModelsButton">
+                   <property name="text">
+                    <string>Download</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </widget>
               </item>
              </layout>
@@ -604,6 +662,32 @@ background-color:#16191d
               </widget>
              </item>
              <item>
+              <widget class="QPushButton" name="downloadBtn">
+               <property name="maximumSize">
+                <size>
+                 <width>55</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>35</width>
+                 <height>35</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="githubBtn">
                <property name="maximumSize">
                 <size>
@@ -623,32 +707,6 @@ background-color:#16191d
                </property>
                <property name="checkable">
                 <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="moreBtn">
-               <property name="maximumSize">
-                <size>
-                 <width>55</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/icons/icons/more-horizontal.svg</normaloff>:/icons/icons/more-horizontal.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>35</width>
-                 <height>35</height>
-                </size>
-               </property>
-               <property name="checkable">
-                <bool>true</bool>
                </property>
               </widget>
              </item>

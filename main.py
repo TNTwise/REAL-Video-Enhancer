@@ -9,7 +9,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 
 # other imports
-from src.util import (
+from src.Util import (
     checkValidVideo,
     getDefaultOutputVideo,
     getVideoFPS,
@@ -39,7 +39,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.homeBtn.clicked.connect(self.switchToHomePage)
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
-        self.moreBtn.clicked.connect(self.switchToMorePage)
+        self.downloadBtn.clicked.connect(self.switchToDownloadPage)
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
@@ -52,25 +52,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # switch menus
     def switchToHomePage(self):
-        self.stackedWidget.setCurrentWidget(self.homePage)  
+        self.stackedWidget.setCurrentWidget(self.homePage)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
+        self.downloadBtn.setChecked(False)
 
     def switchToProcessingPage(self):
         self.stackedWidget.setCurrentWidget(self.procPage)
         self.homeBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
+        self.downloadBtn.setChecked(False)
 
     def switchToSettingsPage(self):
         self.stackedWidget.setCurrentWidget(self.settingsPage)
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
+        self.downloadBtn.setChecked(False)
 
-    def switchToMorePage(self):
-        self.stackedWidget.setCurrentWidget(self.morePage)
+    def switchToDownloadPage(self):
+        self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)

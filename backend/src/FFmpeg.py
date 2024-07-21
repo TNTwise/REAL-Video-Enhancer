@@ -202,5 +202,7 @@ class FFMpegRender:
             process.stdin.close()
             process.wait()
 
-        renderTime = time.time() - startTime    
-        printAndLog(f"Completed Write!\nTime to complete render: {round(renderTime, 2)}")
+        renderTime = time.time() - startTime
+        printAndLog(
+            f"Completed Write!\nTime to complete render: {round(renderTime, 2)}"
+        )

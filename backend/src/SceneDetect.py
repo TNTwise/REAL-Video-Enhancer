@@ -4,7 +4,6 @@ import cv2
 from queue import Queue
 
 
-
 class SceneDetect:
     """
     Class to detect scene changes based on a few parameters
@@ -47,7 +46,7 @@ class SceneDetect:
 
     def getTransitions(self) -> Queue:
         "Method that returns a list of ints where the scene changes are."
-        
+
         if self.sceneChangeMethod == "pyscenedetect":
             return self.getPySceneDetectTransitions()
 

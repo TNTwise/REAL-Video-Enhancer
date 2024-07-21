@@ -116,6 +116,7 @@ class Render(FFMpegRender):
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
         printAndLog("Finished Upscale")
+
     def renderInterpolate(self):
         """
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
@@ -142,7 +143,7 @@ class Render(FFMpegRender):
                 )
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(sc_detected_frame_np)
-                try: # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
+                try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
                 except:
                     self.transitionFrame = None
@@ -189,7 +190,7 @@ class Render(FFMpegRender):
 
     def setupInterpolate(self):
         printAndLog("Setting up Interpolation")
-        
+
         if self.sceneDetectMethod != "none":
             printAndLog("Detecting Transitions")
             scdetect = SceneDetect(
