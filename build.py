@@ -53,7 +53,6 @@ def buildCUDALinux():
     Builds REAL Video Enhancer with cuda, needs python 3.11
     """
     pipInstall("requirements-CUDA-Linux.txt")
-    installImportLib()
     command = [
         "python3",
         "-m",
