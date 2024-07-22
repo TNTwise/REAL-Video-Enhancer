@@ -384,6 +384,10 @@ background-color:#2c313c;
 	border-radius: 10px;
 color:white;
 }
+Line{
+color:white;
+background-color:white;
+}
 
 </string>
              </property>
@@ -404,9 +408,23 @@ color:white;
                <widget class="QWidget" name="modelSelectContainer" native="true">
                 <layout class="QVBoxLayout" name="verticalLayout_10">
                  <item>
+                  <widget class="QLabel" name="label_5">
+                   <property name="text">
+                    <string>Upscaling Models</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="line">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QCheckBox" name="spanCheckBox">
                    <property name="text">
-                    <string>Span</string>
+                    <string>SPAN</string>
                    </property>
                    <property name="checked">
                     <bool>false</bool>
@@ -414,6 +432,40 @@ color:white;
                   </widget>
                  </item>
                  <item>
+                  <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>40</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string>Interpolation Models</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="Line" name="line_2">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QCheckBox" name="checkBox">
+                   <property name="text">
+                    <string>RIFE</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignBottom">
                   <widget class="QPushButton" name="downloadModelsButton">
                    <property name="text">
                     <string>Download</string>
