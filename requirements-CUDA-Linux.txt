@@ -1,10 +1,10 @@
-https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl
-https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp311-none-manylinux1_x86_64.whl
-https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl
-https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/Revert_ncnn/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl
-https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl
+https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp310-cp310-linux_x86_64.whl
+https://github.com/TNTwise/realcugan-ncnn-py/releases/download/2024-04-22-rve/realcugan_ncnn_py-2.0.0-cp310-none-manylinux1_x86_64.whl
+https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp310-none-manylinux1_x86_64.whl
+https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/Revert_ncnn/rife_ncnn_vulkan_python-1.2.1-cp310-cp310-linux_x86_64.whl
+https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp310-cp310-linux_x86_64.whl
+https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp310-cp310-linux_x86_64.whl
+https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp310-cp310-linux_x86_64.whl
 https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/polygraphy-0.49.10-py2.py3-none-any.whl
 spandrel
 fastrlock
