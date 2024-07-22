@@ -50,7 +50,7 @@ def fixEvalFrame():
 
 def buildCUDALinux():
     """
-    Builds REAL Video Enhancer with cuda, needs python 3.10
+    Builds REAL Video Enhancer with cuda, needs python 3.11
     """
     pipInstall("requirements-CUDA-Linux.txt")
     installImportLib()
