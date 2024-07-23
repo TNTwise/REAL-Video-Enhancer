@@ -16,8 +16,10 @@ from src.Util import (
     getVideoRes,
     getVideoLength,
     getVideoFrameCount,
+    checkIfDeps,
 )
 from src.ProcessTab import ProcessTab
+from src.DownloadDeps import DownloadDependencies
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -49,6 +51,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.outputFileSelectButton.clicked.connect(self.openOutputFolder)
         # connect render button
         self.startRenderButton.clicked.connect(self.startRender)
+
+        # setup application
+        self.setupBackendDeps()
+
+    def setupBackendDeps(self):
+        # need pop up window
+        if not checkIfDeps():
+            downloadDependencies = DownloadDependencies()
+            downloadDependencies.downloadPython()
+            downloadDependencies.downloadFFMpeg()
 
     # switch menus
     def switchToHomePage(self):

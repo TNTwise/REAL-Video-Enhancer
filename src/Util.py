@@ -1,14 +1,44 @@
 import cv2
 import os
 import warnings
+import sys
+import requests
+import stat
 
 cwd = os.getcwd()
 
-
-cwd = os.getcwd()
 with open(os.path.join(cwd, "log.txt"), "w") as f:
     pass
 
+
+def getPlatform() -> str:
+    """
+    Returns the current OS that the app is running on
+    Windows: win32
+    MacOS: darwin
+    Linux: linux
+    """
+    return sys.platform
+
+
+def pythonPath() -> str:
+    return (
+        os.path.join(cwd, "python", "bin", "python3")
+        if getPlatform() == "darwin" or getPlatform() == "linux"
+        else os.path.join(cwd, "python", "bin", "python3.exe")
+    )
+
+
+def ffmpegPath() -> str:
+    return (
+        os.path.join(cwd, "ffmpeg", "ffmpeg")
+        if getPlatform() == "darwin" or getPlatform() == "linux"
+        else os.path.join(cwd, "ffmpeg", "ffmpeg.exe")
+    )
+
+def makeExecutable(file_path):
+    st = os.stat(file_path)
+    os.chmod(file_path, st.st_mode | stat.S_IEXEC)
 
 def warnAndLog(message: str):
     warnings.warn(message)
@@ -38,6 +68,30 @@ def log(message: str):
 
 def currentDirectory():
     return cwd
+
+
+def removeFile(file):
+    os.remove(file)
+
+
+def checkIfDeps() -> bool:
+    """
+    Checks if python or ffmpeg is installed, and if not returns false.
+    """
+    if os.path.isfile(ffmpegPath()) == False or os.path.isfile(pythonPath()) == False:
+        return False
+    return True
+
+
+def downloadFile(link, downloadLocation):
+    response = requests.get(
+        link,
+        stream=True,
+    )
+
+    with open(downloadLocation, "wb") as f:
+        for chunk in response.iter_content(chunk_size=128):
+            f.write(chunk)
 
 
 def checkValidVideo(video_path):
