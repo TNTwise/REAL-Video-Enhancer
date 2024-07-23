@@ -50,6 +50,9 @@ styleSheet = (u"QLabel{\n"
 "")
 
 class DownloadAndReportToQTThread(QThread):
+    """
+    Downloads a file while reporting the actual bytes downloaded
+    """
     finished = QtCore.Signal()
     progress = QtCore.Signal(int)
     def __init__(self, parent=None):
@@ -70,6 +73,9 @@ class DownloadAndReportToQTThread(QThread):
         self.finished.emit()
 
 class DownloadProgressPopup(QtWidgets.QProgressDialog):
+    """
+    Runs a download of a file in another thread while reporitng progress to a qt progressbar popup
+    """
     def __init__(self, link: str, downloadLocation: str):
         super().__init__()
         self.link = link
@@ -81,7 +87,9 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.setRange(0,totalSize)
         self.startDownload()
         self.exec()
-
+    """
+    Initializes all threading bs
+    """
     def startDownload(self):
         self.worker.moveToThread(self.workerThread)
         self.workerThread.started.connect(lambda: self.worker.run(link=self.link, downloadLocation=self.downloadLocation))
