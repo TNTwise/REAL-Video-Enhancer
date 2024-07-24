@@ -11,7 +11,7 @@ from .Util import (
 from .QTcustom import DownloadProgressPopup
 import os
 import tarfile
-
+import subprocess
 
 class DownloadDependencies:
     """
@@ -46,6 +46,7 @@ class DownloadDependencies:
 
         # extract python
         self.extractTarGZ(pythonPath())
+        # give executable permissions to python 
         makeExecutable(pythonPath())
 
     def downloadFFMpeg(self):
@@ -58,8 +59,39 @@ class DownloadDependencies:
 
         printAndLog("Downloading FFMpeg")
         DownloadProgressPopup(link=link, downloadLocation=ffmpegPath(), title="Downloading FFMpeg")
+        # give executable permissions to ffmpeg
         makeExecutable(ffmpegPath())
+    
+    def pipInstall(self,deps:list): # going to have to make this into a qt module pop up
+        command = [pythonPath(),
+                   '-m',
+                   'pip',
+                   'install'] + deps
+        printAndLog("Downloading Deps: " + command)
+        subprocess.run(command=True)
 
+    def downloadPlatformIndependentDeps(self):
+        platformIndependentdeps = [
+            "testresources",
+                                   "PySide6==6.7",
+                                   "requests",
+                                   "opencv-python-headless",
+                                   "pypresence",
+                                   "psutil",
+                                   "pillow",
+                                   "scenedetect",
+                                   "numpy==1.26.4",
+                                   "sympy"
+        ]
+        self.pipInstall(platformIndependentdeps)
+    def downloadPyTorchCUDADeps(self):
+        pass
+    def downloadNCNNDeps(self):
+        pass
+    def downloadPyTorchROCmDeps(self):
+        pass
+    def downloadTensorRTDeps(self):
+        pass
 
 
 if __name__ == "__main__":
