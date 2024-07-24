@@ -34,12 +34,12 @@ class DownloadDependencies:
         removeFile(file)
 
     def downloadPython(self):
-        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9"
+        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-+20240713-"
         match getPlatform():
             case "linux":
-                link += "+20240713-x86_64-unknown-linux-gnu-install_only.tar.gz"
+                link += "x86_64-unknown-linux-gnu-install_only.tar.gz"
             case "win32":
-                link += "+20240713-x86_64-pc-windows-msvc-install_only.tar.gz"
+                link += "x86_64-pc-windows-msvc-install_only.tar.gz"
         # probably can add macos support later
         printAndLog("Downloading Python")
         DownloadProgressPopup(link=link, downloadLocation=pythonPath(),title="Downloading Python")
