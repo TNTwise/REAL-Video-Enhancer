@@ -12,24 +12,25 @@ class DownloadAndReportToQTThread(QThread):
 
     finished = QtCore.Signal()
     progress = QtCore.Signal(int)
-
-    def __init__(self, parent=None):
-        QThread.__init__(self, parent)
-
-    def run(self, link, downloadLocation):
+    
+    def __init__(self, link, downloadLocation,parent=None):
+        super().__init__(parent)
+        self.link = link
+        self.downloadLocation = downloadLocation
+    def run(self):
         response = requests.get(
-            link,
+            self.link,
             stream=True,
         )
-        lenBytes = int(response.headers["Content-Length"])
+        totalByteSize = int(response.headers["Content-Length"])
         totalSize = 0
-        with open(downloadLocation, "wb") as f:
+        with open(self.downloadLocation, "wb") as f:
             chunk_size = 128
             for chunk in response.iter_content(chunk_size=chunk_size):
                 f.write(chunk)
-                totalSize = int(chunk_size / lenBytes * 100 + 1)
-                print(totalSize)
-                self.progress.emit(totalSize)
+                totalSize += chunk_size
+                size = totalSize / totalByteSize * 100
+                self.progress.emit(size)
         self.finished.emit()
 
 
@@ -43,9 +44,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         super().__init__()
         self.link = link
         self.downloadLocation = downloadLocation
-        self.workerThread = QThread()
-        self.worker = DownloadAndReportToQTThread()
-        self.setLabelText("")
+        
         self.setWindowTitle(title)
         self.setStyleSheet(styleSheet())
         self.setRange(0, 100)
@@ -59,18 +58,17 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     """
 
     def startDownload(self):
-        self.worker.moveToThread(self.workerThread)
-        self.workerThread.started.connect(
-            lambda: self.worker.run(
-                link=self.link, downloadLocation=self.downloadLocation
-            )
-        )
-        self.worker.progress.connect(self.setProgress)
-        self.worker.finished.connect(self.workerThread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
+        self.workerThread = DownloadAndReportToQTThread(link=self.link, downloadLocation=self.downloadLocation)
+        self.workerThread.progress.connect(self.setProgress)
         self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.close)
         self.workerThread.start()
 
     def setProgress(self, value):
         self.setValue(value)
+
+
+if __name__ == '__main__':
+    DownloadProgressPopup(
+            link="https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg", downloadLocation="ffmpeg", title="Downloading Python"
+        )
