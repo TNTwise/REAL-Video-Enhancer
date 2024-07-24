@@ -160,7 +160,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
-    #setting the pallette
+    # setting the pallette
     palette = QPalette()
     palette.setColor(QPalette.Window, QColor(31, 35, 42))
     palette.setColor(QPalette.WindowText, Qt.white)

@@ -36,9 +36,11 @@ def ffmpegPath() -> str:
         else os.path.join(cwd, "ffmpeg", "ffmpeg.exe")
     )
 
+
 def makeExecutable(file_path):
     st = os.stat(file_path)
     os.chmod(file_path, st.st_mode | stat.S_IEXEC)
+
 
 def warnAndLog(message: str):
     warnings.warn(message)

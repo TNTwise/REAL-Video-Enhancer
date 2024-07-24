@@ -41,11 +41,15 @@ color: #fff;
 
 QProgressBar{
     background-color:#2c313c;
-	text-align:left;
-	padding:5px 10px;
 	border-radius: 10px;
 
 }
+ QProgressBar::chunk {
+     background-color:white;
+	text-align:left;
+	border-radius: 10px;
+	
+ }
 QStackedWidget{
 	background-color:#16191d;
 	text-align:left;
