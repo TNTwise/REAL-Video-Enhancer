@@ -34,32 +34,32 @@ class DownloadDependencies:
         removeFile(file)
 
     def downloadPython(self):
-        pythonInstallLocation = os.path.join(
-            currentDirectory(), "python", "python.tar.gz"
-        )
+        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9"
         match getPlatform():
             case "linux":
-                link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-x86_64-unknown-linux-gnu-install_only.tar.gz"
+                link += "+20240713-x86_64-unknown-linux-gnu-install_only.tar.gz"
             case "win32":
-                link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-x86_64-pc-windows-msvc-install_only.tar.gz"
+                link += "+20240713-x86_64-pc-windows-msvc-install_only.tar.gz"
         # probably can add macos support later
         printAndLog("Downloading Python")
-        DownloadProgressPopup(link=link, downloadLocation=pythonInstallLocation,title="Downloading Python")
+        DownloadProgressPopup(link=link, downloadLocation=pythonPath(),title="Downloading Python")
 
         # extract python
-        self.extractTarGZ(pythonInstallLocation)
+        self.extractTarGZ(pythonPath())
         makeExecutable(pythonPath())
 
     def downloadFFMpeg(self):
+        link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
         match getPlatform():
             case "linux":
-                link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg"
+                link += "ffmpeg"
             case "win32":
-                link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg.exe"
+                link += "ffmpeg.exe"
 
         printAndLog("Downloading FFMpeg")
         DownloadProgressPopup(link=link, downloadLocation=ffmpegPath(), title="Downloading FFMpeg")
         makeExecutable(ffmpegPath())
+
 
 
 if __name__ == "__main__":
