@@ -21,12 +21,14 @@ class DownloadAndReportToQTThread(QThread):
             link,
             stream=True,
         )
+        lenBytes = int(response.headers["Content-Length"])
         totalSize = 0
         with open(downloadLocation, "wb") as f:
             chunk_size = 128
             for chunk in response.iter_content(chunk_size=chunk_size):
                 f.write(chunk)
-                totalSize += chunk_size
+                totalSize = int(chunk_size / lenBytes * 100 + 1)
+                print(totalSize)
                 self.progress.emit(totalSize)
         self.finished.emit()
 
@@ -43,10 +45,10 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.downloadLocation = downloadLocation
         self.workerThread = QThread()
         self.worker = DownloadAndReportToQTThread()
-        totalSize = int(requests.get(link).headers["Content-Length"])
+        self.setLabelText("")
         self.setWindowTitle(title)
         self.setStyleSheet(styleSheet())
-        self.setRange(0, totalSize)
+        self.setRange(0, 100)
         self.setMinimumSize(300, 100)
         self.setMaximumSize(300, 100)
         self.startDownload()

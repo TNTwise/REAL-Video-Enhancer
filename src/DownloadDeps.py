@@ -13,6 +13,7 @@ import os
 import tarfile
 import subprocess
 
+
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -34,7 +35,8 @@ class DownloadDependencies:
         removeFile(file)
 
     def downloadPython(self):
-        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-+20240713-"
+        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-"
+        pyDir = os.path.join(currentDirectory(), "python.tar.gz",)
         match getPlatform():
             case "linux":
                 link += "x86_64-unknown-linux-gnu-install_only.tar.gz"
@@ -42,11 +44,13 @@ class DownloadDependencies:
                 link += "x86_64-pc-windows-msvc-install_only.tar.gz"
         # probably can add macos support later
         printAndLog("Downloading Python")
-        DownloadProgressPopup(link=link, downloadLocation=pythonPath(),title="Downloading Python")
+        DownloadProgressPopup(
+            link=link, downloadLocation=pyDir, title="Downloading Python"
+        )
 
         # extract python
-        self.extractTarGZ(pythonPath())
-        # give executable permissions to python 
+        self.extractTarGZ(pyDir)
+        # give executable permissions to python
         makeExecutable(pythonPath())
 
     def downloadFFMpeg(self):
@@ -58,40 +62,94 @@ class DownloadDependencies:
                 link += "ffmpeg.exe"
 
         printAndLog("Downloading FFMpeg")
-        DownloadProgressPopup(link=link, downloadLocation=ffmpegPath(), title="Downloading FFMpeg")
+        DownloadProgressPopup(
+            link=link, downloadLocation=ffmpegPath(), title="Downloading FFMpeg"
+        )
         # give executable permissions to ffmpeg
         makeExecutable(ffmpegPath())
-    
-    def pipInstall(self,deps:list): # going to have to make this into a qt module pop up
-        command = [pythonPath(),
-                   '-m',
-                   'pip',
-                   'install'] + deps
+
+    def pipInstall(
+        self, deps: list
+    ):  # going to have to make this into a qt module pop up
+        command = [pythonPath(), "-m", "pip", "install"] + deps
         printAndLog("Downloading Deps: " + command)
         subprocess.run(command=True)
 
     def downloadPlatformIndependentDeps(self):
         platformIndependentdeps = [
             "testresources",
-                                   "PySide6==6.7",
-                                   "requests",
-                                   "opencv-python-headless",
-                                   "pypresence",
-                                   "psutil",
-                                   "pillow",
-                                   "scenedetect",
-                                   "numpy==1.26.4",
-                                   "sympy"
+            "requests",
+            "opencv-python-headless",
+            "pypresence",
+            "scenedetect",
+            "numpy==1.26.4",
+            "sympy",
         ]
         self.pipInstall(platformIndependentdeps)
+
     def downloadPyTorchCUDADeps(self):
-        pass
+        """
+        Installs:
+        Default deps
+        Pytorch CUDA deps
+        """
+        self.downloadPlatformIndependentDeps()
+        torchCUDALinuxDeps = [
+            "spandrel",
+            "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
+        ]
+        torchCUDAWindowsDeps = [
+            "spandrel",
+            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl"
+            "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+        ]
+        if getPlatform() == "win32":
+            self.pipInstall(torchCUDAWindowsDeps)
+        if getPlatform() == "linux":
+            self.pipInstall(torchCUDALinuxDeps)
+
     def downloadNCNNDeps(self):
-        pass
+        """
+        Installs:
+        Default deps
+        NCNN deps
+        """
+        self.downloadPlatformIndependentDeps()
+        ncnnLinuxDeps = [
+            "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/Revert_ncnn/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl",
+        ]
+        ncnnWindowsDeps = [
+            "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
+
+
+        ]
+        if getPlatform() == "win32":
+            self.pipInstall(ncnnWindowsDeps)
+        if getPlatform() == "Linux":
+            self.pipInstall(ncnnLinuxDeps)
     def downloadPyTorchROCmDeps(self):
         pass
+
     def downloadTensorRTDeps(self):
-        pass
+        """
+        Installs:
+        Default deps
+        Pytorch CUDA deps
+        TensorRT deps
+        """
+        self.downloadPyTorchCUDADeps()
+        tensorRTDeps = [
+            "tensorrt==10.0.1",
+            "tensorrt_cu12==10.0.1",
+            "tensorrt-cu12_libs==10.0.1",
+            "tensorrt_cu12_bindings==10.0.1",
+        ]
+        self.pipInstall(tensorRTDeps)
 
 
 if __name__ == "__main__":

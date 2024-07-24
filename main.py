@@ -19,6 +19,7 @@ from src.ProcessTab import ProcessTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()

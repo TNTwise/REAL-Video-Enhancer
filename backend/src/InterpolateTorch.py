@@ -68,14 +68,12 @@ class InterpolateRifeTorch:
             torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
             .view(1, 1, 1, self.pw)
             .expand(-1, -1, self.ph, -1)
-        ).to(dtype=self.dtype,
-            device=self.device)
+        ).to(dtype=self.dtype, device=self.device)
         tenVertical = (
             torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device)
             .view(1, 1, self.ph, 1)
             .expand(-1, -1, -1, self.pw)
-        ).to(dtype=self.dtype,
-            device=self.device)
+        ).to(dtype=self.dtype, device=self.device)
         self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
 
         # detect what rife arch to use
