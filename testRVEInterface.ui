@@ -14,7 +14,14 @@
    <string>MainWindow</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QLabel{
+   <string notr="true">
+
+QMainWindow {
+   color:black;
+   background-color:black;
+border:1px;
+}
+QLabel{
 	color: #fff;
 }
 QLineEdit{

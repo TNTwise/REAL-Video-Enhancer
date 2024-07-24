@@ -3,9 +3,10 @@ import os
 import subprocess
 from threading import Thread
 
-from PySide6.QtGui import QImage
+from PySide6.QtGui import QImage, QPalette, QColor
 from PySide6.QtCore import QPropertyAnimation, QPoint, QThread
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtCore import Qt
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 
 # other imports
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Set up the user interface from Designer.
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
+        self.setPalette(QApplication.style().standardPalette())
 
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
@@ -157,6 +159,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    #setting the pallette
+    palette = QPalette()
+    palette.setColor(QPalette.Window, QColor(31, 35, 42))
+    palette.setColor(QPalette.WindowText, Qt.white)
+    palette.setColor(QPalette.Base, QColor(25, 25, 25))
+    palette.setColor(QPalette.AlternateBase, QColor(53, 53, 53))
+    palette.setColor(QPalette.ToolTipBase, Qt.black)
+    palette.setColor(QPalette.ToolTipText, Qt.white)
+    palette.setColor(QPalette.Text, Qt.white)
+    palette.setColor(QPalette.Button, QColor(53, 53, 53))
+    palette.setColor(QPalette.ButtonText, Qt.white)
+    palette.setColor(QPalette.Disabled, QPalette.Base, QColor(49, 49, 49))
+    palette.setColor(QPalette.Disabled, QPalette.Text, QColor(90, 90, 90))
+    palette.setColor(QPalette.Disabled, QPalette.Button, QColor(42, 42, 42))
+    palette.setColor(QPalette.Disabled, QPalette.ButtonText, QColor(90, 90, 90))
+    palette.setColor(QPalette.Disabled, QPalette.Window, QColor(49, 49, 49))
+    palette.setColor(QPalette.Disabled, QPalette.WindowText, QColor(90, 90, 90))
+    palette.setColor(QPalette.BrightText, Qt.red)
+    palette.setColor(QPalette.Link, QColor(42, 130, 218))
+    palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
+    palette.setColor(QPalette.HighlightedText, Qt.black)
+
+    app.setPalette(palette)
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
