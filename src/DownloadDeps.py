@@ -36,7 +36,7 @@ class DownloadDependencies:
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-"
-        pyDir = os.path.join(currentDirectory(), "python.tar.gz",)
+        pyDir = os.path.join(currentDirectory(),"python", "python.tar.gz",)
         match getPlatform():
             case "linux":
                 link += "x86_64-unknown-linux-gnu-install_only.tar.gz"
@@ -50,6 +50,7 @@ class DownloadDependencies:
 
         # extract python
         self.extractTarGZ(pyDir)
+
         # give executable permissions to python
         makeExecutable(pythonPath())
 

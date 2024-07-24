@@ -58,8 +58,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # need pop up window
         if not checkIfDeps():
             downloadDependencies = DownloadDependencies()
-            downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
+            downloadDependencies.downloadFFMpeg()
+            
             
 
     # switch menus

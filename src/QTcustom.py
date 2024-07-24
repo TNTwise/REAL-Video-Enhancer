@@ -60,8 +60,9 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     def startDownload(self):
         self.workerThread = DownloadAndReportToQTThread(link=self.link, downloadLocation=self.downloadLocation)
         self.workerThread.progress.connect(self.setProgress)
-        self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.close)
+        self.workerThread.finished.connect(self.workerThread.deleteLater)
+        self.workerThread.finished.connect(self.workerThread.quit)
         self.workerThread.start()
 
     def setProgress(self, value):
