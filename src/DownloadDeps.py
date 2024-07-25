@@ -7,6 +7,7 @@ from .Util import (
     createDirectory,
     removeFile,
     makeExecutable,
+    move
 )
 from .QTcustom import DownloadProgressPopup
 import os
@@ -54,7 +55,9 @@ class DownloadDependencies:
         # give executable permissions to python
         makeExecutable(pythonPath())
 
+
     def downloadFFMpeg(self):
+        ffmpegTempPath = os.path.join(currentDirectory(),"ffmpeg","ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
         match getPlatform():
             case "linux":
@@ -64,10 +67,11 @@ class DownloadDependencies:
 
         printAndLog("Downloading FFMpeg")
         DownloadProgressPopup(
-            link=link, downloadLocation=ffmpegPath(), title="Downloading FFMpeg"
+            link=link, downloadLocation=ffmpegTempPath, title="Downloading FFMpeg"
         )
         # give executable permissions to ffmpeg
-        makeExecutable(ffmpegPath())
+        makeExecutable(ffmpegTempPath)
+        move(ffmpegTempPath,ffmpegPath())
 
     def pipInstall(
         self, deps: list
@@ -126,8 +130,7 @@ class DownloadDependencies:
         ]
         ncnnWindowsDeps = [
             "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
-
-
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/proc_bytes/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-win_amd64.whl"
         ]
         if getPlatform() == "win32":
             self.pipInstall(ncnnWindowsDeps)

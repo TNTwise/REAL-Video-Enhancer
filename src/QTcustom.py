@@ -1,4 +1,4 @@
-from PySide6 import QtWidgets, QtCore
+from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import QThread, QObject
 
 import requests
@@ -44,14 +44,17 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         super().__init__()
         self.link = link
         self.downloadLocation = downloadLocation
-        
         self.setWindowTitle(title)
         self.setStyleSheet(styleSheet())
         self.setRange(0, 100)
         self.setMinimumSize(300, 100)
         self.setMaximumSize(300, 100)
+        customProgressBar = QtWidgets.QProgressBar()
+        customProgressBar.setTextVisible(False)
+        self.setBar(customProgressBar)
         self.startDownload()
         self.exec()
+        self.workerThread.wait()
     """
     Initializes all threading bs
     """
@@ -64,9 +67,11 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.workerThread.finished.connect(self.workerThread.quit)
         self.workerThread.finished.connect(self.workerThread.wait) # need quit and wait to allow process to exit safely
         self.workerThread.start()
-
+        
     def setProgress(self, value):
+        
         self.setValue(value)
+
 
 
 if __name__ == '__main__':

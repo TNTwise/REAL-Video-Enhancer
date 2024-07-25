@@ -36,23 +36,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
 
+        # set default home page
+        self.stackedWidget.setCurrentIndex(0)
+
+    
+        # setup application
+        self.setupBackendDeps()
+
+    def QButtonConnect(self):
+
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
-
-        # set default home page
-        self.stackedWidget.setCurrentIndex(0)
-
         # connect file select buttons
         self.inputFileSelectButton.clicked.connect(self.openInputFile)
         self.outputFileSelectButton.clicked.connect(self.openOutputFolder)
         # connect render button
         self.startRenderButton.clicked.connect(self.startRender)
-
-        # setup application
-        self.setupBackendDeps()
 
     def setupBackendDeps(self):
         # need pop up window
