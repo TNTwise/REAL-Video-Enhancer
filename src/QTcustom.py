@@ -52,7 +52,6 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.setMaximumSize(300, 100)
         self.startDownload()
         self.exec()
-
     """
     Initializes all threading bs
     """
@@ -63,6 +62,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.workerThread.finished.connect(self.close)
         self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.workerThread.quit)
+        self.workerThread.finished.connect(self.workerThread.wait) # need quit and wait to allow process to exit safely
         self.workerThread.start()
 
     def setProgress(self, value):
