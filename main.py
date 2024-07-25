@@ -39,6 +39,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
+        self.QButtonConnect()
     
         # setup application
         self.setupBackendDeps()
@@ -93,8 +94,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def startRender(self):
         processTab = ProcessTab(
             parent=self,
-            inputFile=self.inputFile,
-            outputPath="",
+            inputFile=self.inputFileText.text(),
+            outputPath=self.outputFileText.text(),
             videoWidth=self.videoWidth,
             videoHeight=self.videoHeight,
             videoFps=self.videoFps,
@@ -103,7 +104,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             interpolateTimes=self.interpolateTimes,
         )
         processTab.run()
-
+    
     # input file button
     def openInputFile(self):
         """
