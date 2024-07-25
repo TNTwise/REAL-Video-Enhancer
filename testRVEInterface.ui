@@ -100,6 +100,9 @@ QPushButton:hover{
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
+            <property name="styleSheet">
+             <string notr="true"/>
+            </property>
             <widget class="QWidget" name="homePage">
              <property name="styleSheet">
               <string notr="true">QWidget{
@@ -157,7 +160,17 @@ background-color:#2c313c;
 color:white;
 }
 
-</string>
+QProgressBar{
+    background-color:#2c313c;
+	border-radius: 10px;
+
+}
+ QProgressBar::chunk {
+     background-color:white;
+	text-align:left;
+	border-radius: 10px;
+	
+ }</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
@@ -328,6 +341,66 @@ border-radius: 10px;
                      </widget>
                     </item>
                    </layout>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="2">
+               <widget class="QWidget" name="bottomMenuSubContainer" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>85</height>
+                 </size>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="spacing">
+                  <number>20</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>22</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>22</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="startRenderButton">
+                   <property name="maximumSize">
+                    <size>
+                     <width>59</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resources.qrc">
+                     <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>55</width>
+                     <height>45</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QProgressBar" name="progressBar">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="value">
+                    <number>0</number>
+                   </property>
+                   <property name="textVisible">
+                    <bool>false</bool>
+                   </property>
                   </widget>
                  </item>
                 </layout>
@@ -682,72 +755,6 @@ background-color:white;
               </item>
              </layout>
             </widget>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item alignment="Qt::AlignmentFlag::AlignBottom">
-        <widget class="QWidget" name="bottomMenuContainer" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QWidget" name="bottomMenuSubContainer" native="true">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>85</height>
-             </size>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
-             <property name="spacing">
-              <number>20</number>
-             </property>
-             <property name="leftMargin">
-              <number>22</number>
-             </property>
-             <property name="rightMargin">
-              <number>22</number>
-             </property>
-             <item>
-              <widget class="QPushButton" name="startRenderButton">
-               <property name="maximumSize">
-                <size>
-                 <width>59</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="resources.qrc">
-                 <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
-               </property>
-               <property name="iconSize">
-                <size>
-                 <width>55</width>
-                 <height>45</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QProgressBar" name="progressBar">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-               <property name="textVisible">
-                <bool>false</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
          </layout>
