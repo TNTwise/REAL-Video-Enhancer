@@ -1,11 +1,14 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import QThread, QObject
-import sys
+from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton
 
+import sys
+import subprocess
 import requests
+
 from .QTstyle import styleSheet
 
-
+# custom threads
 class DownloadAndReportToQTThread(QThread):
     """
     Downloads a file while reporting the actual bytes downloaded
@@ -35,7 +38,33 @@ class DownloadAndReportToQTThread(QThread):
                 self.progress.emit(size)
         self.finished.emit()
 
+class SubprocessThread(QThread):
+    output = QtCore.Signal(str)
 
+    def __init__(self, command):
+        super().__init__()
+        self.command = command
+
+    def run(self):
+        process = subprocess.Popen(
+            self.command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            bufsize=1,
+            universal_newlines=True
+        )
+        
+        for line in iter(process.stdout.readline, ''):
+            self.output.emit(line.strip())
+        
+        process.stdout.close()
+        return_code = process.wait()
+        self.output.emit(f"Process finished with return code {return_code}")
+
+
+
+# Custom Widgets
 class DownloadProgressPopup(QtWidgets.QProgressDialog):
     """
     Runs a download of a file in a thread while reporitng progress to a qt progressbar popup.
@@ -87,6 +116,52 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         if self.wasCanceled():
             exit()
         self.setValue(value + 10)
+
+
+class DisplayCommandOutputPopup(QtWidgets.QProgressDialog):
+    """
+    Runs a download of a file in a thread while reporitng progress to a qt progressbar popup.
+    This wont start up in a new process, rather it will just take over the current process
+    """
+
+    def __init__(self, command:str, title:str="Running Command"):
+        super().__init__()
+        self.command = command
+        self.setWindowTitle(title)
+        self.setStyleSheet(styleSheet())
+        self.setRange(0, 100)
+        self.setMinimumSize(300, 100)
+        self.setMaximumSize(300, 100)
+        customProgressBar = QtWidgets.QProgressBar()
+        customProgressBar.setTextVisible(False)
+        self.setAttribute(QtCore.Qt.WA_QuitOnClose)
+        customProgressBar.setAlignment(QtCore.Qt.AlignCenter)
+        self.setBar(customProgressBar)
+        self.startDownload()
+        self.exec()
+        self.workerThread.wait()
+
+    """
+    Initializes all threading bs
+    """
+
+    def startDownload(self):
+        self.workerThread = SubprocessThread(
+            command=self.command
+        )
+        self.workerThread.output.connect(self.setProgress)
+        self.workerThread.finished.connect(self.close)
+        self.workerThread.finished.connect(self.workerThread.deleteLater)
+        self.workerThread.finished.connect(self.workerThread.quit)
+        self.workerThread.finished.connect(
+            self.workerThread.wait
+        )  # need quit and wait to allow process to exit safely
+
+        self.workerThread.start()
+
+    def setProgress(self, value):
+        
+        print(value)
 
 
 if __name__ == "__main__":

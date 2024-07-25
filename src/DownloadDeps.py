@@ -9,7 +9,7 @@ from .Util import (
     makeExecutable,
     move,
 )
-from .QTcustom import DownloadProgressPopup
+from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import tarfile
 import subprocess
@@ -80,8 +80,8 @@ class DownloadDependencies:
         self, deps: list
     ):  # going to have to make this into a qt module pop up
         command = [pythonPath(), "-m", "pip", "install"] + deps
-        printAndLog("Downloading Deps: " + command)
-        subprocess.run(command=True)
+        printAndLog("Downloading Deps: " + str(command))
+        DisplayCommandOutputPopup(command)
 
     def downloadPlatformIndependentDeps(self):
         platformIndependentdeps = [
@@ -137,7 +137,7 @@ class DownloadDependencies:
         ]
         if getPlatform() == "win32":
             self.pipInstall(ncnnWindowsDeps)
-        if getPlatform() == "Linux":
+        if getPlatform() == "linux":
             self.pipInstall(ncnnLinuxDeps)
 
     def downloadPyTorchROCmDeps(self):
