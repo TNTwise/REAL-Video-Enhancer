@@ -1,5 +1,6 @@
 from PySide6 import QtWidgets, QtCore, QtGui
 from PySide6.QtCore import QThread, QObject
+import sys
 
 import requests
 from .QTstyle import styleSheet
@@ -51,6 +52,8 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.setMaximumSize(300, 100)
         customProgressBar = QtWidgets.QProgressBar()
         customProgressBar.setTextVisible(False)
+        self.setAttribute(QtCore.Qt.WA_QuitOnClose)
+        customProgressBar.setAlignment(QtCore.Qt.AlignCenter)
         self.setBar(customProgressBar)
         self.startDownload()
         self.exec()
@@ -66,11 +69,18 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.workerThread.quit)
         self.workerThread.finished.connect(self.workerThread.wait) # need quit and wait to allow process to exit safely
+        self.canceled.connect(self.cancel_process)
+
         self.workerThread.start()
-        
+    
+    def cancel_process(self):
+        QtWidgets.QApplication.quit()
+        sys.exit()
+
     def setProgress(self, value):
-        
-        self.setValue(value)
+        if self.wasCanceled():
+            exit()
+        self.setValue(value+10)
 
 
 
