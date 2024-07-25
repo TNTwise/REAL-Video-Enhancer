@@ -13,11 +13,12 @@ class DownloadAndReportToQTThread(QThread):
 
     finished = QtCore.Signal()
     progress = QtCore.Signal(int)
-    
-    def __init__(self, link, downloadLocation,parent=None):
+
+    def __init__(self, link, downloadLocation, parent=None):
         super().__init__(parent)
         self.link = link
         self.downloadLocation = downloadLocation
+
     def run(self):
         response = requests.get(
             self.link,
@@ -58,21 +59,26 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.startDownload()
         self.exec()
         self.workerThread.wait()
+
     """
     Initializes all threading bs
     """
 
     def startDownload(self):
-        self.workerThread = DownloadAndReportToQTThread(link=self.link, downloadLocation=self.downloadLocation)
+        self.workerThread = DownloadAndReportToQTThread(
+            link=self.link, downloadLocation=self.downloadLocation
+        )
         self.workerThread.progress.connect(self.setProgress)
         self.workerThread.finished.connect(self.close)
         self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.workerThread.quit)
-        self.workerThread.finished.connect(self.workerThread.wait) # need quit and wait to allow process to exit safely
+        self.workerThread.finished.connect(
+            self.workerThread.wait
+        )  # need quit and wait to allow process to exit safely
         self.canceled.connect(self.cancel_process)
 
         self.workerThread.start()
-    
+
     def cancel_process(self):
         QtWidgets.QApplication.quit()
         sys.exit()
@@ -80,11 +86,12 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     def setProgress(self, value):
         if self.wasCanceled():
             exit()
-        self.setValue(value+10)
+        self.setValue(value + 10)
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     DownloadProgressPopup(
-            link="https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg", downloadLocation="ffmpeg", title="Downloading Python"
-        )
+        link="https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/ffmpeg",
+        downloadLocation="ffmpeg",
+        title="Downloading Python",
+    )

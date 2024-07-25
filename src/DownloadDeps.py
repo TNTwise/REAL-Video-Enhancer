@@ -7,7 +7,7 @@ from .Util import (
     createDirectory,
     removeFile,
     makeExecutable,
-    move
+    move,
 )
 from .QTcustom import DownloadProgressPopup
 import os
@@ -37,7 +37,11 @@ class DownloadDependencies:
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-"
-        pyDir = os.path.join(currentDirectory(),"python", "python.tar.gz",)
+        pyDir = os.path.join(
+            currentDirectory(),
+            "python",
+            "python.tar.gz",
+        )
         match getPlatform():
             case "linux":
                 link += "x86_64-unknown-linux-gnu-install_only.tar.gz"
@@ -55,9 +59,8 @@ class DownloadDependencies:
         # give executable permissions to python
         makeExecutable(pythonPath())
 
-
     def downloadFFMpeg(self):
-        ffmpegTempPath = os.path.join(currentDirectory(),"ffmpeg","ffmpeg.temp")
+        ffmpegTempPath = os.path.join(currentDirectory(), "ffmpeg", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
         match getPlatform():
             case "linux":
@@ -71,7 +74,7 @@ class DownloadDependencies:
         )
         # give executable permissions to ffmpeg
         makeExecutable(ffmpegTempPath)
-        move(ffmpegTempPath,ffmpegPath())
+        move(ffmpegTempPath, ffmpegPath())
 
     def pipInstall(
         self, deps: list
@@ -130,12 +133,13 @@ class DownloadDependencies:
         ]
         ncnnWindowsDeps = [
             "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
-            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/proc_bytes/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-win_amd64.whl"
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/proc_bytes/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-win_amd64.whl",
         ]
         if getPlatform() == "win32":
             self.pipInstall(ncnnWindowsDeps)
         if getPlatform() == "Linux":
             self.pipInstall(ncnnLinuxDeps)
+
     def downloadPyTorchROCmDeps(self):
         pass
 

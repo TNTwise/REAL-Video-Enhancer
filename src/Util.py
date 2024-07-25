@@ -28,11 +28,13 @@ def pythonPath() -> str:
         else os.path.join(cwd, "python", "bin", "python3.exe")
     )
 
-def move(prev:str,new:str):
+
+def move(prev: str, new: str):
     """
     moves a file from prev to new
     """
-    os.rename(prev,new)
+    os.rename(prev, new)
+
 
 def ffmpegPath() -> str:
     return (

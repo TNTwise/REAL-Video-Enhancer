@@ -148,8 +148,8 @@ QPushButton:checked{
 QPushButton:hover{
 	background-color:#343b47;
 }
-QPushButton:disabled{
-	background-color:#343b47;
+*:disabled{
+ 
 	color:gray;
 }
 QComboBox{
@@ -366,6 +366,9 @@ border-radius: 10px;
                  </property>
                  <item>
                   <widget class="QPushButton" name="startRenderButton">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
                    <property name="maximumSize">
                     <size>
                      <width>59</width>

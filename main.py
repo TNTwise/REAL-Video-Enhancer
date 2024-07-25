@@ -16,6 +16,8 @@ from src.Util import (
     checkIfDeps,
 )
 from src.ProcessTab import ProcessTab
+from src.DownloadTab import DownloadTab
+from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
 
@@ -40,22 +42,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
-    
+
         # setup application
         self.setupBackendDeps()
 
-    def QButtonConnect(self):
+        # set up tabs
+        self.processTab = ProcessTab(parent=self)
+        self.downloadTab = DownloadTab(parent=self)
+        self.settingsTab = SettingsTab(parent=self)
 
+    def QButtonConnect(self):
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
-        # connect file select buttons
-        self.inputFileSelectButton.clicked.connect(self.openInputFile)
-        self.outputFileSelectButton.clicked.connect(self.openOutputFolder)
-        # connect render button
-        self.startRenderButton.clicked.connect(self.startRender)
 
     def setupBackendDeps(self):
         # need pop up window
@@ -63,8 +64,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             downloadDependencies = DownloadDependencies()
             downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
-            
-            
 
     # switch menus
     def switchToHomePage(self):
@@ -92,8 +91,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
 
     def startRender(self):
-        processTab = ProcessTab(
-            parent=self,
+        self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
             videoWidth=self.videoWidth,
@@ -103,8 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             upscaleTimes=self.upscaleTimes,
             interpolateTimes=self.interpolateTimes,
         )
-        processTab.run()
-    
+
     # input file button
     def openInputFile(self):
         """

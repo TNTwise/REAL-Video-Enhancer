@@ -2,12 +2,26 @@ import subprocess
 import os
 from threading import Thread
 from PySide6.QtCore import QThread
+from .Util import ffmpegPath, pythonPath, currentDirectory
 
 
 class ProcessTab:
     def __init__(
         self,
         parent,
+    ):
+        self.parent = parent
+        self.QButtonConnect()
+
+    def QButtonConnect(self):
+        # connect file select buttons
+        self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
+        self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
+        # connect render button
+        self.parent.startRenderButton.clicked.connect(self.parent.startRender)
+
+    def run(
+        self,
         inputFile: str,
         outputPath: str,
         videoWidth: int,
@@ -17,7 +31,6 @@ class ProcessTab:
         upscaleTimes: int,
         interpolateTimes: int,
     ):
-        self.parent = parent
         self.inputFile = inputFile
         self.outputPath = outputPath
         self.videoWidth = videoWidth
@@ -26,8 +39,6 @@ class ProcessTab:
         self.videoFrameCount = videoFrameCount
         self.upscaleTimes = upscaleTimes
         self.interpolateTimes = interpolateTimes
-
-    def run(self):
         """
         Function to start the rendering process
         It will initially check for any issues with the current setup, (invalid file, no permissions, etc..)
@@ -45,8 +56,8 @@ class ProcessTab:
 
     def renderToPipeThread(self):
         command = [
-            "./bin/python3.11",
-            os.path.join("backend", "rve-backend.py"),
+            f"{pythonPath()}",
+            os.path.join(currentDirectory(), "backend", "rve-backend.py"),
             "-i",
             self.inputFile,
             "-o",
@@ -66,7 +77,7 @@ class ProcessTab:
 
     def ffmpegWriteThread(self):
         command = [
-            f"{os.path.join('bin','ffmpeg')}",
+            f"{ffmpegPath()}",
             "-f",
             "rawvideo",
             "-pix_fmt",
@@ -89,8 +100,7 @@ class ProcessTab:
             "yuv420p",
             "-c:a",
             "copy",
-            f"out10.mp4",  # placeholder
-            "-y",
+            f"{self.outputPath}",
         ]
         writeOutFrames = subprocess.Popen(
             command,
