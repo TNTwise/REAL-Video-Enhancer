@@ -12,7 +12,7 @@ from .Util import (
 from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import tarfile
-import subprocess
+
 
 
 class DownloadDependencies:
@@ -81,9 +81,9 @@ class DownloadDependencies:
     ):  # going to have to make this into a qt module pop up
         command = [pythonPath(), "-m", "pip", "install"] + deps
         printAndLog("Downloading Deps: " + str(command))
-        DisplayCommandOutputPopup(command)
+        DisplayCommandOutputPopup(command=command,title="Download NCNN Dependencies",progressBarLength=len(deps))
 
-    def downloadPlatformIndependentDeps(self):
+    def getPlatformIndependentDeps(self):
         platformIndependentdeps = [
             "testresources",
             "requests",
@@ -93,7 +93,7 @@ class DownloadDependencies:
             "numpy==1.26.4",
             "sympy",
         ]
-        self.pipInstall(platformIndependentdeps)
+        return platformIndependentdeps
 
     def downloadPyTorchCUDADeps(self):
         """
@@ -101,7 +101,7 @@ class DownloadDependencies:
         Default deps
         Pytorch CUDA deps
         """
-        self.downloadPlatformIndependentDeps()
+        
         torchCUDALinuxDeps = [
             "spandrel",
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
@@ -116,9 +116,9 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
         ]
         if getPlatform() == "win32":
-            self.pipInstall(torchCUDAWindowsDeps)
+            self.pipInstall(torchCUDAWindowsDeps + self.getPlatformIndependentDeps())
         if getPlatform() == "linux":
-            self.pipInstall(torchCUDALinuxDeps)
+            self.pipInstall(torchCUDALinuxDeps + self.getPlatformIndependentDeps())
 
     def downloadNCNNDeps(self):
         """
@@ -126,7 +126,6 @@ class DownloadDependencies:
         Default deps
         NCNN deps
         """
-        self.downloadPlatformIndependentDeps()
         ncnnLinuxDeps = [
             "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
             "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/Revert_ncnn/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl",
@@ -136,9 +135,9 @@ class DownloadDependencies:
             "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/proc_bytes/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-win_amd64.whl",
         ]
         if getPlatform() == "win32":
-            self.pipInstall(ncnnWindowsDeps)
+            self.pipInstall(ncnnWindowsDeps + self.getPlatformIndependentDeps())
         if getPlatform() == "linux":
-            self.pipInstall(ncnnLinuxDeps)
+            self.pipInstall(ncnnLinuxDeps + self.getPlatformIndependentDeps())
 
     def downloadPyTorchROCmDeps(self):
         pass

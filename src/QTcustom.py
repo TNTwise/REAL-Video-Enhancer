@@ -8,6 +8,7 @@ import requests
 
 from .QTstyle import styleSheet
 
+
 # custom threads
 class DownloadAndReportToQTThread(QThread):
     """
@@ -38,6 +39,7 @@ class DownloadAndReportToQTThread(QThread):
                 self.progress.emit(size)
         self.finished.emit()
 
+
 class SubprocessThread(QThread):
     output = QtCore.Signal(str)
 
@@ -52,16 +54,15 @@ class SubprocessThread(QThread):
             stderr=subprocess.STDOUT,
             text=True,
             bufsize=1,
-            universal_newlines=True
+            universal_newlines=True,
         )
-        
-        for line in iter(process.stdout.readline, ''):
+
+        for line in iter(process.stdout.readline, ""):
             self.output.emit(line.strip())
-        
+
         process.stdout.close()
         return_code = process.wait()
         self.output.emit(f"Process finished with return code {return_code}")
-
 
 
 # Custom Widgets
@@ -74,8 +75,18 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     def __init__(self, link: str, downloadLocation: str, title: str = None):
         super().__init__()
         self.link = link
+        self.title = title
         self.downloadLocation = downloadLocation
-        self.setWindowTitle(title)
+        self.setup_ui()
+        self.startDownload()
+        self.exec()
+        self.workerThread.wait()
+
+    """
+    Initializes all threading bs
+    """
+    def setup_ui(self):
+        self.setWindowTitle(self.title)
         self.setStyleSheet(styleSheet())
         self.setRange(0, 100)
         self.setMinimumSize(300, 100)
@@ -85,13 +96,6 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.setAttribute(QtCore.Qt.WA_QuitOnClose)
         customProgressBar.setAlignment(QtCore.Qt.AlignCenter)
         self.setBar(customProgressBar)
-        self.startDownload()
-        self.exec()
-        self.workerThread.wait()
-
-    """
-    Initializes all threading bs
-    """
 
     def startDownload(self):
         self.workerThread = DownloadAndReportToQTThread(
@@ -118,37 +122,70 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.setValue(value + 10)
 
 
-class DisplayCommandOutputPopup(QtWidgets.QProgressDialog):
+class DisplayCommandOutputPopup(QtWidgets.QDialog):
     """
-    Runs a download of a file in a thread while reporitng progress to a qt progressbar popup.
-    This wont start up in a new process, rather it will just take over the current process
+    Runs a command, and displays the output of said command in the popup
     """
 
-    def __init__(self, command:str, title:str="Running Command"):
+    def __init__(self, command: str, title: str = "Running Command", progressBarLength:int = None):
         super().__init__()
         self.command = command
-        self.setWindowTitle(title)
-        self.setStyleSheet(styleSheet())
-        self.setRange(0, 100)
-        self.setMinimumSize(300, 100)
-        self.setMaximumSize(300, 100)
-        customProgressBar = QtWidgets.QProgressBar()
-        customProgressBar.setTextVisible(False)
-        self.setAttribute(QtCore.Qt.WA_QuitOnClose)
-        customProgressBar.setAlignment(QtCore.Qt.AlignCenter)
-        self.setBar(customProgressBar)
-        self.startDownload()
+        self.totalCommandOutput = ""
+        self.title = title
+        self.totalIters = 0
+        self.progressBarLength = progressBarLength
+        self.setup_ui()
+        self.setLayout(self.gridLayout)
         self.exec()
         self.workerThread.wait()
 
     """
     Initializes all threading bs
     """
+    def setup_ui(self):
+        #beginning of bullshit
+        self.setWindowTitle(self.title)
+        self.setStyleSheet(styleSheet())
+        self.setMinimumSize(700, 100)
+        self.startDownload()
+        self.centralwidget = QtWidgets.QWidget(parent=self)
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(parent=self.centralwidget)
+        self.plainTextEdit.setObjectName("plainTextEdit")
+        self.plainTextEdit.setReadOnly(True)
+        self.plainTextEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.plainTextEdit.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.gridLayout.addWidget(self.plainTextEdit, 0, 0, 1, 1)
+        self.progressBar = QtWidgets.QProgressBar(parent=self.centralwidget)
+        self.progressBar.setProperty("value", 0)
+        self.progressBar.setTextVisible(False)
+        self.progressBar.setObjectName("progressBar")
+        if self.progressBarLength:
+            self.progressBar.setRange(0, self.progressBarLength)
+        self.gridLayout.addWidget(self.progressBar, 1, 0, 1, 1)
+        self.widget = QtWidgets.QWidget(parent=self.centralwidget)    
+        self.widget.setObjectName("widget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtWidgets.QSpacerItem(
+            40,
+            20,
+            QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Minimum,
+        )
+        self.horizontalLayout.addItem(spacerItem)
+        self.pushButton = QtWidgets.QPushButton(parent=self.widget)
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.setText("Cancel")
+        self.horizontalLayout.addWidget(self.pushButton)
+        self.gridLayout.addWidget(self.widget, 2, 0, 1, 1)
+        
+        #end of bullshit
 
     def startDownload(self):
-        self.workerThread = SubprocessThread(
-            command=self.command
-        )
+        self.workerThread = SubprocessThread(command=self.command)
         self.workerThread.output.connect(self.setProgress)
         self.workerThread.finished.connect(self.close)
         self.workerThread.finished.connect(self.workerThread.deleteLater)
@@ -160,9 +197,19 @@ class DisplayCommandOutputPopup(QtWidgets.QProgressDialog):
         self.workerThread.start()
 
     def setProgress(self, value):
-        
-        print(value)
+        self.totalCommandOutput += value + '\n'
+        cursor = self.plainTextEdit.textCursor()
+        cursor.setVerticalMovementX(-1000000000)
+        # updates progressbar based on condition
+        if self.progressBarLength is not None:
+            if self.totalCommandOutput.count('satisfied') > self.totalIters:
+                self.totalIters = self.totalCommandOutput.count('satisfied')
+            if self.totalCommandOutput.count('Collecting') > self.totalIters:
+                self.totalIters = self.totalCommandOutput.count('Collecting')
+            self.progressBar.setValue(self.totalIters)
 
+        self.plainTextEdit.setPlainText(self.totalCommandOutput)
+        self.plainTextEdit.setTextCursor(cursor)
 
 if __name__ == "__main__":
     DownloadProgressPopup(

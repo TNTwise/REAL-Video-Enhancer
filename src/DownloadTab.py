@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QMainWindow
 from .DownloadDeps import DownloadDependencies
 
+
 class DownloadTab:
     def __init__(
         self,
@@ -9,5 +10,8 @@ class DownloadTab:
         self.parent = parent
         self.downloadDeps = DownloadDependencies()
         self.QButtonConnect()
+
     def QButtonConnect(self):
-        self.parent.downloadNCNNBtn.clicked.connect(lambda: self.downloadDeps.downloadNCNNDeps())
+        self.parent.downloadNCNNBtn.clicked.connect(
+            lambda: self.downloadDeps.downloadNCNNDeps()
+        )

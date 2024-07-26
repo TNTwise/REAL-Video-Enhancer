@@ -56,6 +56,11 @@ QStackedWidget{
 	padding:5px 10px;
 	border-radius: 25px;
 }
+QPlainTextEdit{
+    background-color:#2c313c;
+	border-radius: 30px;
+
+}
 QPushButton{
     background-color:#2c313c;
 	text-align:left;
