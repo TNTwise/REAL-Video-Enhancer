@@ -12,8 +12,7 @@ class DownloadTab:
         self.QButtonConnect()
 
     def QButtonConnect(self):
-        self.parent.downloadNCNNBtn.clicked.connect(
-            self.downloadDeps.downloadNCNNDeps
-        )
+        self.parent.downloadNCNNBtn.clicked.connect(self.downloadDeps.downloadNCNNDeps)
         self.parent.downloadTorchCUDABtn.clicked.connect(self.downloadDeps.downloadPyTorchCUDADeps)
         self.parent.downloadTensorRTBtn.clicked.connect(self.downloadDeps.downloadTensorRTDeps)
+        self.parent.downloadTorchROCmBtn.clicked.connect(self.downloadDeps.downloadPyTorchROCmDeps)
