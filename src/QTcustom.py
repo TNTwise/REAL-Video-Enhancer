@@ -134,6 +134,7 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.title = title
         self.totalIters = 0
         self.progressBarLength = progressBarLength
+        self.canceled = False
         self.setup_ui()
         self.setLayout(self.gridLayout)
         self.exec()
@@ -179,11 +180,13 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.pushButton = QtWidgets.QPushButton(parent=self.widget)
         self.pushButton.setObjectName("pushButton")
         self.pushButton.setText("Cancel")
+        self.pushButton.clicked.connect(self.closeEvent)
         self.horizontalLayout.addWidget(self.pushButton)
         self.gridLayout.addWidget(self.widget, 2, 0, 1, 1)
         
         #end of bullshit
-
+    def closeEvent(self, x):
+        self.canceled = True
     def startDownload(self):
         self.workerThread = SubprocessThread(command=self.command)
         self.workerThread.output.connect(self.setProgress)
@@ -193,7 +196,6 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.workerThread.finished.connect(
             self.workerThread.wait
         )  # need quit and wait to allow process to exit safely
-
         self.workerThread.start()
 
     def setProgress(self, value):
@@ -207,7 +209,11 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
             if self.totalCommandOutput.count('Collecting') > self.totalIters:
                 self.totalIters = self.totalCommandOutput.count('Collecting')
             self.progressBar.setValue(self.totalIters)
-
+        if self.canceled:
+            self.workerThread.quit()
+            self.workerThread.deleteLater()
+            self.workerThread.wait()
+            self.close()
         self.plainTextEdit.setPlainText(self.totalCommandOutput)
         self.plainTextEdit.setTextCursor(cursor)
 
