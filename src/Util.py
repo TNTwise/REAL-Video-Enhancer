@@ -28,12 +28,12 @@ def pythonPath() -> str:
         else os.path.join(cwd, "python", "bin", "python3.exe")
     )
 
+def modelsPath() -> str:
+    return (
+        os.path.join(cwd, "models")
+    )
 
-def move(prev: str, new: str):
-    """
-    moves a file from prev to new
-    """
-    os.rename(prev, new)
+
 
 
 def ffmpegPath() -> str:
@@ -43,6 +43,11 @@ def ffmpegPath() -> str:
         else os.path.join(cwd, "ffmpeg", "ffmpeg.exe")
     )
 
+def move(prev: str, new: str):
+    """
+    moves a file from prev to new
+    """
+    os.rename(prev, new)
 
 def makeExecutable(file_path):
     st = os.stat(file_path)

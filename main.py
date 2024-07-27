@@ -28,8 +28,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # set up base variables
         self.homeDir = os.path.expanduser("~")
-        self.interpolateTimes = 1
-        self.upscaleTimes = 2
+        self.interpolateTimes = 2
+        self.upscaleTimes = 1
         self.pipeInFrames = None
         self.latestPreviewImage = None
 

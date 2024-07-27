@@ -2,7 +2,7 @@ import subprocess
 import os
 from threading import Thread
 from PySide6.QtCore import QThread
-from .Util import ffmpegPath, pythonPath, currentDirectory
+from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
 
 class ProcessTab:
@@ -62,11 +62,10 @@ class ProcessTab:
             self.inputFile,
             "-o",
             "PIPE",
-            "--upscaleModel",
-            "2x_AnimeJaNai_V2_SuperUltraCompact_100k.pth",  # put actual model here, this is a placeholder
-            "--half",
+            "--interpolateModel",
+            os.path.join(modelsPath(),"rife-v4.20-ncnn"),  # put actual model here, this is a placeholder
             "-b",
-            "tensorrt",
+            "ncnn",
         ]
 
         self.pipeInFrames = subprocess.Popen(
