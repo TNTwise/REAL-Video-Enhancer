@@ -276,13 +276,12 @@ class InterpolateRifeTorch:
         output = self.flownet(
             img0, img1, timestep, self.tenFlow_div, self.backwarp_tenGrid
         )
-        output = output[:, :, : self.height, : self.width]
-        return self.tensor_to_frame(output[0])
+        return self.tensor_to_frame(output)
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
         return (
-            frame.squeeze(0)
+            frame[:, :, : self.height, : self.width][0].squeeze(0)
             .permute(1, 2, 0)
             .float()
             .mul(255)

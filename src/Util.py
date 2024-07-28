@@ -38,7 +38,7 @@ def modelsPath() -> str:
 
 def ffmpegPath() -> str:
     return (
-        os.path.join(cwd, "ffmpeg", "ffmpeg")
+        os.path.join(cwd, "bin", "ffmpeg")
         if getPlatform() == "darwin" or getPlatform() == "linux"
         else os.path.join(cwd, "ffmpeg", "ffmpeg.exe")
     )
