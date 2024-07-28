@@ -128,7 +128,7 @@ class DownloadDependencies:
         """
         ncnnLinuxDeps = [
             "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
-            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/Revert_ncnn/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl",
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/proc_bytes/rife_ncnn_vulkan_python-1.2.1-cp311-cp311-linux_x86_64.whl",
         ]
         ncnnWindowsDeps = [
             "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
