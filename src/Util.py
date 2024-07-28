@@ -47,9 +47,9 @@ def modelsPath() -> str:
 
 def ffmpegPath() -> str:
     return (
-        os.path.join(cwd, "bin", "ffmpeg")
+        os.path.join(cwd, "ffmpeg", "ffmpeg")
         if getPlatform() == "darwin" or getPlatform() == "linux"
-        else os.path.join(cwd, "bin", "ffmpeg.exe")
+        else os.path.join(cwd, "ffmpeg", "ffmpeg.exe")
     )
 
 def move(prev: str, new: str):
