@@ -29,7 +29,7 @@ class SceneDetect:
         )
         openedVideo = open_video(self.inputFile)
         frame_count = openedVideo.duration.frame_num
-        for frame_num in range(frame_count - 1):
+        for frame_num in tqdm(range(frame_count - 1)):
             frame = openedVideo.read()
             frame = cv2.resize(
                 frame, dsize=(100, 100)

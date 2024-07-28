@@ -139,7 +139,7 @@ class Render(FFMpegRender):
             else:
                 # undo the setup done in ffmpeg thread
                 sc_detected_frame_np = self.undoSetup(
-                    self.frame0
+                    self.frame0[:, :, : self.height, : self.width][0]
                 )
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(sc_detected_frame_np)
@@ -208,7 +208,7 @@ class Render(FFMpegRender):
                 height=self.height,
             )
             self.setupRender = interpolateRifeNCNN.bytesToByteArray
-            self.undoSetup = interpolateRifeNCNN.byteArrayToBytes
+            self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifeNCNN.process
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
