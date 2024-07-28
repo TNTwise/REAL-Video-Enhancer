@@ -45,8 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # setup application
         self.setupBackendDeps()
-        sys.stdout = open(os.devnull, 'w')
-        sys.stderr = open(os.devnull, 'w')
+        
 
 
         # set up tabs
