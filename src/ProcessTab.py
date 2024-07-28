@@ -63,7 +63,7 @@ class ProcessTab:
             "-i",
             self.inputFile,
             "-o",
-            "PIPE",
+            "our.mp4",
             "--interpolateModel",
             os.path.join(modelsPath(),"rife-v4.20-ncnn"),  # put actual model here, this is a placeholder
             "-b",
