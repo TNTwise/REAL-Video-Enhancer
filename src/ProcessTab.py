@@ -55,8 +55,10 @@ class ProcessTab:
         writeThread.start()
 
     def renderToPipeThread(self):
-        command = [
-            f"{pythonPath()}",
+        command = activatePythonCommand() # have to activate venv
+        command += [
+            "&&",
+            f"python3",
             os.path.join(currentDirectory(), "backend", "rve-backend.py"),
             "-i",
             self.inputFile,
