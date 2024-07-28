@@ -34,8 +34,6 @@ def modelsPath() -> str:
     )
 
 
-
-
 def ffmpegPath() -> str:
     return (
         os.path.join(cwd, "bin", "ffmpeg")

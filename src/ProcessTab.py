@@ -50,9 +50,9 @@ class ProcessTab:
         # Gui changes
         self.parent.startRenderButton.setEnabled(False)
 
-        self.renderToPipeThread()
+        
         # self.ffmpegWriteThread()
-        writeThread = Thread(target=self.ffmpegWriteThread)
+        writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()
 
     def renderToPipeThread(self):
@@ -62,74 +62,20 @@ class ProcessTab:
             "-i",
             self.inputFile,
             "-o",
-            "PIPE",
+            f"{self.outputPath}",
             "--interpolateModel",
             os.path.join(modelsPath(),"rife-v4.20-ncnn"),  # put actual model here, this is a placeholder
             "-b",
             "ncnn",
         ]
 
-        self.pipeInFrames = subprocess.Popen(
+        self.pipeInFrames = subprocess.run(
             command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            stdin=subprocess.DEVNULL,
-            text=False,
-            bufsize=0,
-            close_fds=True,
+            
 
         )
 
-    def ffmpegWriteThread(self):
-        command = [
-            f"{ffmpegPath()}",
-            "-f",
-            "rawvideo",
-            "-pix_fmt",
-            "rgb24",
-            "-vcodec",
-            "rawvideo",
-            "-s",
-            f"{self.videoWidth * self.upscaleTimes}x{self.videoHeight * self.upscaleTimes}",
-            "-r",
-            f"{self.videoFps * self.interpolateTimes}",
-            "-i",
-            "-",
-            "-i",
-            self.inputFile,  # see if audio bugs come up
-            "-c:v",
-            "libx264",
-            f"-crf",
-            f"18",
-            "-pix_fmt",
-            "yuv420p",
-            "-c:a",
-            "copy",
-            f"{self.outputPath}",
-        ]
-        writeOutFrames = subprocess.Popen(
-            command,
-            stdin=subprocess.PIPE,
-            text=True,
-            universal_newlines=True,
-        )
-
-        outputChunk = (
-            self.videoWidth
-            * self.videoHeight
-            * self.upscaleTimes
-            * self.upscaleTimes
-            * 3
-        )  # 3 is for the channels (RGB)
-
-        totalFrames = int(self.videoFrameCount * self.interpolateTimes)
-        for i in range(totalFrames - 1):
-            print("reading in frame")
-            frame = self.pipeInFrames.stdout.read(outputChunk)
-            writeOutFrames.stdin.buffer.write(frame)
-        writeOutFrames.stdin.close()
-        writeOutFrames.wait()
-
+    
     def updateProcessTab(self):
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
