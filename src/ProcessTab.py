@@ -2,7 +2,7 @@ import subprocess
 import os
 from threading import Thread
 from PySide6.QtCore import QThread
-from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
+from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath, activatePythonCommand
 
 
 class ProcessTab:
@@ -55,8 +55,10 @@ class ProcessTab:
         writeThread.start()
 
     def renderToPipeThread(self):
-        command = [
-            f"{pythonPath()}",
+        command = activatePythonCommand() # have to activate venv
+        command += [
+            "&&",
+            f"python3",
             os.path.join(currentDirectory(), "backend", "rve-backend.py"),
             "-i",
             self.inputFile,
