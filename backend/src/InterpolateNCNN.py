@@ -28,3 +28,5 @@ class InterpolateRIFENCNN:
 
     def bytesToByteArray(self, bytes):
         return bytearray(bytes)
+    def byteArrayToBytes(self, byteArray):
+        return bytes(byteArray)

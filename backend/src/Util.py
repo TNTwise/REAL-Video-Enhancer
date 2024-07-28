@@ -2,8 +2,8 @@ import os
 import warnings
 
 cwd = os.getcwd()
-
-
+with open(os.path.join(cwd, "log.txt"), "w") as f:
+    pass
 
 
 def warnAndLog(message: str):
@@ -11,7 +11,13 @@ def warnAndLog(message: str):
     log("WARN: " + message)
 
 
-def printAndLog(message: str):
+def printAndLog(message: str, separate=False):
+    """
+    Prints and logs a message to the log file
+    separate, if True, activates the divider
+    """
+    if separate:
+        message = message + "\n" + "---------------------"
     print(message)
     log(message=message)
 
