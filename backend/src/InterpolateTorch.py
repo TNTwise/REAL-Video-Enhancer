@@ -9,13 +9,11 @@ from .Util import currentDirectory
 torch.set_float32_matmul_precision("high")
 torch.set_grad_enabled(False)
 
-
 class InterpolateRifeTorch:
     @torch.inference_mode()
     def __init__(
         self,
         interpolateModelPath: str,
-        interpolateArch: str = "rife413",
         width: int = 1920,
         height: int = 1080,
         device: str = "cuda",
@@ -33,16 +31,14 @@ class InterpolateRifeTorch:
         trt_cache_dir: str = currentDirectory(),
         trt_debug: bool = False,
     ):
-        trt_min_shape = [int(width / 15), int(height / 15)]
-        trt_opt_shape = [width, height]
-        trt_max_shape = [width, height]
+        trt_min_shape = [int(width/15),int(height/15)]
+        trt_opt_shape = [width,height]
+        trt_max_shape = [width,height]
 
         self.interpolateModel = interpolateModelPath
         self.width = width
         self.height = height
-        self.device = torch.device(
-            device, 0
-        )  # 0 is the device index, may have to change later
+        self.device = torch.device(device, 0) # 0 is the device index, may have to change later
         self.dtype = self.handlePrecision(dtype)
         self.backend = backend
         scale = 1
@@ -53,67 +49,42 @@ class InterpolateRifeTorch:
             interpolateModelPath, map_location=self.device, weights_only=True, mmap=True
         )
 
+        # detect what rife arch to use
+        model = loadInterpolationModel(state_dict)
+        architecture = model.getIFnet()
+        self.flownet = architecture(scale=scale, ensemble=ensemble)
+
+        state_dict = {
+            k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
+        }
+        self.flownet.load_state_dict(
+            state_dict=state_dict, strict=False
+        )
+        self.flownet.eval().to(device=self.device)
+        if self.dtype == torch.float16:
+            self.flownet.half()
+
         tmp = max(32, int(32 / scale))
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-
-        # if 4.6 v1
         self.tenFlow_div = torch.tensor(
             [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
             dtype=self.dtype,
             device=self.device,
         )
+
         tenHorizontal = (
             torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
             .view(1, 1, 1, self.pw)
             .expand(-1, -1, self.ph, -1)
-        ).to(dtype=self.dtype, device=self.device)
+        )
         tenVertical = (
             torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device)
             .view(1, 1, self.ph, 1)
             .expand(-1, -1, -1, self.pw)
-        ).to(dtype=self.dtype, device=self.device)
-        self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
-
-        # detect what rife arch to use
-        match interpolateArch:
-            case "rife46":
-                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-
-            case "rife413":
-                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
-
-                # if v2
-                h_mul = 2 / (self.pw - 1)
-                v_mul = 2 / (self.ph - 1)
-                self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
-                    device=self.device, dtype=self.dtype
-                )
-
-                self.backwarp_tenGrid = torch.cat(
-                    (
-                        (torch.arange(self.pw) * h_mul - 1)
-                        .reshape(1, 1, 1, -1)
-                        .expand(-1, -1, self.ph, -1),
-                        (torch.arange(self.ph) * v_mul - 1)
-                        .reshape(1, 1, -1, 1)
-                        .expand(-1, -1, -1, self.pw),
-                    ),
-                    dim=1,
-                ).to(device=self.device, dtype=self.dtype)
-
-        self.flownet = IFNet(
-            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
         )
-
-        state_dict = {
-            k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
-        }
-        self.flownet.load_state_dict(state_dict=state_dict, strict=False)
-        self.flownet.eval().to(device=self.device)
-        if self.dtype == torch.float16:
-            self.flownet.half()
+        self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
 
         if self.backend == "tensorrt":
             import tensorrt
@@ -163,19 +134,11 @@ class InterpolateRifeTorch:
                 trt_max_shape.reverse()
 
                 example_tensors = (
-                    torch.zeros(
-                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
-                    ),
-                    torch.zeros(
-                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
-                    ),
-                    torch.zeros(
-                        (1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device
-                    ),
+                    torch.zeros((1, 3, self.ph, self.ph), dtype=self.dtype, device=self.device),
+                    torch.zeros((1, 3, self.ph, self.ph), dtype=self.dtype, device=self.device),
+                    torch.zeros((1, 1, self.ph, self.ph), dtype=self.dtype, device=self.device),
                     torch.zeros((2,), dtype=self.dtype, device=self.device),
-                    torch.zeros(
-                        (1, 2, self.ph, self.pw), dtype=self.dtype, device=self.device
-                    ),
+                    torch.zeros((1, 2, self.ph, self.ph), dtype=self.dtype, device=self.device),
                 )
 
                 _height = torch.export.Dim(
@@ -268,20 +231,23 @@ class InterpolateRifeTorch:
             return self.tensor_to_frame(img1[:, :, : self.height, : self.width][0])
         if timestep == 0:
             return self.tensor_to_frame(img0[:, :, : self.height, : self.width][0])
+        
 
         timestep = torch.full(
             (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
         )
 
+
         output = self.flownet(
             img0, img1, timestep, self.tenFlow_div, self.backwarp_tenGrid
         )
-        return self.tensor_to_frame(output)
+        output = output[:, :, : self.height, : self.width]
+        return self.tensor_to_frame(output[0])
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
         return (
-            frame[:, :, : self.height, : self.width][0].squeeze(0)
+            frame.squeeze(0)
             .permute(1, 2, 0)
             .float()
             .mul(255)
@@ -296,11 +262,7 @@ class InterpolateRifeTorch:
         frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(
             self.height, self.width, 3
         )
-        return F.pad(
-            (frame)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .to(self.device, dtype=self.dtype, non_blocking=True)
-            / 255.0,
-            self.padding,
-        )
+        return F.pad((frame).permute(2, 0, 1).unsqueeze(0).to(
+            self.device, dtype=self.dtype
+        ) / 255.0, self.padding)
+        

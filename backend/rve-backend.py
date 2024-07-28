@@ -9,14 +9,13 @@ class HandleApplication:
         self.args = self.handleArguments()
         self.checkArguments()
         ffmpegSettings = Render(
-            # model settings
+            #model settings
             inputFile=self.args.input,
             outputFile=self.args.output,
             interpolateModel=self.args.interpolateModel,
             interpolateFactor=self.args.interpolateFactor,
-            interpolateArch=self.args.interpolateArch,
             upscaleModel=self.args.upscaleModel,
-            # backend settings
+            #backend settings
             device="cuda",
             backend=self.args.backend,
             precision="float16" if self.args.half else "float32",
@@ -24,11 +23,9 @@ class HandleApplication:
             overwrite=self.args.overwrite,
             crf=self.args.crf,
             benchmark=self.args.benchmark,
-            encoder=self.args.custom_encoder,
-            # misc settingss
-            sceneDetectMethod=self.args.sceneDetectMethod,
-            sceneDetectSensitivity=self.args.sceneDetectSensitivity,
+            encoder=self.args.custom_encoder
         )
+
 
     def handleArguments(self) -> argparse.ArgumentParser:
         """_summary_
@@ -95,10 +92,15 @@ class HandleApplication:
             default=2,
         )
         parser.add_argument(
-            "--interpolateArch",
-            help="Arch used for interpolation when using PyTorch inference. (rife46,rife415)",
-            type=str,
-            default="rife413",
+            "-c",
+            "--cpu",
+            help="use only CPU for upscaling, instead of cuda. default=auto",
+            action="store_true",
+        )
+        parser.add_argument(
+            "-f",
+            "--format",
+            help="output image format (jpg/png/webp, auto=same as input, default=auto)",
         )
         parser.add_argument(
             "--half",
@@ -106,16 +108,17 @@ class HandleApplication:
             action="store_true",
         )
         parser.add_argument(
-            "--sceneDetectMethod",
-            help="Scene change detection to avoid interpolating transitions. (options=pyscenedetect, ffmpeg, none)",
-            type=str,
-            default="pyscenedetect",
+            "--bfloat16",
+            help="like half precision, but more intesive. This can be used with a wider range of models than half.",
+            action="store_true",
         )
+
         parser.add_argument(
-            "--sceneDetectSensitivity",
-            help="Scene change detection sensitivity, lower number means it has a higher chance of detecting scene changes, with risk of detecting too many.",
-            type=float,
-            default=3.0,
+            "-e",
+            "--export",
+            help="Export PyTorch models to ONNX and NCNN. Options: (onnx/ncnn)",
+            default=None,
+            type=str,
         )
         parser.add_argument(
             "--overwrite",
@@ -160,14 +163,14 @@ class HandleApplication:
                 import tensorrt
             except ImportError as e:
                 raise ImportError(f"Cannot use TensorRT as the backend! {e}")
-
+            
         if self.args.backend == "ncnn":
             try:
                 import rife_ncnn_vulkan_python
                 from upscale_ncnn_py import UPSCALE
             except ImportError as e:
                 raise ImportError(f"Cannot use NCNN as the backend! {e}")
-
+            
         if os.path.isfile(self.args.output) and not self.args.overwrite:
             raise os.error("Output file already exists!")
 

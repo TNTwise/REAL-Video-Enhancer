@@ -9,4 +9,3 @@ onnxruntime
 pnnx
 ncnn
 opencv-python
-scenedetect
