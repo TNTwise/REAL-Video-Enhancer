@@ -1,6 +1,7 @@
 import subprocess
 import os
 from threading import Thread
+import sys
 from PySide6.QtCore import QThread
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
@@ -72,6 +73,11 @@ class ProcessTab:
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
+            stdin=subprocess.DEVNULL,
+            text=False,
+            bufsize=0,
+            close_fds=True,
+
         )
 
     def ffmpegWriteThread(self):
@@ -118,6 +124,7 @@ class ProcessTab:
 
         totalFrames = int(self.videoFrameCount * self.interpolateTimes)
         for i in range(totalFrames - 1):
+            print("reading in frame")
             frame = self.pipeInFrames.stdout.read(outputChunk)
             writeOutFrames.stdin.buffer.write(frame)
         writeOutFrames.stdin.close()

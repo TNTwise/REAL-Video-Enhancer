@@ -123,7 +123,7 @@ class Render(FFMpegRender):
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
         printAndLog("Starting Interpolation")
-        self.transitionFrame = self.transitionQueue.get()
+        self.transitionFrame = -1
         self.frame0 = self.readQueue.get()
 
         for frameNum in range(self.totalFrames - 1):
@@ -139,7 +139,7 @@ class Render(FFMpegRender):
             else:
                 # undo the setup done in ffmpeg thread
                 sc_detected_frame_np = self.undoSetup(
-                    self.frame0[:, :, : self.height, : self.width][0]
+                    self.frame0
                 )
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(sc_detected_frame_np)

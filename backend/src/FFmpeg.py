@@ -3,9 +3,9 @@ import os
 import subprocess
 import queue
 import time
-
+import sys
 from .Util import currentDirectory, printAndLog
-
+sysout = sys.stdout
 
 class FFMpegRender:
     def __init__(
@@ -193,14 +193,14 @@ class FFMpegRender:
             self.writeProcess.wait()
 
         else:
-            process = subprocess.Popen(["cat"], stdin=subprocess.PIPE)
+            sys.stdout = sysout
             while True:
                 frame = self.writeQueue.get()
                 if frame is None:
                     break
-                process.stdin.write(frame)
-            process.stdin.close()
-            process.wait()
+                
+                sys.stdout.buffer.write(frame)
+            sys.stdout.close()
 
         renderTime = time.time() - startTime
         printAndLog(
