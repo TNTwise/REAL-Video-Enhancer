@@ -4,7 +4,7 @@ import math
 import os
 
 from .InterpolateArchs.DetectInterpolateArch import loadInterpolationModel
-from .Util import currentDirectory
+from .Util import currentDirectory, printAndLog, errorAndLog
 
 torch.set_float32_matmul_precision("high")
 torch.set_grad_enabled(False)
@@ -59,22 +59,43 @@ class InterpolateRifeTorch:
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
 
         # if 4.6 v1
-        self.tenFlow_div = torch.tensor(
-            [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
-            dtype=self.dtype,
-            device=self.device,
-        )
-        tenHorizontal = (
-            torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
-            .view(1, 1, 1, self.pw)
-            .expand(-1, -1, self.ph, -1)
-        ).to(dtype=self.dtype, device=self.device)
-        tenVertical = (
-            torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device)
-            .view(1, 1, self.ph, 1)
-            .expand(-1, -1, -1, self.pw)
-        ).to(dtype=self.dtype, device=self.device)
-        self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
+        if interpolateArch == "rife46":
+            self.tenFlow_div = torch.tensor(
+                [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
+                dtype=self.dtype,
+                device=self.device,
+            )
+            tenHorizontal = (
+                torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
+                .view(1, 1, 1, self.pw)
+                .expand(-1, -1, self.ph, -1)
+            ).to(dtype=self.dtype, device=self.device)
+            tenVertical = (
+                torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device)
+                .view(1, 1, self.ph, 1)
+                .expand(-1, -1, -1, self.pw)
+            ).to(dtype=self.dtype, device=self.device)
+            self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
+
+        if interpolateArch == "rife413" or interpolateArch == "rife420":
+            # if v2
+            h_mul = 2 / (self.pw - 1)
+            v_mul = 2 / (self.ph - 1)
+            self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
+                device=self.device, dtype=self.dtype
+            ).reshape(1, 2, 1, 1)
+
+            self.backwarp_tenGrid = torch.cat(
+                (
+                    (torch.arange(self.pw) * h_mul - 1)
+                    .reshape(1, 1, 1, -1)
+                    .expand(-1, -1, self.ph, -1),
+                    (torch.arange(self.ph) * v_mul - 1)
+                    .reshape(1, 1, -1, 1)
+                    .expand(-1, -1, -1, self.pw),
+                ),
+                dim=1,
+            ).to(device=self.device, dtype=self.dtype)
 
         # detect what rife arch to use
         match interpolateArch:
@@ -83,25 +104,14 @@ class InterpolateRifeTorch:
 
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+            
+            case "rife420":
+                from .InterpolateArchs.RIFE.rife420IFNET import IFNet
+            
+            case _:
+                errorAndLog("Invalid Interpolation Arch")
 
-                # if v2
-                h_mul = 2 / (self.pw - 1)
-                v_mul = 2 / (self.ph - 1)
-                self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
-                    device=self.device, dtype=self.dtype
-                )
-
-                self.backwarp_tenGrid = torch.cat(
-                    (
-                        (torch.arange(self.pw) * h_mul - 1)
-                        .reshape(1, 1, 1, -1)
-                        .expand(-1, -1, self.ph, -1),
-                        (torch.arange(self.ph) * v_mul - 1)
-                        .reshape(1, 1, -1, 1)
-                        .expand(-1, -1, -1, self.pw),
-                    ),
-                    dim=1,
-                ).to(device=self.device, dtype=self.dtype)
+                
 
         self.flownet = IFNet(
             scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device

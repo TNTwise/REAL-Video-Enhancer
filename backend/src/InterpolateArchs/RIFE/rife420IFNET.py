@@ -132,10 +132,10 @@ class IFBlock(nn.Module):
 class IFNet(nn.Module):
     def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda"):
         super(IFNet, self).__init__()
-        self.block0 = IFBlock(7 + 16, c=192)
-        self.block1 = IFBlock(8 + 4 + 16, c=128)
-        self.block2 = IFBlock(8 + 4 + 16, c=96)
-        self.block3 = IFBlock(8 + 4 + 16, c=64)
+        self.block0 = IFBlock(7+16, c=384)
+        self.block1 = IFBlock(8+4+16, c=192)
+        self.block2 = IFBlock(8+4+16, c=96)
+        self.block3 = IFBlock(8+4+16, c=48)
         self.encode = Head()
         self.device = device
         self.dtype = dtype

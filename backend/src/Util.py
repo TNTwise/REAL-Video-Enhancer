@@ -10,6 +10,10 @@ def warnAndLog(message: str):
     warnings.warn(message)
     log("WARN: " + message)
 
+def errorAndLog(message: str):
+    
+    log("ERROR: " + message)
+    raise os.error("ERROR: "+ message)
 
 def printAndLog(message: str, separate=False):
     """
