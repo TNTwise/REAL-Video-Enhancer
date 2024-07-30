@@ -111,10 +111,11 @@ class InterpolateRifeTorch:
             case _:
                 errorAndLog("Invalid Interpolation Arch")
 
-                
+        
+        testInput = torch.zeros(1,3,self.ph,self.pw).to(device=self.device,dtype=self.dtype)
 
         self.flownet = IFNet(
-            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device
+            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device, img0=testInput
         )
 
         state_dict = {

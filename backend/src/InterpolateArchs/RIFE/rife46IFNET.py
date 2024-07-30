@@ -94,7 +94,7 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda"):
+    def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda", img0=None):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
         self.block1 = IFBlock(8 + 4, c=128)
