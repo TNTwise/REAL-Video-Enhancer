@@ -1,7 +1,7 @@
 import os
 import requests
 
-from Util import printAndLog, currentDirectory, warnAndLog, createDirectory
+from .Util import printAndLog, currentDirectory, warnAndLog, createDirectory
 
 
 class DownloadModels:

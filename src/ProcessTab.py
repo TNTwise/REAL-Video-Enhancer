@@ -2,16 +2,35 @@ import subprocess
 import os
 from threading import Thread
 import sys
-from PySide6.QtCore import QThread
+import time
+import numpy as np
+import cv2
+from multiprocessing import shared_memory
+import time
+
+from PySide6.QtCore import QThread, Signal, Qt
+from PySide6 import QtGui
+
+
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
-
+class UpdateGUIThread(QThread):
+    updateGUITick = Signal()
+    def __init__(self):
+        super().__init__()
+    def run(self):
+        while True:
+            time.sleep(1)
+            self.updateGUITick.emit()
+            
 class ProcessTab:
     def __init__(
         self,
         parent,
     ):
         self.parent = parent
+        self.imagePreviewSharedMemoryID = '/image_preview'
+        
         self.QButtonConnect()
 
     def QButtonConnect(self):
@@ -40,6 +59,7 @@ class ProcessTab:
         self.videoFrameCount = videoFrameCount
         self.upscaleTimes = upscaleTimes
         self.interpolateTimes = interpolateTimes
+        self.frameChunkSize = videoHeight * videoWidth * 3
         """
         Function to start the rendering process
         It will initially check for any issues with the current setup, (invalid file, no permissions, etc..)
@@ -54,6 +74,18 @@ class ProcessTab:
         # self.ffmpegWriteThread()
         writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()
+        self.startGUIUpdate()
+    
+    def startGUIUpdate(self):
+        
+        self.workerThread = UpdateGUIThread()
+        self.workerThread.updateGUITick.connect(self.updateProcessTab)
+        self.workerThread.finished.connect(self.workerThread.deleteLater)
+        self.workerThread.finished.connect(self.workerThread.quit)
+        self.workerThread.finished.connect(
+            self.workerThread.wait
+        )  # need quit and wait to allow process to exit safely
+        self.workerThread.start()
 
     def renderToPipeThread(self):
         command = [
@@ -64,9 +96,11 @@ class ProcessTab:
             "-o",
             f"{self.outputPath}",
             "--interpolateModel",
-            os.path.join(modelsPath(),"rife-v4.20-ncnn"),  # put actual model here, this is a placeholder
+            os.path.join(modelsPath(),"rife4.18.pkl"),  # put actual model here, this is a placeholder
             "-b",
-            "ncnn",
+            "tensorrt",
+            "--shared_memory_id",
+            f"{self.imagePreviewSharedMemoryID}"
         ]
 
         self.pipeInFrames = subprocess.run(
@@ -75,14 +109,26 @@ class ProcessTab:
 
         )
 
+    def convert_cv_qt(self, cv_img):
+        """Convert from an opencv image to QPixmap"""
+        rgb_image = cv2.cvtColor(cv_img, cv2.COLOR_BGR2RGB)
+        h, w, ch = rgb_image.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QtGui.QImage(rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888)
+        p = convert_to_Qt_format.scaled(600, 600, Qt.KeepAspectRatio)
+        return QtGui.QPixmap.fromImage(p)
     
     def updateProcessTab(self):
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
-        pass
-        """if self.latestPreviewImage is not None:
-            height, width, channel = self.latestPreviewImage.shape
-            bytesPerLine = 3 * width
-            qImg = QImage(self.latestPreviewImage.data, width, height, bytesPerLine, QImage.Format_RGB888)
-            self.previewLabel.setPixmap(qImg)"""
+        try:
+            self.shm = shared_memory.SharedMemory(name=self.imagePreviewSharedMemoryID)
+            image_bytes = self.shm.buf[:].tobytes()
+
+            # Convert image bytes back to numpy array
+            image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape((self.videoHeight, self.videoWidth, 3))
+
+            self.parent.previewLabel.setPixmap(self.convert_cv_qt(image_array))
+        except FileNotFoundError:
+            print("No preview yet!")

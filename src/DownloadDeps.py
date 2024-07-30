@@ -23,7 +23,7 @@ class DownloadDependencies:
 
     def __init__(self):
         createDirectory(os.path.join(currentDirectory(), "python"))
-        createDirectory(os.path.join(currentDirectory(), "ffmpeg"))
+        createDirectory(os.path.join(currentDirectory(), "bin"))
 
     def extractTarGZ(self, file):
         """

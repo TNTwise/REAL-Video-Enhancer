@@ -19,6 +19,7 @@ from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
+from src.DownloadModels import DownloadModels
 from src.QTstyle import Palette
 
 
@@ -37,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
-
+        
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
@@ -52,6 +53,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processTab = ProcessTab(parent=self)
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
+        #self.downloadModels = DownloadModels()
 
     def QButtonConnect(self):
         # connect buttons to switch menus

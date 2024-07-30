@@ -1,5 +1,6 @@
 from threading import Thread
 from queue import Queue
+from multiprocessing import shared_memory
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
@@ -74,8 +75,12 @@ class Render(FFMpegRender):
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
-
+        # get video properties early
         self.getVideoProperties(inputFile)
+
+        self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID,create=True, size=self.frameChunkSize)
+
+        
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
             self.setupUpscale()
@@ -85,7 +90,6 @@ class Render(FFMpegRender):
             self.setupInterpolate()
             self.renderThread = Thread(target=self.renderInterpolate)
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
-        # initializes ffmpeg class, gets video properties
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -97,7 +101,9 @@ class Render(FFMpegRender):
             overwrite=overwrite,
             frameSetupFunction=self.setupRender,
             crf=crf,
-            sharedMemoryID=sharedMemoryID
+            sharedMemoryID=sharedMemoryID,
+            shm=self.shm
+
         )
         if sharedMemoryID is not None:
             self.sharedMemoryThread = Thread(target=self.writeOutToSharedMemory)

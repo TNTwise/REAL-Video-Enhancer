@@ -372,7 +372,7 @@ border-radius: 10px;
                  <item>
                   <widget class="QPushButton" name="startRenderButton">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="maximumSize">
                     <size>

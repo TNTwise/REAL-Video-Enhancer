@@ -25,6 +25,7 @@ class FFMpegRender:
         frameSetupFunction=None,
         crf: str = "18",
         sharedMemoryID:str=None,
+        shm:shared_memory.SharedMemory=None,
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -54,6 +55,7 @@ class FFMpegRender:
         self.crf = crf
         self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
+        self.shm = shm
 
         self.writeOutPipe = self.outputFile == "PIPE"
 
@@ -178,10 +180,10 @@ class FFMpegRender:
     def writeOutToSharedMemory(self):
 
         # Create a shared memory block
-        shm = shared_memory.SharedMemory(name=self.sharedMemoryID,create=True, size=self.frameChunkSize)
-        buffer = shm.buf
         
-        printAndLog(f"Shared memory name: {shm.name}")
+        buffer = self.shm.buf
+        
+        printAndLog(f"Shared memory name: {self.shm.name}")
         while True:
             if self.writingDone == True:
                 break
