@@ -136,7 +136,7 @@ class Render(FFMpegRender):
         printAndLog("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
-            frame = self.upscale(frame)
+            frame = self.upscale(self.frameSetupFunction(frame))
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
         printAndLog("Finished Upscale")
@@ -148,28 +148,33 @@ class Render(FFMpegRender):
         """
         printAndLog("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
-        self.frame0 = self.readQueue.get()
-
+        self.frame0 = self.frameSetupFunction(self.readQueue.get())
+        
         for frameNum in range(self.totalInputFrames - 1):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
             if self.transitionFrame is None or frameNum != self.transitionFrame:
                 for n in range(self.interpolateFactor):
+                    timestep = 1 / (self.interpolateFactor - n)
+                    if timestep == 1:
+                        self.writeQueue.put(frame1)
+                        continue
+                    
                     frame = self.interpolate(
-                        self.frame0, frame1, 1 / (self.interpolateFactor - n)
+                        self.frame0, self.frameSetupFunction(frame1), timestep
                     )
                     self.writeQueue.put(frame)
             else:
                 # undo the setup done in ffmpeg thread
-                sc_detected_frame_np = self.undoSetup(self.frame0)
+                
                 for n in range(self.interpolateFactor):
-                    self.writeQueue.put(sc_detected_frame_np)
+                    self.writeQueue.put(frame1)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
                 except:
                     self.transitionFrame = None
-            self.frame0 = frame1
+            self.frame0 = self.frameSetupFunction(frame1)
 
         self.writeQueue.put(None)
         printAndLog("Finished Interpolation")

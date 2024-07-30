@@ -150,7 +150,6 @@ class FFMpegRender:
         )
         for i in range(self.totalInputFrames - 1):
             chunk = self.readProcess.stdout.read(self.inputFrameChunkSize)
-            chunk = self.frameSetupFunction(chunk)
             self.readQueue.put(chunk)
         printAndLog("Ending Video Read")
         self.readQueue.put(None)

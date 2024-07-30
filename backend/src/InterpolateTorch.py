@@ -281,10 +281,7 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
-        if timestep == 1:
-            return self.tensor_to_frame(img1)
-        if timestep == 0:
-            return self.tensor_to_frame(img0)
+        
 
         timestep = torch.full(
             (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
@@ -315,14 +312,10 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
-        frame = torch.frombuffer(frame, dtype=torch.uint8).reshape(
+        frame = torch.frombuffer(frame, dtype=torch.uint8,).reshape(
             self.height, self.width, 3
-        )
+        ).to(device=self.device, dtype=self.dtype, non_blocking=True).permute(2, 0, 1).unsqueeze(0) / 255.0
         return F.pad(
-            (frame)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .to(self.device, dtype=self.dtype, non_blocking=True)
-            / 255.0,
+            (frame),
             self.padding,
         )
