@@ -58,8 +58,22 @@ class InterpolateRifeTorch:
         self.ph = math.ceil(self.height / tmp) * tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
 
+        # detect what rife arch to use
+        match interpolateArch:
+            case "rife46":
+                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
+                v1=True
+            case "rife413":
+                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+                v1=False
+            case "rife420":
+                from .InterpolateArchs.RIFE.rife420IFNET import IFNet
+                v1=False
+            case _:
+                errorAndLog("Invalid Interpolation Arch")
+
         # if 4.6 v1
-        if interpolateArch == "rife46":
+        if v1:
             self.tenFlow_div = torch.tensor(
                 [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
                 dtype=self.dtype,
@@ -77,7 +91,7 @@ class InterpolateRifeTorch:
             ).to(dtype=self.dtype, device=self.device)
             self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
 
-        if interpolateArch == "rife413" or interpolateArch == "rife420":
+        else:
             # if v2
             h_mul = 2 / (self.pw - 1)
             v_mul = 2 / (self.ph - 1)
@@ -96,21 +110,6 @@ class InterpolateRifeTorch:
                 ),
                 dim=1,
             ).to(device=self.device, dtype=self.dtype)
-
-        # detect what rife arch to use
-        match interpolateArch:
-            case "rife46":
-                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-
-            case "rife413":
-                from .InterpolateArchs.RIFE.rife413IFNET import IFNet
-            
-            case "rife420":
-                from .InterpolateArchs.RIFE.rife420IFNET import IFNet
-            
-            case _:
-                errorAndLog("Invalid Interpolation Arch")
-
         
         testInput = torch.zeros(1,3,self.ph,self.pw).to(device=self.device,dtype=self.dtype)
 
