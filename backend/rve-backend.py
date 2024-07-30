@@ -115,7 +115,7 @@ class HandleApplication:
             "--sceneDetectSensitivity",
             help="Scene change detection sensitivity, lower number means it has a higher chance of detecting scene changes, with risk of detecting too many.",
             type=float,
-            default=3.0,
+            default=2.0,
         )
         parser.add_argument(
             "--overwrite",

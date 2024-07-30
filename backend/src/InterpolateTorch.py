@@ -265,9 +265,9 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
         if timestep == 1:
-            return self.tensor_to_frame(img1[:, :, : self.height, : self.width][0])
+            return self.tensor_to_frame(img1)
         if timestep == 0:
-            return self.tensor_to_frame(img0[:, :, : self.height, : self.width][0])
+            return self.tensor_to_frame(img0)
 
         timestep = torch.full(
             (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
@@ -276,11 +276,14 @@ class InterpolateRifeTorch:
         output = self.flownet(
             img0, img1, timestep, self.tenFlow_div, self.backwarp_tenGrid
         )
-        output = output[:, :, : self.height, : self.width]
-        return self.tensor_to_frame(output[0])
+        return self.tensor_to_frame(output)
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
+        """
+        Takes in a 4d tensor, undoes padding, and converts to np array for rendering
+        """
+        frame = frame[:, :, : self.height, : self.width][0]
         return (
             frame.squeeze(0)
             .permute(1, 2, 0)
