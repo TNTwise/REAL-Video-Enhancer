@@ -79,7 +79,7 @@ class Render(FFMpegRender):
         if upscaleModel:
             self.setupUpscale()
             self.renderThread = Thread(target=self.renderUpscale)
-            printAndLog("Using Upscaling Model: " + self.interpolateModel)
+            printAndLog("Using Upscaling Model: " + self.upscaleModel)
         if interpolateModel:
             self.setupInterpolate()
             self.renderThread = Thread(target=self.renderInterpolate)
@@ -123,7 +123,7 @@ class Render(FFMpegRender):
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
         printAndLog("Starting Interpolation")
-        self.transitionFrame = -1
+        self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.readQueue.get()
 
         for frameNum in range(self.totalFrames - 1):
