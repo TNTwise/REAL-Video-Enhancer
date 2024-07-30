@@ -134,7 +134,7 @@ class Render(FFMpegRender):
         self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
         printAndLog("Starting Upscale")
-        for i in range(self.totalFrames - 1):
+        for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
             frame = self.upscale(frame)
             self.writeQueue.put(frame)
@@ -150,7 +150,7 @@ class Render(FFMpegRender):
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.readQueue.get()
 
-        for frameNum in range(self.totalFrames - 1):
+        for frameNum in range(self.totalInputFrames - 1):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break

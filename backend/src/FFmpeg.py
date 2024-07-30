@@ -3,14 +3,10 @@ import os
 import subprocess
 import queue
 import time
-import sys
+from tqdm import tqdm
 from multiprocessing import shared_memory
-import mmap
-import struct
-import numpy as np
 from .Util import currentDirectory, printAndLog
 
-sysout = sys.stdout
 
 
 class FFMpegRender:
@@ -62,6 +58,7 @@ class FFMpegRender:
         self.shm = shm
         self.inputFrameChunkSize = inputFrameChunkSize
         self.outputFrameChunkSize = outputFrameChunkSize
+        self.totalOutputFrames = self.totalInputFrames * self.interpolateFactor
 
         self.writeOutPipe = self.outputFile == "PIPE"
 
@@ -82,7 +79,7 @@ class FFMpegRender:
 
         self.width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.totalInputFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
 
         
@@ -106,62 +103,40 @@ class FFMpegRender:
         ]
         return command
 
+
     def getFFmpegWriteCommand(self):
         printAndLog("Generating FFmpeg WRITE command...")
-        if not self.outputFile == "PIPE":
-            if not self.benchmark:
-                # maybe i can split this so i can just use ffmpeg normally like with vspipe
-                command = [
-                    f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
-                    "-f",
-                    "rawvideo",
-                    "-pix_fmt",
-                    "rgb24",
-                    "-vcodec",
-                    "rawvideo",
-                    "-s",
-                    f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
-                    "-r",
-                    f"{self.fps * self.interpolateFactor}",
-                    "-i",
-                    "-",
-                    "-i",
-                    f"{self.inputFile}",
-                    f"-crf",
-                    f"{self.crf}",
-                    "-pix_fmt",
-                    self.pixelFormat,
-                    "-c:a",
-                    "copy",
-                    f"{self.outputFile}",
-                ]
-                for i in self.encoder.split():
-                    command.append(i)
-            else:
-                printAndLog("Using benchmark mode")
-                command = [
-                    f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
-                    "-y",
-                    "-v",
-                    "warning",
-                    "-stats",
-                    "-f",
-                    "rawvideo",
-                    "-vcodec",
-                    "rawvideo",
-                    "-s",
-                    f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
-                    "-pix_fmt",
-                    f"yuv420p",
-                    "-r",
-                    f"{self.fps * self.interpolateFactor}",
-                    "-i",
-                    "-",
-                    "-benchmark",
-                    "-f",
-                    "null",
-                    "-",
-                ]
+        if not self.benchmark:
+            # maybe i can split this so i can just use ffmpeg normally like with vspipe
+            command = [
+                f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
+                "-f",
+                "rawvideo",
+                "-pix_fmt",
+                "rgb24",
+                "-vcodec",
+                "rawvideo",
+                "-s",
+                f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
+                "-r",
+                f"{self.fps * self.interpolateFactor}",
+                "-i",
+                "-",
+                "-i",
+                f"{self.inputFile}",
+                f"-crf",
+                f"{self.crf}",
+                "-pix_fmt",
+                self.pixelFormat,
+                "-c:a",
+                "copy",
+                "-loglevel",
+                "error",
+            ]
+            for i in self.encoder.split():
+                command.append(i)
+            command.append(f"{self.outputFile}",)
+            
             if self.overwrite:
                 command.append("-y")
             return command
@@ -173,7 +148,7 @@ class FFMpegRender:
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
         )
-        for i in range(self.totalFrames - 1):
+        for i in range(self.totalInputFrames - 1):
             chunk = self.readProcess.stdout.read(self.inputFrameChunkSize)
             chunk = self.frameSetupFunction(chunk)
             self.readQueue.put(chunk)
@@ -209,9 +184,16 @@ class FFMpegRender:
         A command like this is required,
         ffmpeg -f rawvideo -pix_fmt rgb24 -s 1920x1080 -framerate 24 -i - -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a copy out.mp4
         """
+        printAndLog("Rendering")
+        pbar = tqdm(total=self.totalOutputFrames)
         startTime = time.time()
-        print("Starting Write Out")
-        if self.writeOutPipe == False:
+        if self.benchmark:
+            while True:
+                frame = self.writeQueue.get()
+                if frame is None:
+                    break
+                pbar.update(1)
+        else:
             self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),
                 stdin=subprocess.PIPE,
@@ -224,19 +206,14 @@ class FFMpegRender:
                 if frame is None:
                     break
                 self.writeProcess.stdin.buffer.write(frame)
+                # Update other variables
                 self.previewFrame = frame
+                # Update progress bar
+                pbar.update(1)
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
 
-        else:
-            sys.stdout = sysout
-            while True:
-                frame = self.writeQueue.get()
-                if frame is None:
-                    break
-
-                sys.stdout.buffer.write(frame)
-            sys.stdout.close()
+        
 
         renderTime = time.time() - startTime
         self.writingDone = True
