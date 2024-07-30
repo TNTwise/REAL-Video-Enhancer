@@ -28,6 +28,7 @@ class HandleApplication:
             # misc settingss
             sceneDetectMethod=self.args.sceneDetectMethod,
             sceneDetectSensitivity=self.args.sceneDetectSensitivity,
+            sharedMemoryID=self.args.shared_memory_id,
         )
 
     def handleArguments(self) -> argparse.ArgumentParser:
@@ -137,6 +138,12 @@ class HandleApplication:
             "--benchmark",
             help="Overwrite output video if it already exists.",
             action="store_true",
+        )
+        parser.add_argument(
+            "--shared_memory_id",
+            help="Memory ID to share preview ons",
+            type=str,
+            default=None
         )
         return parser.parse_args()
 

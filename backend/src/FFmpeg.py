@@ -4,6 +4,9 @@ import subprocess
 import queue
 import time
 import sys
+from multiprocessing import shared_memory
+import mmap
+import numpy as np
 from .Util import currentDirectory, printAndLog
 sysout = sys.stdout
 
@@ -20,6 +23,7 @@ class FFMpegRender:
         overwrite: bool = False,
         frameSetupFunction=None,
         crf: str = "18",
+        sharedMemoryID:str=None,
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -43,9 +47,12 @@ class FFMpegRender:
         self.benchmark = benchmark
         self.overwrite = overwrite
         self.readingDone = False
+        self.writingDone = False
         self.writeOutPipe = False
+        self.previewFrame = None
         self.crf = crf
         self.frameSetupFunction = frameSetupFunction
+        self.sharedMemoryID = sharedMemoryID
 
         self.writeOutPipe = self.outputFile == "PIPE"
 
@@ -166,7 +173,24 @@ class FFMpegRender:
 
     def returnFrame(self, frame):
         return frame
+    
+    def writeOutToSharedMemory(self):
 
+        # Create a shared memory block
+        shm = shared_memory.SharedMemory(create=True, size=self.frameChunkSize)
+        buffer = shm.buf
+        with open(os.path.join(currentDirectory(),'shm_name.txt'), 'w') as f:
+            f.write(shm.name)
+        with open(os.path.join(currentDirectory(),'metadata.txt'), 'w') as f:
+            f.write(f"{self.height},{self.width},{3}")
+        printAndLog(f"Shared memory name: {shm.name}")
+        while True:
+            if self.writingDone == True:
+                break
+            if self.previewFrame is not None:
+                buffer[:self.frameChunkSize] = bytes(self.previewFrame)
+                # Update the shared array
+            time.sleep(2)
     def writeOutVideoFrames(self):
         """
         Writes out frames either to ffmpeg or to pipe
@@ -189,6 +213,7 @@ class FFMpegRender:
                 if frame is None:
                     break
                 self.writeProcess.stdin.buffer.write(frame)
+                self.previewFrame = frame
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
 
@@ -203,6 +228,7 @@ class FFMpegRender:
             sys.stdout.close()
 
         renderTime = time.time() - startTime
+        self.writingDone = True
         printAndLog(
             f"Completed Write!\nTime to complete render: {round(renderTime, 2)}"
         )

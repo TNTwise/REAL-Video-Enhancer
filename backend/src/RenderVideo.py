@@ -4,7 +4,6 @@ from queue import Queue
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
 from .Util import printAndLog
-
 # try/except imports
 try:
     from .UpscaleNCNN import UpscaleNCNN, getNCNNScale
@@ -59,6 +58,7 @@ class Render(FFMpegRender):
         # misc
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
+        sharedMemoryID:str = None,
     ):
         self.inputFile = inputFile
         self.backend = backend
@@ -73,6 +73,7 @@ class Render(FFMpegRender):
         self.frame0 = None
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
+        self.sharedMemoryID = sharedMemoryID
 
         self.getVideoProperties(inputFile)
         printAndLog("Using backend: " + self.backend)
@@ -84,7 +85,7 @@ class Render(FFMpegRender):
             self.setupInterpolate()
             self.renderThread = Thread(target=self.renderInterpolate)
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
-
+        # initializes ffmpeg class, gets video properties
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -96,13 +97,20 @@ class Render(FFMpegRender):
             overwrite=overwrite,
             frameSetupFunction=self.setupRender,
             crf=crf,
+            sharedMemoryID=sharedMemoryID
         )
+        if sharedMemoryID is not None:
+            self.sharedMemoryThread = Thread(target=self.writeOutToSharedMemory)
+            self.sharedMemoryThread.start()
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
 
         self.ffmpegReadThread.start()
         self.ffmpegWriteThread.start()
         self.renderThread.start()
+
+    
+
 
     def renderUpscale(self):
         """

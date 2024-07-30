@@ -64,7 +64,7 @@ class UpscalePytorch:
                 ]
                 dummy_input = [
                     torch.zeros(
-                        (1, 3, self.height, self.width),
+                        (1, 3, 32, 32),
                         dtype=torch.float32,
                         device="cpu",
                     )
