@@ -190,7 +190,7 @@ class FFMpegRender:
             if self.previewFrame is not None:
                 buffer[:self.frameChunkSize] = bytes(self.previewFrame)
                 # Update the shared array
-            time.sleep(2)
+            time.sleep(.1)
     def writeOutVideoFrames(self):
         """
         Writes out frames either to ffmpeg or to pipe

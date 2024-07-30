@@ -20,7 +20,7 @@ class UpdateGUIThread(QThread):
         super().__init__()
     def run(self):
         while True:
-            time.sleep(1)
+            time.sleep(.1)
             self.updateGUITick.emit()
             
 class ProcessTab:
