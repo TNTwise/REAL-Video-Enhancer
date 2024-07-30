@@ -38,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
-        
+
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
@@ -46,14 +46,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # setup application
         self.setupBackendDeps()
-        
-
 
         # set up tabs
         self.processTab = ProcessTab(parent=self)
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
-        #self.downloadModels = DownloadModels()
+        # self.downloadModels = DownloadModels()
 
     def QButtonConnect(self):
         # connect buttons to switch menus
@@ -61,7 +59,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
-        
 
     def setupBackendDeps(self):
         # need pop up window

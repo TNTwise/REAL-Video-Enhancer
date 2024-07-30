@@ -8,7 +8,6 @@ from multiprocessing import shared_memory
 from .Util import currentDirectory, printAndLog
 
 
-
 class FFMpegRender:
     def __init__(
         self,
@@ -65,8 +64,6 @@ class FFMpegRender:
         self.readQueue = queue.Queue(maxsize=50)
         self.writeQueue = queue.Queue(maxsize=50)
 
-        
-
     def getVideoProperties(self, inputFile: str = None):
         printAndLog("Getting Video Properties...")
         if inputFile is None:
@@ -82,8 +79,7 @@ class FFMpegRender:
         self.totalInputFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
 
-        
-        self.outputFrameChunkSize = None  
+        self.outputFrameChunkSize = None
 
     def getFFmpegReadCommand(self):
         printAndLog("Generating FFmpeg READ command...")
@@ -102,7 +98,6 @@ class FFMpegRender:
             "-",
         ]
         return command
-
 
     def getFFmpegWriteCommand(self):
         printAndLog("Generating FFmpeg WRITE command...")
@@ -135,8 +130,10 @@ class FFMpegRender:
             ]
             for i in self.encoder.split():
                 command.append(i)
-            command.append(f"{self.outputFile}",)
-            
+            command.append(
+                f"{self.outputFile}",
+            )
+
             if self.overwrite:
                 command.append("-y")
             return command
@@ -211,8 +208,6 @@ class FFMpegRender:
                 pbar.update(1)
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
-
-        
 
         renderTime = time.time() - startTime
         self.writingDone = True

@@ -131,7 +131,11 @@ class IFBlock(nn.Module):
 
 class IFNet(nn.Module):
     def __init__(
-        self, scale=1, ensemble=False, dtype=torch.float32, device="cuda", 
+        self,
+        scale=1,
+        ensemble=False,
+        dtype=torch.float32,
+        device="cuda",
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
@@ -146,7 +150,6 @@ class IFNet(nn.Module):
 
         # self.contextnet = Contextnet()
         # self.unet = Unet()
-        
 
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         # cant be cached

@@ -129,7 +129,7 @@ class UpscalePytorch:
     def renderImage(self, image: torch.Tensor) -> torch.Tensor:
         upscaledImage = self.model(image)
         return upscaledImage
-    
+
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
         output = self.model(image)

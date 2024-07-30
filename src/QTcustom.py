@@ -85,6 +85,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     """
     Initializes all threading bs
     """
+
     def setup_ui(self):
         self.setWindowTitle(self.title)
         self.setStyleSheet(styleSheet())
@@ -127,7 +128,12 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
     Runs a command, and displays the output of said command in the popup
     """
 
-    def __init__(self, command: str, title: str = "Running Command", progressBarLength:int = None):
+    def __init__(
+        self,
+        command: str,
+        title: str = "Running Command",
+        progressBarLength: int = None,
+    ):
         super().__init__()
         self.command = command
         self.totalCommandOutput = ""
@@ -142,8 +148,9 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
     """
     Initializes all threading bs
     """
+
     def setup_ui(self):
-        #beginning of bullshit
+        # beginning of bullshit
         self.setWindowTitle(self.title)
         self.setStyleSheet(styleSheet())
         self.setMinimumSize(700, 100)
@@ -155,8 +162,12 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.plainTextEdit = QtWidgets.QPlainTextEdit(parent=self.centralwidget)
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.plainTextEdit.setReadOnly(True)
-        self.plainTextEdit.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        self.plainTextEdit.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.plainTextEdit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self.plainTextEdit.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
         self.gridLayout.addWidget(self.plainTextEdit, 0, 0, 1, 1)
         self.progressBar = QtWidgets.QProgressBar(parent=self.centralwidget)
         self.progressBar.setProperty("value", 0)
@@ -165,7 +176,7 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         if self.progressBarLength:
             self.progressBar.setRange(0, self.progressBarLength)
         self.gridLayout.addWidget(self.progressBar, 1, 0, 1, 1)
-        self.widget = QtWidgets.QWidget(parent=self.centralwidget)    
+        self.widget = QtWidgets.QWidget(parent=self.centralwidget)
         self.widget.setObjectName("widget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -182,13 +193,15 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.pushButton.clicked.connect(self.closeEvent)
         self.horizontalLayout.addWidget(self.pushButton)
         self.gridLayout.addWidget(self.widget, 2, 0, 1, 1)
-        
-        #end of bullshit
+
+        # end of bullshit
+
     def closeEvent(self, x):
         self.workerThread.quit()
         self.workerThread.deleteLater()
         self.workerThread.wait()
         self.close()
+
     def startDownload(self):
         self.workerThread = SubprocessThread(command=self.command)
         self.workerThread.output.connect(self.setProgress)
@@ -201,19 +214,20 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.workerThread.start()
 
     def setProgress(self, value):
-        self.totalCommandOutput += value + '\n'
+        self.totalCommandOutput += value + "\n"
         cursor = self.plainTextEdit.textCursor()
         cursor.setVerticalMovementX(-1000000000)
         # updates progressbar based on condition
         if self.progressBarLength is not None:
-            if self.totalCommandOutput.count('satisfied') > self.totalIters:
-                self.totalIters = self.totalCommandOutput.count('satisfied')
-            if self.totalCommandOutput.count('Collecting') > self.totalIters:
-                self.totalIters = self.totalCommandOutput.count('Collecting')
+            if self.totalCommandOutput.count("satisfied") > self.totalIters:
+                self.totalIters = self.totalCommandOutput.count("satisfied")
+            if self.totalCommandOutput.count("Collecting") > self.totalIters:
+                self.totalIters = self.totalCommandOutput.count("Collecting")
             self.progressBar.setValue(self.totalIters)
-            
+
         self.plainTextEdit.setPlainText(self.totalCommandOutput)
         self.plainTextEdit.setTextCursor(cursor)
+
 
 if __name__ == "__main__":
     DownloadProgressPopup(

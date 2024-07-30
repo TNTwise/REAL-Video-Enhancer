@@ -14,7 +14,6 @@ import os
 import tarfile
 
 
-
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -81,7 +80,11 @@ class DownloadDependencies:
     ):  # going to have to make this into a qt module pop up
         command = [pythonPath(), "-m", "pip", "install"] + deps
         printAndLog("Downloading Deps: " + str(command))
-        DisplayCommandOutputPopup(command=command,title="Download NCNN Dependencies",progressBarLength=len(deps))
+        DisplayCommandOutputPopup(
+            command=command,
+            title="Download NCNN Dependencies",
+            progressBarLength=len(deps),
+        )
 
     def getPlatformIndependentDeps(self):
         platformIndependentdeps = [
@@ -101,7 +104,7 @@ class DownloadDependencies:
         Default deps
         Pytorch CUDA deps
         """
-        
+
         torchCUDALinuxDeps = [
             "spandrel",
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
@@ -140,15 +143,13 @@ class DownloadDependencies:
             self.pipInstall(ncnnLinuxDeps + self.getPlatformIndependentDeps())
 
     def downloadPyTorchROCmDeps(self):
-        
         rocmLinuxDeps = [
             "https://download.pytorch.org/whl/pytorch_triton_rocm-2.3.1-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl"
+            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
         ]
         if getPlatform() == "linux":
             self.pipInstall(rocmLinuxDeps + self.getPlatformIndependentDeps())
-
 
     def downloadTensorRTDeps(self):
         """

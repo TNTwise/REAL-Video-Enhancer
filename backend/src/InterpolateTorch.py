@@ -98,9 +98,8 @@ class InterpolateRifeTorch:
             # if v2
             h_mul = 2 / (self.pw - 1)
             v_mul = 2 / (self.ph - 1)
-            self.tenFlow_div = (
-                torch.Tensor([h_mul, v_mul])
-                .to(device=self.device, dtype=self.dtype)
+            self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
+                device=self.device, dtype=self.dtype
             )
 
             self.backwarp_tenGrid = torch.cat(
@@ -114,8 +113,6 @@ class InterpolateRifeTorch:
                 ),
                 dim=1,
             ).to(device=self.device, dtype=self.dtype)
-
-        
 
         self.flownet = IFNet(
             scale=scale,
@@ -281,8 +278,6 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
-        
-
         timestep = torch.full(
             (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
         )
@@ -307,14 +302,21 @@ class InterpolateRifeTorch:
             .contiguous()
             .cpu()
             .numpy()
-            
         )
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
-        frame = torch.frombuffer(frame, dtype=torch.uint8,).reshape(
-            self.height, self.width, 3
-        ).to(device=self.device, dtype=self.dtype, non_blocking=True).permute(2, 0, 1).unsqueeze(0) / 255.0
+        frame = (
+            torch.frombuffer(
+                frame,
+                dtype=torch.uint8,
+            )
+            .reshape(self.height, self.width, 3)
+            .to(device=self.device, dtype=self.dtype, non_blocking=True)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            / 255.0
+        )
         return F.pad(
             (frame),
             self.padding,

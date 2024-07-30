@@ -42,7 +42,7 @@ class Render(FFMpegRender):
     Get the video properties (res,fps,etc)
     set up upscaling/interpolation, this gets the scale for upscaling if upscaling is the current task
     assign framechunksize to a value, as this is needed to catch bytes and set up shared memory
-    set up shared memory 
+    set up shared memory
     """
 
     def __init__(
@@ -85,7 +85,6 @@ class Render(FFMpegRender):
         self.sharedMemoryID = sharedMemoryID
         # get video properties early
         self.getVideoProperties(inputFile)
-        
 
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
@@ -98,7 +97,9 @@ class Render(FFMpegRender):
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
 
         self.inputFrameChunkSize = self.width * self.height * 3
-        self.outputFrameChunkSize = self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3 
+        self.outputFrameChunkSize = (
+            self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3
+        )
         self.shm = shared_memory.SharedMemory(
             name=self.sharedMemoryID, create=True, size=self.outputFrameChunkSize
         )
@@ -149,7 +150,7 @@ class Render(FFMpegRender):
         printAndLog("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
-        
+
         for frameNum in range(self.totalInputFrames - 1):
             frame1 = self.readQueue.get()
             if frame1 is None:
@@ -160,14 +161,14 @@ class Render(FFMpegRender):
                     if timestep == 1:
                         self.writeQueue.put(frame1)
                         continue
-                    
+
                     frame = self.interpolate(
                         self.frame0, self.frameSetupFunction(frame1), timestep
                     )
                     self.writeQueue.put(frame)
             else:
                 # undo the setup done in ffmpeg thread
-                
+
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(frame1)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
@@ -238,7 +239,7 @@ class Render(FFMpegRender):
             self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifeNCNN.process
         if self.backend == "pytorch" or self.backend == "tensorrt":
-            interpolateRifePytorch = InterpolateRifeTorch( 
+            interpolateRifePytorch = InterpolateRifeTorch(
                 interpolateModelPath=self.interpolateModel,
                 interpolateArch=self.interpolateArch,
                 width=self.width,
