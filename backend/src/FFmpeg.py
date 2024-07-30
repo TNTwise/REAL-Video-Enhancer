@@ -6,6 +6,7 @@ import time
 import sys
 from multiprocessing import shared_memory
 import mmap
+import struct
 import numpy as np
 from .Util import currentDirectory, printAndLog
 sysout = sys.stdout
@@ -177,12 +178,9 @@ class FFMpegRender:
     def writeOutToSharedMemory(self):
 
         # Create a shared memory block
-        shm = shared_memory.SharedMemory(create=True, size=self.frameChunkSize)
+        shm = shared_memory.SharedMemory(name=self.sharedMemoryID,create=True, size=self.frameChunkSize)
         buffer = shm.buf
-        with open(os.path.join(currentDirectory(),'shm_name.txt'), 'w') as f:
-            f.write(shm.name)
-        with open(os.path.join(currentDirectory(),'metadata.txt'), 'w') as f:
-            f.write(f"{self.height},{self.width},{3}")
+        
         printAndLog(f"Shared memory name: {shm.name}")
         while True:
             if self.writingDone == True:
