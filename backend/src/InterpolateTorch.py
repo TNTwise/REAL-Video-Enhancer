@@ -101,7 +101,6 @@ class InterpolateRifeTorch:
             self.tenFlow_div = (
                 torch.Tensor([h_mul, v_mul])
                 .to(device=self.device, dtype=self.dtype)
-                .reshape(1, 2, 1, 1)
             )
 
             self.backwarp_tenGrid = torch.cat(
@@ -116,16 +115,13 @@ class InterpolateRifeTorch:
                 dim=1,
             ).to(device=self.device, dtype=self.dtype)
 
-        testInput = torch.zeros(1, 3, self.ph, self.pw).to(
-            device=self.device, dtype=self.dtype
-        )
+        
 
         self.flownet = IFNet(
             scale=scale,
             ensemble=ensemble,
             dtype=self.dtype,
             device=self.device,
-            img0=testInput,
         )
 
         state_dict = {
