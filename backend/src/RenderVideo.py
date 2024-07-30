@@ -146,6 +146,8 @@ class Render(FFMpegRender):
         """
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
+        self.frame0 is always setup,
+        frame1 is in bytes, and is only converted if need be
         """
         printAndLog("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
@@ -155,7 +157,7 @@ class Render(FFMpegRender):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
-            if self.transitionFrame is None or frameNum != self.transitionFrame:
+            if frameNum != self.transitionFrame:
                 for n in range(self.interpolateFactor):
                     timestep = 1 / (self.interpolateFactor - n)
                     if timestep == 1:
