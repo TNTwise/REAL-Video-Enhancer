@@ -314,6 +314,7 @@ class InterpolateRifeTorch:
             .contiguous()
             .cpu()
             .numpy()
+            
         )
 
     @torch.inference_mode()

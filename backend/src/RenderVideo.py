@@ -36,6 +36,13 @@ class Render(FFMpegRender):
     backend (pytorch,ncnn,tensorrt)
     device (cpu,cuda)
     precision (float16,float32)
+
+    NOTE:
+    Everything in here has to happen in a specific order:
+    Get the video properties (res,fps,etc)
+    set up upscaling/interpolation, this gets the scale for upscaling if upscaling is the current task
+    assign framechunksize to a value, as this is needed to catch bytes and set up shared memory
+    set up shared memory 
     """
 
     def __init__(
@@ -78,10 +85,7 @@ class Render(FFMpegRender):
         self.sharedMemoryID = sharedMemoryID
         # get video properties early
         self.getVideoProperties(inputFile)
-
-        self.shm = shared_memory.SharedMemory(
-            name=self.sharedMemoryID, create=True, size=self.frameChunkSize
-        )
+        
 
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
@@ -92,6 +96,12 @@ class Render(FFMpegRender):
             self.setupInterpolate()
             self.renderThread = Thread(target=self.renderInterpolate)
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
+
+        self.inputFrameChunkSize = self.width * self.height * 3
+        self.outputFrameChunkSize = self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3 
+        self.shm = shared_memory.SharedMemory(
+            name=self.sharedMemoryID, create=True, size=self.outputFrameChunkSize
+        )
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -105,6 +115,8 @@ class Render(FFMpegRender):
             crf=crf,
             sharedMemoryID=sharedMemoryID,
             shm=self.shm,
+            inputFrameChunkSize=self.inputFrameChunkSize,
+            outputFrameChunkSize=self.outputFrameChunkSize,
         )
         if sharedMemoryID is not None:
             self.sharedMemoryThread = Thread(target=self.writeOutToSharedMemory)
@@ -221,7 +233,7 @@ class Render(FFMpegRender):
             self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifeNCNN.process
         if self.backend == "pytorch" or self.backend == "tensorrt":
-            interpolateRifePytorch = InterpolateRifeTorch(
+            interpolateRifePytorch = InterpolateRifeTorch( 
                 interpolateModelPath=self.interpolateModel,
                 interpolateArch=self.interpolateArch,
                 width=self.width,

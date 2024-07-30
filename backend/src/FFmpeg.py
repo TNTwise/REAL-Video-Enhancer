@@ -28,6 +28,8 @@ class FFMpegRender:
         crf: str = "18",
         sharedMemoryID: str = None,
         shm: shared_memory.SharedMemory = None,
+        inputFrameChunkSize: int = None,
+        outputFrameChunkSize: int = None,
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -58,11 +60,15 @@ class FFMpegRender:
         self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
         self.shm = shm
+        self.inputFrameChunkSize = inputFrameChunkSize
+        self.outputFrameChunkSize = outputFrameChunkSize
 
         self.writeOutPipe = self.outputFile == "PIPE"
 
         self.readQueue = queue.Queue(maxsize=50)
         self.writeQueue = queue.Queue(maxsize=50)
+
+        
 
     def getVideoProperties(self, inputFile: str = None):
         printAndLog("Getting Video Properties...")
@@ -79,7 +85,8 @@ class FFMpegRender:
         self.totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
 
-        self.frameChunkSize = self.width * self.height * 3
+        
+        self.outputFrameChunkSize = None  
 
     def getFFmpegReadCommand(self):
         printAndLog("Generating FFmpeg READ command...")
@@ -167,7 +174,7 @@ class FFMpegRender:
             stderr=subprocess.DEVNULL,
         )
         for i in range(self.totalFrames - 1):
-            chunk = self.readProcess.stdout.read(self.frameChunkSize)
+            chunk = self.readProcess.stdout.read(self.inputFrameChunkSize)
             chunk = self.frameSetupFunction(chunk)
             self.readQueue.put(chunk)
         printAndLog("Ending Video Read")
@@ -190,8 +197,8 @@ class FFMpegRender:
                 self.shm.close()
                 self.shm.unlink()
                 break
-            if self.previewFrame is not None:
-                buffer[: self.frameChunkSize] = bytes(self.previewFrame)
+            if self.previewFrame is not None and self.outputFrameChunkSize is not None:
+                buffer[: self.outputFrameChunkSize] = bytes(self.previewFrame)
                 # Update the shared array
             time.sleep(0.1)
 
