@@ -9,7 +9,9 @@ import mmap
 import struct
 import numpy as np
 from .Util import currentDirectory, printAndLog
+
 sysout = sys.stdout
+
 
 class FFMpegRender:
     def __init__(
@@ -24,8 +26,8 @@ class FFMpegRender:
         overwrite: bool = False,
         frameSetupFunction=None,
         crf: str = "18",
-        sharedMemoryID:str=None,
-        shm:shared_memory.SharedMemory=None,
+        sharedMemoryID: str = None,
+        shm: shared_memory.SharedMemory = None,
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -176,13 +178,12 @@ class FFMpegRender:
 
     def returnFrame(self, frame):
         return frame
-    
-    def writeOutToSharedMemory(self):
 
+    def writeOutToSharedMemory(self):
         # Create a shared memory block
-        
+
         buffer = self.shm.buf
-        
+
         printAndLog(f"Shared memory name: {self.shm.name}")
         while True:
             if self.writingDone == True:
@@ -190,9 +191,10 @@ class FFMpegRender:
                 self.shm.unlink()
                 break
             if self.previewFrame is not None:
-                buffer[:self.frameChunkSize] = bytes(self.previewFrame)
+                buffer[: self.frameChunkSize] = bytes(self.previewFrame)
                 # Update the shared array
-            time.sleep(.1)
+            time.sleep(0.1)
+
     def writeOutVideoFrames(self):
         """
         Writes out frames either to ffmpeg or to pipe
@@ -225,7 +227,7 @@ class FFMpegRender:
                 frame = self.writeQueue.get()
                 if frame is None:
                     break
-                
+
                 sys.stdout.buffer.write(frame)
             sys.stdout.close()
 

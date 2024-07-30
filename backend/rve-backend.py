@@ -143,7 +143,7 @@ class HandleApplication:
             "--shared_memory_id",
             help="Memory ID to share preview ons",
             type=str,
-            default=None
+            default=None,
         )
         return parser.parse_args()
 

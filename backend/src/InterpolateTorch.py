@@ -62,13 +62,16 @@ class InterpolateRifeTorch:
         match interpolateArch:
             case "rife46":
                 from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-                v1=True
+
+                v1 = True
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
-                v1=False
+
+                v1 = False
             case "rife420":
                 from .InterpolateArchs.RIFE.rife420IFNET import IFNet
-                v1=False
+
+                v1 = False
             case _:
                 errorAndLog("Invalid Interpolation Arch")
 
@@ -95,9 +98,11 @@ class InterpolateRifeTorch:
             # if v2
             h_mul = 2 / (self.pw - 1)
             v_mul = 2 / (self.ph - 1)
-            self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
-                device=self.device, dtype=self.dtype
-            ).reshape(1, 2, 1, 1)
+            self.tenFlow_div = (
+                torch.Tensor([h_mul, v_mul])
+                .to(device=self.device, dtype=self.dtype)
+                .reshape(1, 2, 1, 1)
+            )
 
             self.backwarp_tenGrid = torch.cat(
                 (
@@ -110,11 +115,17 @@ class InterpolateRifeTorch:
                 ),
                 dim=1,
             ).to(device=self.device, dtype=self.dtype)
-        
-        testInput = torch.zeros(1,3,self.ph,self.pw).to(device=self.device,dtype=self.dtype)
+
+        testInput = torch.zeros(1, 3, self.ph, self.pw).to(
+            device=self.device, dtype=self.dtype
+        )
 
         self.flownet = IFNet(
-            scale=scale, ensemble=ensemble, dtype=self.dtype, device=self.device, img0=testInput
+            scale=scale,
+            ensemble=ensemble,
+            dtype=self.dtype,
+            device=self.device,
+            img0=testInput,
         )
 
         state_dict = {

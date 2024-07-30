@@ -6,6 +6,8 @@ import contextlib
 import io
 import sys
 import os
+
+
 class InterpolateRIFENCNN:
     def __init__(
         self,
@@ -15,7 +17,6 @@ class InterpolateRIFENCNN:
         threads: int = 1,
         gpuid: int = 0,
     ):
-        
         self.interpolateModelPath = interpolateModelPath
         self.width = width
         self.height = height

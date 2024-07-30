@@ -130,7 +130,9 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda",img0=None):
+    def __init__(
+        self, scale=1, ensemble=False, dtype=torch.float32, device="cuda", img0=None
+    ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
         self.block1 = IFBlock(8 + 4 + 16, c=128)
@@ -141,10 +143,11 @@ class IFNet(nn.Module):
         self.dtype = dtype
         self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
         self.ensemble = ensemble
-        
+
         # self.contextnet = Contextnet()
         # self.unet = Unet()
         self.h, self.w = img0.shape[2], img0.shape[3]
+
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         # cant be cached
         self.imgs = torch.cat([img0, img1], dim=1)

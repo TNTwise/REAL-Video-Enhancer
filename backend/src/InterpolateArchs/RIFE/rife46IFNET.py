@@ -94,7 +94,9 @@ class IFBlock(nn.Module):
 
 
 class IFNet(nn.Module):
-    def __init__(self, scale=1, ensemble=False, dtype=torch.float32, device="cuda", img0=None):
+    def __init__(
+        self, scale=1, ensemble=False, dtype=torch.float32, device="cuda", img0=None
+    ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
         self.block1 = IFBlock(8 + 4, c=128)
@@ -112,7 +114,7 @@ class IFNet(nn.Module):
         warped_img0 = img0
         warped_img1 = img1
         flow = None
-        mask = None 
+        mask = None
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:

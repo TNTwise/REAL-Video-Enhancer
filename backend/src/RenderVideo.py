@@ -5,6 +5,7 @@ from multiprocessing import shared_memory
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
 from .Util import printAndLog
+
 # try/except imports
 try:
     from .UpscaleNCNN import UpscaleNCNN, getNCNNScale
@@ -59,7 +60,7 @@ class Render(FFMpegRender):
         # misc
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
-        sharedMemoryID:str = None,
+        sharedMemoryID: str = None,
     ):
         self.inputFile = inputFile
         self.backend = backend
@@ -78,9 +79,10 @@ class Render(FFMpegRender):
         # get video properties early
         self.getVideoProperties(inputFile)
 
-        self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID,create=True, size=self.frameChunkSize)
+        self.shm = shared_memory.SharedMemory(
+            name=self.sharedMemoryID, create=True, size=self.frameChunkSize
+        )
 
-        
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
             self.setupUpscale()
@@ -102,8 +104,7 @@ class Render(FFMpegRender):
             frameSetupFunction=self.setupRender,
             crf=crf,
             sharedMemoryID=sharedMemoryID,
-            shm=self.shm
-
+            shm=self.shm,
         )
         if sharedMemoryID is not None:
             self.sharedMemoryThread = Thread(target=self.writeOutToSharedMemory)
@@ -114,9 +115,6 @@ class Render(FFMpegRender):
         self.ffmpegReadThread.start()
         self.ffmpegWriteThread.start()
         self.renderThread.start()
-
-    
-
 
     def renderUpscale(self):
         """
@@ -152,9 +150,7 @@ class Render(FFMpegRender):
                     self.writeQueue.put(frame)
             else:
                 # undo the setup done in ffmpeg thread
-                sc_detected_frame_np = self.undoSetup(
-                    self.frame0
-                )
+                sc_detected_frame_np = self.undoSetup(self.frame0)
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(sc_detected_frame_np)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
