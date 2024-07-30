@@ -186,6 +186,8 @@ class FFMpegRender:
         printAndLog(f"Shared memory name: {self.shm.name}")
         while True:
             if self.writingDone == True:
+                self.shm.close()
+                self.shm.unlink()
                 break
             if self.previewFrame is not None:
                 buffer[:self.frameChunkSize] = bytes(self.previewFrame)

@@ -7,10 +7,9 @@ import numpy as np
 import cv2
 from multiprocessing import shared_memory
 import time
-
+from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker
 from PySide6.QtCore import QThread, Signal, Qt
 from PySide6 import QtGui
-
 
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
@@ -18,10 +17,18 @@ class UpdateGUIThread(QThread):
     updateGUITick = Signal()
     def __init__(self):
         super().__init__()
+        self._stop_flag = False  # Boolean flag to control stopping
+        self._mutex = QMutex() # Atomic flag to control stopping
     def run(self):
         while True:
+            with QMutexLocker(self._mutex):
+                if self._stop_flag:
+                    break
             time.sleep(.1)
             self.updateGUITick.emit()
+    def stop(self):
+        with QMutexLocker(self._mutex):
+            self._stop_flag = True
             
 class ProcessTab:
     def __init__(
@@ -87,6 +94,15 @@ class ProcessTab:
         )  # need quit and wait to allow process to exit safely
         self.workerThread.start()
 
+    def onRenderCompletion(self):
+        self.workerThread.stop()
+        self.workerThread.quit()
+        self.workerThread.wait()
+        self.shm.close()
+        print("Closed Read Memory")
+        
+
+
     def renderToPipeThread(self):
         command = [
             f"{pythonPath()}",
@@ -99,16 +115,17 @@ class ProcessTab:
             os.path.join(modelsPath(),"rife4.18.pkl"),  # put actual model here, this is a placeholder
             "-b",
             "tensorrt",
+            "--interpolateFactor",
+            "2",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}"
         ]
 
         self.pipeInFrames = subprocess.run(
             command,
-            
-
         )
-
+        print("Done with render")
+        self.onRenderCompletion()
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         rgb_image = cv_img
@@ -131,4 +148,5 @@ class ProcessTab:
 
             self.parent.previewLabel.setPixmap(self.convert_cv_qt(image_array))
         except FileNotFoundError:
-            print("No preview yet!")
+            #print("No preview yet!")
+            pass
