@@ -9,6 +9,7 @@ from multiprocessing import shared_memory
 import time
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
 from PySide6 import QtGui
+from PySide6.QtGui import QPixmap,QPainter,QPainterPath
 
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
@@ -158,12 +159,39 @@ class ProcessTab:
             f"{self.imagePreviewSharedMemoryID}",
         ]
 
-        self.pipeInFrames = subprocess.run(
+        self.pipeInFrames = subprocess.Popen(
             command,
         )
+        self.pipeInFrames.wait()
         print("Done with render")
         self.onRenderCompletion()
 
+    def getRoundedPixmap(self, pixmap, corner_radius):
+        size = pixmap.size()
+        mask = QPixmap(size)
+        mask.fill(Qt.transparent)
+        
+        painter = QPainter(mask)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        
+        path = QPainterPath()
+        path.addRoundedRect(0, 0, size.width(), size.height(), corner_radius, corner_radius)
+        
+        painter.setClipPath(path)
+        painter.drawPixmap(0, 0, pixmap)
+        painter.end()
+        
+        rounded_pixmap = QPixmap(size)
+        rounded_pixmap.fill(Qt.transparent)
+        
+        painter = QPainter(rounded_pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        painter.drawPixmap(0, 0, mask)
+        painter.end()
+        
+        return rounded_pixmap
 
     def updateProcessTab(self, qimage: QtGui.QImage):
         """
@@ -173,8 +201,9 @@ class ProcessTab:
             width = self.parent.width()
             height = self.parent.height()
             p = qimage.scaled(width / 2, height/2, Qt.KeepAspectRatio)
-            
-            self.parent.previewLabel.setPixmap(QtGui.QPixmap.fromImage(p))
+            pixmap = QtGui.QPixmap.fromImage(p)
+            roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
+            self.parent.previewLabel.setPixmap(roundedPixmap)
         except FileNotFoundError:
             # print("No preview yet!")
             pass
