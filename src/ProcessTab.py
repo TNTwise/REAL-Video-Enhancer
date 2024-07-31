@@ -169,7 +169,9 @@ class ProcessTab:
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
         try:
-            p = qimage.scaled(600, 600, Qt.KeepAspectRatio)
+            width = self.parent.width()
+            height = self.parent.height()
+            p = qimage.scaled(width / 1.6, height/1.6, Qt.KeepAspectRatio)
             
             self.parent.previewLabel.setPixmap(QtGui.QPixmap.fromImage(p))
         except FileNotFoundError:
