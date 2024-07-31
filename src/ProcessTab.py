@@ -135,7 +135,8 @@ class ProcessTab:
         self.workerThread.stop()
         self.workerThread.quit()
         self.workerThread.wait()
-        
+        # reset image preview
+        self.parent.previewLabel.clear()
 
     def renderToPipeThread(self):
         command = [
@@ -171,7 +172,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 1.6, height/1.6, Qt.KeepAspectRatio)
+            p = qimage.scaled(width / 2, height/2, Qt.KeepAspectRatio)
             
             self.parent.previewLabel.setPixmap(QtGui.QPixmap.fromImage(p))
         except FileNotFoundError:
