@@ -157,6 +157,7 @@ class ProcessTab:
             "2",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
+            "--half"
         ]
 
         self.pipeInFrames = subprocess.Popen(

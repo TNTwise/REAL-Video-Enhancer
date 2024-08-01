@@ -186,6 +186,7 @@ class FFMpegRender:
         if self.benchmark:
             while True:
                 frame = self.writeQueue.get()
+                self.previewFrame = frame
                 if frame is None:
                     break
                 pbar.update(1)

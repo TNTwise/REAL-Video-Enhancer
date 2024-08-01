@@ -7,7 +7,7 @@ import subprocess
 import requests
 
 from .QTstyle import styleSheet
-
+from .Util import printAndLog
 
 # custom threads
 class DownloadAndReportToQTThread(QThread):
@@ -59,6 +59,7 @@ class SubprocessThread(QThread):
 
         for line in iter(process.stdout.readline, ""):
             self.output.emit(line.strip())
+            printAndLog(line.strip())
 
         process.stdout.close()
         return_code = process.wait()
@@ -88,6 +89,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
 
     def setup_ui(self):
         self.setWindowTitle(self.title)
+        self.setLabelText(self.title)
         self.setStyleSheet(styleSheet())
         self.setRange(0, 100)
         self.setMinimumSize(300, 100)
