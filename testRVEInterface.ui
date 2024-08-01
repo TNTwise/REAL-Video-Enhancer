@@ -335,14 +335,14 @@ QProgressBar{
                  <item>
                   <widget class="QWidget" name="widget" native="true">
                    <layout class="QHBoxLayout" name="horizontalLayout">
-                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                    <item>
                      <widget class="QLabel" name="label_7">
                       <property name="text">
                        <string>Method</string>
                       </property>
                      </widget>
                     </item>
-                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                    <item>
                      <widget class="QComboBox" name="methodComboBox">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -381,7 +381,7 @@ QProgressBar{
                       </property>
                      </widget>
                     </item>
-                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                    <item>
                      <widget class="QComboBox" name="methodComboBox_3">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -391,7 +391,7 @@ QProgressBar{
                       </property>
                       <property name="minimumSize">
                        <size>
-                        <width>250</width>
+                        <width>0</width>
                         <height>0</height>
                        </size>
                       </property>
@@ -410,7 +410,7 @@ QProgressBar{
                       </property>
                      </widget>
                     </item>
-                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                    <item>
                      <widget class="QComboBox" name="methodComboBox_5">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
