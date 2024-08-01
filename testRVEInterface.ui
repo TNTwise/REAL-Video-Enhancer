@@ -178,6 +178,69 @@ QProgressBar{
  }</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
+              <item row="1" column="0" colspan="2">
+               <widget class="QWidget" name="bottomMenuSubContainer" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>85</height>
+                 </size>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="spacing">
+                  <number>20</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>22</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>22</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="startRenderButton">
+                   <property name="enabled">
+                    <bool>true</bool>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>59</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resources.qrc">
+                     <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>55</width>
+                     <height>45</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QProgressBar" name="progressBar">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="value">
+                    <number>0</number>
+                   </property>
+                   <property name="textVisible">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
               <item row="0" column="0">
                <widget class="QWidget" name="videoInfoContainer" native="true">
                 <property name="maximumSize">
@@ -270,17 +333,129 @@ QProgressBar{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="methodComboBox">
-                   <item>
-                    <property name="text">
-                     <string>Interpolate</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Upscale</string>
-                    </property>
-                   </item>
+                  <widget class="QWidget" name="widget" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout">
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QLabel" name="label_7">
+                      <property name="text">
+                       <string>Method</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QComboBox" name="methodComboBox">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>250</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>Interpolate</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>Upscale</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_3" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_11">
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QLabel" name="label_12">
+                      <property name="text">
+                       <string>Backend</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QComboBox" name="methodComboBox_3">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>250</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_5" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_13">
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QLabel" name="label_14">
+                      <property name="text">
+                       <string>Model</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QComboBox" name="methodComboBox_5">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>250</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="widget_2" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_7">
+                    <item alignment="Qt::AlignmentFlag::AlignLeft">
+                     <widget class="QLabel" name="label_11">
+                      <property name="text">
+                       <string>Interpolation Multiplier</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignRight">
+                     <widget class="QComboBox" name="methodComboBox_2">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                  <item>
@@ -321,7 +496,7 @@ border-radius: 10px;
 </string>
                       </property>
                       <property name="text">
-                       <string>Preview</string>
+                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -346,69 +521,6 @@ border-radius: 10px;
                      </widget>
                     </item>
                    </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="1" column="0" colspan="2">
-               <widget class="QWidget" name="bottomMenuSubContainer" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>85</height>
-                 </size>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
-                 <property name="spacing">
-                  <number>20</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>22</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>22</number>
-                 </property>
-                 <item>
-                  <widget class="QPushButton" name="startRenderButton">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>59</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="icon">
-                    <iconset resource="resources.qrc">
-                     <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
-                   </property>
-                   <property name="iconSize">
-                    <size>
-                     <width>55</width>
-                     <height>45</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QProgressBar" name="progressBar">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="value">
-                    <number>0</number>
-                   </property>
-                   <property name="textVisible">
-                    <bool>false</bool>
-                   </property>
                   </widget>
                  </item>
                 </layout>

@@ -13,6 +13,11 @@ from PySide6.QtGui import QPixmap,QPainter,QPainterPath
 
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
+class HandleInputs:
+    """A class specifically made to handle the qt widgets and turn their data into a usable command for processing"""
+    def __init__(self, parent):
+        self.parent = parent
+    
 
 class UpdateGUIThread(QThread):
     """
@@ -51,11 +56,11 @@ class UpdateGUIThread(QThread):
             
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
-        rgb_image = cv_img
-        h, w, ch = rgb_image.shape
+        #rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
+        h, w, ch = cv_img.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QtGui.QImage(
-            rgb_image.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888
+            cv_img.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888
         )
         return convert_to_Qt_format
 
