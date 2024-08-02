@@ -476,6 +476,12 @@ QProgressBar{
               </item>
               <item row="0" column="1">
                <widget class="QWidget" name="processInfoContainer" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_5">
                  <item>
                   <widget class="QWidget" name="previewSubContainer" native="true">
@@ -483,7 +489,7 @@ QProgressBar{
                     <item>
                      <widget class="QLabel" name="previewLabel">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
@@ -508,6 +514,12 @@ border-radius: 10px;
                    <layout class="QVBoxLayout" name="verticalLayout_9">
                     <item>
                      <widget class="QLabel" name="videoInfoLabel">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
                       <property name="styleSheet">
                        <string notr="true">QLabel{
 background-color:#2c313c;

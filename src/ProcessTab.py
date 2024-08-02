@@ -206,7 +206,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 2, height/2, Qt.KeepAspectRatio)
+            p = qimage.scaled(width / 2.4, height/2.4, Qt.KeepAspectRatio)
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)
