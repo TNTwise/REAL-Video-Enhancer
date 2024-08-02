@@ -34,3 +34,46 @@ def log(message: str):
 
 def currentDirectory():
     return cwd
+
+
+def checkForPytorch() -> bool:
+    """
+    function that checks if the pytorch backend is available
+    """
+    try:
+        import torch
+        import torchvision
+        import spandrel
+
+        return True
+    except ImportError as e:
+        return False
+
+
+def checkForTensorRT() -> bool:
+    """
+    function that checks if the pytorch backend is available
+    """
+    try:
+        import torch
+        import torchvision
+        import spandrel
+        import tensorrt
+        import torch_tensorrt
+
+        return True
+    except ImportError as e:
+        return False
+
+
+def checkForNCNN() -> bool:
+    """
+    function that checks if the pytorch backend is available
+    """
+    try:
+        import rife_ncnn_vulkan_python
+        from upscale_ncnn_py import UPSCALE
+
+        return True
+    except ImportError as e:
+        return False

@@ -2,34 +2,46 @@ import argparse
 import os
 
 from src.RenderVideo import Render
+from src.Util import checkForPytorch, checkForNCNN, checkForTensorRT
 
 
 class HandleApplication:
     def __init__(self):
         self.args = self.handleArguments()
-        self.checkArguments()
-        ffmpegSettings = Render(
-            # model settings
-            inputFile=self.args.input,
-            outputFile=self.args.output,
-            interpolateModel=self.args.interpolateModel,
-            interpolateFactor=self.args.interpolateFactor,
-            interpolateArch=self.args.interpolateArch,
-            upscaleModel=self.args.upscaleModel,
-            # backend settings
-            device="cuda",
-            backend=self.args.backend,
-            precision="float16" if self.args.half else "float32",
-            # ffmpeg settings
-            overwrite=self.args.overwrite,
-            crf=self.args.crf,
-            benchmark=self.args.benchmark,
-            encoder=self.args.custom_encoder,
-            # misc settingss
-            sceneDetectMethod=self.args.sceneDetectMethod,
-            sceneDetectSensitivity=self.args.sceneDetectSensitivity,
-            sharedMemoryID=self.args.shared_memory_id,
-        )
+        if not self.args.list_backends:
+            self.checkArguments()
+            Render(
+                # model settings
+                inputFile=self.args.input,
+                outputFile=self.args.output,
+                interpolateModel=self.args.interpolateModel,
+                interpolateFactor=self.args.interpolateFactor,
+                interpolateArch=self.args.interpolateArch,
+                upscaleModel=self.args.upscaleModel,
+                # backend settings
+                device="cuda",
+                backend=self.args.backend,
+                precision="float16" if self.args.half else "float32",
+                # ffmpeg settings
+                overwrite=self.args.overwrite,
+                crf=self.args.crf,
+                benchmark=self.args.benchmark,
+                encoder=self.args.custom_encoder,
+                # misc settingss
+                sceneDetectMethod=self.args.sceneDetectMethod,
+                sceneDetectSensitivity=self.args.sceneDetectSensitivity,
+                sharedMemoryID=self.args.shared_memory_id,
+            )
+        else:
+            availableBackends = []
+
+            if checkForPytorch():
+                availableBackends.append("pytorch")
+            if checkForNCNN():
+                availableBackends.append("tensorrt")
+            if checkForTensorRT():
+                availableBackends.append("ncnn")
+            print("Available Backends: " + str(availableBackends))
 
     def handleArguments(self) -> argparse.ArgumentParser:
         """_summary_
@@ -47,7 +59,6 @@ class HandleApplication:
             "--input",
             default=None,
             help="input video path",
-            required=True,
             type=str,
         )
         parser.add_argument(
@@ -55,7 +66,6 @@ class HandleApplication:
             "--output",
             default=None,
             help="output video path or PIPE",
-            required=True,
             type=str,
         )
         parser.add_argument(
@@ -145,6 +155,11 @@ class HandleApplication:
             type=str,
             default=None,
         )
+        parser.add_argument(
+            "--list_backends",
+            help="list out available backends",
+            action="store_true",
+        )
         return parser.parse_args()
 
     def fullModelPathandName(self):
@@ -165,6 +180,7 @@ class HandleApplication:
                 import torchvision
                 import spandrel
                 import tensorrt
+                import torch_tensorrt
             except ImportError as e:
                 raise ImportError(f"Cannot use TensorRT as the backend! {e}")
 

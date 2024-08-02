@@ -79,6 +79,7 @@ class ProcessTab:
         self.imagePreviewSharedMemoryID = "/image_preview"
 
         self.QButtonConnect()
+        self.setupUI()
 
     def QButtonConnect(self):
         # connect file select buttons
@@ -86,6 +87,9 @@ class ProcessTab:
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
+    
+    def setupUI(self):
+        self.parent.backendComboBox.addItems(self.parent.availableBackends)
 
     def run(
         self,

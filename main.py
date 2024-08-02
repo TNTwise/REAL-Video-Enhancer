@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
 from PySide6.QtCore import Qt
@@ -14,6 +15,7 @@ from src.Util import (
     getVideoLength,
     getVideoFrameCount,
     checkIfDeps,
+    pythonPath,
 )
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
@@ -40,11 +42,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100,600)
         self.aspect_ratio = self.width() / self.height()
+        self.availableBackends = self.getAvailableBackends()
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
+        
 
         # setup application
         self.setupBackendDeps()
@@ -54,6 +58,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
+        
 
     def QButtonConnect(self):
         # connect buttons to switch menus
@@ -106,6 +111,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             upscaleTimes=self.upscaleTimes,
             interpolateTimes=self.interpolateTimes,
         )
+    
+    def getAvailableBackends(self):
+        result = subprocess.run([pythonPath(),os.path.join("backend","rve-backend.py"),"--list_backends"], capture_output=True, text=True)
+
+        # Extract the output from the command result
+        output = result.stdout.strip()
+
+        # Find the part of the output containing the backends list
+        start = output.find("[")
+        end = output.find("]") + 1
+        backends_str = output[start:end]
+
+        # Convert the string representation of the list to an actual list
+        backends = eval(backends_str)
+
+        return backends
 
     # input file button
     def openInputFile(self):

@@ -382,7 +382,7 @@ QProgressBar{
                      </widget>
                     </item>
                     <item>
-                     <widget class="QComboBox" name="methodComboBox_3">
+                     <widget class="QComboBox" name="backendComboBox">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -411,7 +411,7 @@ QProgressBar{
                      </widget>
                     </item>
                     <item>
-                     <widget class="QComboBox" name="methodComboBox_5">
+                     <widget class="QComboBox" name="modelComboBox">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
@@ -440,7 +440,7 @@ QProgressBar{
                      </widget>
                     </item>
                     <item alignment="Qt::AlignmentFlag::AlignRight">
-                     <widget class="QComboBox" name="methodComboBox_2">
+                     <widget class="QComboBox" name="interpolationMultiplierComboBox">
                       <property name="sizePolicy">
                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                         <horstretch>0</horstretch>
