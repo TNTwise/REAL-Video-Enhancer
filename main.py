@@ -21,7 +21,7 @@ from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
-from src.DownloadModels import DownloadModels
+from src.DownloadModels import DownloadModel
 from src.QTstyle import Palette
 
 
@@ -48,8 +48,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
-
         # setup application
+
         self.setupBackendDeps()
 
         # set up tabs

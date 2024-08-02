@@ -1,10 +1,8 @@
 import subprocess
 import os
 from threading import Thread
-import sys
 import time
 import numpy as np
-import cv2
 from multiprocessing import shared_memory
 import time
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
@@ -12,6 +10,7 @@ from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
+from .DownloadModels import DownloadModel
 
 
 class HandleInputs:
@@ -83,18 +82,37 @@ class ProcessTab:
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
 
-        self.QButtonConnect()
+        self.QConnect()
         self.setupUI()
 
-    def QButtonConnect(self):
+    def QConnect(self):
         # connect file select buttons
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
+        self.switchInterpolationAndUpscale()
+        self.parent.methodComboBox.currentIndexChanged.connect(
+            self.switchInterpolationAndUpscale
+        )
 
     def setupUI(self):
         self.parent.backendComboBox.addItems(self.parent.availableBackends)
+
+    def switchInterpolationAndUpscale(self):
+        self.parent.modelComboBox.clear()
+        if self.parent.methodComboBox.currentText() == "Interpolate":
+            models = (
+                "RIFE 4.6",
+                "RIFE 4.15",
+                "RIFE 4.18",
+                "RIFE 4.20",
+            )
+            self.parent.interpolationContainer.setVisible(True)
+        if self.parent.methodComboBox.currentText() == "Upscale":
+            models = ("SPAN (Animation)",)
+            self.parent.interpolationContainer.setVisible(False)
+        self.parent.modelComboBox.addItems(models)
 
     def run(
         self,
@@ -124,9 +142,12 @@ class ProcessTab:
         Finally, It will handle the render via ffmpeg. Taking in the frames from pipe and handing them into ffmpeg on a sperate thread
         """
 
+        self.model = self.parent.modelComboBox.currentText()
+        self.backend = self.parent.backendComboBox.currentText()
+
         # Gui changes
         self.parent.startRenderButton.setEnabled(False)
-
+        DownloadModel(model=self.model, backend=self.backend)
         # self.ffmpegWriteThread()
         writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()

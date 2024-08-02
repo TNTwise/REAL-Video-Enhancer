@@ -1,54 +1,52 @@
 import os
 import requests
 
-from .Util import printAndLog, currentDirectory, warnAndLog, createDirectory
+from .Util import printAndLog, currentDirectory, warnAndLog, createDirectory, modelsPath
+from .QTcustom import DownloadProgressPopup
 
 
-class DownloadModels:
+class DownloadModel:
+    """
+    Takes in the name of a model and the name of the backend in the GUI, and downloads it from a URL
+    model: any valid model used by RVE
+    backend: the backend used (pytorch, tensorrt, ncnn)
+    """
+
     def __init__(
         self,
-        modelsList: list[str],
-        modelPath: str = os.path.join(currentDirectory(), "models"),
+        model: str,
+        backend: str,
+        modelPath: str = modelsPath(),
     ):
-        self.modelsList = modelsList
         self.modelPath = modelPath
         # create Model path directory where models will be downloaded
         createDirectory(modelPath)
-        # validate that all the models in modelList are correct
-        self.validateModelsList()
-        self.downloadModels()
+        modelFile = self.getModelFile(model=model, backend=backend)
+        modelPath = os.path.join(modelsPath(), modelFile)
+        if not os.path.isfile(modelPath):
+            self.downloadModel(modelFile=modelFile, modelPath=modelPath)
 
-    def validateModelsList(self):
-        validInterpolateModels = (
-            "rife4.6.pkl",
-            "rife4.15.pkl",
-            "rife4.17.pkl",
+    def getModelFile(self, model: str = None, backend: str = None):
+        match model:
+            case "RIFE 4.20":
+                if backend == "ncnn":
+                    pass
+                else:
+                    return "rife4.20.pkl"
+            case _:
+                raise os.error("Not a valid model!")
+
+    def downloadModel(self, modelFile: str = None, modelPath: str = None):
+        url = (
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/"
+            + modelFile
         )
-        validUpscaleModels = ("2x_ModernSpanimationV1.5.pth",)
-        validTotalModels = validInterpolateModels + validUpscaleModels
-        for model in self.modelsList:
-            if model not in validTotalModels:
-                warnAndLog("Not a valid model")
-
-    def downloadModels(self):
-        """
-        recursivly goes throgh self.modelsList, and calls downloadModel on each one.
-        """
-        for model in self.modelsList:
-            printAndLog("Downloading model: " + model)
-            response = requests.get(
-                "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
-                + model,
-                stream=True,
-            )
-
-            with open(os.path.join(self.modelPath, model), "wb") as f:
-                for chunk in response.iter_content(chunk_size=128):
-                    f.write(chunk)
+        title = "Downloading: " + modelFile
+        DownloadProgressPopup(link=url, title=title, downloadLocation=modelPath)
 
 
 # just some testing code lol
 if __name__ == "__main__":
-    downloadModels = DownloadModels(
+    downloadModels = DownloadModel(
         modelsList=["2x_ModernSpanimationV1.5.pth"],
     )
