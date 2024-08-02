@@ -9,6 +9,7 @@ import requests
 from .QTstyle import styleSheet
 from .Util import printAndLog
 
+
 # custom threads
 class DownloadAndReportToQTThread(QThread):
     """

@@ -9,36 +9,42 @@ from multiprocessing import shared_memory
 import time
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
 from PySide6 import QtGui
-from PySide6.QtGui import QPixmap,QPainter,QPainterPath
+from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 
 from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
 
+
 class HandleInputs:
     """A class specifically made to handle the qt widgets and turn their data into a usable command for processing"""
+
     def __init__(self, parent):
         self.parent = parent
-    
+
 
 class UpdateGUIThread(QThread):
     """
     Gets the latest bytes outputed from the shared memory and returns them in QImage format for display
     """
+
     latestPreviewPixmap = Signal(QtGui.QImage)
 
-    def __init__(self, imagePreviewSharedMemoryID, outputVideoHeight,outputVideoWidth):
+    def __init__(self, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
         super().__init__()
         self._stop_flag = False  # Boolean flag to control stopping
         self._mutex = QMutex()  # Atomic flag to control stopping
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
         self.outputVideoHeight = outputVideoHeight
         self.outputVideoWidth = outputVideoWidth
+
     def run(self):
         while True:
             with QMutexLocker(self._mutex):
                 if self._stop_flag:
                     break
             try:
-                self.shm = shared_memory.SharedMemory(name=self.imagePreviewSharedMemoryID)
+                self.shm = shared_memory.SharedMemory(
+                    name=self.imagePreviewSharedMemoryID
+                )
                 image_bytes = self.shm.buf[:].tobytes()
 
                 # Convert image bytes back to numpy array
@@ -48,15 +54,13 @@ class UpdateGUIThread(QThread):
                 pixmap = self.convert_cv_qt(image_array)
                 self.latestPreviewPixmap.emit(pixmap)
             except FileNotFoundError:
-                #print("preview not available")
+                # print("preview not available")
                 pass
             time.sleep(0.1)
-            
-            
-            
+
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
-        #rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
+        # rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
         h, w, ch = cv_img.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QtGui.QImage(
@@ -69,6 +73,7 @@ class UpdateGUIThread(QThread):
             self._stop_flag = True
         self.shm.close()
         print("Closed Read Memory")
+
 
 class ProcessTab:
     def __init__(
@@ -87,7 +92,7 @@ class ProcessTab:
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
-    
+
     def setupUI(self):
         self.parent.backendComboBox.addItems(self.parent.availableBackends)
 
@@ -128,11 +133,11 @@ class ProcessTab:
         self.startGUIUpdate()
 
     def startGUIUpdate(self):
-        
-        self.workerThread = UpdateGUIThread(imagePreviewSharedMemoryID=self.imagePreviewSharedMemoryID,
-                                            outputVideoHeight=self.outputVideoHeight,
-                                            outputVideoWidth=self.outputVideoWidth
-                                            )
+        self.workerThread = UpdateGUIThread(
+            imagePreviewSharedMemoryID=self.imagePreviewSharedMemoryID,
+            outputVideoHeight=self.outputVideoHeight,
+            outputVideoWidth=self.outputVideoWidth,
+        )
         self.workerThread.latestPreviewPixmap.connect(self.updateProcessTab)
         self.workerThread.finished.connect(self.workerThread.deleteLater)
         self.workerThread.finished.connect(self.workerThread.quit)
@@ -166,7 +171,7 @@ class ProcessTab:
             "2",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
-            "--half"
+            "--half",
         ]
 
         self.pipeInFrames = subprocess.Popen(
@@ -180,27 +185,29 @@ class ProcessTab:
         size = pixmap.size()
         mask = QPixmap(size)
         mask.fill(Qt.transparent)
-        
+
         painter = QPainter(mask)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        
+
         path = QPainterPath()
-        path.addRoundedRect(0, 0, size.width(), size.height(), corner_radius, corner_radius)
-        
+        path.addRoundedRect(
+            0, 0, size.width(), size.height(), corner_radius, corner_radius
+        )
+
         painter.setClipPath(path)
         painter.drawPixmap(0, 0, pixmap)
         painter.end()
-        
+
         rounded_pixmap = QPixmap(size)
         rounded_pixmap.fill(Qt.transparent)
-        
+
         painter = QPainter(rounded_pixmap)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
         painter.drawPixmap(0, 0, mask)
         painter.end()
-        
+
         return rounded_pixmap
 
     def updateProcessTab(self, qimage: QtGui.QImage):
@@ -210,7 +217,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 2.4, height/2.4, Qt.KeepAspectRatio)
+            p = qimage.scaled(width / 2.4, height / 2.4, Qt.KeepAspectRatio)
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)

@@ -15,6 +15,7 @@ import tarfile
 import subprocess
 import json
 
+
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -35,27 +36,34 @@ class DownloadDependencies:
         tar.close()
         removeFile(file)
 
-    
-
-    def get_total_dependencies(self,packages):
+    def get_total_dependencies(self, packages):
         total_dependencies = 0
-        
+
         for package in packages:
             try:
                 # Run pip show command and capture the output
-                result = subprocess.run([pythonPath(), "-m", "pip", 'show', '-v', package], capture_output=True, text=True, check=True)
-                
+                result = subprocess.run(
+                    [pythonPath(), "-m", "pip", "show", "-v", package],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+
                 # Parse the output to get the dependencies
-                output = result.stdout.split('\n')
-                dependencies = [line.split(': ')[1] for line in output if line.startswith('Requires: ')]
-                
+                output = result.stdout.split("\n")
+                dependencies = [
+                    line.split(": ")[1]
+                    for line in output
+                    if line.startswith("Requires: ")
+                ]
+
                 # If there are dependencies, add their count to the total
                 if dependencies:
-                    total_dependencies += len(dependencies[0].split(', '))
-            
+                    total_dependencies += len(dependencies[0].split(", "))
+
             except subprocess.CalledProcessError:
                 print(f"Warning: Package '{package}' not found or error occurred.")
-        
+
         return total_dependencies
 
     def downloadPython(self):
@@ -99,12 +107,10 @@ class DownloadDependencies:
         makeExecutable(ffmpegTempPath)
         move(ffmpegTempPath, ffmpegPath())
 
-
-
     def pipInstall(
         self, deps: list
     ):  # going to have to make this into a qt module pop up
-        command = [pythonPath(), "-m", "pip", "install","--upgrade","pip"] + deps
+        command = [pythonPath(), "-m", "pip", "install", "--upgrade", "pip"] + deps
         totalDeps = self.get_total_dependencies(deps)
         printAndLog("Downloading Deps: " + str(command))
         printAndLog("Total Dependencies: " + str(totalDeps))
@@ -138,19 +144,19 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
-            
         ]
         torchCUDAWindowsDeps = [
             "spandrel",
             "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
-            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl"
+            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
         ]
         match getPlatform():
             case "win32":
-                 torchCUDAWindowsDeps += self.getPlatformIndependentDeps()
+                torchCUDAWindowsDeps += self.getPlatformIndependentDeps()
             case "linux":
-                 torchCUDALinuxDeps += self.getPlatformIndependentDeps()
+                torchCUDALinuxDeps += self.getPlatformIndependentDeps()
         return torchCUDALinuxDeps
+
     def downloadPyTorchCUDADeps(self):
         self.pipInstall(self.getPyTorchCUDADeps() + self.getPlatformIndependentDeps())
 
@@ -172,7 +178,7 @@ class DownloadDependencies:
             case "win32":
                 self.pipInstall(ncnnWindowsDeps + self.getPlatformIndependentDeps())
             case "linux":
-                self.pipInstall(ncnnLinuxDeps + self.getPlatformIndependentDeps())            
+                self.pipInstall(ncnnLinuxDeps + self.getPlatformIndependentDeps())
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [
@@ -198,12 +204,21 @@ class DownloadDependencies:
         ]
         match getPlatform():
             case "linux":
-                tensorRTDeps += "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
+                tensorRTDeps += (
+                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
+                )
             case "win32":
-                tensorRTDeps += "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+                tensorRTDeps += (
+                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+                )
         return tensorRTDeps
+
     def downloadTensorRTDeps(self):
-        self.pipInstall(self.getPyTorchCUDADeps() + self.getTensorRTDeps() + self.getTensorRTDeps())
+        self.pipInstall(
+            self.getPyTorchCUDADeps() + self.getTensorRTDeps() + self.getTensorRTDeps()
+        )
+
+
 if __name__ == "__main__":
     downloadDependencies = DownloadDependencies()
     downloadDependencies.downloadPython()

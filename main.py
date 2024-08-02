@@ -40,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
-        self.setMinimumSize(1100,600)
+        self.setMinimumSize(1100, 600)
         self.aspect_ratio = self.width() / self.height()
         self.availableBackends = self.getAvailableBackends()
 
@@ -48,7 +48,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
-        
 
         # setup application
         self.setupBackendDeps()
@@ -58,7 +57,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
-        
 
     def QButtonConnect(self):
         # connect buttons to switch menus
@@ -111,9 +109,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             upscaleTimes=self.upscaleTimes,
             interpolateTimes=self.interpolateTimes,
         )
-    
+
     def getAvailableBackends(self):
-        result = subprocess.run([pythonPath(),os.path.join("backend","rve-backend.py"),"--list_backends"], capture_output=True, text=True)
+        result = subprocess.run(
+            [
+                pythonPath(),
+                os.path.join("backend", "rve-backend.py"),
+                "--list_backends",
+            ],
+            capture_output=True,
+            text=True,
+        )
 
         # Extract the output from the command result
         output = result.stdout.strip()
