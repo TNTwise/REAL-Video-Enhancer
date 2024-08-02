@@ -1,5 +1,4 @@
 import os
-import requests
 
 from .Util import printAndLog, currentDirectory, warnAndLog, createDirectory, modelsPath
 from .QTcustom import DownloadProgressPopup

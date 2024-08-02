@@ -3,7 +3,6 @@ import torch.nn.functional as F
 import math
 import os
 
-from .InterpolateArchs.DetectInterpolateArch import loadInterpolationModel
 from .Util import currentDirectory, printAndLog, errorAndLog
 
 torch.set_float32_matmul_precision("high")

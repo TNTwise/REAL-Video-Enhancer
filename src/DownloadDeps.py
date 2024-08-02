@@ -13,8 +13,6 @@ from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import tarfile
 import subprocess
-import json
-
 
 class DownloadDependencies:
     """

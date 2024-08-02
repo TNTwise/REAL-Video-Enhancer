@@ -9,7 +9,6 @@ from mainwindow import Ui_MainWindow  # Import the UI class from the converted m
 # other imports
 from src.Util import (
     checkValidVideo,
-    getDefaultOutputVideo,
     getVideoFPS,
     getVideoRes,
     getVideoLength,
@@ -21,7 +20,6 @@ from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
-from src.DownloadModels import DownloadModel
 from src.QTstyle import Palette
 
 
@@ -31,8 +29,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # set up base variables
         self.homeDir = os.path.expanduser("~")
-        self.interpolateTimes = 2
-        self.upscaleTimes = 1
+        self.interpolateTimes = 1
+        self.upscaleTimes = 2
         self.pipeInFrames = None
         self.latestPreviewImage = None
 

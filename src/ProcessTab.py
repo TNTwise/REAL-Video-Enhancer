@@ -9,7 +9,7 @@ from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 
-from .Util import ffmpegPath, pythonPath, currentDirectory, modelsPath
+from .Util import pythonPath, currentDirectory, modelsPath
 from .DownloadModels import DownloadModel
 
 
@@ -182,14 +182,14 @@ class ProcessTab:
             self.inputFile,
             "-o",
             f"{self.outputPath}",
-            "--interpolateModel",
+            "--upscaleModel",
             os.path.join(
-                modelsPath(), "rife4.18.pkl"
+                modelsPath(), "2x_ModernSpanimationV1.pth"
             ),  # put actual model here, this is a placeholder
             "-b",
-            "tensorrt",
+            "pytorch",
             "--interpolateFactor",
-            "2",
+            "1",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
             "--half",
@@ -231,6 +231,9 @@ class ProcessTab:
 
         return rounded_pixmap
 
+    def modelNameToFile(self):
+        pass
+
     def updateProcessTab(self, qimage: QtGui.QImage):
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
@@ -238,7 +241,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 2.4, height / 2.4, Qt.KeepAspectRatio)
+            p = qimage.scaled(width / 2, height / 2, Qt.KeepAspectRatio)
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)
