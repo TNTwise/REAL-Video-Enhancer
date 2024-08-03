@@ -74,7 +74,10 @@ python3 build.py
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/chaiNNer/blob/2aa0b46233ba8cd90d4bb405e2bc6e16a3430546/backend/src/nodes/impl/ncnn/model.py
   " target="_blank">Chainner's NCNN Implementation (For scale detection with NCNN models)
   <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For rife TRT inference code)</a></li>
+        </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/feathericons/feather" target="_blank">feather icons</a></li>
 </ul>
+
 
 # Custom models used:
 
