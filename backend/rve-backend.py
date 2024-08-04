@@ -107,7 +107,7 @@ class HandleApplication:
         )
         parser.add_argument(
             "--interpolateArch",
-            help="Arch used for interpolation when using PyTorch inference. (rife46,rife413,rife420)",
+            help="Arch used for interpolation when using PyTorch inference. (rife46,rife413,rife420,rife421)",
             type=str,
             default="rife413",
         )
