@@ -61,19 +61,18 @@ class InterpolateRifeTorch:
         match interpolateArch:
             case "rife46":
                 from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-
+                v1 = True
+            case "rife47":
+                from .InterpolateArchs.RIFE.rife47IFNET import IFNet
                 v1 = True
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
-
                 v1 = False
             case "rife420":
                 from .InterpolateArchs.RIFE.rife420IFNET import IFNet
-
                 v1 = False
             case "rife421":
                 from .InterpolateArchs.RIFE.rife420IFNET import IFNet
-
                 v1 = False
             case _:
                 errorAndLog("Invalid Interpolation Arch")
