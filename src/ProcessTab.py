@@ -117,26 +117,28 @@ class ProcessTab:
         [0] = file in models directory
         [1] = file to download
         [2] = upscale times
+        [3] = arch
         """
         self.ncnnInterpolateModels = {
-            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz", 1),
-            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1),
-            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1),
-            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1),
-            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1),
+            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz", 1,"rife46"),
+            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1,"rife413"),
+            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1,"rife413"),
+            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1,"rife420"),
+            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1,"rife421"),
         }
         self.pytorchInterpolateModels = {
-            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1),
-            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1),
-            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1),
-            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1),
-            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1),
+            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1,"rife46"),
+            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1,"rife413"),
+            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1,"rife413"),
+            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1,"rife420"),
+            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1,"rife421"),
         }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
                 "2x_ModenSpanimationV1.5",
                 "2x_ModenSpanimationV1.5.tar.gz",
                 2,
+                "SPAN",
             ),
         }
         self.pytorchUpscaleModels = {
@@ -144,6 +146,7 @@ class ProcessTab:
                 "2x_ModenSpanimationV1.5.pth",
                 "2x_ModenSpanimationV1.5.pth",
                 2,
+                "SPAN",
             ),
         }
 
@@ -189,9 +192,13 @@ class ProcessTab:
         self.videoFrameCount = videoFrameCount
         self.interpolateTimes = int(self.parent.interpolationMultiplierComboBox.currentText())
         self.model = self.parent.modelComboBox.currentText()
+        # get model attributes
         self.upscaleTimes = self.totalModels[self.model][2]
+        self.modelArch = self.totalModels[self.model][3]
+        # get video attributes
         self.outputVideoWidth = videoWidth * self.upscaleTimes
         self.outputVideoHeight = videoHeight * self.upscaleTimes
+        # if upscale or interpolate
         self.method = method
         """
         Function to start the rendering process
@@ -264,6 +271,8 @@ class ProcessTab:
                 os.path.join(
                     modelsPath(), self.modelFile,
                 ),
+                "--interpolateArch",
+                f"{self.modelArch}",
                 "--interpolateFactor",
                 f"{self.interpolateTimes}",
 
@@ -272,7 +281,7 @@ class ProcessTab:
             command,
         )
         self.parent.renderProcess.wait()
-        print("Done with render")
+        # done with render
         self.onRenderCompletion()
 
     def getRoundedPixmap(self, pixmap, corner_radius):
