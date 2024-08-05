@@ -90,7 +90,6 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
     """
 
     def setup_ui(self):
-        self.setWindowTitle(self.title)
         self.setLabelText(self.title)
         self.setStyleSheet(styleSheet())
         self.setRange(0, 100)

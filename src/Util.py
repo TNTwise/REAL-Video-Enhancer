@@ -24,9 +24,9 @@ def getPlatform() -> str:
 
 def pythonPath() -> str:
     return (
-        os.path.join(cwd, "python", "bin", "python3")
+        os.path.join(cwd, "python","python", "bin", "python3")
         if getPlatform() == "darwin" or getPlatform() == "linux"
-        else os.path.join(cwd, "python", "bin", "python3.exe")
+        else os.path.join(cwd, "python","python", "bin", "python3.exe")
     )
 
 
