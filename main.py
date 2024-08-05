@@ -109,7 +109,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoHeight=self.videoHeight,
             videoFps=self.videoFps,
             videoFrameCount=self.videoFrameCount,
-            upscaleTimes=self.upscaleTimes,
             interpolateTimes=self.interpolateTimes,
             method=self.methodComboBox.currentText(),
         )

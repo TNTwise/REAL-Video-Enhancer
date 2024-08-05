@@ -4,7 +4,6 @@ from threading import Thread
 import time
 import numpy as np
 from multiprocessing import shared_memory
-import time
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
@@ -63,7 +62,11 @@ class UpdateGUIThread(QThread):
         h, w, ch = cv_img.shape
         bytes_per_line = ch * w
         convert_to_Qt_format = QtGui.QImage(
-            cv_img.data, w, h, bytes_per_line, QtGui.QImage.Format_RGB888
+            cv_img.data,
+            w,
+            h,
+            bytes_per_line,
+            QtGui.QImage.Format_RGB888,  # type: ignore
         )
         return convert_to_Qt_format
 
@@ -84,7 +87,6 @@ class ProcessTab:
         # get default backend
         self.setupUI()
         self.QConnect()
-        
 
     def QConnect(self):
         # connect file select buttons
@@ -97,6 +99,7 @@ class ProcessTab:
             self.switchInterpolationAndUpscale
         )
         print(self.totalModels)
+
     def setupUI(self):
         self.parent.backendComboBox.addItems(self.parent.availableBackends)
 
@@ -104,27 +107,32 @@ class ProcessTab:
         self.parent.modelComboBox.clear()
         self.backend = self.parent.backendComboBox.currentText()
         """
-        Key value pairs of the model name in the GUI, and the file that will be selected for render and the file to download
+        Key value pairs of the model name in the GUI
+        Data inside the tuple:
+        [0] = file in models directory
+        [1] = file to download
+        [2] = upscale times
         """
         self.ncnnInterpolateModels = {
-            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz"),
-            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz"),
-            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz"),
-            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz"),
+            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz",1),
+            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz",1),
+            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz",1),
+            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz",1),
         }
         self.pytorchInterpolateModels = {
-            "RIFE 4.6": ("rife4.6.pkl","rife4.6.pkl"),
-            "RIFE 4.15": ("rife4.15.pkl","rife4.15.pkl"),
-            "RIFE 4.18": ("rife4.18.pkl","rife4.18.pkl"),
-            "RIFE 4.20": ("rife4.20.pkl","rife4.20.pkl"),
+            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl",1),
+            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl",1),
+            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl",1),
+            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl",1),
         }
         self.ncnnUpscaleModels = {
-            "SPAN (Animation)": "2x_ModenSpanimationV1.5",
+            "SPAN (Animation) (2X)": ("2x_ModenSpanimationV1.5","2x_ModenSpanimationV1.5.tar.gz", 2),
         }
         self.pytorchUpscaleModels = {
-            "SPAN (Animation)": "2x_ModenSpanimationV1.5.pth",
+            "SPAN (Animation) (2X)": ("2x_ModenSpanimationV1.5.pth", "2x_ModenSpanimationV1.5.pth", 2),
         }
-        print(self.backend)
+        
+        models = None
         if self.parent.methodComboBox.currentText() == "Interpolate":
             if self.backend == "ncnn":
                 models = self.ncnnInterpolateModels.keys()
@@ -156,7 +164,6 @@ class ProcessTab:
         videoHeight: int,
         videoFps: float,
         videoFrameCount: int,
-        upscaleTimes: int,
         interpolateTimes: int,
         method: str,
     ):
@@ -166,10 +173,11 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        self.upscaleTimes = upscaleTimes
         self.interpolateTimes = interpolateTimes
-        self.outputVideoWidth = videoWidth * upscaleTimes
-        self.outputVideoHeight = videoHeight * upscaleTimes
+        self.model = self.parent.modelComboBox.currentText()
+        self.upscaleTimes = self.totalModels[self.model][2]
+        self.outputVideoWidth = videoWidth * self.upscaleTimes
+        self.outputVideoHeight = videoHeight * self.upscaleTimes
         self.method = method
         """
         Function to start the rendering process
@@ -178,14 +186,18 @@ class ProcessTab:
         Finally, It will handle the render via ffmpeg. Taking in the frames from pipe and handing them into ffmpeg on a sperate thread
         """
 
-        self.model = self.parent.modelComboBox.currentText()
+        
         self.backend = self.parent.backendComboBox.currentText()
 
         # Gui changes
         self.parent.startRenderButton.setEnabled(False)
         self.modelFile = self.totalModels[self.model][0]
         self.downloadFile = self.totalModels[self.model][1]
-        DownloadModel(modelFile=self.modelFile,downloadModelFile=self.downloadFile, backend=self.backend)
+        DownloadModel(
+            modelFile=self.modelFile,
+            downloadModelFile=self.downloadFile,
+            backend=self.backend,
+        )
         # self.ffmpegWriteThread()
         writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()
@@ -251,11 +263,11 @@ class ProcessTab:
     def getRoundedPixmap(self, pixmap, corner_radius):
         size = pixmap.size()
         mask = QPixmap(size)
-        mask.fill(Qt.transparent)
+        mask.fill(Qt.transparent)  # type: ignore
 
         painter = QPainter(mask)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        painter.setRenderHint(QPainter.Antialiasing)  # type: ignore
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)  # type: ignore
 
         path = QPainterPath()
         path.addRoundedRect(
@@ -267,11 +279,11 @@ class ProcessTab:
         painter.end()
 
         rounded_pixmap = QPixmap(size)
-        rounded_pixmap.fill(Qt.transparent)
+        rounded_pixmap.fill(Qt.transparent)  # type: ignore
 
         painter = QPainter(rounded_pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        painter.setRenderHint(QPainter.Antialiasing)  # type: ignore
+        painter.setRenderHint(QPainter.SmoothPixmapTransform)  # type: ignore
         painter.drawPixmap(0, 0, mask)
         painter.end()
 
@@ -287,7 +299,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 2, height / 2, Qt.KeepAspectRatio)
+            p = qimage.scaled(width / 2, height / 2, Qt.KeepAspectRatio)  # type: ignore
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)

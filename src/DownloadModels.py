@@ -16,21 +16,19 @@ class DownloadModel:
     def __init__(
         self,
         modelFile: str,
-        downloadModelFile:str,
+        downloadModelFile: str,
         backend: str,
         modelPath: str = modelsPath(),
     ):
         self.modelPath = modelPath
         self.downloadModelFile = downloadModelFile
-        self.downloadModelPath = os.path.join(modelPath,downloadModelFile)
+        self.downloadModelPath = os.path.join(modelPath, downloadModelFile)
         createDirectory(modelPath)
-        
-
 
         if not os.path.isfile(modelFile):
-            self.downloadModel(modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath)
-
-        
+            self.downloadModel(
+                modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath
+            )
 
     def downloadModel(self, modelFile: str = None, downloadModelPath: str = None):
         url = (
@@ -42,7 +40,6 @@ class DownloadModel:
         if "tar.gz" in self.downloadModelFile:
             print("Extracting File")
             extractTarGZ(self.downloadModelPath)
-        
 
 
 # just some testing code lol
