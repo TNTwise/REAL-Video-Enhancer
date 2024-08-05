@@ -132,7 +132,7 @@ class IFBlock(nn.Module):
 class IFNet(nn.Module):
     def __init__(
         self,
-        scale=1,
+        scale=1.,
         ensemble=False,
         dtype=torch.float32,
         device="cuda",

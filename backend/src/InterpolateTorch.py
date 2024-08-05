@@ -127,10 +127,8 @@ class InterpolateRifeTorch:
             k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
         }
         self.flownet.load_state_dict(state_dict=state_dict, strict=False)
-        self.flownet.eval().to(device=self.device)
-        if self.dtype == torch.float16:
-            self.flownet.half()
-
+        self.flownet.eval().to(device=self.device,dtype=self.dtype)
+       
         if self.backend == "tensorrt":
             import tensorrt
             import torch_tensorrt
