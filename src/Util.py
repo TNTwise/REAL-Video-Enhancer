@@ -188,12 +188,17 @@ def getVideoFrameCount(video_path) -> int:
 
     return total_frames
 
+
 def extractTarGZ(file):
-        """
-        Extracts a tar gz in the same directory as the tar file and deleted it after extraction.
-        """
-        printAndLog("Extracting: " + file)
-        tar = tarfile.open(file, "r:gz")
-        tar.extractall()
-        tar.close()
-        removeFile(file)
+    """
+    Extracts a tar gz in the same directory as the tar file and deleted it after extraction.
+    """
+    origCWD = os.getcwd()
+    dir_path = os.path.dirname(os.path.realpath(file))
+    os.chdir(dir_path)
+    printAndLog("Extracting: " + file)
+    tar = tarfile.open(file, "r:gz")
+    tar.extractall()
+    tar.close()
+    removeFile(file)
+    os.chdir(origCWD)

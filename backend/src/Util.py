@@ -81,4 +81,3 @@ def checkForNCNN() -> bool:
     except ImportError as e:
         printAndLog(str(e))
         return False
-    

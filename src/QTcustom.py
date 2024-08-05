@@ -29,6 +29,7 @@ class DownloadAndReportToQTThread(QThread):
             self.link,
             stream=True,
         )
+        printAndLog("Downloading: " + self.link)
         totalByteSize = int(response.headers["Content-Length"])
         totalSize = 0
         with open(self.downloadLocation, "wb") as f:

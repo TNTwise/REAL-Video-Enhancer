@@ -7,11 +7,12 @@ from .Util import (
     createDirectory,
     makeExecutable,
     move,
-    extractTarGZ
+    extractTarGZ,
 )
 from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
+
 
 class DownloadDependencies:
     """
@@ -22,8 +23,6 @@ class DownloadDependencies:
     def __init__(self):
         createDirectory(os.path.join(currentDirectory(), "python"))
         createDirectory(os.path.join(currentDirectory(), "bin"))
-
-   
 
     def get_total_dependencies(self, packages):
         total_dependencies = 0
@@ -100,7 +99,7 @@ class DownloadDependencies:
         self, deps: list
     ):  # going to have to make this into a qt module pop up
         command = [pythonPath(), "-m", "pip", "install", "--upgrade", "pip"] + deps
-        #totalDeps = self.get_total_dependencies(deps)
+        # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))
         printAndLog("Total Dependencies: " + str(totalDeps))

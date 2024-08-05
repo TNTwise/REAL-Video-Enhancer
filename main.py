@@ -54,7 +54,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
-        
 
         # set up tabs
         self.processTab = ProcessTab(parent=self)
@@ -112,6 +111,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoFrameCount=self.videoFrameCount,
             upscaleTimes=self.upscaleTimes,
             interpolateTimes=self.interpolateTimes,
+            method=self.methodComboBox.currentText(),
         )
 
     def getAvailableBackends(self):

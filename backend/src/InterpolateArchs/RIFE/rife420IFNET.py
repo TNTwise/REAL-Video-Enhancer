@@ -189,23 +189,23 @@ class IFNet(nn.Module):
                     flows, mask = block(temp, scale=scale)
             else:
                 if self.ensemble:
-                    temp = torch.cat( # type: ignore
-                        ( # type: ignore
-                            wimg, # type: ignore  # noqa: F821
-                            wf, # type: ignore  # noqa: F821
+                    temp = torch.cat(  # type: ignore
+                        (  # type: ignore
+                            wimg,  # type: ignore  # noqa: F821
+                            wf,  # type: ignore  # noqa: F821
                             timestep,
                             mask,
                             (flows * (1 / scale) if scale != 1 else flows),
                         ),
                         1,
-                    ) # type: ignore
-                    temp_ = torch.cat( # type: ignore
-                        ( # type: ignore
-                            wimg_rev, # noqa: F821 # type: ignore
-                            wf_rev, # noqa: F821 # type: ignore
+                    )  # type: ignore
+                    temp_ = torch.cat(  # type: ignore
+                        (  # type: ignore
+                            wimg_rev,  # noqa: F821 # type: ignore
+                            wf_rev,  # noqa: F821 # type: ignore
                             1 - timestep,
-                            -mask, # type: ignore
-                            (flows_rev * (1 / scale) if scale != 1 else flows_rev),# type: ignore
+                            -mask,  # type: ignore
+                            (flows_rev * (1 / scale) if scale != 1 else flows_rev),  # type: ignore
                         ),
                         1,
                     )
@@ -217,10 +217,10 @@ class IFNet(nn.Module):
                     ) / 2
                     mask = (mask - mask_) / 2
                 else:
-                    temp = torch.cat( # type: ignore
+                    temp = torch.cat(  # type: ignore
                         (
-                            wimg, # type: ignore
-                            wf, # type: ignore
+                            wimg,  # type: ignore
+                            wf,  # type: ignore
                             timestep,
                             mask,
                             (flows * (1 / scale) if scale != 1 else flows),
@@ -264,6 +264,6 @@ class IFNet(nn.Module):
                 if self.ensemble:
                     wimg_rev = torch.cat(torch.split(wimg, [3, 3], dim=1)[::-1], dim=1)
                     wf_rev = torch.cat(torch.split(wf, [8, 8], dim=1)[::-1], dim=1)
-        mask = torch.sigmoid(mask) # type: ignore
-        warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1]) # type: ignore
+        mask = torch.sigmoid(mask)  # type: ignore
+        warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])  # type: ignore
         return warped_img0 * mask + warped_img1 * (1 - mask)

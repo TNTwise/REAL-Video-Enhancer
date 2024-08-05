@@ -82,9 +82,9 @@ class ProcessTab:
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
         # get default backend
-        self.backend = self.parent.backendComboBox.currentText()
-        self.QConnect()
         self.setupUI()
+        self.QConnect()
+        
 
     def QConnect(self):
         # connect file select buttons
@@ -96,42 +96,45 @@ class ProcessTab:
         self.parent.methodComboBox.currentIndexChanged.connect(
             self.switchInterpolationAndUpscale
         )
-
+        print(self.totalModels)
     def setupUI(self):
         self.parent.backendComboBox.addItems(self.parent.availableBackends)
 
     def switchInterpolationAndUpscale(self):
         self.parent.modelComboBox.clear()
+        self.backend = self.parent.backendComboBox.currentText()
         """
-        Key value pairs of the model name in the GUI, and the file that will be selected for render
+        Key value pairs of the model name in the GUI, and the file that will be selected for render and the file to download
         """
         self.ncnnInterpolateModels = {
-            "RIFE 4.6":"rife-v4.6",
-            "RIFE 4.15":"rife-v4.15",
-            "RIFE 4.18":"rife-v4.18",
-            "RIFE 4.20":"rife-v4.20",
+            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz"),
+            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz"),
+            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz"),
+            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz"),
         }
         self.pytorchInterpolateModels = {
-            "RIFE 4.6":"rife46.pkl",
-            "RIFE 4.15":"rife415.pkl",
-            "RIFE 4.18":"rife418.pkl",
-            "RIFE 4.20":"rife420.pkl",
+            "RIFE 4.6": ("rife4.6.pkl","rife4.6.pkl"),
+            "RIFE 4.15": ("rife4.15.pkl","rife4.15.pkl"),
+            "RIFE 4.18": ("rife4.18.pkl","rife4.18.pkl"),
+            "RIFE 4.20": ("rife4.20.pkl","rife4.20.pkl"),
         }
         self.ncnnUpscaleModels = {
-            "SPAN (Animation)":"2x_ModenSpanimationV1.5",
+            "SPAN (Animation)": "2x_ModenSpanimationV1.5",
         }
         self.pytorchUpscaleModels = {
-            "SPAN (Animation)":"2x_ModenSpanimationV1.5.pth",
+            "SPAN (Animation)": "2x_ModenSpanimationV1.5.pth",
         }
-        
+        print(self.backend)
         if self.parent.methodComboBox.currentText() == "Interpolate":
             if self.backend == "ncnn":
                 models = self.ncnnInterpolateModels.keys()
                 self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
             else:
                 models = self.pytorchInterpolateModels.keys()
-                self.totalModels = self.pytorchInterpolateModels | self.pytorchUpscaleModels
-                
+                self.totalModels = (
+                    self.pytorchInterpolateModels | self.pytorchUpscaleModels
+                )
+
             self.parent.interpolationContainer.setVisible(True)
         if self.parent.methodComboBox.currentText() == "Upscale":
             if self.backend == "ncnn":
@@ -139,11 +142,11 @@ class ProcessTab:
                 self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
             else:
                 models = self.pytorchUpscaleModels.keys()
-                self.totalModels = self.pytorchInterpolateModels | self.pytorchUpscaleModels
+                self.totalModels = (
+                    self.pytorchInterpolateModels | self.pytorchUpscaleModels
+                )
             self.parent.interpolationContainer.setVisible(False)
         self.parent.modelComboBox.addItems(models)
-
-
 
     def run(
         self,
@@ -155,6 +158,7 @@ class ProcessTab:
         videoFrameCount: int,
         upscaleTimes: int,
         interpolateTimes: int,
+        method: str,
     ):
         self.inputFile = inputFile
         self.outputPath = outputPath
@@ -166,6 +170,7 @@ class ProcessTab:
         self.interpolateTimes = interpolateTimes
         self.outputVideoWidth = videoWidth * upscaleTimes
         self.outputVideoHeight = videoHeight * upscaleTimes
+        self.method = method
         """
         Function to start the rendering process
         It will initially check for any issues with the current setup, (invalid file, no permissions, etc..)
@@ -178,8 +183,9 @@ class ProcessTab:
 
         # Gui changes
         self.parent.startRenderButton.setEnabled(False)
-        modelFile = self.totalModels[self.model]
-        DownloadModel(modelFile=modelFile, backend=self.backend)
+        self.modelFile = self.totalModels[self.model][0]
+        self.downloadFile = self.totalModels[self.model][1]
+        DownloadModel(modelFile=self.modelFile,downloadModelFile=self.downloadFile, backend=self.backend)
         # self.ffmpegWriteThread()
         writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()
@@ -207,6 +213,7 @@ class ProcessTab:
         self.parent.previewLabel.clear()
 
     def renderToPipeThread(self):
+        # builds command
         command = [
             f"{pythonPath()}",
             os.path.join(currentDirectory(), "backend", "rve-backend.py"),
@@ -214,19 +221,26 @@ class ProcessTab:
             self.inputFile,
             "-o",
             f"{self.outputPath}",
-            "--upscaleModel",
-            os.path.join(
-                modelsPath(), "2x_ModernSpanimationV1.pth"
-            ),  # put actual model here, this is a placeholder
             "-b",
-            "pytorch",
+            f"{self.backend}",
             "--interpolateFactor",
-            "1",
+            f"{self.interpolateTimes}",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
             "--half",
         ]
-
+        if self.method == "Upscale":
+            command += [
+                "--upscaleModel",
+                os.path.join(modelsPath(), self.modelFile),
+            ]
+        if self.method == "Interpolate":
+            command += [
+                "--interpolateModel",
+                os.path.join(
+                    modelsPath(), self.modelFile
+                ),  # put actual model here, this is a placeholder
+            ]
         self.pipeInFrames = subprocess.Popen(
             command,
         )
