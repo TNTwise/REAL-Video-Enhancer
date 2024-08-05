@@ -114,24 +114,32 @@ class ProcessTab:
         [2] = upscale times
         """
         self.ncnnInterpolateModels = {
-            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz",1),
-            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz",1),
-            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz",1),
-            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz",1),
+            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz", 1),
+            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1),
+            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1),
+            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1),
         }
         self.pytorchInterpolateModels = {
-            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl",1),
-            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl",1),
-            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl",1),
-            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl",1),
+            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1),
+            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1),
+            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1),
+            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1),
         }
         self.ncnnUpscaleModels = {
-            "SPAN (Animation) (2X)": ("2x_ModenSpanimationV1.5","2x_ModenSpanimationV1.5.tar.gz", 2),
+            "SPAN (Animation) (2X)": (
+                "2x_ModenSpanimationV1.5",
+                "2x_ModenSpanimationV1.5.tar.gz",
+                2,
+            ),
         }
         self.pytorchUpscaleModels = {
-            "SPAN (Animation) (2X)": ("2x_ModenSpanimationV1.5.pth", "2x_ModenSpanimationV1.5.pth", 2),
+            "SPAN (Animation) (2X)": (
+                "2x_ModenSpanimationV1.5.pth",
+                "2x_ModenSpanimationV1.5.pth",
+                2,
+            ),
         }
-        
+
         models = None
         if self.parent.methodComboBox.currentText() == "Interpolate":
             if self.backend == "ncnn":
@@ -186,7 +194,6 @@ class ProcessTab:
         Finally, It will handle the render via ffmpeg. Taking in the frames from pipe and handing them into ffmpeg on a sperate thread
         """
 
-        
         self.backend = self.parent.backendComboBox.currentText()
 
         # Gui changes
