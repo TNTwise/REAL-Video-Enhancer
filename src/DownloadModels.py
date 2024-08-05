@@ -1,6 +1,6 @@
 import os
 
-from .Util import printAndLog, currentDirectory, warnAndLog, createDirectory, modelsPath
+from .Util import createDirectory, modelsPath, extractTarGZ
 from .QTcustom import DownloadProgressPopup
 
 
@@ -13,27 +13,28 @@ class DownloadModel:
 
     def __init__(
         self,
-        model: str,
+        modelFile: str,
         backend: str,
         modelPath: str = modelsPath(),
     ):
         self.modelPath = modelPath
+        # get initial extension
+        self.modelFileExtension = modelFile.split(".")[-1]
         # create Model path directory where models will be downloaded
         createDirectory(modelPath)
-        modelFile = self.getModelFile(model=model, backend=backend)
         modelPath = os.path.join(modelsPath(), modelFile)
+        modelFile = self.getModelFileToDownload(modelFile=modelFile)
+        # override, necessary if it is tar.gz
+        self.downloadModelFileExtension = modelFile.split(".")[-1]
         if not os.path.isfile(modelPath):
             self.downloadModel(modelFile=modelFile, modelPath=modelPath)
 
-    def getModelFile(self, model: str = None, backend: str = None):
-        match model:
-            case "RIFE 4.20":
-                if backend == "ncnn":
-                    pass
-                else:
-                    return "rife4.20.pkl"
-            case _:
-                raise os.error("Not a valid model!")
+    def getModelFileToDownload(self, modelFile: str = None):
+        
+        if self.modelFileExtension == ".pth" or self.modelFileExtension == ".pkl":
+            return modelFile
+        return modelFile + ".tar.gz"
+        
 
     def downloadModel(self, modelFile: str = None, modelPath: str = None):
         url = (
@@ -42,10 +43,7 @@ class DownloadModel:
         )
         title = "Downloading: " + modelFile
         DownloadProgressPopup(link=url, title=title, downloadLocation=modelPath)
-
+        if self.downloadModelFileExtension == ".tar.gz":
+            extractTarGZ(modelFile)
 
 # just some testing code lol
-if __name__ == "__main__":
-    downloadModels = DownloadModel(
-        modelsList=["2x_ModernSpanimationV1.5.pth"],
-    )

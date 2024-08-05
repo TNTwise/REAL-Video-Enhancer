@@ -5,13 +5,12 @@ from .Util import (
     ffmpegPath,
     currentDirectory,
     createDirectory,
-    removeFile,
     makeExecutable,
     move,
+    extractTarGZ
 )
 from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
-import tarfile
 import subprocess
 
 class DownloadDependencies:
@@ -24,15 +23,7 @@ class DownloadDependencies:
         createDirectory(os.path.join(currentDirectory(), "python"))
         createDirectory(os.path.join(currentDirectory(), "bin"))
 
-    def extractTarGZ(self, file):
-        """
-        Extracts a tar gz in the same directory as the tar file and deleted it after extraction.
-        """
-        printAndLog("Extracting: " + file)
-        tar = tarfile.open(file, "r:gz")
-        tar.extractall()
-        tar.close()
-        removeFile(file)
+   
 
     def get_total_dependencies(self, packages):
         total_dependencies = 0
@@ -83,7 +74,7 @@ class DownloadDependencies:
         )
 
         # extract python
-        self.extractTarGZ(pyDir)
+        extractTarGZ(pyDir)
 
         # give executable permissions to python
         makeExecutable(pythonPath())

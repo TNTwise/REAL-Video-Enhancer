@@ -102,39 +102,48 @@ class ProcessTab:
 
     def switchInterpolationAndUpscale(self):
         self.parent.modelComboBox.clear()
-        ncnnInterpolateModels = {
+        """
+        Key value pairs of the model name in the GUI, and the file that will be selected for render
+        """
+        self.ncnnInterpolateModels = {
             "RIFE 4.6":"rife-v4.6",
             "RIFE 4.15":"rife-v4.15",
             "RIFE 4.18":"rife-v4.18",
             "RIFE 4.20":"rife-v4.20",
         }
-        pytorchInterpolateModels = {
+        self.pytorchInterpolateModels = {
             "RIFE 4.6":"rife46.pkl",
             "RIFE 4.15":"rife415.pkl",
             "RIFE 4.18":"rife418.pkl",
             "RIFE 4.20":"rife420.pkl",
         }
-        ncnnUpscaleModels = {
+        self.ncnnUpscaleModels = {
             "SPAN (Animation)":"2x_ModenSpanimationV1.5",
         }
-        pytorchUpscaleModels = {
+        self.pytorchUpscaleModels = {
             "SPAN (Animation)":"2x_ModenSpanimationV1.5.pth",
         }
+        
         if self.parent.methodComboBox.currentText() == "Interpolate":
             if self.backend == "ncnn":
-                models = ncnnInterpolateModels.keys()
+                models = self.ncnnInterpolateModels.keys()
+                self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
             else:
-                models = pytorchInterpolateModels.keys()
+                models = self.pytorchInterpolateModels.keys()
+                self.totalModels = self.pytorchInterpolateModels | self.pytorchUpscaleModels
                 
             self.parent.interpolationContainer.setVisible(True)
         if self.parent.methodComboBox.currentText() == "Upscale":
             if self.backend == "ncnn":
-                models = ncnnUpscaleModels.keys()
+                models = self.ncnnUpscaleModels.keys()
+                self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
             else:
-                models = pytorchUpscaleModels.keys()
-
+                models = self.pytorchUpscaleModels.keys()
+                self.totalModels = self.pytorchInterpolateModels | self.pytorchUpscaleModels
             self.parent.interpolationContainer.setVisible(False)
         self.parent.modelComboBox.addItems(models)
+
+
 
     def run(
         self,
@@ -169,7 +178,8 @@ class ProcessTab:
 
         # Gui changes
         self.parent.startRenderButton.setEnabled(False)
-        DownloadModel(model=self.model, backend=self.backend)
+        modelFile = self.totalModels[self.model]
+        DownloadModel(modelFile=modelFile, backend=self.backend)
         # self.ffmpegWriteThread()
         writeThread = Thread(target=self.renderToPipeThread)
         writeThread.start()

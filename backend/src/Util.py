@@ -1,8 +1,9 @@
 import os
 import warnings
+import tarfile
 
 cwd = os.getcwd()
-with open(os.path.join(cwd, "log.txt"), "w") as f:
+with open(os.path.join(cwd, "backendlog.txt"), "w") as f:
     pass
 
 
@@ -80,3 +81,4 @@ def checkForNCNN() -> bool:
     except ImportError as e:
         printAndLog(str(e))
         return False
+    

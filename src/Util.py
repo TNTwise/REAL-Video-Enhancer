@@ -4,10 +4,11 @@ import warnings
 import sys
 import requests
 import stat
+import tarfile
 
 cwd = os.getcwd()
 
-with open(os.path.join(cwd, "log.txt"), "w") as f:
+with open(os.path.join(cwd, "frontendlog.txt"), "w") as f:
     pass
 
 
@@ -186,3 +187,13 @@ def getVideoFrameCount(video_path) -> int:
     cap.release()
 
     return total_frames
+
+def extractTarGZ(file):
+        """
+        Extracts a tar gz in the same directory as the tar file and deleted it after extraction.
+        """
+        printAndLog("Extracting: " + file)
+        tar = tarfile.open(file, "r:gz")
+        tar.extractall()
+        tar.close()
+        removeFile(file)
