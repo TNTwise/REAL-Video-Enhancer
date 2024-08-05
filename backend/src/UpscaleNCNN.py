@@ -45,7 +45,7 @@ class NCNNParam:
 
 def getNCNNScale(modelPath: str = "") -> int:
     
-    paramName=os.path.basename(modelPath)
+    paramName=os.path.basename(modelPath).lower()
     for i in range(100):
         if f"{i}x" in paramName or f"x{i}" in paramName:
             return i
