@@ -2,8 +2,9 @@ import sys
 import os
 import subprocess
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PySide6.QtCore import Qt
+from backend.src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 
 # other imports
@@ -189,6 +190,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dir=self.homeDir,
         )
         self.outputFileText.setText(self.outputFolder)
+    
+    def killRenderProcess(self):
+        try: # kills  render process if necessary
+            self.renderProcess.terminate()
+        except AttributeError:
+            printAndLog("No render process!")
+    
+    def closeEvent(self, event):
+        reply = QMessageBox.question(
+            self, '','Are you sure you want to exit?',
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No  # type: ignore
+        )
+        if reply == QMessageBox.Yes: # type: ignore
+            self.killRenderProcess()
+            event.accept()  
+        else:
+            event.ignore()  
 
 
 if __name__ == "__main__":

@@ -1,3 +1,4 @@
+from math import e
 import subprocess
 import os
 from threading import Thread
@@ -7,6 +8,8 @@ from multiprocessing import shared_memory
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
+
+from backend.src.Util import printAndLog
 
 from .Util import pythonPath, currentDirectory, modelsPath
 from .DownloadModels import DownloadModel
@@ -73,8 +76,11 @@ class UpdateGUIThread(QThread):
     def stop(self):
         with QMutexLocker(self._mutex):
             self._stop_flag = True
-        self.shm.close()
-        print("Closed Read Memory")
+        try:
+            self.shm.close()
+            print("Closed Read Memory")
+        except AttributeError as e:
+            printAndLog("No read memory", str(e)) # type: ignore
 
 
 class ProcessTab:
@@ -260,10 +266,10 @@ class ProcessTab:
                 f"{self.interpolateTimes}",
 
             ]
-        self.pipeInFrames = subprocess.Popen(
+        self.parent.renderProcess = subprocess.Popen(
             command,
         )
-        self.pipeInFrames.wait()
+        self.parent.renderProcess.wait()
         print("Done with render")
         self.onRenderCompletion()
 
