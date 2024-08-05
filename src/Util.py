@@ -5,6 +5,7 @@ import sys
 import requests
 import stat
 import tarfile
+import subprocess
 
 cwd = os.getcwd()
 
@@ -202,3 +203,57 @@ def extractTarGZ(file):
     tar.close()
     removeFile(file)
     os.chdir(origCWD)
+
+def get_gpu_info():
+    system = getPlatform()
+
+    if system == "win32":
+        try:
+            output = subprocess.check_output(
+                "wmic path win32_VideoController get name", shell=True
+            ).decode()
+            return output.strip().split("\n")[1]
+        except:
+            return "Unable to retrieve GPU info on Windows"
+
+    elif system == "darwin":  # macOS
+        try:
+            output = subprocess.check_output(
+                "system_profiler SPDisplaysDataType | grep Vendor", shell=True
+            ).decode()
+            return output.strip().split(":")[1].strip()
+        except:
+            return "Unable to retrieve GPU info on macOS"
+
+    elif system == "linux":
+        try:
+            # Try lspci command first
+            output = subprocess.check_output("lspci | grep -i vga", shell=True).decode()
+            return output.strip().split(":")[2].strip()
+        except:
+            try:
+                # If lspci fails, try reading from /sys/class/graphics
+                with open("/sys/class/graphics/fb0/device/vendor", "r") as f:
+                    vendor_id = f.read().strip()
+                return f"Vendor ID: {vendor_id}"
+            except:
+                return "Unable to retrieve GPU info on Linux"
+
+    else:
+        return "Unsupported operating system"
+
+
+def getVendor():
+    """
+    Gets GPU vendor of the system
+    vendors = ["Intel", "AMD", "Nvidia"]
+    """
+    gpuInfo = get_gpu_info()
+    vendors = ["Intel", "AMD", "Nvidia"]
+    for vendor in vendors:
+        if vendor.lower() in gpuInfo.lower():
+            return vendor
+
+
+if __name__ == "__main__":
+    print(getVendor())
