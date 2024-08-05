@@ -38,9 +38,9 @@ class HandleApplication:
             if checkForPytorch():
                 availableBackends.append("pytorch")
             if checkForNCNN():
-                availableBackends.append("tensorrt")
-            if checkForTensorRT():
                 availableBackends.append("ncnn")
+            if checkForTensorRT():
+                availableBackends.append("tensorrt")
             print("Available Backends: " + str(availableBackends))
 
     def handleArguments(self) -> argparse.ArgumentParser:

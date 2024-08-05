@@ -81,7 +81,8 @@ class ProcessTab:
     ):
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
-
+        # get default backend
+        self.backend = self.parent.backendComboBox.currentText()
         self.QConnect()
         self.setupUI()
 

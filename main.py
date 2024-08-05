@@ -43,8 +43,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100, 600)
         self.aspect_ratio = self.width() / self.height()
-        self.availableBackends = self.getAvailableBackends()
-
+        try:
+            self.availableBackends = self.getAvailableBackends()
+        except SyntaxError:
+            # On error, install ncnn as a base dependency
+            downloadDependencies = DownloadDependencies()
+            downloadDependencies.downloadNCNNDeps()
+            self.availableBackends = self.getAvailableBackends()
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
