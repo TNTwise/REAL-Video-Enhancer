@@ -64,7 +64,7 @@ class InterpolateRifeTorch:
                 v1 = True
             case "rife47":
                 from .InterpolateArchs.RIFE.rife47IFNET import IFNet
-                v1 = True
+                v1 = False
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
                 v1 = False
