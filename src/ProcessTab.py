@@ -104,7 +104,6 @@ class ProcessTab:
         self.parent.methodComboBox.currentIndexChanged.connect(
             self.switchInterpolationAndUpscale
         )
-        print(self.totalModels)
 
     def setupUI(self):
         self.parent.backendComboBox.addItems(self.parent.availableBackends)
@@ -312,7 +311,8 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            p = qimage.scaled(width / 2, height / 2, Qt.KeepAspectRatio)  # type: ignore
+            
+            p = qimage.scaled(width / 2, height / 2, Qt.AspectRatioMode.KeepAspectRatio)  # type: ignore
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)
