@@ -89,7 +89,7 @@ class DownloadDependencies:
         makeExecutable(pythonPath())
 
     def downloadFFMpeg(self):
-        ffmpegTempPath = os.path.join(currentDirectory(), "ffmpeg", "ffmpeg.temp")
+        ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
         match getPlatform():
             case "linux":

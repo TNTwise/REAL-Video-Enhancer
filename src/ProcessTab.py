@@ -101,16 +101,37 @@ class ProcessTab:
 
     def switchInterpolationAndUpscale(self):
         self.parent.modelComboBox.clear()
+        ncnnInterpolateModels = {
+            "RIFE 4.6":"rife-v4.6",
+            "RIFE 4.15":"rife-v4.15",
+            "RIFE 4.18":"rife-v4.18",
+            "RIFE 4.20":"rife-v4.20",
+        }
+        pytorchInterpolateModels = {
+            "RIFE 4.6":"rife46.pkl",
+            "RIFE 4.15":"rife415.pkl",
+            "RIFE 4.18":"rife418.pkl",
+            "RIFE 4.20":"rife420.pkl",
+        }
+        ncnnUpscaleModels = {
+            "SPAN (Animation)":"2x_ModenSpanimationV1.5",
+        }
+        pytorchUpscaleModels = {
+            "SPAN (Animation)":"2x_ModenSpanimationV1.5.pth",
+        }
         if self.parent.methodComboBox.currentText() == "Interpolate":
-            models = (
-                "RIFE 4.6",
-                "RIFE 4.15",
-                "RIFE 4.18",
-                "RIFE 4.20",
-            )
+            if self.backend == "ncnn":
+                models = ncnnInterpolateModels.keys()
+            else:
+                models = pytorchInterpolateModels.keys()
+                
             self.parent.interpolationContainer.setVisible(True)
         if self.parent.methodComboBox.currentText() == "Upscale":
-            models = ("SPAN (Animation)",)
+            if self.backend == "ncnn":
+                models = ncnnUpscaleModels.keys()
+            else:
+                models = pytorchUpscaleModels.keys()
+
             self.parent.interpolationContainer.setVisible(False)
         self.parent.modelComboBox.addItems(models)
 

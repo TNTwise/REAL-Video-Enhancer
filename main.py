@@ -34,6 +34,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.pipeInFrames = None
         self.latestPreviewImage = None
 
+        # setup application
+        self.setupBackendDeps()
+
         # Set up the user interface from Designer.
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
@@ -46,9 +49,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QButtonConnect()
-        # setup application
-
-        self.setupBackendDeps()
+        
 
         # set up tabs
         self.processTab = ProcessTab(parent=self)
