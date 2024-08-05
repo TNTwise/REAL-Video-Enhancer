@@ -1,6 +1,6 @@
 
 import numpy as np
-import sys
+import os
 
 from upscale_ncnn_py import UPSCALE
 
@@ -22,7 +22,7 @@ class NCNNParam:
         self.paramDict = paramDict
 
     def getPixelShuffleScale(self) -> int:
-        scale = 1
+        scale = None
                 
         for value in self.paramDict["PixelShuffle"]:
             if "0=" in value:
@@ -31,13 +31,11 @@ class NCNNParam:
         return scale
     def getInterpScale(self) -> int:
         scale = 1
-        try:
-            for value in self.paramDict["Interp"]:
-                if "0=" in value:
-                    scale = int(value[2])
-                    break
-        except IndexError:
-            pass
+        for value in self.paramDict["Interp"]:
+            if "0=" in value:
+                scale = int(value[2])
+                break
+        
         return scale
         
 
@@ -46,8 +44,16 @@ class NCNNParam:
 
 
 def getNCNNScale(modelPath: str = "") -> int:
+    
+    paramName=os.path.basename(modelPath)
+    for i in range(100):
+        if f"{i}x" in paramName or f"x{i}" in paramName:
+            return i
+
+    #fallback
     ncnnp = NCNNParam(modelPath + '.param')
-    return ncnnp.getPixelShuffleScale()
+    scale = ncnnp.getPixelShuffleScale()
+    return scale
 
 
 class UpscaleNCNN:
