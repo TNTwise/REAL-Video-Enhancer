@@ -80,7 +80,7 @@ class UpdateGUIThread(QThread):
             self.shm.close()
             print("Closed Read Memory")
         except AttributeError as e:
-            printAndLog("No read memory", str(e)) # type: ignore
+            printAndLog("No read memory", str(e))  # type: ignore
 
 
 class ProcessTab:
@@ -120,18 +120,18 @@ class ProcessTab:
         [3] = arch
         """
         self.ncnnInterpolateModels = {
-            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz", 1,"rife46"),
-            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1,"rife413"),
-            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1,"rife413"),
-            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1,"rife420"),
-            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1,"rife421"),
+            "RIFE 4.6": ("rife-v4.6", "rife-v4.6.tar.gz", 1, "rife46"),
+            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1, "rife413"),
+            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1, "rife413"),
+            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1, "rife420"),
+            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1, "rife421"),
         }
         self.pytorchInterpolateModels = {
-            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1,"rife46"),
-            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1,"rife413"),
-            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1,"rife413"),
-            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1,"rife420"),
-            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1,"rife421"),
+            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
+            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
+            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
+            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
+            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
         }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -190,7 +190,9 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        self.interpolateTimes = int(self.parent.interpolationMultiplierComboBox.currentText())
+        self.interpolateTimes = int(
+            self.parent.interpolationMultiplierComboBox.currentText()
+        )
         self.model = self.parent.modelComboBox.currentText()
         # get model attributes
         self.upscaleTimes = self.totalModels[self.model][2]
@@ -269,13 +271,13 @@ class ProcessTab:
             command += [
                 "--interpolateModel",
                 os.path.join(
-                    modelsPath(), self.modelFile,
+                    modelsPath(),
+                    self.modelFile,
                 ),
                 "--interpolateArch",
                 f"{self.modelArch}",
                 "--interpolateFactor",
                 f"{self.interpolateTimes}",
-
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,
@@ -323,7 +325,7 @@ class ProcessTab:
         try:
             width = self.parent.width()
             height = self.parent.height()
-            
+
             p = qimage.scaled(width / 2, height / 2, Qt.AspectRatioMode.KeepAspectRatio)  # type: ignore
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)

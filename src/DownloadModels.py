@@ -25,7 +25,9 @@ class DownloadModel:
         self.downloadModelPath = os.path.join(modelPath, downloadModelFile)
         createDirectory(modelPath)
 
-        if os.path.isfile(os.path.join(self.modelPath,modelFile)) or os.path.exists(os.path.join(self.modelPath,modelFile)):
+        if os.path.isfile(os.path.join(self.modelPath, modelFile)) or os.path.exists(
+            os.path.join(self.modelPath, modelFile)
+        ):
             return
         self.downloadModel(
             modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath

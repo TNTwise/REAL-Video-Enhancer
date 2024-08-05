@@ -103,7 +103,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
 
     def startRender(self):
-        
         self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
@@ -190,23 +189,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dir=self.homeDir,
         )
         self.outputFileText.setText(self.outputFolder)
-    
+
     def killRenderProcess(self):
-        try: # kills  render process if necessary
+        try:  # kills  render process if necessary
             self.renderProcess.terminate()
         except AttributeError:
             printAndLog("No render process!")
-    
+
     def closeEvent(self, event):
         reply = QMessageBox.question(
-            self, '','Are you sure you want to exit?',
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No  # type: ignore
+            self,
+            "",
+            "Are you sure you want to exit?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,  # type: ignore
         )
-        if reply == QMessageBox.Yes: # type: ignore
+        if reply == QMessageBox.Yes:  # type: ignore
             self.killRenderProcess()
-            event.accept()  
+            event.accept()
         else:
-            event.ignore()  
+            event.ignore()
 
 
 if __name__ == "__main__":
