@@ -123,12 +123,14 @@ class ProcessTab:
             "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1),
             "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1),
             "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1),
+            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1),
         }
         self.pytorchInterpolateModels = {
             "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1),
             "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1),
             "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1),
             "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1),
+            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1),
         }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -234,6 +236,7 @@ class ProcessTab:
         self.workerThread.wait()
         # reset image preview
         self.parent.previewLabel.clear()
+        self.parent.startRenderButton.setEnabled(True)
 
     def renderToPipeThread(self):
         # builds command
