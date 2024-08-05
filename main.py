@@ -102,6 +102,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
 
     def startRender(self):
+        
         self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
@@ -109,7 +110,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoHeight=self.videoHeight,
             videoFps=self.videoFps,
             videoFrameCount=self.videoFrameCount,
-            interpolateTimes=self.interpolateTimes,
             method=self.methodComboBox.currentText(),
         )
 

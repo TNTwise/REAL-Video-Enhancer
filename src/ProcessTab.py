@@ -172,7 +172,6 @@ class ProcessTab:
         videoHeight: int,
         videoFps: float,
         videoFrameCount: int,
-        interpolateTimes: int,
         method: str,
     ):
         self.inputFile = inputFile
@@ -181,7 +180,7 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        self.interpolateTimes = interpolateTimes
+        self.interpolateTimes = int(self.parent.interpolationMultiplierComboBox.currentText())
         self.model = self.parent.modelComboBox.currentText()
         self.upscaleTimes = self.totalModels[self.model][2]
         self.outputVideoWidth = videoWidth * self.upscaleTimes
@@ -242,8 +241,6 @@ class ProcessTab:
             f"{self.outputPath}",
             "-b",
             f"{self.backend}",
-            "--interpolateFactor",
-            f"{self.interpolateTimes}",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
             "--half",
@@ -257,8 +254,11 @@ class ProcessTab:
             command += [
                 "--interpolateModel",
                 os.path.join(
-                    modelsPath(), self.modelFile
-                ),  # put actual model here, this is a placeholder
+                    modelsPath(), self.modelFile,
+                ),
+                "--interpolateFactor",
+                f"{self.interpolateTimes}",
+
             ]
         self.pipeInFrames = subprocess.Popen(
             command,

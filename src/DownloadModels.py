@@ -25,10 +25,11 @@ class DownloadModel:
         self.downloadModelPath = os.path.join(modelPath, downloadModelFile)
         createDirectory(modelPath)
 
-        if not os.path.isfile(modelFile):
-            self.downloadModel(
-                modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath
-            )
+        if os.path.isfile(os.path.join(self.modelPath,modelFile)) or os.path.exists(os.path.join(self.modelPath,modelFile)):
+            return
+        self.downloadModel(
+            modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath
+        )
 
     def downloadModel(self, modelFile: str = None, downloadModelPath: str = None):
         url = (
