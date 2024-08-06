@@ -145,8 +145,8 @@ class ProcessTab:
         }
         self.pytorchUpscaleModels = {
             "SPAN (Animation) (2X)": (
-                "2x_ModenSpanimationV1.5.pth",
-                "2x_ModenSpanimationV1.5.pth",
+                "2x_ModernSpanimationV1.5.pth",
+                "2x_ModernSpanimationV1.5.pth",
                 2,
                 "SPAN",
             ),
