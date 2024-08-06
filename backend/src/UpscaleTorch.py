@@ -62,14 +62,24 @@ class UpscalePytorch:
                         (1, 3, self.height, self.width), dtype=self.dtype, device=device
                     )
                 ]
-                dummy_input = [
+                dummy_input_cpu_fp32 = [
                     torch.zeros(
                         (1, 3, 32, 32),
                         dtype=torch.float32,
                         device="cpu",
                     )
                 ]
-                module = torch.jit.trace(model.float().cpu(), dummy_input)
+                dummy_input = [
+                    torch.zeros(
+                        (1, 3, 32, 32),
+                        dtype=self.dtype,
+                        device=self.device,
+                    )
+                ]
+                try:
+                    module = torch.jit.trace(model, dummy_input)
+                except:
+                    module = torch.jit.trace(model.float().cpu(), dummy_input_cpu_fp32)
 
                 module = torch_tensorrt.compile(
                     module,
