@@ -63,7 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backend=self.backendComboBox.currentText(),
             method=self.methodComboBox.currentText(),
         )
-        
+
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
@@ -110,7 +110,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def startRender(self):
         self.startRenderButton.setEnabled(False)
-        self.progressBar.setRange(0,self.videoFrameCount*int(self.interpolationMultiplierComboBox.currentText()))
+        self.progressBar.setRange(
+            0,
+            self.videoFrameCount
+            * int(self.interpolationMultiplierComboBox.currentText()),
+        )
+        self.disableProcessPage()
         self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
@@ -123,6 +128,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
             model=self.modelComboBox.currentText(),
         )
+
+    def disableProcessPage(self):
+        self.videoInfoContainer.setDisabled(True)
+    
+    def enableProcessPage(self):
+        self.videoInfoContainer.setEnabled(True)
 
     def getAvailableBackends(self):
         result = subprocess.run(

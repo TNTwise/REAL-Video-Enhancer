@@ -1,5 +1,3 @@
-
-
 import sys
 import subprocess
 import requests
@@ -22,7 +20,9 @@ class UpdateGUIThread(QThread):
 
     latestPreviewPixmap = Signal(QtGui.QImage)
 
-    def __init__(self, parent, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
+    def __init__(
+        self, parent, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth
+    ):
         super().__init__()
         self._parent = parent
         self._stop_flag = False  # Boolean flag to control stopping

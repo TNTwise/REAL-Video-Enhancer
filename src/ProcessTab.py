@@ -66,7 +66,7 @@ class ProcessTab:
 
     def getTotalModels(self, method: str, backend: str) -> dict:
         """
-        returns 
+        returns
         the current models available given a method (interpolate, upscale) and a backend (ncnn, tensorrt, pytorch)
         """
         printAndLog("Getting total models, method: " + method + " backend: " + backend)
@@ -84,16 +84,15 @@ class ProcessTab:
             self.parent.interpolationContainer.setVisible(False)
         return models
 
-    def QConnect(self,method:str,backend:str):
+    def QConnect(self, method: str, backend: str):
         # connect file select buttons
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
         self.parent.methodComboBox.currentIndexChanged.connect(
-            lambda:self.switchInterpolationAndUpscale(method=method,backend=backend)
+            lambda: self.switchInterpolationAndUpscale(method=method, backend=backend)
         )
-        
 
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
@@ -126,9 +125,8 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        models = self.getTotalModels(method=method,backend=backend)
+        models = self.getTotalModels(method=method, backend=backend)
 
-        
         # if upscale or interpolate
         """
         Function to start the rendering process
@@ -183,12 +181,12 @@ class ProcessTab:
         # reset image preview
         self.parent.previewLabel.clear()
         self.parent.startRenderButton.setEnabled(True)
+        self.parent.enableProcessPage()
 
-    def splitListIntoStringWithNewLines(self, string_list:list[str]):
+    def splitListIntoStringWithNewLines(self, string_list: list[str]):
         # Join the strings with newline characters
         return "\n".join(string_list)
         # Set the text to the QTextEdit
-        
 
     def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
@@ -229,20 +227,24 @@ class ProcessTab:
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-            bufsize=1
+            bufsize=1,
         )
         textOutput = []
-        for line in iter(self.parent.renderProcess.stdout.readline, b''):
+        for line in iter(self.parent.renderProcess.stdout.readline, b""):
             if self.parent.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
             line = line.strip()
-            if  "it/s" in line:
+            if "it/s" in line:
                 textOutput = textOutput[:-1]
             if "FPS" in line:
-                textOutput = textOutput[:-2] # slice the list to only get the last updated data
-                self.currentFrame = int(re.search(r'Current Frame: (\d+)', line).group(1))
+                textOutput = textOutput[
+                    :-2
+                ]  # slice the list to only get the last updated data
+                self.currentFrame = int(
+                    re.search(r"Current Frame: (\d+)", line).group(1)
+                )
             textOutput.append(line)
-            #self.setRenderOutputContent(textOutput)
+            # self.setRenderOutputContent(textOutput)
             self.renderTextOutputList = textOutput
             if "Time to complete render" in line:
                 break
@@ -287,7 +289,9 @@ class ProcessTab:
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
         if self.renderTextOutputList is not None:
-            self.parent.renderOutput.setPlainText(self.splitListIntoStringWithNewLines(self.renderTextOutputList))
+            self.parent.renderOutput.setPlainText(
+                self.splitListIntoStringWithNewLines(self.renderTextOutputList)
+            )
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
             self.parent.progressBar.setValue(self.currentFrame)

@@ -158,16 +158,16 @@ class FFMpegRender:
     def returnFrame(self, frame):
         return frame
 
-    def realTimePrint(self,data):
+    def realTimePrint(self, data):
         data = str(data)
         # Clear the last line
-        sys.stdout.write('\r' + ' ' * self.last_length)
+        sys.stdout.write("\r" + " " * self.last_length)
         sys.stdout.flush()
-        
+
         # Write the new line
-        sys.stdout.write('\r' + data)
+        sys.stdout.write("\r" + data)
         sys.stdout.flush()
-        
+
         # Update the length of the last printed line
         self.last_length = len(data)
 
@@ -175,7 +175,7 @@ class FFMpegRender:
         # Create a shared memory block
 
         buffer = self.shm.buf
-        
+
         log(f"Shared memory name: {self.shm.name}")
         while True:
             if self.writingDone == True:
@@ -184,12 +184,12 @@ class FFMpegRender:
                 break
             if self.previewFrame is not None and self.outputFrameChunkSize is not None:
                 # print out data to stdout
-                fps = round(self.currentFrame/(time.time() - self.startTime))
+                fps = round(self.currentFrame / (time.time() - self.startTime))
                 message = f"FPS: {fps} Current Frame: {self.currentFrame}"
                 self.realTimePrint(message)
                 # Update the shared array
                 buffer[: self.outputFrameChunkSize] = bytes(self.previewFrame)
-                
+
             time.sleep(0.1)
 
     def writeOutVideoFrames(self):
@@ -202,9 +202,9 @@ class FFMpegRender:
         log("Rendering")
         #
         self.startTime = time.time()
-        self.currentFrame:int=0
-        self.last_length:int = 0
-        
+        self.currentFrame: int = 0
+        self.last_length: int = 0
+
         if self.benchmark:
             pbar = tqdm(total=self.totalOutputFrames)
             while True:
@@ -229,13 +229,11 @@ class FFMpegRender:
                 # Update other variables
                 self.previewFrame = frame
                 # Update progress bar
-                #pbar.update(1)
-                self.currentFrame+=1
+                # pbar.update(1)
+                self.currentFrame += 1
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
-        
+
         renderTime = time.time() - self.startTime
         self.writingDone = True
-        printAndLog(
-            f"\nTime to complete render: {round(renderTime, 2)}"
-        )
+        printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")
