@@ -100,7 +100,9 @@ class ProcessTab:
         Called every render, gets the correct model based on the backend and the method.
         """
         self.parent.modelComboBox.clear()
-
+        # overwrite method
+        method = self.parent.methodComboBox.currentText()
+        backend = self.parent.backendComboBox.currentText()
         models = self.getTotalModels(method=method, backend=backend)
 
         self.parent.modelComboBox.addItems(models)
