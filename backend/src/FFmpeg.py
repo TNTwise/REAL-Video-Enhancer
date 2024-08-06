@@ -2,10 +2,11 @@ import cv2
 import os
 import subprocess
 import queue
+import sys
 import time
 from tqdm import tqdm
 from multiprocessing import shared_memory
-from .Util import currentDirectory, printAndLog
+from .Util import currentDirectory, log, printAndLog
 
 
 class FFMpegRender:
@@ -65,7 +66,7 @@ class FFMpegRender:
         self.writeQueue = queue.Queue(maxsize=50)
 
     def getVideoProperties(self, inputFile: str = None):
-        printAndLog("Getting Video Properties...")
+        log("Getting Video Properties...")
         if inputFile is None:
             cap = cv2.VideoCapture(self.inputFile)
         else:
@@ -82,7 +83,7 @@ class FFMpegRender:
         self.outputFrameChunkSize = None
 
     def getFFmpegReadCommand(self):
-        printAndLog("Generating FFmpeg READ command...")
+        log("Generating FFmpeg READ command...")
         command = [
             f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
             "-i",
@@ -100,7 +101,7 @@ class FFMpegRender:
         return command
 
     def getFFmpegWriteCommand(self):
-        printAndLog("Generating FFmpeg WRITE command...")
+        log("Generating FFmpeg WRITE command...")
         if not self.benchmark:
             # maybe i can split this so i can just use ffmpeg normally like with vspipe
             command = [
@@ -139,7 +140,7 @@ class FFMpegRender:
             return command
 
     def readinVideoFrames(self):
-        printAndLog("Starting Video Read")
+        log("Starting Video Read")
         self.readProcess = subprocess.Popen(
             self.getFFmpegReadCommand(),
             stdout=subprocess.PIPE,
@@ -148,7 +149,7 @@ class FFMpegRender:
         for i in range(self.totalInputFrames - 1):
             chunk = self.readProcess.stdout.read(self.inputFrameChunkSize)
             self.readQueue.put(chunk)
-        printAndLog("Ending Video Read")
+        log("Ending Video Read")
         self.readQueue.put(None)
         self.readingDone = True
         self.readProcess.stdout.close()
@@ -157,20 +158,38 @@ class FFMpegRender:
     def returnFrame(self, frame):
         return frame
 
+    def realTimePrint(self,data):
+        data = str(data)
+        # Clear the last line
+        sys.stdout.write('\r' + ' ' * self.last_length)
+        sys.stdout.flush()
+        
+        # Write the new line
+        sys.stdout.write('\r' + data)
+        sys.stdout.flush()
+        
+        # Update the length of the last printed line
+        self.last_length = len(data)
+
     def writeOutToSharedMemory(self):
         # Create a shared memory block
 
         buffer = self.shm.buf
-
-        printAndLog(f"Shared memory name: {self.shm.name}")
+        
+        log(f"Shared memory name: {self.shm.name}")
         while True:
             if self.writingDone == True:
                 self.shm.close()
                 self.shm.unlink()
                 break
             if self.previewFrame is not None and self.outputFrameChunkSize is not None:
-                buffer[: self.outputFrameChunkSize] = bytes(self.previewFrame)
+                # print out data to stdout
+                fps = round(self.currentFrame/(time.time() - self.startTime))
+                message = f"FPS: {fps} Current Frame: {self.currentFrame}"
+                self.realTimePrint(message)
                 # Update the shared array
+                buffer[: self.outputFrameChunkSize] = bytes(self.previewFrame)
+                
             time.sleep(0.1)
 
     def writeOutVideoFrames(self):
@@ -180,10 +199,14 @@ class FFMpegRender:
         A command like this is required,
         ffmpeg -f rawvideo -pix_fmt rgb24 -s 1920x1080 -framerate 24 -i - -c:v libx264 -crf 18 -pix_fmt yuv420p -c:a copy out.mp4
         """
-        printAndLog("Rendering")
-        pbar = tqdm(total=self.totalOutputFrames)
-        startTime = time.time()
+        log("Rendering")
+        #
+        self.startTime = time.time()
+        self.currentFrame:int=0
+        self.last_length:int = 0
+        
         if self.benchmark:
+            pbar = tqdm(total=self.totalOutputFrames)
             while True:
                 frame = self.writeQueue.get()
                 self.previewFrame = frame
@@ -206,12 +229,13 @@ class FFMpegRender:
                 # Update other variables
                 self.previewFrame = frame
                 # Update progress bar
-                pbar.update(1)
+                #pbar.update(1)
+                self.currentFrame+=1
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
-
-        renderTime = time.time() - startTime
+        
+        renderTime = time.time() - self.startTime
         self.writingDone = True
         printAndLog(
-            f"Completed Write!\nTime to complete render: {round(renderTime, 2)}"
+            f"\nCompleted Write!\nTime to complete render: {round(renderTime, 2)}"
         )

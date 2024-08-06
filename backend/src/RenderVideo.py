@@ -4,7 +4,7 @@ from multiprocessing import shared_memory
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
-from .Util import printAndLog
+from .Util import printAndLog, log
 
 # try/except imports
 try:
@@ -134,13 +134,13 @@ class Render(FFMpegRender):
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
-        printAndLog("Starting Upscale")
+        log("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
             frame = self.upscale(self.frameSetupFunction(frame))
             self.writeQueue.put(frame)
         self.writeQueue.put(None)
-        printAndLog("Finished Upscale")
+        log("Finished Upscale")
 
     def renderInterpolate(self):
         """
@@ -149,7 +149,7 @@ class Render(FFMpegRender):
         self.frame0 is always setup,
         frame1 is in bytes, and is only converted if need be
         """
-        printAndLog("Starting Interpolation")
+        log("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
 
@@ -180,7 +180,7 @@ class Render(FFMpegRender):
             self.frame0 = self.frameSetupFunction(frame1)
 
         self.writeQueue.put(None)
-        printAndLog("Finished Interpolation")
+        log("Finished Interpolation")
 
     def setupUpscale(self):
         """
@@ -191,7 +191,7 @@ class Render(FFMpegRender):
         For interpolation:
         Mapss the self.undoSetup to the tensor_to_frame function, which undoes the prep done in the FFMpeg thread. Used for SCDetect
         """
-        printAndLog("Setting up Upscale")
+        log("Setting up Upscale")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             upscalePytorch = UpscalePytorch(
                 self.upscaleModel,
@@ -219,7 +219,7 @@ class Render(FFMpegRender):
             self.upscale = upscaleNCNN.Upscale
 
     def setupInterpolate(self):
-        printAndLog("Setting up Interpolation")
+        log("Setting up Interpolation")
 
         if self.sceneDetectMethod != "none":
             printAndLog("Detecting Transitions")

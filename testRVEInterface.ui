@@ -141,6 +141,11 @@ background-color:#2c313c;
 border-radius: 10px;
 }
 
+QTextEdit{
+background-color:#2c313c;
+border-radius: 10px;
+}
+
 QPushButton{
     background-color:#2c313c;
 	text-align:left;
@@ -497,17 +502,11 @@ QProgressBar{
                   </widget>
                  </item>
                  <item>
-                  <spacer name="verticalSpacer_2">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Vertical</enum>
+                  <widget class="QTextEdit" name="renderOutput">
+                   <property name="readOnly">
+                    <bool>true</bool>
                    </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>40</height>
-                    </size>
-                   </property>
-                  </spacer>
+                  </widget>
                  </item>
                 </layout>
                </widget>

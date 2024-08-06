@@ -16,6 +16,7 @@ class ProcessTab:
     def __init__(self, parent, backend: str, method: str):
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
+        self.renderTextOutputList = None
 
         """
         Key value pairs of the model name in the GUI
@@ -158,6 +159,7 @@ class ProcessTab:
 
     def startGUIUpdate(self):
         self.workerThread = UpdateGUIThread(
+            parent=self,
             imagePreviewSharedMemoryID=self.imagePreviewSharedMemoryID,
             outputVideoHeight=self.outputVideoHeight,
             outputVideoWidth=self.outputVideoWidth,
@@ -177,6 +179,12 @@ class ProcessTab:
         # reset image preview
         self.parent.previewLabel.clear()
         self.parent.startRenderButton.setEnabled(True)
+
+    def splitListIntoStringWithNewLines(self, string_list:list[str]):
+        # Join the strings with newline characters
+        return "\n".join(string_list)
+        # Set the text to the QTextEdit
+        
 
     def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
@@ -212,7 +220,25 @@ class ProcessTab:
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+            bufsize=1
         )
+        textOutput = []
+        for line in iter(self.parent.renderProcess.stdout.readline, b''):
+            if self.parent.renderProcess.poll() is not None:
+                break  # Exit the loop if the process has terminated
+            line = line.strip()
+            if  "it/s" in line:
+                textOutput = textOutput[:-1]
+            if "FPS" in line:
+                textOutput = textOutput[:-2] # slice the list to only get the last updated data
+            textOutput.append(line)
+            #self.setRenderOutputContent(textOutput)
+            self.renderTextOutputList = textOutput
+            if "Completed Write!" in line:
+                break
         self.parent.renderProcess.wait()
         # done with render
         self.onRenderCompletion()
@@ -253,6 +279,10 @@ class ProcessTab:
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
+        if self.renderTextOutputList is not None:
+            self.parent.renderOutput.setPlainText(self.splitListIntoStringWithNewLines(self.renderTextOutputList))
+            scrollbar = self.parent.renderOutput.verticalScrollBar()
+            scrollbar.setValue(scrollbar.maximum())
         try:
             width = self.parent.width()
             height = self.parent.height()
@@ -261,6 +291,5 @@ class ProcessTab:
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)
-        except FileNotFoundError:
-            # print("No preview yet!")
+        except:
             pass

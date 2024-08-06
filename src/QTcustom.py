@@ -22,8 +22,9 @@ class UpdateGUIThread(QThread):
 
     latestPreviewPixmap = Signal(QtGui.QImage)
 
-    def __init__(self, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
+    def __init__(self, parent, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
         super().__init__()
+        self._parent = parent
         self._stop_flag = False  # Boolean flag to control stopping
         self._mutex = QMutex()  # Atomic flag to control stopping
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
@@ -49,7 +50,7 @@ class UpdateGUIThread(QThread):
                 self.latestPreviewPixmap.emit(pixmap)
             except FileNotFoundError:
                 # print("preview not available")
-                pass
+                self.latestPreviewPixmap.emit(None)
             time.sleep(0.1)
 
     def convert_cv_qt(self, cv_img):
