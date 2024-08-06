@@ -190,6 +190,8 @@ class ProcessTab:
         # builds command
         command = [
             f"{pythonPath()}",
+            "-W",
+            "ignore",
             os.path.join(currentDirectory(), "backend", "rve-backend.py"),
             "-i",
             self.inputFile,
@@ -237,7 +239,7 @@ class ProcessTab:
             textOutput.append(line)
             #self.setRenderOutputContent(textOutput)
             self.renderTextOutputList = textOutput
-            if "Completed Write!" in line:
+            if "Time to complete render" in line:
                 break
         self.parent.renderProcess.wait()
         # done with render

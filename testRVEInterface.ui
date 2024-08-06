@@ -503,6 +503,12 @@ QProgressBar{
                  </item>
                  <item>
                   <widget class="QTextEdit" name="renderOutput">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
                    <property name="readOnly">
                     <bool>true</bool>
                    </property>
@@ -526,7 +532,7 @@ QProgressBar{
                     <item>
                      <widget class="QLabel" name="previewLabel">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
