@@ -2,6 +2,7 @@ from math import e
 import subprocess
 import os
 from threading import Thread
+import re
 
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
@@ -17,6 +18,7 @@ class ProcessTab:
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
         self.renderTextOutputList = None
+        self.currentFrame = 0
 
         """
         Key value pairs of the model name in the GUI
@@ -236,6 +238,7 @@ class ProcessTab:
                 textOutput = textOutput[:-1]
             if "FPS" in line:
                 textOutput = textOutput[:-2] # slice the list to only get the last updated data
+                self.currentFrame = int(re.search(r'Current Frame: (\d+)', line).group(1))
             textOutput.append(line)
             #self.setRenderOutputContent(textOutput)
             self.renderTextOutputList = textOutput
@@ -285,6 +288,7 @@ class ProcessTab:
             self.parent.renderOutput.setPlainText(self.splitListIntoStringWithNewLines(self.renderTextOutputList))
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
+            self.parent.progressBar.setValue(self.currentFrame)
         try:
             width = self.parent.width()
             height = self.parent.height()

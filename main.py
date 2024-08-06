@@ -110,6 +110,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def startRender(self):
         self.startRenderButton.setEnabled(False)
+        self.progressBar.setRange(0,self.videoFrameCount*int(self.interpolationMultiplierComboBox.currentText()))
         self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
