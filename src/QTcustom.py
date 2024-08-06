@@ -1,13 +1,79 @@
-from PySide6 import QtWidgets, QtCore, QtGui
-from PySide6.QtCore import QThread, QObject
-from PySide6.QtWidgets import QVBoxLayout, QTextEdit, QPushButton
+
 
 import sys
 import subprocess
 import requests
+import time
+import numpy as np
+from multiprocessing import shared_memory
+
+from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker
+from PySide6 import QtWidgets, QtCore, QtGui
+from PySide6.QtCore import QThread, Qt
 
 from .QTstyle import styleSheet
 from .Util import printAndLog
+
+
+class UpdateGUIThread(QThread):
+    """
+    Gets the latest bytes outputed from the shared memory and returns them in QImage format for display
+    """
+
+    latestPreviewPixmap = Signal(QtGui.QImage)
+
+    def __init__(self, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
+        super().__init__()
+        self._stop_flag = False  # Boolean flag to control stopping
+        self._mutex = QMutex()  # Atomic flag to control stopping
+        self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
+        self.outputVideoHeight = outputVideoHeight
+        self.outputVideoWidth = outputVideoWidth
+
+    def run(self):
+        while True:
+            with QMutexLocker(self._mutex):
+                if self._stop_flag:
+                    break
+            try:
+                self.shm = shared_memory.SharedMemory(
+                    name=self.imagePreviewSharedMemoryID
+                )
+                image_bytes = self.shm.buf[:].tobytes()
+
+                # Convert image bytes back to numpy array
+                image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
+                    (self.outputVideoHeight, self.outputVideoWidth, 3)
+                )
+                pixmap = self.convert_cv_qt(image_array)
+                self.latestPreviewPixmap.emit(pixmap)
+            except FileNotFoundError:
+                # print("preview not available")
+                pass
+            time.sleep(0.1)
+
+    def convert_cv_qt(self, cv_img):
+        """Convert from an opencv image to QPixmap"""
+        # rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
+        h, w, ch = cv_img.shape
+        bytes_per_line = ch * w
+        convert_to_Qt_format = QtGui.QImage(
+            cv_img.data,
+            w,
+            h,
+            bytes_per_line,
+            QtGui.QImage.Format_RGB888,  # type: ignore
+        )
+        return convert_to_Qt_format
+
+    def stop(self):
+        with QMutexLocker(self._mutex):
+            self._stop_flag = True
+        try:
+            self.shm.close()
+            print("Closed Read Memory")
+        except AttributeError as e:
+            printAndLog("No read memory", str(e))  # type: ignore
 
 
 # custom threads

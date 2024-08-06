@@ -2,115 +2,21 @@ from math import e
 import subprocess
 import os
 from threading import Thread
-import time
-import numpy as np
-from multiprocessing import shared_memory
-from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker, Qt
+
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
+from PySide6.QtCore import Qt
 
-from backend.src.Util import printAndLog
-
-from .Util import pythonPath, currentDirectory, modelsPath
+from .QTcustom import UpdateGUIThread
+from .Util import pythonPath, currentDirectory, modelsPath, printAndLog
 from .DownloadModels import DownloadModel
 
 
-class HandleInputs:
-    """A class specifically made to handle the qt widgets and turn their data into a usable command for processing"""
-
-    def __init__(self, parent):
-        self.parent = parent
-
-
-class UpdateGUIThread(QThread):
-    """
-    Gets the latest bytes outputed from the shared memory and returns them in QImage format for display
-    """
-
-    latestPreviewPixmap = Signal(QtGui.QImage)
-
-    def __init__(self, imagePreviewSharedMemoryID, outputVideoHeight, outputVideoWidth):
-        super().__init__()
-        self._stop_flag = False  # Boolean flag to control stopping
-        self._mutex = QMutex()  # Atomic flag to control stopping
-        self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
-        self.outputVideoHeight = outputVideoHeight
-        self.outputVideoWidth = outputVideoWidth
-
-    def run(self):
-        while True:
-            with QMutexLocker(self._mutex):
-                if self._stop_flag:
-                    break
-            try:
-                self.shm = shared_memory.SharedMemory(
-                    name=self.imagePreviewSharedMemoryID
-                )
-                image_bytes = self.shm.buf[:].tobytes()
-
-                # Convert image bytes back to numpy array
-                image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
-                    (self.outputVideoHeight, self.outputVideoWidth, 3)
-                )
-                pixmap = self.convert_cv_qt(image_array)
-                self.latestPreviewPixmap.emit(pixmap)
-            except FileNotFoundError:
-                # print("preview not available")
-                pass
-            time.sleep(0.1)
-
-    def convert_cv_qt(self, cv_img):
-        """Convert from an opencv image to QPixmap"""
-        # rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
-        h, w, ch = cv_img.shape
-        bytes_per_line = ch * w
-        convert_to_Qt_format = QtGui.QImage(
-            cv_img.data,
-            w,
-            h,
-            bytes_per_line,
-            QtGui.QImage.Format_RGB888,  # type: ignore
-        )
-        return convert_to_Qt_format
-
-    def stop(self):
-        with QMutexLocker(self._mutex):
-            self._stop_flag = True
-        try:
-            self.shm.close()
-            print("Closed Read Memory")
-        except AttributeError as e:
-            printAndLog("No read memory", str(e))  # type: ignore
-
-
 class ProcessTab:
-    def __init__(
-        self,
-        parent,
-    ):
+    def __init__(self, parent, backend: str, method: str):
         self.parent = parent
         self.imagePreviewSharedMemoryID = "/image_preview"
-        # get default backend
-        self.setupUI()
-        self.QConnect()
 
-    def QConnect(self):
-        # connect file select buttons
-        self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
-        self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
-        # connect render button
-        self.parent.startRenderButton.clicked.connect(self.parent.startRender)
-        self.switchInterpolationAndUpscale()
-        self.parent.methodComboBox.currentIndexChanged.connect(
-            self.switchInterpolationAndUpscale
-        )
-
-    def setupUI(self):
-        self.parent.backendComboBox.addItems(self.parent.availableBackends)
-
-    def switchInterpolationAndUpscale(self):
-        self.parent.modelComboBox.clear()
-        self.backend = self.parent.backendComboBox.currentText()
         """
         Key value pairs of the model name in the GUI
         Data inside the tuple:
@@ -151,29 +57,55 @@ class ProcessTab:
                 "SPAN",
             ),
         }
+        # get default backend
+        self.QConnect(method=method, backend=backend)
+        self.switchInterpolationAndUpscale(method=method, backend=backend)
 
-        models = None
-        if self.parent.methodComboBox.currentText() == "Interpolate":
-            if self.backend == "ncnn":
+    def getTotalModels(self, method: str, backend: str):
+        printAndLog("Getting total models, method: " + method + " backend: " + backend)
+        if method == "Interpolate":
+            if backend == "ncnn":
                 models = self.ncnnInterpolateModels.keys()
                 self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
-            else:
+            elif backend == "pytorch" or backend == "tensorrt":
                 models = self.pytorchInterpolateModels.keys()
                 self.totalModels = (
                     self.pytorchInterpolateModels | self.pytorchUpscaleModels
                 )
 
             self.parent.interpolationContainer.setVisible(True)
-        if self.parent.methodComboBox.currentText() == "Upscale":
-            if self.backend == "ncnn":
+        if method == "Upscale":
+            if backend == "ncnn":
                 models = self.ncnnUpscaleModels.keys()
                 self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
-            else:
+            elif backend == "pytorch" or backend == "tensorrt":
                 models = self.pytorchUpscaleModels.keys()
                 self.totalModels = (
                     self.pytorchInterpolateModels | self.pytorchUpscaleModels
                 )
+            
             self.parent.interpolationContainer.setVisible(False)
+        return models
+
+    def QConnect(self,method:str,backend:str):
+        # connect file select buttons
+        self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
+        self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
+        # connect render button
+        self.parent.startRenderButton.clicked.connect(self.parent.startRender)
+        self.parent.methodComboBox.currentIndexChanged.connect(
+            lambda:self.switchInterpolationAndUpscale(method=method,backend=backend)
+        )
+        
+
+    def switchInterpolationAndUpscale(self, method: str, backend: str):
+        """
+        Called every render, gets the correct model based on the backend and the method.
+        """
+        self.parent.modelComboBox.clear()
+
+        models = self.getTotalModels(method=method, backend=backend)
+
         self.parent.modelComboBox.addItems(models)
 
     def run(
@@ -185,6 +117,9 @@ class ProcessTab:
         videoFps: float,
         videoFrameCount: int,
         method: str,
+        backend: str,
+        interpolationTimes: int,
+        model: str,
     ):
         self.inputFile = inputFile
         self.outputPath = outputPath
@@ -192,18 +127,10 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        self.interpolateTimes = int(
-            self.parent.interpolationMultiplierComboBox.currentText()
-        )
-        self.model = self.parent.modelComboBox.currentText()
-        # get model attributes
-        self.upscaleTimes = self.totalModels[self.model][2]
-        self.modelArch = self.totalModels[self.model][3]
-        # get video attributes
-        self.outputVideoWidth = videoWidth * self.upscaleTimes
-        self.outputVideoHeight = videoHeight * self.upscaleTimes
+        self.getTotalModels(method=method,backend=backend)
+
+        
         # if upscale or interpolate
-        self.method = method
         """
         Function to start the rendering process
         It will initially check for any issues with the current setup, (invalid file, no permissions, etc..)
@@ -211,19 +138,27 @@ class ProcessTab:
         Finally, It will handle the render via ffmpeg. Taking in the frames from pipe and handing them into ffmpeg on a sperate thread
         """
 
-        self.backend = self.parent.backendComboBox.currentText()
+        # get model attributes
+        self.modelFile = self.totalModels[model][0]
+        self.downloadFile = self.totalModels[model][1]
+        self.upscaleTimes = self.totalModels[model][2]
+        self.modelArch = self.totalModels[model][3]
 
-        # Gui changes
-        self.parent.startRenderButton.setEnabled(False)
-        self.modelFile = self.totalModels[self.model][0]
-        self.downloadFile = self.totalModels[self.model][1]
+        # get video attributes
+        self.outputVideoWidth = videoWidth * self.upscaleTimes
+        self.outputVideoHeight = videoHeight * self.upscaleTimes
+
         DownloadModel(
             modelFile=self.modelFile,
             downloadModelFile=self.downloadFile,
-            backend=self.backend,
+            backend=backend,
         )
         # self.ffmpegWriteThread()
-        writeThread = Thread(target=self.renderToPipeThread)
+        writeThread = Thread(
+            target=lambda: self.renderToPipeThread(
+                method=method, backend=backend, interpolateTimes=interpolationTimes
+            )
+        )
         writeThread.start()
         self.startGUIUpdate()
 
@@ -249,7 +184,7 @@ class ProcessTab:
         self.parent.previewLabel.clear()
         self.parent.startRenderButton.setEnabled(True)
 
-    def renderToPipeThread(self):
+    def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
         command = [
             f"{pythonPath()}",
@@ -259,17 +194,17 @@ class ProcessTab:
             "-o",
             f"{self.outputPath}",
             "-b",
-            f"{self.backend}",
+            f"{backend}",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
             "--half",
         ]
-        if self.method == "Upscale":
+        if method == "Upscale":
             command += [
                 "--upscaleModel",
                 os.path.join(modelsPath(), self.modelFile),
             ]
-        if self.method == "Interpolate":
+        if method == "Interpolate":
             command += [
                 "--interpolateModel",
                 os.path.join(
@@ -279,7 +214,7 @@ class ProcessTab:
                 "--interpolateArch",
                 f"{self.modelArch}",
                 "--interpolateFactor",
-                f"{self.interpolateTimes}",
+                f"{interpolateTimes}",
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,

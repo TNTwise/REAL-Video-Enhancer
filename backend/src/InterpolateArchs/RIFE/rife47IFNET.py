@@ -54,7 +54,6 @@ class MyPixelShuffle(nn.Module):
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 
-
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
         super(ResConv, self).__init__()
@@ -111,19 +110,18 @@ class IFBlock(nn.Module):
 class IFNet(nn.Module):
     def __init__(
         self,
-        scale=1.,
+        scale=1.0,
         ensemble=False,
         dtype=torch.float32,
         device="cuda",
     ):
         super(IFNet, self).__init__()
-        self.block0 = IFBlock(7+8, c=192)
-        self.block1 = IFBlock(8+4+8, c=128)
-        self.block2 = IFBlock(8+4+8, c=96)
-        self.block3 = IFBlock(8+4+8, c=64)
+        self.block0 = IFBlock(7 + 8, c=192)
+        self.block1 = IFBlock(8 + 4 + 8, c=128)
+        self.block2 = IFBlock(8 + 4 + 8, c=96)
+        self.block3 = IFBlock(8 + 4 + 8, c=64)
         self.encode = nn.Sequential(
-            nn.Conv2d(3, 16, 3, 2, 1),
-            nn.ConvTranspose2d(16, 4, 4, 2, 1)
+            nn.Conv2d(3, 16, 3, 2, 1), nn.ConvTranspose2d(16, 4, 4, 2, 1)
         )
         self.device = device
         self.dtype = dtype

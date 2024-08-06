@@ -61,18 +61,23 @@ class InterpolateRifeTorch:
         match interpolateArch:
             case "rife46":
                 from .InterpolateArchs.RIFE.rife46IFNET import IFNet
+
                 v1 = True
             case "rife47":
                 from .InterpolateArchs.RIFE.rife47IFNET import IFNet
+
                 v1 = False
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+
                 v1 = False
             case "rife420":
                 from .InterpolateArchs.RIFE.rife420IFNET import IFNet
+
                 v1 = False
             case "rife421":
                 from .InterpolateArchs.RIFE.rife421IFNET import IFNet
+
                 v1 = False
             case _:
                 errorAndLog("Invalid Interpolation Arch")
@@ -127,8 +132,8 @@ class InterpolateRifeTorch:
             k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
         }
         self.flownet.load_state_dict(state_dict=state_dict, strict=False)
-        self.flownet.eval().to(device=self.device,dtype=self.dtype)
-       
+        self.flownet.eval().to(device=self.device, dtype=self.dtype)
+
         if self.backend == "tensorrt":
             import tensorrt
             import torch_tensorrt

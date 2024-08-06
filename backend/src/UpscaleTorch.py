@@ -69,10 +69,9 @@ class UpscalePytorch:
                         device="cpu",
                     )
                 ]
-                
+
                 module = torch.jit.trace(model.float().cpu(), dummy_input_cpu_fp32)
-                module.to(device=self.device,dtype=self.dtype)
-                module.to()
+                module.to(device=self.device, dtype=self.dtype)
                 module = torch_tensorrt.compile(
                     module,
                     ir="ts",

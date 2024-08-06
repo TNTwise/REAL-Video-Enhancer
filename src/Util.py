@@ -204,6 +204,7 @@ def extractTarGZ(file):
     removeFile(file)
     os.chdir(origCWD)
 
+
 def get_gpu_info():
     system = getPlatform()
 

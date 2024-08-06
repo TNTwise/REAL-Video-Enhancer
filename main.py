@@ -57,7 +57,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.QButtonConnect()
 
         # set up tabs
-        self.processTab = ProcessTab(parent=self)
+        self.backendComboBox.addItems(self.availableBackends)
+        self.processTab = ProcessTab(
+            parent=self,
+            backend=self.backendComboBox.currentText(),
+            method=self.methodComboBox.currentText(),
+        )
+        
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
@@ -103,6 +109,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
 
     def startRender(self):
+        self.startRenderButton.setEnabled(False)
         self.processTab.run(
             inputFile=self.inputFileText.text(),
             outputPath=self.outputFileText.text(),
@@ -111,6 +118,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoFps=self.videoFps,
             videoFrameCount=self.videoFrameCount,
             method=self.methodComboBox.currentText(),
+            backend=self.backendComboBox.currentText(),
+            interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
+            model=self.modelComboBox.currentText(),
         )
 
     def getAvailableBackends(self):
