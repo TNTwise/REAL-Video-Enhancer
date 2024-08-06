@@ -61,29 +61,23 @@ class ProcessTab:
         self.QConnect(method=method, backend=backend)
         self.switchInterpolationAndUpscale(method=method, backend=backend)
 
-    def getTotalModels(self, method: str, backend: str):
+    def getTotalModels(self, method: str, backend: str) -> dict:
+        """
+        returns 
+        the current models available given a method (interpolate, upscale) and a backend (ncnn, tensorrt, pytorch)
+        """
         printAndLog("Getting total models, method: " + method + " backend: " + backend)
         if method == "Interpolate":
             if backend == "ncnn":
-                models = self.ncnnInterpolateModels.keys()
-                self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
+                models = self.ncnnInterpolateModels
             elif backend == "pytorch" or backend == "tensorrt":
-                models = self.pytorchInterpolateModels.keys()
-                self.totalModels = (
-                    self.pytorchInterpolateModels | self.pytorchUpscaleModels
-                )
-
+                models = self.pytorchInterpolateModels
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             if backend == "ncnn":
-                models = self.ncnnUpscaleModels.keys()
-                self.totalModels = self.ncnnInterpolateModels | self.ncnnUpscaleModels
+                models = self.ncnnUpscaleModels
             elif backend == "pytorch" or backend == "tensorrt":
-                models = self.pytorchUpscaleModels.keys()
-                self.totalModels = (
-                    self.pytorchInterpolateModels | self.pytorchUpscaleModels
-                )
-            
+                models = self.pytorchUpscaleModels
             self.parent.interpolationContainer.setVisible(False)
         return models
 
@@ -127,7 +121,7 @@ class ProcessTab:
         self.videoHeight = videoHeight
         self.videoFps = videoFps
         self.videoFrameCount = videoFrameCount
-        self.getTotalModels(method=method,backend=backend)
+        models = self.getTotalModels(method=method,backend=backend)
 
         
         # if upscale or interpolate
@@ -139,10 +133,10 @@ class ProcessTab:
         """
 
         # get model attributes
-        self.modelFile = self.totalModels[model][0]
-        self.downloadFile = self.totalModels[model][1]
-        self.upscaleTimes = self.totalModels[model][2]
-        self.modelArch = self.totalModels[model][3]
+        self.modelFile = models[model][0]
+        self.downloadFile = models[model][1]
+        self.upscaleTimes = models[model][2]
+        self.modelArch = models[model][3]
 
         # get video attributes
         self.outputVideoWidth = videoWidth * self.upscaleTimes
