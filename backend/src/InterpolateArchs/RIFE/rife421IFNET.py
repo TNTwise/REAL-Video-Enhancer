@@ -6,6 +6,18 @@ try:
 except ImportError:
     from torch.nn.functional import interpolate
 
+class MyPixelShuffle(nn.Module):
+    def __init__(self, upscale_factor):
+        super(MyPixelShuffle, self).__init__()
+        self.upscale_factor = upscale_factor
+
+    def forward(self, input):
+        b, c, hh, hw = input.size()
+        out_channel = c // (self.upscale_factor**2)
+        h = hh * self.upscale_factor
+        w = hw * self.upscale_factor
+        x_view = input.view(b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw)
+        return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -76,7 +88,7 @@ class IFBlock(nn.Module):
             nn.ConvTranspose2d(
                 in_channels=c, out_channels=4 * 13, kernel_size=4, stride=2, padding=1
             ),
-            nn.PixelShuffle(upscale_factor=2),
+            MyPixelShuffle(upscale_factor=2),
         )
         self.in_planes = in_planes
 
@@ -113,10 +125,10 @@ class IFNet(nn.Module):
         device="cuda",
     ):
         super(IFNet, self).__init__()
-        self.block0 = IFBlock(7 + 16, c=384)
-        self.block1 = IFBlock(8 + 4 + 16, c=192)
-        self.block2 = IFBlock(8 + 4 + 16, c=96)
-        self.block3 = IFBlock(8 + 4 + 16, c=48)
+        self.block0 = IFBlock(7+16, c=256)
+        self.block1 = IFBlock(8+4+16+8, c=192)
+        self.block2 = IFBlock(8+4+16+8, c=96)
+        self.block3 = IFBlock(8+4+16+8, c=48)
         self.encode = Head()
         self.device = device
         self.dtype = dtype
