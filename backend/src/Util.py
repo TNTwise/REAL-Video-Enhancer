@@ -36,6 +36,9 @@ def log(message: str):
 def currentDirectory():
     return cwd
 
+def modelsDirectory():
+    return os.path.join(cwd,"models")
+
 
 def checkForPytorch() -> bool:
     """

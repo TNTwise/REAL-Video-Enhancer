@@ -234,7 +234,7 @@ class ProcessTab:
             if self.parent.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
             line = line.strip()
-            if "it/s" in line:
+            if "it/s" in line or "warn" in line.lower():
                 textOutput = textOutput[:-1]
             if "FPS" in line:
                 textOutput = textOutput[

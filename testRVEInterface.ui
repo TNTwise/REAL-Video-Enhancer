@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>897</width>
-    <height>681</height>
+    <height>707</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -275,6 +275,11 @@ QProgressBar{
                         <height>30</height>
                        </size>
                       </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
@@ -316,6 +321,11 @@ QProgressBar{
                         <height>30</height>
                        </size>
                       </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="styleSheet">
                        <string notr="true"/>
                       </property>
@@ -345,6 +355,11 @@ QProgressBar{
                    <layout class="QHBoxLayout" name="horizontalLayout_11">
                     <item>
                      <widget class="QLabel" name="label_12">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Backend</string>
                       </property>
@@ -374,6 +389,11 @@ QProgressBar{
                    <layout class="QHBoxLayout" name="horizontalLayout">
                     <item>
                      <widget class="QLabel" name="label_7">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Method</string>
                       </property>
@@ -413,6 +433,11 @@ QProgressBar{
                    <layout class="QHBoxLayout" name="horizontalLayout_13">
                     <item alignment="Qt::AlignmentFlag::AlignLeft">
                      <widget class="QLabel" name="label_14">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Model</string>
                       </property>
@@ -445,6 +470,11 @@ QProgressBar{
                    <layout class="QHBoxLayout" name="horizontalLayout_7">
                     <item alignment="Qt::AlignmentFlag::AlignLeft">
                      <widget class="QLabel" name="label_11">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
                       <property name="text">
                        <string>Interpolation Multiplier</string>
                       </property>
@@ -511,6 +541,11 @@ QProgressBar{
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <pointsize>15</pointsize>
+                    </font>
                    </property>
                    <property name="styleSheet">
                     <string notr="true">*:disabled{

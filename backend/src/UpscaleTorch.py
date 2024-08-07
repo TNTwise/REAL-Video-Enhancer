@@ -5,7 +5,7 @@ import cv2
 import torch as torch
 
 
-from src.Util import currentDirectory
+from src.Util import currentDirectory, modelsDirectory
 
 # tiling code permidently borrowed from https://github.com/chaiNNer-org/spandrel/issues/113#issuecomment-1907209731
 
@@ -25,7 +25,7 @@ class UpscalePytorch:
         trt_workspace_size: int = 0,
         trt_max_aux_streams: int | None = None,
         trt_optimization_level: int = 5,
-        trt_cache_dir: str = currentDirectory(),
+        trt_cache_dir: str = modelsDirectory(),
         trt_debug: bool = False,
     ):
         self.tile_pad = tile_pad

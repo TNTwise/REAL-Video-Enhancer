@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import math
 import os
 
-from .Util import currentDirectory, printAndLog, errorAndLog
+from .Util import currentDirectory, printAndLog, errorAndLog, modelsDirectory
 
 torch.set_float32_matmul_precision("high")
 torch.set_grad_enabled(False)
@@ -29,7 +29,7 @@ class InterpolateRifeTorch:
         trt_workspace_size: int = 0,
         trt_max_aux_streams: int | None = None,
         trt_optimization_level: int = 5,
-        trt_cache_dir: str = currentDirectory(),
+        trt_cache_dir: str = modelsDirectory(),
         trt_debug: bool = False,
     ):
         trt_min_shape = [int(width / 15), int(height / 15)]
