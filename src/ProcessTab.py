@@ -234,7 +234,7 @@ class ProcessTab:
             if self.parent.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
             line = line.strip()
-            if "it/s" in line or "warn" in line.lower():
+            if "it/s" in line:
                 textOutput = textOutput[:-1]
             if "FPS" in line:
                 textOutput = textOutput[
@@ -243,7 +243,8 @@ class ProcessTab:
                 self.currentFrame = int(
                     re.search(r"Current Frame: (\d+)", line).group(1)
                 )
-            textOutput.append(line)
+            if not "warn" in line.lower():
+                textOutput.append(line.replace('\n',''))
             # self.setRenderOutputContent(textOutput)
             self.renderTextOutputList = textOutput
             if "Time to complete render" in line:
