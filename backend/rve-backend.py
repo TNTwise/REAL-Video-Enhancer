@@ -19,7 +19,7 @@ class HandleApplication:
                 interpolateArch=self.args.interpolateArch,
                 upscaleModel=self.args.upscaleModel,
                 # backend settings
-                device="cuda",
+                device="default",
                 backend=self.args.backend,
                 precision="float16" if self.args.half else "float32",
                 # ffmpeg settings

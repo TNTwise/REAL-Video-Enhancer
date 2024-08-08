@@ -51,7 +51,7 @@ class Render(FFMpegRender):
         outputFile: str,
         # backend settings
         backend="pytorch",
-        device="cuda",
+        device="default",
         precision="float16",
         # model settings
         upscaleModel=None,
