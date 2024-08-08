@@ -77,7 +77,7 @@ def printAndLog(message: str, separate=False):
 
 
 def log(message: str):
-    with open(os.path.join(cwd, "fronted_log.txt"), "a") as f:
+    with open(os.path.join(cwd, "frontend_log.txt"), "a") as f:
         f.write(message + "\n")
 
 

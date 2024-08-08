@@ -3,7 +3,6 @@ import torch
 import torch.nn.functional as F
 import math
 import os
-
 from .Util import currentDirectory, printAndLog, errorAndLog, modelsDirectory
 
 torch.set_float32_matmul_precision("high")
@@ -75,7 +74,7 @@ class InterpolateRifeTorch:
             case "rife47":
                 from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
-                v1 = False
+                v1 = True
             case "rife413":
                 from .InterpolateArchs.RIFE.rife413IFNET import IFNet
 
