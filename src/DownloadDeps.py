@@ -105,7 +105,7 @@ class DownloadDependencies:
         printAndLog("Total Dependencies: " + str(totalDeps))
         DisplayCommandOutputPopup(
             command=command,
-            title="Download NCNN Dependencies",
+            title="Download Dependencies",
             progressBarLength=totalDeps,
         )
 

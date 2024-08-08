@@ -1,3 +1,4 @@
+from cv2.cuda import getDevice
 import torch
 import torch.nn.functional as F
 import math
@@ -17,7 +18,7 @@ class InterpolateRifeTorch:
         interpolateArch: str = "rife413",
         width: int = 1920,
         height: int = 1080,
-        device: str = "cuda",
+        device: str = "default",
         dtype: str = "float16",
         backend: str = "pytorch",
         UHDMode: bool = False,
@@ -32,6 +33,16 @@ class InterpolateRifeTorch:
         trt_cache_dir: str = modelsDirectory(),
         trt_debug: bool = False,
     ):
+        if device == "default":
+            if torch.cuda.is_available():
+                device = torch.device("cuda",0) # 0 is the device index, may have to change later
+            else:
+                device = torch.device("cpu")
+        else:
+            decice = torch.device(device)
+
+        printAndLog("Using device: "+ str(device))
+
         trt_min_shape = [int(width / 15), int(height / 15)]
         trt_opt_shape = [width, height]
         trt_max_shape = [width, height]
@@ -39,9 +50,7 @@ class InterpolateRifeTorch:
         self.interpolateModel = interpolateModelPath
         self.width = width
         self.height = height
-        self.device = torch.device(
-            device, 0
-        )  # 0 is the device index, may have to change later
+        self.device = device
         self.dtype = self.handlePrecision(dtype)
         self.backend = backend
         scale = 1
@@ -274,6 +283,7 @@ class InterpolateRifeTorch:
                 )
 
             self.flownet = torch.jit.load(trt_engine_path).eval()
+
 
     def handlePrecision(self, precision):
         if precision == "float32":

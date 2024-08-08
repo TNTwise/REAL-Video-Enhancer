@@ -5,7 +5,7 @@ import cv2
 import torch as torch
 
 
-from src.Util import currentDirectory, modelsDirectory
+from src.Util import currentDirectory, modelsDirectory, printAndLog
 
 # tiling code permidently borrowed from https://github.com/chaiNNer-org/spandrel/issues/113#issuecomment-1907209731
 
@@ -15,7 +15,7 @@ class UpscalePytorch:
     def __init__(
         self,
         modelPath: str,
-        device="cuda",
+        device="default",
         tile_pad: int = 10,
         precision: str = "float16",
         width: int = 1920,
@@ -28,9 +28,17 @@ class UpscalePytorch:
         trt_cache_dir: str = modelsDirectory(),
         trt_debug: bool = False,
     ):
+        if device == "default":
+            if torch.cuda.is_available():
+                device = torch.device("cuda",0) # 0 is the device index, may have to change later
+            else:
+                device = torch.device("cpu")
+        else:
+            decice = torch.device(device)
+        printAndLog("Using device: "+ device)
         self.tile_pad = tile_pad
         self.dtype = self.handlePrecision(precision)
-        self.device = torch.device("cuda", 0)
+        self.device = torch.device(device, 0)
         model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
 
         self.width = width

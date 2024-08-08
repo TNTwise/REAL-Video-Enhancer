@@ -9,7 +9,7 @@ from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt
 
 from .QTcustom import UpdateGUIThread
-from .Util import pythonPath, currentDirectory, modelsPath, printAndLog
+from .Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
 from .DownloadModels import DownloadModel
 
 
@@ -249,6 +249,7 @@ class ProcessTab:
             self.renderTextOutputList = textOutput
             if "Time to complete render" in line:
                 break
+        log(str(textOutput))
         self.parent.renderProcess.wait()
         # done with render
         self.onRenderCompletion()
