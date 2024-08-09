@@ -246,7 +246,7 @@ class ProcessTab:
                     re.search(r"Current Frame: (\d+)", line).group(1)
                 )
             if not "warn" in line.lower():
-                textOutput.append(line.replace("\n", ""))
+                textOutput.append(line)
             # self.setRenderOutputContent(textOutput)
             self.renderTextOutputList = textOutput
             if "Time to complete render" in line:
