@@ -131,7 +131,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def disableProcessPage(self):
         self.videoInfoContainer.setDisabled(True)
-    
+
     def enableProcessPage(self):
         self.videoInfoContainer.setEnabled(True)
 

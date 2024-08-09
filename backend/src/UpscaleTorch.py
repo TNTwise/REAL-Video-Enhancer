@@ -30,12 +30,14 @@ class UpscalePytorch:
     ):
         if device == "default":
             if torch.cuda.is_available():
-                device = torch.device("cuda",0) # 0 is the device index, may have to change later
+                device = torch.device(
+                    "cuda", 0
+                )  # 0 is the device index, may have to change later
             else:
                 device = torch.device("cpu")
         else:
             decice = torch.device(device)
-        printAndLog("Using device: "+ device)
+        printAndLog("Using device: " + device)
         self.tile_pad = tile_pad
         self.dtype = self.handlePrecision(precision)
         self.device = torch.device(device, 0)

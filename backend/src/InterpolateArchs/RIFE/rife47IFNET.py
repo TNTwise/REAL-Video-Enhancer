@@ -1,10 +1,12 @@
 import torch
 import torch.nn as nn
 from .warplayer import warp
+
 try:
     from .interpolate import interpolate
 except ImportError:
     from torch.nn.functional import interpolate
+
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -143,17 +145,53 @@ class IFNet(nn.Module):
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
-                flow, mask = block[i](torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1), None, scale=self.scale_list[i])
+                flow, mask = block[i](
+                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+                    None,
+                    scale=self.scale_list[i],
+                )
                 if self.ensemble:
-                    f_, m_ = block[i](torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1-timestep), 1), None, scale=self.scale_list[i])
+                    f_, m_ = block[i](
+                        torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
+                        None,
+                        scale=self.scale_list[i],
+                    )
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
                 wf0 = warp(f0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
                 wf1 = warp(f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
-                fd, m0 = block[i](torch.cat((warped_img0[:, :3], warped_img1[:, :3], wf0, wf1, timestep, mask), 1), flow, scale=self.scale_list[i])
+                fd, m0 = block[i](
+                    torch.cat(
+                        (
+                            warped_img0[:, :3],
+                            warped_img1[:, :3],
+                            wf0,
+                            wf1,
+                            timestep,
+                            mask,
+                        ),
+                        1,
+                    ),
+                    flow,
+                    scale=self.scale_list[i],
+                )
                 if self.ensemble:
-                    f_, m_ = block[i](torch.cat((warped_img1[:, :3], warped_img0[:, :3], wf1, wf0, 1-timestep, -mask), 1), torch.cat((flow[:, 2:4], flow[:, :2]), 1), scale=self.scale_list[i])
+                    f_, m_ = block[i](
+                        torch.cat(
+                            (
+                                warped_img1[:, :3],
+                                warped_img0[:, :3],
+                                wf1,
+                                wf0,
+                                1 - timestep,
+                                -mask,
+                            ),
+                            1,
+                        ),
+                        torch.cat((flow[:, 2:4], flow[:, :2]), 1),
+                        scale=self.scale_list[i],
+                    )
                     fd = (fd + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (m0 + (-m_)) / 2
                 else:

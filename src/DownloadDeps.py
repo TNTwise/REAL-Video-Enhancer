@@ -98,7 +98,15 @@ class DownloadDependencies:
     def pipInstall(
         self, deps: list
     ):  # going to have to make this into a qt module pop up
-        command = [pythonPath(), "-m", "pip", "install", "--upgrade", "pip", "--no-cache-dir"] + deps
+        command = [
+            pythonPath(),
+            "-m",
+            "pip",
+            "install",
+            "--upgrade",
+            "pip",
+            "--no-cache-dir",
+        ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))

@@ -34,13 +34,15 @@ class InterpolateRifeTorch:
     ):
         if device == "default":
             if torch.cuda.is_available():
-                device = torch.device("cuda",0) # 0 is the device index, may have to change later
+                device = torch.device(
+                    "cuda", 0
+                )  # 0 is the device index, may have to change later
             else:
                 device = torch.device("cpu")
         else:
             decice = torch.device(device)
 
-        printAndLog("Using device: "+ str(device))
+        printAndLog("Using device: " + str(device))
 
         trt_min_shape = [int(width / 15), int(height / 15)]
         trt_opt_shape = [width, height]
@@ -282,7 +284,6 @@ class InterpolateRifeTorch:
                 )
 
             self.flownet = torch.jit.load(trt_engine_path).eval()
-
 
     def handlePrecision(self, precision):
         if precision == "float32":
