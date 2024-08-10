@@ -92,3 +92,7 @@ def Palette():
     palette.setColor(QPalette.Highlight, QColor(42, 130, 218))
     palette.setColor(QPalette.HighlightedText, Qt.black)
     return palette
+
+
+def iconFallback():
+    pass

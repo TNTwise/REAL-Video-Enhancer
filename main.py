@@ -4,8 +4,11 @@ import subprocess
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon
 from backend.src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
+from PySide6 import QtSvg
+
 
 # other imports
 from src.Util import (
@@ -16,6 +19,7 @@ from src.Util import (
     getVideoFrameCount,
     checkIfDeps,
     pythonPath,
+    currentDirectory,
     getPlatform,
 )
 from src.ProcessTab import ProcessTab
