@@ -40,7 +40,7 @@ class UpdateGUIThread(QThread):
                 self.shm = shared_memory.SharedMemory(
                     name=self.imagePreviewSharedMemoryID
                 )
-                image_bytes = self.shm.buf[:].tobytes()
+                image_bytes = self.shm.buf[:self.outputVideoHeight*self.outputVideoWidth*3].tobytes()
 
                 # Convert image bytes back to numpy array
                 image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(

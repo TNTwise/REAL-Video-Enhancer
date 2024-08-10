@@ -105,7 +105,7 @@ class DownloadDependencies:
         vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
         link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/VC_redist.x64.exe"
         
-        printAndLog("Downloading VC_redlist.x64.exe")
+        printAndLog("Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed.")
         DownloadProgressPopup(
             link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe"
         )
@@ -180,8 +180,8 @@ class DownloadDependencies:
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
-            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
-            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240808%2Bcu121-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240808%2Bcu121-cp311-cp311-win_amd64.whl",
         ]
         match getPlatform():
             case "win32":
@@ -250,7 +250,7 @@ class DownloadDependencies:
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
                 tensorRTDeps += (
-                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
+                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240808%2Bcu121-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 

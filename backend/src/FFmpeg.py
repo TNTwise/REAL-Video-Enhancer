@@ -171,7 +171,10 @@ class FFMpegRender:
         # Update the length of the last printed line
         self.last_length = len(data)
 
-    def writeOutToSharedMemory(self):
+    def writeOutToSharedMemory(self, fcs):
+        """
+        fcs = framechunksize
+        """
         # Create a shared memory block
 
         buffer = self.shm.buf
@@ -182,13 +185,14 @@ class FFMpegRender:
                 self.shm.close()
                 self.shm.unlink()
                 break
-            if self.previewFrame is not None and self.outputFrameChunkSize is not None:
+            if self.previewFrame is not None:
                 # print out data to stdout
                 fps = round(self.currentFrame / (time.time() - self.startTime))
                 message = f"FPS: {fps} Current Frame: {self.currentFrame}"
                 self.realTimePrint(message)
+                
                 # Update the shared array
-                buffer[: self.outputFrameChunkSize] = bytes(self.previewFrame)
+                buffer[: fcs] = bytes(self.previewFrame)
 
             time.sleep(0.1)
 

@@ -564,8 +564,8 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Sans Serif';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                    </property>
                   </widget>
                  </item>
@@ -727,7 +727,7 @@ background-color:white;
                  <item>
                   <widget class="Line" name="line_3">
                    <property name="orientation">
-                    <enum>Qt::Vertical</enum>
+                    <enum>Qt::Orientation::Vertical</enum>
                    </property>
                   </widget>
                  </item>
@@ -901,6 +901,9 @@ background-color:white;
                  </item>
                  <item>
                   <spacer name="verticalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
                    <property name="sizeHint" stdset="0">
                     <size>
                      <width>20</width>
@@ -925,7 +928,7 @@ background-color:white;
                  <item>
                   <widget class="Line" name="line">
                    <property name="orientation">
-                    <enum>Qt::Vertical</enum>
+                    <enum>Qt::Orientation::Vertical</enum>
                    </property>
                   </widget>
                  </item>
@@ -941,6 +944,9 @@ background-color:white;
                  </item>
                  <item>
                   <spacer name="verticalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Vertical</enum>
+                   </property>
                    <property name="sizeHint" stdset="0">
                     <size>
                      <width>20</width>
@@ -959,7 +965,7 @@ background-color:white;
                  <item>
                   <widget class="Line" name="line_2">
                    <property name="orientation">
-                    <enum>Qt::Vertical</enum>
+                    <enum>Qt::Orientation::Vertical</enum>
                    </property>
                   </widget>
                  </item>
@@ -1002,13 +1008,13 @@ background-color:white;
        <property name="rightMargin">
         <number>0</number>
        </property>
-       <item alignment="Qt::AlignLeft">
+       <item alignment="Qt::AlignmentFlag::AlignLeft">
         <widget class="QWidget" name="leftMenuSubContainer" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="rightMargin">
            <number>9</number>
           </property>
-          <item alignment="Qt::AlignLeft">
+          <item alignment="Qt::AlignmentFlag::AlignLeft">
            <widget class="QWidget" name="verticalWidget_2" native="true">
             <layout class="QVBoxLayout" name="verticalLayout_6">
              <property name="spacing">
@@ -1092,8 +1098,11 @@ background-color:white;
           </item>
           <item>
            <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Orientation::Vertical</enum>
+            </property>
             <property name="sizeType">
-             <enum>QSizePolicy::Expanding</enum>
+             <enum>QSizePolicy::Policy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1103,7 +1112,7 @@ background-color:white;
             </property>
            </spacer>
           </item>
-          <item alignment="Qt::AlignLeft">
+          <item alignment="Qt::AlignmentFlag::AlignLeft">
            <widget class="QWidget" name="verticalWidget" native="true">
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="spacing">
@@ -1127,7 +1136,7 @@ background-color:white;
                 </size>
                </property>
                <property name="contextMenuPolicy">
-                <enum>Qt::NoContextMenu</enum>
+                <enum>Qt::ContextMenuPolicy::NoContextMenu</enum>
                </property>
                <property name="styleSheet">
                 <string notr="true">text-align:left;
