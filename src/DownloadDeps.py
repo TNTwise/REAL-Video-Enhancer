@@ -230,18 +230,25 @@ class DownloadDependencies:
         Pytorch CUDA deps
         TensorRT deps
         """
-        tensorRTDeps = [
-            "tensorrt==10.0.1",
-            "tensorrt_cu12==10.0.1",
-            "tensorrt-cu12_libs==10.0.1",
-            "tensorrt_cu12_bindings==10.0.1",
-        ]
+        
         match getPlatform():
             case "linux":
+                tensorRTDeps = [
+                    "tensorrt==10.0.1",
+                    "tensorrt_cu12==10.0.1",
+                    "tensorrt-cu12_libs==10.0.1",
+                    "tensorrt_cu12_bindings==10.0.1",
+                ]
                 tensorRTDeps += (
                     "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-linux_x86_64.whl",
                 )
             case "win32":
+                tensorRTDeps = [
+                    "tensorrt==10.1.0",
+                    "tensorrt_cu12==10.1.0",
+                    "tensorrt-cu12_libs==10.1.0",
+                    "tensorrt_cu12_bindings==10.1.0",
+                ]
                 tensorRTDeps += (
                     "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
                 )
