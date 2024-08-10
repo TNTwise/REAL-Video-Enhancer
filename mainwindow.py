@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'testRVEInterface.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         self.startRenderButton.setEnabled(True)
         self.startRenderButton.setMaximumSize(QSize(59, 16777215))
         icon = QIcon()
-        icon.addFile(u":/icons/icons/play.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/icons/icons/play.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.startRenderButton.setIcon(icon)
         self.startRenderButton.setIconSize(QSize(55, 45))
 
@@ -526,7 +526,7 @@ class Ui_MainWindow(object):
         self.downloadTorchCUDABtn.setSizePolicy(sizePolicy4)
         self.downloadTorchCUDABtn.setMaximumSize(QSize(50, 16777215))
         icon1 = QIcon()
-        icon1.addFile(u":/icons/icons/download.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/icons/icons/download.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.downloadTorchCUDABtn.setIcon(icon1)
         self.downloadTorchCUDABtn.setIconSize(QSize(30, 30))
 
@@ -696,7 +696,7 @@ class Ui_MainWindow(object):
         self.homeBtn.setMinimumSize(QSize(31, 0))
         self.homeBtn.setMaximumSize(QSize(55, 16777215))
         icon2 = QIcon()
-        icon2.addFile(u":/icons/icons/home.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/icons/icons/home.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.homeBtn.setIcon(icon2)
         self.homeBtn.setIconSize(QSize(35, 35))
         self.homeBtn.setCheckable(True)
@@ -708,7 +708,7 @@ class Ui_MainWindow(object):
         self.processBtn.setObjectName(u"processBtn")
         self.processBtn.setMaximumSize(QSize(55, 16777215))
         icon3 = QIcon()
-        icon3.addFile(u":/icons/icons/cpu.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon3.addFile(u":/icons/icons/cpu.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.processBtn.setIcon(icon3)
         self.processBtn.setIconSize(QSize(35, 35))
         self.processBtn.setCheckable(True)
@@ -738,7 +738,7 @@ class Ui_MainWindow(object):
 "\n"
 "")
         icon4 = QIcon()
-        icon4.addFile(u":/icons/icons/settings.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon4.addFile(u":/icons/icons/settings.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.settingsBtn.setIcon(icon4)
         self.settingsBtn.setIconSize(QSize(35, 35))
         self.settingsBtn.setCheckable(True)
@@ -758,7 +758,7 @@ class Ui_MainWindow(object):
         self.githubBtn.setObjectName(u"githubBtn")
         self.githubBtn.setMaximumSize(QSize(55, 16777215))
         icon5 = QIcon()
-        icon5.addFile(u":/icons/icons/github.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon5.addFile(u":/icons/icons/github.svg", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.githubBtn.setIcon(icon5)
         self.githubBtn.setIconSize(QSize(35, 35))
         self.githubBtn.setCheckable(False)
