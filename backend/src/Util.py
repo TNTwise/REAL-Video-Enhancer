@@ -39,7 +39,7 @@ def currentDirectory():
 
 def modelsDirectory():
     return os.path.join(cwd, "models")
-
+    
 
 def checkForPytorch() -> bool:
     """

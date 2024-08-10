@@ -16,6 +16,7 @@ from src.Util import (
     getVideoFrameCount,
     checkIfDeps,
     pythonPath,
+    getPlatform,
 )
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
@@ -46,8 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.aspect_ratio = self.width() / self.height()
         try:
             pass
-            self.availableBackends = ['pytorch']
-            #self.availableBackends = self.getAvailableBackends()
+            self.availableBackends = self.getAvailableBackends()
         except SyntaxError:
             # On error, install ncnn as a base dependency
             downloadDependencies = DownloadDependencies()
@@ -84,6 +84,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
+            if getPlatform() == "win32":
+                downloadDependencies.downloadVCREDLIST()
 
     # switch menus
     def switchToHomePage(self):
@@ -150,7 +152,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Extract the output from the command result
         output = result.stdout.strip()
-
+        print(output)
         # Find the part of the output containing the backends list
         start = output.find("[")
         end = output.find("]") + 1

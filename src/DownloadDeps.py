@@ -13,6 +13,29 @@ from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
 
+def run_executable(exe_path):
+    try:
+        # Run the executable and wait for it to complete
+        result = subprocess.run([exe_path], check=True, capture_output=True, text=True)
+        
+        # Print the output of the executable
+        print("STDOUT:", result.stdout)
+        
+        # Print any error messages
+        print("STDERR:", result.stderr)
+        
+        # Print the exit code
+        print("Exit Code:", result.returncode)
+        
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while running the executable.")
+        print("Exit Code:", e.returncode)
+        print("Output:", e.output)
+        print("Error:", e.stderr)
+    except FileNotFoundError:
+        print("The specified executable was not found.")
+    except Exception as e:
+        print("An unexpected error occurred:", str(e))
 
 class DownloadDependencies:
     """
@@ -77,7 +100,19 @@ class DownloadDependencies:
 
         # give executable permissions to python
         makeExecutable(pythonPath())
-
+    
+    def downloadVCREDLIST(self):
+        vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
+        link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/VC_redist.x64.exe"
+        
+        printAndLog("Downloading VC_redlist.x64.exe")
+        DownloadProgressPopup(
+            link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe"
+        )
+        # give executable permissions to ffmpeg
+        makeExecutable(vcTempPath)
+        run_executable(vcTempPath)
+        
     def downloadFFMpeg(self):
         ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
@@ -145,8 +180,8 @@ class DownloadDependencies:
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
-            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
-            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torch-2.5.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu121/torchvision-0.20.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
         ]
         match getPlatform():
             case "win32":
@@ -208,7 +243,7 @@ class DownloadDependencies:
                 )
             case "win32":
                 tensorRTDeps += (
-                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240620%2Bcu121-cp311-cp311-win_amd64.whl",
+                    "https://download.pytorch.org/whl/nightly/cu121/torch_tensorrt-2.5.0.dev20240809%2Bcu121-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 
