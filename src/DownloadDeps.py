@@ -126,6 +126,7 @@ class DownloadDependencies:
             "scenedetect",
             "numpy==1.26.4",
             "sympy",
+            "tqdm",
         ]
         return platformIndependentdeps
 
@@ -149,13 +150,12 @@ class DownloadDependencies:
         ]
         match getPlatform():
             case "win32":
-                torchCUDAWindowsDeps += self.getPlatformIndependentDeps()
+                return torchCUDAWindowsDeps + self.getPlatformIndependentDeps()
             case "linux":
-                torchCUDALinuxDeps += self.getPlatformIndependentDeps()
-        return torchCUDALinuxDeps
+                return torchCUDALinuxDeps + self.getPlatformIndependentDeps()
 
     def downloadPyTorchCUDADeps(self):
-        self.pipInstall(self.getPyTorchCUDADeps() + self.getPlatformIndependentDeps())
+        self.pipInstall(self.getPyTorchCUDADeps())
 
     def downloadNCNNDeps(self):
         """
@@ -173,9 +173,11 @@ class DownloadDependencies:
         ]
         match getPlatform():
             case "win32":
-                self.pipInstall(ncnnWindowsDeps + self.getPlatformIndependentDeps())
+                ncnnWindowsDeps+=self.getPlatformIndependentDeps()
+                self.pipInstall(ncnnWindowsDeps)
             case "linux":
-                self.pipInstall(ncnnLinuxDeps + self.getPlatformIndependentDeps())
+                ncnnLinuxDeps+=self.getPlatformIndependentDeps()
+                self.pipInstall(ncnnLinuxDeps)
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [

@@ -9,7 +9,7 @@ import subprocess
 
 cwd = os.getcwd()
 
-with open(os.path.join(cwd, "frontendlog.txt"), "w") as f:
+with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
 
@@ -27,7 +27,7 @@ def pythonPath() -> str:
     return (
         os.path.join(cwd, "python", "python", "bin", "python3")
         if getPlatform() == "darwin" or getPlatform() == "linux"
-        else os.path.join(cwd, "python", "python", "bin", "python3.exe")
+        else os.path.join(cwd, "python", "python", "python.exe")
     )
 
 
@@ -47,8 +47,13 @@ def move(prev: str, new: str):
     """
     moves a file from prev to new
     """
-    os.rename(prev, new)
-
+    if not os.path.exists(new):
+        if not os.path.isfile(new):
+            os.rename(prev, new)
+        else:
+            print("WARN tried to rename a file to a file that already exists")
+    else:
+        print("WARN tried to rename a folder to a folder that already exists")
 
 def makeExecutable(file_path):
     st = os.stat(file_path)

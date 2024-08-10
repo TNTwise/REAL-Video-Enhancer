@@ -3,7 +3,7 @@ import warnings
 import tarfile
 
 cwd = os.getcwd()
-with open(os.path.join(cwd, "backendlog.txt"), "w") as f:
+with open(os.path.join(cwd, "backend_log.txt"), "w") as f:
     pass
 
 
@@ -78,7 +78,7 @@ def checkForNCNN() -> bool:
     function that checks if the pytorch backend is available
     """
     try:
-        import rife_ncnn_vulkan_python
+        from rife_ncnn_vulkan_python import RIFE
         from upscale_ncnn_py import UPSCALE
 
         return True

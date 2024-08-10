@@ -37,7 +37,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # setup application
         self.setupBackendDeps()
-
+        
         # Set up the user interface from Designer.
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
@@ -45,7 +45,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setMinimumSize(1100, 600)
         self.aspect_ratio = self.width() / self.height()
         try:
-            self.availableBackends = self.getAvailableBackends()
+            pass
+            self.availableBackends = ['pytorch']
+            #self.availableBackends = self.getAvailableBackends()
         except SyntaxError:
             # On error, install ncnn as a base dependency
             downloadDependencies = DownloadDependencies()
