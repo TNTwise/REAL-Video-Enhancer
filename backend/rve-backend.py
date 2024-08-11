@@ -3,7 +3,7 @@ import os
 import sys
 
 from src.RenderVideo import Render
-from src.Util import checkForPytorch, checkForNCNN, checkForTensorRT
+from src.Util import checkForPytorch, checkForNCNN, checkForTensorRT, check_bfloat16_support
 
 
 class HandleApplication:
@@ -35,14 +35,31 @@ class HandleApplication:
             )
         else:
             availableBackends = []
-
-            if checkForPytorch():
-                availableBackends.append("pytorch")
+            printMSG = ""
             if checkForNCNN():
                 availableBackends.append("ncnn")
-            if checkForTensorRT():
-                availableBackends.append("tensorrt")
+                printMSG += f"NCNN Version: 20220729\n"
+            if checkForPytorch():
+                availableBackends.append("pytorch")
+                import torch
+                half_prec_supp = check_bfloat16_support()
+                printMSG += f"PyTorch Version: {torch.__version__}\n"
+                printMSG += f"Half precision support: {half_prec_supp}"
+                if checkForTensorRT():
+                    """
+                    checks for tensorrt availability, and the current gpu works with it (if half precision is supported)
+                    Trt 10 only supports RTX 20 series and up.
+                    Half precision is only availaible on RTX 20 series and up
+                    """
+                    if half_prec_supp:
+                        import tensorrt
+                        availableBackends.append("tensorrt")
+                        printMSG+=f"TensorRT Version: {tensorrt.__version__}"
+                    else:
+                        printMSG+="ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
+        
             print("Available Backends: " + str(availableBackends))
+            print(printMSG)
 
     def handleArguments(self) -> argparse.ArgumentParser:
         """_summary_
@@ -188,7 +205,7 @@ class HandleApplication:
         if self.args.backend == "ncnn":
             try:
                 import rife_ncnn_vulkan_python
-                from upscale_ncnn_py import UPSCALE
+                from upscale_ncnn_py import UPSCALE            
             except ImportError as e:
                 raise ImportError(f"Cannot use NCNN as the backend! {e}")
 

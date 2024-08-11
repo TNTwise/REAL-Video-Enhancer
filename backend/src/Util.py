@@ -76,6 +76,18 @@ def checkForTensorRT() -> bool:
     except Exception as e:
         printAndLog(str(e))
 
+def check_bfloat16_support() -> bool:
+    import torch
+    if torch.cuda.is_available():
+        device = torch.device('cuda')
+        # Check if bfloat16 is supported on the GPU
+        bfloat16_supported = torch.cuda.get_device_capability(device) >= (8, 0)
+    else:
+        bfloat16_supported = False
+
+    # Check if PyTorch can use bfloat16
+    bfloat16_available = torch.has_bf16
+    return bfloat16_supported and bfloat16_available
 
 def checkForNCNN() -> bool:
     """

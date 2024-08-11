@@ -63,6 +63,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # set up tabs
         self.backendComboBox.addItems(self.availableBackends)
+        self.renderOutput.setText(self.fullOutput)
         self.processTab = ProcessTab(
             parent=self,
             backend=self.backendComboBox.currentText(),
@@ -123,7 +124,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
         """
         try:
-            self.availableBackends = self.getAvailableBackends()
+            self.availableBackends, self.fullOutput = self.getAvailableBackends()
+            
         except SyntaxError:
             if not firstIter:
                 RegularQTPopup("Please install at least 1 backend!")
@@ -187,7 +189,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Convert the string representation of the list to an actual list
         backends = eval(backends_str)
 
-        return backends
+        return backends, output
 
     # input file button
     def openInputFile(self):
@@ -225,6 +227,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.inputFileText.setText(inputFile)
             self.outputFileText.setEnabled(True)
             self.outputFileSelectButton.setEnabled(True)
+
 
     # output file button
     def openOutputFolder(self):
