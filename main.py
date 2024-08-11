@@ -9,7 +9,6 @@ from backend.src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 from PySide6 import QtSvg
 
-
 # other imports
 from src.Util import (
     checkValidVideo,
