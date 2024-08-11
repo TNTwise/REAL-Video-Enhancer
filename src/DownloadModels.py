@@ -1,6 +1,5 @@
 import os
 
-from backend.src.Util import printAndLog
 
 from .Util import createDirectory, modelsPath, extractTarGZ
 from .QTcustom import DownloadProgressPopup

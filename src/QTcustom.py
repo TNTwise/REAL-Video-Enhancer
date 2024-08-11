@@ -145,7 +145,16 @@ class DownloadAndReportToQTThread(QThread):
             stream=True,
         )
         printAndLog("Downloading: " + self.link)
-        totalByteSize = int(response.headers["Content-Length"])
+        if "Content-Length" in response.headers:
+            totalByteSize = int(response.headers["Content-Length"])
+
+        else:
+            print(
+                "Warning: missing key 'Content-Length' in request headers; taking default length of 100 for progress bar."
+            )
+
+            totalByteSize = 10000000
+
         totalSize = 0
         with open(self.downloadLocation, "wb") as f:
             chunk_size = 128
@@ -237,7 +246,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
 
     def setProgress(self, value):
         if self.wasCanceled():
-            exit()
+            sys.exit()
         self.setValue(value + 10)
 
 
@@ -370,7 +379,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 
     def closeEventExit(self, x):
         self.close()
-        exit()
+        sys.exit()
 
     def doneEvent(self):
         self.closeEventOrig(QtGui.QCloseEvent())

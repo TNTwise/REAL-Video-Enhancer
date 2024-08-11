@@ -5,7 +5,7 @@ import subprocess
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from backend.src.Util import printAndLog
+from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 from PySide6 import QtSvg
 
@@ -73,28 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
 
-    def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-        self, firstIter=True
-    ):
-        """
-        will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
-        """
-        try:
-            self.availableBackends = self.getAvailableBackends()
-        except SyntaxError:
-            if not firstIter:
-                RegularQTPopup("Please Install at least 1 backend!")
-            downloadDependencies = DownloadDependencies()
-            DownloadDepsDialog(
-                ncnnDownloadBtnFunc=downloadDependencies.downloadNCNNDeps,
-                pytorchCUDABtnFunc=downloadDependencies.downloadPyTorchCUDADeps,
-                pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
-                trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
-            )
-            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-                firstIter=False
-            )
-
     def QButtonConnect(self):
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
@@ -104,8 +82,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def setupBackendDeps(self):
         # need pop up window
+        downloadDependencies = DownloadDependencies()
+        downloadDependencies.downloadBackend()
         if not checkIfDeps():
-            downloadDependencies = DownloadDependencies()
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
@@ -136,6 +115,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
+
+    def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+        self, firstIter=True
+    ):
+        """
+        will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
+        """
+        try:
+            self.availableBackends = self.getAvailableBackends()
+        except SyntaxError:
+            if not firstIter:
+                RegularQTPopup("Please install at least 1 backend!")
+            downloadDependencies = DownloadDependencies()
+            DownloadDepsDialog(
+                ncnnDownloadBtnFunc=downloadDependencies.downloadNCNNDeps,
+                pytorchCUDABtnFunc=downloadDependencies.downloadPyTorchCUDADeps,
+                pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
+                trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
+            )
+            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+                firstIter=False
+            )
 
     def startRender(self):
         self.startRenderButton.setEnabled(False)

@@ -39,7 +39,14 @@ def build_resources():
 
 def build_executable():
     if getPlatform() == "linux":
-        command = ["python3", "-m", "cx_Freeze", "main.py"]
+        command = [
+            "python3",
+            "-m",
+            "PyInstaller",
+            "main.py",
+            "--noconfirm",
+            "--noupx",
+        ]
         subprocess.run(command)
     if getPlatform() == "win32":
         command = [
@@ -59,5 +66,5 @@ setup_windows()
 build_gui()
 build_resources()
 if len(sys.argv) > 1:
-    if sys.argv[1] == "build_exe":
+    if sys.argv[1] == "--build_exe":
         build_executable()

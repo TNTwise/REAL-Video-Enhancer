@@ -12,6 +12,8 @@ from .Util import (
 from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
+import shutil
+import urllib.request
 
 
 def run_executable(exe_path):
@@ -78,6 +80,27 @@ class DownloadDependencies:
                 print(f"Warning: Package '{package}' not found or error occurred.")
 
         return total_dependencies
+
+    def downloadBackend(self):
+        if not os.path.exists(os.path.join(currentDirectory(), "backend")):
+            backend_url = "https://github.com/tntwise/REAL-Video-Enhancer/archive/refs/heads/2.0.zip"
+            main_zip = os.path.join(currentDirectory(), "repo.zip")
+            main_folder = os.path.join(currentDirectory(), "repo")
+            orig_backend_folder = os.path.join(
+                main_folder, "REAL-Video-Enhancer-2.0", "backend"
+            )
+            moved_backed_folder = os.path.join(currentDirectory(), "backend")
+
+            printAndLog("Downloading backend")
+            urllib.request.urlretrieve(backend_url, main_zip)
+            # DownloadProgressPopup(link=backend_url, downloadLocation=backend_zip,title="Downloading Backend")
+
+            printAndLog("Extracting backend")
+            shutil.unpack_archive(main_zip, main_folder)
+            printAndLog("Moving Backend")
+            move(orig_backend_folder, moved_backed_folder)
+            printAndLog("Cleaning up")
+            os.remove(main_zip)
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240713/cpython-3.11.9+20240713-"
