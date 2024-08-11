@@ -107,7 +107,7 @@ class DownloadDependencies:
         
         printAndLog("Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed.")
         DownloadProgressPopup(
-            link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe"
+            link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed."
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
@@ -182,7 +182,6 @@ class DownloadDependencies:
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
             r"C:\Users\tntwi\Downloads\torch-2.4.0+cu121-cp311-cp311-win_amd64.whl", # this is for testing, find somewhere to host whl
-            "--no-deps",
             "torchvision==0.19.0"
         ]
         match getPlatform():
@@ -252,13 +251,14 @@ class DownloadDependencies:
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
                 tensorRTDeps += (
+                    "--no-deps",
                     "torch-tensorrt==2.4.0",
                 )
         return tensorRTDeps
 
     def downloadTensorRTDeps(self):
         self.pipInstall(
-             self.getTensorRTDeps() + self.getPyTorchCUDADeps() # Has to be in this order, because i skip dependency check for torchvision
+              self.getPyTorchCUDADeps() + self.getTensorRTDeps() # Has to be in this order, because i skip dependency check for torchvision
         )
 
 
