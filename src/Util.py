@@ -43,6 +43,7 @@ def ffmpegPath() -> str:
         else os.path.join(cwd, "bin", "ffmpeg.exe")
     )
 
+
 def copy(prev: str, new: str):
     """
     moves a folder from prev to new
@@ -55,6 +56,7 @@ def copy(prev: str, new: str):
     else:
         print("WARN tried to rename a folder to a folder that already exists")
 
+
 def move(prev: str, new: str):
     """
     moves a file from prev to new
@@ -66,6 +68,7 @@ def move(prev: str, new: str):
             print("WARN tried to rename a file to a file that already exists")
     else:
         print("WARN tried to rename a folder to a folder that already exists")
+
 
 def makeExecutable(file_path):
     st = os.stat(file_path)

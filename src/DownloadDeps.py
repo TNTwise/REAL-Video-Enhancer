@@ -13,20 +13,21 @@ from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
 
+
 def run_executable(exe_path):
     try:
         # Run the executable and wait for it to complete
         result = subprocess.run([exe_path], check=True, capture_output=True, text=True)
-        
+
         # Print the output of the executable
         print("STDOUT:", result.stdout)
-        
+
         # Print any error messages
         print("STDERR:", result.stderr)
-        
+
         # Print the exit code
         print("Exit Code:", result.returncode)
-        
+
     except subprocess.CalledProcessError as e:
         print("An error occurred while running the executable.")
         print("Exit Code:", e.returncode)
@@ -36,6 +37,7 @@ def run_executable(exe_path):
         print("The specified executable was not found.")
     except Exception as e:
         print("An unexpected error occurred:", str(e))
+
 
 class DownloadDependencies:
     """
@@ -100,19 +102,23 @@ class DownloadDependencies:
 
         # give executable permissions to python
         makeExecutable(pythonPath())
-    
+
     def downloadVCREDLIST(self):
         vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
         link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/VC_redist.x64.exe"
-        
-        printAndLog("Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed.")
+
+        printAndLog(
+            "Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed."
+        )
         DownloadProgressPopup(
-            link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed."
+            link=link,
+            downloadLocation=vcTempPath,
+            title="Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed.",
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
         run_executable(vcTempPath)
-        
+
     def downloadFFMpeg(self):
         ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
@@ -178,12 +184,14 @@ class DownloadDependencies:
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
-            r"C:\Users\tntwi\Downloads\torch-2.4.0+cu121-cp311-cp311-win_amd64.whl", # this is for testing, find somewhere to host whl
-            "torchvision==0.19.0"
+            r"C:\Users\tntwi\Downloads\torch-2.4.0+cu121-cp311-cp311-win_amd64.whl",  # this is for testing, find somewhere to host whl
+            "torchvision==0.19.0",
         ]
         match getPlatform():
             case "win32":
-                return self.getPlatformIndependentDeps() + torchCUDAWindowsDeps # flipped order for skipping check on deps with torchvision
+                return (
+                    self.getPlatformIndependentDeps() + torchCUDAWindowsDeps
+                )  # flipped order for skipping check on deps with torchvision
             case "linux":
                 return torchCUDALinuxDeps + self.getPlatformIndependentDeps()
 
@@ -206,10 +214,10 @@ class DownloadDependencies:
         ]
         match getPlatform():
             case "win32":
-                ncnnWindowsDeps+=self.getPlatformIndependentDeps()
+                ncnnWindowsDeps += self.getPlatformIndependentDeps()
                 self.pipInstall(ncnnWindowsDeps)
             case "linux":
-                ncnnLinuxDeps+=self.getPlatformIndependentDeps()
+                ncnnLinuxDeps += self.getPlatformIndependentDeps()
                 self.pipInstall(ncnnLinuxDeps)
 
     def downloadPyTorchROCmDeps(self):
@@ -228,7 +236,7 @@ class DownloadDependencies:
         Pytorch CUDA deps
         TensorRT deps
         """
-        
+
         match getPlatform():
             case "linux":
                 tensorRTDeps = [
@@ -255,7 +263,8 @@ class DownloadDependencies:
 
     def downloadTensorRTDeps(self):
         self.pipInstall(
-              self.getPyTorchCUDADeps() + self.getTensorRTDeps() # Has to be in this order, because i skip dependency check for torchvision
+            self.getPyTorchCUDADeps()
+            + self.getTensorRTDeps()  # Has to be in this order, because i skip dependency check for torchvision
         )
 
 

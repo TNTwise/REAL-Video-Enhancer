@@ -190,9 +190,9 @@ class FFMpegRender:
                 fps = round(self.currentFrame / (time.time() - self.startTime))
                 message = f"FPS: {fps} Current Frame: {self.currentFrame}"
                 self.realTimePrint(message)
-                
+
                 # Update the shared array
-                buffer[: fcs] = bytes(self.previewFrame)
+                buffer[:fcs] = bytes(self.previewFrame)
 
             time.sleep(0.1)
 

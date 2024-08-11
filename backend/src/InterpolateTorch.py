@@ -40,7 +40,6 @@ class InterpolateRifeTorch:
 
         printAndLog("Using device: " + str(device))
 
-
         self.interpolateModel = interpolateModelPath
         self.width = width
         self.height = height
@@ -141,7 +140,6 @@ class InterpolateRifeTorch:
             import tensorrt
             import torch_tensorrt
 
-            
             trt_engine_path = os.path.join(
                 os.path.realpath(trt_cache_dir),
                 (
@@ -172,24 +170,32 @@ class InterpolateRifeTorch:
             )
             if not os.path.isfile(trt_engine_path):
                 inputs = [
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=device),
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=device),
-                torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=device),
-                torch.zeros((2,), dtype=self.dtype, device=device),
-                torch.zeros((1, 2, self.ph, self.pw), dtype=self.dtype, device=device),
+                    torch.zeros(
+                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
+                    ),
+                    torch.zeros(
+                        (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
+                    ),
+                    torch.zeros(
+                        (1, 1, self.ph, self.pw), dtype=self.dtype, device=device
+                    ),
+                    torch.zeros((2,), dtype=self.dtype, device=device),
+                    torch.zeros(
+                        (1, 2, self.ph, self.pw), dtype=self.dtype, device=device
+                    ),
                 ]
                 self.flownet = torch_tensorrt.compile(
-                        self.flownet,
-                        ir="dynamo",
-                        inputs=inputs,
-                        enabled_precisions={self.dtype},
-                        debug=trt_debug,
-                        workspace_size=trt_workspace_size,
-                        min_block_size=1,
-                        max_aux_streams=trt_max_aux_streams,
-                        optimization_level=trt_optimization_level,
-                        device=device,
-                    )
+                    self.flownet,
+                    ir="dynamo",
+                    inputs=inputs,
+                    enabled_precisions={self.dtype},
+                    debug=trt_debug,
+                    workspace_size=trt_workspace_size,
+                    min_block_size=1,
+                    max_aux_streams=trt_max_aux_streams,
+                    optimization_level=trt_optimization_level,
+                    device=device,
+                )
 
                 torch_tensorrt.save(self.flownet, trt_engine_path, inputs=inputs)
 

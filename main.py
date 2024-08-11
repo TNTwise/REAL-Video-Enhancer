@@ -26,7 +26,7 @@ from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
-from src.QTcustom import DownloadDepsDialog
+from src.QTcustom import DownloadDepsDialog, RegularQTPopup
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -41,24 +41,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.latestPreviewImage = None
 
         # setup application
+        
         self.setupBackendDeps()
         
+
         # Set up the user interface from Designer.
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100, 600)
-        DownloadDepsDialog()
+
         self.aspect_ratio = self.width() / self.height()
-        try:
-            pass
-            self.availableBackends = self.getAvailableBackends()
-        except SyntaxError as e:
-            # On error, install ncnn as a base dependency
-            printAndLog("Error: " + str(e))
-            downloadDependencies = DownloadDependencies()
-            downloadDependencies.downloadNCNNDeps()
-            self.availableBackends = self.getAvailableBackends()
+
+        self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(firstIter=True)
+
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
@@ -75,6 +71,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
         # self.downloadModels = DownloadModels()
+
+    def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+        self, firstIter=True
+    ):
+        """
+        will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
+        """
+        try:
+            self.availableBackends = self.getAvailableBackends()
+        except SyntaxError:
+            if not firstIter:
+                RegularQTPopup("Please Install at least 1 backend!")
+            downloadDependencies = DownloadDependencies()
+            DownloadDepsDialog(
+                ncnnDownloadBtnFunc=downloadDependencies.downloadNCNNDeps,
+                pytorchCUDABtnFunc=downloadDependencies.downloadPyTorchCUDADeps,
+                pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
+                trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
+            )
+            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(firstIter=False)
 
     def QButtonConnect(self):
         # connect buttons to switch menus
