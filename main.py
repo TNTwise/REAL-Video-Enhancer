@@ -26,6 +26,7 @@ from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
+from src.QTcustom import DownloadDepsDialog
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -47,6 +48,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100, 600)
+        DownloadDepsDialog()
         self.aspect_ratio = self.width() / self.height()
         try:
             pass

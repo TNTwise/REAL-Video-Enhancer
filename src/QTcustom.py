@@ -7,11 +7,22 @@ from multiprocessing import shared_memory
 
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker
 from PySide6 import QtWidgets, QtCore, QtGui
-from PySide6.QtCore import QThread, Qt
+from PySide6.QtGui import QIcon
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QDialog, QHBoxLayout, QLabel,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget)
 
-from .QTstyle import styleSheet
-from .Util import printAndLog
-
+try:
+    from .QTstyle import styleSheet
+    from .Util import printAndLog
+except ImportError:
+    pass
 
 class UpdateGUIThread(QThread):
     """
@@ -297,6 +308,145 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
 
         self.plainTextEdit.setPlainText(self.totalCommandOutput)
         self.plainTextEdit.setTextCursor(cursor)
+
+class DownloadDepsDialog(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.setStyleSheet(styleSheet())
+        self.exec()
+    def setupUi(self, Dialog):
+        Dialog = self
+        self.verticalLayout = QVBoxLayout(Dialog)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.backendSelectContainer = QWidget(Dialog)
+        self.backendSelectContainer.setObjectName(u"backendSelectContainer")
+        self.verticalLayout_11 = QVBoxLayout(self.backendSelectContainer)
+        self.verticalLayout_11.setObjectName(u"verticalLayout_11")
+        self.label_4 = QLabel(self.backendSelectContainer)
+        self.label_4.setObjectName(u"label_4")
+        font = QFont()
+        font.setPointSize(25)
+        self.label_4.setFont(font)
+
+        self.verticalLayout_11.addWidget(self.label_4)
+
+        self.pytorchBackendInstallerContainer = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer.setObjectName(u"pytorchBackendInstallerContainer")
+        self.horizontalLayout_6 = QHBoxLayout(self.pytorchBackendInstallerContainer)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.downloadTorchCUDABtn = QPushButton(self.pytorchBackendInstallerContainer)
+        self.downloadTorchCUDABtn.setObjectName(u"downloadTorchCUDABtn")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.downloadTorchCUDABtn.sizePolicy().hasHeightForWidth())
+        self.downloadTorchCUDABtn.setSizePolicy(sizePolicy)
+        self.downloadTorchCUDABtn.setMaximumSize(QSize(50, 16777215))
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/download.svg", QSize(), QIcon.Normal, QIcon.Off)
+        self.downloadTorchCUDABtn.setIcon(icon)
+        self.downloadTorchCUDABtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_6.addWidget(self.downloadTorchCUDABtn)
+
+        self.label_6 = QLabel(self.pytorchBackendInstallerContainer)
+        self.label_6.setObjectName(u"label_6")
+
+        self.horizontalLayout_6.addWidget(self.label_6)
+
+
+        self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer)
+
+        self.pytorchBackendInstallerContainer_2 = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer_2.setObjectName(u"pytorchBackendInstallerContainer_2")
+        self.horizontalLayout_8 = QHBoxLayout(self.pytorchBackendInstallerContainer_2)
+        self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
+        self.downloadTensorRTBtn = QPushButton(self.pytorchBackendInstallerContainer_2)
+        self.downloadTensorRTBtn.setObjectName(u"downloadTensorRTBtn")
+        sizePolicy.setHeightForWidth(self.downloadTensorRTBtn.sizePolicy().hasHeightForWidth())
+        self.downloadTensorRTBtn.setSizePolicy(sizePolicy)
+        self.downloadTensorRTBtn.setMaximumSize(QSize(50, 16777215))
+        self.downloadTensorRTBtn.setIcon(icon)
+        self.downloadTensorRTBtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_8.addWidget(self.downloadTensorRTBtn)
+
+        self.label_8 = QLabel(self.pytorchBackendInstallerContainer_2)
+        self.label_8.setObjectName(u"label_8")
+
+        self.horizontalLayout_8.addWidget(self.label_8)
+
+
+        self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer_2)
+
+        self.pytorchBackendInstallerContainer_3 = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer_3.setObjectName(u"pytorchBackendInstallerContainer_3")
+        self.horizontalLayout_9 = QHBoxLayout(self.pytorchBackendInstallerContainer_3)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.downloadTorchROCmBtn = QPushButton(self.pytorchBackendInstallerContainer_3)
+        self.downloadTorchROCmBtn.setObjectName(u"downloadTorchROCmBtn")
+        sizePolicy.setHeightForWidth(self.downloadTorchROCmBtn.sizePolicy().hasHeightForWidth())
+        self.downloadTorchROCmBtn.setSizePolicy(sizePolicy)
+        self.downloadTorchROCmBtn.setMaximumSize(QSize(50, 16777215))
+        self.downloadTorchROCmBtn.setIcon(icon)
+        self.downloadTorchROCmBtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_9.addWidget(self.downloadTorchROCmBtn)
+
+        self.label_9 = QLabel(self.pytorchBackendInstallerContainer_3)
+        self.label_9.setObjectName(u"label_9")
+
+        self.horizontalLayout_9.addWidget(self.label_9)
+
+
+        self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer_3)
+
+        self.pytorchBackendInstallerContainer_4 = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer_4.setObjectName(u"pytorchBackendInstallerContainer_4")
+        self.horizontalLayout_10 = QHBoxLayout(self.pytorchBackendInstallerContainer_4)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.downloadNCNNBtn = QPushButton(self.pytorchBackendInstallerContainer_4)
+        self.downloadNCNNBtn.setObjectName(u"downloadNCNNBtn")
+        sizePolicy.setHeightForWidth(self.downloadNCNNBtn.sizePolicy().hasHeightForWidth())
+        self.downloadNCNNBtn.setSizePolicy(sizePolicy)
+        self.downloadNCNNBtn.setMaximumSize(QSize(50, 16777215))
+        self.downloadNCNNBtn.setIcon(icon)
+        self.downloadNCNNBtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_10.addWidget(self.downloadNCNNBtn)
+
+        self.label_10 = QLabel(self.pytorchBackendInstallerContainer_4)
+        self.label_10.setObjectName(u"label_10")
+
+        self.horizontalLayout_10.addWidget(self.label_10)
+
+
+        self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer_4)
+
+
+        self.verticalLayout.addWidget(self.backendSelectContainer)
+
+
+        self.retranslateUi(Dialog)
+
+        QMetaObject.connectSlotsByName(Dialog)
+    # setupUi
+
+    def retranslateUi(self, Dialog):
+        Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
+        self.label_4.setText(QCoreApplication.translate("Dialog", u"Backends", None))
+        self.downloadTorchCUDABtn.setText("")
+        self.label_6.setText(QCoreApplication.translate("Dialog", u"PyTorch CUDA (Nvidia Only) ", None))
+        self.downloadTensorRTBtn.setText("")
+        self.label_8.setText(QCoreApplication.translate("Dialog", u"TensorRT (Nvidia RTX 20 series and up)", None))
+        self.downloadTorchROCmBtn.setText("")
+        self.label_9.setText(QCoreApplication.translate("Dialog", u"PyTorch ROCm (AMD Unknown Compatiblity)", None))
+        self.downloadNCNNBtn.setText("")
+        self.label_10.setText(QCoreApplication.translate("Dialog", u"NCNN Vulkan (All GPUs, Slower)", None))
+    # retranslateUi
+
+
 
 
 if __name__ == "__main__":
