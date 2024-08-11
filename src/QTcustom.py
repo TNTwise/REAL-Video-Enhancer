@@ -545,6 +545,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 
     # retranslateUi
 
+
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
         super().__init__()
@@ -555,6 +556,7 @@ class RegularQTPopup(QtWidgets.QDialog):
         layout.addWidget(label)
         self.setLayout(layout)
         self.exec()
+
 
 if __name__ == "__main__":
     DownloadProgressPopup(

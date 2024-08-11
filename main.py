@@ -41,9 +41,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.latestPreviewImage = None
 
         # setup application
-        
+
         self.setupBackendDeps()
-        
 
         # Set up the user interface from Designer.
         self.setupUi(self)
@@ -53,7 +52,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.aspect_ratio = self.width() / self.height()
 
-        self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(firstIter=True)
+        self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+            firstIter=True
+        )
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
@@ -90,7 +91,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
                 trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
             )
-            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(firstIter=False)
+            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+                firstIter=False
+            )
 
     def QButtonConnect(self):
         # connect buttons to switch menus
