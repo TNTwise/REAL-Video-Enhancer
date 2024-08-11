@@ -6,7 +6,7 @@ def setup_windows():
     if getPlatform() == "win32":
         command = ["python3.10.exe","-m","venv","venv"]
         subprocess.run(command)
-        command = ["venv\\Scripts\\python.exe","-m","pip","install","-r","requirements.txt","--force","--no-cache-dir"]
+        command = ["venv\\Scripts\\python.exe","-m","pip","install","-r","requirements.txt"]
         subprocess.run(command)    
 
 def build_gui():
@@ -26,7 +26,7 @@ def build_executable():
         command = ["python3","-m","cx_Freeze","main.py"]
         subprocess.run(command)
     if getPlatform() == "win32":
-        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py"]
+        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py",r"--add-data=backend\*:backend"]
         subprocess.run(command)
 
 setup_windows()

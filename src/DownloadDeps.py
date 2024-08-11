@@ -138,10 +138,7 @@ class DownloadDependencies:
             "-m",
             "pip",
             "install",
-            "--upgrade",
-            "pip",
             "--no-cache-dir",
-            '--force-reinstall'
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)

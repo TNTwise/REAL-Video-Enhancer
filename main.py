@@ -51,8 +51,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             pass
             self.availableBackends = self.getAvailableBackends()
-        except SyntaxError:
+        except SyntaxError as e:
             # On error, install ncnn as a base dependency
+            printAndLog("Error: " + str(e))
             downloadDependencies = DownloadDependencies()
             downloadDependencies.downloadNCNNDeps()
             self.availableBackends = self.getAvailableBackends()
