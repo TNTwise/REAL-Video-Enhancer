@@ -105,7 +105,7 @@ class DownloadDependencies:
         vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
         link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/VC_redist.x64.exe"
         
-        printAndLog("Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed.")
+        printAndLog("Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed.")
         DownloadProgressPopup(
             link=link, downloadLocation=vcTempPath, title="Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed."
         )

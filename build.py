@@ -26,7 +26,7 @@ def build_executable():
         command = ["python3","-m","cx_Freeze","main.py"]
         subprocess.run(command)
     if getPlatform() == "win32":
-        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py",r"--add-data=backend\*:backend"]
+        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py",r"--add-data=backend\*:..\backend"]
         subprocess.run(command)
 
 setup_windows()
