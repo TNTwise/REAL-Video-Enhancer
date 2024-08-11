@@ -54,6 +54,8 @@ def checkForPytorch() -> bool:
     except ImportError as e:
         printAndLog(str(e))
         return False
+    except Exception as e:
+        printAndLog(str(e))
 
 
 def checkForTensorRT() -> bool:
@@ -71,6 +73,8 @@ def checkForTensorRT() -> bool:
     except ImportError as e:
         printAndLog(str(e))
         return False
+    except Exception as e:
+        printAndLog(str(e))
 
 
 def checkForNCNN() -> bool:
@@ -85,3 +89,5 @@ def checkForNCNN() -> bool:
     except ImportError as e:
         printAndLog(str(e))
         return False
+    except Exception as e:
+        printAndLog(str(e))

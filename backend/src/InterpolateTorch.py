@@ -1,4 +1,3 @@
-from cv2.cuda import getDevice
 import torch
 import torch.nn.functional as F
 import math
