@@ -80,8 +80,14 @@ class DownloadDependencies:
                 print(f"Warning: Package '{package}' not found or error occurred.")
 
         return total_dependencies
-
-    def downloadBackend(self):
+        
+    def downloadBackend(self,tag):
+        """
+        Downloads the backend based on the tag of release.
+        The tag of release is equal to the tag of the version.
+        *NOTE
+        tag is unused for now, as still in active development. just downloads the latest backend.
+        """
         if not os.path.exists(os.path.join(currentDirectory(), "backend")):
             backend_url = "https://github.com/tntwise/REAL-Video-Enhancer/archive/refs/heads/2.0.zip"
             main_zip = os.path.join(currentDirectory(), "repo.zip")

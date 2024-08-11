@@ -8,7 +8,7 @@ from PySide6.QtGui import QIcon
 from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 from PySide6 import QtSvg
-
+from src.version import version
 # other imports
 from src.Util import (
     checkValidVideo,
@@ -83,7 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setupBackendDeps(self):
         # need pop up window
         downloadDependencies = DownloadDependencies()
-        downloadDependencies.downloadBackend()
+        downloadDependencies.downloadBackend(version)
         if not checkIfDeps():
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()
