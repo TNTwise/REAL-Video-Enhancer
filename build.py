@@ -26,9 +26,10 @@ def build_executable():
         command = ["python3","-m","cx_Freeze","main.py"]
         subprocess.run(command)
     if getPlatform() == "win32":
-        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py",r"--add-data=backend\*:..\backend"]
+        command = [r".\venv\Scripts\python.exe","-m","PyInstaller","main.py",'--noconfirm',"--noupx"]
+        
         subprocess.run(command)
-
+        #copy("backend","dist\\main\\backend")
 setup_windows()
 build_gui()
 build_resources()

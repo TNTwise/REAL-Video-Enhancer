@@ -6,6 +6,7 @@ import requests
 import stat
 import tarfile
 import subprocess
+import shutil
 
 cwd = os.getcwd()
 
@@ -42,6 +43,17 @@ def ffmpegPath() -> str:
         else os.path.join(cwd, "bin", "ffmpeg.exe")
     )
 
+def copy(prev: str, new: str):
+    """
+    moves a folder from prev to new
+    """
+    if not os.path.exists(new):
+        if not os.path.isfile(new):
+            shutil.copytree(prev, new)
+        else:
+            print("WARN tried to rename a file to a file that already exists")
+    else:
+        print("WARN tried to rename a folder to a folder that already exists")
 
 def move(prev: str, new: str):
     """
