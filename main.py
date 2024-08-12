@@ -126,7 +126,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         try:
             self.availableBackends, self.fullOutput = self.getAvailableBackends()
             
-        except SyntaxError:
+        except SyntaxError as e:
+            printAndLog(str(e))
             if not firstIter:
                 RegularQTPopup("Please install at least 1 backend!")
             downloadDependencies = DownloadDependencies()

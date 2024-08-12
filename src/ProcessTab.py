@@ -205,7 +205,6 @@ class ProcessTab:
             f"{backend}",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
-            "--half",
         ]
         if method == "Upscale":
             command += [
@@ -299,7 +298,7 @@ class ProcessTab:
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
             self.parent.progressBar.setValue(self.currentFrame)
-        try:
+        if not qimage.isNull():
             width = self.parent.width()
             height = self.parent.height()
 
@@ -307,5 +306,4 @@ class ProcessTab:
             pixmap = QtGui.QPixmap.fromImage(p)
             roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
             self.parent.previewLabel.setPixmap(roundedPixmap)
-        except:
-            pass
+        
