@@ -17,7 +17,7 @@ cwd = os.getcwd()
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
-    
+
 def getOSInfo() -> str:
     """
     Returns the exact name of the operating system along with additional information like 64-bit.
@@ -37,20 +37,23 @@ def getPlatform() -> str:
     """
     return sys.platform
 
+
 def getRAMAmount() -> str:
-        """
-        Returns the amount of RAM in the system.
-        """
-        ram = psutil.virtual_memory().total
-        ram_gb = ram / (1024 ** 3)
-        return f"{ram_gb:.2f} GB"
+    """
+    Returns the amount of RAM in the system.
+    """
+    ram = psutil.virtual_memory().total
+    ram_gb = ram / (1024**3)
+    return f"{ram_gb:.2f} GB"
+
 
 def getCPUInfo() -> str:
     """
     Returns the CPU information of the system.
     """
-    #return platform.processor() + " " + str(psutil.cpu_count(logical=False)) + " cores" + platform.
-    return cpuinfo.get_cpu_info()['brand_raw']
+    # return platform.processor() + " " + str(psutil.cpu_count(logical=False)) + " cores" + platform.
+    return cpuinfo.get_cpu_info()["brand_raw"]
+
 
 def pythonPath() -> str:
     return (
@@ -58,6 +61,7 @@ def pythonPath() -> str:
         if getPlatform() == "darwin" or getPlatform() == "linux"
         else os.path.join(cwd, "python", "python", "python.exe")
     )
+
 
 def modelsPath() -> str:
     """

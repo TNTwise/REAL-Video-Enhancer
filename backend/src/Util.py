@@ -89,6 +89,7 @@ def check_bfloat16_support() -> bool:
     except RuntimeError:
         return False
 
+
 def checkForNCNN() -> bool:
     """
     function that checks if the pytorch backend is available

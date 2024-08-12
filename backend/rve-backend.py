@@ -46,6 +46,7 @@ class HandleApplication:
                 printMSG += f"NCNN Version: 20220729\n"
             if checkForPytorch():
                 import torch
+
                 availableBackends.append("pytorch")
                 printMSG += f"PyTorch Version: {torch.__version__}\n"
                 half_prec_supp = check_bfloat16_support()
@@ -62,10 +63,7 @@ class HandleApplication:
                         printMSG += f"TensorRT Version: {tensorrt.__version__}\n"
                     else:
                         printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
-                
 
-                
-                
                 printMSG += f"Half precision support: {half_prec_supp}\n"
             print("Available Backends: " + str(availableBackends))
             print(printMSG)

@@ -71,10 +71,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         printOut = (
             "------REAL Video Enhancer------\n"
             + "System Information: \n"
-            + "OS: " + getOSInfo() + '\n'
-            + "CPU: " + getCPUInfo() + '\n'
-            + "GPU: " + get_gpu_info() + '\n'
-            + "RAM: " + getRAMAmount() + '\n'
+            + "OS: "
+            + getOSInfo()
+            + "\n"
+            + "CPU: "
+            + getCPUInfo()
+            + "\n"
+            + "GPU: "
+            + get_gpu_info()
+            + "\n"
+            + "RAM: "
+            + getRAMAmount()
+            + "\n"
             + "-------------------------------------------\n"
             + "Software Information: \n"
             + self.fullOutput
@@ -198,7 +206,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Extract the output from the command result
         output = result.stdout.strip()
-        
+
         # Find the part of the output containing the backends list
         start = output.find("[")
         end = output.find("]") + 1
