@@ -9,6 +9,7 @@ from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 from PySide6 import QtSvg
 from src.version import version
+
 # other imports
 from src.Util import (
     checkValidVideo,
@@ -20,6 +21,10 @@ from src.Util import (
     pythonPath,
     currentDirectory,
     getPlatform,
+    getOSInfo,
+    get_gpu_info,
+    getRAMAmount,
+    getCPUInfo,
 )
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
@@ -63,7 +68,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # set up tabs
         self.backendComboBox.addItems(self.availableBackends)
-        self.renderOutput.setText(self.fullOutput)
+        printOut = (
+            "------REAL Video Enhancer------\n"
+            + "System Information: \n"
+            + "OS: " + getOSInfo() + '\n'
+            + "CPU: " + getCPUInfo() + '\n'
+            + "GPU: " + get_gpu_info() + '\n'
+            + "RAM: " + getRAMAmount() + '\n'
+            + "-------------------------------------------\n"
+            + "Software Information: \n"
+            + self.fullOutput
+        )
+        self.renderOutput.setText(printOut)
+        printAndLog(printOut)
         self.processTab = ProcessTab(
             parent=self,
             backend=self.backendComboBox.currentText(),
@@ -125,7 +142,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         try:
             self.availableBackends, self.fullOutput = self.getAvailableBackends()
-            
+
         except SyntaxError as e:
             printAndLog(str(e))
             if not firstIter:
@@ -181,7 +198,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # Extract the output from the command result
         output = result.stdout.strip()
-        print(output)
+        
         # Find the part of the output containing the backends list
         start = output.find("[")
         end = output.find("]") + 1
@@ -228,7 +245,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.inputFileText.setText(inputFile)
             self.outputFileText.setEnabled(True)
             self.outputFileSelectButton.setEnabled(True)
-
 
     # output file button
     def openOutputFolder(self):

@@ -80,8 +80,8 @@ class DownloadDependencies:
                 print(f"Warning: Package '{package}' not found or error occurred.")
 
         return total_dependencies
-        
-    def downloadBackend(self,tag):
+
+    def downloadBackend(self, tag):
         """
         Downloads the backend based on the tag of release.
         The tag of release is equal to the tag of the version.

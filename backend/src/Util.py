@@ -1,6 +1,6 @@
 import os
 import warnings
-import tarfile
+import platform
 
 cwd = os.getcwd()
 with open(os.path.join(cwd, "backend_log.txt"), "w") as f:
@@ -76,11 +76,13 @@ def checkForTensorRT() -> bool:
     except Exception as e:
         printAndLog(str(e))
 
+
 def check_bfloat16_support() -> bool:
     """
     Function that checks if the torch backend supports bfloat16
     """
     import torch
+
     try:
         x = torch.tensor([1.0], dtype=torch.bfloat16)
         return True

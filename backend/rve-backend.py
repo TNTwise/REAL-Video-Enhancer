@@ -3,7 +3,12 @@ import os
 import sys
 
 from src.RenderVideo import Render
-from src.Util import checkForPytorch, checkForNCNN, checkForTensorRT, check_bfloat16_support
+from src.Util import (
+    checkForPytorch,
+    checkForNCNN,
+    checkForTensorRT,
+    check_bfloat16_support,
+)
 
 
 class HandleApplication:
@@ -40,11 +45,10 @@ class HandleApplication:
                 availableBackends.append("ncnn")
                 printMSG += f"NCNN Version: 20220729\n"
             if checkForPytorch():
-                availableBackends.append("pytorch")
                 import torch
-                half_prec_supp = check_bfloat16_support()
+                availableBackends.append("pytorch")
                 printMSG += f"PyTorch Version: {torch.__version__}\n"
-                printMSG += f"Half precision support: {half_prec_supp}"
+                half_prec_supp = check_bfloat16_support()
                 if checkForTensorRT():
                     """
                     checks for tensorrt availability, and the current gpu works with it (if half precision is supported)
@@ -53,11 +57,16 @@ class HandleApplication:
                     """
                     if half_prec_supp:
                         import tensorrt
+
                         availableBackends.append("tensorrt")
-                        printMSG+=f"TensorRT Version: {tensorrt.__version__}"
+                        printMSG += f"TensorRT Version: {tensorrt.__version__}\n"
                     else:
-                        printMSG+="ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
-        
+                        printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
+                
+
+                
+                
+                printMSG += f"Half precision support: {half_prec_supp}\n"
             print("Available Backends: " + str(availableBackends))
             print(printMSG)
 
@@ -132,7 +141,7 @@ class HandleApplication:
         parser.add_argument(
             "--precision",
             help="sets precision for model, (auto/float16/float32, default=auto)",
-            default="auto"
+            default="auto",
         )
         parser.add_argument(
             "--sceneDetectMethod",
@@ -205,7 +214,7 @@ class HandleApplication:
         if self.args.backend == "ncnn":
             try:
                 import rife_ncnn_vulkan_python
-                from upscale_ncnn_py import UPSCALE            
+                from upscale_ncnn_py import UPSCALE
             except ImportError as e:
                 raise ImportError(f"Cannot use NCNN as the backend! {e}")
 

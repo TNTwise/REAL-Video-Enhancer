@@ -5,7 +5,12 @@ import cv2
 import torch as torch
 
 
-from src.Util import currentDirectory, modelsDirectory, printAndLog, check_bfloat16_support
+from src.Util import (
+    currentDirectory,
+    modelsDirectory,
+    printAndLog,
+    check_bfloat16_support,
+)
 
 # tiling code permidently borrowed from https://github.com/chaiNNer-org/spandrel/issues/113#issuecomment-1907209731
 

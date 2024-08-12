@@ -1,4 +1,5 @@
 import cv2
+
 import os
 import warnings
 import sys
@@ -7,11 +8,24 @@ import stat
 import tarfile
 import subprocess
 import shutil
+import platform
+import psutil
+import cpuinfo
 
 cwd = os.getcwd()
 
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
+
+    
+def getOSInfo() -> str:
+    """
+    Returns the exact name of the operating system along with additional information like 64-bit.
+    """
+    system = platform.system()
+    release = platform.release()
+    architecture = platform.machine()
+    return f"{system} {release} {architecture}"
 
 
 def getPlatform() -> str:
@@ -23,6 +37,20 @@ def getPlatform() -> str:
     """
     return sys.platform
 
+def getRAMAmount() -> str:
+        """
+        Returns the amount of RAM in the system.
+        """
+        ram = psutil.virtual_memory().total
+        ram_gb = ram / (1024 ** 3)
+        return f"{ram_gb:.2f} GB"
+
+def getCPUInfo() -> str:
+    """
+    Returns the CPU information of the system.
+    """
+    #return platform.processor() + " " + str(psutil.cpu_count(logical=False)) + " cores" + platform.
+    return cpuinfo.get_cpu_info()['brand_raw']
 
 def pythonPath() -> str:
     return (
@@ -31,8 +59,13 @@ def pythonPath() -> str:
         else os.path.join(cwd, "python", "python", "python.exe")
     )
 
-
 def modelsPath() -> str:
+    """
+    Returns the file path for the models directory.
+
+    :return: The file path for the models directory.
+    :rtype: str
+    """
     return os.path.join(cwd, "models")
 
 

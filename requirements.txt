@@ -5,3 +5,5 @@ numpy==1.26.4
 cx_freeze
 lief==0.15.0
 pyinstaller
+psutil
+py-cpuinfo
