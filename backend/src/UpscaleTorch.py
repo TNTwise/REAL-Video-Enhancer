@@ -16,6 +16,40 @@ from src.Util import (
 
 
 class UpscalePytorch:
+    """A class for upscaling images using PyTorch.
+
+    Args:
+        modelPath (str): The path to the model file.
+        device (str, optional): The device to use for inference. Defaults to "default".
+        tile_pad (int, optional): The padding size for tiles. Defaults to 10.
+        precision (str, optional): The precision mode for the model. Defaults to "auto".
+        width (int, optional): The width of the input image. Defaults to 1920.
+        height (int, optional): The height of the input image. Defaults to 1080.
+        backend (str, optional): The backend for inference. Defaults to "pytorch".
+        trt_workspace_size (int, optional): The workspace size for TensorRT. Defaults to 0.
+        trt_cache_dir (str, optional): The cache directory for TensorRT. Defaults to modelsDirectory().
+
+    Attributes:
+        tile_pad (int): The padding size for tiles.
+        dtype (torch.dtype): The data type for the model.
+        device (torch.device): The device used for inference.
+        model (torch.nn.Module): The loaded model.
+        width (int): The width of the input image.
+        height (int): The height of the input image.
+        scale (float): The scale factor of the model.
+
+    Methods:
+        handlePrecision(precision): Handles the precision mode for the model.
+        loadModel(modelPath, dtype, device): Loads the model from file.
+        bytesToFrame(frame): Converts bytes to a torch tensor.
+        tensorToNPArray(image): Converts a torch tensor to a NumPy array.
+        renderImage(image): Renders an image using the model.
+        renderToNPArray(image): Renders an image and returns it as a NumPy array.
+        renderImagesInDirectory(dir): Renders all images in a directory.
+        getScale(): Returns the scale factor of the model.
+        saveImage(image, fullOutputPathLocation): Saves an image to a file.
+        renderTiledImage(image, tile_size): Renders a tiled image."""
+    
     @torch.inference_mode()
     def __init__(
         self,
@@ -28,10 +62,7 @@ class UpscalePytorch:
         backend: str = "pytorch",
         # trt options
         trt_workspace_size: int = 0,
-        trt_max_aux_streams: int | None = None,
-        trt_optimization_level: int = 5,
         trt_cache_dir: str = modelsDirectory(),
-        trt_debug: bool = False,
     ):
         if device == "default":
             if torch.cuda.is_available():

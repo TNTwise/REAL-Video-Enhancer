@@ -15,6 +15,66 @@ torch.set_grad_enabled(False)
 
 
 class InterpolateRifeTorch:
+    """InterpolateRifeTorch class for video interpolation using RIFE model in PyTorch.
+
+    Args:
+        interpolateModelPath (str): Path to the pre-trained interpolation model.
+        interpolateArch (str, optional): Interpolation architecture to use. Defaults to "rife413".
+        width (int, optional): Width of the input frames. Defaults to 1920.
+        height (int, optional): Height of the input frames. Defaults to 1080.
+        device (str, optional): Device to use for computation. Defaults to "default".
+        dtype (str, optional): Data type to use for computation. Defaults to "auto".
+        backend (str, optional): Backend to use for computation. Defaults to "pytorch".
+        UHDMode (bool, optional): Flag to enable UHD mode. Defaults to False.
+        ensemble (bool, optional): Flag to enable ensemble mode. Defaults to False.
+        trt_workspace_size (int, optional): Workspace size for TensorRT optimization. Defaults to 0.
+        trt_max_aux_streams (int | None, optional): Maximum auxiliary streams for TensorRT optimization. Defaults to None.
+        trt_optimization_level (int, optional): Optimization level for TensorRT optimization. Defaults to 5.
+        trt_cache_dir (str, optional): Directory to cache TensorRT engine files. Defaults to modelsDirectory().
+        trt_debug (bool, optional): Flag to enable TensorRT debug mode. Defaults to False.
+
+    Methods:
+        process(img0, img1, timestep):
+            Processes the input frames and returns the interpolated frame.
+
+        tensor_to_frame(frame):
+            Converts a tensor to a frame for rendering.
+
+        frame_to_tensor(frame):
+            Converts a frame to a tensor for processing.
+    def __init__(self, interpolateModelPath, interpolateArch="rife413", width=1920, height=1080, device="default", dtype="auto", backend="pytorch", UHDMode=False, ensemble=False, trt_workspace_size=0, trt_max_aux_streams=None, trt_optimization_level=5, trt_cache_dir=modelsDirectory(), trt_debug=False):
+        pass
+
+        Processes the input frames and returns the interpolated frame.
+
+        Args:
+            img0 (torch.Tensor): First input frame.
+            img1 (torch.Tensor): Second input frame.
+            timestep (float): Timestep between the input frames.
+
+        Returns:
+            torch.Tensor: Interpolated frame.
+        pass
+
+    def tensor_to_frame(self, frame):
+        Converts a tensor to a frame for rendering.
+
+        Args:
+            frame (torch.Tensor): Input tensor representing a frame.
+
+        Returns:
+            numpy.ndarray: Rendered frame.
+        pass
+
+    def frame_to_tensor(self, frame):
+        Converts a frame to a tensor for processing.
+
+        Args:
+            frame (numpy.ndarray): Input frame.
+
+        Returns:
+            torch.Tensor: Tensor representing the frame.
+        pass"""
     @torch.inference_mode()
     def __init__(
         self,

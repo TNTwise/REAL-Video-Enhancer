@@ -35,6 +35,37 @@ from src.QTcustom import DownloadDepsDialog, RegularQTPopup
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    """Main window class for the REAL Video Enhancer application.
+
+    This class extends the QMainWindow and Ui_MainWindow classes to create the main window of the application.
+    It sets up the user interface, connects buttons to switch menus, and handles various functionalities such as rendering, file selection, and backend setup.
+
+    Attributes:
+        homeDir (str): The home directory path.
+        interpolateTimes (int): The number of times to interpolate frames.
+        upscaleTimes (int): The number of times to upscale frames.
+        pipeInFrames (None): Placeholder for input frames.
+        latestPreviewImage (None): Placeholder for the latest preview image.
+        aspect_ratio (float): The aspect ratio of the window.
+
+    Methods:
+        __init__(): Initializes the MainWindow class.
+        QButtonConnect(): Connects buttons to switch menus.
+        setupBackendDeps(): Sets up the backend dependencies.
+        switchToHomePage(): Switches to the home page.
+        switchToProcessingPage(): Switches to the processing page.
+        switchToSettingsPage(): Switches to the settings page.
+        switchToDownloadPage(): Switches to the download page.
+        recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(): Recursively checks if at least one backend is installed.
+        startRender(): Starts the rendering process.
+        disableProcessPage(): Disables the process page.
+        enableProcessPage(): Enables the process page.
+        getAvailableBackends(): Retrieves the available backends.
+        openInputFile(): Opens an input video file.
+        openOutputFolder(): Opens an output folder.
+        killRenderProcess(): Terminates the render process.
+        closeEvent(event): Handles the close event of the main window."""
+    
     def __init__(self):
         super().__init__()
 

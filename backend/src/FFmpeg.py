@@ -10,6 +10,53 @@ from .Util import currentDirectory, log, printAndLog
 
 
 class FFMpegRender:
+    """Args:
+        inputFile (str): The path to the input file.
+        outputFile (str): The path to the output file.
+        interpolateFactor (int, optional): Sets the multiplier for the framerate when interpolating. Defaults to 1.
+        upscaleTimes (int, optional): Upscaling factor. Defaults to 1.
+        encoder (str, optional): The exact name of the encoder ffmpeg will use. Defaults to "libx264".
+        pixelFormat (str, optional): The pixel format ffmpeg will use. Defaults to "yuv420p".
+        benchmark (bool, optional): Enable benchmark mode. Defaults to False.
+        overwrite (bool, optional): Overwrite existing output file if it exists. Defaults to False.
+        frameSetupFunction (function, optional): Function to setup frames. Defaults to None.
+        crf (str, optional): Constant Rate Factor for video quality. Defaults to "18".
+        sharedMemoryID (str, optional): ID for shared memory. Defaults to None.
+        shm (shared_memory.SharedMemory, optional): Shared memory object. Defaults to None.
+        inputFrameChunkSize (int, optional): Size of input frame chunks. Defaults to None.
+        outputFrameChunkSize (int, optional): Size of output frame chunks. Defaults to None.
+    pass
+    Gets the properties of the video file.
+    Args:
+        inputFile (str, optional): The path to the input file. If None, uses the inputFile specified in the constructor. Defaults to None.
+    pass
+    Generates the FFmpeg command for reading video frames.
+    Returns:
+        list: The FFmpeg command for reading video frames.
+    pass
+    Generates the FFmpeg command for writing video frames.
+    Returns:
+        list: The FFmpeg command for writing video frames.
+    pass
+    Starts reading video frames using FFmpeg.
+    pass
+    Returns a frame.
+    Args:
+        frame: The frame to be returned.
+    Returns:
+        The returned frame.
+    pass
+    Prints data in real-time.
+    Args:
+        data: The data to be printed.
+    pass
+    Writes frames to shared memory.
+    Args:
+        fcs: The frame chunk size.
+    pass
+    Writes out video frames using FFmpeg.
+    pass"""
+
     def __init__(
         self,
         inputFile: str,
