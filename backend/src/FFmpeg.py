@@ -257,13 +257,14 @@ class FFMpegRender:
         self.last_length: int = 0
 
         if self.benchmark:
-            pbar = tqdm(total=self.totalOutputFrames)
+            #pbar = tqdm(total=self.totalOutputFrames)
             while True:
                 frame = self.writeQueue.get()
                 self.previewFrame = frame
                 if frame is None:
                     break
-                pbar.update(1)
+                #pbar.update(1)
+                self.currentFrame += 1
         else:
             self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),

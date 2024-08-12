@@ -31,7 +31,9 @@ class InterpolateRIFENCNN:
         )
 
     def process(self, img0, img1, timestep) -> bytes:
-        return bytes(self.render.process_bytes(img0, img1, timestep))
+        return self.render.process_bytes(img0, img1, timestep)
 
-    def bytesToByteArray(self, bytes):
-        return bytearray(bytes)
+    def uncacheFrame(self, n):
+        self.render.uncache_frame()
+
+

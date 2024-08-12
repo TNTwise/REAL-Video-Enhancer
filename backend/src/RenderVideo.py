@@ -145,12 +145,25 @@ class Render(FFMpegRender):
         log("Finished Upscale")
 
     def renderInterpolate(self):
+        """Method that performs interpolation between frames.\n
+        This method takes in a chunk of frames and outputs an array that can be sent to ffmpeg.\n
+        It starts by setting up the initial frame (frame0) using the frameSetupFunction.\n
+        Then, for each frame in the input frames, it retrieves the next frame (frame1) from the readQueue.\n
+        If frame1 is None, the loop breaks.\n
+        If the current frame number is not the transitionFrame, it performs interpolation by calling the interpolate method.\n
+        The interpolation is done by generating intermediate frames between frame0 and frame1 using the interpolateFactor.\n
+        The resulting frames are then added to the writeQueue.\n
+        If the current frame number is the transitionFrame, it uncaches the cached frame and adds it to the writeQueue.\n
+        After each iteration, frame0 is updated to setup_frame1.\n
+        Finally, None is added to the writeQueue to signal the end of interpolation.\n
+        *NOTE:
+        - The frameSetupFunction is used to convert the frames to the desired format.
+        - The transitionFrame is obtained from the transitionQueue.
+        - The interpolate method performs the actual interpolation between frames.
+        Returns:
+        None
         """
-        self.setupRender, method that is mapped to the bytesToFrame in each respective backend
-        self.interpoate, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
-        self.frame0 is always setup,
-        frame1 is in bytes, and is only converted if need be
-        """
+        
         log("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
@@ -159,27 +172,28 @@ class Render(FFMpegRender):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
+            setup_frame1 = self.frameSetupFunction(frame1)
             if frameNum != self.transitionFrame:
                 for n in range(self.interpolateFactor):
                     timestep = 1 / (self.interpolateFactor - n)
                     if timestep == 1:
                         self.writeQueue.put(frame1)
                         continue
-
+                               
                     frame = self.interpolate(
-                        self.frame0, self.frameSetupFunction(frame1), timestep
+                        self.frame0, setup_frame1, timestep
                     )
                     self.writeQueue.put(frame)
             else:
-                # undo the setup done in ffmpeg thread
-
+                # uncache the cached frame
+                self.undoSetup(frame1)
                 for n in range(self.interpolateFactor):
                     self.writeQueue.put(frame1)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
                 except:
                     self.transitionFrame = None
-            self.frame0 = self.frameSetupFunction(frame1)
+            self.frame0 = setup_frame1
 
         self.writeQueue.put(None)
         log("Finished Interpolation")
@@ -239,8 +253,8 @@ class Render(FFMpegRender):
                 width=self.width,
                 height=self.height,
             )
-            self.setupRender = interpolateRifeNCNN.bytesToByteArray
-            self.undoSetup = self.returnFrame
+            self.setupRender = self.returnFrame
+            self.undoSetup = interpolateRifeNCNN.uncacheFrame
             self.interpolate = interpolateRifeNCNN.process
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
@@ -253,5 +267,5 @@ class Render(FFMpegRender):
                 backend=self.backend,
             )
             self.setupRender = interpolateRifePytorch.frame_to_tensor
-            self.undoSetup = interpolateRifePytorch.tensor_to_frame
+            self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifePytorch.process
