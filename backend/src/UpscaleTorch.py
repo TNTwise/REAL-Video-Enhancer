@@ -5,7 +5,7 @@ import cv2
 import torch as torch
 
 
-from src.Util import currentDirectory, modelsDirectory, printAndLog
+from src.Util import currentDirectory, modelsDirectory, printAndLog, check_bfloat16_support
 
 # tiling code permidently borrowed from https://github.com/chaiNNer-org/spandrel/issues/113#issuecomment-1907209731
 
@@ -17,7 +17,7 @@ class UpscalePytorch:
         modelPath: str,
         device="default",
         tile_pad: int = 10,
-        precision: str = "float16",
+        precision: str = "auto",
         width: int = 1920,
         height: int = 1080,
         backend: str = "pytorch",
@@ -100,6 +100,8 @@ class UpscalePytorch:
         self.model = model
 
     def handlePrecision(self, precision):
+        if precision == "auto":
+            return torch.float16 if check_bfloat16_support() else torch.float32
         if precision == "float32":
             return torch.float32
         if precision == "float16":

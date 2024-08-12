@@ -22,7 +22,7 @@ class HandleApplication:
                 # backend settings
                 device="default",
                 backend=self.args.backend,
-                precision="float16" if self.args.half else "float32",
+                precision=self.args.precision,
                 # ffmpeg settings
                 overwrite=self.args.overwrite,
                 crf=self.args.crf,
@@ -130,9 +130,9 @@ class HandleApplication:
             default="rife413",
         )
         parser.add_argument(
-            "--half",
-            help="half precision, only works with NVIDIA RTX 20 series and above.",
-            action="store_true",
+            "--precision",
+            help="sets precision for model, (auto/float16/float32, default=auto)",
+            default="auto"
         )
         parser.add_argument(
             "--sceneDetectMethod",

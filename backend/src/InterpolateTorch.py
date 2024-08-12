@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 import math
 import os
-from .Util import currentDirectory, printAndLog, errorAndLog, modelsDirectory
+from .Util import currentDirectory, printAndLog, errorAndLog, modelsDirectory, check_bfloat16_support
 
 torch.set_float32_matmul_precision("high")
 torch.set_grad_enabled(False)
@@ -17,7 +17,7 @@ class InterpolateRifeTorch:
         width: int = 1920,
         height: int = 1080,
         device: str = "default",
-        dtype: str = "float16",
+        dtype: str = "auto",
         backend: str = "pytorch",
         UHDMode: bool = False,
         ensemble: bool = False,
@@ -202,6 +202,8 @@ class InterpolateRifeTorch:
             self.flownet = torch.export.load(trt_engine_path).module()
 
     def handlePrecision(self, precision):
+        if precision == "auto":
+            return torch.float16 if check_bfloat16_support() else torch.float32
         if precision == "float32":
             return torch.float32
         if precision == "float16":
