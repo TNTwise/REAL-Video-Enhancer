@@ -37,6 +37,7 @@ class HandleApplication:
                 sceneDetectMethod=self.args.sceneDetectMethod,
                 sceneDetectSensitivity=self.args.sceneDetectSensitivity,
                 sharedMemoryID=self.args.shared_memory_id,
+                trt_optimization_level=self.args.tensorrt_opt_profile
             )
         else:
             availableBackends = []
@@ -140,6 +141,12 @@ class HandleApplication:
             "--precision",
             help="sets precision for model, (auto/float16/float32, default=auto)",
             default="auto",
+        )
+        parser.add_argument(
+            "--tensorrt_opt_profile",
+            help="sets tensorrt optimization profile for model, (1/2/3/4/5, default=3)",
+            type=int,
+            default=3,
         )
         parser.add_argument(
             "--sceneDetectMethod",

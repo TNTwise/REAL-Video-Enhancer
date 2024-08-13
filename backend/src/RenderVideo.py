@@ -68,6 +68,7 @@ class Render(FFMpegRender):
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
         sharedMemoryID: str = None,
+        trt_optimization_level: int = 3,
     ):
         self.inputFile = inputFile
         self.backend = backend
@@ -83,6 +84,7 @@ class Render(FFMpegRender):
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
+        self.trt_optimization_level = trt_optimization_level
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -265,6 +267,7 @@ class Render(FFMpegRender):
                 device=self.device,
                 dtype=self.precision,
                 backend=self.backend,
+                trt_optimization_level=self.trt_optimization_level
             )
             self.setupRender = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = self.returnFrame

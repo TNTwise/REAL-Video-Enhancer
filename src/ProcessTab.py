@@ -11,7 +11,7 @@ from PySide6.QtCore import Qt
 from .QTcustom import UpdateGUIThread
 from .Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
 from .DownloadModels import DownloadModel
-from .SettingsTab import SettingsTab
+from .SettingsTab import Settings
 
 
 class ProcessTab:
@@ -20,7 +20,6 @@ class ProcessTab:
         self.imagePreviewSharedMemoryID = "/image_preview"
         self.renderTextOutputList = None
         self.currentFrame = 0
-
         """
         Key value pairs of the model name in the GUI
         Data inside the tuple:
@@ -182,6 +181,11 @@ class ProcessTab:
         self.outputVideoWidth = videoWidth * self.upscaleTimes
         self.outputVideoHeight = videoHeight * self.upscaleTimes
 
+        # get most recent settings
+        settings = Settings()
+        settings.readSettings()
+        self.settings = settings.settings
+
         DownloadModel(
             modelFile=self.modelFile,
             downloadModelFile=self.downloadFile,
@@ -257,6 +261,12 @@ class ProcessTab:
                 f"{self.modelArch}",
                 "--interpolateFactor",
                 f"{interpolateTimes}",
+                "--custom_encoder",
+                f"-c:v {self.settings['encoder']}",
+                "--precision",
+                f"{self.settings['precision']}",
+                "--tensorrt_opt_profile",
+                f"{self.settings['tensorrt_optimization_level']}"
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,
