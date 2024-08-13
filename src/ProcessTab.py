@@ -71,8 +71,8 @@ class ProcessTab:
                 "SPAN",
             ),
             "Sudo Shuffle SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV1.5.pth",
-                "2x_ModernSpanimationV1.5.pth",
+                "2xSudoShuffleSPAN.pth",
+                "2xSudoShuffleSPAN.pth",
                 2,
                 "SPAN",
             ),
