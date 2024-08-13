@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
-from PySide6 import QtSvg
+from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
 
 # other imports
@@ -29,6 +29,7 @@ from src.Util import (
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
 from src.SettingsTab import SettingsTab
+from src.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
 from src.QTcustom import DownloadDepsDialog, RegularQTPopup
@@ -128,6 +129,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(parent=self)
+        self.moreTab = MoreTab(parent=self)
         # self.downloadModels = DownloadModels()
 
     def QButtonConnect(self):
