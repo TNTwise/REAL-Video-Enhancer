@@ -46,6 +46,15 @@ class ProcessTab:
             "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
             "RIFE 4.22": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
         }
+        self.tensorrtInterpolateModels = {
+            "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
+            "RIFE 4.7": ("rife4.7.pkl", "rife4.7.pkl", 1, "rife47"),
+            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
+            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
+            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
+            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
+            "RIFE 4.22": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
+        }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
                 "2x_ModenSpanimationV1.5",
@@ -55,6 +64,20 @@ class ProcessTab:
             ),
         }
         self.pytorchUpscaleModels = {
+            "SPAN (Animation) (2X)": (
+                "2x_ModernSpanimationV1.5.pth",
+                "2x_ModernSpanimationV1.5.pth",
+                2,
+                "SPAN",
+            ),
+            "Sudo Shuffle SPAN (Animation) (2X)": (
+                "2x_ModernSpanimationV1.5.pth",
+                "2x_ModernSpanimationV1.5.pth",
+                2,
+                "SPAN",
+            ),
+        }
+        self.tensorrtUpscaleModels = {
             "SPAN (Animation) (2X)": (
                 "2x_ModernSpanimationV1.5.pth",
                 "2x_ModernSpanimationV1.5.pth",
@@ -73,17 +96,22 @@ class ProcessTab:
         """
         printAndLog("Getting total models, method: " + method + " backend: " + backend)
         if method == "Interpolate":
-            if backend == "ncnn":
-                models = self.ncnnInterpolateModels
-            elif backend == "pytorch" or backend == "tensorrt":
-                models = self.pytorchInterpolateModels
+            match backend:
+                case "ncnn":
+                    models = self.ncnnInterpolateModels
+                case "pytorch":
+                    models = self.pytorchInterpolateModels
+                case "tensorrt":
+                    models = self.tensorrtInterpolateModels
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
-            if backend == "ncnn":
-                models = self.ncnnUpscaleModels
-            elif backend == "pytorch" or backend == "tensorrt":
-                models = self.pytorchUpscaleModels
-            self.parent.interpolationContainer.setVisible(False)
+            match backend:
+                case "ncnn":
+                    models = self.ncnnUpscaleModels
+                case "pytorch":
+                    models = self.pytorchUpscaleModels
+                case "tensorrt":
+                    models = self.tensorrtUpscaleModels
         return models
 
     def QConnect(self, method: str, backend: str):
@@ -92,9 +120,12 @@ class ProcessTab:
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
-        self.parent.methodComboBox.currentIndexChanged.connect(
-            lambda: self.switchInterpolationAndUpscale(method=method, backend=backend)
-        )
+        cbs = (self.parent.backendComboBox, self.parent.methodComboBox)
+        for combobox in cbs:
+            combobox.currentIndexChanged.connect(
+                lambda: self.switchInterpolationAndUpscale(method=method, backend=backend)
+            )
+        
 
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
@@ -108,7 +139,7 @@ class ProcessTab:
 
         self.parent.modelComboBox.addItems(models)
         total_items = self.parent.modelComboBox.count()
-        if total_items > 0:
+        if total_items > 0 and method.lower() == 'interpolate':
             self.parent.modelComboBox.setCurrentIndex(total_items - 1)
 
     def run(

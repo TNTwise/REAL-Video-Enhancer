@@ -61,7 +61,7 @@ python3 build.py
   <li> <a rel="noopener noreferrer" href="https://github.com/nihui/rife-ncnn-vulkan" target="_blank" >rife-ncnn-vulkan</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar/VapourSynth-RIFE-ncnn-Vulkan" target="_blank">VapourSynth-RIFE-ncnn-Vulkan (For RIFE models [4.1-4.5],[4.7-4.12-lite])</a> </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar" target="_blank">Styler00dollar (For RIFE models [4.1-4.5],[4.7-4.12-lite]) and Sudo Shuffle Span</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/nihui/ifrnet-ncnn-vulkan" target="_blank" >ifrnet-ncnn-vulkan</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/hzwer/Practical-RIFE" target="_blank" >RIFE</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
