@@ -759,7 +759,7 @@ QProgressBar{
                     </widget>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="precisionComboBox">
+                    <widget class="QComboBox" name="precision">
                      <item>
                       <property name="text">
                        <string>auto</string>
@@ -794,7 +794,7 @@ QProgressBar{
                     </widget>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="comboBox">
+                    <widget class="QComboBox" name="tensorrt_optimization_level">
                      <property name="currentIndex">
                       <number>2</number>
                      </property>
@@ -836,7 +836,7 @@ QProgressBar{
                  <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_18">
                    <item>
-                    <widget class="QLabel" name="label_2">
+                    <widget class="QLabel" name="encoderLabel">
                      <property name="font">
                       <font>
                        <pointsize>12</pointsize>
@@ -848,7 +848,7 @@ QProgressBar{
                     </widget>
                    </item>
                    <item>
-                    <widget class="QComboBox" name="comboBox_2">
+                    <widget class="QComboBox" name="encoder">
                      <item>
                       <property name="text">
                        <string>libx264</string>
@@ -857,6 +857,16 @@ QProgressBar{
                      <item>
                       <property name="text">
                        <string>libx265</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>libvpx-vp9</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>libaom-av1</string>
                       </property>
                      </item>
                     </widget>
