@@ -33,7 +33,7 @@ from src.SettingsTab import SettingsTab
 from src.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.QTstyle import Palette
-from src.QTcustom import DownloadDepsDialog, RegularQTPopup
+from src.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -248,18 +248,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.videoInfoContainer.setEnabled(True)
 
     def getAvailableBackends(self):
-        result = subprocess.run(
-            [
+        output = SettingUpBackendPopup(
+                [
                 pythonPath(),
                 os.path.join("backend", "rve-backend.py"),
                 "--list_backends",
-            ],
-            capture_output=True,
-            text=True,
+                ]
         )
-
-        # Extract the output from the command result
-        output = result.stdout.strip()
+        output = output.getOutput()
 
         # Find the part of the output containing the backends list
         start = output.find("[")

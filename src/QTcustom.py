@@ -168,6 +168,7 @@ class DownloadAndReportToQTThread(QThread):
 
 class SubprocessThread(QThread):
     output = QtCore.Signal(str)
+    fullOutput = QtCore.Signal(str)
 
     def __init__(self, command):
         super().__init__()
@@ -182,11 +183,12 @@ class SubprocessThread(QThread):
             bufsize=1,
             universal_newlines=True,
         )
-
+        totalOutput = ""
         for line in iter(process.stdout.readline, ""):
+            totalOutput += line
             self.output.emit(line.strip())
             printAndLog(line.strip())
-
+        self.fullOutput.emit(totalOutput)
         process.stdout.close()
         return_code = process.wait()
         self.output.emit(f"Process finished with return code {return_code}")
@@ -249,6 +251,69 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
             sys.exit()
         self.setValue(value + 10)
 
+class SettingUpBackendPopup(QtWidgets.QDialog):
+    """
+    Runs a command, and displays the output of said command in the popup
+    """
+
+    def __init__(
+        self,
+        command: list,
+        title: str = "Setting Up Backend",
+        progressBarLength: int = None,
+    ):
+        super().__init__()
+        self.command = command
+        self.totalCommandOutput = ""
+        self.title = title
+        self.totalIters = 0
+        self.progressBarLength = progressBarLength
+        self.output = None
+        self.setup_ui()
+        self.exec()
+        self.workerThread.wait()
+        
+
+    """
+    Initializes all threading bs
+    """
+
+    def setup_ui(self):
+        # beginning of bullshit
+        self.setStyleSheet(styleSheet())
+        self.setMinimumSize(300, 100)
+        self.setMaximumSize(300, 100)
+        self.layout2 = QtWidgets.QVBoxLayout()
+        self.label = QtWidgets.QLabel(self.title)
+        self.layout2.addWidget(self.label)
+        self.setLayout(self.layout2)
+        self.startThread()
+        
+
+        # end of bullshit
+
+    def closeEvent(self, x):
+        self.workerThread.quit()
+        self.workerThread.deleteLater()
+        self.workerThread.wait()
+        self.close()
+
+    def startThread(self):
+        self.workerThread = SubprocessThread(command=self.command)
+        self.workerThread.fullOutput.connect(self.setOutput)
+        self.workerThread.finished.connect(self.close)
+        self.workerThread.finished.connect(self.workerThread.deleteLater)
+        self.workerThread.finished.connect(self.workerThread.quit)
+        self.workerThread.finished.connect(
+            self.workerThread.wait
+        )  # need quit and wait to allow process to exit safely
+        self.workerThread.start()
+
+    def setOutput(self, output):
+        self.output = output
+    
+    def getOutput(self):
+        return self.output
 
 class DisplayCommandOutputPopup(QtWidgets.QDialog):
     """
