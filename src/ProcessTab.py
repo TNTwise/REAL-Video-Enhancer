@@ -11,6 +11,7 @@ from PySide6.QtCore import Qt
 from .QTcustom import UpdateGUIThread
 from .Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
 from .DownloadModels import DownloadModel
+from .SettingsTab import SettingsTab
 
 
 class ProcessTab:

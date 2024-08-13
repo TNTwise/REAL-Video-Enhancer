@@ -10,6 +10,23 @@ class SettingsTab:
         parent: QMainWindow,
     ):
         self.parent = parent
+        self.settings = Settings()
+
+        self.connectWriteSettings()
+        self.connectSettingText()
+    
+    def connectWriteSettings(self):
+        self.parent.precision.currentIndexChanged.connect(lambda: self.settings.writeSetting("precision", self.parent.precision.currentText()))
+        self.parent.tensorrt_optimization_level.currentIndexChanged.connect(lambda: self.settings.writeSetting("tensorrt_optimization_level", self.parent.tensorrt_optimization_level.currentText()))
+        self.parent.encoder.currentIndexChanged.connect(lambda: self.settings.writeSetting("encoder", self.parent.encoder.currentText()))
+    
+    def connectSettingText(self):
+        self.parent.precision.setCurrentText(self.settings.settings["precision"])
+        self.parent.tensorrt_optimization_level.setCurrentText(self.settings.settings["tensorrt_optimization_level"])
+        self.parent.encoder.setCurrentText(self.settings.settings["encoder"])
+
+class Settings:
+    def __init__(self):
         self.settingsFile = os.path.join(currentDirectory(),"settings.txt")
         
         """
@@ -33,20 +50,6 @@ class SettingsTab:
         # check if the settings file is corrupted
         if len(self.defaultSettings) != len(self.settings):
             self.writeDefaultSettings()
-
-        self.connectWriteSettings()
-        self.connectSettingText()
-    
-    def connectWriteSettings(self):
-        self.parent.precision.currentIndexChanged.connect(lambda: self.writeSetting("precision", self.parent.precision.currentText()))
-        self.parent.tensorrt_optimization_level.currentIndexChanged.connect(lambda: self.writeSetting("tensorrt_optimization_level", self.parent.tensorrt_optimization_level.currentText()))
-        self.parent.encoder.currentIndexChanged.connect(lambda: self.writeSetting("encoder", self.parent.encoder.currentText()))
-    
-    def connectSettingText(self):
-        self.parent.precision.setCurrentText(self.settings["precision"])
-        self.parent.tensorrt_optimization_level.setCurrentText(self.settings["tensorrt_optimization_level"])
-        self.parent.encoder.setCurrentText(self.settings["encoder"])
-
     def readSettings(self):
         """
         Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.
