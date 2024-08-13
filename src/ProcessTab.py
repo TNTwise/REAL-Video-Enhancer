@@ -107,6 +107,9 @@ class ProcessTab:
         models = self.getTotalModels(method=method, backend=backend)
 
         self.parent.modelComboBox.addItems(models)
+        total_items = self.parent.modelComboBox.count()
+        if total_items > 0:
+            self.parent.modelComboBox.setCurrentIndex(total_items - 1)
 
     def run(
         self,

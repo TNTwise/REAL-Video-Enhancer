@@ -136,6 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
+        self.moreBtn.clicked.connect(self.switchToMorePage)
 
     def setupBackendDeps(self):
         # need pop up window
@@ -147,31 +148,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             downloadDependencies.downloadPython()
             if getPlatform() == "win32":
                 downloadDependencies.downloadVCREDLIST()
-
+    
     # switch menus
     def switchToHomePage(self):
         self.stackedWidget.setCurrentWidget(self.homePage)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
+        self.moreBtn.setChecked(False)
 
     def switchToProcessingPage(self):
         self.stackedWidget.setCurrentWidget(self.procPage)
         self.homeBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
+        self.moreBtn.setChecked(False)
 
     def switchToSettingsPage(self):
         self.stackedWidget.setCurrentWidget(self.settingsPage)
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
+        self.moreBtn.setChecked(False)
 
     def switchToDownloadPage(self):
         self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.homeBtn.setChecked(False)
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
+        self.moreBtn.setChecked(False)
+
+    def switchToMorePage(self):
+        self.stackedWidget.setCurrentWidget(self.morePage)
+        self.homeBtn.setChecked(False)
+        self.processBtn.setChecked(False)
+        self.settingsBtn.setChecked(False)
+        self.downloadBtn.setChecked(False)
 
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
