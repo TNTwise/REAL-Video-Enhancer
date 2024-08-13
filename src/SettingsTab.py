@@ -59,8 +59,8 @@ class SettingsTab:
                 for line in file:
                     key, value = line.strip().split(',')
                     self.settings[key] = value
-            except ValueError:
-                self.writeDefaultSettings()
+            except ValueError: # writes and reads again if the settings file is corrupted
+                self.writeDefaultSettings() 
                 self.readSettings()
     def writeSetting(self, setting:str, value:str):
         """
@@ -102,8 +102,8 @@ class SettingsTab:
         with open(self.settingsFile, 'w') as file:
             
             for key, value in self.settings.items():
-                if key in self.defaultSettings:
-                    if value in self.allowedSettings[key]:
+                if key in self.defaultSettings: # check if the key is valid
+                    if value in self.allowedSettings[key]: # check if it is in the allowed settings dict
                         file.write(f"{key},{value}\n")
                 else:
                     self.writeDefaultSettings()
