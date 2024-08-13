@@ -1,6 +1,7 @@
 import sys
 import os
 import subprocess
+import re
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
 from PySide6.QtCore import Qt
@@ -121,6 +122,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.renderOutput.setText(printOut)
         printAndLog(printOut)
+        
+        halfPrecisionSupport = re.search("half precision support: \s*(true|false)", self.fullOutput.lower())
+        if halfPrecisionSupport:
+            halfPrecisionSupport = halfPrecisionSupport.group(1) == 'true'
+        else:
+            halfPrecisionSupport = False
+
         self.processTab = ProcessTab(
             parent=self,
             backend=self.backendComboBox.currentText(),
@@ -128,7 +136,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
         self.downloadTab = DownloadTab(parent=self)
-        self.settingsTab = SettingsTab(parent=self)
+        self.settingsTab = SettingsTab(parent=self,
+                                       halfPrecisionSupport=halfPrecisionSupport)
         self.moreTab = MoreTab(parent=self)
         # self.downloadModels = DownloadModels()
 

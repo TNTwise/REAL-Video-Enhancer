@@ -8,12 +8,17 @@ class SettingsTab:
     def __init__(
         self,
         parent: QMainWindow,
+        halfPrecisionSupport,
     ):
         self.parent = parent
         self.settings = Settings()
 
         self.connectWriteSettings()
         self.connectSettingText()
+
+        # disable half option if its not supported
+        if not halfPrecisionSupport:
+            self.parent.precision.removeItem(1)
     
     def connectWriteSettings(self):
         self.parent.precision.currentIndexChanged.connect(lambda: self.settings.writeSetting("precision", self.parent.precision.currentText()))
