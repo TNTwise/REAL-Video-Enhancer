@@ -222,10 +222,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def startRender(self):
         self.startRenderButton.setEnabled(False)
+        method = self.methodComboBox.currentText()
         self.progressBar.setRange(
             0,
-            self.videoFrameCount
-            * int(self.interpolationMultiplierComboBox.currentText()),
+            # only set the range to multiply the frame count if the method is interpolate
+            self.videoFrameCount * int(self.interpolationMultiplierComboBox.currentText()) if method == "Interpolate" else self.videoFrameCount, 
         )
         self.disableProcessPage()
         self.processTab.run(
@@ -235,7 +236,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoHeight=self.videoHeight,
             videoFps=self.videoFps,
             videoFrameCount=self.videoFrameCount,
-            method=self.methodComboBox.currentText(),
+            method=method,
             backend=self.backendComboBox.currentText(),
             interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
             model=self.modelComboBox.currentText(),

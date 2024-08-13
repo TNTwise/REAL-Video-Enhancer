@@ -73,10 +73,10 @@ class UpscalePytorch:
                 device = torch.device("cpu")
         else:
             decice = torch.device(device)
-        printAndLog("Using device: " + device)
+        printAndLog("Using device: " + str(device))
         self.tile_pad = tile_pad
         self.dtype = self.handlePrecision(precision)
-        self.device = torch.device(device, 0)
+        self.device = device
         model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
 
         self.width = width
