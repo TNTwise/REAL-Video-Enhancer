@@ -1,6 +1,6 @@
-from PySide6.QtGui import QImage, QPalette, QColor
-from PySide6.QtCore import Qt
-
+from PySide6.QtGui import QImage, QPalette, QColor, QIcon
+from PySide6.QtCore import Qt, QPropertyAnimation, QRect
+from PySide6.QtWidgets import QGraphicsOpacityEffect, QWidget
 
 def styleSheet():
     return (
@@ -94,5 +94,12 @@ def Palette():
     return palette
 
 
-def iconFallback():
-    pass
+def fadeAnimation(qObject:QWidget):
+    opacity_effect = QGraphicsOpacityEffect()
+    qObject.setGraphicsEffect(opacity_effect)
+
+    animation = QPropertyAnimation(opacity_effect, b"opacity")
+    animation.setDuration(200)  # Duration in milliseconds
+    animation.setStartValue(.3)
+    animation.setEndValue(1)
+    animation.start()

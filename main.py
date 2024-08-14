@@ -3,13 +3,15 @@ import os
 import subprocess
 import re
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QGraphicsOpacityEffect, QWidget
+from PySide6.QtCore import Qt, QPropertyAnimation, QRect
 from PySide6.QtGui import QIcon
+from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
+
 from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
-from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
+from src.QTstyle import fadeAnimation
 
 # other imports
 from src.Util import (
@@ -79,7 +81,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.latestPreviewImage = None
 
         # setup application
-
         self.setupBackendDeps()
 
         # Set up the user interface from Designer.
@@ -139,7 +140,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsTab = SettingsTab(parent=self,
                                        halfPrecisionSupport=halfPrecisionSupport)
         self.moreTab = MoreTab(parent=self)
-        # self.downloadModels = DownloadModels()
+        # Startup Animation
+        self.fadeAnimation(self)
 
     def QButtonConnect(self):
         # connect buttons to switch menus
@@ -167,6 +169,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
         self.moreBtn.setChecked(False)
+        fadeAnimation(self.stackedWidget)
 
     def switchToProcessingPage(self):
         self.stackedWidget.setCurrentWidget(self.procPage)
@@ -174,6 +177,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
         self.moreBtn.setChecked(False)
+        fadeAnimation(self.stackedWidget)
 
     def switchToSettingsPage(self):
         self.stackedWidget.setCurrentWidget(self.settingsPage)
@@ -181,6 +185,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
         self.moreBtn.setChecked(False)
+        fadeAnimation(self.stackedWidget)
 
     def switchToDownloadPage(self):
         self.stackedWidget.setCurrentWidget(self.downloadPage)
@@ -188,6 +193,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
         self.moreBtn.setChecked(False)
+        fadeAnimation(self.stackedWidget)
 
     def switchToMorePage(self):
         self.stackedWidget.setCurrentWidget(self.morePage)
@@ -195,6 +201,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.setChecked(False)
         self.settingsBtn.setChecked(False)
         self.downloadBtn.setChecked(False)
+        fadeAnimation(self.stackedWidget)
 
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
