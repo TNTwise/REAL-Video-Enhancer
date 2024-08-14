@@ -4,14 +4,12 @@ import subprocess
 import re
 
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QGraphicsOpacityEffect, QWidget
-from PySide6.QtCore import Qt, QPropertyAnimation, QRect
+from PySide6.QtCore import Qt, QPropertyAnimation, QRect, QEasingCurve
 from PySide6.QtGui import QIcon
-from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
-
 from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
+from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
-from src.QTstyle import fadeAnimation
 
 # other imports
 from src.Util import (
@@ -141,7 +139,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                                        halfPrecisionSupport=halfPrecisionSupport)
         self.moreTab = MoreTab(parent=self)
         # Startup Animation
-        self.fadeAnimation(self)
+        self.fadeInAnimation(self)
+    
+    def setButtonAnimations(self):
+        self.homeBtn.enterEvent = self.fade_to_color(self.homeBtn)
+
+    def fadeInAnimation(self,qObject:QWidget, n=None):
+        self.opacity_effect = QGraphicsOpacityEffect()
+        qObject.setGraphicsEffect(self.opacity_effect)
+
+        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.animation.setDuration(200)  # Duration in milliseconds
+        self.animation.setStartValue(0)
+        self.animation.setEndValue(1)
+        self.animation.start()
+    
+    def fadeOutAnimation(self,qObject:QWidget, n=None):
+        self.opacity_effect = QGraphicsOpacityEffect()
+        qObject.setGraphicsEffect(self.opacity_effect)
+
+        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
+        self.animation.setDuration(200)  # Duration in milliseconds
+        self.animation.setStartValue(1)
+        self.animation.setEndValue(0)
+        self.animation.start()
+
+    def fade_to_color(self, color):
+        self.animation = QPropertyAnimation(self, b"styleSheet")
+        self.animation.setDuration(5000)  # Duration in milliseconds
+        self.animation.setStartValue(self.styleSheet())
+        self.animation.setEndValue(color)
+        self.animation.setEasingCurve(QEasingCurve.InOutQuad)
+        self.animation.start()
 
     def QButtonConnect(self):
         # connect buttons to switch menus
@@ -162,46 +191,45 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if getPlatform() == "win32":
                 downloadDependencies.downloadVCREDLIST()
     
+    def setButtonsUnchecked(self,buttonToIgnore):
+        buttons = [self.homeBtn, self.processBtn, self.settingsBtn, self.downloadBtn, self.moreBtn]
+        for button in buttons:
+            if button != buttonToIgnore:
+                button.setChecked(False)
+            else:
+                button.setChecked(True)
+
     # switch menus
     def switchToHomePage(self):
+        self.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.homePage)
-        self.processBtn.setChecked(False)
-        self.settingsBtn.setChecked(False)
-        self.downloadBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
-        fadeAnimation(self.stackedWidget)
+        self.setButtonsUnchecked(self.homeBtn)
+        self.fadeInAnimation(self.stackedWidget)
 
     def switchToProcessingPage(self):
+        self.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.procPage)
-        self.homeBtn.setChecked(False)
-        self.settingsBtn.setChecked(False)
-        self.downloadBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
-        fadeAnimation(self.stackedWidget)
+        self.setButtonsUnchecked(self.processBtn)
+        self.fadeInAnimation(self.stackedWidget)
 
     def switchToSettingsPage(self):
+        self.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.settingsPage)
-        self.homeBtn.setChecked(False)
-        self.processBtn.setChecked(False)
-        self.downloadBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
-        fadeAnimation(self.stackedWidget)
+        self.setButtonsUnchecked(self.settingsBtn)
+        self.fadeInAnimation(self.stackedWidget)
 
     def switchToDownloadPage(self):
+        self.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.downloadPage)
-        self.homeBtn.setChecked(False)
-        self.processBtn.setChecked(False)
-        self.settingsBtn.setChecked(False)
-        self.moreBtn.setChecked(False)
-        fadeAnimation(self.stackedWidget)
+        self.setButtonsUnchecked(self.downloadBtn)
+        self.fadeInAnimation(self.stackedWidget)
 
     def switchToMorePage(self):
+        self.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.morePage)
-        self.homeBtn.setChecked(False)
-        self.processBtn.setChecked(False)
-        self.settingsBtn.setChecked(False)
-        self.downloadBtn.setChecked(False)
-        fadeAnimation(self.stackedWidget)
+        self.setButtonsUnchecked(self.moreBtn)
+        self.fadeInAnimation(self.stackedWidget)
+        self.moreBtn.setChecked(True)
 
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True

@@ -1351,6 +1351,11 @@ background-color:white;
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="styleSheet">
+                <string notr="true">QPushButton:checked{
+	background-color:#676e7b;
+}</string>
+               </property>
                <property name="icon">
                 <iconset resource="resources.qrc">
                  <normaloff>:/icons/icons/more-horizontal.svg</normaloff>:/icons/icons/more-horizontal.svg</iconset>
@@ -1362,6 +1367,9 @@ background-color:white;
                 </size>
                </property>
                <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
                 <bool>false</bool>
                </property>
               </widget>
