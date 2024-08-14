@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="icons">
+    <file>icons/logo-v2.svg</file>
     <file>icons/activity.svg</file>
     <file>icons/airplay.svg</file>
     <file>icons/alert-circle.svg</file>
