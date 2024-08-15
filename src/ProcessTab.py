@@ -1,4 +1,3 @@
-from math import e
 import subprocess
 import os
 from threading import Thread
@@ -113,6 +112,7 @@ class ProcessTab:
                 case "tensorrt":
                     models = self.tensorrtUpscaleModels
         return models
+    
 
     def QConnect(self, method: str, backend: str):
         # connect file select buttons
@@ -127,11 +127,16 @@ class ProcessTab:
                     method=method, backend=backend
                 )
             )
+        # connect gui switching
+
+        self.parent.inputFileText.textChanged.connect(self.parent.setDefaultOutputFile)
+        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(self.parent.setDefaultOutputFile)
 
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
         Called every render, gets the correct model based on the backend and the method.
         """
+        
         self.parent.modelComboBox.clear()
         # overwrite method
         method = self.parent.methodComboBox.currentText()
@@ -142,6 +147,14 @@ class ProcessTab:
         total_items = self.parent.modelComboBox.count()
         if total_items > 0 and method.lower() == "interpolate":
             self.parent.modelComboBox.setCurrentIndex(total_items - 1)
+        
+        if method.lower() == "interpolate":
+            self.parent.interpolationContainer.setVisible(True)
+        else:
+            self.parent.interpolationContainer.setVisible(False)
+
+        self.parent.setDefaultOutputFile()
+
 
     def run(
         self,
@@ -257,7 +270,7 @@ class ProcessTab:
                 "--upscaleModel",
                 os.path.join(modelsPath(), self.modelFile),
                 "--interpolateFactor",
-                f"1",
+                "1",
             ]
         if method == "Interpolate":
             command += [

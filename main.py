@@ -33,6 +33,7 @@ from src.Util import (
     get_gpu_info,
     getRAMAmount,
     getCPUInfo,
+    videosPath,
 )
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
@@ -80,10 +81,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # set up base variables
         self.homeDir = os.path.expanduser("~")
-        self.interpolateTimes = 1
-        self.upscaleTimes = 2
         self.pipeInFrames = None
         self.latestPreviewImage = None
+        self.videoWidth=None
+        self.videoHeight=None
 
         # setup application
         self.setupBackendDeps()
@@ -103,7 +104,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
-        self.QButtonConnect()
+        self.QConnect()
+        
 
         # set up tabs
         self.backendComboBox.addItems(self.availableBackends)
@@ -142,7 +144,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backend=self.backendComboBox.currentText(),
             method=self.methodComboBox.currentText(),
         )
-
+        
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(
             parent=self, halfPrecisionSupport=halfPrecisionSupport
@@ -182,13 +184,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
         self.animation.start()
 
-    def QButtonConnect(self):
+    def QConnect(self):
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
         self.moreBtn.clicked.connect(self.switchToMorePage)
+        # connect getting default output file
+
 
     def setupBackendDeps(self):
         # need pop up window
@@ -270,7 +274,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
                 firstIter=False
             )
-
+        
+    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int):
+        """
+        Generates the default output file name based on the input file and the current settings
+        """
+        file_name = os.path.splitext(os.path.basename(inputVideo))[0]
+        file_extension = os.path.splitext(inputVideo)[1]
+        self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}{file_extension}"
+        iteration=0
+        while os.path.isfile(self.output_file):
+            self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}){file_extension}"
+        self.output_file = os.path.join(videosPath(), self.output_file)
+        return self.output_file
+    
+    def setDefaultOutputFile(self):
+        
+        #check if there is a video loaded
+        print(self.methodComboBox.currentText())
+        if self.videoHeight:
+            inputFile=self.inputFileText.text()
+            modelName = self.modelComboBox.currentText()
+            if self.methodComboBox.currentText() == "Upscale":
+                
+                
+                # get the scale from the current model name
+                scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
+                interpolateTimes = 1
+            elif self.methodComboBox.currentText() == "Interpolate":
+                scale = 1
+                interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
+                
+            outputText = self.generateDefaultOutputFile(inputFile, 
+                                                        int(interpolateTimes),
+                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight))
+            self.outputFileText.setText(outputText)
     def startRender(self):
         self.startRenderButton.setEnabled(False)
         method = self.methodComboBox.currentText()
@@ -373,7 +411,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             caption="Select Output Directory",
             dir=self.homeDir,
         )
-        self.outputFileText.setText(self.outputFolder)
+        self.outputFileText.setText(self.outputFolder + self.setDefaultOutputFile())
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary

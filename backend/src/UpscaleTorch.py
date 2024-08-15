@@ -84,7 +84,6 @@ class UpscalePytorch:
         if backend == "tensorrt":
             import tensorrt as trt
             import torch_tensorrt
-            printAndLog("Building Engine")
             trt_engine_path = os.path.join(
                 os.path.realpath(trt_cache_dir),
                 (

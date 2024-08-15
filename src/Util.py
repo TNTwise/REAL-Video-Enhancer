@@ -13,7 +13,7 @@ import psutil
 import cpuinfo
 
 cwd = os.getcwd()
-
+home_dir = os.path.expanduser("~")
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
@@ -72,6 +72,14 @@ def modelsPath() -> str:
     """
     return os.path.join(cwd, "models")
 
+def videosPath() -> str:
+    """
+    Returns the file path for the videos directory.
+
+    :return: The file path for the videos directory.
+    :rtype: str
+    """
+    return os.path.join(home_dir, "Videos")
 
 def ffmpegPath() -> str:
     return (
