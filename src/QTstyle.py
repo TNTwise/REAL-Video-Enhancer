@@ -49,6 +49,7 @@ def styleSheet():
         "QPlainTextEdit{\n"
         "    background-color:#2c313c;\n"
         "	border-radius: 30px;\n"
+        "   padding:5px 10px;\n"
         "\n"
         "}\n"
         "QPushButton{\n"

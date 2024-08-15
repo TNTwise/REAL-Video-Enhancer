@@ -283,13 +283,13 @@ class DownloadDependencies:
         match getPlatform():
             case "linux":
                 tensorRTDeps = [
-                    "tensorrt==10.0.1",
-                    "tensorrt_cu12==10.0.1",
-                    "tensorrt-cu12_libs==10.0.1",
-                    "tensorrt_cu12_bindings==10.0.1",
+                    "tensorrt==10.1.0",
+                    "tensorrt_cu12==10.1.0",
+                    "tensorrt-cu12_libs==10.1.0",
+                    "tensorrt_cu12_bindings==10.1.0",
                 ]
                 tensorRTDeps += (
-                    "2.4.0",
+                    "torch_tensorrt==2.4.0",
                 )
             case "win32":
                 tensorRTDeps = [
