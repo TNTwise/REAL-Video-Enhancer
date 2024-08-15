@@ -352,7 +352,7 @@ class ProcessTab:
         """
         
         if self.renderTextOutputList is not None:
-            print(self.renderTextOutputList)
+            #print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
                 self.splitListIntoStringWithNewLines(self.renderTextOutputList)
             )

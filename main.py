@@ -281,10 +281,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         file_name = os.path.splitext(os.path.basename(inputVideo))[0]
         file_extension = os.path.splitext(inputVideo)[1]
-        self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}{file_extension}"
+        self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv"
         iteration=0
         while os.path.isfile(self.output_file):
-            self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}){file_extension}"
+            self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv"
         return self.output_file
     
     def setDefaultOutputFile(self,useDefaultVideoPath=True):
