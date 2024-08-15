@@ -11,6 +11,7 @@ import shutil
 import platform
 import psutil
 import cpuinfo
+import distro
 
 cwd = os.getcwd()
 home_dir = os.path.expanduser("~")
@@ -25,6 +26,10 @@ def getOSInfo() -> str:
     system = platform.system()
     release = platform.release()
     architecture = platform.machine()
+    if system == "Linux":
+        distro_name = distro.name()
+        distro_version = distro.version()
+        return f"{distro_name} {distro_version} {architecture}"
     return f"{system} {release} {architecture}"
 
 

@@ -319,29 +319,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.outputFileText.setText(outputText)
             return outputText
     def startRender(self):
-        self.startRenderButton.setEnabled(False)
-        method = self.methodComboBox.currentText()
-        self.progressBar.setRange(
-            0,
-            # only set the range to multiply the frame count if the method is interpolate
-            self.videoFrameCount
-            * int(self.interpolationMultiplierComboBox.currentText())
-            if method == "Interpolate"
-            else self.videoFrameCount,
-        )
-        self.disableProcessPage()
-        self.processTab.run(
-            inputFile=self.inputFileText.text(),
-            outputPath=self.outputFileText.text(),
-            videoWidth=self.videoWidth,
-            videoHeight=self.videoHeight,
-            videoFps=self.videoFps,
-            videoFrameCount=self.videoFrameCount,
-            method=method,
-            backend=self.backendComboBox.currentText(),
-            interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
-            model=self.modelComboBox.currentText(),
-        )
+        if self.videoHeight:
+            self.startRenderButton.setEnabled(False)
+            method = self.methodComboBox.currentText()
+            self.progressBar.setRange(
+                0,
+                # only set the range to multiply the frame count if the method is interpolate
+                self.videoFrameCount
+                * int(self.interpolationMultiplierComboBox.currentText())
+                if method == "Interpolate"
+                else self.videoFrameCount,
+            )
+            self.disableProcessPage()
+            self.processTab.run(
+                inputFile=self.inputFileText.text(),
+                outputPath=self.outputFileText.text(),
+                videoWidth=self.videoWidth,
+                videoHeight=self.videoHeight,
+                videoFps=self.videoFps,
+                videoFrameCount=self.videoFrameCount,
+                method=method,
+                backend=self.backendComboBox.currentText(),
+                interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
+                model=self.modelComboBox.currentText(),
+            )
 
     def disableProcessPage(self):
         self.videoInfoContainer.setDisabled(True)

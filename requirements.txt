@@ -7,3 +7,4 @@ lief==0.15.0
 pyinstaller
 psutil
 py-cpuinfo
+distro

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>897</width>
-    <height>707</height>
+    <height>709</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -35,7 +35,7 @@ color: #fff;
    border-radius: 30px;
 }
 #bottomMenuSubContainer{
-	background-color:#16191d;
+	background-color:#2c313c;
    border-radius: 30px;
 }
 
@@ -205,71 +205,110 @@ QProgressBar{
  }</string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
-              <item row="1" column="0" colspan="2">
-               <widget class="QWidget" name="bottomMenuSubContainer" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>85</height>
-                 </size>
+              <item row="0" column="1">
+               <widget class="QWidget" name="processInfoContainer" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
-                 <property name="spacing">
-                  <number>20</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>22</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>22</number>
-                 </property>
+                <property name="styleSheet">
+                 <string notr="true">#processInfoContainer{
+background-color:#1f232a;
+border-radius:10px;
+border-padding:30px;
+}
+#infoSubContainer{
+background-color:#1f232a
+
+}
+#previewSubContainer{
+background-color:#1f232a
+}
+#renderOutput{
+background-color:#343b47;
+border-radius: 10px;
+
+}
+#previewLabel{
+background-color:#343b47;
+border-radius: 10px;
+
+
+}</string>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_5">
                  <item>
-                  <widget class="QPushButton" name="startRenderButton">
-                   <property name="enabled">
-                    <bool>true</bool>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>59</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                   <property name="icon">
-                    <iconset resource="resources.qrc">
-                     <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
-                   </property>
-                   <property name="iconSize">
-                    <size>
-                     <width>55</width>
-                     <height>45</height>
-                    </size>
-                   </property>
+                  <widget class="QWidget" name="previewSubContainer" native="true">
+                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                    <item>
+                     <widget class="QLabel" name="previewLabel">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="scaledContents">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                  <item>
-                  <widget class="QProgressBar" name="progressBar">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="value">
-                    <number>0</number>
-                   </property>
-                   <property name="textVisible">
-                    <bool>false</bool>
-                   </property>
+                  <widget class="QWidget" name="infoSubContainer" native="true">
+                   <layout class="QVBoxLayout" name="verticalLayout_9">
+                    <item>
+                     <widget class="QTextEdit" name="renderOutput">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true">*:disabled{
+ 
+	color:white;
+}</string>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                      <property name="html">
+                       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
                   </widget>
                  </item>
                 </layout>
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QWidget" name="videoInfoContainer" native="true">
+               <widget class="QWidget" name="processSettingsContainer" native="true">
                 <property name="maximumSize">
                  <size>
                   <width>16000</width>
@@ -560,90 +599,54 @@ QProgressBar{
                   </widget>
                  </item>
                  <item>
-                  <widget class="QLabel" name="videoInfoLabel">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
+                  <widget class="QWidget" name="videoInfoContainer_2" native="true">
                    <property name="styleSheet">
-                    <string notr="true">QLabel{
-background-color:#2c313c;
-border-radius: 10px;
-}
-</string>
+                    <string notr="true">QWidget {
+	background-color:#1f232a;
+	border-radius:10px;
+}</string>
                    </property>
-                   <property name="text">
-                    <string>videoInfo</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="1">
-               <widget class="QWidget" name="processInfoContainer" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_5">
-                 <item>
-                  <widget class="QWidget" name="previewSubContainer" native="true">
-                   <layout class="QVBoxLayout" name="verticalLayout_8">
+                   <layout class="QVBoxLayout" name="verticalLayout_10">
                     <item>
-                     <widget class="QLabel" name="previewLabel">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
+                     <spacer name="verticalSpacer_3">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Vertical</enum>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">QLabel{
-background-color:#2c313c;
-border-radius: 10px;
-}
-</string>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>20</width>
+                        <height>40</height>
+                       </size>
                       </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="scaledContents">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
+                     </spacer>
                     </item>
-                   </layout>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="infoSubContainer" native="true">
-                   <layout class="QVBoxLayout" name="verticalLayout_9">
                     <item>
-                     <widget class="QTextEdit" name="renderOutput">
+                     <widget class="QTextEdit" name="videoInfoTextEdit">
                       <property name="sizePolicy">
-                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+                       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                         <horstretch>0</horstretch>
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>15</pointsize>
-                       </font>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>150</height>
+                       </size>
+                      </property>
+                      <property name="accessibleDescription">
+                       <string notr="true"/>
                       </property>
                       <property name="styleSheet">
-                       <string notr="true">*:disabled{
- 
-	color:white;
+                       <string notr="true">QTextEdit{
+background-color:#343b47
 }</string>
                       </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
+                      <property name="verticalScrollBarPolicy">
+                       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                      </property>
+                      <property name="horizontalScrollBarPolicy">
+                       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
                       </property>
                       <property name="html">
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
@@ -652,8 +655,97 @@ p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:15pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;FPS:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Resolution:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Bitrate:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Encoder:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Container:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Frame Count:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QWidget" name="bottomMenuSubContainer" native="true">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>85</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">#bottomMenuSubContainer{
+background-color:#1f232a
+}
+#progressBar{
+background-color:#343b47
+}
+#startRenderButton{
+background-color:#343b47
+}
+#startRenderButton:hover{
+background-color:#676e7b
+}</string>
+                   </property>
+                   <layout class="QHBoxLayout" name="horizontalLayout_2">
+                    <property name="spacing">
+                     <number>20</number>
+                    </property>
+                    <property name="leftMargin">
+                     <number>22</number>
+                    </property>
+                    <property name="rightMargin">
+                     <number>22</number>
+                    </property>
+                    <item>
+                     <widget class="QPushButton" name="startRenderButton">
+                      <property name="enabled">
+                       <bool>true</bool>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>59</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                      <property name="icon">
+                       <iconset resource="resources.qrc">
+                        <normaloff>:/icons/icons/play.svg</normaloff>:/icons/icons/play.svg</iconset>
+                      </property>
+                      <property name="iconSize">
+                       <size>
+                        <width>55</width>
+                        <height>45</height>
+                       </size>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QProgressBar" name="progressBar">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="value">
+                       <number>0</number>
+                      </property>
+                      <property name="textVisible">
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
