@@ -52,10 +52,10 @@ def checkForPytorch() -> bool:
 
         return True
     except ImportError as e:
-        printAndLog(str(e))
+        log(str(e))
         return False
     except Exception as e:
-        printAndLog(str(e))
+        log(str(e))
 
 
 def checkForTensorRT() -> bool:
@@ -71,10 +71,10 @@ def checkForTensorRT() -> bool:
 
         return True
     except ImportError as e:
-        printAndLog(str(e))
+        log(str(e))
         return False
     except Exception as e:
-        printAndLog(str(e))
+        log(str(e))
 
 
 def check_bfloat16_support() -> bool:
@@ -100,7 +100,7 @@ def checkForNCNN() -> bool:
 
         return True
     except ImportError as e:
-        printAndLog(str(e))
+        log(str(e))
         return False
     except Exception as e:
-        printAndLog(str(e))
+        log(str(e))

@@ -12,13 +12,13 @@ try:
     from .UpscaleNCNN import UpscaleNCNN, getNCNNScale
     from .InterpolateNCNN import InterpolateRIFENCNN
 except ImportError:
-    print("WARN: unable to import ncnn.")
+    log("WARN: unable to import ncnn.")
 
 try:
     from .InterpolateTorch import InterpolateRifeTorch
     from .UpscaleTorch import UpscalePytorch
 except ImportError:
-    print("WARN: unable to import pytorch.")
+    log("WARN: unable to import pytorch.")
 
 
 class Render(FFMpegRender):
