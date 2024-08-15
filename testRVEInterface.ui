@@ -217,7 +217,6 @@ QProgressBar{
                  <string notr="true">#processInfoContainer{
 background-color:#1f232a;
 border-radius:10px;
-border-padding:30px;
 }
 #infoSubContainer{
 background-color:#1f232a
@@ -647,6 +646,9 @@ background-color:#343b47
                       </property>
                       <property name="horizontalScrollBarPolicy">
                        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
                       </property>
                       <property name="html">
                        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

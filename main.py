@@ -85,6 +85,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.latestPreviewImage = None
         self.videoWidth=None
         self.videoHeight=None
+        self.isVideoLoaded = False
 
         # setup application
         self.setupBackendDeps()
@@ -280,13 +281,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Generates the default output file name based on the input file and the current settings
         """
         file_name = os.path.splitext(os.path.basename(inputVideo))[0]
-        file_extension = os.path.splitext(inputVideo)[1]
         self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv"
         iteration=0
         while os.path.isfile(self.output_file):
             self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv"
         return self.output_file
     
+    def updateVideoGUIDetails(self):
+        if self.isVideoLoaded:
+            self.setDefaultOutputFile()
+            inputFile=self.inputFileText.text()
+            modelName = self.modelComboBox.currentText()
+            method = self.methodComboBox.currentText()
+            interpolateTimes = self.getInterpolateTimes(method,modelName)
+            scale = self.getScale(method,modelName)
+            text = (
+            f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
+            + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth*scale}x{self.videoHeight*scale}\n"
+            + "Bitrate:\n"
+            + "Encoder:\n"
+            + "Container:\n"
+            + "Frame Count\n"
+            )
+            self.videoInfoTextEdit.setFontPointSize(14)
+            self.videoInfoTextEdit.setText(text)
+            
+    def getScale(self,method,modelName):
+        if method == "Upscale":
+            scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
+        elif method == "Interpolate":
+            scale = 1
+        return scale
+    def getInterpolateTimes(self,method,modelName):
+        if method == "Upscale":
+            interpolateTimes = 1
+        elif method == "Interpolate":
+            interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
+        return interpolateTimes
+
     def setDefaultOutputFile(self,useDefaultVideoPath=True):
         """
         Sets the default output file for the video enhancer.
@@ -297,19 +329,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         
         #check if there is a video loaded
-        print(self.methodComboBox.currentText())
         if self.videoHeight:
             inputFile=self.inputFileText.text()
             modelName = self.modelComboBox.currentText()
-            if self.methodComboBox.currentText() == "Upscale":
-                
-                
-                # get the scale from the current model name
-                scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
-                interpolateTimes = 1
-            elif self.methodComboBox.currentText() == "Interpolate":
-                scale = 1
-                interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
+            method = self.methodComboBox.currentText()
+            interpolateTimes = self.getInterpolateTimes(method,modelName)
+            scale = self.getScale(method,modelName)
                 
             outputText = self.generateDefaultOutputFile(inputFile, 
                                                         int(interpolateTimes),
@@ -343,6 +368,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
                 model=self.modelComboBox.currentText(),
             )
+        else:
+            pass
+            RegularQTPopup("Please select a video file!")
 
     def disableProcessPage(self):
         self.videoInfoContainer.setDisabled(True)
@@ -395,6 +423,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         if checkValidVideo(inputFile):
             self.inputFile = inputFile
+            self.isVideoLoaded = True
             # gets width and height from the res
             self.videoWidth, self.videoHeight = getVideoRes(inputFile)
             # get fps

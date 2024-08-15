@@ -129,8 +129,8 @@ class ProcessTab:
             )
         # connect gui switching
 
-        self.parent.inputFileText.textChanged.connect(self.parent.setDefaultOutputFile)
-        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(self.parent.setDefaultOutputFile)
+        self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
+        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(self.parent.updateVideoGUIDetails)
 
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
@@ -153,7 +153,7 @@ class ProcessTab:
         else:
             self.parent.interpolationContainer.setVisible(False)
 
-        self.parent.setDefaultOutputFile()
+        self.parent.updateVideoGUIDetails()
 
 
     def run(
