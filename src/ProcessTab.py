@@ -279,7 +279,6 @@ class ProcessTab:
         )
         textOutput = []
         for line in iter(self.parent.renderProcess.stdout.readline, b""):
-            print('a')
             if self.parent.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
             line = str(line.strip())
