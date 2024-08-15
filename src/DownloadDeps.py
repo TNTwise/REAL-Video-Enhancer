@@ -177,7 +177,7 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/nightly/cu124",
             "--extra-index-url",
             "https://pypi.nvidia.com",
-            "-U"
+            "-U",
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
@@ -202,7 +202,7 @@ class DownloadDependencies:
             "typing_extensions",
             "packaging",
             "mpmath",
-            "pillow"
+            "pillow",
         ]
         return platformIndependentdeps
 
@@ -215,16 +215,16 @@ class DownloadDependencies:
 
         torchCUDALinuxDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
-            #"https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
+            # "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
             "torch==2.4.0",
             "torchvision==0.19.0",
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/spandrel/releases/download/sudo_span/spandrel-0.3.4-py3-none-any.whl",
-            #"--pre",
-            #"https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
-            #"--pre",
-            #"https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
+            # "--pre",
+            # "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
+            # "--pre",
+            # "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
             "torch==2.4.0",
             "torchvision==0.19.0",
             "safetensors",
@@ -288,9 +288,7 @@ class DownloadDependencies:
                     "tensorrt-cu12_libs==10.1.0",
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
-                tensorRTDeps += (
-                    "torch_tensorrt==2.4.0",
-                )
+                tensorRTDeps += ("torch_tensorrt==2.4.0",)
             case "win32":
                 tensorRTDeps = [
                     "tensorrt==10.1.0",
@@ -301,7 +299,7 @@ class DownloadDependencies:
                 tensorRTDeps += (
                     "--no-deps",
                     "torch_tensorrt==2.4.0",
-                    #"https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
+                    # "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240803%2Bcu124-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 

@@ -37,7 +37,7 @@ class HandleApplication:
                 sceneDetectMethod=self.args.sceneDetectMethod,
                 sceneDetectSensitivity=self.args.sceneDetectSensitivity,
                 sharedMemoryID=self.args.shared_memory_id,
-                trt_optimization_level=self.args.tensorrt_opt_profile
+                trt_optimization_level=self.args.tensorrt_opt_profile,
             )
         else:
             availableBackends = []

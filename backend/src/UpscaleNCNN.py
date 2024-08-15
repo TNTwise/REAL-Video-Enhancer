@@ -57,7 +57,7 @@ def getNCNNScale(modelPath: str = "") -> int:
 class UpscaleNCNN:
     def __init__(
         self,
-        modelPath: str,
+        modelPath: os.PathLike,
         num_threads: int,
         scale: int,
         gpuid: int = 0,
@@ -65,7 +65,9 @@ class UpscaleNCNN:
         height: int = 1080,
     ):
         # only import if necessary
+        path, last_folder = os.path.split(modelPath)
 
+        modelPath = os.path.join(path, last_folder, last_folder)
         self.model = UPSCALE(
             gpuid=gpuid, model_str=modelPath, num_threads=num_threads, scale=scale
         )

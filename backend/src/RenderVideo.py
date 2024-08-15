@@ -165,7 +165,7 @@ class Render(FFMpegRender):
         Returns:
         None
         """
-        
+
         log("Starting Interpolation")
         self.transitionFrame = self.transitionQueue.get()
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
@@ -181,10 +181,8 @@ class Render(FFMpegRender):
                     if timestep == 1:
                         self.writeQueue.put(frame1)
                         continue
-                               
-                    frame = self.interpolate(
-                        self.frame0, setup_frame1, timestep
-                    )
+
+                    frame = self.interpolate(self.frame0, setup_frame1, timestep)
                     self.writeQueue.put(frame)
             else:
                 # uncache the cached frame
@@ -267,7 +265,7 @@ class Render(FFMpegRender):
                 device=self.device,
                 dtype=self.precision,
                 backend=self.backend,
-                trt_optimization_level=self.trt_optimization_level
+                trt_optimization_level=self.trt_optimization_level,
             )
             self.setupRender = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = self.returnFrame

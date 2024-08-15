@@ -57,16 +57,16 @@ class ProcessTab:
         }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
-                "2x_ModenSpanimationV1.5",
-                "2x_ModenSpanimationV1.5.tar.gz",
+                "2x_ModernSpanimationV2",
+                "2x_ModernSpanimationV2.tar.gz",
                 2,
                 "SPAN",
             ),
         }
         self.pytorchUpscaleModels = {
             "SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV1.5.pth",
-                "2x_ModernSpanimationV1.5.pth",
+                "2x_ModernSpanimationV2.pth",
+                "2x_ModernSpanimationV2.pth",
                 2,
                 "SPAN",
             ),
@@ -79,8 +79,8 @@ class ProcessTab:
         }
         self.tensorrtUpscaleModels = {
             "SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV1.5.pth",
-                "2x_ModernSpanimationV1.5.pth",
+                "2x_ModernSpanimationV2.pth",
+                "2x_ModernSpanimationV2.pth",
                 2,
                 "SPAN",
             ),
@@ -123,9 +123,10 @@ class ProcessTab:
         cbs = (self.parent.backendComboBox, self.parent.methodComboBox)
         for combobox in cbs:
             combobox.currentIndexChanged.connect(
-                lambda: self.switchInterpolationAndUpscale(method=method, backend=backend)
+                lambda: self.switchInterpolationAndUpscale(
+                    method=method, backend=backend
+                )
             )
-        
 
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
@@ -139,7 +140,7 @@ class ProcessTab:
 
         self.parent.modelComboBox.addItems(models)
         total_items = self.parent.modelComboBox.count()
-        if total_items > 0 and method.lower() == 'interpolate':
+        if total_items > 0 and method.lower() == "interpolate":
             self.parent.modelComboBox.setCurrentIndex(total_items - 1)
 
     def run(
@@ -266,7 +267,7 @@ class ProcessTab:
                 "--precision",
                 f"{self.settings['precision']}",
                 "--tensorrt_opt_profile",
-                f"{self.settings['tensorrt_optimization_level']}"
+                f"{self.settings['tensorrt_optimization_level']}",
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,

@@ -75,6 +75,7 @@ class InterpolateRifeTorch:
         Returns:
             torch.Tensor: Tensor representing the frame.
         pass"""
+
     @torch.inference_mode()
     def __init__(
         self,

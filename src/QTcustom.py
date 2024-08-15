@@ -210,7 +210,6 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.startDownload()
         self.exec()
         self.workerThread.wait()
-        
 
     """
     Initializes all threading bs
@@ -252,6 +251,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
             sys.exit()
         self.setValue(value + 10)
 
+
 class SettingUpBackendPopup(QtWidgets.QDialog):
     """
     Runs a command, and displays the output of said command in the popup
@@ -273,7 +273,6 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
         self.setup_ui()
         self.exec()
         self.workerThread.wait()
-        
 
     """
     Initializes all threading bs
@@ -281,6 +280,7 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
 
     def setup_ui(self):
         # beginning of bullshit
+        self.setWindowTitle(self.title)
         self.setStyleSheet(styleSheet())
         self.setMinimumSize(350, 400)
         self.setMaximumSize(350, 400)
@@ -289,7 +289,7 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
         self.iconLabel = QtWidgets.QLabel()
         logobtn = QPushButton()
         icon = QIcon()
-        icon.addFile(u":/icons/icons/logo-v2.svg", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(":/icons/icons/logo-v2.svg", QSize(), QIcon.Normal, QIcon.Off)
         logobtn.setIcon(icon)
         logobtn.setIconSize(QSize(200, 200))
         pixmap = icon.pixmap(QSize(200, 200))
@@ -301,7 +301,6 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
         self.layout2.addWidget(self.label)
         self.setLayout(self.layout2)
         self.startThread()
-        
 
         # end of bullshit
 
@@ -324,9 +323,10 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
 
     def setOutput(self, output):
         self.output = output
-    
+
     def getOutput(self):
         return self.output
+
 
 class DisplayCommandOutputPopup(QtWidgets.QDialog):
     """

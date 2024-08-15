@@ -3,12 +3,19 @@ import os
 import subprocess
 import re
 
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QGraphicsOpacityEffect, QWidget
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QFileDialog,
+    QMessageBox,
+    QGraphicsOpacityEffect,
+    QWidget,
+)
 from PySide6.QtCore import Qt, QPropertyAnimation, QRect, QEasingCurve
 from PySide6.QtGui import QIcon
 from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
-from PySide6 import QtSvg # Import the QtSvg module so svg icons can be used on windows
+from PySide6 import QtSvg  # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
 
 # other imports
@@ -67,7 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         openOutputFolder(): Opens an output folder.
         killRenderProcess(): Terminates the render process.
         closeEvent(event): Handles the close event of the main window."""
-    
+
     def __init__(self):
         super().__init__()
 
@@ -121,10 +128,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.renderOutput.setText(printOut)
         printAndLog(printOut)
-        
-        halfPrecisionSupport = re.search("half precision support: \s*(true|false)", self.fullOutput.lower())
+
+        halfPrecisionSupport = re.search(
+            "half precision support: \s*(true|false)", self.fullOutput.lower()
+        )
         if halfPrecisionSupport:
-            halfPrecisionSupport = halfPrecisionSupport.group(1) == 'true'
+            halfPrecisionSupport = halfPrecisionSupport.group(1) == "true"
         else:
             halfPrecisionSupport = False
 
@@ -135,16 +144,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
 
         self.downloadTab = DownloadTab(parent=self)
-        self.settingsTab = SettingsTab(parent=self,
-                                       halfPrecisionSupport=halfPrecisionSupport)
+        self.settingsTab = SettingsTab(
+            parent=self, halfPrecisionSupport=halfPrecisionSupport
+        )
         self.moreTab = MoreTab(parent=self)
         # Startup Animation
         self.fadeInAnimation(self)
-    
+
     def setButtonAnimations(self):
         self.homeBtn.enterEvent = self.fade_to_color(self.homeBtn)
 
-    def fadeInAnimation(self,qObject:QWidget, n=None):
+    def fadeInAnimation(self, qObject: QWidget, n=None):
         self.opacity_effect = QGraphicsOpacityEffect()
         qObject.setGraphicsEffect(self.opacity_effect)
 
@@ -153,8 +163,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.animation.setStartValue(0)
         self.animation.setEndValue(1)
         self.animation.start()
-    
-    def fadeOutAnimation(self,qObject:QWidget, n=None):
+
+    def fadeOutAnimation(self, qObject: QWidget, n=None):
         self.opacity_effect = QGraphicsOpacityEffect()
         qObject.setGraphicsEffect(self.opacity_effect)
 
@@ -190,9 +200,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             downloadDependencies.downloadPython()
             if getPlatform() == "win32":
                 downloadDependencies.downloadVCREDLIST()
-    
-    def setButtonsUnchecked(self,buttonToIgnore):
-        buttons = [self.homeBtn, self.processBtn, self.settingsBtn, self.downloadBtn, self.moreBtn]
+
+    def setButtonsUnchecked(self, buttonToIgnore):
+        buttons = [
+            self.homeBtn,
+            self.processBtn,
+            self.settingsBtn,
+            self.downloadBtn,
+            self.moreBtn,
+        ]
         for button in buttons:
             if button != buttonToIgnore:
                 button.setChecked(False)
@@ -261,7 +277,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.progressBar.setRange(
             0,
             # only set the range to multiply the frame count if the method is interpolate
-            self.videoFrameCount * int(self.interpolationMultiplierComboBox.currentText()) if method == "Interpolate" else self.videoFrameCount, 
+            self.videoFrameCount
+            * int(self.interpolationMultiplierComboBox.currentText())
+            if method == "Interpolate"
+            else self.videoFrameCount,
         )
         self.disableProcessPage()
         self.processTab.run(
@@ -285,11 +304,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def getAvailableBackends(self):
         output = SettingUpBackendPopup(
-                [
+            [
                 pythonPath(),
                 os.path.join("backend", "rve-backend.py"),
                 "--list_backends",
-                ]
+            ]
         )
         output = output.getOutput()
 

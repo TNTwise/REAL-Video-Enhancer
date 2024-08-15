@@ -49,7 +49,7 @@ class UpscalePytorch:
         getScale(): Returns the scale factor of the model.
         saveImage(image, fullOutputPathLocation): Saves an image to a file.
         renderTiledImage(image, tile_size): Renders a tiled image."""
-    
+
     @torch.inference_mode()
     def __init__(
         self,
