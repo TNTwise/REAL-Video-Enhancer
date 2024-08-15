@@ -17,7 +17,7 @@ from .SettingsTab import Settings
 class ProcessTab:
     def __init__(self, parent, backend: str, method: str):
         self.parent = parent
-        self.imagePreviewSharedMemoryID = "/image_preview"
+        self.imagePreviewSharedMemoryID = "/image_preview" + str(os.getpid())
         self.renderTextOutputList = None
         self.currentFrame = 0
         """
@@ -245,11 +245,19 @@ class ProcessTab:
             f"{backend}",
             "--shared_memory_id",
             f"{self.imagePreviewSharedMemoryID}",
+            "--precision",
+            f"{self.settings['precision']}",
+            "--custom_encoder",
+            f"-c:v {self.settings['encoder']}",
+            "--tensorrt_opt_profile",
+            f"{self.settings['tensorrt_optimization_level']}",
         ]
         if method == "Upscale":
             command += [
                 "--upscaleModel",
                 os.path.join(modelsPath(), self.modelFile),
+                "--interpolateFactor",
+                f"1",
             ]
         if method == "Interpolate":
             command += [
@@ -262,25 +270,19 @@ class ProcessTab:
                 f"{self.modelArch}",
                 "--interpolateFactor",
                 f"{interpolateTimes}",
-                "--custom_encoder",
-                f"-c:v {self.settings['encoder']}",
-                "--precision",
-                f"{self.settings['precision']}",
-                "--tensorrt_opt_profile",
-                f"{self.settings['tensorrt_optimization_level']}",
             ]
         self.parent.renderProcess = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-            bufsize=1,
         )
         textOutput = []
         for line in iter(self.parent.renderProcess.stdout.readline, b""):
+            print('a')
             if self.parent.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
-            line = line.strip()
+            line = str(line.strip())
             if "it/s" in line:
                 textOutput = textOutput[:-1]
             if "FPS" in line:
@@ -290,10 +292,9 @@ class ProcessTab:
                 self.currentFrame = int(
                     re.search(r"Current Frame: (\d+)", line).group(1)
                 )
-            if not "warn" in line.lower():
-                textOutput.append(line)
+            textOutput.append(line)
             # self.setRenderOutputContent(textOutput)
-            self.renderTextOutputList = textOutput
+            self.renderTextOutputList = textOutput.copy()
             if "Time to complete render" in line:
                 break
         log(str(textOutput))
@@ -337,7 +338,9 @@ class ProcessTab:
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
+        
         if self.renderTextOutputList is not None:
+            print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
                 self.splitListIntoStringWithNewLines(self.renderTextOutputList)
             )

@@ -1,6 +1,7 @@
 from threading import Thread
 from queue import Queue
 from multiprocessing import shared_memory
+import os
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
@@ -207,7 +208,7 @@ class Render(FFMpegRender):
         For interpolation:
         Mapss the self.undoSetup to the tensor_to_frame function, which undoes the prep done in the FFMpeg thread. Used for SCDetect
         """
-        log("Setting up Upscale")
+        printAndLog("Setting up Upscale")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             upscalePytorch = UpscalePytorch(
                 self.upscaleModel,
@@ -222,6 +223,10 @@ class Render(FFMpegRender):
             self.upscale = upscalePytorch.renderToNPArray
 
         if self.backend == "ncnn":
+            path, last_folder = os.path.split(self.upscaleModel)
+
+            self.upscaleModel = os.path.join(path, last_folder, last_folder)
+            
             self.upscaleTimes = getNCNNScale(modelPath=self.upscaleModel)
             upscaleNCNN = UpscaleNCNN(
                 modelPath=self.upscaleModel,
