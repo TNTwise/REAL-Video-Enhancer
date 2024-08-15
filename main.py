@@ -285,10 +285,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         iteration=0
         while os.path.isfile(self.output_file):
             self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}){file_extension}"
-        self.output_file = os.path.join(videosPath(), self.output_file)
         return self.output_file
     
-    def setDefaultOutputFile(self):
+    def setDefaultOutputFile(self,useDefaultVideoPath=True):
+        """
+        Sets the default output file for the video enhancer.
+        Parameters:
+        - useDefaultVideoPath (bool): Flag indicating whether to use the default video path for the output file.
+        Returns:
+        None
+        """
         
         #check if there is a video loaded
         print(self.methodComboBox.currentText())
@@ -308,7 +314,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             outputText = self.generateDefaultOutputFile(inputFile, 
                                                         int(interpolateTimes),
                                                         int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight))
+            if useDefaultVideoPath:
+                outputText = os.path.join(videosPath(), outputText)
             self.outputFileText.setText(outputText)
+            return outputText
     def startRender(self):
         self.startRenderButton.setEnabled(False)
         method = self.methodComboBox.currentText()
@@ -406,12 +415,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         It will also read the input file name, and generate an output file based on it.
         """
-        self.outputFolder = QFileDialog.getExistingDirectory(
+        outputFolder = QFileDialog.getExistingDirectory(
             self,
             caption="Select Output Directory",
             dir=self.homeDir,
         )
-        self.outputFileText.setText(self.outputFolder + self.setDefaultOutputFile())
+        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(False)))
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
