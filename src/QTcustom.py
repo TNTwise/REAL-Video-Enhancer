@@ -210,6 +210,7 @@ class DownloadProgressPopup(QtWidgets.QProgressDialog):
         self.startDownload()
         self.exec()
         self.workerThread.wait()
+        
 
     """
     Initializes all threading bs
@@ -281,10 +282,22 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
     def setup_ui(self):
         # beginning of bullshit
         self.setStyleSheet(styleSheet())
-        self.setMinimumSize(300, 100)
-        self.setMaximumSize(300, 100)
+        self.setMinimumSize(350, 400)
+        self.setMaximumSize(350, 400)
         self.layout2 = QtWidgets.QVBoxLayout()
         self.label = QtWidgets.QLabel(self.title)
+        self.iconLabel = QtWidgets.QLabel()
+        logobtn = QPushButton()
+        icon = QIcon()
+        icon.addFile(u":/icons/icons/logo-v2.svg", QSize(), QIcon.Normal, QIcon.Off)
+        logobtn.setIcon(icon)
+        logobtn.setIconSize(QSize(200, 200))
+        pixmap = icon.pixmap(QSize(200, 200))
+        self.iconLabel.setPixmap(pixmap)
+        self.iconLabel.setAlignment(Qt.AlignCenter)
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setFont(QFont("Arial", 20))
+        self.layout2.addWidget(self.iconLabel)
         self.layout2.addWidget(self.label)
         self.setLayout(self.layout2)
         self.startThread()
