@@ -12,6 +12,7 @@ import platform
 import psutil
 import cpuinfo
 import distro
+import webbrowser
 
 cwd = os.getcwd()
 home_dir = os.path.expanduser("~")
@@ -351,6 +352,11 @@ def getVendor():
         if vendor.lower() in gpuInfo.lower():
             return vendor
 
-
-if __name__ == "__main__":
-    print(getVendor())
+def openLink(link: str):
+    """
+    Opens a link in the default web browser.
+    
+    :param link: The link to open.
+    :type link: str
+    """
+    webbrowser.open(link)

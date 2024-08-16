@@ -29,7 +29,7 @@ from src.Util import (
     getVideoBitrate,
     checkIfDeps,
     pythonPath,
-    currentDirectory,
+    openLink,
     getPlatform,
     getOSInfo,
     get_gpu_info,
@@ -194,8 +194,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.processBtn.clicked.connect(self.switchToProcessingPage)
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
-        self.moreBtn.clicked.connect(self.switchToMorePage)
         # connect getting default output file
+        self.githubBtn.clicked.connect(lambda: openLink("https://github.com/tntwise/REAL-Video-Enhancer"))
+        self.kofiBtn.clicked.connect(lambda: openLink("https://ko-fi.com/tntwise"))
 
 
     def setupBackendDeps(self):
@@ -215,7 +216,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.processBtn,
             self.settingsBtn,
             self.downloadBtn,
-            self.moreBtn,
         ]
         for button in buttons:
             if button != buttonToIgnore:
@@ -247,13 +247,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.setButtonsUnchecked(self.downloadBtn)
         self.fadeInAnimation(self.stackedWidget)
-
-    def switchToMorePage(self):
-        self.fadeOutAnimation(self.stackedWidget)
-        self.stackedWidget.setCurrentWidget(self.morePage)
-        self.setButtonsUnchecked(self.moreBtn)
-        self.fadeInAnimation(self.stackedWidget)
-        self.moreBtn.setChecked(True)
 
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
