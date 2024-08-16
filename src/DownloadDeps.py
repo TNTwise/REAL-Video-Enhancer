@@ -142,7 +142,7 @@ class DownloadDependencies:
         DownloadProgressPopup(
             link=link,
             downloadLocation=vcTempPath,
-            title="Downloading VC_redlist.x64.exe\nClick cancel if you already have it installed.",
+            title="Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed.",
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)

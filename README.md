@@ -84,8 +84,8 @@ python3 build.py
 <ul>
   <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-SPANkendata" target="_blank" >4x-SPANkendata by Crustaceous D</a> </li>
   <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-ClearRealityV1" target="_blank" >4x-ClearRealityV1 by Kim2091</a> </li>
-  
-  
+  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong" target="_blank" >4x-Nomos8k-SPAN series by Helaman</a> </li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus" target="_blank" >OpenProteus by SiroSky</a> </li>
 </ul>
 
 

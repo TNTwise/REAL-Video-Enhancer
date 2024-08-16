@@ -61,6 +61,30 @@ class ProcessTab:
                 2,
                 "SPAN",
             ),
+            "SPAN (Realistic) (High Quality Source) (4X)": (
+                "4xNomos8k_span_otf_weak",
+                "4xNomos8k_span_otf_weak.tar.gz",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Medium Quality Source) (4X)": (
+                "4xNomos8k_span_otf_medium",
+                "4xNomos8k_span_otf_medium.tar.gz",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Low Quality Source) (4X)": (
+                "4xNomos8k_span_otf_strong",
+                "4xNomos8k_span_otf_strong.tar.gz",
+                4,
+                "SPAN"
+            ),
+            "Compact (Realistic) (HD Input) (2X)": (
+                "2x_OpenProteus_Compact_i2_70K",
+                "2x_OpenProteus_Compact_i2_70K.tar.gz",
+                2,
+                "Compact"
+            )
         }
         self.pytorchUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -75,6 +99,30 @@ class ProcessTab:
                 2,
                 "SPAN",
             ),
+            "SPAN (Realistic) (High Quality Source) (4X)": (
+                "4xNomos8k_span_otf_weak.pth",
+                "4xNomos8k_span_otf_weak.pth",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Medium Quality Source) (4X)": (
+                "4xNomos8k_span_otf_medium.pth",
+                "4xNomos8k_span_otf_medium.pth",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Low Quality Source) (4X)": (
+                "4xNomos8k_span_otf_strong.pth",
+                "4xNomos8k_span_otf_strong.pth",
+                4,
+                "SPAN"
+            ),
+            "Compact (Realistic) (HD Input) (2X)": (
+                "2x_OpenProteus_Compact_i2_70K.pth",
+                "2x_OpenProteus_Compact_i2_70K.pth",
+                2,
+                "Compact"
+            )
         }
         self.tensorrtUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -83,6 +131,30 @@ class ProcessTab:
                 2,
                 "SPAN",
             ),
+            "SPAN (Realistic) (High Quality Source) (4X)": (
+                "4xNomos8k_span_otf_weak.pth",
+                "4xNomos8k_span_otf_weak.pth",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Medium Quality Source) (4X)": (
+                "4xNomos8k_span_otf_medium.pth",
+                "4xNomos8k_span_otf_medium.pth",
+                4,
+                "SPAN"
+            ),
+            "SPAN (Realistic) (Low Quality Source) (4X)": (
+                "4xNomos8k_span_otf_strong.pth",
+                "4xNomos8k_span_otf_strong.pth",
+                4,
+                "SPAN"
+            ),
+            "Compact (Realistic) (HD Input) (2X)": (
+                "2x_OpenProteus_Compact_i2_70K.pth",
+                "2x_OpenProteus_Compact_i2_70K.pth",
+                2,
+                "Compact"
+            )
         }
         # get default backend
         self.QConnect(method=method, backend=backend)
