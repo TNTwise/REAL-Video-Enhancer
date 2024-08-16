@@ -213,6 +213,32 @@ def getVideoRes(video_path) -> list[int, int]:
 
     return resolution
 
+def getVideoBitrate(video_path) -> int:
+    """
+    Takes in a video path
+    Uses opencv to detect the bitrate of the video
+    """
+    cap = cv2.VideoCapture(video_path)
+    bitrate = int(cap.get(cv2.CAP_PROP_BITRATE))
+
+    cap.release()
+
+    return bitrate
+
+def getVideoEncoder(inputFile):
+    """
+    Returns the video encoder codec as a string for the given input file.
+    Parameters:
+    inputFile (str): The path to the input video file.
+    Returns:
+    str: The video encoder codec as a string.
+    """
+
+    video = cv2.VideoCapture(inputFile)
+    codec = int(video.get(cv2.CAP_PROP_FOURCC))
+    codec_str = chr(codec & 0xFF) + chr((codec >> 8) & 0xFF) + chr((codec >> 16) & 0xFF) + chr((codec >> 24) & 0xFF)
+    video.release()
+    return codec_str
 
 def getVideoFPS(video_path) -> float:
     """

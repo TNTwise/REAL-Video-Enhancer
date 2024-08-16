@@ -25,6 +25,8 @@ from src.Util import (
     getVideoRes,
     getVideoLength,
     getVideoFrameCount,
+    getVideoEncoder,
+    getVideoBitrate,
     checkIfDeps,
     pythonPath,
     currentDirectory,
@@ -34,6 +36,7 @@ from src.Util import (
     getRAMAmount,
     getCPUInfo,
     videosPath,
+    
 )
 from src.ProcessTab import ProcessTab
 from src.DownloadTab import DownloadTab
@@ -290,20 +293,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def updateVideoGUIDetails(self):
         if self.isVideoLoaded:
             self.setDefaultOutputFile()
-            inputFile=self.inputFileText.text()
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method,modelName)
             scale = self.getScale(method,modelName)
+            inputFile=self.inputFileText.text()
+            file_extension = os.path.splitext(inputFile)[1]
             text = (
             f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
             + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth*scale}x{self.videoHeight*scale}\n"
-            + "Bitrate:\n"
-            + "Encoder:\n"
-            + "Container:\n"
-            + "Frame Count\n"
+            + f"Bitrate: {self.videoBitrate}\n"
+            + f"Encoder: {self.videoEncoder}\n"
+            + f"Container: {file_extension}\n"
+            + f"Frame Count: {self.videoFrameCount}\n"
             )
-            self.videoInfoTextEdit.setFontPointSize(14)
+            self.videoInfoTextEdit.setFontPointSize(10)
             self.videoInfoTextEdit.setText(text)
             
     def getScale(self,method,modelName):
@@ -329,7 +333,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """
         
         #check if there is a video loaded
-        if self.videoHeight:
+        if self.isVideoLoaded:
             inputFile=self.inputFileText.text()
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
@@ -432,6 +436,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.videoLength = getVideoLength(inputFile)
             # get video frame count
             self.videoFrameCount = getVideoFrameCount(inputFile)
+            # get video encoder
+            self.videoEncoder = getVideoEncoder(inputFile)
+            # get video bitrate
+            self.videoBitrate = getVideoBitrate(inputFile)
+            # get video codec
+            self.videoCodec = getVideoEncoder(inputFile)
             self.inputFileText.setText(inputFile)
             self.outputFileText.setEnabled(True)
             self.outputFileSelectButton.setEnabled(True)
