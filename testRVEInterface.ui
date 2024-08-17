@@ -790,7 +790,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   <widget class="QWidget" name="widget_2" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_13">
                     <item>
-                     <widget class="QWidget" name="videoInfoContainer_2" native="true">
+                     <widget class="QWidget" name="videoInfoContainer" native="true">
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
