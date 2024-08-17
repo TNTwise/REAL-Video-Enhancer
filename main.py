@@ -38,13 +38,13 @@ from src.Util import (
     videosPath,
     
 )
-from src.ProcessTab import ProcessTab
-from src.DownloadTab import DownloadTab
-from src.SettingsTab import SettingsTab
-from src.MoreTab import MoreTab
+from src.ui.ProcessTab import ProcessTab
+from src.ui.DownloadTab import DownloadTab
+from src.ui.SettingsTab import SettingsTab
+from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
-from src.QTstyle import Palette
-from src.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
+from src.ui.QTstyle import Palette
+from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):

@@ -1,5 +1,4 @@
 import cv2
-
 import os
 import warnings
 import sys

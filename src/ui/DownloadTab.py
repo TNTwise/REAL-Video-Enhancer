@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
-from .DownloadDeps import DownloadDependencies
+from ..DownloadDeps import DownloadDependencies
 
 
 class DownloadTab:

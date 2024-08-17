@@ -9,7 +9,7 @@ from .Util import (
     move,
     extractTarGZ,
 )
-from .QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
+from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
 import shutil

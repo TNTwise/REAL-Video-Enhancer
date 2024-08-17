@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtWidgets import QMainWindow
-from .Util import currentDirectory
+from ..Util import currentDirectory
 
 
 class SettingsTab:

@@ -54,7 +54,7 @@ from PySide6.QtWidgets import (
 
 try:
     from .QTstyle import styleSheet
-    from .Util import printAndLog
+    from ..Util import printAndLog
 except ImportError:
     pass
 
