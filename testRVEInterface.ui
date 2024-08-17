@@ -794,7 +794,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>15</height>
+                        <height>200</height>
                        </size>
                       </property>
                       <property name="styleSheet">
@@ -815,13 +815,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
-                           <height>130</height>
+                           <height>180</height>
                           </size>
                          </property>
                          <property name="maximumSize">
                           <size>
                            <width>16777215</width>
-                           <height>150</height>
+                           <height>16777215</height>
                           </size>
                          </property>
                          <property name="accessibleDescription">

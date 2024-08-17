@@ -272,15 +272,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 firstIter=False
             )
         
-    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int):
+    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int, outputDirectory = ""):
         """
         Generates the default output file name based on the input file and the current settings
         """
         file_name = os.path.splitext(os.path.basename(inputVideo))[0]
-        self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv"
+        self.output_file = os.path.join(outputDirectory, f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv")
         iteration=0
         while os.path.isfile(self.output_file):
             self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv"
+            iteration+=1
         return self.output_file
     
     def updateVideoGUIDetails(self):
@@ -316,7 +317,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
         return interpolateTimes
 
-    def setDefaultOutputFile(self,useDefaultVideoPath=True):
+    def setDefaultOutputFile(self,useDefaultVideoPath=True,customOutputPath=videosPath()):
         """
         Sets the default output file for the video enhancer.
         Parameters:
@@ -332,10 +333,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method,modelName)
             scale = self.getScale(method,modelName)
-                
+
             outputText = self.generateDefaultOutputFile(inputFile, 
                                                         int(interpolateTimes),
-                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight))
+                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight),outputDirectory=customOutputPath)
             if useDefaultVideoPath:
                 outputText = os.path.join(videosPath(), outputText)
             self.outputFileText.setText(outputText)
@@ -453,7 +454,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             caption="Select Output Directory",
             dir=self.homeDir,
         )
-        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(False)))
+        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(False,customOutputPath=outputFolder)))
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
