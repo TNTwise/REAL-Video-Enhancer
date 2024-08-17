@@ -97,7 +97,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
-        self.setMinimumSize(1100, 600)
+        self.setMinimumSize(1100, 700
+                            )
 
         self.aspect_ratio = self.width() / self.height()
 
