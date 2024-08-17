@@ -273,7 +273,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 firstIter=False
             )
         
-    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int, outputDirectory = ""):
+    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int, outputDirectory:str):
         """
         Generates the default output file name based on the input file and the current settings
         """
@@ -281,13 +281,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.output_file = os.path.join(outputDirectory, f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv")
         iteration=0
         while os.path.isfile(self.output_file):
-            self.output_file = f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv"
+            self.output_file = os.path.join(outputDirectory, f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv")
             iteration+=1
         return self.output_file
     
-    def updateVideoGUIDetails(self):
-        if self.isVideoLoaded:
-            self.setDefaultOutputFile()
+    def updateVideoGUIText(self):
+         if self.isVideoLoaded:
+            
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method,modelName)
@@ -304,21 +304,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
             self.videoInfoTextEdit.setFontPointSize(10)
             self.videoInfoTextEdit.setText(text)
-            
-    def getScale(self,method,modelName):
-        if method == "Upscale":
-            scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
-        elif method == "Interpolate":
-            scale = 1
-        return scale
-    def getInterpolateTimes(self,method,modelName):
-        if method == "Upscale":
-            interpolateTimes = 1
-        elif method == "Interpolate":
-            interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
-        return interpolateTimes
-
-    def setDefaultOutputFile(self,useDefaultVideoPath=True,customOutputPath=videosPath()):
+    
+    def setDefaultOutputFile(self,outputDirectory):
         """
         Sets the default output file for the video enhancer.
         Parameters:
@@ -337,13 +324,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             outputText = self.generateDefaultOutputFile(inputFile, 
                                                         int(interpolateTimes),
-                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight),outputDirectory=customOutputPath)
-            if useDefaultVideoPath:
-                outputText = os.path.join(videosPath(), outputText)
+                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight),outputDirectory=outputDirectory)
             self.outputFileText.setText(outputText)
             return outputText
+
+    def updateVideoGUIDetails(self):
+        self.setDefaultOutputFile(videosPath())
+        self.updateVideoGUIDetails()
+       
+            
+    def getScale(self,method,modelName):
+        if method == "Upscale":
+            scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
+        elif method == "Interpolate":
+            scale = 1
+        return scale
+    def getInterpolateTimes(self,method,modelName):
+        if method == "Upscale":
+            interpolateTimes = 1
+        elif method == "Interpolate":
+            interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
+        return interpolateTimes
+
+    
     def startRender(self):
-        if self.videoHeight:
+        if self.isVideoLoaded:
             self.startRenderButton.setEnabled(False)
             method = self.methodComboBox.currentText()
             self.progressBar.setRange(
@@ -455,7 +460,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             caption="Select Output Directory",
             dir=self.homeDir,
         )
-        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(False,customOutputPath=outputFolder)))
+        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(outputFolder)))
 
     
 
