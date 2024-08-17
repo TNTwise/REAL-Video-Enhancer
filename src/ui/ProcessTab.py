@@ -204,6 +204,12 @@ class ProcessTab:
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(self.parent.updateVideoGUIDetails)
 
+    def killRenderProcess(self):
+        try:  # kills  render process if necessary
+            self.renderProcess.terminate()
+        except AttributeError:
+            printAndLog("No render process!")
+
     def switchInterpolationAndUpscale(self, method: str, backend: str):
         """
         Called every render, gets the correct model based on the backend and the method.
@@ -356,15 +362,15 @@ class ProcessTab:
                 "--interpolateFactor",
                 f"{interpolateTimes}",
             ]
-        self.parent.renderProcess = subprocess.Popen(
+        self.renderProcess = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
         )
         textOutput = []
-        for line in iter(self.parent.renderProcess.stdout.readline, b""):
-            if self.parent.renderProcess.poll() is not None:
+        for line in iter(self.renderProcess.stdout.readline, b""):
+            if self.renderProcess.poll() is not None:
                 break  # Exit the loop if the process has terminated
             line = str(line.strip())
             if "it/s" in line:
@@ -382,7 +388,7 @@ class ProcessTab:
             if "Time to complete render" in line:
                 break
         log(str(textOutput))
-        self.parent.renderProcess.wait()
+        self.renderProcess.wait()
         # done with render
         self.onRenderCompletion()
 

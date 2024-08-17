@@ -457,11 +457,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(False,customOutputPath=outputFolder)))
 
-    def killRenderProcess(self):
-        try:  # kills  render process if necessary
-            self.renderProcess.terminate()
-        except AttributeError:
-            printAndLog("No render process!")
+    
 
     def closeEvent(self, event):
         reply = QMessageBox.question(
@@ -472,7 +468,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             QMessageBox.StandardButton.No,  # type: ignore
         )
         if reply == QMessageBox.Yes:  # type: ignore
-            self.killRenderProcess()
+            self.processTab.killRenderProcess()
             event.accept()
         else:
             event.ignore()
