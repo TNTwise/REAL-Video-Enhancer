@@ -329,8 +329,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return outputText
 
     def updateVideoGUIDetails(self):
-        self.setDefaultOutputFile(videosPath())
-        self.updateVideoGUIDetails()
+        videoPath = videosPath()
+        self.setDefaultOutputFile(videoPath)
+        self.updateVideoGUIText()
        
             
     def getScale(self,method,modelName):
