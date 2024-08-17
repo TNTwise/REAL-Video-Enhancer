@@ -812,6 +812,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <layout class="QVBoxLayout" name="verticalLayout_10">
                        <item>
                         <widget class="QTextEdit" name="videoInfoTextEdit">
+                         <property name="enabled">
+                          <bool>true</bool>
+                         </property>
                          <property name="sizePolicy">
                           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                            <horstretch>0</horstretch>
@@ -835,8 +838,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
                          </property>
                          <property name="styleSheet">
                           <string notr="true">QTextEdit{
-background-color:#343b47
-}</string>
+background-color:#343b47;
+color:white;
+}
+QTextEdit:disabled{color:white;}</string>
                          </property>
                          <property name="verticalScrollBarPolicy">
                           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>

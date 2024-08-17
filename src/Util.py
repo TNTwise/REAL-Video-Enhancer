@@ -77,6 +77,7 @@ def modelsPath() -> str:
     """
     return os.path.join(cwd, "models")
 
+
 def videosPath() -> str:
     """
     Returns the file path for the videos directory.
@@ -85,6 +86,7 @@ def videosPath() -> str:
     :rtype: str
     """
     return os.path.join(home_dir, "Videos")
+
 
 def ffmpegPath() -> str:
     return (
@@ -213,6 +215,7 @@ def getVideoRes(video_path) -> list[int, int]:
 
     return resolution
 
+
 def getVideoBitrate(video_path) -> int:
     """
     Takes in a video path
@@ -225,6 +228,7 @@ def getVideoBitrate(video_path) -> int:
 
     return bitrate
 
+
 def getVideoEncoder(inputFile):
     """
     Returns the video encoder codec as a string for the given input file.
@@ -236,9 +240,15 @@ def getVideoEncoder(inputFile):
 
     video = cv2.VideoCapture(inputFile)
     codec = int(video.get(cv2.CAP_PROP_FOURCC))
-    codec_str = chr(codec & 0xFF) + chr((codec >> 8) & 0xFF) + chr((codec >> 16) & 0xFF) + chr((codec >> 24) & 0xFF)
+    codec_str = (
+        chr(codec & 0xFF)
+        + chr((codec >> 8) & 0xFF)
+        + chr((codec >> 16) & 0xFF)
+        + chr((codec >> 24) & 0xFF)
+    )
     video.release()
     return codec_str
+
 
 def getVideoFPS(video_path) -> float:
     """
@@ -351,10 +361,11 @@ def getVendor():
         if vendor.lower() in gpuInfo.lower():
             return vendor
 
+
 def openLink(link: str):
     """
     Opens a link in the default web browser.
-    
+
     :param link: The link to open.
     :type link: str
     """

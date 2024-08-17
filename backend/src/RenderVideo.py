@@ -226,7 +226,7 @@ class Render(FFMpegRender):
             path, last_folder = os.path.split(self.upscaleModel)
 
             self.upscaleModel = os.path.join(path, last_folder, last_folder)
-            
+
             self.upscaleTimes = getNCNNScale(modelPath=self.upscaleModel)
             upscaleNCNN = UpscaleNCNN(
                 modelPath=self.upscaleModel,

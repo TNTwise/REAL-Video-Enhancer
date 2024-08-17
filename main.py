@@ -36,7 +36,6 @@ from src.Util import (
     getRAMAmount,
     getCPUInfo,
     videosPath,
-    
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -86,8 +85,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.homeDir = os.path.expanduser("~")
         self.pipeInFrames = None
         self.latestPreviewImage = None
-        self.videoWidth=None
-        self.videoHeight=None
+        self.videoWidth = None
+        self.videoHeight = None
         self.isVideoLoaded = False
 
         # setup application
@@ -97,8 +96,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
-        self.setMinimumSize(1100, 700
-                            )
+        self.setMinimumSize(1100, 700)
 
         self.aspect_ratio = self.width() / self.height()
 
@@ -110,7 +108,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QConnect()
-        
 
         # set up tabs
         self.backendComboBox.addItems(self.availableBackends)
@@ -149,7 +146,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backend=self.backendComboBox.currentText(),
             method=self.methodComboBox.currentText(),
         )
-        
+
         self.downloadTab = DownloadTab(parent=self)
         self.settingsTab = SettingsTab(
             parent=self, halfPrecisionSupport=halfPrecisionSupport
@@ -196,9 +193,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsBtn.clicked.connect(self.switchToSettingsPage)
         self.downloadBtn.clicked.connect(self.switchToDownloadPage)
         # connect getting default output file
-        self.githubBtn.clicked.connect(lambda: openLink("https://github.com/tntwise/REAL-Video-Enhancer"))
+        self.githubBtn.clicked.connect(
+            lambda: openLink("https://github.com/tntwise/REAL-Video-Enhancer")
+        )
         self.kofiBtn.clicked.connect(lambda: openLink("https://ko-fi.com/tntwise"))
-
 
     def setupBackendDeps(self):
         # need pop up window
@@ -272,40 +270,54 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
                 firstIter=False
             )
-        
-    def generateDefaultOutputFile(self,inputVideo:str, interpolationTimes:int, upscaleTimes:int, videoFps:float, videoWidth:int, videoHeight:int, outputDirectory:str):
+
+    def generateDefaultOutputFile(
+        self,
+        inputVideo: str,
+        interpolationTimes: int,
+        upscaleTimes: int,
+        videoFps: float,
+        videoWidth: int,
+        videoHeight: int,
+        outputDirectory: str,
+    ):
         """
         Generates the default output file name based on the input file and the current settings
         """
         file_name = os.path.splitext(os.path.basename(inputVideo))[0]
-        self.output_file = os.path.join(outputDirectory, f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv")
-        iteration=0
+        self.output_file = os.path.join(
+            outputDirectory,
+            f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}.mkv",
+        )
+        iteration = 0
         while os.path.isfile(self.output_file):
-            self.output_file = os.path.join(outputDirectory, f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv")
-            iteration+=1
+            self.output_file = os.path.join(
+                outputDirectory,
+                f"{file_name}_{interpolationTimes*videoFps}fps_{upscaleTimes*videoWidth}x{upscaleTimes*videoHeight}_({iteration}).mkv",
+            )
+            iteration += 1
         return self.output_file
-    
+
     def updateVideoGUIText(self):
-         if self.isVideoLoaded:
-            
+        if self.isVideoLoaded:
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
-            interpolateTimes = self.getInterpolateTimes(method,modelName)
-            scale = self.getScale(method,modelName)
-            inputFile=self.inputFileText.text()
+            interpolateTimes = self.getInterpolateTimes(method, modelName)
+            scale = self.getScale(method, modelName)
+            inputFile = self.inputFileText.text()
             file_extension = os.path.splitext(inputFile)[1]
             text = (
-            f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
-            + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth*scale}x{self.videoHeight*scale}\n"
-            + f"Bitrate: {self.videoBitrate}\n"
-            + f"Encoder: {self.videoEncoder}\n"
-            + f"Container: {file_extension}\n"
-            + f"Frame Count: {self.videoFrameCount}\n"
+                f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
+                + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth*scale}x{self.videoHeight*scale}\n"
+                + f"Bitrate: {self.videoBitrate}\n"
+                + f"Encoder: {self.videoEncoder}\n"
+                + f"Container: {file_extension}\n"
+                + f"Frame Count: {self.videoFrameCount}\n"
             )
             self.videoInfoTextEdit.setFontPointSize(10)
             self.videoInfoTextEdit.setText(text)
-    
-    def setDefaultOutputFile(self,outputDirectory):
+
+    def setDefaultOutputFile(self, outputDirectory):
         """
         Sets the default output file for the video enhancer.
         Parameters:
@@ -313,18 +325,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Returns:
         None
         """
-        
-        #check if there is a video loaded
+
+        # check if there is a video loaded
         if self.isVideoLoaded:
-            inputFile=self.inputFileText.text()
+            inputFile = self.inputFileText.text()
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
-            interpolateTimes = self.getInterpolateTimes(method,modelName)
-            scale = self.getScale(method,modelName)
+            interpolateTimes = self.getInterpolateTimes(method, modelName)
+            scale = self.getScale(method, modelName)
 
-            outputText = self.generateDefaultOutputFile(inputFile, 
-                                                        int(interpolateTimes),
-                                                        int(scale), round(self.videoFps,0), int(self.videoWidth), int(self.videoHeight),outputDirectory=outputDirectory)
+            outputText = self.generateDefaultOutputFile(
+                inputFile,
+                int(interpolateTimes),
+                int(scale),
+                round(self.videoFps, 0),
+                int(self.videoWidth),
+                int(self.videoHeight),
+                outputDirectory=outputDirectory,
+            )
             self.outputFileText.setText(outputText)
             return outputText
 
@@ -332,22 +350,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         videoPath = videosPath()
         self.setDefaultOutputFile(videoPath)
         self.updateVideoGUIText()
-       
-            
-    def getScale(self,method,modelName):
+
+    def getScale(self, method, modelName):
         if method == "Upscale":
-            scale = (int(re.search(r"\d+x", modelName.lower()).group()[0]))
+            scale = int(re.search(r"\d+x", modelName.lower()).group()[0])
         elif method == "Interpolate":
             scale = 1
         return scale
-    def getInterpolateTimes(self,method,modelName):
+
+    def getInterpolateTimes(self, method, modelName):
         if method == "Upscale":
             interpolateTimes = 1
         elif method == "Interpolate":
             interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
         return interpolateTimes
 
-    
     def startRender(self):
         if self.isVideoLoaded:
             self.startRenderButton.setEnabled(False)
@@ -370,7 +387,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 videoFrameCount=self.videoFrameCount,
                 method=method,
                 backend=self.backendComboBox.currentText(),
-                interpolationTimes=int(self.interpolationMultiplierComboBox.currentText()),
+                interpolationTimes=int(
+                    self.interpolationMultiplierComboBox.currentText()
+                ),
                 model=self.modelComboBox.currentText(),
             )
         else:
@@ -378,10 +397,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             RegularQTPopup("Please select a video file!")
 
     def disableProcessPage(self):
-        self.videoInfoContainer.setDisabled(True)
+        self.processSettingsContainer.setDisabled(True)
 
     def enableProcessPage(self):
-        self.videoInfoContainer.setEnabled(True)
+        self.processSettingsContainer.setEnabled(True)
 
     def getAvailableBackends(self):
         output = SettingUpBackendPopup(
@@ -461,9 +480,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             caption="Select Output Directory",
             dir=self.homeDir,
         )
-        self.outputFileText.setText(os.path.join(outputFolder,self.setDefaultOutputFile(outputFolder)))
-
-    
+        self.outputFileText.setText(
+            os.path.join(outputFolder, self.setDefaultOutputFile(outputFolder))
+        )
 
     def closeEvent(self, event):
         reply = QMessageBox.question(

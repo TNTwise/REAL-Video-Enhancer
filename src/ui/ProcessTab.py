@@ -65,26 +65,26 @@ class ProcessTab:
                 "4xNomos8k_span_otf_weak",
                 "4xNomos8k_span_otf_weak.tar.gz",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Medium Quality Source) (4X)": (
                 "4xNomos8k_span_otf_medium",
                 "4xNomos8k_span_otf_medium.tar.gz",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Low Quality Source) (4X)": (
                 "4xNomos8k_span_otf_strong",
                 "4xNomos8k_span_otf_strong.tar.gz",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "Compact (Realistic) (HD Input) (2X)": (
                 "2x_OpenProteus_Compact_i2_70K",
                 "2x_OpenProteus_Compact_i2_70K.tar.gz",
                 2,
-                "Compact"
-            )
+                "Compact",
+            ),
         }
         self.pytorchUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -103,26 +103,26 @@ class ProcessTab:
                 "4xNomos8k_span_otf_weak.pth",
                 "4xNomos8k_span_otf_weak.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Medium Quality Source) (4X)": (
                 "4xNomos8k_span_otf_medium.pth",
                 "4xNomos8k_span_otf_medium.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Low Quality Source) (4X)": (
                 "4xNomos8k_span_otf_strong.pth",
                 "4xNomos8k_span_otf_strong.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "Compact (Realistic) (HD Input) (2X)": (
                 "2x_OpenProteus_Compact_i2_70K.pth",
                 "2x_OpenProteus_Compact_i2_70K.pth",
                 2,
-                "Compact"
-            )
+                "Compact",
+            ),
         }
         self.tensorrtUpscaleModels = {
             "SPAN (Animation) (2X)": (
@@ -135,26 +135,26 @@ class ProcessTab:
                 "4xNomos8k_span_otf_weak.pth",
                 "4xNomos8k_span_otf_weak.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Medium Quality Source) (4X)": (
                 "4xNomos8k_span_otf_medium.pth",
                 "4xNomos8k_span_otf_medium.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "SPAN (Realistic) (Low Quality Source) (4X)": (
                 "4xNomos8k_span_otf_strong.pth",
                 "4xNomos8k_span_otf_strong.pth",
                 4,
-                "SPAN"
+                "SPAN",
             ),
             "Compact (Realistic) (HD Input) (2X)": (
                 "2x_OpenProteus_Compact_i2_70K.pth",
                 "2x_OpenProteus_Compact_i2_70K.pth",
                 2,
-                "Compact"
-            )
+                "Compact",
+            ),
         }
         # get default backend
         self.QConnect(method=method, backend=backend)
@@ -184,7 +184,6 @@ class ProcessTab:
                 case "tensorrt":
                     models = self.tensorrtUpscaleModels
         return models
-    
 
     def QConnect(self, method: str, backend: str):
         # connect file select buttons
@@ -202,7 +201,9 @@ class ProcessTab:
         # connect gui switching
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
-        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(self.parent.updateVideoGUIDetails)
+        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(
+            self.parent.updateVideoGUIDetails
+        )
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
@@ -214,7 +215,7 @@ class ProcessTab:
         """
         Called every render, gets the correct model based on the backend and the method.
         """
-        
+
         self.parent.modelComboBox.clear()
         # overwrite method
         method = self.parent.methodComboBox.currentText()
@@ -225,14 +226,13 @@ class ProcessTab:
         total_items = self.parent.modelComboBox.count()
         if total_items > 0 and method.lower() == "interpolate":
             self.parent.modelComboBox.setCurrentIndex(total_items - 1)
-        
+
         if method.lower() == "interpolate":
             self.parent.interpolationContainer.setVisible(True)
         else:
             self.parent.interpolationContainer.setVisible(False)
 
         self.parent.updateVideoGUIDetails()
-
 
     def run(
         self,
@@ -428,9 +428,9 @@ class ProcessTab:
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
-        
+
         if self.renderTextOutputList is not None:
-            #print(self.renderTextOutputList)
+            # print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
                 self.splitListIntoStringWithNewLines(self.renderTextOutputList)
             )

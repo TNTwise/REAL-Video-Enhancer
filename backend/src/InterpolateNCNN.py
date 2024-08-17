@@ -1,12 +1,4 @@
-import sys
-import os
-
 from rife_ncnn_vulkan_python import Rife
-import contextlib
-import io
-import sys
-import os
-
 
 class InterpolateRIFENCNN:
     def __init__(
