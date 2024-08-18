@@ -44,6 +44,7 @@ from src.ui.SettingsTab import SettingsTab
 from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.Backendhandler import BackendHandler
+from src.ui.AnimationHandler import AnimationHandler
 from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
@@ -161,38 +162,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.moreTab = MoreTab(parent=self)
         # Startup Animation
-        self.fadeInAnimation(self)
+        self.animationHandler = AnimationHandler()
+        self.animationHandler.fadeInAnimation(self)
 
-    def setButtonAnimations(self):
-        self.homeBtn.enterEvent = self.fade_to_color(self.homeBtn)
 
-    def fadeInAnimation(self, qObject: QWidget, n=None):
-        self.opacity_effect = QGraphicsOpacityEffect()
-        qObject.setGraphicsEffect(self.opacity_effect)
-
-        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
-        self.animation.setDuration(200)  # Duration in milliseconds
-        self.animation.setStartValue(0)
-        self.animation.setEndValue(1)
-        self.animation.start()
-
-    def fadeOutAnimation(self, qObject: QWidget, n=None):
-        self.opacity_effect = QGraphicsOpacityEffect()
-        qObject.setGraphicsEffect(self.opacity_effect)
-
-        self.animation = QPropertyAnimation(self.opacity_effect, b"opacity")
-        self.animation.setDuration(200)  # Duration in milliseconds
-        self.animation.setStartValue(1)
-        self.animation.setEndValue(0)
-        self.animation.start()
-
-    def fade_to_color(self, color):
-        self.animation = QPropertyAnimation(self, b"styleSheet")
-        self.animation.setDuration(5000)  # Duration in milliseconds
-        self.animation.setStartValue(self.styleSheet())
-        self.animation.setEndValue(color)
-        self.animation.setEasingCurve(QEasingCurve.InOutQuad)
-        self.animation.start()
+    
 
     def QConnect(self):
         # connect buttons to switch menus
@@ -223,28 +197,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     # switch menus
     def switchToHomePage(self):
-        self.fadeOutAnimation(self.stackedWidget)
+        self.animationHandler.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.homePage)
         self.setButtonsUnchecked(self.homeBtn)
-        self.fadeInAnimation(self.stackedWidget)
+        self.animationHandler.fadeInAnimation(self.stackedWidget)
 
     def switchToProcessingPage(self):
-        self.fadeOutAnimation(self.stackedWidget)
+        self.animationHandler.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.procPage)
         self.setButtonsUnchecked(self.processBtn)
-        self.fadeInAnimation(self.stackedWidget)
+        self.animationHandler.fadeInAnimation(self.stackedWidget)
 
     def switchToSettingsPage(self):
-        self.fadeOutAnimation(self.stackedWidget)
+        self.animationHandler.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.settingsPage)
         self.setButtonsUnchecked(self.settingsBtn)
-        self.fadeInAnimation(self.stackedWidget)
+        self.animationHandler.fadeInAnimation(self.stackedWidget)
 
     def switchToDownloadPage(self):
-        self.fadeOutAnimation(self.stackedWidget)
+        self.animationHandler.fadeOutAnimation(self.stackedWidget)
         self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.setButtonsUnchecked(self.downloadBtn)
-        self.fadeInAnimation(self.stackedWidget)
+        self.animationHandler.fadeInAnimation(self.stackedWidget)
     
 
     def generateDefaultOutputFile(
