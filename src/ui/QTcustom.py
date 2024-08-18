@@ -52,11 +52,10 @@ from PySide6.QtWidgets import (
     QSpacerItem,
 )
 
-try:
-    from .QTstyle import styleSheet
-    from ..Util import printAndLog
-except ImportError:
-    pass
+from .QTstyle import styleSheet
+from ..Util import printAndLog, getPlatform
+from ..Backendhandler import BackendHandler
+
 
 
 class UpdateGUIThread(QThread):
@@ -464,6 +463,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 
     def setupUi(self, Dialog):
         Dialog = self
+        self.setWindowTitle("Select Dependencies")
         self.verticalLayout = QVBoxLayout(Dialog)
         self.verticalLayout.setObjectName("verticalLayout")
         self.backendSelectContainer = QWidget(Dialog)
@@ -550,7 +550,10 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.downloadTorchROCmBtn.setIconSize(QSize(30, 30))
 
         self.horizontalLayout_9.addWidget(self.downloadTorchROCmBtn)
-
+        
+        
+        backendHandler = BackendHandler(self)
+        backendHandler.enableCorrectBackends()
         self.label_9 = QLabel(self.pytorchBackendInstallerContainer_3)
         self.label_9.setObjectName("label_9")
 
@@ -622,7 +625,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.downloadTorchROCmBtn.setText("")
         self.label_9.setText(
             QCoreApplication.translate(
-                "Dialog", "PyTorch ROCm (AMD Unknown Compatiblity)", None
+                "Dialog", "PyTorch ROCm (AMD RX 6000 through RX 7000, linux only)", None
             )
         )
         self.downloadNCNNBtn.setText("")
@@ -636,7 +639,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
         super().__init__()
-        self.setWindowTitle("Message")
+        self.setWindowTitle(message)
         self.setFixedSize(300, 100)
         layout = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(message)

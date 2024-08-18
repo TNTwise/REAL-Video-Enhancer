@@ -36,12 +36,14 @@ from src.Util import (
     getRAMAmount,
     getCPUInfo,
     videosPath,
+    
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
 from src.ui.SettingsTab import SettingsTab
 from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
+from src.Backendhandler import BackendHandler
 from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
@@ -90,27 +92,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.isVideoLoaded = False
 
         # setup application
-        self.setupBackendDeps()
+        
+        
 
         # Set up the user interface from Designer.
         self.setupUi(self)
+        backendHandler = BackendHandler(self)
+        backendHandler.enableCorrectBackends()
+        backendHandler.setupBackendDeps()
+        backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+            firstIter=True
+        )
+        
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100, 700)
 
         self.aspect_ratio = self.width() / self.height()
 
-        self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-            firstIter=True
-        )
+        
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
 
         self.QConnect()
-
+        self.backends, self.fullOutput = backendHandler.getAvailableBackends()
         # set up tabs
-        self.backendComboBox.addItems(self.availableBackends)
+        self.backendComboBox.addItems(self.backends)
         printOut = (
             "------REAL Video Enhancer------\n"
             + "System Information: \n"
@@ -198,16 +206,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.kofiBtn.clicked.connect(lambda: openLink("https://ko-fi.com/tntwise"))
 
-    def setupBackendDeps(self):
-        # need pop up window
-        downloadDependencies = DownloadDependencies()
-        downloadDependencies.downloadBackend(version)
-        if not checkIfDeps():
-            # Dont flip these due to shitty code!
-            downloadDependencies.downloadFFMpeg()
-            downloadDependencies.downloadPython()
-            if getPlatform() == "win32":
-                downloadDependencies.downloadVCREDLIST()
+    
 
     def setButtonsUnchecked(self, buttonToIgnore):
         buttons = [
@@ -246,30 +245,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.setButtonsUnchecked(self.downloadBtn)
         self.fadeInAnimation(self.stackedWidget)
-
-    def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-        self, firstIter=True
-    ):
-        """
-        will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
-        """
-        try:
-            self.availableBackends, self.fullOutput = self.getAvailableBackends()
-
-        except SyntaxError as e:
-            printAndLog(str(e))
-            if not firstIter:
-                RegularQTPopup("Please install at least 1 backend!")
-            downloadDependencies = DownloadDependencies()
-            DownloadDepsDialog(
-                ncnnDownloadBtnFunc=downloadDependencies.downloadNCNNDeps,
-                pytorchCUDABtnFunc=downloadDependencies.downloadPyTorchCUDADeps,
-                pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
-                trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
-            )
-            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-                firstIter=False
-            )
+    
 
     def generateDefaultOutputFile(
         self,
@@ -402,25 +378,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enableProcessPage(self):
         self.processSettingsContainer.setEnabled(True)
 
-    def getAvailableBackends(self):
-        output = SettingUpBackendPopup(
-            [
-                pythonPath(),
-                os.path.join("backend", "rve-backend.py"),
-                "--list_backends",
-            ]
-        )
-        output = output.getOutput()
-
-        # Find the part of the output containing the backends list
-        start = output.find("[")
-        end = output.find("]") + 1
-        backends_str = output[start:end]
-
-        # Convert the string representation of the list to an actual list
-        backends = eval(backends_str)
-
-        return backends, output
+    
 
     # input file button
     def openInputFile(self):

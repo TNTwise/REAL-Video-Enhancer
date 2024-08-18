@@ -370,3 +370,4 @@ def openLink(link: str):
     :type link: str
     """
     webbrowser.open(link)
+

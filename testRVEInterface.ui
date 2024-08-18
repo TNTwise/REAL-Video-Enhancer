@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>897</width>
-    <height>713</height>
+    <height>1093</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1243,7 +1243,7 @@ QPushButton:hover{
 	background-color:#343b47;
 }
 QPushButton:disabled{
-	background-color:#343b47;
+	background-color:#676e7b;
 	color:gray;
 }
 QComboBox{
@@ -1263,6 +1263,9 @@ background-color:white;
              <layout class="QGridLayout" name="gridLayout_5">
               <item row="0" column="0">
                <widget class="QWidget" name="backendSelectContainer" native="true">
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_11">
                  <item>
                   <widget class="QLabel" name="label_4">
@@ -1402,7 +1405,7 @@ background-color:white;
                     <item>
                      <widget class="QLabel" name="label_9">
                       <property name="text">
-                       <string>PyTorch ROCm (AMD Unknown Compatiblity)</string>
+                       <string>PyTorch ROCm (AMD RX 6000 through RX 7000, linux only)</string>
                       </property>
                      </widget>
                     </item>
