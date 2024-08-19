@@ -297,7 +297,7 @@ class DownloadDependencies:
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
                 #default
-                tensorRTDeps += ("torch_tensorrt==2.4.0")
+                tensorRTDeps += ["torch_tensorrt==2.4.0"]
                 #nightly
                 #tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl"]
             case "win32":
