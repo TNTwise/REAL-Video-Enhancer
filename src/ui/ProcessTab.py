@@ -35,6 +35,7 @@ class ProcessTab:
             "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1, "rife420"),
             "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1, "rife421"),
             "RIFE 4.22": ("rife-v4.22", "rife-v4.22.tar.gz", 1, "rife421"),
+            "RIFE 4.22-lite": ("rife-v4.22-lite", "rife-v4.22-lite.tar.gz", 1, "rife422-lite"),
         }
         self.pytorchInterpolateModels = {
             "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
@@ -44,6 +45,7 @@ class ProcessTab:
             "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
             "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
             "RIFE 4.22": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
+            "RIFE 4.22-lite": ("rife4.22-lite.pkl", "rife4.22=lite.pkl", 1, "rife422-lite"),
         }
         self.tensorrtInterpolateModels = {
             "RIFE 4.6": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
@@ -53,6 +55,7 @@ class ProcessTab:
             "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
             "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
             "RIFE 4.22": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
+            "RIFE 4.22-lite": ("rife4.22-lite.pkl", "rife4.22=lite.pkl", 1, "rife422-lite"),
         }
         self.ncnnUpscaleModels = {
             "SPAN (Animation) (2X)": (
