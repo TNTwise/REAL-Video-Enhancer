@@ -177,8 +177,8 @@ class Render(FFMpegRender):
                 break
             setup_frame1 = self.frameSetupFunction(frame1)
             if frameNum != self.transitionFrame:
-                for n in range(self.interpolateFactor):
-                    timestep = 1 / (self.interpolateFactor - n)
+                for n in range(self.ceilInterpolateFactor):
+                    timestep = 1 / (self.ceilInterpolateFactor - n)
                     if timestep == 1:
                         self.writeQueue.put(frame1)
                         continue
@@ -188,7 +188,7 @@ class Render(FFMpegRender):
             else:
                 # uncache the cached frame
                 self.undoSetup(frame1)
-                for n in range(self.interpolateFactor):
+                for n in range(self.ceilInterpolateFactor):
                     self.writeQueue.put(frame1)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()

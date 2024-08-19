@@ -127,9 +127,9 @@ class HandleApplication:
         )
         parser.add_argument(
             "--interpolateFactor",
-            help="Multiplier for interpolation",
-            type=int,
-            default=1,
+            help="Multiplier for interpolation, will round up to nearest integer for interpolation but the fps will be correct",
+            type=float,
+            default=1.,
         )
         parser.add_argument(
             "--interpolateArch",

@@ -4,6 +4,7 @@ import subprocess
 import queue
 import sys
 import time
+import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
 from .Util import currentDirectory, log, printAndLog
@@ -105,7 +106,8 @@ class FFMpegRender:
         self.shm = shm
         self.inputFrameChunkSize = inputFrameChunkSize
         self.outputFrameChunkSize = outputFrameChunkSize
-        self.totalOutputFrames = self.totalInputFrames * self.interpolateFactor
+        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
+        self.totalOutputFrames = self.totalInputFrames * self.ceilInterpolateFactor
 
         self.writeOutPipe = self.outputFile == "PIPE"
 
@@ -162,11 +164,13 @@ class FFMpegRender:
                 "-s",
                 f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
                 "-r",
-                f"{self.fps * self.interpolateFactor}",
+                f"{self.fps * self.ceilInterpolateFactor}",
                 "-i",
                 "-",
                 "-i",
                 f"{self.inputFile}",
+                "-r",
+                f"{self.fps * self.interpolateFactor}",
                 f"-crf",
                 f"{self.crf}",
                 "-pix_fmt",
