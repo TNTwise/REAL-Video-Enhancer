@@ -199,6 +199,8 @@ class InterpolateRifeTorch:
             ensemble=ensemble,
             dtype=self.dtype,
             device=self.device,
+            width=self.width,
+            height=self.height,
         )
 
         state_dict = {
@@ -296,12 +298,9 @@ class InterpolateRifeTorch:
         """
         Takes in a 4d tensor, undoes padding, and converts to np array for rendering
         """
-        frame = frame[:, :, : self.height, : self.width][0]
+        
         return (
-            frame.squeeze(0)
-            .permute(1, 2, 0)
-            .float()
-            .mul(255)
+            frame
             .byte()
             .contiguous()
             .cpu()
@@ -315,8 +314,8 @@ class InterpolateRifeTorch:
                 frame,
                 dtype=torch.uint8,
             )
-            .reshape(self.height, self.width, 3)
             .to(device=self.device, dtype=self.dtype, non_blocking=True)
+            .reshape(self.height, self.width, 3)
             .permute(2, 0, 1)
             .unsqueeze(0)
             / 255.0

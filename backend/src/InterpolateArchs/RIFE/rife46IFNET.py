@@ -100,6 +100,8 @@ class IFNet(nn.Module):
         ensemble=False,
         dtype=torch.float32,
         device="cuda",
+        width=1920,
+        height=1080,
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
@@ -110,6 +112,8 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.dtype = dtype
         self.device = device
+        self.width = width
+        self.height = height
 
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         flow_list = []
@@ -167,4 +171,6 @@ class IFNet(nn.Module):
             warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
             merged.append((warped_img0, warped_img1))
         mask_list[3] = torch.sigmoid(mask_list[3])
-        return merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
+        frame = merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
+        frame = frame[:, :, : self.height, : self.width][0]
+        return frame.squeeze(0).permute(1, 2, 0).mul(255).float()
