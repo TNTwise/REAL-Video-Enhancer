@@ -230,7 +230,7 @@ class DownloadDependencies:
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             # "--pre",
-             "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240817%2Bcu124-cp311-cp311-win_amd64.whl",
+             "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
             # "--pre",
              "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240817%2Bcu124-cp311-cp311-win_amd64.whl",
             #"torch==2.4.0",
@@ -310,7 +310,7 @@ class DownloadDependencies:
                 tensorRTDeps += (
                     #"--no-deps",
                     #"torch_tensorrt==2.4.0",
-                     "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240817%2Bcu124-cp311-cp311-win_amd64.whl",
+                     "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 
