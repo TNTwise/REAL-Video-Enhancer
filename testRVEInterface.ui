@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>897</width>
-    <height>1093</height>
+    <width>900</width>
+    <height>693</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -894,7 +894,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <property name="sizeHint" stdset="0">
                        <size>
                         <width>20</width>
-                        <height>400</height>
+                        <height>0</height>
                        </size>
                       </property>
                      </spacer>
@@ -1591,7 +1591,7 @@ background-color:white;
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>1000000</height>
+              <height>40</height>
              </size>
             </property>
            </spacer>
