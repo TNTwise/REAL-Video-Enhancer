@@ -168,7 +168,10 @@ class Render(FFMpegRender):
         """
 
         log("Starting Interpolation")
-        self.transitionFrame = self.transitionQueue.get()
+        try:
+            self.transitionFrame = self.transitionQueue.get()
+        except AttributeError:
+            self.transitionFrame = -1 # if there is no transition queue, set it to -1
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
 
         for frameNum in range(self.totalInputFrames - 1):
