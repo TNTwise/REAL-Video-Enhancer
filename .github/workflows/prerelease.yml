@@ -1,28 +1,13 @@
 
 name: build-prerelease
 
-# Controls when the workflow will run
-
 on:
-  #schedule:
-  #  - cron: "0 0 * * *"
-  
- 
-  
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
   
-  
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build-Linux:
-   
-    # The type of runner that the job will run on
-    #runs-on: self-hosted-22.04 
     runs-on: ubuntu-20.04 
     permissions: write-all  
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v3
       
@@ -31,12 +16,10 @@ jobs:
         with:
           python-version: 3.11.8
 
-      - name: Checkout code
-        run: ls
-
       - name: Install Python Dependencies
         run: |
           python3 -m pip install -r requirements.txt
+          
       - name: Build
         run: python3 build.py --build_exe
         
@@ -51,13 +34,10 @@ jobs:
         with:
           name: REAL-Video-Enhancer-2.0-Linux.zip
           path: REAL-Video-Enhancer-2.0-Linux.zip
+          
   build-Windows:
-   
-    # The type of runner that the job will run on
-    #runs-on: self-hosted-22.04 
     runs-on: windows-2019
     permissions: write-all  
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v3
       
@@ -65,9 +45,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
-
-      - name: Checkout code
-        run: ls
 
       - name: Install Python Dependencies
         run: |
@@ -90,13 +67,10 @@ jobs:
         with:
           name: REAL-Video-Enhancer-2.0-Windows.zip
           path: REAL-Video-Enhancer-2.0-Windows.zip
+          
   build-MacOS:
-   
-    # The type of runner that the job will run on
-    #runs-on: self-hosted-22.04 
     runs-on: macos-12
     permissions: write-all  
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - uses: actions/checkout@v3
       
@@ -104,9 +78,6 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11.8
-
-      - name: Checkout code
-        run: ls
 
       - name: Install Python Dependencies
         run: |
@@ -135,8 +106,6 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: artifacts
-
-     
           
       - name: Generate version and tag
         id: version_tag
