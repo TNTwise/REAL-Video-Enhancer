@@ -178,6 +178,7 @@ class DownloadDependencies:
             "--extra-index-url",
             "https://pypi.nvidia.com",
             "-U",
+            "--no-warn-script-location",
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
