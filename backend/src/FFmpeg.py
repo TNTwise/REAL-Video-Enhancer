@@ -222,7 +222,7 @@ class FFMpegRender:
         # Update the length of the last printed line
         self.last_length = len(data)
 
-    def writeOutToSharedMemory(self, fcs):
+    def writeOutInformation(self, fcs):
         """
         fcs = framechunksize
         """
@@ -232,7 +232,7 @@ class FFMpegRender:
 
         log(f"Shared memory name: {self.shm.name}")
         while True:
-            if self.writingDone == True:
+            if self.writingDone:
                 self.shm.close()
                 self.shm.unlink()
                 break
@@ -241,9 +241,9 @@ class FFMpegRender:
                 fps = round(self.currentFrame / (time.time() - self.startTime))
                 message = f"FPS: {fps} Current Frame: {self.currentFrame}"
                 self.realTimePrint(message)
-
-                # Update the shared array
-                buffer[:fcs] = bytes(self.previewFrame)
+                if self.sharedMemoryID is not None:
+                    # Update the shared array
+                    buffer[:fcs] = bytes(self.previewFrame)
 
             time.sleep(0.1)
 

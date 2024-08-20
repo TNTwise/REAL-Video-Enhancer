@@ -122,11 +122,11 @@ class Render(FFMpegRender):
             inputFrameChunkSize=self.inputFrameChunkSize,
             outputFrameChunkSize=self.outputFrameChunkSize,
         )
-        if sharedMemoryID is not None:
-            self.sharedMemoryThread = Thread(
-                target=lambda: self.writeOutToSharedMemory(self.outputFrameChunkSize)
-            )
-            self.sharedMemoryThread.start()
+        
+        self.sharedMemoryThread = Thread(
+            target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
+        )
+        self.sharedMemoryThread.start()
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
 
