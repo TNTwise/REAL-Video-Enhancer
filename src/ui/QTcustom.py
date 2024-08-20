@@ -452,6 +452,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.downloadTensorRTBtn.clicked.connect(trtBtnFunc)
         self.pushButton.clicked.connect(self.doneEvent)
         self.setStyleSheet(styleSheet())
+        self.setWindowTitle("Select Dependencies")
         self.exec()
 
     def closeEventExit(self, x):
@@ -462,11 +463,9 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.closeEventOrig(QtGui.QCloseEvent())
 
     def setupUi(self, Dialog):
-        Dialog = self
-        self.setWindowTitle("Select Dependencies")
-        self.verticalLayout = QVBoxLayout(Dialog)
+        self.verticalLayout = QVBoxLayout(self)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.backendSelectContainer = QWidget(Dialog)
+        self.backendSelectContainer = QWidget(self)
         self.backendSelectContainer.setObjectName("backendSelectContainer")
         self.verticalLayout_11 = QVBoxLayout(self.backendSelectContainer)
         self.verticalLayout_11.setObjectName("verticalLayout_11")
@@ -603,9 +602,9 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 
         self.verticalLayout_11.addLayout(self.horizontalLayout)
 
-        self.retranslateUi(Dialog)
+        self.retranslateUi(self)
 
-        QMetaObject.connectSlotsByName(Dialog)
+        QMetaObject.connectSlotsByName(self)
 
     # setupUi
 
@@ -614,23 +613,23 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.label_4.setText(QCoreApplication.translate("Dialog", "Backends", None))
         self.downloadTorchCUDABtn.setText("")
         self.label_6.setText(
-            QCoreApplication.translate("Dialog", "PyTorch CUDA (Nvidia Only) ", None)
+            QCoreApplication.translate("Dialog", "PyTorch CUDA (Nvidia Only, Fast inference, large download) ", None)
         )
         self.downloadTensorRTBtn.setText("")
         self.label_8.setText(
             QCoreApplication.translate(
-                "Dialog", "TensorRT (Nvidia RTX 20 series and up)", None
+                "Dialog", "TensorRT (Nvidia RTX 20 series and up, Fastest inference, largest download)", None
             )
         )
         self.downloadTorchROCmBtn.setText("")
         self.label_9.setText(
             QCoreApplication.translate(
-                "Dialog", "PyTorch ROCm (AMD RX 6000 through RX 7000, linux only)", None
+                "Dialog", "PyTorch ROCm (AMD RX 6000 through RX 7000, linux only, Fast inference, large download)", None
             )
         )
         self.downloadNCNNBtn.setText("")
         self.label_10.setText(
-            QCoreApplication.translate("Dialog", "NCNN Vulkan (All GPUs, Slower)", None)
+            QCoreApplication.translate("Dialog", "NCNN Vulkan (All GPUs, Slower inference, small download)", None)
         )
 
     # retranslateUi
