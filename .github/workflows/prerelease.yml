@@ -39,6 +39,9 @@ jobs:
           python3 -m pip install -r requirements.txt
       - name: Build
         run: python3 build.py --build_exe
+        
+      - name: copy backend
+        run: cp -r backend dist/main/
       
       - name: compress archive
         run: zip -r REAL-Video-Enhancer-2.0-Windows.zip dist/main/
