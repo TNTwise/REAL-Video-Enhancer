@@ -164,10 +164,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Startup Animation
         self.animationHandler = AnimationHandler()
         self.animationHandler.fadeInAnimation(self)
-
-
-    
-
+        
     def QConnect(self):
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)

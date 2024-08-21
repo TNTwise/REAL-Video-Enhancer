@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>693</height>
+    <width>929</width>
+    <height>750</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -113,16 +113,8 @@ QPushButton:hover{
               <string notr="true">QWidget{
 background-color:#16191d
 
-}</string>
-             </property>
-             <layout class="QGridLayout" name="gridLayout_2">
-              <item row="0" column="1" alignment="Qt::AlignmentFlag::AlignTop">
-               <widget class="QWidget" name="widget_6" native="true">
-                <layout class="QVBoxLayout" name="verticalLayout_15">
-                 <item>
-                  <widget class="QWidget" name="widget_7" native="true">
-                   <property name="styleSheet">
-                    <string notr="true">QPushButton{
+}
+QPushButton{
     background-color:#2c313c;
 	text-align:left;
 	padding:5px 10px;
@@ -134,72 +126,13 @@ QPushButton:checked{
 }
 QPushButton:hover{
 	background-color:#343b47;
-}
-</string>
-                   </property>
-                   <layout class="QHBoxLayout" name="horizontalLayout_14">
-                    <item>
-                     <widget class="QPushButton" name="githubBtn">
-                      <property name="maximumSize">
-                       <size>
-                        <width>55</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="resources.qrc">
-                        <normaloff>:/icons/icons/github.svg</normaloff>:/icons/icons/github.svg</iconset>
-                      </property>
-                      <property name="iconSize">
-                       <size>
-                        <width>35</width>
-                        <height>35</height>
-                       </size>
-                      </property>
-                      <property name="checkable">
-                       <bool>false</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="kofiBtn">
-                      <property name="maximumSize">
-                       <size>
-                        <width>55</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="resources.qrc">
-                        <normaloff>:/icons/icons/coffee.svg</normaloff>:/icons/icons/coffee.svg</iconset>
-                      </property>
-                      <property name="iconSize">
-                       <size>
-                        <width>35</width>
-                        <height>35</height>
-                       </size>
-                      </property>
-                      <property name="checkable">
-                       <bool>false</bool>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="0">
+}</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="1" column="0">
                <widget class="QWidget" name="widget_8" native="true">
-                <layout class="QHBoxLayout" name="horizontalLayout_15">
-                 <item alignment="Qt::AlignmentFlag::AlignTop">
+                <layout class="QGridLayout" name="gridLayout_7">
+                 <item row="0" column="1">
                   <widget class="QLabel" name="label">
                    <property name="font">
                     <font>
@@ -212,11 +145,73 @@ QPushButton:hover{
                    </property>
                   </widget>
                  </item>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_2">
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="resources.qrc">:/icons/icons/logo-v2.svg</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <widget class="QPushButton" name="githubBtn">
+                   <property name="maximumSize">
+                    <size>
+                     <width>55</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resources.qrc">
+                     <normaloff>:/icons/icons/github.svg</normaloff>:/icons/icons/github.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>35</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QPushButton" name="kofiBtn">
+                   <property name="maximumSize">
+                    <size>
+                     <width>55</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="resources.qrc">
+                     <normaloff>:/icons/icons/coffee.svg</normaloff>:/icons/icons/coffee.svg</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>35</width>
+                     <height>35</height>
+                    </size>
+                   </property>
+                   <property name="checkable">
+                    <bool>false</bool>
+                   </property>
+                  </widget>
+                 </item>
                 </layout>
                </widget>
-              </item>
-              <item row="1" column="0">
-               <widget class="QWidget" name="widget_9" native="true"/>
               </item>
              </layout>
             </widget>
@@ -547,6 +542,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                         <width>0</width>
                         <height>30</height>
                        </size>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
