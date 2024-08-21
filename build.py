@@ -46,16 +46,16 @@ def install_requirements_in_venv():
 
 def build_executable():
     print("Building executable")
-    if getPlatform() == "linux" or getPlatform() == "darwin": 
-        command = [
-            r".\venv\Scripts\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
-            "-m",
-            "PyInstaller",
-            "main.py",
-            "--icon=icons/logo-v2.ico",
-            "--noconfirm",
-            "--noupx",
-        ]
+    
+    command = [
+        r".\venv\Scripts\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
+        "-m",
+        "PyInstaller",
+        "main.py",
+        "--icon=icons/logo-v2.ico",
+        "--noconfirm",
+        "--noupx",
+    ]
 
     subprocess.run(command)
 
