@@ -20,8 +20,7 @@ class BackendHandler:
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
-            if getPlatform() == "win32":
-                downloadDependencies.downloadVCREDLIST()
+            
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
     ):

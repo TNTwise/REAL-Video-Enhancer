@@ -16,31 +16,6 @@ import shutil
 import urllib.request
 
 
-def run_executable(exe_path):
-    try:
-        # Run the executable and wait for it to complete
-        result = subprocess.run([exe_path], check=True, capture_output=True, text=True)
-
-        # Print the output of the executable
-        print("STDOUT:", result.stdout)
-
-        # Print any error messages
-        print("STDERR:", result.stderr)
-
-        # Print the exit code
-        print("Exit Code:", result.returncode)
-
-    except subprocess.CalledProcessError as e:
-        print("An error occurred while running the executable.")
-        print("Exit Code:", e.returncode)
-        print("Output:", e.output)
-        print("Error:", e.stderr)
-    except FileNotFoundError:
-        print("The specified executable was not found.")
-    except Exception as e:
-        print("An unexpected error occurred:", str(e))
-
-
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -134,22 +109,7 @@ class DownloadDependencies:
         # give executable permissions to python
         makeExecutable(pythonPath())
 
-    def downloadVCREDLIST(self):
-        vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
-        link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/VC_redist.x64.exe"
-
-        printAndLog(
-            "Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed."
-        )
-        DownloadProgressPopup(
-            link=link,
-            downloadLocation=vcTempPath,
-            title="Downloading VC_redlist.x64.exe\nClick close after the download has completed\n if you already have it installed.",
-        )
-        # give executable permissions to ffmpeg
-        makeExecutable(vcTempPath)
-        run_executable(vcTempPath)
-
+    
     def downloadFFMpeg(self):
         ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
