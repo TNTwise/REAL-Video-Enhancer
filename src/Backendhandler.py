@@ -6,17 +6,11 @@ class BackendHandler:
         self.parent = parent
     
     def enableCorrectBackends(self):
-        # this is used for the initial dialog asking for dependency select and the main window, names for the variables are both the same.
-        #if getVendor() == "AMD":
-        #    self.parent.downloadTorchROCmBtn.setEnabled(getPlatform() == "linux")
-        #else:
-        #    self.parent.downloadTorchROCmBtn.setEnabled(False)
-            
-        
-        #if getVendor() != "Nvidia":
-        #    self.parent.downloadTorchCUDABtn.setEnabled(False)
-        #    self.parent.downloadTensorRTBtn.setEnabled(False)
-        pass
+        self.parent.downloadTorchROCmBtn.setEnabled(getPlatform() == "linux")
+        if getPlatform() == "darwin":
+            self.parent.downloadTorchCUDABtn.setEnabled(False)
+            self.parent.downloadTensorRTBtn.setEnabled(False)
+
     def setupBackendDeps(self):
         # need pop up window
         from .DownloadDeps import DownloadDependencies

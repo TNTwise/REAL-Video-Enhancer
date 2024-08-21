@@ -90,10 +90,44 @@ jobs:
         with:
           name: REAL-Video-Enhancer-2.0-Windows.zip
           path: REAL-Video-Enhancer-2.0-Windows.zip
-  
+  build-MacOS:
+   
+    # The type of runner that the job will run on
+    #runs-on: self-hosted-22.04 
+    runs-on: macos-12
+    permissions: write-all  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+
+      - name: Checkout code
+        run: ls
+
+      - name: Install Python Dependencies
+        run: |
+          python3 -m pip install -r requirements.txt
+      - name: Build
+        run: python3 build.py --build_exe
+        
+      - name: copy backend
+        run: cp -r backend dist/main/
+      
+      - name: compress archive
+        run: zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip dist/main/
+
+      - name: Save Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
+          path: REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
 
   Release:
-    needs: [build-Windows, build-Linux]
+    needs: [build-Windows, build-Linux, build-MacOS]
     runs-on: ubuntu-latest
     permissions:
       contents: write

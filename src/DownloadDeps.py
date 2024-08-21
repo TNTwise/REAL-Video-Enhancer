@@ -120,6 +120,8 @@ class DownloadDependencies:
                 link += "x86_64-unknown-linux-gnu-install_only.tar.gz"
             case "win32":
                 link += "x86_64-pc-windows-msvc-install_only.tar.gz"
+            case "darwin":
+                link += "x86_64-apple-darwin-install_only.tar.gz"
         # probably can add macos support later
         printAndLog("Downloading Python")
         DownloadProgressPopup(
@@ -156,7 +158,8 @@ class DownloadDependencies:
                 link += "ffmpeg"
             case "win32":
                 link += "ffmpeg.exe"
-
+            case "darwin":
+                link += "ffmpeg-macos-bin"
         printAndLog("Downloading FFMpeg")
         DownloadProgressPopup(
             link=link, downloadLocation=ffmpegTempPath, title="Downloading FFMpeg"
@@ -257,20 +260,25 @@ class DownloadDependencies:
         NCNN deps
         """
         ncnnLinuxDeps = [
-            "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
-            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/efficient_proc_bytes/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-linux_x86_64.whl",
-        ]
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-linux_x86_64.whl",
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
+        ] + self.getPlatformIndependentDeps() 
         ncnnWindowsDeps = [
-            "https://github.com/TNTwise/Universal-NCNN-upscaler-python/releases/download/2024-07-05/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
-            "https://github.com/TNTwise/rife-ncnn-vulkan-python-test/releases/download/efficient_proc_bytes/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-win_amd64.whl",
-        ]
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-win_amd64.whl",
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
+        ] + self.getPlatformIndependentDeps()
+        ncnnMacOSDeps = [
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-macosx_12_0_universal2.whl",
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-macosx_11_0_universal2.whl",
+        ] + self.getPlatformIndependentDeps()
+        
         match getPlatform():
             case "win32":
-                ncnnWindowsDeps += self.getPlatformIndependentDeps()
                 self.pipInstall(ncnnWindowsDeps)
             case "linux":
-                ncnnLinuxDeps += self.getPlatformIndependentDeps()
                 self.pipInstall(ncnnLinuxDeps)
+            case "darwin":
+                self.pipInstall(ncnnMacOSDeps)
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [

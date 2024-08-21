@@ -99,11 +99,16 @@ def videosPath() -> str:
 
 
 def ffmpegPath() -> str:
-    return (
-        os.path.join(cwd, "bin", "ffmpeg")
-        if getPlatform() == "darwin" or getPlatform() == "linux"
-        else os.path.join(cwd, "bin", "ffmpeg.exe")
-    )
+    match getPlatform():
+        case "linux":
+            return os.path.join(cwd, "bin", "ffmpeg")
+        case "win32":
+            return os.path.join(cwd, "bin", "ffmpeg.exe")
+        case "darwin":
+            return os.path.join(cwd, "bin", "ffmpeg-macos-bin")
+        case _:
+            return None
+    
 
 
 def copy(prev: str, new: str):
