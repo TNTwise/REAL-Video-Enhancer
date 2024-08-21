@@ -158,7 +158,6 @@ class IFNet(nn.Module):
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
-        tenFlow_div = tenFlow_div.reshape(1, 2, 1, 1)
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, h, w))
         fs_2 = self.encode(imgs_2)
@@ -166,15 +165,13 @@ class IFNet(nn.Module):
         if self.ensemble:
             fs_rev = torch.cat(torch.split(fs, [8, 8], dim=1)[::-1], dim=1)
             imgs_rev = torch.cat([img1, img0], dim=1)
-        warped_img0 = img0
-        warped_img1 = img1
+        
         flows = None
         mask = None
         blocks = [self.block0, self.block1, self.block2, self.block3]
         for block, scale in zip(blocks, self.scale_list):
             if flows is None:
                 if self.ensemble:
-                    temp = torch.cat((imgs, fs, timestep), 1)
                     temp_ = torch.cat((imgs_rev, fs_rev, 1 - timestep), 1)
                     flowss, masks = block(torch.cat((temp, temp_), 0), scale=scale)
                     flows, flows_ = torch.split(flowss, [1, 1], dim=0)

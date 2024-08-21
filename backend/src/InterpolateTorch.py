@@ -180,7 +180,7 @@ class InterpolateRifeTorch:
             v_mul = 2 / (self.ph - 1)
             self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
                 device=self.device, dtype=self.dtype
-            )
+            ).reshape(1, 2, 1, 1)
 
             self.backwarp_tenGrid = torch.cat(
                 (
@@ -255,6 +255,10 @@ class InterpolateRifeTorch:
                     torch.zeros((2,), dtype=self.dtype, device=device),
                     torch.zeros(
                         (1, 2, self.ph, self.pw), dtype=self.dtype, device=device
+                    )
+                    if v1 else 
+                    torch.zeros(
+                        (1, 2, 1, 1), dtype=self.dtype, device=device
                     ),
                 ]
                 self.flownet = torch_tensorrt.compile(
