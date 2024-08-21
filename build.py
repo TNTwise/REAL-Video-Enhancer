@@ -52,7 +52,7 @@ def build_executable():
             "-m",
             "PyInstaller",
             "main.py",
-            "--icon=icons/logo-v2.svg",
+            "--icon=icons/logo-v2.ico",
             "--noconfirm",
             "--noupx",
         ]
