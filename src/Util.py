@@ -67,7 +67,7 @@ def getCPUInfo() -> str:
             print(f"An error occurred while getting CPU brand: {e}")
             return None
     else:
-        cpuinfo.get_cpu_info()["brand_raw"]
+        return cpuinfo.get_cpu_info()["brand_raw"]
 
 
 def pythonPath() -> str:

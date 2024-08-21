@@ -101,7 +101,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         backendHandler = BackendHandler(self)
         backendHandler.enableCorrectBackends()
         backendHandler.setupBackendDeps()
-        backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+        self.backends, self.fullOutput = backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
             firstIter=True
         )
         
@@ -117,7 +117,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentIndex(0)
 
         self.QConnect()
-        self.backends, self.fullOutput = backendHandler.getAvailableBackends()
         # set up tabs
         self.backendComboBox.addItems(self.backends)
         printOut = (

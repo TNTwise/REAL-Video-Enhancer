@@ -32,7 +32,7 @@ class BackendHandler:
         """
         try:
             self.availableBackends, self.fullOutput = self.getAvailableBackends()
-
+            return self.availableBackends, self.fullOutput
         except SyntaxError as e:
             printAndLog(str(e))
             if not firstIter:
