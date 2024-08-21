@@ -79,7 +79,11 @@ jobs:
         run: cp -r backend dist/main/
       
       - name: compress archive
-        run: tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip dist/main/
+        run: 
+            cd dist
+            tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip main
+            cd ..
+            cp dist/REAL-Video-Enhancer-2.0-Windows.zip REAL-Video-Enhancer-2.0-Windows.zip
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
