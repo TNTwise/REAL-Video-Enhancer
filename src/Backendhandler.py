@@ -44,7 +44,7 @@ class BackendHandler:
                 pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
                 trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
             )
-            self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+            return self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
                 firstIter=False
             )
     def getAvailableBackends(self):
