@@ -39,14 +39,23 @@ def install_requirements_in_venv():
                 "-r",
                 "requirements.txt",
             ]
-        subprocess.run(command)
-    
+        
+    else:
+        command = [
+            "venv/bin/python3",
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            "requirements.txt",
+        ]
+    subprocess.run(command)
 
 
 def build_executable():
     if getPlatform() == "linux" or getPlatform() == "darwin": 
         command = [
-            "python3",
+            "venv/bin/python3",
             "-m",
             "PyInstaller",
             "main.py",
@@ -54,7 +63,6 @@ def build_executable():
             "--noconfirm",
             "--noupx",
         ]
-        subprocess.run(command)
     if getPlatform() == "win32":
         command = [
             r".\venv\Scripts\python.exe",
@@ -66,8 +74,7 @@ def build_executable():
             "--noupx",
         ]
 
-        subprocess.run(command)
-        # copy("backend","dist\\main\\backend")
+    subprocess.run(command)
 
 
 create_venv()
