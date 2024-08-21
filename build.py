@@ -1,22 +1,9 @@
 import os
 import subprocess
 import sys
-from src.Util import getPlatform
-
-
-def setup_windows():
-    if getPlatform() == "win32":
-        command = ["python3.10.exe", "-m", "venv", "venv"]
-        subprocess.run(command)
-        command = [
-            "venv\\Scripts\\python.exe",
-            "-m",
-            "pip",
-            "install",
-            "-r",
-            "requirements.txt",
-        ]
-        subprocess.run(command)
+def getPlatform():
+    return sys.platform
+        
 
 
 def build_gui():
@@ -35,6 +22,25 @@ def build_resources():
         os.system(
             r".\venv\Lib\site-packages\PySide6\rcc.exe -g python resources.qrc > resources_rc.py"
         )
+
+def create_venv():
+    print("Creating virtual environment")
+    command = ["python3", "-m", "venv", "venv"]
+    subprocess.run(command)
+
+def install_requirements_in_venv():
+    if getPlatform() == "win32":
+        print("Installing requirements in windows virtual environment")
+        command = [
+                "venv\\Scripts\\python.exe",
+                "-m",
+                "pip",
+                "install",
+                "-r",
+                "requirements.txt",
+            ]
+        subprocess.run(command)
+    
 
 
 def build_executable():
@@ -62,7 +68,8 @@ def build_executable():
         # copy("backend","dist\\main\\backend")
 
 
-setup_windows()
+create_venv()
+install_requirements_in_venv()
 build_gui()
 build_resources()
 if len(sys.argv) > 1:
