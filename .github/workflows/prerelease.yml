@@ -79,7 +79,7 @@ jobs:
         run: cp -r backend dist/main/
       
       - name: compress archive
-        run: 
+        run: |
             cd dist
             tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip main
             cd ..
