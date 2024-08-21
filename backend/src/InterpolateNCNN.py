@@ -1,4 +1,3 @@
-from rife_ncnn_vulkan_python import Rife
 
 class InterpolateRIFENCNN:
     def __init__(
@@ -9,6 +8,7 @@ class InterpolateRIFENCNN:
         threads: int = 1,
         gpuid: int = 0,
     ):
+        from rife_ncnn_vulkan_python import Rife
         self.interpolateModelPath = interpolateModelPath
         self.width = width
         self.height = height

@@ -88,14 +88,16 @@ def check_bfloat16_support() -> bool:
         return True
     except RuntimeError:
         return False
-
-
+try: # it will error out without this code?
+    from rife_ncnn_vulkan_python import Rife
+except:
+    pass
 def checkForNCNN() -> bool:
     """
     function that checks if the pytorch backend is available
     """
     try:
-        from rife_ncnn_vulkan_python import RIFE
+        from rife_ncnn_vulkan_python import Rife
         from upscale_ncnn_py import UPSCALE
 
         return True

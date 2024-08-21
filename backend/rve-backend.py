@@ -45,6 +45,7 @@ class HandleApplication:
             if checkForNCNN():
                 availableBackends.append("ncnn")
                 printMSG += f"NCNN Version: 20220729\n"
+                from rife_ncnn_vulkan_python import Rife
             if checkForPytorch():
                 import torch
 

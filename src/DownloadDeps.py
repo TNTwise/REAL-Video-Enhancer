@@ -152,6 +152,16 @@ class DownloadDependencies:
             title="Download Dependencies",
             progressBarLength=totalDeps,
         )
+        command = [pythonPath(),
+            "-m",
+            "pip","cache",
+            "purge",]
+        DisplayCommandOutputPopup(
+            command=command,
+            title="Purging Cache",
+            progressBarLength=1,
+        )
+        
 
     def getPlatformIndependentDeps(self):
         platformIndependentdeps = [
