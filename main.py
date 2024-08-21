@@ -101,9 +101,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         backendHandler = BackendHandler(self)
         backendHandler.enableCorrectBackends()
         backendHandler.setupBackendDeps()
-        self.backends, self.fullOutput = backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-            firstIter=True
-        )
+        try:
+            self.backends, self.fullOutput = backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+                firstIter=True
+            )
+        except TypeError:
+            self.backends, self.fullOutput = backendHandler.getAvailableBackends()
         
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
