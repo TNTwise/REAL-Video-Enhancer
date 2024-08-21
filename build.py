@@ -7,7 +7,7 @@ def getPlatform():
 
 
 def build_gui():
-    if getPlatform() == "linux":
+    if getPlatform() == "darwin" or getPlatform() == "linux":
         os.system("pyside6-uic -g python testRVEInterface.ui > mainwindow.py")
     if getPlatform() == "win32":
         os.system(
@@ -16,7 +16,7 @@ def build_gui():
 
 
 def build_resources():
-    if getPlatform() == "linux":
+    if getPlatform() == "darwin" or getPlatform() == "linux":
         os.system("pyside6-rcc -g python resources.qrc > resources_rc.py")
     if getPlatform() == "win32":
         os.system(
@@ -44,7 +44,7 @@ def install_requirements_in_venv():
 
 
 def build_executable():
-    if getPlatform() == "linux":
+    if getPlatform() == "linux" or getPlatform() == "darwin": 
         command = [
             "python3",
             "-m",
