@@ -105,7 +105,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             firstIter=True
         )
         
-        
+        icon_path = ":/icons/icons/logo-v2.svg"  # Adjust the path to your icon file
+        self.setWindowIcon(QIcon(icon_path))
+        QApplication.setWindowIcon(QIcon(icon_path))
         self.setWindowTitle("REAL Video Enhancer")
         self.setPalette(QApplication.style().standardPalette())
         self.setMinimumSize(1100, 700)
@@ -164,7 +166,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # Startup Animation
         self.animationHandler = AnimationHandler()
         self.animationHandler.fadeInAnimation(self)
-        
+
     def QConnect(self):
         # connect buttons to switch menus
         self.homeBtn.clicked.connect(self.switchToHomePage)
