@@ -46,123 +46,50 @@ jobs:
       - name: compress archive
         run: zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/main/
 
-      - name: Save CUDA Archive as artifact
+      - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
         with:
           name: REAL-Video-Enhancer-2.0-Linux.zip
           path: REAL-Video-Enhancer-2.0-Linux.zip
-  
-  build-MacOS:
+  build-Windows:
+   
     # The type of runner that the job will run on
-    runs-on: macos-12
+    #runs-on: self-hosted-22.04 
+    runs-on: windows-2019
     permissions: write-all  
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
       
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
-        # cp -r /usr/local/Cellar/postgresql@14/14.11_1/lib/postgresql@14/* /Applications/Postgres.app/Contents/Versions/9.6/lib/ - only if cx_freeze
-      - name: checks
-        run: | 
-          mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
-          brew reinstall postgresql
-          
-                      
-          brew update
-          brew reinstall libiodbc
-          export LDFLAGS="-L/usr/local/opt/libiodbc/lib"
-          export CPPFLAGS="-I/usr/local/opt/libiodbc/include"
-          export PKG_CONFIG_PATH="/usr/local/opt/libiodbc/lib/pkgconfig"
-      - uses: actions/checkout@v3
-       
+          python-version: 3.11.8
+
       - name: Checkout code
-        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer-BETA.git
-        
-      # Runs a single command using the runners shell
-      - name: Log
         run: ls
-      - name: Get last release
-        id: last_release
-        
-        run: |
-          cd REAL-Video-Enhancer-BETA
-          last_release_tag=$(git describe --tags --abbrev=0)
-          last_release_date=$(git log -1 --format="%aI" $last_release_tag)
-          echo "::set-output name=last_release_date::$last_release_date"
 
-
-
-
-      # Runs a set of commands using the runners shell
-      - name: Get latest version
-        run: git clone https://github.com/TNTwise/REAL-Video-Enhancer.git
-      - name: Generate version and tag
-        id: version_tag
+      - name: Install Python Dependencies
         run: |
-          version=$(python -c "from datetime import datetime; print(str(datetime.now()).split(' ')[0].replace('-',''))")
-          tag=$(python -c "import random, string; print(''.join(random.choices(string.ascii_letters, k=8)))")
-          commitlog=$(cd REAL-Video-Enhancer && git log --since="24 hours ago" --pretty=format:"%h - %s")
-          echo "Version=$version"
-          echo "Tag=$version"
-          echo "CommitLog=$commitlog"
-          echo "::set-output name=version::$version"
-          echo "::set-output name=tag::$version"
-          echo "::set-output name=commitlog::$commitlog"
-      - name: Make Commit Log
-      
-        run: |
-             cd REAL-Video-Enhancer 
-             time_difference=${{ 604800 }}
-             hours=$((time_difference / 3600)) # Convert seconds to hours
-             git log --since="$hours hours ago" --pretty=format:"%h - %s" >> ../output.log
-      - name: Install python dependencies
-        run: |
-          cd REAL-Video-Enhancer
           python3 -m pip install -r requirements.txt
-          python3 -m pip install -r requirements-MAC.txt
+      - name: Build
+        run: python3 build.py --build_exe
         
-      - name: Compile to executable
-        run: |
-          
-          cd REAL-Video-Enhancer
-          
-          
-                    
-          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
-          rm -rf dist
-          rm -rf build
-          mkdir dist
-          python3 -m PyQt5.uic.pyuic mainwindow.ui > mainwindow.py
-          python3 -m PyQt5.uic.pyuic src/getModels/SelectModels.ui > src/getModels/SelectModels.py
-          python3 -m PyQt5.uic.pyuic src/getModels/Download.ui > src/getModels/Download.py
-          python3 -m PyQt5.uic.pyuic src/getModels/SelectAI.ui > src/getModels/SelectAI.py
-          python3 -m PyQt5.uic.pyuic src/getLinkVideo/get_vid_from_link.ui > src/getLinkVideo/get_vid_from_link.py
-          python3 -m PyInstaller --onefile main.py --hidden-import upscale_ncnn_py.upscale_ncnn_py_wrapper --hidden-import realcugan_ncnn_py.realcugan_ncnn_py_wrapper --hidden-import rife_ncnn_vulkan_python.rife_ncnn_vulkan_wrapper     
-
+      - name: copy backend
+        run: cp -r backend dist/main/
       
       - name: compress archive
-        run: |
-          cp -r REAL-Video-Enhancer/dist/ bin/
-          cd bin
-          mv main REAL-Video-Enhancer
-          tar -caf REAL-Video-Enhancer.tar.xz *
-          cd ../
-          mv bin/REAL-Video-Enhancer.tar.xz .
-          mv REAL-Video-Enhancer.tar.xz REAL-Video-Enhancer-MacOS-x86_64.tar.xz
-       
-      
+        run: tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip dist/main/
+
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: REAL-Video-Enhancer-MacOS-x86_64.tar.xz
-          path: REAL-Video-Enhancer-MacOS-x86_64.tar.xz
-          
- 
+          name: REAL-Video-Enhancer-2.0-Windows.zip
+          path: REAL-Video-Enhancer-2.0-Windows.zip
+  
+
   Release:
-    needs: [build-MacOS, build-Linux]
+    needs: [build-Windows, build-Linux]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -193,10 +120,9 @@ jobs:
           prerelease: true
           
           files: |
-              artifacts/REAL-Video-Enhancer-Appimage/REAL-Video-Enhancer-x86_64.AppImage
-              artifacts/REAL-Video-Enhancer-MacOS-x86_64.tar.xz/REAL-Video-Enhancer-MacOS-x86_64.tar.xz
-              artifacts/REAL-Video-Enhancer-CUDA.7z/REAL-Video-Enhancer-CUDA.7z
-              artifacts/REAL-Video-Enhancer-ROCm.7z/REAL-Video-Enhancer-ROCm.7z
+              artifacts/REAL-Video-Enhancer-2.0-Windows.zip/REAL-Video-Enhancer-2.0-Windows.zip
+              artifacts/REAL-Video-Enhancer-2.0-Linux.zip/REAL-Video-Enhancer-2.0-Linux.zip
+
               
               
         
