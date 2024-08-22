@@ -188,21 +188,15 @@ class UpscalePytorch:
             .float()
             .clamp(0.0, 1.0)
             .mul(255)
+            .byte()
             .contiguous()
             .detach()
             .cpu()
             .numpy()
         )
 
-    @torch.inference_mode()
-    def renderImagesInDirectory(self, dir):
-        pass
-
     def getScale(self):
         return self.scale
-
-    def saveImage(self, image: np.array, fullOutputPathLocation):
-        cv2.imwrite(fullOutputPathLocation, image)
 
     @torch.inference_mode()
     def renderTiledImage(

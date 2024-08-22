@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-
+import math
 try:
     from .interpolate import interpolate
 except ImportError:
@@ -138,6 +138,8 @@ class IFNet(nn.Module):
         device="cuda",
         width=1920,
         height=1080,
+        backwarp_tenGrid=None,
+        tenFlow_div=None,
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
@@ -151,11 +153,14 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.width = width
         self.height = height
+        self.backwarp_tenGrid = backwarp_tenGrid
+        self.tenFlow_div = tenFlow_div
+        
 
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
+    def forward(self, img0, img1, timestep):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
@@ -237,7 +242,7 @@ class IFNet(nn.Module):
                         torch.split(flows, [2, 2], dim=1)[::-1], dim=1
                     )
             precomp = (
-                (backwarp_tenGrid + flows.reshape((2, 2, h, w)) * tenFlow_div)
+                (self.backwarp_tenGrid + flows.reshape((2, 2, h, w)) * self.tenFlow_div)
                 .permute(0, 2, 3, 1)
                 .to(dtype=self.dtype)
             )

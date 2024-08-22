@@ -201,6 +201,8 @@ class InterpolateRifeTorch:
             device=self.device,
             width=self.width,
             height=self.height,
+            backwarp_tenGrid=self.backwarp_tenGrid,
+            tenFlow_div=self.tenFlow_div,
         )
 
         state_dict = {
@@ -252,14 +254,7 @@ class InterpolateRifeTorch:
                     torch.zeros(
                         (1, 1, self.ph, self.pw), dtype=self.dtype, device=device
                     ),
-                    torch.zeros((2,), dtype=self.dtype, device=device),
-                    torch.zeros(
-                        (1, 2, self.ph, self.pw), dtype=self.dtype, device=device
-                    )
-                    if v1 else 
-                    torch.zeros(
-                        (1, 2, 1, 1), dtype=self.dtype, device=device
-                    ),
+                    
                 ]
                 self.flownet = torch_tensorrt.compile(
                     self.flownet,
@@ -293,7 +288,7 @@ class InterpolateRifeTorch:
         )
 
         output = self.flownet(
-            img0, img1, timestep, self.tenFlow_div, self.backwarp_tenGrid
+            img0, img1, timestep
         )
         return self.tensor_to_frame(output)
 
@@ -305,6 +300,7 @@ class InterpolateRifeTorch:
         
         return (
             frame
+            .byte()
             .contiguous()
             .cpu()
             .numpy()

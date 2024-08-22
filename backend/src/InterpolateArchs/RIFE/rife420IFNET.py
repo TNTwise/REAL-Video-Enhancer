@@ -5,7 +5,7 @@ try:
     from .interpolate import interpolate
 except ImportError:
     from torch.nn.functional import interpolate
-
+import math
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -138,6 +138,8 @@ class IFNet(nn.Module):
         device="cuda",
         width=1920,
         height=1080,
+        backwarp_tenGrid=None,
+        tenFlow_div=None,
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=384)
@@ -151,14 +153,12 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.width = width
         self.height = height
+        self.backwarp_tenGrid = backwarp_tenGrid
+        self.tenFlow_div = tenFlow_div
 
-        # self.contextnet = Contextnet()
-        # self.unet = Unet()
-
-    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
+    def forward(self, img0, img1, timestep):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
-        tenFlow_div = tenFlow_div.reshape(1, 2, 1, 1)
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, h, w))
         fs_2 = self.encode(imgs_2)
@@ -240,7 +240,7 @@ class IFNet(nn.Module):
                         torch.split(flows, [2, 2], dim=1)[::-1], dim=1
                     )
             precomp = (
-                (backwarp_tenGrid + flows.reshape((2, 2, h, w)) * tenFlow_div)
+                (self.backwarp_tenGrid + flows.reshape((2, 2, h, w)) * self.tenFlow_div)
                 .permute(0, 2, 3, 1)
                 .to(dtype=self.dtype)
             )

@@ -102,6 +102,8 @@ class IFNet(nn.Module):
         device="cuda",
         width=1920,
         height=1080,
+        backwarp_tenGrid=None,
+        tenFlow_div=None,
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
@@ -114,8 +116,10 @@ class IFNet(nn.Module):
         self.device = device
         self.width = width
         self.height = height
+        self.backwarp_tenGrid = backwarp_tenGrid
+        self.tenFlow_div = tenFlow_div
 
-    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
+    def forward(self, img0, img1, timestep):
         flow_list = []
         merged = []
         mask_list = []
@@ -167,8 +171,8 @@ class IFNet(nn.Module):
                 mask = mask + m0
             mask_list.append(mask)
             flow_list.append(flow)
-            warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
-            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
+            warped_img0 = warp(img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid)
+            warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid)
             merged.append((warped_img0, warped_img1))
         mask_list[3] = torch.sigmoid(mask_list[3])
         frame = merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
