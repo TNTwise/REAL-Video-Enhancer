@@ -340,6 +340,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.interpolationMultiplierComboBox.currentText()
                 ),
                 model=self.modelComboBox.currentText(),
+                benchmarkMode=self.benchmarkModeCheckBox.isChecked(),
             )
         else:
             pass

@@ -75,6 +75,10 @@ QPushButton:hover{
 	background-color:#343b47;
 }
 
+QCheckBox{
+color:#fff;
+background-color:#fff;
+}
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -785,6 +789,54 @@ li.checked::marker { content: &quot;\2612&quot;; }
                   </widget>
                  </item>
                  <item>
+                  <widget class="QWidget" name="widget_6" native="true">
+                   <layout class="QHBoxLayout" name="horizontalLayout_15">
+                    <item>
+                     <widget class="QLabel" name="label_18">
+                      <property name="font">
+                       <font>
+                        <pointsize>15</pointsize>
+                       </font>
+                      </property>
+                      <property name="text">
+                       <string>Benchmark Mode</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer">
+                      <property name="orientation">
+                       <enum>Qt::Orientation::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QCheckBox" name="benchmarkModeCheckBox">
+                      <property name="styleSheet">
+                       <string notr="true">QCheckBox::indicator{
+border : 1px solid white;
+border-radius: 2px;
+}
+QCheckBox::indicator::checked{
+background-color:white;
+}
+</string>
+                      </property>
+                      <property name="text">
+                       <string/>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
                   <widget class="QWidget" name="widget_2" native="true">
                    <layout class="QVBoxLayout" name="verticalLayout_13">
                     <item>
@@ -792,7 +844,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                       <property name="minimumSize">
                        <size>
                         <width>0</width>
-                        <height>170</height>
+                        <height>40</height>
                        </size>
                       </property>
                       <property name="maximumSize">
@@ -822,7 +874,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                          <property name="minimumSize">
                           <size>
                            <width>0</width>
-                           <height>150</height>
+                           <height>40</height>
                           </size>
                          </property>
                          <property name="maximumSize">
@@ -867,19 +919,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                          </property>
                         </widget>
-                       </item>
-                       <item>
-                        <spacer name="verticalSpacer_5">
-                         <property name="orientation">
-                          <enum>Qt::Orientation::Vertical</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>20</width>
-                           <height>40</height>
-                          </size>
-                         </property>
-                        </spacer>
                        </item>
                       </layout>
                      </widget>

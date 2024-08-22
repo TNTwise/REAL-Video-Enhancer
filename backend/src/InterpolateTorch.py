@@ -305,7 +305,6 @@ class InterpolateRifeTorch:
         
         return (
             frame
-            .byte()
             .contiguous()
             .cpu()
             .numpy()

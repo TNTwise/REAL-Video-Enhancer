@@ -249,6 +249,7 @@ class ProcessTab:
         backend: str,
         interpolationTimes: int,
         model: str,
+        benchmarkMode: bool,
     ):
         self.inputFile = inputFile
         self.outputPath = outputPath
@@ -265,7 +266,7 @@ class ProcessTab:
         Then, based on the settings selected, it will build a command that is then passed into rve-backend
         Finally, It will handle the render via ffmpeg. Taking in the frames from pipe and handing them into ffmpeg on a sperate thread
         """
-
+        self.benchmarkMode = benchmarkMode
         # get model attributes
         self.modelFile = models[model][0]
         self.downloadFile = models[model][1]
@@ -365,6 +366,11 @@ class ProcessTab:
                 "--interpolateFactor",
                 f"{interpolateTimes}",
             ]
+        
+        if self.benchmarkMode:
+            command += [
+                "--benchmark"
+                ]
         self.renderProcess = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
