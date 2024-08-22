@@ -27,7 +27,7 @@ jobs:
         run: cp -r backend dist/
       
       - name: compress archive
-        run: zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/main/
+        run: zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
@@ -89,7 +89,7 @@ jobs:
         run: cp -r backend dist/
       
       - name: compress archive
-        run: zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip dist/main/
+        run: zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip dist/
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
