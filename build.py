@@ -49,19 +49,29 @@ def install_requirements_in_venv():
 
 def build_executable():
     print("Building executable")
-
-    command = [
-        r".\venv\Scripts\python.exe"
-        if getPlatform() == "win32"
-        else "venv/bin/python3",
-        "-m",
-        "PyInstaller",
-        "main.py",
-        "--icon=icons/logo-v2.ico",
-        "--noconfirm",
-        "--noupx",
-    ]
-
+    if getPlatform() == "win32": 
+        command = [
+            r".\venv\Scripts\python.exe"
+            if getPlatform() == "win32"
+            else "venv/bin/python3",
+            "-m",
+            "PyInstaller",
+            "main.py",
+            "--icon=icons/logo-v2.ico",
+            "--noconfirm",
+            "--noupx",
+        ]
+    else: 
+        command = [
+            r".\venv\Scripts\python.exe"
+            if getPlatform() == "win32"
+            else "venv/bin/python3",
+            "-m",
+            "cx_Freeze",
+            "main.py",
+            "--target-dir","dist"
+            
+        ]
     subprocess.run(command)
 
 
