@@ -135,10 +135,6 @@ class DownloadDependencies:
             "-m",
             "pip",
             "install",
-            "--extra-index-url",
-            "https://download.pytorch.org/whl/nightly/cu124",
-            "--extra-index-url",
-            "https://pypi.nvidia.com",
             "-U",
             "--no-warn-script-location",
         ] + deps
