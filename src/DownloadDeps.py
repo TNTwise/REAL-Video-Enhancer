@@ -270,24 +270,24 @@ class DownloadDependencies:
         match getPlatform():
             case "linux":
                 tensorRTDeps = [
-                    "tensorrt==10.1.0",
-                    "tensorrt_cu12==10.1.0",
-                    "tensorrt-cu12_libs==10.1.0",
-                    "tensorrt_cu12_bindings==10.1.0",
+                    "tensorrt==10.3.0",
+                    "tensorrt_cu12==10.3.0",
+                    "tensorrt-cu12_libs==10.3.0",
+                    "tensorrt_cu12_bindings==10.3.0",
                 ]
                 #default
-                tensorRTDeps += ["torch_tensorrt==2.4.0"]
+                tensorRTDeps += ["--no-deps","torch_tensorrt==2.4.0"]
                 #nightly
                 #tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl"]
             case "win32":
                 tensorRTDeps = [
-                    "tensorrt==10.1.0",
-                    "tensorrt_cu12==10.1.0",
-                    "tensorrt-cu12_libs==10.1.0",
-                    "tensorrt_cu12_bindings==10.1.0",
+                    "tensorrt==10.3.0",
+                    "tensorrt_cu12==10.3.0",
+                    "tensorrt-cu12_libs==10.3.0",
+                    "tensorrt_cu12_bindings==10.3.0",
                 ]
                 tensorRTDeps += (
-                    #"--no-deps",
+                    "--no-deps",
                     #"torch_tensorrt==2.4.0",
                      "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
                 )

@@ -120,9 +120,6 @@ class IFNet(nn.Module):
         self.tenFlow_div = tenFlow_div
 
     def forward(self, img0, img1, timestep):
-        flow_list = []
-        merged = []
-        mask_list = []
         warped_img0 = img0
         warped_img1 = img1
         flow = None
@@ -169,12 +166,11 @@ class IFNet(nn.Module):
                     m0 = (m0 + (-m1)) / 2
                 flow = flow + f0
                 mask = mask + m0
-            mask_list.append(mask)
-            flow_list.append(flow)
+            latest_mask = mask
             warped_img0 = warp(img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid)
             warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid)
-            merged.append((warped_img0, warped_img1))
-        mask_list[3] = torch.sigmoid(mask_list[3])
-        frame = merged[3][0] * mask_list[3] + merged[3][1] * (1 - mask_list[3])
+            
+        temp = torch.sigmoid(latest_mask)
+        frame = warped_img0 * temp + warped_img1 * (1 - temp)
         frame = frame[:, :, : self.height, : self.width][0]
         return frame.squeeze(0).permute(1, 2, 0).mul(255).float()
