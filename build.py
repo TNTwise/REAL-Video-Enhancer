@@ -1,7 +1,19 @@
 import os
 import subprocess
 import sys
+import os
+import subprocess
+import sys
 
+import urllib.request
+
+def download_file(url, destination):
+    print(f"Downloading file from {url}")
+    urllib.request.urlretrieve(url, destination)
+    print("File downloaded successfully")
+
+
+# Rest of the code...
 
 def getPlatform():
     return sys.platform
@@ -16,6 +28,17 @@ def build_gui():
             r".\venv\Lib\site-packages\PySide6\uic.exe -g python testRVEInterface.ui > mainwindow.py"
         )
 
+def install_pip():
+    download_file("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
+    command = ["python3", "get-pip.py"]
+    subprocess.run(command)
+
+def install_pip_in_venv():
+    command = [
+        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
+        "get-pip.py"
+    ]
+    subprocess.run(command)
 
 def build_resources():
     print("Building resources.rc")
@@ -74,8 +97,14 @@ def build_executable():
         ]
     subprocess.run(command)
 
+def clean():
+    print("Cleaning up")
+    os.remove("get-pip.py")
+    
 
+install_pip()
 create_venv()
+install_pip_in_venv()
 install_requirements_in_venv()
 build_gui()
 build_resources()
