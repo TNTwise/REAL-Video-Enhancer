@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import QWidget, QGraphicsOpacityEffect
 from PySide6.QtCore import QPropertyAnimation, QEasingCurve
+
+
 class AnimationHandler:
-
-
     def fadeInAnimation(self, qObject: QWidget, n=None):
         self.opacity_effect = QGraphicsOpacityEffect()
         qObject.setGraphicsEffect(self.opacity_effect)

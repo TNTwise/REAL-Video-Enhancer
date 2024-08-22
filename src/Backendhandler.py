@@ -1,10 +1,12 @@
 import os
 from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath
 from .version import version
+
+
 class BackendHandler:
-    def __init__(self,parent):
+    def __init__(self, parent):
         self.parent = parent
-    
+
     def enableCorrectBackends(self):
         self.parent.downloadTorchROCmBtn.setEnabled(getPlatform() == "linux")
         if getPlatform() == "darwin":
@@ -14,18 +16,20 @@ class BackendHandler:
     def setupBackendDeps(self):
         # need pop up window
         from .DownloadDeps import DownloadDependencies
+
         downloadDependencies = DownloadDependencies()
         downloadDependencies.downloadBackend(version)
         if not checkIfDeps():
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()
             downloadDependencies.downloadPython()
-            
+
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
     ):
         from .DownloadDeps import DownloadDependencies
         from .ui.QTcustom import RegularQTPopup, DownloadDepsDialog
+
         """
         will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
         """
@@ -46,8 +50,10 @@ class BackendHandler:
             return self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
                 firstIter=False
             )
+
     def getAvailableBackends(self):
         from .ui.QTcustom import SettingUpBackendPopup
+
         output = SettingUpBackendPopup(
             [
                 pythonPath(),
@@ -66,6 +72,3 @@ class BackendHandler:
         backends = eval(backends_str)
 
         return backends, output
-    
-        
-    

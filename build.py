@@ -1,9 +1,10 @@
 import os
 import subprocess
 import sys
+
+
 def getPlatform():
     return sys.platform
-        
 
 
 def build_gui():
@@ -25,30 +26,34 @@ def build_resources():
             r".\venv\Lib\site-packages\PySide6\rcc.exe -g python resources.qrc > resources_rc.py"
         )
 
+
 def create_venv():
     print("Creating virtual environment")
     command = ["python3", "-m", "venv", "venv"]
     subprocess.run(command)
 
+
 def install_requirements_in_venv():
     print("Installing requirements in virtual environment")
     command = [
-            "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
-            "-m",
-            "pip",
-            "install",
-            "-r",
-            "requirements.txt",
+        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "requirements.txt",
     ]
-        
+
     subprocess.run(command)
 
 
 def build_executable():
     print("Building executable")
-    
+
     command = [
-        r".\venv\Scripts\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
+        r".\venv\Scripts\python.exe"
+        if getPlatform() == "win32"
+        else "venv/bin/python3",
         "-m",
         "PyInstaller",
         "main.py",

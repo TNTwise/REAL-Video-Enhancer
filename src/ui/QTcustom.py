@@ -57,7 +57,6 @@ from ..Util import printAndLog, getPlatform
 from ..Backendhandler import BackendHandler
 
 
-
 class UpdateGUIThread(QThread):
     """
     Gets the latest bytes outputed from the shared memory and returns them in QImage format for display
@@ -549,8 +548,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.downloadTorchROCmBtn.setIconSize(QSize(30, 30))
 
         self.horizontalLayout_9.addWidget(self.downloadTorchROCmBtn)
-        
-        
+
         backendHandler = BackendHandler(self)
         backendHandler.enableCorrectBackends()
         self.label_9 = QLabel(self.pytorchBackendInstallerContainer_3)
@@ -613,23 +611,35 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.label_4.setText(QCoreApplication.translate("Dialog", "Backends", None))
         self.downloadTorchCUDABtn.setText("")
         self.label_6.setText(
-            QCoreApplication.translate("Dialog", "PyTorch CUDA (Nvidia Only, Fast inference, large download) ", None)
+            QCoreApplication.translate(
+                "Dialog",
+                "PyTorch CUDA (Nvidia Only, Fast inference, large download) ",
+                None,
+            )
         )
         self.downloadTensorRTBtn.setText("")
         self.label_8.setText(
             QCoreApplication.translate(
-                "Dialog", "TensorRT (Nvidia RTX 20 series and up, Fastest inference, largest download)", None
+                "Dialog",
+                "TensorRT (Nvidia RTX 20 series and up, Fastest inference, largest download)",
+                None,
             )
         )
         self.downloadTorchROCmBtn.setText("")
         self.label_9.setText(
             QCoreApplication.translate(
-                "Dialog", "PyTorch ROCm (AMD RX 6000 through RX 7000, linux only, Fast inference, large download)", None
+                "Dialog",
+                "PyTorch ROCm (AMD RX 6000 through RX 7000, linux only, Fast inference, large download)",
+                None,
             )
         )
         self.downloadNCNNBtn.setText("")
         self.label_10.setText(
-            QCoreApplication.translate("Dialog", "NCNN Vulkan (All GPUs, Slower inference, small download)", None)
+            QCoreApplication.translate(
+                "Dialog",
+                "NCNN Vulkan (All GPUs, Slower inference, small download)",
+                None,
+            )
         )
 
     # retranslateUi

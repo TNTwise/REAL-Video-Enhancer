@@ -6,6 +6,7 @@ try:
 except ImportError:
     from torch.nn.functional import interpolate
 
+
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
@@ -156,8 +157,7 @@ class IFNet(nn.Module):
         if self.ensemble:
             fs_rev = torch.cat(torch.split(fs, [8, 8], dim=1)[::-1], dim=1)
             imgs_rev = torch.cat([img1, img0], dim=1)
-        
-            
+
         warped_img0 = img0
         warped_img1 = img1
         flows = None
@@ -166,7 +166,6 @@ class IFNet(nn.Module):
         scale_list = [8, 4, 2, 1]
         for block, scale in zip(blocks, scale_list):
             if flows is None:
-                
                 temp = torch.cat((imgs, fs, timestep), 1)
                 flows, mask, feat = block(temp, scale=scale)
             else:
@@ -212,10 +211,9 @@ class IFNet(nn.Module):
                 wimg, wf = torch.split(warps, [3, 8], dim=1)
                 wimg = torch.reshape(wimg, (1, 6, h, w))
                 wf = torch.reshape(wf, (1, 16, h, w))
-                
+
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
         frame = warped_img0 * mask + warped_img1 * (1 - mask)
         frame = frame[:, :, : self.height, : self.width][0]
         return frame.squeeze(0).permute(1, 2, 0).mul(255).float()
-

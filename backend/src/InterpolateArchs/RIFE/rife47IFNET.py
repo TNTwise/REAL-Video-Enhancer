@@ -207,10 +207,14 @@ class IFNet(nn.Module):
                 flow = flow + fd
             mask_list.append(mask)
             flow_list.append(flow)
-            warped_img0 = warp(img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid)
-            warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid)
+            warped_img0 = warp(
+                img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
+            )
+            warped_img1 = warp(
+                img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
+            )
             merged.append((warped_img0, warped_img1))
         mask = torch.sigmoid(mask)
-        frame= warped_img0 * mask + warped_img1 * (1 - mask)
+        frame = warped_img0 * mask + warped_img1 * (1 - mask)
         frame = frame[:, :, : self.height, : self.width][0]
         return frame.squeeze(0).permute(1, 2, 0).mul(255).float()

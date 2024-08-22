@@ -178,9 +178,11 @@ class InterpolateRifeTorch:
             # if v2
             h_mul = 2 / (self.pw - 1)
             v_mul = 2 / (self.ph - 1)
-            self.tenFlow_div = torch.Tensor([h_mul, v_mul]).to(
-                device=self.device, dtype=self.dtype
-            ).reshape(1, 2, 1, 1)
+            self.tenFlow_div = (
+                torch.Tensor([h_mul, v_mul])
+                .to(device=self.device, dtype=self.dtype)
+                .reshape(1, 2, 1, 1)
+            )
 
             self.backwarp_tenGrid = torch.cat(
                 (
@@ -254,7 +256,6 @@ class InterpolateRifeTorch:
                     torch.zeros(
                         (1, 1, self.ph, self.pw), dtype=self.dtype, device=device
                     ),
-                    
                 ]
                 self.flownet = torch_tensorrt.compile(
                     self.flownet,
@@ -287,9 +288,7 @@ class InterpolateRifeTorch:
             (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
         )
 
-        output = self.flownet(
-            img0, img1, timestep
-        )
+        output = self.flownet(img0, img1, timestep)
         return self.tensor_to_frame(output)
 
     @torch.inference_mode()
@@ -297,14 +296,8 @@ class InterpolateRifeTorch:
         """
         Takes in a 4d tensor, undoes padding, and converts to np array for rendering
         """
-        
-        return (
-            frame
-            .byte()
-            .contiguous()
-            .cpu()
-            .numpy()
-        )
+
+        return frame.byte().contiguous().cpu().numpy()
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:

@@ -36,7 +36,6 @@ from src.Util import (
     getRAMAmount,
     getCPUInfo,
     videosPath,
-    
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -93,18 +92,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.isVideoLoaded = False
 
         # setup application
-        
-        
 
         # Set up the user interface from Designer.
         self.setupUi(self)
         backendHandler = BackendHandler(self)
         backendHandler.enableCorrectBackends()
         backendHandler.setupBackendDeps()
-        self.backends, self.fullOutput = backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
-            firstIter=True
+        self.backends, self.fullOutput = (
+            backendHandler.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
+                firstIter=True
+            )
         )
-        
+
         icon_path = ":/icons/icons/logo-v2.svg"  # Adjust the path to your icon file
         self.setWindowIcon(QIcon(icon_path))
         QApplication.setWindowIcon(QIcon(icon_path))
@@ -113,8 +112,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setMinimumSize(1100, 700)
 
         self.aspect_ratio = self.width() / self.height()
-
-        
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
@@ -179,8 +176,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.kofiBtn.clicked.connect(lambda: openLink("https://ko-fi.com/tntwise"))
 
-    
-
     def setButtonsUnchecked(self, buttonToIgnore):
         buttons = [
             self.homeBtn,
@@ -218,7 +213,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.downloadPage)
         self.setButtonsUnchecked(self.downloadBtn)
         self.animationHandler.fadeInAnimation(self.stackedWidget)
-    
 
     def generateDefaultOutputFile(
         self,
@@ -351,8 +345,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def enableProcessPage(self):
         self.processSettingsContainer.setEnabled(True)
-
-    
 
     # input file button
     def openInputFile(self):

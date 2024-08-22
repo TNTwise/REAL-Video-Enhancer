@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import math
+
 try:
     from .interpolate import interpolate
 except ImportError:
@@ -155,7 +156,6 @@ class IFNet(nn.Module):
         self.height = height
         self.backwarp_tenGrid = backwarp_tenGrid
         self.tenFlow_div = tenFlow_div
-        
 
         # self.contextnet = Contextnet()
         # self.unet = Unet()
@@ -170,7 +170,7 @@ class IFNet(nn.Module):
         if self.ensemble:
             fs_rev = torch.cat(torch.split(fs, [8, 8], dim=1)[::-1], dim=1)
             imgs_rev = torch.cat([img1, img0], dim=1)
-        
+
         flows = None
         mask = None
         blocks = [self.block0, self.block1, self.block2, self.block3]
@@ -273,6 +273,6 @@ class IFNet(nn.Module):
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
 
-        frame= warped_img0 * mask + warped_img1 * (1 - mask)
+        frame = warped_img0 * mask + warped_img1 * (1 - mask)
         frame = frame[:, :, : self.height, : self.width][0]
         return frame.squeeze(0).permute(1, 2, 0).mul(255).float()

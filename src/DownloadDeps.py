@@ -109,7 +109,6 @@ class DownloadDependencies:
         # give executable permissions to python
         makeExecutable(pythonPath())
 
-    
     def downloadFFMpeg(self):
         ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
@@ -152,16 +151,18 @@ class DownloadDependencies:
             title="Download Dependencies",
             progressBarLength=totalDeps,
         )
-        command = [pythonPath(),
+        command = [
+            pythonPath(),
             "-m",
-            "pip","cache",
-            "purge",]
+            "pip",
+            "cache",
+            "purge",
+        ]
         DisplayCommandOutputPopup(
             command=command,
             title="Purging Cache",
             progressBarLength=1,
         )
-        
 
     def getPlatformIndependentDeps(self):
         platformIndependentdeps = [
@@ -189,28 +190,28 @@ class DownloadDependencies:
         # default
         torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
-            #"https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
+            # "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
             "torch==2.4.0",
             "torchvision==0.19.0",
         ]
-        #Nigthly test
-        '''torchCUDALinuxDeps = [
+        # Nigthly test
+        """torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240817%2Bcu124-py3-none-any.whl"
-        ]'''
+        ]"""
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             # "--pre",
-             "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
             # "--pre",
-             "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240817%2Bcu124-cp311-cp311-win_amd64.whl",
-            #"torch==2.4.0",
-            #"torchvision==0.19.0",
-            #"safetensors",
-            #"einops",
+            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240817%2Bcu124-cp311-cp311-win_amd64.whl",
+            # "torch==2.4.0",
+            # "torchvision==0.19.0",
+            # "safetensors",
+            # "einops",
         ]
         match getPlatform():
             case "win32":
@@ -232,7 +233,7 @@ class DownloadDependencies:
         ncnnLinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-linux_x86_64.whl",
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
-        ] + self.getPlatformIndependentDeps() 
+        ] + self.getPlatformIndependentDeps()
         ncnnWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-win_amd64.whl",
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
@@ -241,7 +242,7 @@ class DownloadDependencies:
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-macosx_12_0_universal2.whl",
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-macosx_11_0_universal2.whl",
         ] + self.getPlatformIndependentDeps()
-        
+
         match getPlatform():
             case "win32":
                 self.pipInstall(ncnnWindowsDeps)
@@ -275,11 +276,12 @@ class DownloadDependencies:
                     "tensorrt-cu12_libs==10.1.0",
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
-                #default
-                tensorRTDeps += [#"--no-deps",
-                "torch_tensorrt==2.4.0"]
-                #nightly
-                #tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl"]
+                # default
+                tensorRTDeps += [  # "--no-deps",
+                    "torch_tensorrt==2.4.0"
+                ]
+                # nightly
+                # tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240817%2Bcu124-cp311-cp311-linux_x86_64.whl"]
             case "win32":
                 tensorRTDeps = [
                     "tensorrt==10.1.0",
@@ -288,9 +290,9 @@ class DownloadDependencies:
                     "tensorrt_cu12_bindings==10.1.0",
                 ]
                 tensorRTDeps += (
-                    #"--no-deps",
-                    #"torch_tensorrt==2.4.0",
-                     "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
+                    # "--no-deps",
+                    # "torch_tensorrt==2.4.0",
+                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240816%2Bcu124-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 

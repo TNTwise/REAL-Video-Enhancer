@@ -122,7 +122,7 @@ class Render(FFMpegRender):
             inputFrameChunkSize=self.inputFrameChunkSize,
             outputFrameChunkSize=self.outputFrameChunkSize,
         )
-        
+
         self.sharedMemoryThread = Thread(
             target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
         )
@@ -171,7 +171,7 @@ class Render(FFMpegRender):
         try:
             self.transitionFrame = self.transitionQueue.get()
         except AttributeError:
-            self.transitionFrame = -1 # if there is no transition queue, set it to -1
+            self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.frameSetupFunction(self.readQueue.get())
 
         for frameNum in range(self.totalInputFrames - 1):

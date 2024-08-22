@@ -60,9 +60,14 @@ def getCPUInfo() -> str:
     if getPlatform() == "win32":
         try:
             # Run the 'wmic' command to get CPU information
-            result = subprocess.run(['wmic', 'cpu', 'get', 'name'], capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                ["wmic", "cpu", "get", "name"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
             # Split the result by lines and return the second line which contains the CPU name
-            return result.stdout.split('\n')[2].strip()
+            return result.stdout.split("\n")[2].strip()
         except subprocess.CalledProcessError as e:
             print(f"An error occurred while getting CPU brand: {e}")
             return None
@@ -108,7 +113,6 @@ def ffmpegPath() -> str:
             return os.path.join(cwd, "bin", "ffmpeg-macos-bin")
         case _:
             return None
-    
 
 
 def copy(prev: str, new: str):
@@ -385,4 +389,3 @@ def openLink(link: str):
     :type link: str
     """
     webbrowser.open(link)
-
