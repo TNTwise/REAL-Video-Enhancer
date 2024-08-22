@@ -24,7 +24,7 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/main/
+        run: cp -r backend dist/
       
       - name: compress archive
         run: zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/main/
@@ -86,7 +86,7 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/main/
+        run: cp -r backend dist/
       
       - name: compress archive
         run: zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip dist/main/
