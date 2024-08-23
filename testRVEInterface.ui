@@ -1031,6 +1031,12 @@ background-color:white;
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
                   <widget class="Line" name="line_2">
+                   <property name="minimumSize">
+                    <size>
+                     <width>1</width>
+                     <height>1</height>
+                    </size>
+                   </property>
                    <property name="orientation">
                     <enum>Qt::Orientation::Horizontal</enum>
                    </property>
@@ -1180,6 +1186,12 @@ background-color:white;
               </item>
               <item>
                <widget class="Line" name="line">
+                <property name="minimumSize">
+                 <size>
+                  <width>1</width>
+                  <height>1</height>
+                 </size>
+                </property>
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>
                 </property>

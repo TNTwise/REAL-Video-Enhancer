@@ -168,7 +168,7 @@ class IFNet(nn.Module):
         fs_2 = self.encode(imgs_2)
         fs = torch.reshape(fs_2, (1, 8, h, w))
 
-        imgs_fs_2 = torch.cat((imgs_2, fs_2), 1)
+        
         warped_img0 = img0
         warped_img1 = img1
         flows = None
@@ -208,7 +208,7 @@ class IFNet(nn.Module):
                 )
             else:
                 warps = torch.nn.functional.grid_sample(
-                    imgs_fs_2,
+                    torch.cat((imgs_2, fs_2), 1),
                     precomp,
                     mode="bilinear",
                     padding_mode="border",
