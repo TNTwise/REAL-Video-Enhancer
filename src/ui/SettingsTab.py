@@ -43,6 +43,13 @@ class SettingsTab:
                 "True" if self.parent.preview_enabled.isChecked() else "False",
             )
         )
+        self.parent.scene_change_detection_enabled.stateChanged.connect(
+            lambda: self.settings.writeSetting(
+                "scene_change_detection_enabled",
+                "True" if self.parent.scene_change_detection_enabled.isChecked() else "False",
+            )
+        )
+        
 
     def connectSettingText(self):
         self.parent.precision.setCurrentText(self.settings.settings["precision"])
@@ -52,6 +59,9 @@ class SettingsTab:
         self.parent.encoder.setCurrentText(self.settings.settings["encoder"])
         self.parent.preview_enabled.setChecked(
             self.settings.settings["preview_enabled"] == "True"
+        )
+        self.parent.scene_change_detection_enabled.setChecked(
+            self.settings.settings["scene_change_detection_enabled"] == "True"
         )
 
 
@@ -68,12 +78,14 @@ class Settings:
             "tensorrt_optimization_level": "3",
             "encoder": "libx264",
             "preview_enabled": "True",
+            "scene_change_detection_enabled": "True",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
             "tensorrt_optimization_level": ("0", "1", "2", "3", "4", "5"),
             "encoder": ("libx264", "libx265", "libvpx-vp9", "libaom-av1"),
             "preview_enabled": ("True", "False"),
+            "scene_change_detection_enabled": ("True", "False"),
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):

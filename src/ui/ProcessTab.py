@@ -384,6 +384,8 @@ class ProcessTab:
                 "--shared_memory_id",
                 f"{self.imagePreviewSharedMemoryID}",
             ]
+        if self.settings["scene_change_detection_enabled"] == "False":
+            command += ["--sceneDetectMethod","none"]
         if self.benchmarkMode:
             command += ["--benchmark"]
         self.renderProcess = subprocess.Popen(

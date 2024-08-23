@@ -1,5 +1,5 @@
 from threading import Thread
-from queue import Queue
+from queue import Queue, Empty
 from multiprocessing import shared_memory
 import os
 
@@ -195,7 +195,7 @@ class Render(FFMpegRender):
                     self.writeQueue.put(frame1)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
-                except:
+                except Empty:
                     self.transitionFrame = None
             self.frame0 = setup_frame1
 
