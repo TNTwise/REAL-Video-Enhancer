@@ -1007,7 +1007,11 @@ border-radius: 2px;
 QCheckBox::indicator::checked{
 background-color:white;
 }
-</string>
+
+Line{
+color:white;
+background-color:white;
+}</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
@@ -1026,6 +1030,13 @@ background-color:white;
                <widget class="QWidget" name="renderSettingsContainer" native="true">
                 <layout class="QVBoxLayout" name="verticalLayout_12">
                  <item>
+                  <widget class="Line" name="line_2">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
                   <layout class="QHBoxLayout" name="horizontalLayout_12">
                    <item>
                     <widget class="QLabel" name="label_3">
@@ -1036,6 +1047,28 @@ background-color:white;
                      </property>
                      <property name="text">
                       <string>Precision</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_17">
+                     <property name="maximumSize">
+                      <size>
+                       <width>25</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Precision:&lt;/p&gt;&lt;p&gt; - Auto: Defaults to float16 if the GPU is supported (RTX 20 series and up)&lt;/p&gt;&lt;p&gt; - Float16: Faster inference and less VRAM usage.&lt;/p&gt;&lt;p&gt; - Float32: Slower inference and more VRAM usage, supported on more GPUS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="pixmap">
+                      <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                     </property>
+                     <property name="scaledContents">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -1071,6 +1104,28 @@ background-color:white;
                      </property>
                      <property name="text">
                       <string>TensorRT Optimization Level</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="label_21">
+                     <property name="maximumSize">
+                      <size>
+                       <width>25</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;TensorRT Optimization Level:&lt;/p&gt;&lt;p&gt; - Lower means less optimization, but faster engine generation time.&lt;/p&gt;&lt;p&gt; - Higher means more optimization, but slowe engine generation time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                     </property>
+                     <property name="text">
+                      <string/>
+                     </property>
+                     <property name="pixmap">
+                      <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                     </property>
+                     <property name="scaledContents">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -1120,6 +1175,13 @@ background-color:white;
                 </property>
                 <property name="text">
                  <string>Video Options:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="Line" name="line">
+                <property name="orientation">
+                 <enum>Qt::Orientation::Horizontal</enum>
                 </property>
                </widget>
               </item>
@@ -1234,6 +1296,28 @@ background-color:white;
                     </size>
                    </property>
                   </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_24">
+                   <property name="maximumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scene Change Detection:&lt;/p&gt;&lt;p&gt; - Enabled: Attempts to detect when scenes change in a video. When running an interpolation, it will avoide interpolating over these scene changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
                  </item>
                  <item>
                   <widget class="QCheckBox" name="scene_change_detection_enabled">
