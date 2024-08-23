@@ -23,21 +23,6 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
-    return nn.Sequential(
-        nn.Conv2d(
-            in_planes,
-            out_planes,
-            kernel_size=kernel_size,
-            stride=stride,
-            padding=padding,
-            dilation=dilation,
-            bias=False,
-        ),
-        nn.BatchNorm2d(out_planes),
-        nn.LeakyReLU(0.2, True),
-    )
-
 
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
@@ -105,7 +90,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
+        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear")
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask
