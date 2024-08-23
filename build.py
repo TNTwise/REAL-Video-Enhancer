@@ -7,6 +7,7 @@ import sys
 
 import urllib.request
 
+
 def download_file(url, destination):
     print(f"Downloading file from {url}")
     urllib.request.urlretrieve(url, destination)
@@ -14,6 +15,7 @@ def download_file(url, destination):
 
 
 # Rest of the code...
+
 
 def getPlatform():
     return sys.platform
@@ -28,17 +30,20 @@ def build_gui():
             r".\venv\Lib\site-packages\PySide6\uic.exe -g python testRVEInterface.ui > mainwindow.py"
         )
 
+
 def install_pip():
     download_file("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
     command = ["python3", "get-pip.py"]
     subprocess.run(command)
 
+
 def install_pip_in_venv():
     command = [
         "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
-        "get-pip.py"
+        "get-pip.py",
     ]
     subprocess.run(command)
+
 
 def build_resources():
     print("Building resources.rc")
@@ -72,7 +77,7 @@ def install_requirements_in_venv():
 
 def build_executable():
     print("Building executable")
-    if getPlatform() == "win32": 
+    if getPlatform() == "win32":
         command = [
             r".\venv\Scripts\python.exe"
             if getPlatform() == "win32"
@@ -84,7 +89,7 @@ def build_executable():
             "--noconfirm",
             "--noupx",
         ]
-    else: 
+    else:
         command = [
             r".\venv\Scripts\python.exe"
             if getPlatform() == "win32"
@@ -92,15 +97,16 @@ def build_executable():
             "-m",
             "cx_Freeze",
             "main.py",
-            "--target-dir","dist"
-            
+            "--target-dir",
+            "dist",
         ]
     subprocess.run(command)
+
 
 def clean():
     print("Cleaning up")
     os.remove("get-pip.py")
-    
+
 
 install_pip()
 create_venv()

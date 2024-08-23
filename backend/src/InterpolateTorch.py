@@ -113,6 +113,9 @@ class InterpolateRifeTorch:
         self.device = device
         self.dtype = self.handlePrecision(dtype)
         self.backend = backend
+        # set up streams for async processing
+        self.stream = torch.cuda.Stream()
+        self.prepareStream = torch.cuda.Stream()
         scale = 1
         if UHDMode:
             scale = 0.5
@@ -284,12 +287,15 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
-        timestep = torch.full(
-            (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
-        )
+        with torch.cuda.stream(self.stream):
+            timestep = torch.full(
+                (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
+            )
 
-        output = self.flownet(img0, img1, timestep)
-        return self.tensor_to_frame(output)
+            output = self.flownet(img0, img1, timestep)
+            output = self.tensor_to_frame(output)
+        self.stream.synchronize()
+        return output
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
@@ -301,18 +307,25 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
-        frame = (
-            torch.frombuffer(
-                frame,
-                dtype=torch.uint8,
+        with torch.cuda.stream(self.prepareStream):
+            frame = (
+                torch.frombuffer(
+                    frame,
+                    dtype=torch.uint8,
+                )
+                .to(device=self.device, dtype=self.dtype, non_blocking=True)
+                .reshape(self.height, self.width, 3)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                / 255.0
             )
-            .to(device=self.device, dtype=self.dtype, non_blocking=True)
-            .reshape(self.height, self.width, 3)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            / 255.0
-        )
-        return F.pad(
-            (frame),
-            self.padding,
-        )
+            frame = F.pad(
+                (frame),
+                self.padding,
+            )
+        self.prepareStream.synchronize()
+        return frame
+
+    def enqueueV3(self, context, bindings, stream, input_shapes):
+        # Use the non-default stream for TensorRT inference
+        context.enqueueV3(bindings, self.stream.cuda_stream, input_shapes)

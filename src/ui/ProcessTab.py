@@ -353,8 +353,6 @@ class ProcessTab:
             f"{self.outputPath}",
             "-b",
             f"{backend}",
-            "--shared_memory_id",
-            f"{self.imagePreviewSharedMemoryID}",
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
@@ -381,7 +379,11 @@ class ProcessTab:
                 "--interpolateFactor",
                 f"{interpolateTimes}",
             ]
-
+        if self.settings["preview_enabled"] == "True":
+            command += [
+                "--shared_memory_id",
+                f"{self.imagePreviewSharedMemoryID}",
+            ]
         if self.benchmarkMode:
             command += ["--benchmark"]
         self.renderProcess = subprocess.Popen(
