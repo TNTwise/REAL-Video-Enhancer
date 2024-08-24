@@ -19,6 +19,7 @@ class SettingsTab:
         # disable half option if its not supported
         if not halfPrecisionSupport:
             self.parent.precision.removeItem(1)
+    
 
     def connectWriteSettings(self):
         self.parent.precision.currentIndexChanged.connect(
@@ -49,8 +50,13 @@ class SettingsTab:
                 "True" if self.parent.scene_change_detection_enabled.isChecked() else "False",
             )
         )
-        self.parent.resetSettingsBtn.clicked.connect(self.settings.writeDefaultSettings)
-        
+        self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
+
+    def resetSettings(self):
+        self.settings.writeDefaultSettings()
+        self.settings.readSettings()
+        self.connectSettingText()
+        self.parent.switchToSettingsPage()
 
     def connectSettingText(self):
         self.parent.precision.setCurrentText(self.settings.settings["precision"])
@@ -96,6 +102,8 @@ class Settings:
         if len(self.defaultSettings) != len(self.settings):
             self.writeDefaultSettings()
 
+    
+
     def readSettings(self):
         """
         Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.
@@ -127,7 +135,8 @@ class Settings:
         """
         self.settings[setting] = value
         self.writeOutCurrentSettings()
-
+    
+    
     def writeDefaultSettings(self):
         """
         Writes the default settings to the settings file if it doesn't exist.
