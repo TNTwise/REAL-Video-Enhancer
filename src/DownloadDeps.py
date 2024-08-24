@@ -184,20 +184,20 @@ class DownloadDependencies:
         Pytorch CUDA deps
         """
         # default
-        '''torchCUDALinuxDeps = [
+        torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             # "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
             "torch==2.4.0",
             "torchvision==0.19.0",
-        ]'''
+        ]
         # Nigthly test
-        torchCUDALinuxDeps = [
+        '''torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240823%2Bcu124-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240823z%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240823%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240823%2Bcu124-py3-none-any.whl"
-        ]
+        ]'''
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             # "--pre",
@@ -267,17 +267,17 @@ class DownloadDependencies:
         match getPlatform():
             case "linux":
                 tensorRTDeps = [
-                    "tensorrt==10.3.0",
-                    "tensorrt_cu12==10.3.0",
-                    "tensorrt-cu12_libs==10.3.0",
-                    "tensorrt_cu12_bindings==10.3.0",
+                    "tensorrt==10.1.0",
+                    "tensorrt_cu12==10.1.0",
+                    "tensorrt-cu12_libs==10.1.0",
+                    "tensorrt_cu12_bindings==10.1.0",
                 ]
                 # default
-                #tensorRTDeps += [  # "--no-deps",
-                #    "torch_tensorrt==2.4.0"
-                #]
+                tensorRTDeps += [  # "--no-deps",
+                    "torch_tensorrt==2.4.0"
+                ]
                 # nightly
-                tensorRTDeps += ["--no-deps","https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240824%2Bcu124-cp311-cp311-linux_x86_64.whl"]
+                #tensorRTDeps += ["--no-deps","https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240824%2Bcu124-cp311-cp311-linux_x86_64.whl"]
             case "win32":
                 tensorRTDeps = [
                     "tensorrt==10.1.0",
