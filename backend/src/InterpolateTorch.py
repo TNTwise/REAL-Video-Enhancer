@@ -1,5 +1,6 @@
 import torch
 import torch.nn.functional as F
+from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 import math
 import os
 from .Util import (
@@ -80,7 +81,6 @@ class InterpolateRifeTorch:
     def __init__(
         self,
         interpolateModelPath: str,
-        interpolateArch: str = "rife413",
         width: int = 1920,
         height: int = 1080,
         device: str = "default",
@@ -128,9 +128,10 @@ class InterpolateRifeTorch:
             self.pw = math.ceil(self.width / tmp) * tmp
             self.ph = math.ceil(self.height / tmp) * tmp
             self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-
+            ad = ArchDetect(interpolateModelPath)
+            interpolateArch = ad.getArch()
             # detect what rife arch to use
-            match interpolateArch:
+            match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
 
@@ -146,7 +147,7 @@ class InterpolateRifeTorch:
                 case "rife421":
                     from .InterpolateArchs.RIFE.rife421IFNET import IFNet
 
-                case "rife422-lite":
+                case "rife422lite":
                     from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet
 
                 case _:

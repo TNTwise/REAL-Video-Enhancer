@@ -374,8 +374,6 @@ class ProcessTab:
                     modelsPath(),
                     self.modelFile,
                 ),
-                "--interpolateArch",
-                f"{self.modelArch}",
                 "--interpolateFactor",
                 f"{interpolateTimes}",
             ]

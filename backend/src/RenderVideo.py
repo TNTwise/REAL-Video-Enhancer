@@ -58,7 +58,6 @@ class Render(FFMpegRender):
         upscaleModel=None,
         interpolateModel=None,
         interpolateFactor: int = 1,
-        interpolateArch: str = "rife413",
         # ffmpeg settings
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
@@ -75,7 +74,6 @@ class Render(FFMpegRender):
         self.backend = backend
         self.upscaleModel = upscaleModel
         self.interpolateModel = interpolateModel
-        self.interpolateArch = interpolateArch
         self.device = device
         self.precision = precision
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
@@ -267,7 +265,6 @@ class Render(FFMpegRender):
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
                 interpolateModelPath=self.interpolateModel,
-                interpolateArch=self.interpolateArch,
                 width=self.width,
                 height=self.height,
                 device=self.device,

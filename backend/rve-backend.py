@@ -23,7 +23,6 @@ class HandleApplication:
                 outputFile=self.args.output,
                 interpolateModel=self.args.interpolateModel,
                 interpolateFactor=self.args.interpolateFactor,
-                interpolateArch=self.args.interpolateArch,
                 upscaleModel=self.args.upscaleModel,
                 # backend settings
                 device="default",
@@ -132,12 +131,6 @@ class HandleApplication:
             help="Multiplier for interpolation, will round up to nearest integer for interpolation but the fps will be correct",
             type=float,
             default=1.0,
-        )
-        parser.add_argument(
-            "--interpolateArch",
-            help="Arch used for interpolation when using PyTorch inference. (rife46,rife413,rife420,rife421,rife422-lite)",
-            type=str,
-            default="rife413",
         )
         parser.add_argument(
             "--precision",
