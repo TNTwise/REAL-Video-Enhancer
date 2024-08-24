@@ -2,6 +2,7 @@ from threading import Thread
 from queue import Queue, Empty
 from multiprocessing import shared_memory
 import os
+import math
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
@@ -78,6 +79,7 @@ class Render(FFMpegRender):
         self.precision = precision
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
         self.interpolateFactor = interpolateFactor
+        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.frame0 = None
         self.sceneDetectMethod = sceneDetectMethod
@@ -265,6 +267,7 @@ class Render(FFMpegRender):
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
                 interpolateModelPath=self.interpolateModel,
+                ceilInterpolateFactor=self.ceilInterpolateFactor,
                 width=self.width,
                 height=self.height,
                 device=self.device,

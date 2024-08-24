@@ -92,6 +92,7 @@ class FFMpegRender:
         # upsacletimes will be set to the scale of the loaded model with spandrel
         self.upscaleTimes = upscaleTimes
         self.interpolateFactor = interpolateFactor
+        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.encoder = encoder
         self.pixelFormat = pixelFormat
         self.benchmark = benchmark
@@ -106,7 +107,7 @@ class FFMpegRender:
         self.shm = shm
         self.inputFrameChunkSize = inputFrameChunkSize
         self.outputFrameChunkSize = outputFrameChunkSize
-        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
+        
         self.totalOutputFrames = self.totalInputFrames * self.ceilInterpolateFactor
 
         self.writeOutPipe = self.outputFile == "PIPE"

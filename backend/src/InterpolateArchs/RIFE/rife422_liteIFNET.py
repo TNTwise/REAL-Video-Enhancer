@@ -142,6 +142,8 @@ class IFNet(nn.Module):
         height=1080,
         backwarp_tenGrid=None,
         tenFlow_div=None,
+        pw=1920,
+        ph=1088,
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 8, c=192)
@@ -159,9 +161,10 @@ class IFNet(nn.Module):
         self.backwarp_tenGrid = backwarp_tenGrid
         self.tenFlow_div = tenFlow_div
 
+        self.pw = pw
+        self.ph = ph
     def forward(self, img0, img1, timestep):
-        # cant be cached
-
+        
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, h, w))

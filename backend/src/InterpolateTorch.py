@@ -81,6 +81,7 @@ class InterpolateRifeTorch:
     def __init__(
         self,
         interpolateModelPath: str,
+        ceilInterpolateFactor: int = 2,
         width: int = 1920,
         height: int = 1080,
         device: str = "default",
@@ -113,6 +114,7 @@ class InterpolateRifeTorch:
         self.device = device
         self.dtype = self.handlePrecision(dtype)
         self.backend = backend
+        self.ceilInterpolateFactor = ceilInterpolateFactor
         # set up streams for async processing
         self.stream = torch.cuda.Stream()
         self.prepareStream = torch.cuda.Stream()
@@ -130,6 +132,14 @@ class InterpolateRifeTorch:
             self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
             ad = ArchDetect(interpolateModelPath)
             interpolateArch = ad.getArch()
+            # caching the timestep tensor in a dict with the timestep as a float for the key
+            self.timestepDict = {}
+            for n in range(self.ceilInterpolateFactor):
+                    timestep = 1 / (self.ceilInterpolateFactor - n)
+                    timestep_tens = torch.full(
+                        (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
+                    )
+                    self.timestepDict[timestep] = timestep_tens
             # detect what rife arch to use
             match interpolateArch.lower():
                 case "rife46":
@@ -290,10 +300,8 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
         with torch.cuda.stream(self.stream):
-            timestep = torch.full(
-                (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
-            )
-
+            
+            timestep = self.timestepDict[timestep]
             output = self.flownet(img0, img1, timestep)
             output = self.tensor_to_frame(output)
         self.stream.synchronize()
