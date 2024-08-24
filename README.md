@@ -43,7 +43,6 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.10 - v4.15 | 22.801 fps | 12.981 fps
 | rife-v4.16-lite | 31.205 fps | 19.381 fps
 
-### RTX 3080
 | RTX 3080 | |
 |--|--|
 | rife-v4.6 | 81 fps 
