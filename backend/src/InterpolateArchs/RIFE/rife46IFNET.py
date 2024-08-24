@@ -1,15 +1,16 @@
 import torch
 import torch.nn as nn
-import math
+import torch.nn.functional as F
 
 try:
     from .interpolate import interpolate
 except ImportError:
     from torch.nn.functional import interpolate
 
-UniqueKeys = {
-    
-}
+from .warplayer import warp
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -26,24 +27,20 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
         self.upscale_factor = upscale_factor
 
-    def forward(self, x):
-        b, c, hh, hw = x.size()
+    def forward(self, input):
+        b, c, hh, hw = input.size()
         out_channel = c // (self.upscale_factor**2)
         h = hh * self.upscale_factor
         w = hw * self.upscale_factor
-        x_view = x.view(
+        x_view = input.view(
             b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw
         )
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
-
-
-
 
 
 class ResConv(nn.Module):
@@ -79,14 +76,11 @@ class IFBlock(nn.Module):
         )
 
     def forward(self, x, flow=None, scale=1):
-        x = interpolate(
-            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
-        )
+        x = interpolate(x, scale_factor=1.0 / scale, mode="bilinear")
         if flow is not None:
             flow = (
-                interpolate(
-                    flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
-                )
+                interpolate(flow, scale_factor=1.0 / scale, mode="bilinear")
+                * 1.0
                 / scale
             )
             x = torch.cat((x, flow), 1)
@@ -102,7 +96,7 @@ class IFBlock(nn.Module):
 class IFNet(nn.Module):
     def __init__(
         self,
-        scale=1,
+        scale=1.0,
         ensemble=False,
         dtype=torch.float32,
         device="cuda",
@@ -112,80 +106,75 @@ class IFNet(nn.Module):
         tenFlow_div=None,
     ):
         super(IFNet, self).__init__()
-        self.block0 = IFBlock(7 , c=192)
-        self.block1 = IFBlock(8 + 4 , c=128)
-        self.block2 = IFBlock(8 + 4 , c=96)
+        self.block0 = IFBlock(7, c=192)
+        self.block1 = IFBlock(8 + 4, c=128)
+        self.block2 = IFBlock(8 + 4, c=96)
         self.block3 = IFBlock(8 + 4, c=64)
-        
-        self.device = device
-        self.dtype = dtype
         self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
         self.ensemble = ensemble
+        self.dtype = dtype
+        self.device = device
         self.width = width
         self.height = height
         self.backwarp_tenGrid = backwarp_tenGrid
         self.tenFlow_div = tenFlow_div
 
-        # self.contextnet = Contextnet()
-        # self.unet = Unet()
-
     def forward(self, img0, img1, timestep):
-        # cant be cached
-        h, w = img0.shape[2], img0.shape[3]
-        imgs = torch.cat([img0, img1], dim=1)
-        imgs_2 = torch.reshape(imgs, (2, 3, h, w))
-        
-
-        flows = None
+        warped_img0 = img0
+        warped_img1 = img1
+        flow = None
         mask = None
-        blocks = [self.block0, self.block1, self.block2, self.block3]
-        for block, scale in zip(blocks, self.scale_list):
-            if flows is None:
-                
-                temp = torch.cat((imgs, timestep), 1)
-                flows, mask = block(temp, scale=scale)
+        block = [self.block0, self.block1, self.block2, self.block3]
+        for i in range(4):
+            if flow is None:
+                flow, mask = block[i](
+                    torch.cat((img0[:, :3], img1[:, :3], timestep), 1),
+                    None,
+                    scale=self.scale_list[i],
+                )
+                if self.ensemble:
+                    f1, m1 = block[i](
+                        torch.cat((img1[:, :3], img0[:, :3], 1 - timestep), 1),
+                        None,
+                        scale=self.scale_list[i],
+                    )
+                    flow = (flow + torch.cat((f1[:, 2:4], f1[:, :2]), 1)) / 2
+                    mask = (mask + (-m1)) / 2
             else:
-                
-                temp = torch.cat(
-                    (
-                        warped_imgs,
-                        timestep,
-                        mask,
-                        (flows * (1 / scale) if scale != 1 else flows),
+                f0, m0 = block[i](
+                    torch.cat(
+                        (warped_img0[:, :3], warped_img1[:, :3], timestep, mask), 1
                     ),
-                    1,
+                    flow,
+                    scale=self.scale_list[i],
                 )
-                fds, mask = block(temp, scale=scale)
-
-                flows = flows + fds
-
-                
-            precomp = (
-                (self.backwarp_tenGrid + flows.reshape((2, 2, h, w)) * self.tenFlow_div)
-                .permute(0, 2, 3, 1)
-                .to(dtype=self.dtype)
+                if self.ensemble:
+                    f1, m1 = block[i](
+                        torch.cat(
+                            (
+                                warped_img1[:, :3],
+                                warped_img0[:, :3],
+                                1 - timestep,
+                                -mask,
+                            ),
+                            1,
+                        ),
+                        torch.cat((flow[:, 2:4], flow[:, :2]), 1),
+                        scale=self.scale_list[i],
+                    )
+                    f0 = (f0 + torch.cat((f1[:, 2:4], f1[:, :2]), 1)) / 2
+                    m0 = (m0 + (-m1)) / 2
+                flow = flow + f0
+                mask = mask + m0
+            latest_mask = mask
+            warped_img0 = warp(
+                img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
             )
-            if scale == 1:
-                warped_imgs = torch.nn.functional.grid_sample(
-                    imgs_2,
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
-            else:
-                warps = torch.nn.functional.grid_sample(
-                    imgs_2.to(dtype=self.dtype),
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
-                warped_imgs = warps.reshape(1,6,h,w)
-                
-        mask = torch.sigmoid(mask)
-        warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
+            warped_img1 = warp(
+                img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
+            )
 
-        frame = warped_img0 * mask + warped_img1 * (1 - mask)
+        temp = torch.sigmoid(latest_mask)
+        frame = warped_img0 * temp + warped_img1 * (1 - temp)
         frame = frame[:, :, : self.height, : self.width][0]
         return frame.squeeze(0).permute(1, 2, 0).mul(255).float()
