@@ -33,25 +33,22 @@
 Benchmarks done with 1920x1080 video, default settings.<br/>
 
 
-| RX 6650 XT | Ensemble False | Ensemble True | 
-|--|--|--|
-| rife-v2.0 - v2.4  | 12.341 fps | -
-| rife-v3.0 - v3.1 | 10.646 fps | -
-| rife-v4.0 - v4.5 | 32.504 fps | -
-| rife-v4.6 | 31.154 fps | 18.078 fps
-| rife-v4.7 - v4.9 | 27.924 fps | 15.463 fps
-| rife-v4.10 - v4.15 | 22.801 fps | 12.981 fps
-| rife-v4.16-lite | 31.205 fps | 19.381 fps
+| RX 6650 XT | |
+ |--|--|
+| rife-v4.6 | 31 fps 
+| rife-v4.7 - v4.9 | 28 fps
+| rife-v4.10 - v4.15 | 23 fps 
+| rife-v4.16-lite | 31 fps 
 
-| RTX 3080 | Ensemble False |
+| RTX 3080 | |
 |--|--|
 | rife-v4.6 | 81 fps 
 | rife-v4.7 - v4.9 | 65 fps 
 | rife-v4.10 - v4.15 | 55 fps 
 | rife-v4.22-lite | 63 fps 
 
-## Benchmarks: (RIFE PyTorch TensorRT)
-| RTX 3080 | Ensemble False |
+## Benchmarks: (RIFE TensorRT)
+| RTX 3080 | |
 |--|--|
 | rife-v4.6 | 220 fps 
 | rife-v4.7 - v4.9 | 168 fps 
