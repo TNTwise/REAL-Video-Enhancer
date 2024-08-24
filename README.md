@@ -43,7 +43,7 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.10 - v4.15 | 22.801 fps | 12.981 fps
 | rife-v4.16-lite | 31.205 fps | 19.381 fps
 
-| RTX 3080 | |
+| RTX 3080 | Ensemble False |
 |--|--|
 | rife-v4.6 | 81 fps 
 | rife-v4.7 - v4.9 | 65 fps 
@@ -53,7 +53,7 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 ## Benchmarks: (RIFE PyTorch CUDA)
 Benchmarks done with 1920x1080 video, default settings
 
-| RTX 3080 | |
+| RTX 3080 | Ensemble False |
 |--|--|
 | rife-v4.6 | 220 fps 
 | rife-v4.7 - v4.9 | 168 fps 
