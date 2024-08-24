@@ -49,6 +49,7 @@ class SettingsTab:
                 "True" if self.parent.scene_change_detection_enabled.isChecked() else "False",
             )
         )
+        self.parent.resetSettingsBtn.clicked.connect(self.settings.writeDefaultSettings)
         
 
     def connectSettingText(self):
