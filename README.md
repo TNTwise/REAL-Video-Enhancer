@@ -47,13 +47,13 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.10 - v4.15 | 55 fps 
 | rife-v4.22-lite | 63 fps 
 
-## Benchmarks: (RIFE TensorRT)
+## Benchmarks: (RIFE TensorRT 10.3)
 | RTX 3080 | |
 |--|--|
-| rife-v4.6 | 220 fps 
-| rife-v4.7 - v4.9 | 168 fps 
-| rife-v4.10 - v4.15 | 133 fps 
-| rife-v4.22-lite | 165 fps 
+| rife-v4.6 | 254 fps 
+| rife-v4.7 - v4.9 | 204 fps 
+| rife-v4.10 - v4.15 | 162 fps 
+| rife-v4.22-lite | 192 fps 
 
 # Cloning:
 ```
