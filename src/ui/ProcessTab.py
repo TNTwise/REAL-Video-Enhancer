@@ -219,7 +219,7 @@ class ProcessTab:
         # connect gui switching
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
-        self.parent.interpolationMultiplierComboBox.currentTextChanged.connect(
+        self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
             self.parent.updateVideoGUIDetails
         )
 

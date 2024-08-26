@@ -293,6 +293,13 @@ border-radius: 2px;
 QCheckBox::indicator::checked{
 background-color:white;
 }
+QDoubleSpinBox{
+background-color:#2c313c;
+	text-align:left;
+	padding:5px 10px;
+	border-radius: 10px;
+color:white;
+}
 </string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
@@ -638,54 +645,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
                      </widget>
                     </item>
                     <item>
-                     <widget class="QComboBox" name="interpolationMultiplierComboBox">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
+                     <widget class="QDoubleSpinBox" name="interpolationMultiplierSpinBox">
+                      <property name="decimals">
+                       <number>1</number>
                       </property>
-                      <property name="minimumSize">
-                       <size>
-                        <width>0</width>
-                        <height>0</height>
-                       </size>
+                      <property name="value">
+                       <double>2.000000000000000</double>
                       </property>
-                      <item>
-                       <property name="text">
-                        <string>2</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>3</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>4</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>5</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>6</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>7</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>8</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                    </layout>

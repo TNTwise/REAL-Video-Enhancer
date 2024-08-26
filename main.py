@@ -2,6 +2,7 @@ import sys
 import os
 import subprocess
 import re
+import math
 
 from PySide6.QtWidgets import (
     QApplication,
@@ -279,7 +280,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             outputText = self.generateDefaultOutputFile(
                 inputFile,
-                int(interpolateTimes),
+                interpolateTimes,
                 int(scale),
                 round(self.videoFps, 0),
                 int(self.videoWidth),
@@ -305,7 +306,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if method == "Upscale":
             interpolateTimes = 1
         elif method == "Interpolate":
-            interpolateTimes = int(self.interpolationMultiplierComboBox.currentText())
+            interpolateTimes = self.interpolationMultiplierSpinBox.value()
         return interpolateTimes
 
     def startRender(self):
@@ -315,8 +316,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.progressBar.setRange(
                 0,
                 # only set the range to multiply the frame count if the method is interpolate
-                self.videoFrameCount
-                * int(self.interpolationMultiplierComboBox.currentText())
+                int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value)())
                 if method == "Interpolate"
                 else self.videoFrameCount,
             )
@@ -330,9 +330,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 videoFrameCount=self.videoFrameCount,
                 method=method,
                 backend=self.backendComboBox.currentText(),
-                interpolationTimes=int(
-                    self.interpolationMultiplierComboBox.currentText()
-                ),
+                interpolationTimes=self.interpolationMultiplierSpinBox.value(),
                 model=self.modelComboBox.currentText(),
                 benchmarkMode=self.benchmarkModeCheckBox.isChecked(),
             )
