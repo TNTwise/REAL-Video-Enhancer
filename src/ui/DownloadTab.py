@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
+from .QTcustom import RegularQTPopup
 from ..DownloadDeps import DownloadDependencies
 
 
@@ -12,13 +13,32 @@ class DownloadTab:
         self.QButtonConnect()
 
     def QButtonConnect(self):
-        self.parent.downloadNCNNBtn.clicked.connect(self.downloadDeps.downloadNCNNDeps)
+        self.parent.downloadNCNNBtn.clicked.connect(lambda: self.download("ncnn"))
         self.parent.downloadTorchCUDABtn.clicked.connect(
-            self.downloadDeps.downloadPyTorchCUDADeps
+            lambda: self.download("torch_cuda")
         )
         self.parent.downloadTensorRTBtn.clicked.connect(
-            self.downloadDeps.downloadTensorRTDeps
+            lambda: self.download("tensorrt")
         )
         self.parent.downloadTorchROCmBtn.clicked.connect(
-            self.downloadDeps.downloadPyTorchROCmDeps
+            lambda: self.download("torch_rocm")
         )
+    def download(self, dep):
+        """
+        Downloads the specified dependency.
+        Parameters:
+        - dep (str): The name of the dependency to download.
+        Returns:
+        - None
+        """
+        match dep:
+            case "ncnn":
+                self.downloadDeps.downloadNCNNDeps()
+            case "torch_cuda":
+                self.downloadDeps.downloadPyTorchCUDADeps()
+            case "tensorrt":
+                self.downloadDeps.downloadTensorRTDeps()
+            case "torch_rocm":
+                self.downloadDeps.downloadPyTorchROCmDeps()
+        RegularQTPopup("Download Complete\nPlease restart the application to apply changes.")
+        
