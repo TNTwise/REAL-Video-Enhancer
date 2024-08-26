@@ -316,7 +316,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.progressBar.setRange(
                 0,
                 # only set the range to multiply the frame count if the method is interpolate
-                int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value)())
+                int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value()))
                 if method == "Interpolate"
                 else self.videoFrameCount,
             )
