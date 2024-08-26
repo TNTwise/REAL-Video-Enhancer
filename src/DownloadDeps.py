@@ -227,11 +227,11 @@ class DownloadDependencies:
         NCNN deps
         """
         ncnnLinuxDeps = [
-            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-linux_x86_64.whl",
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python/releases/download/2024-08-26/rife_ncnn_vulkan_python_tntwise-1.4.1-cp311-cp311-linux_x86_64.whl",
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-manylinux1_x86_64.whl",
         ] + self.getPlatformIndependentDeps()
         ncnnWindowsDeps = [
-            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/rife_ncnn_vulkan_python-1.3.0-cp311-cp311-win_amd64.whl",
+            "https://github.com/TNTwise/rife-ncnn-vulkan-python/releases/download/2024-08-26/rife_ncnn_vulkan_python_tntwise-1.4.1-cp311-cp311-win_amd64.whl",
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/upscale_ncnn_py-1.2.0-cp311-none-win_amd64.whl",
         ] + self.getPlatformIndependentDeps()
         ncnnMacOSDeps = [
