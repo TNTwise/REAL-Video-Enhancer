@@ -8,6 +8,25 @@ import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
 from .Util import currentDirectory, log, printAndLog
+import time
+from time import sleep
+
+
+def convertTime(remaining_time):
+        """
+        Converts seconds to hours, minutes and seconds
+        """
+        hours = remaining_time // 3600
+        remaining_time -= 3600 * hours
+        minutes = remaining_time // 60
+        remaining_time -= minutes * 60
+        seconds = remaining_time
+        if minutes < 10:
+            minutes = str(f"0{minutes}")
+        if seconds < 10:
+            seconds = str(f"0{seconds}")
+        return hours, minutes, seconds
+
 
 
 class FFMpegRender:
@@ -222,6 +241,27 @@ class FFMpegRender:
 
         # Update the length of the last printed line
         self.last_length = len(data)
+    
+
+    def calculateETA(self):
+        """
+        Calculates ETA
+
+        Gets the time for every frame rendered by taking the
+        elapsed time / completed iterations (files)
+        remaining time = remaining iterations (files) * time per iteration
+
+        """
+
+        # Estimate the remaining time
+        elapsed_time = time.time() - self.startTime
+        time_per_iteration = elapsed_time / self.framesRendered
+        remaining_iterations = self.totalOutputFrames - self.framesRendered
+        remaining_time = remaining_iterations * time_per_iteration
+        remaining_time = int(remaining_time)
+        # convert to hours, minutes, and seconds
+        hours, minutes, seconds = convertTime(remaining_time)
+        return f"{hours}:{minutes}:{seconds}"
 
     def writeOutInformation(self, fcs):
         """
@@ -239,8 +279,9 @@ class FFMpegRender:
                 break
             if self.previewFrame is not None:
                 # print out data to stdout
-                fps = round(self.currentFrame / (time.time() - self.startTime))
-                message = f"FPS: {fps} Current Frame: {self.currentFrame}"
+                fps = round(self.framesRendered / (time.time() - self.startTime))
+                eta = self.calculateETA()
+                message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
                 self.realTimePrint(message)
                 if self.sharedMemoryID is not None:
                     # Update the shared array
@@ -258,7 +299,7 @@ class FFMpegRender:
         log("Rendering")
         #
         self.startTime = time.time()
-        self.currentFrame: int = 0
+        self.framesRendered: int = 0
         self.last_length: int = 0
 
         if self.benchmark:
@@ -269,7 +310,7 @@ class FFMpegRender:
                 if frame is None:
                     break
                 # pbar.update(1)
-                self.currentFrame += 1
+                self.framesRendered += 1
         else:
             self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),
@@ -287,7 +328,7 @@ class FFMpegRender:
                 self.previewFrame = frame
                 # Update progress bar
                 # pbar.update(1)
-                self.currentFrame += 1
+                self.framesRendered += 1
             self.writeProcess.stdin.close()
             self.writeProcess.wait()
 
