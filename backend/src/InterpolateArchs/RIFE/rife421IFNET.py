@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 
-try:
-    from .interpolate import interpolate
-except ImportError:
-    from torch.nn.functional import interpolate
+
+from torch.nn.functional import interpolate
 
 
 class MyPixelShuffle(nn.Module):
@@ -92,7 +90,7 @@ class IFBlock(nn.Module):
             nn.ConvTranspose2d(
                 in_channels=c, out_channels=4 * 13, kernel_size=4, stride=2, padding=1
             ),
-            MyPixelShuffle(upscale_factor=2),
+            nn.PixelShuffle(upscale_factor=2),
         )
         self.in_planes = in_planes
 

@@ -2,10 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-try:
-    from .interpolate import interpolate
-except ImportError:
-    from torch.nn.functional import interpolate
+
+from torch.nn.functional import interpolate
 
 from .warplayer import warp
 
@@ -72,7 +70,7 @@ class IFBlock(nn.Module):
             ResConv(c),
         )
         self.lastconv = nn.Sequential(
-            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), MyPixelShuffle(2)
+            nn.ConvTranspose2d(c, 4 * 6, 4, 2, 1), nn.PixelShuffle(2)
         )
 
     def forward(self, x, flow=None, scale=1):

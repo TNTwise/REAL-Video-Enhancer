@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 
-try:
-    from .interpolate import interpolate
-except ImportError:
-    from torch.nn.functional import interpolate
+
+from torch.nn.functional import interpolate
 
 
 class MyPixelShuffle(nn.Module):
