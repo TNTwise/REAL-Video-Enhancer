@@ -294,12 +294,19 @@ QCheckBox::indicator::checked{
 background-color:white;
 }
 QDoubleSpinBox{
-background-color:#2c313c;
-	text-align:left;
+	background-color:#2c313c;
 	padding:5px 10px;
 	border-radius: 10px;
-color:white;
+	color:white;
 }
+QDoubleSpinBox::up-arrow {
+       
+		image: url(:/icons/icons/arrow-up.svg); 
+    }
+QDoubleSpinBox::down-arrow {
+
+        image: url(:/icons/icons/arrow-down.svg); 
+    }
 </string>
              </property>
              <layout class="QGridLayout" name="gridLayout_3">
@@ -648,6 +655,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
                      <widget class="QDoubleSpinBox" name="interpolationMultiplierSpinBox">
                       <property name="decimals">
                        <number>1</number>
+                      </property>
+                      <property name="minimum">
+                       <double>2.000000000000000</double>
                       </property>
                       <property name="value">
                        <double>2.000000000000000</double>
