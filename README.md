@@ -45,6 +45,7 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.6 | 81 fps 
 | rife-v4.7 - v4.9 | 65 fps 
 | rife-v4.10 - v4.15 | 55 fps 
+| rife-v4.22 | 50 fps 
 | rife-v4.22-lite | 63 fps 
 
 ## Benchmarks: (RIFE TensorRT 10.3)
@@ -53,6 +54,7 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.6 | 254 fps 
 | rife-v4.7 - v4.9 | 204 fps 
 | rife-v4.10 - v4.15 | 162 fps 
+| rife-v4.22 | 134 fps 
 | rife-v4.22-lite | 192 fps 
 
 # Cloning:
