@@ -306,6 +306,15 @@ QDoubleSpinBox::up-arrow {
 QDoubleSpinBox::down-arrow {
 
         image: url(:/icons/icons/arrow-down.svg); 
+		
+    }
+QDoubleSpinBox::up-button {
+        width: 20px;
+        height: 15px;
+    }
+QDoubleSpinBox::down-button {
+        width: 20px;
+        height: 15px;
     }
 </string>
              </property>
@@ -653,6 +662,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
                     </item>
                     <item>
                      <widget class="QDoubleSpinBox" name="interpolationMultiplierSpinBox">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="buttonSymbols">
+                       <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
+                      </property>
                       <property name="decimals">
                        <number>1</number>
                       </property>
