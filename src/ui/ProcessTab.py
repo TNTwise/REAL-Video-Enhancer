@@ -299,7 +299,8 @@ class ProcessTab:
         self.settings = settings.settings
 
         # discord rpc
-        start_discordRPC(method, os.path.basename(self.inputFile), backend)
+        if self.settings["discord_rich_presence"] == "True":
+            start_discordRPC(method, os.path.basename(self.inputFile), backend)
 
         DownloadModel(
             modelFile=self.modelFile,
