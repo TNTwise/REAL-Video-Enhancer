@@ -11,6 +11,7 @@ from .QTcustom import UpdateGUIThread
 from ..Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
 from ..DownloadModels import DownloadModel
 from .SettingsTab import Settings
+from ..DiscordRPC import start_discordRPC
 
 
 class ProcessTab:
@@ -297,6 +298,9 @@ class ProcessTab:
         settings.readSettings()
         self.settings = settings.settings
 
+        # discord rpc
+        start_discordRPC(method, os.path.basename(self.inputFile), backend)
+
         DownloadModel(
             modelFile=self.modelFile,
             downloadModelFile=self.downloadFile,
@@ -326,14 +330,6 @@ class ProcessTab:
         )  # need quit and wait to allow process to exit safely
         self.workerThread.start()
 
-    def onRenderCompletion(self):
-        self.workerThread.stop()
-        self.workerThread.quit()
-        self.workerThread.wait()
-        # reset image preview
-        self.parent.previewLabel.clear()
-        self.parent.startRenderButton.setEnabled(True)
-        self.parent.enableProcessPage()
 
     def splitListIntoStringWithNewLines(self, string_list: list[str]):
         # Join the strings with newline characters
@@ -414,7 +410,7 @@ class ProcessTab:
         log(str(textOutput))
         self.renderProcess.wait()
         # done with render
-        self.onRenderCompletion()
+        self.parent.onRenderCompletion()
 
     def getRoundedPixmap(self, pixmap, corner_radius):
         size = pixmap.size()

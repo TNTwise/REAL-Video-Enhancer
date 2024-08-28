@@ -8,3 +8,4 @@ pyinstaller
 psutil
 py-cpuinfo
 distro
+pypresence

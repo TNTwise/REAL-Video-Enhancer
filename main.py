@@ -49,6 +49,7 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Main window class for the REAL Video Enhancer application.
 
@@ -321,6 +322,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else self.videoFrameCount,
             )
             self.disableProcessPage()
+            
+            
             self.processTab.run(
                 inputFile=self.inputFileText.text(),
                 outputPath=self.outputFileText.text(),
@@ -338,6 +341,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
             RegularQTPopup("Please select a video file!")
 
+    def onRenderCompletion(self):
+        self.processTab.workerThread.stop()
+        self.processTab.workerThread.quit()
+        self.processTab.workerThread.wait()
+        # reset image preview
+        self.previewLabel.clear()
+        self.startRenderButton.setEnabled(True)
+        self.enableProcessPage()
+    
     def disableProcessPage(self):
         self.processSettingsContainer.setDisabled(True)
 

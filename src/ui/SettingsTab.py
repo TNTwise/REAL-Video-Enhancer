@@ -20,7 +20,31 @@ class SettingsTab:
         if not halfPrecisionSupport:
             self.parent.precision.removeItem(1)
     
-
+    '''def connectWriteSettings(self):
+        settings_and_combo_boxes = {
+            "precision": self.parent.precision,
+            "tensorrt_optimization_level": self.parent.tensorrt_optimization_level,
+            "encoder": self.parent.encoder,
+            
+        }
+        settings_and_check_boxes = {
+            "preview_enabled": self.parent.preview_enabled,
+            "scene_change_detection_enabled": self.parent.scene_change_detection_enabled,
+            "discord_rich_presence": self.parent.discord_rich_presence,
+        }
+        for setting, combo_box in settings_and_combo_boxes.items():
+            combo_box.currentIndexChanged.connect(
+                lambda: self.settings.writeSetting(
+                    setting, combo_box.currentText()
+                )
+            )
+        for setting, check_box in settings_and_check_boxes.items():
+            check_box.stateChanged.connect(
+                lambda: self.settings.writeSetting(
+                    setting, "True" if check_box.isChecked() else "False"
+                )
+            )
+            print(setting)'''
     def connectWriteSettings(self):
         self.parent.precision.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
@@ -50,6 +74,12 @@ class SettingsTab:
                 "True" if self.parent.scene_change_detection_enabled.isChecked() else "False",
             )
         )
+        self.parent.discord_rich_presence.stateChanged.connect(
+            lambda: self.settings.writeSetting(
+                "discord_rich_presence",
+                "True" if self.parent.discord_rich_presence.isChecked() else "False",
+            )
+        )
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
 
     def resetSettings(self):
@@ -70,6 +100,9 @@ class SettingsTab:
         self.parent.scene_change_detection_enabled.setChecked(
             self.settings.settings["scene_change_detection_enabled"] == "True"
         )
+        self.parent.discord_rich_presence.setChecked(
+            self.settings.settings["discord_rich_presence"] == "True"
+        )
 
 
 class Settings:
@@ -86,6 +119,7 @@ class Settings:
             "encoder": "libx264",
             "preview_enabled": "True",
             "scene_change_detection_enabled": "True",
+            "discord_rich_presence": "True",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -93,6 +127,7 @@ class Settings:
             "encoder": ("libx264", "libx265", "libvpx-vp9", "libaom-av1"),
             "preview_enabled": ("True", "False"),
             "scene_change_detection_enabled": ("True", "False"),
+            "discord_rich_presence": ("True", "False"),
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):
