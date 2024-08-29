@@ -84,7 +84,7 @@ class DownloadDependencies:
             os.remove(main_zip)
 
     def downloadPython(self):
-        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.12.5+20240814-"
+        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
         pyDir = os.path.join(
             currentDirectory(),
             "python",
@@ -186,24 +186,24 @@ class DownloadDependencies:
         # default
         """torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
-            # "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp312-cp312-linux_x86_64.whl",
+            # "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B45fff310c8-cp311-cp311-linux_x86_64.whl",
             "torch==2.4.0",
             "torchvision==0.19.0",
         ]"""
         # Nigthly test
         torchCUDALinuxDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
-            "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp312-cp312-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240826%2Bcu124-cp312-cp312-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp312-cp312-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240826%2Bcu124-py3-none-any.whl"
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
             # "--pre",
-            "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240826%2Bcu124-cp312-cp312-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124/torch-2.5.0.dev20240826%2Bcu124-cp311-cp311-win_amd64.whl",
             # "--pre",
-            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp312-cp312-win_amd64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp311-cp311-win_amd64.whl",
             # "torch==2.4.0",
             # "torchvision==0.19.0",
             # "safetensors",
@@ -242,7 +242,7 @@ class DownloadDependencies:
                 #    "torch_tensorrt==2.4.0"]
                 
                 # nightly
-                tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp312-cp312-linux_x86_64.whl"]
+                tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl"]
             case "win32":
                 tensorRTDeps = [
                     "tensorrt==10.3.0",
@@ -253,7 +253,7 @@ class DownloadDependencies:
                 tensorRTDeps += (
                     # "--no-deps",
                     # "torch_tensorrt==2.4.0",
-                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp312-cp312-win_amd64.whl",
+                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp311-cp311-win_amd64.whl",
                 )
         return tensorRTDeps
 
@@ -281,9 +281,9 @@ class DownloadDependencies:
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [
-            "https://download.pytorch.org/whl/pytorch_triton_rocm-2.3.1-cp312-cp312-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp312-cp312-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp312-cp312-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/pytorch_triton_rocm-2.3.1-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
         ]
         if getPlatform() == "linux":
             self.pipInstall(rocmLinuxDeps + self.getPlatformIndependentDeps())
