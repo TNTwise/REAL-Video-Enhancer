@@ -7,6 +7,8 @@ import sys
 
 import urllib.request
 
+def python_path():
+    return "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3"
 
 def download_file(url, destination):
     print(f"Downloading file from {url}")
@@ -64,7 +66,7 @@ def create_venv():
 def install_requirements_in_venv():
     print("Installing requirements in virtual environment")
     command = [
-        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
+        python_path(),
         "-m",
         "pip",
         "install",
@@ -79,9 +81,7 @@ def build_executable():
     print("Building executable")
     if getPlatform() == "win32":
         command = [
-            r".\venv\Scripts\python.exe"
-            if getPlatform() == "win32"
-            else "venv/bin/python3",
+            python_path(),
             "-m",
             "PyInstaller",
             "main.py",
@@ -91,9 +91,7 @@ def build_executable():
         ]
     else:
         command = [
-            r".\venv\Scripts\python.exe"
-            if getPlatform() == "win32"
-            else "venv/bin/python3",
+            python_path(),
             "-m",
             "cx_Freeze",
             "main.py",
