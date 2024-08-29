@@ -1,4 +1,4 @@
-from pypresence import Presence
+from pypresence import Presence, exceptions
 from time import sleep
 import signal
 from contextlib import contextmanager
@@ -45,12 +45,15 @@ def start_discordRPC(mode:str, videoName:str, backend:str):
                         )
             except:
                 log("Not flatpak")
-            RPC = Presence(client_id)  # Initialize the client class
-            RPC.connect()  # Start the handshake loop
+            try:
+                RPC = Presence(client_id)  # Initialize the client class
+                RPC.connect()  # Start the handshake loop
 
-            RPC.update(
-                state=f"{mode} Video", details=f"Backend: {backend}", large_image="logo-v2"
-            )
+                RPC.update(
+                    state=f"{mode} Video", details=f"Backend: {backend}", large_image="logo-v2"
+                )
+            except exceptions.DiscordNotFound:
+                pass
 
     # The presence will stay on as long as the program is running
     # Can only update rich presence every 15 seconds
