@@ -106,7 +106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
         )
 
-        icon_path = ":/icons/icons/logo-v2.svg"  # Adjust the path to your icon file
+        icon_path = ":/icons/icons/logo-v2.svg" 
         self.setWindowIcon(QIcon(icon_path))
         QApplication.setWindowIcon(QIcon(icon_path))
         self.setWindowTitle("REAL Video Enhancer")

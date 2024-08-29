@@ -12,6 +12,14 @@ from ..Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
 from ..DownloadModels import DownloadModel
 from .SettingsTab import Settings
 from ..DiscordRPC import start_discordRPC
+from ..ModelHandler import (
+    ncnnInterpolateModels,
+    ncnnUpscaleModels, 
+    pytorchInterpolateModels, 
+    pytorchUpscaleModels, 
+    tensorrtInterpolateModels, 
+    tensorrtUpscaleModels
+    )
 
 
 class ProcessTab:
@@ -20,161 +28,7 @@ class ProcessTab:
         self.imagePreviewSharedMemoryID = "/image_preview" + str(os.getpid())
         self.renderTextOutputList = None
         self.currentFrame = 0
-        """
-        Key value pairs of the model name in the GUI
-        Data inside the tuple:
-        [0] = file in models directory
-        [1] = file to download
-        [2] = upscale times
-        [3] = arch
-        """
-        self.ncnnInterpolateModels = {
-            "RIFE 4.6 (Fastest Model)": ("rife-v4.6", "rife-v4.6.tar.gz", 1, "rife46"),
-            "RIFE 4.7 (Smoothest Model)": ("rife-v4.7", "rife-v4.7.tar.gz", 1, "rife47"),
-            "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1, "rife413"),
-            "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1, "rife413"),
-            "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1, "rife420"),
-            "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1, "rife421"),
-            "RIFE 4.22 (Latest General Model)": ("rife-v4.22", "rife-v4.22.tar.gz", 1, "rife421"),
-            "RIFE 4.22-lite (Recommended Model)": (
-                "rife-v4.22-lite",
-                "rife-v4.22-lite.tar.gz",
-                1,
-                "rife422-lite",
-            ),
-        }
-        self.pytorchInterpolateModels = {
-            "RIFE 4.6 (Fastest Model)": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
-            "RIFE 4.7 (Smoothest Model)": ("rife4.7.pkl", "rife4.7.pkl", 1, "rife47"),
-            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
-            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
-            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
-            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
-            "RIFE 4.22 (Latest General Model)": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
-            "RIFE 4.22-lite (Recommended Model)": (
-                "rife4.22-lite.pkl",
-                "rife4.22-lite.pkl",
-                1,
-                "rife422-lite",
-            ),
-        }
-        self.tensorrtInterpolateModels = {
-            "RIFE 4.6 (Fastest Model)": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
-            "RIFE 4.7 (Smoothest Model)": ("rife4.7.pkl", "rife4.7.pkl", 1, "rife47"),
-            "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
-            "RIFE 4.18": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
-            "RIFE 4.20": ("rife4.20.pkl", "rife4.20.pkl", 1, "rife420"),
-            "RIFE 4.21": ("rife4.21.pkl", "rife4.21.pkl", 1, "rife421"),
-            "RIFE 4.22 (Latest General Model)": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
-            "RIFE 4.22-lite (Recommended Model)": (
-                "rife4.22-lite.pkl",
-                "rife4.22-lite.pkl",
-                1,
-                "rife422-lite",
-            ),
-        }
-        self.ncnnUpscaleModels = {
-            "SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV2",
-                "2x_ModernSpanimationV2.tar.gz",
-                2,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (High Quality Source) (4X)": (
-                "4xNomos8k_span_otf_weak",
-                "4xNomos8k_span_otf_weak.tar.gz",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Medium Quality Source) (4X)": (
-                "4xNomos8k_span_otf_medium",
-                "4xNomos8k_span_otf_medium.tar.gz",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Low Quality Source) (4X)": (
-                "4xNomos8k_span_otf_strong",
-                "4xNomos8k_span_otf_strong.tar.gz",
-                4,
-                "SPAN",
-            ),
-            "Compact (Realistic) (HD Input) (2X)": (
-                "2x_OpenProteus_Compact_i2_70K",
-                "2x_OpenProteus_Compact_i2_70K.tar.gz",
-                2,
-                "Compact",
-            ),
-        }
-        self.pytorchUpscaleModels = {
-            "SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV2.pth",
-                "2x_ModernSpanimationV2.pth",
-                2,
-                "SPAN",
-            ),
-            "Sudo Shuffle SPAN (Animation) (2X)": (
-                "2xSudoShuffleSPAN.pth",
-                "2xSudoShuffleSPAN.pth",
-                2,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (High Quality Source) (4X)": (
-                "4xNomos8k_span_otf_weak.pth",
-                "4xNomos8k_span_otf_weak.pth",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Medium Quality Source) (4X)": (
-                "4xNomos8k_span_otf_medium.pth",
-                "4xNomos8k_span_otf_medium.pth",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Low Quality Source) (4X)": (
-                "4xNomos8k_span_otf_strong.pth",
-                "4xNomos8k_span_otf_strong.pth",
-                4,
-                "SPAN",
-            ),
-            "Compact (Realistic) (HD Input) (2X)": (
-                "2x_OpenProteus_Compact_i2_70K.pth",
-                "2x_OpenProteus_Compact_i2_70K.pth",
-                2,
-                "Compact",
-            ),
-        }
-        self.tensorrtUpscaleModels = {
-            "SPAN (Animation) (2X)": (
-                "2x_ModernSpanimationV2.pth",
-                "2x_ModernSpanimationV2.pth",
-                2,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (High Quality Source) (4X)": (
-                "4xNomos8k_span_otf_weak.pth",
-                "4xNomos8k_span_otf_weak.pth",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Medium Quality Source) (4X)": (
-                "4xNomos8k_span_otf_medium.pth",
-                "4xNomos8k_span_otf_medium.pth",
-                4,
-                "SPAN",
-            ),
-            "SPAN (Realistic) (Low Quality Source) (4X)": (
-                "4xNomos8k_span_otf_strong.pth",
-                "4xNomos8k_span_otf_strong.pth",
-                4,
-                "SPAN",
-            ),
-            "Compact (Realistic) (HD Input) (2X)": (
-                "2x_OpenProteus_Compact_i2_70K.pth",
-                "2x_OpenProteus_Compact_i2_70K.pth",
-                2,
-                "Compact",
-            ),
-        }
+        
         # get default backend
         self.QConnect(method=method, backend=backend)
         self.switchInterpolationAndUpscale(method=method, backend=backend)
@@ -188,20 +42,20 @@ class ProcessTab:
         if method == "Interpolate":
             match backend:
                 case "ncnn":
-                    models = self.ncnnInterpolateModels
+                    models = ncnnInterpolateModels
                 case "pytorch":
-                    models = self.pytorchInterpolateModels
+                    models = pytorchInterpolateModels
                 case "tensorrt":
-                    models = self.tensorrtInterpolateModels
+                    models = tensorrtInterpolateModels
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
                 case "ncnn":
-                    models = self.ncnnUpscaleModels
+                    models = ncnnUpscaleModels
                 case "pytorch":
-                    models = self.pytorchUpscaleModels
+                    models = pytorchUpscaleModels
                 case "tensorrt":
-                    models = self.tensorrtUpscaleModels
+                    models = tensorrtUpscaleModels
         return models
 
     def QConnect(self, method: str, backend: str):
