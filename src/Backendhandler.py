@@ -1,6 +1,7 @@
 import os
 from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath
 from .version import version
+from . import ModelHandler
 
 
 class BackendHandler:
@@ -35,6 +36,8 @@ class BackendHandler:
         """
         try:
             self.availableBackends, self.fullOutput = self.getAvailableBackends()
+            if firstIter == False:
+                modelHandler = ModelHandler(self.availableBackends)
             return self.availableBackends, self.fullOutput
         except SyntaxError as e:
             printAndLog(str(e))

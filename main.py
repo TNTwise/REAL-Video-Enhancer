@@ -44,6 +44,7 @@ from src.ui.SettingsTab import SettingsTab
 from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.Backendhandler import BackendHandler
+from src.ModelHandler import ModelHandler
 from src.ui.AnimationHandler import AnimationHandler
 from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
@@ -105,6 +106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 firstIter=True
             )
         )
+        
 
         icon_path = ":/icons/icons/logo-v2.svg" 
         self.setWindowIcon(QIcon(icon_path))
