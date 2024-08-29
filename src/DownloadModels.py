@@ -2,7 +2,7 @@ import os
 
 
 from .Util import createDirectory, modelsPath, extractTarGZ
-from .ui.QTcustom import DownloadProgressPopup
+from .ui.QTcustom import DownloadProgressPopup, SelectModelDownloadOptionPopUp
 
 
 class DownloadModel:

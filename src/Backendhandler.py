@@ -1,7 +1,6 @@
 import os
 from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath
 from .version import version
-from . import ModelHandler
 
 
 class BackendHandler:
@@ -30,6 +29,7 @@ class BackendHandler:
     ):
         from .DownloadDeps import DownloadDependencies
         from .ui.QTcustom import RegularQTPopup, DownloadDepsDialog
+        from . import ModelHandler
 
         """
         will keep trying until the user installs at least 1 backend, happens when user tries to close out of backend slect and gets an error
@@ -37,6 +37,8 @@ class BackendHandler:
         try:
             self.availableBackends, self.fullOutput = self.getAvailableBackends()
             if firstIter == False:
+                
+
                 modelHandler = ModelHandler(self.availableBackends)
             return self.availableBackends, self.fullOutput
         except SyntaxError as e:

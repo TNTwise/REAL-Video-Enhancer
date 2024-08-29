@@ -1,5 +1,4 @@
-from .DownloadModels import DownloadModel
-from .ui.QTcustom import SelectModelDownloadOptionPopUp
+from .ui.QTcustom import  SelectModelDownloadOptionPopUp
 
 """
 Key value pairs of the model name in the GUI
