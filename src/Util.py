@@ -20,6 +20,11 @@ with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
 def downloadTempDirectory() -> str:
+    # make directory I forgot to do that
+    try:
+        os.mkdir(os.path.join(cwd, "temp"))
+    except:
+        pass
     return os.path.join(cwd, "temp")
 
 def networkCheck(hostname="https://githubrawusercontent.com") -> bool:
