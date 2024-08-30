@@ -19,6 +19,8 @@ home_dir = os.path.expanduser("~")
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
+def downloadTempDirectory() -> str:
+    return os.path.join(cwd, "temp")
 
 def networkCheck(hostname="https://githubrawusercontent.com") -> bool:
     """

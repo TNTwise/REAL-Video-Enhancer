@@ -8,6 +8,7 @@ from .Util import (
     makeExecutable,
     move,
     extractTarGZ,
+    downloadTempDirectory,
 )
 from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, NetworkCheckPopup
 import os
@@ -110,7 +111,7 @@ class DownloadDependencies:
         makeExecutable(pythonPath())
 
     def downloadFFMpeg(self):
-        ffmpegTempPath = os.path.join(currentDirectory(), "bin", "ffmpeg.temp")
+        ffmpegTempPath = os.path.join(downloadTempDirectory(), "ffmpeg")
         link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
         match getPlatform():
             case "linux":
