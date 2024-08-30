@@ -1,14 +1,16 @@
 from PySide6.QtWidgets import QMainWindow
 from .QTcustom import RegularQTPopup, NetworkCheckPopup
 from ..DownloadDeps import DownloadDependencies
-from ..ModelHandler import downloadAllModels
+from ..ModelHandler import downloadModelsBasedOnInstalledBackend
 
 class DownloadTab:
     def __init__(
         self,
         parent: QMainWindow,
+        installed_backends: list,
     ):
         self.parent = parent
+        self.installed_backends = installed_backends
         self.downloadDeps = DownloadDependencies()
         self.QButtonConnect()
 
@@ -24,8 +26,12 @@ class DownloadTab:
             lambda: self.download("torch_rocm")
         )
         self.parent.downloadAllModelsBtn.clicked.connect(
-            downloadAllModels
+            lambda: downloadModelsBasedOnInstalledBackend(["ncnn","pytorch","tensorrt"])
         )
+        self.parent.downloadSomeModelsBasedOnInstalledBackendbtn.clicked.connect(
+            lambda: downloadModelsBasedOnInstalledBackend(self.installed_backends)
+        )
+
     def download(self, dep):
         """
         Downloads the specified dependency.
