@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QMainWindow
 from .QTcustom import RegularQTPopup
 from ..DownloadDeps import DownloadDependencies
-
+from ..ModelHandler import downloadAllModels
 
 class DownloadTab:
     def __init__(
@@ -22,6 +22,9 @@ class DownloadTab:
         )
         self.parent.downloadTorchROCmBtn.clicked.connect(
             lambda: self.download("torch_rocm")
+        )
+        self.parent.downloadAllModelsBtn.clicked.connect(
+            downloadAllModels
         )
     def download(self, dep):
         """

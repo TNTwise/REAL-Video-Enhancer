@@ -160,14 +160,14 @@ def downloadAllModels():
     Download all models in the models folder
     """
     for model in ncnnInterpolateModels:
-        DownloadModel(model, ncnnInterpolateModels[model][1])
+        DownloadModel(model, ncnnInterpolateModels[model][1], "ncnn")
     for model in pytorchInterpolateModels:
-        DownloadModel(model, pytorchInterpolateModels[model][1])
+        DownloadModel(model, pytorchInterpolateModels[model][1], "pytorch")
     for model in tensorrtInterpolateModels:
-        DownloadModel(model, tensorrtInterpolateModels[model][1])
+        DownloadModel(model, tensorrtInterpolateModels[model][1], "tensorrt")
     for model in ncnnUpscaleModels:
-        DownloadModel(model, ncnnUpscaleModels[model][1])
+        DownloadModel(model, ncnnUpscaleModels[model][1], "ncnn")
     for model in pytorchUpscaleModels:
-        DownloadModel(model, pytorchUpscaleModels[model][1])
+        DownloadModel(model, pytorchUpscaleModels[model][1], "pytorch")
     for model in tensorrtUpscaleModels:
-        DownloadModel(model, tensorrtUpscaleModels[model][1])
+        DownloadModel(model, tensorrtUpscaleModels[model][1], "tensorrt")
