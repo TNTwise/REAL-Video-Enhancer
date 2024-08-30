@@ -139,6 +139,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + "\n"
             + "-------------------------------------------\n"
             + "Software Information: \n"
+            + f"REAL Video Enhancer Version: {version}\n"
             + self.fullOutput
         )
         self.renderOutput.setText(printOut)

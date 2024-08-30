@@ -20,7 +20,10 @@ with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
 
-def networkCheck(hostname="https://githubrawusercontent.com"):
+def networkCheck(hostname="https://githubrawusercontent.com") -> bool:
+    """
+    checks network availability against a url, default url: https://githubrawusercontent.com
+    """
     try:
         _ = requests.head(hostname, timeout=1)
         return True
