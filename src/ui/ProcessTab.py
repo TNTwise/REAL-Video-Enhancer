@@ -162,13 +162,18 @@ class ProcessTab:
             backend=backend,
         )
         # self.ffmpegWriteThread()
-        writeThread = Thread(
-            target=lambda: self.renderToPipeThread(
-                method=method, backend=backend, interpolateTimes=interpolationTimes
+        if os.path.exists(self.modelFile) or os.path.isfile(self.modelFile):
+            
+            writeThread = Thread(
+                target=lambda: self.renderToPipeThread(
+                    method=method, backend=backend, interpolateTimes=interpolationTimes
+                )
             )
-        )
-        writeThread.start()
-        self.startGUIUpdate()
+            writeThread.start()
+            self.startGUIUpdate()
+        else:
+            self.parent.onRenderCompletion()
+            # stop render process here
 
     def startGUIUpdate(self):
         self.workerThread = UpdateGUIThread(

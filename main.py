@@ -343,9 +343,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             RegularQTPopup("Please select a video file!")
 
     def onRenderCompletion(self):
-        self.processTab.workerThread.stop()
-        self.processTab.workerThread.quit()
-        self.processTab.workerThread.wait()
+        try:
+            self.processTab.workerThread.stop()
+            self.processTab.workerThread.quit()
+            self.processTab.workerThread.wait()
+        except AttributeError:
+            pass # pass just incase internet error caused a skip
         # reset image preview
         self.previewLabel.clear()
         self.startRenderButton.setEnabled(True)
