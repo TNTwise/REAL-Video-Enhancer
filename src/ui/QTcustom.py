@@ -157,7 +157,7 @@ class DownloadAndReportToQTThread(QThread):
 
         totalSize = 0
         with open(self.downloadLocation, "wb") as f:
-            chunk_size = 128
+            chunk_size = 1024
             for chunk in response.iter_content(chunk_size=chunk_size):
                 f.write(chunk)
                 totalSize += chunk_size

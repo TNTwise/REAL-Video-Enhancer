@@ -40,6 +40,7 @@ class DownloadModel:
         )
         title = "Downloading: " + modelFile
         DownloadProgressPopup(link=url, title=title, downloadLocation=downloadModelPath)
+        print("Done")
         if "tar.gz" in self.downloadModelFile:
             print("Extracting File")
             extractTarGZ(self.downloadModelPath)
