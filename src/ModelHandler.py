@@ -1,4 +1,4 @@
-from .ui.QTcustom import  SelectModelDownloadOptionPopUp
+from .DownloadModels import DownloadModel
 
 """
 Key value pairs of the model name in the GUI
@@ -155,66 +155,19 @@ tensorrtUpscaleModels = {
         "Compact",
     ),
 }
-class ModelHandler:
-    def __init__(self,installed_backends):
-        self.installed_backends = installed_backends
-        self.downloadDialog()
-
-
-    def downloadDialog(self):
-        self.dD = SelectModelDownloadOptionPopUp()
-        self.dD.doneBtn.clicked.connect(self.downloadModels)
-
-    def ncnnBackends(self):
-        return ncnnInterpolateModels | ncnnUpscaleModels
-    def pytorchBackends(self):
-        return pytorchInterpolateModels | pytorchUpscaleModels
-    def tensorrtBackends(self):
-        return tensorrtInterpolateModels | tensorrtUpscaleModels
-    
-    def s(self,checkbox):
-        if checkbox == "all":
-            self.dD.NoInternetRequiredCheckBox.setChecked(False)
-            self.dD.someInternetRequiredCheckBox.setChecked(False)
-        if checkbox == "some":
-            self.dD.NoInternetRequiredCheckBox.setChecked(False)
-            self.dD.allInterentRequiredCheckBox.setChecked(False)
-        if checkbox == "none":
-            self.dD.allInterentRequiredCheckBox.setChecked(False)
-            self.dD.someInternetRequiredCheckBox.setChecked(False)
-
-
-    def switchStateCheckboxChanged(self):
-        self.dD.NoInternetRequiredCheckBox.checkStateChanged.connect("none")
-        self.dD.someInternetRequiredCheckBox.checkStateChanged.connect("some")
-        self.dD.allInterentRequiredCheckBox.checkStateChanged.connect("all")
-    def downloadModels(self):
-        """
-        Downloads all the models based on the selected backend.
-        Returns:
-            None
-        """
-        
-        
-        if self.dD.NoInternetRequiredCheckBox.isChecked():
-            backend_list = ["ncnn", "pytorch", "tensorrt"]
-            models = ncnnUpscaleModels | ncnnInterpolateModels | pytorchInterpolateModels | pytorchUpscaleModels | tensorrtInterpolateModels | tensorrtUpscaleModels
-        elif self.dD.someInternetRequiredCheckBox.isChecked():
-            backend_list = self.installed_backends
-            b = []
-            for backend in backend_list:
-                if backend == "ncnn":
-                    b += self.ncnnBackends()
-                if backend == "pytorch":
-                    b += self.pytorchBackends()
-                if backend == "tensorrt":
-                    b += self.tensorrtBackends()
-        else:
-            backend_list = []
-        for backend in backend_list:
-            for model in models:
-                DownloadModel(
-                    modelFile=models[model][0],
-                    downloadModelFile=models[model][1],
-                    backend=backend,
-                )
+def downloadAllModels():
+    """
+    Download all models in the models folder
+    """
+    for model in ncnnInterpolateModels:
+        DownloadModel(model, ncnnInterpolateModels[model][1])
+    for model in pytorchInterpolateModels:
+        DownloadModel(model, pytorchInterpolateModels[model][1])
+    for model in tensorrtInterpolateModels:
+        DownloadModel(model, tensorrtInterpolateModels[model][1])
+    for model in ncnnUpscaleModels:
+        DownloadModel(model, ncnnUpscaleModels[model][1])
+    for model in pytorchUpscaleModels:
+        DownloadModel(model, pytorchUpscaleModels[model][1])
+    for model in tensorrtUpscaleModels:
+        DownloadModel(model, tensorrtUpscaleModels[model][1])
