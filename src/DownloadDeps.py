@@ -142,24 +142,24 @@ class DownloadDependencies:
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))
         printAndLog("Total Dependencies: " + str(totalDeps))
-        if NetworkCheckPopup("https://pypi.org/"): # check for network before installing
-            DisplayCommandOutputPopup(
-                command=command,
-                title="Download Dependencies",
-                progressBarLength=totalDeps,
-            )
-            command = [
-                pythonPath(),
-                "-m",
-                "pip",
-                "cache",
-                "purge",
-            ]
-            DisplayCommandOutputPopup(
-                command=command,
-                title="Purging Cache",
-                progressBarLength=1,
-            )
+        
+        DisplayCommandOutputPopup(
+            command=command,
+            title="Download Dependencies",
+            progressBarLength=totalDeps,
+        )
+        command = [
+            pythonPath(),
+            "-m",
+            "pip",
+            "cache",
+            "purge",
+        ]
+        DisplayCommandOutputPopup(
+            command=command,
+            title="Purging Cache",
+            progressBarLength=1,
+        )
 
     def getPlatformIndependentDeps(self):
         platformIndependentdeps = [

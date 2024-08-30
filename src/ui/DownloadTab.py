@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QMainWindow
-from .QTcustom import RegularQTPopup
+from .QTcustom import RegularQTPopup, NetworkCheckPopup
 from ..DownloadDeps import DownloadDependencies
 from ..ModelHandler import downloadAllModels
 
@@ -34,14 +34,15 @@ class DownloadTab:
         Returns:
         - None
         """
-        match dep:
-            case "ncnn":
-                self.downloadDeps.downloadNCNNDeps()
-            case "torch_cuda":
-                self.downloadDeps.downloadPyTorchCUDADeps()
-            case "tensorrt":
-                self.downloadDeps.downloadTensorRTDeps()
-            case "torch_rocm":
-                self.downloadDeps.downloadPyTorchROCmDeps()
-        RegularQTPopup("Download Complete\nPlease restart the application to apply changes.")
+        if NetworkCheckPopup("https://pypi.org/"): # check for network before installing
+            match dep:
+                case "ncnn":
+                    self.downloadDeps.downloadNCNNDeps()
+                case "torch_cuda":
+                    self.downloadDeps.downloadPyTorchCUDADeps()
+                case "tensorrt":
+                    self.downloadDeps.downloadTensorRTDeps()
+                case "torch_rocm":
+                    self.downloadDeps.downloadPyTorchROCmDeps()
+            RegularQTPopup("Download Complete\nPlease restart the application to apply changes.")
         
