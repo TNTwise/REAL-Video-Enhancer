@@ -2,7 +2,7 @@ import os
 
 
 from .Util import createDirectory, modelsPath, extractTarGZ
-from .ui.QTcustom import DownloadProgressPopup
+from .ui.QTcustom import DownloadProgressPopup, NetworkCheckPopup
 
 
 class DownloadModel:
@@ -28,9 +28,10 @@ class DownloadModel:
             os.path.join(self.modelPath, modelFile)
         ):
             return
-        self.downloadModel(
-            modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath
-        )
+        if NetworkCheckPopup():
+            self.downloadModel(
+                modelFile=downloadModelFile, downloadModelPath=self.downloadModelPath
+            )
 
     def downloadModel(self, modelFile: str = None, downloadModelPath: str = None):
         url = (

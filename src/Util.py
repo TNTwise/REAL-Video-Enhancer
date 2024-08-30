@@ -13,10 +13,20 @@ import cpuinfo
 import distro
 import webbrowser
 
+
 cwd = os.getcwd()
 home_dir = os.path.expanduser("~")
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
+
+
+def networkCheck(hostname="https://githubrawusercontent.com"):
+    try:
+        _ = requests.head(hostname, timeout=1)
+        return True
+    except requests.ConnectionError:
+        print("No internet connection available.")
+    return False
 
 
 def getOSInfo() -> str:

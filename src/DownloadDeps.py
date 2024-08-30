@@ -9,7 +9,7 @@ from .Util import (
     move,
     extractTarGZ,
 )
-from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
+from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, NetworkCheckPopup
 import os
 import subprocess
 import shutil
@@ -142,23 +142,24 @@ class DownloadDependencies:
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))
         printAndLog("Total Dependencies: " + str(totalDeps))
-        DisplayCommandOutputPopup(
-            command=command,
-            title="Download Dependencies",
-            progressBarLength=totalDeps,
-        )
-        command = [
-            pythonPath(),
-            "-m",
-            "pip",
-            "cache",
-            "purge",
-        ]
-        DisplayCommandOutputPopup(
-            command=command,
-            title="Purging Cache",
-            progressBarLength=1,
-        )
+        if NetworkCheckPopup("https://pypi.org/"): # check for network before installing
+            DisplayCommandOutputPopup(
+                command=command,
+                title="Download Dependencies",
+                progressBarLength=totalDeps,
+            )
+            command = [
+                pythonPath(),
+                "-m",
+                "pip",
+                "cache",
+                "purge",
+            ]
+            DisplayCommandOutputPopup(
+                command=command,
+                title="Purging Cache",
+                progressBarLength=1,
+            )
 
     def getPlatformIndependentDeps(self):
         platformIndependentdeps = [

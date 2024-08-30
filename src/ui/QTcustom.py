@@ -55,7 +55,7 @@ from PySide6.QtWidgets import (
 )
 
 from .QTstyle import styleSheet
-from ..Util import printAndLog, getPlatform
+from ..Util import printAndLog, getPlatform, networkCheck
 from ..Backendhandler import BackendHandler
 
 
@@ -647,10 +647,12 @@ class DownloadDepsDialog(QtWidgets.QDialog):
     # retranslateUi
 
 
+
+
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
         super().__init__()
-        self.setWindowTitle(message)
+        self.setWindowTitle("REAL Video Enhancer")
         self.setFixedSize(300, 100)
         layout = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(message)
@@ -658,6 +660,12 @@ class RegularQTPopup(QtWidgets.QDialog):
         self.setLayout(layout)
         self.exec()
 
+def NetworkCheckPopup(hostname="https://githubrawusercontent.com") -> bool:
+        if not networkCheck(hostname=hostname):
+            RegularQTPopup("No Network Connection")
+            return False
+        # return true if network connection
+        return True
 
 if __name__ == "__main__":
     DownloadProgressPopup(
