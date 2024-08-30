@@ -10,7 +10,7 @@ from .Util import (
     extractTarGZ,
     downloadTempDirectory,
 )
-from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, NetworkCheckPopup
+from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 import subprocess
 import shutil

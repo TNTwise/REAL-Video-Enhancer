@@ -20,21 +20,19 @@ with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
 def downloadTempDirectory() -> str:
-    # make directory I forgot to do that
-    try:
-        os.mkdir(os.path.join(cwd, "temp"))
-    except:
-        pass
-    return os.path.join(cwd, "temp")
+    tmppath = os.path.join(cwd, "temp")
+    createDirectory(tmppath)
+    return tmppath
 
-def networkCheck(hostname="https://githubrawusercontent.com") -> bool:
+def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
     """
-    checks network availability against a url, default url: https://githubrawusercontent.com
+    checks network availability against a url, default url: raw.githubusercontent.com
     """
     try:
         _ = requests.head(hostname, timeout=1)
         return True
-    except requests.ConnectionError:
+    except requests.ConnectionError as e:
+        print(str(e))
         print("No internet connection available.")
     return False
 
@@ -204,7 +202,7 @@ def checkIfDeps() -> bool:
     """
     Checks if python or ffmpeg is installed, and if not returns false.
     """
-    if os.path.isfile(ffmpegPath()) == False or os.path.isfile(pythonPath()) == False:
+    if not os.path.isfile(ffmpegPath()) or not os.path.isfile(pythonPath()):
         return False
     return True
 

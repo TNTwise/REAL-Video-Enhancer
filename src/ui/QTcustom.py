@@ -660,7 +660,7 @@ class RegularQTPopup(QtWidgets.QDialog):
         self.setLayout(layout)
         self.exec()
 
-def NetworkCheckPopup(hostname="https://githubrawusercontent.com") -> bool:
+def NetworkCheckPopup(hostname="https://raw.githubusercontent.com") -> bool:
         if not networkCheck(hostname=hostname):
             RegularQTPopup("No Network Connection")
             return False
