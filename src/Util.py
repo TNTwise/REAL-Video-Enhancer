@@ -29,9 +29,9 @@ def backendDirectory():
     """
     
     if isFlatpak():
-        return "/app/bin"
+        return "/app/bin/backend"
     else:
-        return cwd
+        return os.path.join(cwd, "backend")
 
 def downloadFile(link,downloadLocation):
     response = requests.get(
