@@ -1,5 +1,5 @@
 import os
-from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath
+from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath, backendDirectory
 from .version import version
 
 
@@ -57,7 +57,7 @@ class BackendHandler:
         output = SettingUpBackendPopup(
             [
                 pythonPath(),
-                os.path.join("backend", "rve-backend.py"),
+                os.path.join(backendDirectory(), "rve-backend.py"),
                 "--list_backends",
             ]
         )
