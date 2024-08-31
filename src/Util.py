@@ -12,10 +12,14 @@ import psutil
 import cpuinfo
 import distro
 import webbrowser
-
-
-cwd = os.getcwd()
 home_dir = os.path.expanduser("~")
+def isFlatpak():
+    return "FLATPAK_ID" in os.environ
+if isFlatpak():
+    cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-EnhancerV2")
+else:
+    cwd = os.getcwd()
+
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
