@@ -18,7 +18,7 @@ class BackendHandler:
         from .DownloadDeps import DownloadDependencies
 
         downloadDependencies = DownloadDependencies()
-        downloadDependencies.downloadBackend(version)
+        #downloadDependencies.downloadBackend(version)
         if not checkIfDeps():
             # Dont flip these due to shitty code!
             downloadDependencies.downloadFFMpeg()

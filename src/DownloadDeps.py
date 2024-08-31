@@ -74,8 +74,8 @@ class DownloadDependencies:
             moved_backed_folder = os.path.join(currentDirectory(), "backend")
 
             printAndLog("Downloading backend")
-            urllib.request.urlretrieve(backend_url, main_zip)
-            # DownloadProgressPopup(link=backend_url, downloadLocation=backend_zip,title="Downloading Backend")
+            #urllib.request.urlretrieve(backend_url, main_zip)
+            DownloadProgressPopup(link=backend_url, downloadLocation=main_zip,title="Downloading Backend")
 
             printAndLog("Extracting backend")
             shutil.unpack_archive(main_zip, main_folder)
