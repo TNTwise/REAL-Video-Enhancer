@@ -27,13 +27,47 @@ jobs:
         run: cp -r backend dist/
       
       - name: compress archive
-        run: zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/
+        run: |
+          zip -r REAL-Video-Enhancer-2.0-Linux.zip dist/
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
         with:
           name: REAL-Video-Enhancer-2.0-Linux.zip
           path: REAL-Video-Enhancer-2.0-Linux.zip
+  build-Flatpak:
+    runs-on: ubuntu-20.04 
+    permissions: write-all  
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.8
+
+      - name: Install Python Dependencies
+        run: |
+          python3 -m pip install -r requirements.txt
+          
+      - name: Build
+        run: python3 build.py --build_exe
+        
+      - name: copy backend
+        run: | 
+          mv dist/ bin/
+          cp -r backend bin/
+          
+      
+      - name: compress archive
+        run: |
+          zip -r REAL-Video-Enhancer-2.0-Flatpak.zip bin/
+
+      - name: Save Archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: REAL-Video-Enhancer-2.0-Flatpak.zip
+          path: REAL-Video-Enhancer-2.0-Flatpak.zip
           
   build-Windows:
     runs-on: windows-2019
@@ -98,7 +132,7 @@ jobs:
           path: REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
 
   Release:
-    needs: [build-Windows, build-Linux, build-MacOS]
+    needs: [build-Windows, build-Linux, build-MacOS, build-Flatpak]
     runs-on: ubuntu-latest
     permissions:
       contents: write
