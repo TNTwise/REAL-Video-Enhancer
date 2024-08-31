@@ -29,14 +29,7 @@ def backendDirectory():
     """
     
     if isFlatpak():
-        # Get the absolute path of the current script
-        current_script_path = os.path.abspath(__file__)
-
-        # Get the directory of the current script
-        current_directory = os.path.dirname(current_script_path)
-
-        print("Current directory:", current_directory)
-        return current_directory
+        return "/app/bin"
     else:
         return cwd
 
