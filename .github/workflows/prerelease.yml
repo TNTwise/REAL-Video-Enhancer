@@ -163,7 +163,7 @@ jobs:
           files: |
               artifacts/REAL-Video-Enhancer-2.0-Windows.zip/REAL-Video-Enhancer-2.0-Windows.zip
               artifacts/REAL-Video-Enhancer-2.0-Linux.zip/REAL-Video-Enhancer-2.0-Linux.zip
-              artifacts/REAL-Video-Enhancer-2.0-Linux.zip/REAL-Video-Enhancer-2.0-Flatpak.zip
+              artifacts/REAL-Video-Enhancer-2.0-Flatpak.zip/REAL-Video-Enhancer-2.0-Flatpak.zip
               artifacts/REAL-Video-Enhancer-2.0-MacOS_x86_64.zip/REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
 
               
