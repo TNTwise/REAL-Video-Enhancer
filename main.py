@@ -3,7 +3,7 @@ import os
 import subprocess
 import re
 import math
-
+import certifi
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
