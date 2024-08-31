@@ -146,7 +146,7 @@ class Settings:
         Returns:
             None
         """
-        with open("settings.txt", "r") as file:
+        with open(self.settingsFile, "r") as file:
             try:
                 for line in file:
                     key, value = line.strip().split(",")
