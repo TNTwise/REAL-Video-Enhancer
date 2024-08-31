@@ -9,6 +9,7 @@ from .Util import (
     move,
     extractTarGZ,
     downloadTempDirectory,
+    downloadFile
 )
 from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
@@ -65,8 +66,8 @@ class DownloadDependencies:
         tag is unused for now, as still in active development. just downloads the latest backend.
         """
         if not os.path.exists(os.path.join(currentDirectory(), "backend")):
-            backend_url = "https://github.com/tntwise/REAL-Video-Enhancer/archive/refs/heads/2.0.zip"
-            main_zip = os.path.join(currentDirectory(), "repo.zip")
+            backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"
+            main_zip = os.path.join(currentDirectory(), "backend.tar.gz")
             main_folder = os.path.join(currentDirectory(), "repo")
             orig_backend_folder = os.path.join(
                 main_folder, "REAL-Video-Enhancer-2.0", "backend"
@@ -75,14 +76,15 @@ class DownloadDependencies:
 
             printAndLog("Downloading backend")
             #urllib.request.urlretrieve(backend_url, main_zip)
-            DownloadProgressPopup(link=backend_url, downloadLocation=main_zip,title="Downloading Backend")
-
+            downloadFile(link=backend_url, downloadLocation=main_zip)
             printAndLog("Extracting backend")
-            shutil.unpack_archive(main_zip, main_folder)
-            printAndLog("Moving Backend")
-            move(orig_backend_folder, moved_backed_folder)
-            printAndLog("Cleaning up")
-            os.remove(main_zip)
+            extractTarGZ(main_zip)
+            #printAndLog("Extracting backend")
+            #shutil.unpack_archive(main_zip, main_folder)
+            #printAndLog("Moving Backend")
+            #move(orig_backend_folder, moved_backed_folder)
+            #printAndLog("Cleaning up")
+            
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"

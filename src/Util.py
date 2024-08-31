@@ -23,6 +23,17 @@ else:
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
+def downloadFile(link,downloadLocation):
+    response = requests.get(
+            link,
+            stream=True,
+        )
+    printAndLog("Downloading: " + link)
+    with open(downloadLocation, "wb") as f:
+        chunk_size = 1024
+        for chunk in response.iter_content(chunk_size=chunk_size):
+            f.write(chunk)
+
 def downloadTempDirectory() -> str:
     tmppath = os.path.join(cwd, "temp")
     createDirectory(tmppath)
