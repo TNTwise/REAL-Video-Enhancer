@@ -79,17 +79,19 @@ def install_requirements_in_venv():
 
 def build_executable():
     print("Building executable")
-    if getPlatform() == "win32":
-        command = [
+    #if getPlatform() == "win32":
+    command = [
             python_path(),
             "-m",
             "PyInstaller",
             "main.py",
+            "--collect-all",
+            "PySide6",
             "--icon=icons/logo-v2.ico",
             "--noconfirm",
             "--noupx",
         ]
-    else:
+    """else:
         command = [
             python_path(),
             "-m",
@@ -97,7 +99,7 @@ def build_executable():
             "main.py",
             "--target-dir",
             "dist",
-        ]
+        ]"""
     subprocess.run(command)
 
 
