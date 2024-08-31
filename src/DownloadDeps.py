@@ -9,7 +9,8 @@ from .Util import (
     move,
     extractTarGZ,
     downloadTempDirectory,
-    downloadFile
+    downloadFile,
+    backendDirectory,
 )
 from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
@@ -65,7 +66,7 @@ class DownloadDependencies:
         *NOTE
         tag is unused for now, as still in active development. just downloads the latest backend.
         """
-        if not os.path.exists(os.path.join(currentDirectory(), "backend")):
+        if not os.path.exists(backendDirectory()):
             backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"
             main_zip = os.path.join(currentDirectory(), "backend.tar.gz")
             main_folder = os.path.join(currentDirectory(), "repo")

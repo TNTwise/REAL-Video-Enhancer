@@ -23,6 +23,23 @@ else:
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
 
+def backendDirectory():
+    """
+    returns cwd except when running in flatpak, then it returns the flatpak bin directory
+    """
+    
+    if isFlatpak():
+        # Get the absolute path of the current script
+        current_script_path = os.path.abspath(__file__)
+
+        # Get the directory of the current script
+        current_directory = os.path.dirname(current_script_path)
+
+        print("Current directory:", current_directory)
+        return current_directory
+    else:
+        return cwd
+
 def downloadFile(link,downloadLocation):
     response = requests.get(
             link,

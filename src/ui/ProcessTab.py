@@ -8,7 +8,7 @@ from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt
 
 from .QTcustom import UpdateGUIThread
-from ..Util import pythonPath, currentDirectory, modelsPath, printAndLog, log
+from ..Util import pythonPath, currentDirectory, modelsPath, printAndLog, log, backendDirectory
 from ..DownloadModels import DownloadModel
 from .SettingsTab import Settings
 from ..DiscordRPC import start_discordRPC
@@ -200,7 +200,7 @@ class ProcessTab:
             f"{pythonPath()}",
             "-W",
             "ignore",
-            os.path.join(currentDirectory(), "backend", "rve-backend.py"),
+            os.path.join(backendDirectory(), "rve-backend.py"),
             "-i",
             self.inputFile,
             "-o",
