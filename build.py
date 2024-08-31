@@ -107,7 +107,7 @@ def clean():
 
 
 install_pip()
-python_version = "python3.11" if getPlatform() != "win32" else "python3"
+python_version = "python3.10" if getPlatform() != "win32" else "python3"
 create_venv(python_version=python_version)
 install_pip_in_venv()
 install_requirements_in_venv()
