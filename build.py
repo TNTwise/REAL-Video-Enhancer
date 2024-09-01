@@ -84,7 +84,7 @@ def build_executable():
             python_path(),
             "-m",
             "PyInstaller",
-            "main.py",
+            "REAL-Video-Enhancer.py",
             "--collect-all",
             "PySide6",
             "--icon=icons/logo-v2.ico",
@@ -96,7 +96,7 @@ def build_executable():
             python_path(),
             "-m",
             "cx_Freeze",
-            "main.py",
+            "REAL-Video-Enhancer.py",
             "--target-dir",
             "dist",
         ]
