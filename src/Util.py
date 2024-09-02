@@ -17,6 +17,8 @@ def isFlatpak():
     return "FLATPAK_ID" in os.environ
 if isFlatpak():
     cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-Enhancer")
+    if not os.path.exists(cwd):
+        cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-EnhancerV2")
 else:
     cwd = os.getcwd()
 
