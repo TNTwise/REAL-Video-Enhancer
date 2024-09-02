@@ -37,6 +37,7 @@ from src.Util import (
     getRAMAmount,
     getCPUInfo,
     videosPath,
+    checkForWritePermissions,
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -314,31 +315,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def startRender(self):
         if self.isVideoLoaded:
-            self.startRenderButton.setEnabled(False)
-            method = self.methodComboBox.currentText()
-            self.progressBar.setRange(
-                0,
-                # only set the range to multiply the frame count if the method is interpolate
-                int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value()))
-                if method == "Interpolate"
-                else self.videoFrameCount,
-            )
-            self.disableProcessPage()
-            
-            
-            self.processTab.run(
-                inputFile=self.inputFileText.text(),
-                outputPath=self.outputFileText.text(),
-                videoWidth=self.videoWidth,
-                videoHeight=self.videoHeight,
-                videoFps=self.videoFps,
-                videoFrameCount=self.videoFrameCount,
-                method=method,
-                backend=self.backendComboBox.currentText(),
-                interpolationTimes=self.interpolationMultiplierSpinBox.value(),
-                model=self.modelComboBox.currentText(),
-                benchmarkMode=self.benchmarkModeCheckBox.isChecked(),
-            )
+            if checkForWritePermissions(os.path.dirname(self.outputFileText.text())):
+                self.startRenderButton.setEnabled(False)
+                method = self.methodComboBox.currentText()
+                self.progressBar.setRange(
+                    0,
+                    # only set the range to multiply the frame count if the method is interpolate
+                    int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value()))
+                    if method == "Interpolate"
+                    else self.videoFrameCount,
+                )
+                self.disableProcessPage()
+                
+                
+                self.processTab.run(
+                    inputFile=self.inputFileText.text(),
+                    outputPath=self.outputFileText.text(),
+                    videoWidth=self.videoWidth,
+                    videoHeight=self.videoHeight,
+                    videoFps=self.videoFps,
+                    videoFrameCount=self.videoFrameCount,
+                    method=method,
+                    backend=self.backendComboBox.currentText(),
+                    interpolationTimes=self.interpolationMultiplierSpinBox.value(),
+                    model=self.modelComboBox.currentText(),
+                    benchmarkMode=self.benchmarkModeCheckBox.isChecked(),
+                )
+            else:
+                RegularQTPopup("No write permissions to the output directory!")
         else:
             pass
             RegularQTPopup("Please select a video file!")
