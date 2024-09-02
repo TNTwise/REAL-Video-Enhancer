@@ -21,7 +21,13 @@ if isFlatpak():
         cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-EnhancerV2")
 else:
     cwd = os.getcwd()
-
+def getAvailableDiskSpace() -> float:
+    """
+    Returns the available disk space in GB.
+    """
+    total, used, free = shutil.disk_usage("/")
+    available_space = free / (1024**3)
+    return available_space
 
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass

@@ -38,6 +38,7 @@ from src.Util import (
     getCPUInfo,
     videosPath,
     checkForWritePermissions,
+    getAvailableDiskSpace,
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -137,6 +138,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + "\n"
             + "RAM: "
             + getRAMAmount()
+            + "\n"
+            + "Available Disk Space: "
+            + str(round(getAvailableDiskSpace(),2)) + "GB"
             + "\n"
             + "-------------------------------------------\n"
             + "Software Information: \n"
