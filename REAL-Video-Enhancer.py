@@ -384,7 +384,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         """
 
-        fileFilter = "Video files (*.mp4 *.mov *.webm)"
+        fileFilter = "Video files (*.mp4 *.mov *.webm *.mkv)"
         inputFile, _ = QFileDialog.getOpenFileName(
             parent=self,
             caption="Select File",
