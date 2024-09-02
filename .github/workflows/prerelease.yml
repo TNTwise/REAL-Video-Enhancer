@@ -58,12 +58,12 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/main/
+        run: cp -r backend dist/REAL-Video-Enhancer/
       
       - name: compress archive
         run: |
             cd dist
-            tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip main
+            tar -a -c -f REAL-Video-Enhancer-2.0-Windows.zip REAL-Video-Enhancer
             cd ..
             cp dist/REAL-Video-Enhancer-2.0-Windows.zip REAL-Video-Enhancer-2.0-Windows.zip
 
