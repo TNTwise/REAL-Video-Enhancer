@@ -28,36 +28,7 @@ class DownloadDependencies:
     def __init__(self):
         createDirectory(os.path.join(currentDirectory(), "python"))
         createDirectory(os.path.join(currentDirectory(), "bin"))
-
-    def get_total_dependencies(self, packages):
-        total_dependencies = 0
-
-        for package in packages:
-            try:
-                # Run pip show command and capture the output
-                result = subprocess.run(
-                    [pythonPath(), "-m", "pip", "show", "-v", package],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-
-                # Parse the output to get the dependencies
-                output = result.stdout.split("\n")
-                dependencies = [
-                    line.split(": ")[1]
-                    for line in output
-                    if line.startswith("Requires: ")
-                ]
-
-                # If there are dependencies, add their count to the total
-                if dependencies:
-                    total_dependencies += len(dependencies[0].split(", "))
-
-            except subprocess.CalledProcessError:
-                print(f"Warning: Package '{package}' not found or error occurred.")
-
-        return total_dependencies
+        createDirectory(os.path.join(currentDirectory(), "pip_cache"))
 
     def downloadBackend(self, tag):
         """
@@ -141,6 +112,7 @@ class DownloadDependencies:
             "install",
             "-U",
             "--no-warn-script-location",
+            "--cache-dir=" + os.path.join(currentDirectory(), "pip_cache"),
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
