@@ -1,5 +1,5 @@
 import os
-from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath, backendDirectory
+from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath, backendDirectory, isFlatpak
 from .version import version
 
 
@@ -11,6 +11,10 @@ class BackendHandler:
         self.parent.downloadTorchROCmBtn.setEnabled(getPlatform() == "linux")
         if getPlatform() == "darwin":
             self.parent.downloadTorchCUDABtn.setEnabled(False)
+            self.parent.downloadTensorRTBtn.setEnabled(False)
+        if isFlatpak():
+            self.parent.downloadTorchCUDABtn.setEnabled(False)
+            self.parent.downloadTorchROCmBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
 
     def setupBackendDeps(self):
