@@ -123,9 +123,9 @@ def getCPUInfo() -> str:
 
 def pythonPath() -> str:
     return (
-        os.path.join(cwd, "python", "python", "bin", "python3")
-        if getPlatform() == "darwin" or getPlatform() == "linux"
-        else os.path.join(cwd, "python", "python", "python.exe")
+        os.path.join(cwd, "python", "python", "python.exe")
+        if getPlatform() == "win32"
+        else os.path.join(cwd, "python", "python", "bin", "python3")
     )
 
 
@@ -156,9 +156,9 @@ def ffmpegPath() -> str:
         case "win32":
             return os.path.join(cwd, "bin", "ffmpeg.exe")
         case "darwin":
-            return os.path.join(cwd, "bin", "ffmpeg-macos-bin")
+            return os.path.join(cwd, "bin", "ffmpeg")
         case _:
-            return None
+            return os.path.join(cwd, "bin", "ffmpeg")
 
 
 def copy(prev: str, new: str):
