@@ -20,6 +20,10 @@ try:
     from .UpscaleTorch import UpscalePytorch
 except ImportError:
     log("WARN: unable to import pytorch.")
+try:
+    from .UpscaleONNX import UpscaleONNX
+except ImportError:
+    log("WARN: unable to import directml.")
 
 
 class Render(FFMpegRender):
@@ -241,6 +245,12 @@ class Render(FFMpegRender):
             )
             self.setupRender = self.returnFrame
             self.upscale = upscaleNCNN.Upscale
+        if self.backend == "directml":
+            upscaleONNX = UpscaleONNX(modelPath=self.upscaleModel)
+            self.upscaleTimes = upscaleONNX.getScale()
+            self.setupRender = upscaleONNX.bytesToFrame
+            self.upscale = upscaleONNX.renderTensor
+            
 
     def setupInterpolate(self):
         log("Setting up Interpolation")
@@ -278,3 +288,4 @@ class Render(FFMpegRender):
             self.setupRender = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifePytorch.process
+        

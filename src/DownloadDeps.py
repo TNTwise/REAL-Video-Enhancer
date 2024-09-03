@@ -245,7 +245,7 @@ class DownloadDependencies:
 
     def downloadDirectMLDeps(self):
         directMLDeps = [
-            "onnxruntime-directml"
+            "onnxruntime-directml",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(directMLDeps)
 

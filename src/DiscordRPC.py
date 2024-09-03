@@ -4,24 +4,21 @@ import signal
 from contextlib import contextmanager
 import os
 from .Util import log
-
+import threading
 
 class TimeoutException(Exception):
     pass
-
-
 @contextmanager
 def time_limit(seconds):
-    def signal_handler(signum, frame):
+    def timeout_handler():
         raise TimeoutException("Timed out!")
 
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
+    timer = threading.Timer(seconds, timeout_handler)
+    timer.start()
     try:
         yield
     finally:
-        signal.alarm(0)
-
+        timer.cancel()
 
 def start_discordRPC(mode:str, videoName:str, backend:str):
     """
