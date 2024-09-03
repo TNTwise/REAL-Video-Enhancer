@@ -60,5 +60,5 @@ def start_discordRPC(mode: str, videoName: str, backend: str):
 
     # The presence will stay on as long as the program is running
     # Can only update rich presence every 15 seconds
-    except TimeoutException as e:
+    except Exception as e:
         log("Timed out!")
