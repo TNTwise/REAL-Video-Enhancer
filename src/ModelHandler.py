@@ -155,6 +155,23 @@ tensorrtUpscaleModels = {
         "Compact",
     ),
 }
+onnxInterpolateModels = {
+    "RIFE 4.22 (Recommended Model)": (
+        "rife422_v2_ensembleFalse_op20_clamp.onnx",
+        "rife422_v2_ensembleFalse_op20_clamp.onnx",
+        1,
+        "rife422-lite",
+    ),
+}
+onnxUpscaleModels = {
+    "SPAN (Animation) (2X)": (
+        "2x_ModernSpanimationV2_clamp_op20.onnx",
+        "2x_ModernSpanimationV2_clamp_op20.onnx",
+        2,
+        "SPAN",
+    ),
+    
+}
 
 def downloadModelsBasedOnInstalledBackend(installed_backends:list):
     if NetworkCheckPopup():
@@ -170,4 +187,9 @@ def downloadModelsBasedOnInstalledBackend(installed_backends:list):
                         DownloadModel(model, pytorchInterpolateModels[model][1], "pytorch")
                     for model in pytorchUpscaleModels:
                         DownloadModel(model, pytorchUpscaleModels[model][1], "pytorch")
+                case "directml":
+                    for model in onnxInterpolateModels:
+                        DownloadModel(model, onnxInterpolateModels[model][1], "onnx")
+                    for model in onnxUpscaleModels:
+                        DownloadModel(model, onnxUpscaleModels[model][1], "onnx")
                 

@@ -18,7 +18,9 @@ from ..ModelHandler import (
     pytorchInterpolateModels, 
     pytorchUpscaleModels, 
     tensorrtInterpolateModels, 
-    tensorrtUpscaleModels
+    tensorrtUpscaleModels,
+    onnxUpscaleModels,
+    onnxInterpolateModels
     )
 
 
@@ -47,6 +49,8 @@ class ProcessTab:
                     models = pytorchInterpolateModels
                 case "tensorrt":
                     models = tensorrtInterpolateModels
+                case "directml":
+                    models = onnxInterpolateModels
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
@@ -56,6 +60,8 @@ class ProcessTab:
                     models = pytorchUpscaleModels
                 case "tensorrt":
                     models = tensorrtUpscaleModels
+                case "directml":
+                    models = onnxUpscaleModels
         return models
 
     def QConnect(self, method: str, backend: str):

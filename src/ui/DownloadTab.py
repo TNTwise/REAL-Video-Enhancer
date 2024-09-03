@@ -25,8 +25,11 @@ class DownloadTab:
         self.parent.downloadTorchROCmBtn.clicked.connect(
             lambda: self.download("torch_rocm")
         )
+        self.parent.downloadDirectMLBtn.clicked.connect(
+            lambda: self.download("directml")
+        )
         self.parent.downloadAllModelsBtn.clicked.connect(
-            lambda: downloadModelsBasedOnInstalledBackend(["ncnn","pytorch","tensorrt"])
+            lambda: downloadModelsBasedOnInstalledBackend(["ncnn","pytorch","tensorrt","directml"])
         )
         self.parent.downloadSomeModelsBasedOnInstalledBackendbtn.clicked.connect(
             lambda: downloadModelsBasedOnInstalledBackend(self.installed_backends)
@@ -50,5 +53,7 @@ class DownloadTab:
                     self.downloadDeps.downloadTensorRTDeps()
                 case "torch_rocm":
                     self.downloadDeps.downloadPyTorchROCmDeps()
+                case "directml":
+                    self.downloadDeps.downloadDirectMLDeps()
             RegularQTPopup("Download Complete\nPlease restart the application to apply changes.")
         

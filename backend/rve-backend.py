@@ -9,6 +9,7 @@ from src.Util import (
     checkForNCNN,
     checkForTensorRT,
     check_bfloat16_support,
+    checkForDirectML,
 )
 
 
@@ -46,6 +47,10 @@ class HandleApplication:
                 availableBackends.append("ncnn")
                 printMSG += f"NCNN Version: 20220729\n"
                 from rife_ncnn_vulkan_python import Rife
+            if checkForDirectML():
+                availableBackends.append("directml")
+                import onnxruntime as ort
+                printMSG += f"ONNXruntime Version: {ort.__version__}\n"
             if checkForPytorch():
                 import torch
 
@@ -112,7 +117,7 @@ class HandleApplication:
         parser.add_argument(
             "-b",
             "--backend",
-            help="backend used to upscale image. (pytorch/ncnn/tensorrt, default=pytorch)",
+            help="backend used to upscale image. (pytorch/ncnn/tensorrt/directml, default=pytorch)",
             default="pytorch",
             type=str,
         )
@@ -217,6 +222,12 @@ class HandleApplication:
                 from upscale_ncnn_py import UPSCALE
             except ImportError as e:
                 raise ImportError(f"Cannot use NCNN as the backend! {e}")
+
+        if self.args.backend == "directml":
+            try:
+                import onnxruntime as ort
+            except ImportError as e:
+                raise ImportError(f"Cannot use DirectML as the backend! {e}")
 
         if os.path.isfile(self.args.output) and not self.args.overwrite:
             raise os.error("Output file already exists!")

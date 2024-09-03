@@ -243,6 +243,12 @@ class DownloadDependencies:
             + self.getTensorRTDeps()  # Has to be in this order, because i skip dependency check for torchvision
         )
 
+    def downloadDirectMLDeps(self):
+        directMLDeps = [
+            "onnxruntime-directml"
+        ] + self.getPlatformIndependentDeps()
+        self.pipInstall(directMLDeps)
+
     def downloadNCNNDeps(self):
         """
         Installs:

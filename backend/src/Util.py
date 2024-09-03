@@ -96,6 +96,26 @@ def check_bfloat16_support() -> bool:
     except RuntimeError:
         return False
 
+def checkForDirectML() -> bool:
+    """
+    Function that checks if the onnxruntime DirectML backend is available
+    """
+    try:
+        import onnxruntime as ort
+
+        # Check if DirectML execution provider is available
+        providers = ort.get_available_providers()
+        if 'DmlExecutionProvider' in providers:
+            return True
+        else:
+            log("DirectML execution provider not available")
+            return False
+    except ImportError as e:
+        log(str(e))
+        return False
+    except Exception as e:
+        log(str(e))
+        return False
 
 def checkForNCNN() -> bool:
     """

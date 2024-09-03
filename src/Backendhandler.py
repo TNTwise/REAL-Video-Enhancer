@@ -16,6 +16,8 @@ class BackendHandler:
             self.parent.downloadTorchCUDABtn.setEnabled(False)
             self.parent.downloadTorchROCmBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
+        if getPlatform() != 'win32':
+            self.parent.downloadDirectMLBtn.setEnabled(False) 
 
     def setupBackendDeps(self):
         # need pop up window
@@ -50,6 +52,7 @@ class BackendHandler:
                 pytorchCUDABtnFunc=downloadDependencies.downloadPyTorchCUDADeps,
                 pytorchROCMBtnFunc=downloadDependencies.downloadPyTorchROCmDeps,
                 trtBtnFunc=downloadDependencies.downloadTensorRTDeps,
+                directmlBtnFunc=downloadDependencies.downloadDirectMLDeps,
             )
             return self.recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
                 firstIter=False
