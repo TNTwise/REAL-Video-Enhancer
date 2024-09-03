@@ -441,6 +441,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         pytorchCUDABtnFunc=None,
         pytorchROCMBtnFunc=None,
         trtBtnFunc=None,
+        directmlBtnFunc=None,
     ):
         super().__init__()
         self.setupUi(self)
@@ -451,6 +452,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.downloadTorchCUDABtn.clicked.connect(pytorchCUDABtnFunc)
         self.downloadTorchROCmBtn.clicked.connect(pytorchROCMBtnFunc)
         self.downloadTensorRTBtn.clicked.connect(trtBtnFunc)
+        self.downloadDirectMLBtn.clicked.connect(directmlBtnFunc)
         self.pushButton.clicked.connect(self.doneEvent)
         self.setStyleSheet(styleSheet())
         self.setWindowTitle("Select Dependencies")
@@ -580,8 +582,31 @@ class DownloadDepsDialog(QtWidgets.QDialog):
 
         self.label_10 = QLabel(self.pytorchBackendInstallerContainer_4)
         self.label_10.setObjectName("label_10")
-
         self.horizontalLayout_10.addWidget(self.label_10)
+        
+        self.pytorchBackendInstallerContainer_5 = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer_5.setObjectName(
+            "pytorchBackendInstallerContainer_4"
+        )
+        self.horizontalLayout_11 = QHBoxLayout(self.pytorchBackendInstallerContainer_5)
+        self.horizontalLayout_11.setObjectName("horizontalLayout_11")
+        self.downloadDirectMLBtn = QPushButton(self.pytorchBackendInstallerContainer_5)
+        self.downloadDirectMLBtn.setObjectName("downloadDirectMLBtn")
+        sizePolicy.setHeightForWidth(
+            self.downloadDirectMLBtn.sizePolicy().hasHeightForWidth()
+        )
+        self.downloadDirectMLBtn.setSizePolicy(sizePolicy)
+        self.downloadDirectMLBtn.setMaximumSize(QSize(50, 16777215))
+        self.downloadDirectMLBtn.setIcon(icon)
+        self.downloadDirectMLBtn.setIconSize(QSize(30, 30))
+
+        self.horizontalLayout_11.addWidget(self.downloadDirectMLBtn)
+
+        self.label_11 = QLabel(self.pytorchBackendInstallerContainer_5)
+        self.label_11.setObjectName("label_11")
+
+        self.horizontalLayout_11.addWidget(self.label_11)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.horizontalSpacer = QSpacerItem(
@@ -597,6 +622,8 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.horizontalLayout.addWidget(self.pushButton)
 
         self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer_4)
+
+        self.verticalLayout_11.addWidget(self.pytorchBackendInstallerContainer_5)
 
         self.verticalLayout.addWidget(self.backendSelectContainer)
 
@@ -640,6 +667,14 @@ class DownloadDepsDialog(QtWidgets.QDialog):
             QCoreApplication.translate(
                 "Dialog",
                 "NCNN Vulkan (All GPUs, Slower inference, small download)",
+                None,
+            )
+        )
+        self.downloadDirectMLBtn.setText("")
+        self.label_11.setText(
+            QCoreApplication.translate(
+                "Dialog",
+                "DirectML (All DirectX12 capable GPUs, faster inference, small download, Windows only)",
                 None,
             )
         )
