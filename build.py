@@ -4,6 +4,7 @@ import sys
 import os
 import subprocess
 import sys
+import shutil
 
 import urllib.request
 
@@ -111,9 +112,14 @@ def clean():
     print("Cleaning up")
     os.remove("get-pip.py")
 
+def checkIfExeExists(exe):
+   path = shutil.which(exe)
+   return path is not None
+   
 
 install_pip()
-python_version = "python3.10" if getPlatform() != "win32" else "python3"
+linux_and_mac_py_ver = "python3.10"
+python_version = linux_and_mac_py_ver if getPlatform() != "win32" and checkIfExeExists(linux_and_mac_py_ver) else "python3"
 create_venv(python_version=python_version)
 install_pip_in_venv()
 install_requirements_in_venv()
