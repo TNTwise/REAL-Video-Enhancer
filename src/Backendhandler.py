@@ -26,10 +26,12 @@ class BackendHandler:
             self.parent.downloadTensorRTBtn.setEnabled(False)
         
         #disable as it is not complete
-        self.parent.downloadDirectMLBtn.setEnabled(False)
-        if getPlatform() != "win32":
+        try:
             self.parent.downloadDirectMLBtn.setEnabled(False)
-
+            if getPlatform() != "win32":
+                self.parent.downloadDirectMLBtn.setEnabled(False)
+        except Exception as e:
+            print(e)
     def setupBackendDeps(self):
         # need pop up window
         from .DownloadDeps import DownloadDependencies

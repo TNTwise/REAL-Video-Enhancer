@@ -444,15 +444,16 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         directmlBtnFunc=None,
     ):
         super().__init__()
-        self.setupUi(self)
+        self.setupUi()
         self.closeEventOrig = self.closeEvent
         self.closeEvent = self.closeEventExit
         # pair btns
+        self.downloadDirectMLBtn.clicked.connect(directmlBtnFunc)
         self.downloadNCNNBtn.clicked.connect(ncnnDownloadBtnFunc)
         self.downloadTorchCUDABtn.clicked.connect(pytorchCUDABtnFunc)
         self.downloadTorchROCmBtn.clicked.connect(pytorchROCMBtnFunc)
         self.downloadTensorRTBtn.clicked.connect(trtBtnFunc)
-        self.downloadDirectMLBtn.clicked.connect(directmlBtnFunc)
+        
         self.pushButton.clicked.connect(self.doneEvent)
         self.setStyleSheet(styleSheet())
         self.setWindowTitle("Select Dependencies")
@@ -465,11 +466,34 @@ class DownloadDepsDialog(QtWidgets.QDialog):
     def doneEvent(self):
         self.closeEventOrig(QtGui.QCloseEvent())
 
-    def setupUi(self, Dialog):
-        self.verticalLayout = QVBoxLayout(self)
-        self.verticalLayout.setObjectName("verticalLayout")
+    def setupUi(self):
         self.backendSelectContainer = QWidget(self)
         self.backendSelectContainer.setObjectName("backendSelectContainer")
+        self.pytorchBackendInstallerContainer_5 = QWidget(self.backendSelectContainer)
+        self.pytorchBackendInstallerContainer_5.setObjectName(
+            "pytorchBackendInstallerContainer_4"
+        )
+        self.downloadDirectMLBtn = QPushButton(self.pytorchBackendInstallerContainer_5)
+        icon = QIcon()
+        icon.addFile(":/icons/icons/download.svg", QSize(), QIcon.Normal, QIcon.Off)
+        
+        
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        
+        
+        self.downloadDirectMLBtn.setObjectName("downloadDirectMLBtn")
+        sizePolicy.setHeightForWidth(
+            self.downloadDirectMLBtn.sizePolicy().hasHeightForWidth()
+        )
+        self.downloadDirectMLBtn.setSizePolicy(sizePolicy)
+        self.downloadDirectMLBtn.setMaximumSize(QSize(50, 16777215))
+        self.downloadDirectMLBtn.setIcon(icon)
+        self.downloadDirectMLBtn.setIconSize(QSize(30, 30))
+        self.verticalLayout = QVBoxLayout(self)
+        self.verticalLayout.setObjectName("verticalLayout")
+        
         self.verticalLayout_11 = QVBoxLayout(self.backendSelectContainer)
         self.verticalLayout_11.setObjectName("verticalLayout_11")
         self.label_4 = QLabel(self.backendSelectContainer)
@@ -496,9 +520,13 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         )
         self.downloadTorchCUDABtn.setSizePolicy(sizePolicy)
         self.downloadTorchCUDABtn.setMaximumSize(QSize(50, 16777215))
+        sizePolicy.setHeightForWidth(
+            self.downloadTorchCUDABtn.sizePolicy().hasHeightForWidth()
+        )
         icon = QIcon()
         icon.addFile(":/icons/icons/download.svg", QSize(), QIcon.Normal, QIcon.Off)
         self.downloadTorchCUDABtn.setIcon(icon)
+        
         self.downloadTorchCUDABtn.setIconSize(QSize(30, 30))
 
         self.horizontalLayout_6.addWidget(self.downloadTorchCUDABtn)
@@ -584,21 +612,10 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.label_10.setObjectName("label_10")
         self.horizontalLayout_10.addWidget(self.label_10)
 
-        self.pytorchBackendInstallerContainer_5 = QWidget(self.backendSelectContainer)
-        self.pytorchBackendInstallerContainer_5.setObjectName(
-            "pytorchBackendInstallerContainer_4"
-        )
+        
         self.horizontalLayout_11 = QHBoxLayout(self.pytorchBackendInstallerContainer_5)
         self.horizontalLayout_11.setObjectName("horizontalLayout_11")
-        self.downloadDirectMLBtn = QPushButton(self.pytorchBackendInstallerContainer_5)
-        self.downloadDirectMLBtn.setObjectName("downloadDirectMLBtn")
-        sizePolicy.setHeightForWidth(
-            self.downloadDirectMLBtn.sizePolicy().hasHeightForWidth()
-        )
-        self.downloadDirectMLBtn.setSizePolicy(sizePolicy)
-        self.downloadDirectMLBtn.setMaximumSize(QSize(50, 16777215))
-        self.downloadDirectMLBtn.setIcon(icon)
-        self.downloadDirectMLBtn.setIconSize(QSize(30, 30))
+        
 
         self.horizontalLayout_11.addWidget(self.downloadDirectMLBtn)
 
