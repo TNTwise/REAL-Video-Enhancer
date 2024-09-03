@@ -64,83 +64,80 @@ class UpscalePytorch:
         trt_workspace_size: int = 0,
         trt_cache_dir: str = modelsDirectory(),
     ):
-        self.stream = torch.cuda.Stream()
-        self.prepareStream = torch.cuda.Stream()
-        with torch.cuda.stream(self.prepareStream):
-            if device == "default":
-                if torch.cuda.is_available():
-                    device = torch.device(
-                        "cuda", 0
-                    )  # 0 is the device index, may have to change later
-                else:
-                    device = torch.device("cpu")
+        
+        if device == "default":
+            if torch.cuda.is_available():
+                device = torch.device(
+                    "cuda", 0
+                )  # 0 is the device index, may have to change later
             else:
-                decice = torch.device(device)
-            printAndLog("Using device: " + str(device))
-            self.tile_pad = tile_pad
-            self.dtype = self.handlePrecision(precision)
-            self.device = device
-            model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
+                device = torch.device("cpu")
+        else:
+            decice = torch.device(device)
+        printAndLog("Using device: " + str(device))
+        self.tile_pad = tile_pad
+        self.dtype = self.handlePrecision(precision)
+        self.device = device
+        model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
 
-            self.width = width
-            self.height = height
+        self.width = width
+        self.height = height
 
-            if backend == "tensorrt":
-                import tensorrt as trt
-                import torch_tensorrt
+        if backend == "tensorrt":
+            import tensorrt as trt
+            import torch_tensorrt
 
-                trt_engine_path = os.path.join(
-                    os.path.realpath(trt_cache_dir),
-                    (
-                        f"{os.path.basename(modelPath)}"
-                        + f"_{width}x{height}"
-                        + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
-                        + f"_{torch.cuda.get_device_name(device)}"
-                        + f"_trt-{trt.__version__}"
-                        + (
-                            f"_workspace-{trt_workspace_size}"
-                            if trt_workspace_size > 0
-                            else ""
-                        )
-                        + ".ts"
-                    ),
+            trt_engine_path = os.path.join(
+                os.path.realpath(trt_cache_dir),
+                (
+                    f"{os.path.basename(modelPath)}"
+                    + f"_{width}x{height}"
+                    + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
+                    + f"_{torch.cuda.get_device_name(device)}"
+                    + f"_trt-{trt.__version__}"
+                    + (
+                        f"_workspace-{trt_workspace_size}"
+                        if trt_workspace_size > 0
+                        else ""
+                    )
+                    + ".ts"
+                ),
+            )
+
+            if not os.path.isfile(trt_engine_path):
+                inputs = [
+                    torch.zeros(
+                        (1, 3, self.height, self.width),
+                        dtype=self.dtype,
+                        device=device,
+                    )
+                ]
+                dummy_input_cpu_fp32 = [
+                    torch.zeros(
+                        (1, 3, 32, 32),
+                        dtype=torch.float32,
+                        device="cpu",
+                    )
+                ]
+
+                module = torch.jit.trace(model.float().cpu(), dummy_input_cpu_fp32)
+                module.to(device=self.device, dtype=self.dtype)
+                module = torch_tensorrt.compile(
+                    module,
+                    ir="ts",
+                    inputs=inputs,
+                    enabled_precisions={self.dtype},
+                    device=torch_tensorrt.Device(gpu_id=0),
+                    workspace_size=trt_workspace_size,
+                    truncate_long_and_double=True,
+                    min_block_size=1,
                 )
 
-                if not os.path.isfile(trt_engine_path):
-                    inputs = [
-                        torch.zeros(
-                            (1, 3, self.height, self.width),
-                            dtype=self.dtype,
-                            device=device,
-                        )
-                    ]
-                    dummy_input_cpu_fp32 = [
-                        torch.zeros(
-                            (1, 3, 32, 32),
-                            dtype=torch.float32,
-                            device="cpu",
-                        )
-                    ]
+                torch.jit.save(module, trt_engine_path)
 
-                    module = torch.jit.trace(model.float().cpu(), dummy_input_cpu_fp32)
-                    module.to(device=self.device, dtype=self.dtype)
-                    module = torch_tensorrt.compile(
-                        module,
-                        ir="ts",
-                        inputs=inputs,
-                        enabled_precisions={self.dtype},
-                        device=torch_tensorrt.Device(gpu_id=0),
-                        workspace_size=trt_workspace_size,
-                        truncate_long_and_double=True,
-                        min_block_size=1,
-                    )
+            model = torch.jit.load(trt_engine_path)
 
-                    torch.jit.save(module, trt_engine_path)
-
-                model = torch.jit.load(trt_engine_path)
-
-            self.model = model
-        self.prepareStream.synchronize()
+        self.model = model
 
     def handlePrecision(self, precision):
         if precision == "auto":
@@ -179,9 +176,7 @@ class UpscalePytorch:
         )
 
     def tensorToNPArray(self, image: torch.Tensor) -> np.array:
-        with torch.cuda.stream(self.prepareStream):
-            image = image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
-        self.prepareStream.syncronize()
+        image = image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
         return image
 
     @torch.inference_mode()
@@ -191,21 +186,19 @@ class UpscalePytorch:
 
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
-        with torch.cuda.stream(self.stream):
-            output = self.renderImage(image)
-            output = (
-                output.squeeze(0)
-                .permute(1, 2, 0)
-                .float()
-                .clamp(0.0, 1.0)
-                .mul(255)
-                .byte()
-                .contiguous()
-                .detach()
-                .cpu()
-                .numpy()
-            )
-        self.stream.synchronize()
+        output = self.renderImage(image)
+        output = (
+            output.squeeze(0)
+            .permute(1, 2, 0)
+            .float()
+            .clamp(0.0, 1.0)
+            .mul(255)
+            .byte()
+            .contiguous()
+            .detach()
+            .cpu()
+            .numpy()
+        )
         return output
 
     def getScale(self):

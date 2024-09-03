@@ -24,6 +24,9 @@ class BackendHandler:
             self.parent.downloadTorchCUDABtn.setEnabled(False)
             self.parent.downloadTorchROCmBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
+        
+        #disable as it is not complete
+        self.parent.downloadDirectMLBtn.setEnabled(False)
         if getPlatform() != "win32":
             self.parent.downloadDirectMLBtn.setEnabled(False)
 
