@@ -138,7 +138,7 @@ class InterpolateRifeTorch:
             # caching the timestep tensor in a dict with the timestep as a float for the key
             self.timestepDict = {}
             for n in range(self.ceilInterpolateFactor):
-                timestep = 1 / (self.ceilInterpolateFactor - n)
+                timestep =   n / (self.ceilInterpolateFactor)
                 timestep_tens = torch.full(
                     (1, 1, self.ph, self.pw),
                     timestep,

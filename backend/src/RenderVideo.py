@@ -176,7 +176,8 @@ class Render(FFMpegRender):
             self.transitionFrame = self.transitionQueue.get()
         except AttributeError:
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
-        self.frame0 = self.frameSetupFunction(self.readQueue.get())
+        self.frame0 = self.readQueue.get()
+        self.setup_frame0 = self.frameSetupFunction(self.frame0)
 
         for frameNum in range(self.totalInputFrames - 1):
             frame1 = self.readQueue.get()
@@ -185,23 +186,24 @@ class Render(FFMpegRender):
             setup_frame1 = self.frameSetupFunction(frame1)
             if frameNum != self.transitionFrame:
                 for n in range(self.ceilInterpolateFactor):
-                    timestep = 1 / (self.ceilInterpolateFactor - n)
-                    if timestep == 1:
-                        self.writeQueue.put(frame1)
+                    timestep =   n / (self.ceilInterpolateFactor)
+                    if timestep == 0:
+                        self.writeQueue.put(self.frame0)
                         continue
 
-                    frame = self.interpolate(self.frame0, setup_frame1, timestep)
+                    frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
                     self.writeQueue.put(frame)
             else:
                 # uncache the cached frame
-                self.undoSetup(frame1)
+                self.undoSetup(self.frame0)
                 for n in range(self.ceilInterpolateFactor):
-                    self.writeQueue.put(frame1)
+                    self.writeQueue.put(self.frame0)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                     self.transitionFrame = self.transitionQueue.get_nowait()
                 except Empty:
                     self.transitionFrame = None
-            self.frame0 = setup_frame1
+            self.frame0 = frame1
+            self.setup_frame0 = setup_frame1
 
         self.writeQueue.put(None)
         log("Finished Interpolation")
