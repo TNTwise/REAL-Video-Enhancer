@@ -19,13 +19,13 @@ V2 Alpha 2 New Look!:
 </p>
 <h1>Features: </h1>
 <ul>
-  <li> <strong>NEW!</strong> CUDA support. </li>
-  <li> <strong>NEW!</strong> MacOS support. </li>
+  <li> <strong>NEW!</strong> Windows support. </li> 
+  <li> CUDA support. </li>
+  <li> MacOS support. </li>
   <li>Support for Ubuntu 20.04+ on AppImage and Flatpak. </li>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
   <li> Preview that shows latest frame that has been rendered. </li>
-  <li> Enhancing straight from a YouTube link or a video URL.  </li>
 </ul>
 
 ## Benchmarks: (RIFE NCNN)
@@ -58,11 +58,11 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 
 # Cloning:
 ```
-git clone https://github.com/TNTwise/REAL-Video-Enhancer --branch main
+git clone https://github.com/TNTwise/REAL-Video-Enhancer
 ```
 # Building:
 ```
-python3 build.py
+python3 build.py --build_exe
 ```
 ## Download the Latest PRE-Release release here:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease">https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease</a>
@@ -73,17 +73,15 @@ python3 build.py
   <li> <a rel="noopener noreferrer" href="https://ffmpeg.org/" target="_blank" >FFMpeg</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/nihui/rife-ncnn-vulkan" target="_blank" >rife-ncnn-vulkan</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/yt-dlp/yt-dlp" target="_blank" >yt-dlp</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar" target="_blank">Styler00dollar (For RIFE models [4.1-4.5],[4.7-4.12-lite]) and Sudo Shuffle Span</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/ifrnet-ncnn-vulkan" target="_blank" >ifrnet-ncnn-vulkan</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/hzwer/Practical-RIFE" target="_blank" >RIFE</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/realcugan-ncnn-vulkan" target="_blank" >realcugan-ncnn-vulkan</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/bilibili/ailab/tree/main/Real-CUGAN" target="_blank" >REAL-Cugan</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter (For CUDA implementation code, TRT upscaling code and non image extraction NCNN code in v1)</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter for inspiration</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Final2x/realesrgan-ncnn-py" target="_blank">RealESRGAN NCNN python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/media2x/rife-ncnn-vulkan-python" target="_blank">rife ncnn vulkan python</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/WolframRhodium" target="_blank">WolframRhodium for rife v2 code.</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting rife v2 to older versions of rife</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For rife TRT inference code)</a></li>
