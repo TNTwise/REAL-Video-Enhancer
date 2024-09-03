@@ -13,10 +13,7 @@
 
 <strong>REAL Video Enhancer</strong>  is a redesigned and enhanced version of the original Rife ESRGAN App for Linux. This program offers convenient access to frame interpolation and upscaling functionalities on Linux, and is an alternative to outdated software like <a rel="noopener noreferrer" href="https://nmkd.itch.io/flowframes" target="_blank" >Flowframes</a> or <a rel="noopener noreferrer" href="https://github.com/mafiosnik777/enhancr" target="_blank">enhancr</a> on Windows.
 <p align=center>
-  <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/main/Screenshots/mainmenu.png" width = "100%">
-</p>
-<p align=center>
-  <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/main/Screenshots/settings.png" width = "100%">
+  <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/2.0/icons/demo.png" width = "100%">
 </p>
 <h1>Features: </h1>
 <ul>
