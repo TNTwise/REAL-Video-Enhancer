@@ -39,8 +39,8 @@ class ProcessTab:
         self.currentFrame = 0
 
         # get default backend
-        self.QConnect(method=method, backend=backend)
-        self.switchInterpolationAndUpscale(method=method, backend=backend)
+        self.QConnect()
+        self.switchInterpolationAndUpscale()
 
     def getTotalModels(self, method: str, backend: str) -> dict:
         """
@@ -71,7 +71,7 @@ class ProcessTab:
                     models = onnxUpscaleModels
         return models
 
-    def QConnect(self, method: str, backend: str):
+    def QConnect(self):
         # connect file select buttons
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
@@ -80,16 +80,15 @@ class ProcessTab:
         cbs = (self.parent.backendComboBox, self.parent.methodComboBox)
         for combobox in cbs:
             combobox.currentIndexChanged.connect(
-                lambda: self.switchInterpolationAndUpscale(
-                    method=method, backend=backend
-                )
+                self.switchInterpolationAndUpscale
             )
-        # connect gui switching
+        
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
             self.parent.updateVideoGUIDetails
         )
+        self.parent.modelComboBox.currentIndexChanged.connect(self.parent.updateVideoGUIDetails)
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
@@ -97,7 +96,7 @@ class ProcessTab:
         except AttributeError:
             printAndLog("No render process!")
 
-    def switchInterpolationAndUpscale(self, method: str, backend: str):
+    def switchInterpolationAndUpscale(self):
         """
         Called every render, gets the correct model based on the backend and the method.
         """
