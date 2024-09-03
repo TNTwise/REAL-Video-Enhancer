@@ -12,15 +12,29 @@ import psutil
 import cpuinfo
 import distro
 import webbrowser
+
 homedir = os.path.expanduser("~")
+
+
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
+
+
 if isFlatpak():
-    cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-Enhancer")
+    cwd = os.path.join(
+        os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
+    )
     if not os.path.exists(cwd):
-        cwd = os.path.join(os.path.expanduser("~"), ".var", "app", "io.github.tntwise.REAL-Video-EnhancerV2")
+        cwd = os.path.join(
+            os.path.expanduser("~"),
+            ".var",
+            "app",
+            "io.github.tntwise.REAL-Video-EnhancerV2",
+        )
 else:
     cwd = os.getcwd()
+
+
 def getAvailableDiskSpace() -> float:
     """
     Returns the available disk space in GB.
@@ -29,34 +43,39 @@ def getAvailableDiskSpace() -> float:
     available_space = free / (1024**3)
     return available_space
 
+
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
     pass
+
 
 def backendDirectory():
     """
     returns cwd except when running in flatpak, then it returns the flatpak bin directory
     """
-    
+
     if isFlatpak():
         return "/app/bin/backend"
     else:
         return os.path.join(cwd, "backend")
 
-def downloadFile(link,downloadLocation):
+
+def downloadFile(link, downloadLocation):
     response = requests.get(
-            link,
-            stream=True,
-        )
+        link,
+        stream=True,
+    )
     printAndLog("Downloading: " + link)
     with open(downloadLocation, "wb") as f:
         chunk_size = 1024
         for chunk in response.iter_content(chunk_size=chunk_size):
             f.write(chunk)
 
+
 def downloadTempDirectory() -> str:
     tmppath = os.path.join(cwd, "temp")
     createDirectory(tmppath)
     return tmppath
+
 
 def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
     """
@@ -442,6 +461,7 @@ def openLink(link: str):
     """
     webbrowser.open(link)
 
+
 def checkForWritePermissions(dir):
     """
     Checks for write permissions in the current directory.
@@ -453,7 +473,6 @@ def checkForWritePermissions(dir):
 
     i = 2  # change this to 1 to debug flatpak
     if "FLATPAK_ID" in os.environ or i == 1:
-
         with open("/.flatpak-info", "r") as f:
             result = f.readlines()
 

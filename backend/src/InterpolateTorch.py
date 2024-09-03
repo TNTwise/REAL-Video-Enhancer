@@ -123,7 +123,10 @@ class InterpolateRifeTorch:
             scale = 0.5
         with torch.cuda.stream(self.prepareStream):
             state_dict = torch.load(
-                interpolateModelPath, map_location=self.device, weights_only=True, mmap=True
+                interpolateModelPath,
+                map_location=self.device,
+                weights_only=True,
+                mmap=True,
             )
 
             tmp = max(32, int(32 / scale))
@@ -135,11 +138,14 @@ class InterpolateRifeTorch:
             # caching the timestep tensor in a dict with the timestep as a float for the key
             self.timestepDict = {}
             for n in range(self.ceilInterpolateFactor):
-                    timestep = 1 / (self.ceilInterpolateFactor - n)
-                    timestep_tens = torch.full(
-                        (1, 1, self.ph, self.pw), timestep, dtype=self.dtype, device=self.device
-                    )
-                    self.timestepDict[timestep] = timestep_tens
+                timestep = 1 / (self.ceilInterpolateFactor - n)
+                timestep_tens = torch.full(
+                    (1, 1, self.ph, self.pw),
+                    timestep,
+                    dtype=self.dtype,
+                    device=self.device,
+                )
+                self.timestepDict[timestep] = timestep_tens
             # detect what rife arch to use
             match interpolateArch.lower():
                 case "rife46":
@@ -177,12 +183,16 @@ class InterpolateRifeTorch:
                     device=self.device,
                 )
                 tenHorizontal = (
-                    torch.linspace(-1.0, 1.0, self.pw, dtype=self.dtype, device=self.device)
+                    torch.linspace(
+                        -1.0, 1.0, self.pw, dtype=self.dtype, device=self.device
+                    )
                     .view(1, 1, 1, self.pw)
                     .expand(-1, -1, self.ph, -1)
                 ).to(dtype=self.dtype, device=self.device)
                 tenVertical = (
-                    torch.linspace(-1.0, 1.0, self.ph, dtype=self.dtype, device=self.device)
+                    torch.linspace(
+                        -1.0, 1.0, self.ph, dtype=self.dtype, device=self.device
+                    )
                     .view(1, 1, self.ph, 1)
                     .expand(-1, -1, -1, self.pw)
                 ).to(dtype=self.dtype, device=self.device)
@@ -210,7 +220,6 @@ class InterpolateRifeTorch:
                     dim=1,
                 ).to(device=self.device, dtype=self.dtype)
 
-
             self.flownet = IFNet(
                 scale=scale,
                 ensemble=ensemble,
@@ -223,7 +232,9 @@ class InterpolateRifeTorch:
             )
 
             state_dict = {
-                k.replace("module.", ""): v for k, v in state_dict.items() if "module." in k
+                k.replace("module.", ""): v
+                for k, v in state_dict.items()
+                if "module." in k
             }
             self.flownet.load_state_dict(state_dict=state_dict, strict=False)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
@@ -300,7 +311,6 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
         with torch.cuda.stream(self.stream):
-            
             timestep = self.timestepDict[timestep]
             output = self.flownet(img0, img1, timestep)
             output = self.tensor_to_frame(output)

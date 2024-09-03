@@ -51,7 +51,6 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
 
-
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Main window class for the REAL Video Enhancer application.
 
@@ -107,9 +106,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 firstIter=True
             )
         )
-        
 
-        icon_path = ":/icons/icons/logo-v2.svg" 
+        icon_path = ":/icons/icons/logo-v2.svg"
         self.setWindowIcon(QIcon(icon_path))
         QApplication.setWindowIcon(QIcon(icon_path))
         self.setWindowTitle("REAL Video Enhancer")
@@ -140,7 +138,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + getRAMAmount()
             + "\n"
             + "Available Disk Space: "
-            + str(round(getAvailableDiskSpace(),2)) + "GB"
+            + str(round(getAvailableDiskSpace(), 2))
+            + "GB"
             + "\n"
             + "-------------------------------------------\n"
             + "Software Information: \n"
@@ -325,13 +324,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.progressBar.setRange(
                     0,
                     # only set the range to multiply the frame count if the method is interpolate
-                    int(self.videoFrameCount * math.ceil(self.interpolationMultiplierSpinBox.value()))
+                    int(
+                        self.videoFrameCount
+                        * math.ceil(self.interpolationMultiplierSpinBox.value())
+                    )
                     if method == "Interpolate"
                     else self.videoFrameCount,
                 )
                 self.disableProcessPage()
-                
-                
+
                 self.processTab.run(
                     inputFile=self.inputFileText.text(),
                     outputPath=self.outputFileText.text(),
@@ -357,12 +358,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.processTab.workerThread.quit()
             self.processTab.workerThread.wait()
         except AttributeError:
-            pass # pass just incase internet error caused a skip
+            pass  # pass just incase internet error caused a skip
         # reset image preview
         self.previewLabel.clear()
         self.startRenderButton.setEnabled(True)
         self.enableProcessPage()
-    
+
     def disableProcessPage(self):
         self.processSettingsContainer.setDisabled(True)
 

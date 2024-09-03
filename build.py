@@ -7,8 +7,12 @@ import sys
 
 import urllib.request
 
+
 def python_path():
-    return "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3"
+    return (
+        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3"
+    )
+
 
 def download_file(url, destination):
     print(f"Downloading file from {url}")

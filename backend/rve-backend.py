@@ -10,6 +10,7 @@ from src.Util import (
     checkForTensorRT,
     check_bfloat16_support,
     checkForDirectML,
+    checkForDirectMLHalfPrecisionSupport,
 )
 
 
@@ -41,6 +42,7 @@ class HandleApplication:
                 trt_optimization_level=self.args.tensorrt_opt_profile,
             )
         else:
+            half_prec_supp = False
             availableBackends = []
             printMSG = ""
             if checkForNCNN():
@@ -50,7 +52,9 @@ class HandleApplication:
             if checkForDirectML():
                 availableBackends.append("directml")
                 import onnxruntime as ort
+
                 printMSG += f"ONNXruntime Version: {ort.__version__}\n"
+                half_prec_supp = checkForDirectMLHalfPrecisionSupport()
             if checkForPytorch():
                 import torch
 
@@ -71,7 +75,7 @@ class HandleApplication:
                     else:
                         printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
 
-                printMSG += f"Half precision support: {half_prec_supp}\n"
+            printMSG += f"Half precision support: {half_prec_supp}\n"
             print("Available Backends: " + str(availableBackends))
             print(printMSG)
 

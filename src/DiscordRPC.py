@@ -6,8 +6,11 @@ import os
 from .Util import log
 import threading
 
+
 class TimeoutException(Exception):
     pass
+
+
 @contextmanager
 def time_limit(seconds):
     def timeout_handler():
@@ -20,7 +23,8 @@ def time_limit(seconds):
     finally:
         timer.cancel()
 
-def start_discordRPC(mode:str, videoName:str, backend:str):
+
+def start_discordRPC(mode: str, videoName: str, backend: str):
     """
     Attempts to connect to discord for RPC suppor
     Args:
@@ -47,7 +51,9 @@ def start_discordRPC(mode:str, videoName:str, backend:str):
                 RPC.connect()  # Start the handshake loop
 
                 RPC.update(
-                    state=f"{mode} Video", details=f"Backend: {backend}", large_image="logo-v2"
+                    state=f"{mode} Video",
+                    details=f"Backend: {backend}",
+                    large_image="logo-v2",
                 )
             except exceptions.DiscordNotFound:
                 pass

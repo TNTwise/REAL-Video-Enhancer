@@ -51,7 +51,7 @@ from PySide6.QtWidgets import (
     QWidget,
     QSpacerItem,
     QCheckBox,
-    QGridLayout
+    QGridLayout,
 )
 
 from .QTstyle import styleSheet
@@ -583,7 +583,7 @@ class DownloadDepsDialog(QtWidgets.QDialog):
         self.label_10 = QLabel(self.pytorchBackendInstallerContainer_4)
         self.label_10.setObjectName("label_10")
         self.horizontalLayout_10.addWidget(self.label_10)
-        
+
         self.pytorchBackendInstallerContainer_5 = QWidget(self.backendSelectContainer)
         self.pytorchBackendInstallerContainer_5.setObjectName(
             "pytorchBackendInstallerContainer_4"
@@ -682,8 +682,6 @@ class DownloadDepsDialog(QtWidgets.QDialog):
     # retranslateUi
 
 
-
-
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
         super().__init__()
@@ -695,12 +693,14 @@ class RegularQTPopup(QtWidgets.QDialog):
         self.setLayout(layout)
         self.exec()
 
+
 def NetworkCheckPopup(hostname="https://raw.githubusercontent.com") -> bool:
-        if not networkCheck(hostname=hostname):
-            RegularQTPopup("No Network Connection")
-            return False
-        # return true if network connection
-        return True
+    if not networkCheck(hostname=hostname):
+        RegularQTPopup("No Network Connection")
+        return False
+    # return true if network connection
+    return True
+
 
 if __name__ == "__main__":
     DownloadProgressPopup(

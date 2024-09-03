@@ -84,7 +84,7 @@ class UpscalePytorch:
 
             self.width = width
             self.height = height
-            
+
             if backend == "tensorrt":
                 import tensorrt as trt
                 import torch_tensorrt
@@ -109,7 +109,9 @@ class UpscalePytorch:
                 if not os.path.isfile(trt_engine_path):
                     inputs = [
                         torch.zeros(
-                            (1, 3, self.height, self.width), dtype=self.dtype, device=device
+                            (1, 3, self.height, self.width),
+                            dtype=self.dtype,
+                            device=device,
                         )
                     ]
                     dummy_input_cpu_fp32 = [
@@ -178,13 +180,12 @@ class UpscalePytorch:
 
     def tensorToNPArray(self, image: torch.Tensor) -> np.array:
         with torch.cuda.stream(self.prepareStream):
-            image =  image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
+            image = image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
         self.prepareStream.syncronize()
         return image
 
     @torch.inference_mode()
     def renderImage(self, image: torch.Tensor) -> torch.Tensor:
-        
         upscaledImage = self.model(image)
         return upscaledImage
 
@@ -192,7 +193,7 @@ class UpscalePytorch:
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
         with torch.cuda.stream(self.stream):
             output = self.renderImage(image)
-            output =  (
+            output = (
                 output.squeeze(0)
                 .permute(1, 2, 0)
                 .float()

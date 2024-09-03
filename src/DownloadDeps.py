@@ -47,16 +47,15 @@ class DownloadDependencies:
             moved_backed_folder = os.path.join(currentDirectory(), "backend")
 
             printAndLog("Downloading backend")
-            #urllib.request.urlretrieve(backend_url, main_zip)
+            # urllib.request.urlretrieve(backend_url, main_zip)
             downloadFile(link=backend_url, downloadLocation=main_zip)
             printAndLog("Extracting backend")
             extractTarGZ(main_zip)
-            #printAndLog("Extracting backend")
-            #shutil.unpack_archive(main_zip, main_folder)
-            #printAndLog("Moving Backend")
-            #move(orig_backend_folder, moved_backed_folder)
-            #printAndLog("Cleaning up")
-            
+            # printAndLog("Extracting backend")
+            # shutil.unpack_archive(main_zip, main_folder)
+            # printAndLog("Moving Backend")
+            # move(orig_backend_folder, moved_backed_folder)
+            # printAndLog("Cleaning up")
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
@@ -118,7 +117,7 @@ class DownloadDependencies:
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))
         printAndLog("Total Dependencies: " + str(totalDeps))
-        
+
         DisplayCommandOutputPopup(
             command=command,
             title="Download Dependencies",
@@ -173,7 +172,7 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
             "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240826%2Bcu124-py3-none-any.whl"
+            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240826%2Bcu124-py3-none-any.whl",
         ]
         torchCUDAWindowsDeps = [
             "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
@@ -194,10 +193,6 @@ class DownloadDependencies:
             case "linux":
                 return torchCUDALinuxDeps + self.getPlatformIndependentDeps()
 
-    
-
-    
-
     def getTensorRTDeps(self):
         """
         Installs:
@@ -215,11 +210,13 @@ class DownloadDependencies:
                     "tensorrt_cu12_bindings==10.3.0",
                 ]
                 # default
-                #tensorRTDeps += [  # "--no-deps",
+                # tensorRTDeps += [  # "--no-deps",
                 #    "torch_tensorrt==2.4.0"]
-                
+
                 # nightly
-                tensorRTDeps += ["https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl"]
+                tensorRTDeps += [
+                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl"
+                ]
             case "win32":
                 tensorRTDeps = [
                     "tensorrt==10.3.0",
@@ -236,7 +233,7 @@ class DownloadDependencies:
 
     def downloadPyTorchCUDADeps(self):
         self.pipInstall(self.getPyTorchCUDADeps())
-    
+
     def downloadTensorRTDeps(self):
         self.pipInstall(
             self.getPyTorchCUDADeps()
@@ -246,6 +243,8 @@ class DownloadDependencies:
     def downloadDirectMLDeps(self):
         directMLDeps = [
             "onnxruntime-directml",
+            "onnx",
+            "onnxconverter-common",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(directMLDeps)
 
@@ -258,9 +257,8 @@ class DownloadDependencies:
         ncnnDeps = [
             "rife-ncnn-vulkan-python-tntwise==1.4.1",
             "upscale_ncnn_py==1.2.0",
-        ]  + self.getPlatformIndependentDeps()
+        ] + self.getPlatformIndependentDeps()
         self.pipInstall(ncnnDeps)
-
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [
@@ -270,8 +268,6 @@ class DownloadDependencies:
         ]
         if getPlatform() == "linux":
             self.pipInstall(rocmLinuxDeps + self.getPlatformIndependentDeps())
-
-    
 
 
 if __name__ == "__main__":

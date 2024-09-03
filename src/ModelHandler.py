@@ -1,5 +1,6 @@
 from .DownloadModels import DownloadModel
 from .ui.QTcustom import NetworkCheckPopup
+
 """
 Key value pairs of the model name in the GUI
 Data inside the tuple:
@@ -15,7 +16,12 @@ ncnnInterpolateModels = {
     "RIFE 4.18": ("rife-v4.18", "rife-v4.18.tar.gz", 1, "rife413"),
     "RIFE 4.20": ("rife-v4.20", "rife-v4.20.tar.gz", 1, "rife420"),
     "RIFE 4.21": ("rife-v4.21", "rife-v4.21.tar.gz", 1, "rife421"),
-    "RIFE 4.22 (Latest General Model)": ("rife-v4.22", "rife-v4.22.tar.gz", 1, "rife421"),
+    "RIFE 4.22 (Latest General Model)": (
+        "rife-v4.22",
+        "rife-v4.22.tar.gz",
+        1,
+        "rife421",
+    ),
     "RIFE 4.22-lite (Recommended Model)": (
         "rife-v4.22-lite",
         "rife-v4.22-lite.tar.gz",
@@ -170,10 +176,10 @@ onnxUpscaleModels = {
         2,
         "SPAN",
     ),
-    
 }
 
-def downloadModelsBasedOnInstalledBackend(installed_backends:list):
+
+def downloadModelsBasedOnInstalledBackend(installed_backends: list):
     if NetworkCheckPopup():
         for backend in installed_backends:
             match backend:
@@ -182,9 +188,11 @@ def downloadModelsBasedOnInstalledBackend(installed_backends:list):
                         DownloadModel(model, ncnnInterpolateModels[model][1], "ncnn")
                     for model in ncnnUpscaleModels:
                         DownloadModel(model, ncnnUpscaleModels[model][1], "ncnn")
-                case "pytorch": # no need for tensorrt as it uses pytorch models
+                case "pytorch":  # no need for tensorrt as it uses pytorch models
                     for model in pytorchInterpolateModels:
-                        DownloadModel(model, pytorchInterpolateModels[model][1], "pytorch")
+                        DownloadModel(
+                            model, pytorchInterpolateModels[model][1], "pytorch"
+                        )
                     for model in pytorchUpscaleModels:
                         DownloadModel(model, pytorchUpscaleModels[model][1], "pytorch")
                 case "directml":
@@ -192,4 +200,3 @@ def downloadModelsBasedOnInstalledBackend(installed_backends:list):
                         DownloadModel(model, onnxInterpolateModels[model][1], "onnx")
                     for model in onnxUpscaleModels:
                         DownloadModel(model, onnxUpscaleModels[model][1], "onnx")
-                

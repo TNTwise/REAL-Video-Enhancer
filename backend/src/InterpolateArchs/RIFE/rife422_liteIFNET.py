@@ -161,15 +161,14 @@ class IFNet(nn.Module):
 
         self.pw = pw
         self.ph = ph
+
     def forward(self, img0, img1, timestep):
-        
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, h, w))
         fs_2 = self.encode(imgs_2)
         fs = torch.reshape(fs_2, (1, 8, h, w))
 
-        
         warped_img0 = img0
         warped_img1 = img1
         flows = None

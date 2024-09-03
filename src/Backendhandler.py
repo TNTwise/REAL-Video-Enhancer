@@ -1,5 +1,13 @@
 import os
-from .Util import getVendor, getPlatform, checkIfDeps, printAndLog, pythonPath, backendDirectory, isFlatpak
+from .Util import (
+    getVendor,
+    getPlatform,
+    checkIfDeps,
+    printAndLog,
+    pythonPath,
+    backendDirectory,
+    isFlatpak,
+)
 from .version import version
 
 
@@ -16,8 +24,8 @@ class BackendHandler:
             self.parent.downloadTorchCUDABtn.setEnabled(False)
             self.parent.downloadTorchROCmBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
-        if getPlatform() != 'win32':
-            self.parent.downloadDirectMLBtn.setEnabled(False) 
+        if getPlatform() != "win32":
+            self.parent.downloadDirectMLBtn.setEnabled(False)
 
     def setupBackendDeps(self):
         # need pop up window

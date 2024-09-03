@@ -13,20 +13,19 @@ from time import sleep
 
 
 def convertTime(remaining_time):
-        """
-        Converts seconds to hours, minutes and seconds
-        """
-        hours = remaining_time // 3600
-        remaining_time -= 3600 * hours
-        minutes = remaining_time // 60
-        remaining_time -= minutes * 60
-        seconds = remaining_time
-        if minutes < 10:
-            minutes = str(f"0{minutes}")
-        if seconds < 10:
-            seconds = str(f"0{seconds}")
-        return hours, minutes, seconds
-
+    """
+    Converts seconds to hours, minutes and seconds
+    """
+    hours = remaining_time // 3600
+    remaining_time -= 3600 * hours
+    minutes = remaining_time // 60
+    remaining_time -= minutes * 60
+    seconds = remaining_time
+    if minutes < 10:
+        minutes = str(f"0{minutes}")
+    if seconds < 10:
+        seconds = str(f"0{seconds}")
+    return hours, minutes, seconds
 
 
 class FFMpegRender:
@@ -126,7 +125,7 @@ class FFMpegRender:
         self.shm = shm
         self.inputFrameChunkSize = inputFrameChunkSize
         self.outputFrameChunkSize = outputFrameChunkSize
-        
+
         self.totalOutputFrames = self.totalInputFrames * self.ceilInterpolateFactor
 
         self.writeOutPipe = self.outputFile == "PIPE"
@@ -241,7 +240,6 @@ class FFMpegRender:
 
         # Update the length of the last printed line
         self.last_length = len(data)
-    
 
     def calculateETA(self):
         """

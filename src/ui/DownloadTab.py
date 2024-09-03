@@ -3,6 +3,7 @@ from .QTcustom import RegularQTPopup, NetworkCheckPopup
 from ..DownloadDeps import DownloadDependencies
 from ..ModelHandler import downloadModelsBasedOnInstalledBackend
 
+
 class DownloadTab:
     def __init__(
         self,
@@ -29,7 +30,9 @@ class DownloadTab:
             lambda: self.download("directml")
         )
         self.parent.downloadAllModelsBtn.clicked.connect(
-            lambda: downloadModelsBasedOnInstalledBackend(["ncnn","pytorch","tensorrt","directml"])
+            lambda: downloadModelsBasedOnInstalledBackend(
+                ["ncnn", "pytorch", "tensorrt", "directml"]
+            )
         )
         self.parent.downloadSomeModelsBasedOnInstalledBackendbtn.clicked.connect(
             lambda: downloadModelsBasedOnInstalledBackend(self.installed_backends)
@@ -43,7 +46,9 @@ class DownloadTab:
         Returns:
         - None
         """
-        if NetworkCheckPopup("https://pypi.org/"): # check for network before installing
+        if NetworkCheckPopup(
+            "https://pypi.org/"
+        ):  # check for network before installing
             match dep:
                 case "ncnn":
                     self.downloadDeps.downloadNCNNDeps()
@@ -55,5 +60,6 @@ class DownloadTab:
                     self.downloadDeps.downloadPyTorchROCmDeps()
                 case "directml":
                     self.downloadDeps.downloadDirectMLDeps()
-            RegularQTPopup("Download Complete\nPlease restart the application to apply changes.")
-        
+            RegularQTPopup(
+                "Download Complete\nPlease restart the application to apply changes."
+            )

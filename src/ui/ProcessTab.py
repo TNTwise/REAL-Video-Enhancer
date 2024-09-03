@@ -8,20 +8,27 @@ from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt
 
 from .QTcustom import UpdateGUIThread
-from ..Util import pythonPath, currentDirectory, modelsPath, printAndLog, log, backendDirectory
+from ..Util import (
+    pythonPath,
+    currentDirectory,
+    modelsPath,
+    printAndLog,
+    log,
+    backendDirectory,
+)
 from ..DownloadModels import DownloadModel
 from .SettingsTab import Settings
 from ..DiscordRPC import start_discordRPC
 from ..ModelHandler import (
     ncnnInterpolateModels,
-    ncnnUpscaleModels, 
-    pytorchInterpolateModels, 
-    pytorchUpscaleModels, 
-    tensorrtInterpolateModels, 
+    ncnnUpscaleModels,
+    pytorchInterpolateModels,
+    pytorchUpscaleModels,
+    tensorrtInterpolateModels,
     tensorrtUpscaleModels,
     onnxUpscaleModels,
-    onnxInterpolateModels
-    )
+    onnxInterpolateModels,
+)
 
 
 class ProcessTab:
@@ -30,7 +37,7 @@ class ProcessTab:
         self.imagePreviewSharedMemoryID = "/image_preview" + str(os.getpid())
         self.renderTextOutputList = None
         self.currentFrame = 0
-        
+
         # get default backend
         self.QConnect(method=method, backend=backend)
         self.switchInterpolationAndUpscale(method=method, backend=backend)
@@ -168,8 +175,7 @@ class ProcessTab:
             backend=backend,
         )
         # self.ffmpegWriteThread()
-        
-            
+
         writeThread = Thread(
             target=lambda: self.renderToPipeThread(
                 method=method, backend=backend, interpolateTimes=interpolationTimes
@@ -177,7 +183,6 @@ class ProcessTab:
         )
         writeThread.start()
         self.startGUIUpdate()
-        
 
     def startGUIUpdate(self):
         self.workerThread = UpdateGUIThread(
@@ -193,7 +198,6 @@ class ProcessTab:
             self.workerThread.wait
         )  # need quit and wait to allow process to exit safely
         self.workerThread.start()
-
 
     def splitListIntoStringWithNewLines(self, string_list: list[str]):
         # Join the strings with newline characters
@@ -243,7 +247,7 @@ class ProcessTab:
                 f"{self.imagePreviewSharedMemoryID}",
             ]
         if self.settings["scene_change_detection_enabled"] == "False":
-            command += ["--sceneDetectMethod","none"]
+            command += ["--sceneDetectMethod", "none"]
         if self.benchmarkMode:
             command += ["--benchmark"]
         self.renderProcess = subprocess.Popen(
