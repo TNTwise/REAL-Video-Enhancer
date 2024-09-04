@@ -175,7 +175,7 @@ class SubprocessThread(QThread):
         self.command = command
 
     def run(self):
-        process = subprocess.Popen(
+        self.process = subprocess.Popen(
             self.command,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
@@ -184,13 +184,13 @@ class SubprocessThread(QThread):
             universal_newlines=True,
         )
         totalOutput = ""
-        for line in iter(process.stdout.readline, ""):
+        for line in iter(self.process.stdout.readline, ""):
             totalOutput += line
             self.output.emit(line.strip())
             printAndLog(line.strip())
         self.fullOutput.emit(totalOutput)
-        process.stdout.close()
-        return_code = process.wait()
+        self.process.stdout.close()
+        return_code = self.process.wait()
         self.output.emit(f"Process finished with return code {return_code}")
 
 
@@ -402,6 +402,7 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         # end of bullshit
 
     def closeEvent(self, x):
+        self.workerThread.process.terminate()
         self.workerThread.quit()
         self.workerThread.deleteLater()
         self.workerThread.wait()
