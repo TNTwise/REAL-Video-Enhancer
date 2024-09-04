@@ -252,6 +252,7 @@ class InterpolateRifeTorch:
                         + f"_scale-{scale}"
                         + f"_ensemble-{ensemble}"
                         + f"_{torch.cuda.get_device_name(self.device)}"
+                        + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
                         + (
                             f"_workspace-{trt_workspace_size}"
@@ -268,7 +269,7 @@ class InterpolateRifeTorch:
                             if trt_optimization_level is not None
                             else ""
                         )
-                        + ".ts"
+                        + ".dyn"
                     ),
                 )
                 if not os.path.isfile(trt_engine_path):
@@ -346,6 +347,4 @@ class InterpolateRifeTorch:
         self.prepareStream.synchronize()
         return frame
 
-    def enqueueV3(self, context, bindings, stream, input_shapes):
-        # Use the non-default stream for TensorRT inference
-        context.enqueueV3(bindings, self.stream.cuda_stream, input_shapes)
+

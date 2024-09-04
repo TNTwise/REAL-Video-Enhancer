@@ -221,5 +221,5 @@ class IFNet(nn.Module):
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
         frame = warped_img0 * mask + warped_img1 * (1 - mask)
-        frame = frame[:, :, : self.height, : self.width]
-        return frame.squeeze(0).permute(1, 2, 0).mul(255).float()
+        frame = frame[:, :, : self.height, : self.width][0]
+        return frame.permute(1, 2, 0).mul(255).float()
