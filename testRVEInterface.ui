@@ -1376,6 +1376,9 @@ QDoubleSpinBox::down-button {
                    <property name="decimals">
                     <number>1</number>
                    </property>
+                   <property name="maximum">
+                    <double>10.000000000000000</double>
+                   </property>
                   </widget>
                  </item>
                 </layout>
