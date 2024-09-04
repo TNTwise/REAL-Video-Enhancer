@@ -83,6 +83,12 @@ class SettingsTab:
                 "True" if self.parent.discord_rich_presence.isChecked() else "False",
             )
         )
+        self.parent.scene_detection_threshold.valueChanged.connect(
+            lambda: self.settings.writeSetting(
+                "scene_detection_threshold",
+                str(self.parent.scene_detection_threshold.value()),
+            )
+        )
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
 
     def resetSettings(self):
@@ -106,6 +112,9 @@ class SettingsTab:
         self.parent.discord_rich_presence.setChecked(
             self.settings.settings["discord_rich_presence"] == "True"
         )
+        self.parent.scene_detection_threshold.setValue(
+            float(self.settings.settings["scene_detection_threshold"])
+        )
 
 
 class Settings:
@@ -123,6 +132,7 @@ class Settings:
             "preview_enabled": "True",
             "scene_change_detection_enabled": "True",
             "discord_rich_presence": "True",
+            "scene_detection_threshold": "2.0",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -131,6 +141,7 @@ class Settings:
             "preview_enabled": ("True", "False"),
             "scene_change_detection_enabled": ("True", "False"),
             "discord_rich_presence": ("True", "False"),
+            "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):

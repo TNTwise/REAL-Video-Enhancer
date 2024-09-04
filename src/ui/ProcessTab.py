@@ -247,6 +247,11 @@ class ProcessTab:
             ]
         if self.settings["scene_change_detection_enabled"] == "False":
             command += ["--sceneDetectMethod", "none"]
+        else:
+            command += [
+                "--sceneDetectSensitivity",
+                self.settings["scene_detection_threshold"],
+            ]
         if self.benchmarkMode:
             command += ["--benchmark"]
         self.renderProcess = subprocess.Popen(

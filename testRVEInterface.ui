@@ -1005,7 +1005,31 @@ background-color:white;
 Line{
 color:white;
 background-color:white;
-}</string>
+}
+QDoubleSpinBox{
+	background-color:#2c313c;
+	padding:5px 10px;
+	border-radius: 10px;
+	color:white;
+}
+QDoubleSpinBox::up-arrow {
+       
+		image: url(:/icons/icons/arrow-up.svg); 
+    }
+QDoubleSpinBox::down-arrow {
+
+        image: url(:/icons/icons/arrow-down.svg); 
+		
+    }
+QDoubleSpinBox::up-button {
+        width: 20px;
+        height: 15px;
+    }
+QDoubleSpinBox::down-button {
+        width: 20px;
+        height: 15px;
+    }
+</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_14">
               <item>
@@ -1291,6 +1315,66 @@ background-color:white;
                   <widget class="QCheckBox" name="scene_change_detection_enabled">
                    <property name="text">
                     <string/>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_7" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_14">
+                 <item>
+                  <widget class="QLabel" name="label_30">
+                   <property name="font">
+                    <font>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Scene Change Detection Enabled</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>319</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_31">
+                   <property name="maximumSize">
+                    <size>
+                     <width>25</width>
+                     <height>25</height>
+                    </size>
+                   </property>
+                   <property name="toolTip">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scene change detection sensitivity, lower number means it has a higher chance of detecting scene changes, with risk of overdetection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="pixmap">
+                    <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QDoubleSpinBox" name="scene_detection_threshold">
+                   <property name="decimals">
+                    <number>1</number>
                    </property>
                   </widget>
                  </item>
