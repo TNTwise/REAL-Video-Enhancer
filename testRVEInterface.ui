@@ -1332,7 +1332,7 @@ QDoubleSpinBox::down-button {
                     </font>
                    </property>
                    <property name="text">
-                    <string>Scene Change Detection Enabled</string>
+                    <string>Scene Change Detection Threshold</string>
                    </property>
                   </widget>
                  </item>
@@ -1343,7 +1343,7 @@ QDoubleSpinBox::down-button {
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>319</width>
+                     <width>305</width>
                      <height>20</height>
                     </size>
                    </property>
