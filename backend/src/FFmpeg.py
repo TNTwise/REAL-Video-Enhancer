@@ -10,7 +10,7 @@ from multiprocessing import shared_memory
 from .Util import currentDirectory, log, printAndLog
 import time
 from time import sleep
-
+from threading import Thread
 
 def convertTime(remaining_time):
     """
@@ -89,9 +89,8 @@ class FFMpegRender:
         frameSetupFunction=None,
         crf: str = "18",
         sharedMemoryID: str = None,
-        shm: shared_memory.SharedMemory = None,
-        inputFrameChunkSize: int = None,
-        outputFrameChunkSize: int = None,
+        channels=3,
+
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -122,10 +121,16 @@ class FFMpegRender:
         self.crf = crf
         self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
-        self.shm = shm
-        self.inputFrameChunkSize = inputFrameChunkSize
-        self.outputFrameChunkSize = outputFrameChunkSize
-
+        self.sharedMemoryThread = Thread(
+            target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
+        )
+        self.inputFrameChunkSize = self.width * self.height * 3
+        self.outputFrameChunkSize = (
+            self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3
+        )
+        self.shm = shared_memory.SharedMemory(
+            name=self.sharedMemoryID, create=True, size=self.outputFrameChunkSize
+        )
         self.totalOutputFrames = self.totalInputFrames * self.ceilInterpolateFactor
 
         self.writeOutPipe = self.outputFile == "PIPE"

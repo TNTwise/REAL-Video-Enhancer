@@ -103,13 +103,7 @@ class Render(FFMpegRender):
             self.renderThread = Thread(target=self.renderInterpolate)
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
 
-        self.inputFrameChunkSize = self.width * self.height * 3
-        self.outputFrameChunkSize = (
-            self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3
-        )
-        self.shm = shared_memory.SharedMemory(
-            name=self.sharedMemoryID, create=True, size=self.outputFrameChunkSize
-        )
+        
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -122,14 +116,10 @@ class Render(FFMpegRender):
             frameSetupFunction=self.setupRender,
             crf=crf,
             sharedMemoryID=sharedMemoryID,
-            shm=self.shm,
-            inputFrameChunkSize=self.inputFrameChunkSize,
-            outputFrameChunkSize=self.outputFrameChunkSize,
+            channels=3
         )
 
-        self.sharedMemoryThread = Thread(
-            target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
-        )
+        
         self.sharedMemoryThread.start()
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
