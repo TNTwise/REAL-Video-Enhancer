@@ -2,7 +2,7 @@ PySide6==6.7.0
 opencv-python-headless
 requests
 numpy==1.26.4
-cx-Freeze==6.15.16
+cx-Freeze
 lief
 pyinstaller
 psutil
