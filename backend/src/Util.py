@@ -53,6 +53,8 @@ def log(message: str):
 def currentDirectory():
     return cwd
 
+def ffmpegPath() -> str:
+    return os.path.join(currentDirectory(),'bin','ffmpeg')
 
 def modelsDirectory():
     return os.path.join(cwd, "models")

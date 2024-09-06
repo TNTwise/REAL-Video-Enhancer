@@ -1,4 +1,5 @@
 import cv2
+import re
 import os
 import subprocess
 import queue
@@ -7,7 +8,7 @@ import time
 import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
-from .Util import currentDirectory, log, printAndLog
+from .Util import currentDirectory, log, printAndLog, ffmpegPath
 import time
 from time import sleep
 from threading import Thread
@@ -121,12 +122,16 @@ class FFMpegRender:
         self.crf = crf
         self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
+        self.videoPropertiesLocation = os.path.join(currentDirectory(), inputFile + "_VIDEODATA")
+        if not os.path.exists(self.videoPropertiesLocation):
+            os.makedirs(self.videoPropertiesLocation)
+        self.subtitleFiles = []
         self.sharedMemoryThread = Thread(
             target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
         )
-        self.inputFrameChunkSize = self.width * self.height * 3
+        self.inputFrameChunkSize = self.width * self.height * channels
         self.outputFrameChunkSize = (
-            self.width * self.upscaleTimes * self.height * self.upscaleTimes * 3
+            self.width * self.upscaleTimes * self.height * self.upscaleTimes * channels
         )
         self.shm = shared_memory.SharedMemory(
             name=self.sharedMemoryID, create=True, size=self.outputFrameChunkSize
@@ -137,6 +142,51 @@ class FFMpegRender:
 
         self.readQueue = queue.Queue(maxsize=50)
         self.writeQueue = queue.Queue(maxsize=50)
+    
+
+    def get_ffmpeg_streams(self,video_file):
+        """Get a list of streams from the video file using FFmpeg."""
+        try:
+            result = subprocess.run(
+                [ffmpegPath(), '-i', video_file],
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            return result.stderr
+        except Exception as e:
+            print(f"An error occurred while running FFmpeg: {e}")
+            return None
+
+    def extract_subtitles(self,video_file, stream_index, subtitle_file):
+        """Extract a specific subtitle stream from the video file."""
+        try:
+            subprocess.run(
+                [ffmpegPath(), '-i', video_file, '-map', f'0:{stream_index}', subtitle_file],
+                check=True
+            )
+            print(f"Extracted subtitle stream {stream_index} to {subtitle_file}")
+            self.subtitleFiles.append(subtitle_file)
+        except subprocess.CalledProcessError as e:
+            print(f"An error occurred while extracting subtitles: {e}")
+
+    def getVideoSubs(self, video_file):
+
+
+        ffmpeg_output = self.get_ffmpeg_streams(video_file)
+        if not ffmpeg_output:
+            return
+
+        subtitle_stream_pattern = re.compile(r'Stream #0:(\d+).*?Subtitle', re.MULTILINE | re.DOTALL)
+        subtitle_streams = subtitle_stream_pattern.findall(ffmpeg_output)
+
+        if not subtitle_streams:
+            print("No subtitle streams found in the video.")
+            return
+
+        for stream_index in subtitle_streams:
+            subtitle_file = os.path.join(self.videoPropertiesLocation, f'subtitle_{stream_index}.srt')
+            self.extract_subtitles(video_file, stream_index, subtitle_file)
+
 
     def getVideoProperties(self, inputFile: str = None):
         log("Getting Video Properties...")
@@ -158,7 +208,7 @@ class FFMpegRender:
     def getFFmpegReadCommand(self):
         log("Generating FFmpeg READ command...")
         command = [
-            f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
+            f"{ffmpegPath()}",
             "-i",
             f"{self.inputFile}",
             "-f",
@@ -178,7 +228,7 @@ class FFMpegRender:
         if not self.benchmark:
             # maybe i can split this so i can just use ffmpeg normally like with vspipe
             command = [
-                f"{os.path.join(currentDirectory(),'bin','ffmpeg')}",
+                f"{ffmpegPath()}",
                 "-f",
                 "rawvideo",
                 "-pix_fmt",
@@ -193,6 +243,7 @@ class FFMpegRender:
                 "-",
                 "-i",
                 f"{self.inputFile}",
+                ["-i" + subtitle for subtitle in self.subtitleFiles],
                 "-r",
                 f"{self.fps * self.interpolateFactor}",
                 f"-crf",
@@ -206,6 +257,7 @@ class FFMpegRender:
             ]
             for i in self.encoder.split():
                 command.append(i)
+            
             command.append(
                 f"{self.outputFile}",
             )
@@ -306,13 +358,11 @@ class FFMpegRender:
         self.last_length: int = 0
 
         if self.benchmark:
-            # pbar = tqdm(total=self.totalOutputFrames)
             while True:
                 frame = self.writeQueue.get()
                 self.previewFrame = frame
                 if frame is None:
                     break
-                # pbar.update(1)
                 self.framesRendered += 1
         else:
             self.writeProcess = subprocess.Popen(
