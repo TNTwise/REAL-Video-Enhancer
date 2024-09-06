@@ -1,30 +1,12 @@
 from scenedetect import AdaptiveDetector, open_video
 from tqdm import tqdm
-import cv2
 from queue import Queue
-import numpy as np
 from .FFmpeg import FFMpegRender
 from threading import Thread
-from .Util import printAndLog
+from .Util import bytesTo100x100img
+from .NPMean import NPMeanSequential
 from queue import Queue
-class SCDetectNP:
-    def __init__(self):
-        self.i0 = None
-        self.i1 = None
-    def forward(self, img1):
-        if self.i0 is None:
-            self.i0 = img1
-            self.image0mean = np.mean(self.i0)
-            return
-        self.i1 = img1
-        img1mean = np.mean(self.i1)
-        if self.image0mean > img1mean + 20 or self.image0mean < img1mean - 20:
-            self.image0mean = img1mean
-            return True
-        self.image0mean = img1mean
-        return False
-        
-        
+
 
 class SceneDetect(FFMpegRender):
     """
@@ -61,12 +43,7 @@ class SceneDetect(FFMpegRender):
         
         # add frame chunk size to ffmpegrender
     
-    def getFrameTo100x100img(self, image: bytes) -> np.ndarray:
-        frame = np.frombuffer(image,dtype=np.uint8).reshape(self.height, self.width, 3)
-        frame = cv2.resize(
-                frame, dsize=(100, 100)
-            )
-        return frame
+    
 
     def copy_queue(self,original_queue):
         items = []
@@ -117,10 +94,11 @@ class SceneDetect(FFMpegRender):
     def getMeanTransitions(self):
         self.readThread.start()
         sceneChangeQueue = Queue()
-        detector = SCDetectNP()
+        detector = NPMeanSequential()
         for frame_num in tqdm(range(self.totalInputFrames - 1)):
-            frame = self.getFrameTo100x100img(self.readQueue.get())
-            if detector.forward(frame):
+            frame = bytesTo100x100img(self.readQueue.get())
+            detector.forward(frame)
+            if detector.isSceneChange():
                 sceneChangeQueue.put(frame_num-1)
         return sceneChangeQueue
 

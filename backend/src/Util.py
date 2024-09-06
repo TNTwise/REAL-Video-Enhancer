@@ -1,7 +1,8 @@
 import os
 import warnings
 import platform
-
+import numpy as np
+import cv2
 
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
@@ -49,6 +50,12 @@ def log(message: str):
     with open(os.path.join(cwd, "backend_log.txt"), "a") as f:
         f.write(message + "\n")
 
+def bytesTo100x100img(self, image: bytes) -> np.ndarray:
+        frame = np.frombuffer(image,dtype=np.uint8).reshape(self.height, self.width, 3)
+        frame = cv2.resize(
+                frame, dsize=(100, 100)
+            )
+        return frame
 
 def currentDirectory():
     return cwd

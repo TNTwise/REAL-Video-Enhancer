@@ -7,6 +7,7 @@ import math
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
 from .Util import printAndLog, log
+from .NPMean import NPMeanSequential
 
 # try/except imports
 try:
@@ -90,6 +91,7 @@ class Render(FFMpegRender):
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
         self.trt_optimization_level = trt_optimization_level
+        self.npMean = NPMeanSequential
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -136,8 +138,11 @@ class Render(FFMpegRender):
         log("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
-            frame = self.upscale(self.frameSetupFunction(frame))
-            self.writeQueue.put(frame)
+            if self.skipUpscaleIfSameFrame(frame=frame):
+                self.writeQueue.put(self.f0)
+            else:
+                self.f0 = self.upscale(self.frameSetupFunction(self.frame))
+                self.writeQueue.put(self.f0)
         self.writeQueue.put(None)
         log("Finished Upscale")
 
@@ -197,6 +202,11 @@ class Render(FFMpegRender):
 
         self.writeQueue.put(None)
         log("Finished Interpolation")
+    
+    def skipUpscaleIfSameFrame(self, frame):
+        self.npMean.forward(frame)
+        return self.npMean.isMeanEqual()
+            
 
     def setupUpscale(self):
         """
