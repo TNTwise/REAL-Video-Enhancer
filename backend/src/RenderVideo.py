@@ -64,6 +64,7 @@ class Render(FFMpegRender):
         upscaleModel=None,
         interpolateModel=None,
         interpolateFactor: int = 1,
+        tile_size=None,
         # ffmpeg settings
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
@@ -80,6 +81,7 @@ class Render(FFMpegRender):
         self.backend = backend
         self.upscaleModel = upscaleModel
         self.interpolateModel = interpolateModel
+        self.tilesize = tile_size
         self.device = device
         self.precision = precision
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
@@ -91,7 +93,7 @@ class Render(FFMpegRender):
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
         self.trt_optimization_level = trt_optimization_level
-        self.npMean = NPMeanSequential
+        self.npMean = NPMeanSequential()
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -138,7 +140,7 @@ class Render(FFMpegRender):
         log("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
-            '''if self.skipUpscaleIfSameFrame(frame=frame):
+            '''if self.npMean.isEqualImages(frame):
                 self.writeQueue.put(self.f0)
             else:'''
             self.f0 = self.upscale(self.frameSetupFunction(frame))
@@ -203,9 +205,7 @@ class Render(FFMpegRender):
         self.writeQueue.put(None)
         log("Finished Interpolation")
     
-    def skipUpscaleIfSameFrame(self, frame):
-        self.npMean.forward(frame)
-        return self.npMean.isMeanEqual()
+    
             
 
     def setupUpscale(self):
@@ -226,6 +226,7 @@ class Render(FFMpegRender):
                 width=self.width,
                 height=self.height,
                 backend=self.backend,
+                tilesize=self.tilesize,
             )
             self.upscaleTimes = upscalePytorch.getScale()
             self.setupRender = upscalePytorch.bytesToFrame
@@ -244,6 +245,7 @@ class Render(FFMpegRender):
                 gpuid=0,  # might have this be a setting
                 width=self.width,
                 height=self.height,
+                tilesize=self.tilesize
             )
             self.setupRender = self.returnFrame
             self.upscale = upscaleNCNN.Upscale

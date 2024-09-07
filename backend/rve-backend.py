@@ -26,6 +26,7 @@ class HandleApplication:
                 interpolateModel=self.args.interpolateModel,
                 interpolateFactor=self.args.interpolateFactor,
                 upscaleModel=self.args.upscaleModel,
+                tile_size=self.args.tilesize,
                 # backend settings
                 device="default",
                 backend=self.args.backend,
@@ -104,13 +105,7 @@ class HandleApplication:
             help="output video path or PIPE",
             type=str,
         )
-        parser.add_argument(
-            "-t",
-            "--tilesize",
-            help="tile size (default=0)",
-            default=0,
-            type=int,
-        )
+        
         parser.add_argument(
             "-l",
             "--overlap",
@@ -179,6 +174,12 @@ class HandleApplication:
             help="custom encoder",
             default="-c:v libx264",
             type=str,
+        )
+        parser.add_argument(
+            "--tilesize",
+            help="upscale images in smaller chunks, default is the size of the input video",
+            default=0,
+            type=int,
         )
         parser.add_argument(
             "--benchmark",

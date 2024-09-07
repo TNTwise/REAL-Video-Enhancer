@@ -19,18 +19,15 @@ class NPMeanSequential:
         self.image0mean = img1mean
         return False
     
-    def isEqualImages(self,img1):
+    def isEqualImages(self,img1:np.ndarray):
         if self.i0 is None:
             self.i0 = img1
-            self.image0mean = np.mean(self.i0)
             return
-        self.i1 = img1
-        img1mean = np.mean(self.i1)
-        if (self.i0==self.i1).all():
-            self.image0mean = img1mean
-            self.i0 = self.i1
+        self.i1:np.ndarray = img1
+        if np.array_equal(self.i0,self.i1):
+            self.i0:np.ndarray = self.i1
+            print("Skipped upscaling frame")
             return True
         self.i0 = self.i1
-        self.image0mean = img1mean
         return False
 

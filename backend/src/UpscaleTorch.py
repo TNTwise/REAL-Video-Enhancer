@@ -59,6 +59,7 @@ class UpscalePytorch:
         precision: str = "auto",
         width: int = 1920,
         height: int = 1080,
+        tilesize: int = 0,
         backend: str = "pytorch",
         # trt options
         trt_workspace_size: int = 0,
@@ -82,6 +83,7 @@ class UpscalePytorch:
 
         self.width = width
         self.height = height
+        self.tilesize = tilesize
 
         if backend == "tensorrt":
             import tensorrt as trt
@@ -186,7 +188,10 @@ class UpscalePytorch:
 
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
-        output = self.renderImage(image)
+        if self.tilesize == 0:
+            output = self.renderImage(image)
+        else:
+            output = self.renderTiledImage(image)
         output = (
             output.squeeze(0)
             .permute(1, 2, 0)
@@ -208,7 +213,6 @@ class UpscalePytorch:
     def renderTiledImage(
         self,
         image: torch.Tensor,
-        tile_size: int = 32,
     ) -> torch.Tensor:
         """It will first crop input images to tiles, and then process each tile.
         Finally, all the processed tiles are merged into one images.
@@ -222,20 +226,20 @@ class UpscalePytorch:
 
         # start with black image
         output = image.new_zeros(output_shape)
-        tiles_x = math.ceil(width / tile_size)
-        tiles_y = math.ceil(height / tile_size)
+        tiles_x = math.ceil(width / self.tilesize)
+        tiles_y = math.ceil(height / self.tilesize)
 
         # loop over all tiles
         for y in range(tiles_y):
             for x in range(tiles_x):
                 # extract tile from input image
-                ofs_x = x * tile_size
-                ofs_y = y * tile_size
+                ofs_x = x * self.tilesize
+                ofs_y = y * self.tilesize
                 # input tile area on total image
                 input_start_x = ofs_x
-                input_end_x = min(ofs_x + tile_size, width)
+                input_end_x = min(ofs_x + self.tilesize, width)
                 input_start_y = ofs_y
-                input_end_y = min(ofs_y + tile_size, height)
+                input_end_y = min(ofs_y + self.tilesize, height)
 
                 # input tile area on total image with padding
                 input_start_x_pad = max(input_start_x - self.tile_pad, 0)
@@ -258,7 +262,6 @@ class UpscalePytorch:
                 with torch.no_grad():
                     output_tile = self.renderImage(input_tile)
 
-                print(f"\tTile {tile_idx}/{tiles_x * tiles_y}")
 
                 # output tile area on total image
                 output_start_x = input_start_x * self.scale
