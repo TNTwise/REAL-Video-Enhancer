@@ -97,8 +97,7 @@ class SceneDetect(FFMpegRender):
         detector = NPMeanSequential()
         for frame_num in tqdm(range(self.totalInputFrames - 1)):
             frame = bytesTo100x100img(self.readQueue.get())
-            detector.forward(frame)
-            if detector.isSceneChange():
+            if detector.sceneDetect(frame):
                 sceneChangeQueue.put(frame_num-1)
         return sceneChangeQueue
 
