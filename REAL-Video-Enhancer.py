@@ -339,6 +339,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     videoWidth=self.videoWidth,
                     videoHeight=self.videoHeight,
                     videoFps=self.videoFps,
+                    tilingEnabled=self.tilingCheckBox.isChecked(),
+                    tilesize=self.tileSizeComboBox.currentText(),
                     videoFrameCount=self.videoFrameCount,
                     method=method,
                     backend=self.backendComboBox.currentText(),

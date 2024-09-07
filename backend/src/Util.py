@@ -50,8 +50,8 @@ def log(message: str):
     with open(os.path.join(cwd, "backend_log.txt"), "a") as f:
         f.write(message + "\n")
 
-def bytesTo100x100img(self, image: bytes) -> np.ndarray:
-        frame = np.frombuffer(image,dtype=np.uint8).reshape(self.height, self.width, 3)
+def bytesTo100x100img(image: bytes, width, height) -> np.ndarray:
+        frame = np.frombuffer(image,dtype=np.uint8).reshape(height, width, 3)
         frame = cv2.resize(
                 frame, dsize=(100, 100)
             )

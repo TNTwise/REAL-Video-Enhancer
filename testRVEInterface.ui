@@ -692,7 +692,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                      <widget class="QWidget" name="tilingContainer" native="true">
                       <layout class="QHBoxLayout" name="horizontalLayout_16">
                        <property name="spacing">
-                        <number>0</number>
+                        <number>6</number>
                        </property>
                        <property name="leftMargin">
                         <number>0</number>
@@ -747,7 +747,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                           </size>
                          </property>
                          <property name="toolTip">
-                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Perform processing without outputing new video. This tests the raw performance of the inference.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Split up processing upscaled frames into chunks.&lt;/p&gt;&lt;p&gt;Lowers VRAM usage, but also slows down render. &lt;/p&gt;&lt;p&gt;Only use when render failes due to VRAM limits.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                          </property>
                          <property name="text">
                           <string/>

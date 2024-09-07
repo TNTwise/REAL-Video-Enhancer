@@ -82,13 +82,20 @@ class ProcessTab:
             combobox.currentIndexChanged.connect(
                 self.switchInterpolationAndUpscale
             )
-        
+        # set tile size visible to false by default
+        self.parent.tileSizeContainer.setVisible(False)
+        # connect up tilesize container visiable
+        self.parent.tilingCheckBox.stateChanged.connect(
+            lambda: self.parent.tileSizeContainer.setVisible(self.parent.tilingCheckBox.isChecked())
+        )
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
             self.parent.updateVideoGUIDetails
         )
         self.parent.modelComboBox.currentIndexChanged.connect(self.parent.updateVideoGUIDetails)
+
+    
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
@@ -114,8 +121,10 @@ class ProcessTab:
 
         if method.lower() == "interpolate":
             self.parent.interpolationContainer.setVisible(True)
+            self.parent.upscaleContainer.setVisible(False)
         else:
             self.parent.interpolationContainer.setVisible(False)
+            self.parent.upscaleContainer.setVisible(True)
 
         self.parent.updateVideoGUIDetails()
 
@@ -127,6 +136,8 @@ class ProcessTab:
         videoHeight: int,
         videoFps: float,
         videoFrameCount: int,
+        tilesize: int,
+        tilingEnabled: bool,
         method: str,
         backend: str,
         interpolationTimes: int,
@@ -138,6 +149,8 @@ class ProcessTab:
         self.videoWidth = videoWidth
         self.videoHeight = videoHeight
         self.videoFps = videoFps
+        self.tilingEnabled = tilingEnabled
+        self.tilesize = tilesize
         self.videoFrameCount = videoFrameCount
         models = self.getTotalModels(method=method, backend=backend)
 
@@ -230,6 +243,11 @@ class ProcessTab:
                 "--interpolateFactor",
                 "1",
             ]
+            if self.tilingEnabled:
+                command += [
+                    "--tilesize",
+                    f"{self.tilesize}",
+                ]
         if method == "Interpolate":
             command += [
                 "--interpolateModel",

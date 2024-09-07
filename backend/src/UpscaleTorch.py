@@ -3,6 +3,7 @@ import math
 import numpy as np
 import cv2
 import torch as torch
+import torch.nn.functional as F 
 
 
 from src.Util import (
@@ -55,7 +56,7 @@ class UpscalePytorch:
         self,
         modelPath: str,
         device="default",
-        tile_pad: int = 10,
+        tile_pad: int = 0,
         precision: str = "auto",
         width: int = 1920,
         height: int = 1080,
@@ -81,9 +82,23 @@ class UpscalePytorch:
         self.device = device
         model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
 
-        self.width = width
-        self.height = height
+        self.videoWidth = width
+        self.videoHeight = height
         self.tilesize = tilesize
+        self.tile = [self.tilesize, self.tilesize]
+        match self.scale:
+            case 1:
+                modulo = 4
+            case 2:
+                modulo = 2
+            case _:
+                modulo = 1
+        if all(t > 0 for t in self.tile):
+            self.pad_w = math.ceil(min(self.tile[0] + 2 * tile_pad, width) / modulo) * modulo
+            self.pad_h = math.ceil(min(self.tile[1] + 2 * tile_pad, height) / modulo) * modulo
+        else:
+            self.pad_w = width
+            self.pad_h = height
 
         if backend == "tensorrt":
             import tensorrt as trt
@@ -93,7 +108,7 @@ class UpscalePytorch:
                 os.path.realpath(trt_cache_dir),
                 (
                     f"{os.path.basename(modelPath)}"
-                    + f"_{width}x{height}"
+                    + f"_{self.pad_w}x{self.pad_h}"
                     + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
                     + f"_{torch.cuda.get_device_name(device)}"
                     + f"_trt-{trt.__version__}"
@@ -109,7 +124,7 @@ class UpscalePytorch:
             if not os.path.isfile(trt_engine_path):
                 inputs = [
                     torch.zeros(
-                        (1, 3, self.height, self.width),
+                        (1, 3, self.pad_h, self.pad_w),
                         dtype=self.dtype,
                         device=device,
                     )
@@ -170,7 +185,7 @@ class UpscalePytorch:
     def bytesToFrame(self, frame):
         return (
             torch.frombuffer(frame, dtype=torch.uint8)
-            .reshape(self.height, self.width, 3)
+            .reshape(self.videoHeight, self.videoWidth, 3)
             .to(self.device, dtype=self.dtype)
             .permute(2, 0, 1)
             .unsqueeze(0)
@@ -212,76 +227,69 @@ class UpscalePytorch:
     @torch.inference_mode()
     def renderTiledImage(
         self,
-        image: torch.Tensor,
+        img: torch.Tensor,
     ) -> torch.Tensor:
-        """It will first crop input images to tiles, and then process each tile.
-        Finally, all the processed tiles are merged into one images.
+        scale = self.scale
+        tile = self.tile
+        tile_pad = self.tile_pad
 
-        Modified from: https://github.com/ata4/esrgan-launcher
-        """
-        batch, channel, height, width = image.shape
-        output_height = height * self.scale
-        output_width = width * self.scale
-        output_shape = (batch, channel, output_height, output_width)
+        batch, channel, height, width = img.shape
+        output_shape = (batch, channel, height * scale, width * scale)
 
         # start with black image
-        output = image.new_zeros(output_shape)
-        tiles_x = math.ceil(width / self.tilesize)
-        tiles_y = math.ceil(height / self.tilesize)
+        output = img.new_zeros(output_shape)
+
+        tiles_x = math.ceil(width / tile[0])
+        tiles_y = math.ceil(height / tile[1])
 
         # loop over all tiles
         for y in range(tiles_y):
             for x in range(tiles_x):
                 # extract tile from input image
-                ofs_x = x * self.tilesize
-                ofs_y = y * self.tilesize
+                ofs_x = x * tile[0]
+                ofs_y = y * tile[1]
+
                 # input tile area on total image
                 input_start_x = ofs_x
-                input_end_x = min(ofs_x + self.tilesize, width)
+                input_end_x = min(ofs_x + tile[0], width)
                 input_start_y = ofs_y
-                input_end_y = min(ofs_y + self.tilesize, height)
+                input_end_y = min(ofs_y + tile[1], height)
 
                 # input tile area on total image with padding
-                input_start_x_pad = max(input_start_x - self.tile_pad, 0)
-                input_end_x_pad = min(input_end_x + self.tile_pad, width)
-                input_start_y_pad = max(input_start_y - self.tile_pad, 0)
-                input_end_y_pad = min(input_end_y + self.tile_pad, height)
+                input_start_x_pad = max(input_start_x - tile_pad, 0)
+                input_end_x_pad = min(input_end_x + tile_pad, width)
+                input_start_y_pad = max(input_start_y - tile_pad, 0)
+                input_end_y_pad = min(input_end_y + tile_pad, height)
 
                 # input tile dimensions
                 input_tile_width = input_end_x - input_start_x
                 input_tile_height = input_end_y - input_start_y
-                tile_idx = y * tiles_x + x + 1
-                input_tile = image[
-                    :,
-                    :,
-                    input_start_y_pad:input_end_y_pad,
-                    input_start_x_pad:input_end_x_pad,
-                ]
 
-                # upscale tile
-                with torch.no_grad():
-                    output_tile = self.renderImage(input_tile)
+                input_tile = img[:, :, input_start_y_pad:input_end_y_pad, input_start_x_pad:input_end_x_pad]
 
+                h, w = input_tile.shape[2:]
+                input_tile = F.pad(input_tile, (0, self.pad_w - w, 0, self.pad_h - h), "replicate")
+
+                # process tile
+                output_tile = self.model(input_tile)
+
+                output_tile = output_tile[:, :, : h * scale, : w * scale]
 
                 # output tile area on total image
-                output_start_x = input_start_x * self.scale
-                output_end_x = input_end_x * self.scale
-                output_start_y = input_start_y * self.scale
-                output_end_y = input_end_y * self.scale
+                output_start_x = input_start_x * scale
+                output_end_x = input_end_x * scale
+                output_start_y = input_start_y * scale
+                output_end_y = input_end_y * scale
 
                 # output tile area without padding
-                output_start_x_tile = (input_start_x - input_start_x_pad) * self.scale
-                output_end_x_tile = output_start_x_tile + input_tile_width * self.scale
-                output_start_y_tile = (input_start_y - input_start_y_pad) * self.scale
-                output_end_y_tile = output_start_y_tile + input_tile_height * self.scale
+                output_start_x_tile = (input_start_x - input_start_x_pad) * scale
+                output_end_x_tile = output_start_x_tile + input_tile_width * scale
+                output_start_y_tile = (input_start_y - input_start_y_pad) * scale
+                output_end_y_tile = output_start_y_tile + input_tile_height * scale
 
                 # put tile into output image
-                output[
-                    :, :, output_start_y:output_end_y, output_start_x:output_end_x
-                ] = output_tile[
-                    :,
-                    :,
-                    output_start_y_tile:output_end_y_tile,
-                    output_start_x_tile:output_end_x_tile,
+                output[:, :, output_start_y:output_end_y, output_start_x:output_end_x] = output_tile[
+                    :, :, output_start_y_tile:output_end_y_tile, output_start_x_tile:output_end_x_tile
                 ]
+
         return output
