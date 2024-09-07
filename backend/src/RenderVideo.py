@@ -138,11 +138,11 @@ class Render(FFMpegRender):
         log("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
-            if self.skipUpscaleIfSameFrame(frame=frame):
+            '''if self.skipUpscaleIfSameFrame(frame=frame):
                 self.writeQueue.put(self.f0)
-            else:
-                self.f0 = self.upscale(self.frameSetupFunction(self.frame))
-                self.writeQueue.put(self.f0)
+            else:'''
+            self.f0 = self.upscale(self.frameSetupFunction(frame))
+            self.writeQueue.put(self.f0)
         self.writeQueue.put(None)
         log("Finished Upscale")
 

@@ -243,7 +243,7 @@ class FFMpegRender:
                 "-",
                 "-i",
                 f"{self.inputFile}",
-                ["-i" + subtitle for subtitle in self.subtitleFiles],
+                #"""["-i" + subtitle for subtitle in self.subtitleFiles],"""
                 "-r",
                 f"{self.fps * self.interpolateFactor}",
                 f"-crf",
