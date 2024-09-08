@@ -316,6 +316,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif method == "Interpolate":
             interpolateTimes = self.interpolationMultiplierSpinBox.value()
         return interpolateTimes
+    
 
     def startRender(self):
         if self.isVideoLoaded:

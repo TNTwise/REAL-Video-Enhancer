@@ -5,8 +5,9 @@ import re
 
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPropertyAnimation
 
+from .AnimationHandler import AnimationHandler
 from .QTcustom import UpdateGUIThread
 from ..Util import (
     pythonPath,
@@ -37,6 +38,9 @@ class ProcessTab:
         self.imagePreviewSharedMemoryID = "/image_preview" + str(os.getpid())
         self.renderTextOutputList = None
         self.currentFrame = 0
+        self.animationHandler = AnimationHandler()
+        self.tileUpAnimationHandler = AnimationHandler()
+        self.tileDownAnimationHandler = AnimationHandler()
 
         # get default backend
         self.QConnect()
@@ -71,22 +75,29 @@ class ProcessTab:
                     models = onnxUpscaleModels
         return models
 
+    def onTilingSwitch(self):
+        if self.parent.tilingCheckBox.isChecked():
+            self.parent.tileSizeContainer.setVisible(True)
+            self.tileDownAnimationHandler.dropDownAnimation(self.parent.tileSizeContainer)
+        else:
+            self.tileUpAnimationHandler.moveUpAnimation(self.parent.tileSizeContainer)
+            self.parent.tileSizeContainer.setVisible(False)
+            
+
     def QConnect(self):
         # connect file select buttons
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
-        cbs = (self.parent.backendComboBox, self.parent.methodComboBox)
+        cbs = (self.parent.methodComboBox,)
         for combobox in cbs:
             combobox.currentIndexChanged.connect(self.switchInterpolationAndUpscale)
         # set tile size visible to false by default
         self.parent.tileSizeContainer.setVisible(False)
         # connect up tilesize container visiable
         self.parent.tilingCheckBox.stateChanged.connect(
-            lambda: self.parent.tileSizeContainer.setVisible(
-                self.parent.tilingCheckBox.isChecked()
-            )
+            self.onTilingSwitch
         )
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
@@ -122,11 +133,15 @@ class ProcessTab:
         if method.lower() == "interpolate":
             self.parent.interpolationContainer.setVisible(True)
             self.parent.upscaleContainer.setVisible(False)
+            self.animationHandler.dropDownAnimation(self.parent.interpolationContainer)
         else:
             self.parent.interpolationContainer.setVisible(False)
             self.parent.upscaleContainer.setVisible(True)
+            self.animationHandler.dropDownAnimation(self.parent.upscaleContainer)
+            
 
         self.parent.updateVideoGUIDetails()
+
 
     def run(
         self,
