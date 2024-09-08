@@ -76,7 +76,7 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar" target="_blank">Styler00dollar (For RIFE models [4.1-4.5],[4.7-4.12-lite]) and Sudo Shuffle Span</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/hzwer/Practical-RIFE" target="_blank" >RIFE</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter for inspiration</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter for inspiration and mods to rife arch.</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Final2x/realesrgan-ncnn-py" target="_blank">RealESRGAN NCNN python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>

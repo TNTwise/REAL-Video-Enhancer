@@ -189,8 +189,9 @@ class Render(FFMpegRender):
                     frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
                     self.writeQueue.put(frame)
             else:
-                # uncache the cached frame
-                self.undoSetup(self.frame0)
+                
+                self.interpolate(self.setup_frame0, setup_frame1, 0)
+
                 for n in range(self.ceilInterpolateFactor):
                     self.writeQueue.put(self.frame0)
                 try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though

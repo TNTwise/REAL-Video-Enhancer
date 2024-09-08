@@ -53,26 +53,6 @@ class MyPixelShuffle(nn.Module):
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 
-class Head(nn.Module):
-    def __init__(self):
-        super(Head, self).__init__()
-        self.cnn0 = nn.Conv2d(3, 32, 3, 2, 1)
-        self.cnn1 = nn.Conv2d(32, 32, 3, 1, 1)
-        self.cnn2 = nn.Conv2d(32, 32, 3, 1, 1)
-        self.cnn3 = nn.ConvTranspose2d(32, 8, 4, 2, 1)
-        self.relu = nn.LeakyReLU(0.2, True)
-
-    def forward(self, x, feat=False):
-        x0 = self.cnn0(x)
-        x = self.relu(x0)
-        x1 = self.cnn1(x)
-        x = self.relu(x1)
-        x2 = self.cnn2(x)
-        x = self.relu(x2)
-        x3 = self.cnn3(x)
-        if feat:
-            return [x0, x1, x2, x3]
-        return x3
 
 
 class ResConv(nn.Module):
@@ -154,95 +134,56 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.width = width
         self.height = height
-        self.backwarp_tenGrid = backwarp_tenGrid
-        self.tenFlow_div = tenFlow_div
+        self.backWarp = backwarp_tenGrid
+        self.tenFlow = tenFlow_div
+        self.blocks = [self.block0, self.block1, self.block2, self.block3]
+
+        self.paddedHeight = backwarp_tenGrid.shape[2]
+        self.paddedWidth = backwarp_tenGrid.shape[3]
 
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(self, img0, img1, timestep):
+    def forward(self, img0, img1, timestep,f0):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
-        imgs_2 = torch.reshape(imgs, (2, 3, h, w))
-        fs_2 = self.encode(imgs_2)
-        fs = torch.reshape(fs_2, (1, 8, h, w))
-        if self.ensemble:
-            fs_rev = torch.cat(torch.split(fs, [8, 8], dim=1)[::-1], dim=1)
-            imgs_rev = torch.cat([img1, img0], dim=1)
+        imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
+        f1 = self.encode(img1[:, :3])
+        fs = torch.cat([f0, f1], dim=1)
+        fs_2 = torch.reshape(fs, (2, 4, self.paddedHeight, self.paddedWidth))
+        
+
+        flows = None
+        mask = None
 
         flows = None
         mask = None
         blocks = [self.block0, self.block1, self.block2, self.block3]
         for block, scale in zip(blocks, self.scale_list):
             if flows is None:
-                if self.ensemble:
-                    temp_ = torch.cat((imgs_rev, fs_rev, 1 - timestep), 1)
-                    flowss, masks = block(torch.cat((temp, temp_), 0), scale=scale)
-                    flows, flows_ = torch.split(flowss, [1, 1], dim=0)
-                    mask, mask_ = torch.split(masks, [1, 1], dim=0)
-                    flows = (
-                        flows
-                        + torch.cat(torch.split(flows_, [2, 2], dim=1)[::-1], dim=1)
-                    ) / 2
-                    mask = (mask - mask_) / 2
-
-                    flows_rev = torch.cat(
-                        torch.split(flows, [2, 2], dim=1)[::-1], dim=1
-                    )
-                else:
-                    temp = torch.cat((imgs, fs, timestep), 1)
-                    flows, mask = block(temp, scale=scale)
+                
+                temp = torch.cat((imgs, fs, timestep), 1)
+                flows, mask = block(temp, scale=scale)
             else:
-                if self.ensemble:
-                    temp = torch.cat(
-                        (
-                            wimg,
-                            wf,
-                            timestep,
-                            mask,
-                            (flows * (1 / scale) if scale != 1 else flows),
-                        ),
-                        1,
-                    )
-                    temp_ = torch.cat(
-                        (
-                            wimg_rev,
-                            wf_rev,
-                            1 - timestep,
-                            -mask,
-                            (flows_rev * (1 / scale) if scale != 1 else flows_rev),
-                        ),
-                        1,
-                    )
-                    fdss, masks = block(torch.cat((temp, temp_), 0), scale=scale)
-                    fds, fds_ = torch.split(fdss, [1, 1], dim=0)
-                    mask, mask_ = torch.split(masks, [1, 1], dim=0)
-                    fds = (
-                        fds + torch.cat(torch.split(fds_, [2, 2], dim=1)[::-1], dim=1)
-                    ) / 2
-                    mask = (mask - mask_) / 2
-                else:
-                    temp = torch.cat(
-                        (
-                            wimg,
-                            wf,
-                            timestep,
-                            mask,
-                            (flows * (1 / scale) if scale != 1 else flows),
-                        ),
-                        1,
-                    )
-                    fds, mask = block(temp, scale=scale)
+                
+                temp = torch.cat(
+                    (
+                        wimg,
+                        wf,
+                        timestep,
+                        mask,
+                        (flows * (1 / scale) if scale != 1 else flows),
+                    ),
+                    1,
+                )
+                fds, mask = block(temp, scale=scale)
 
                 flows = flows + fds
 
-                if self.ensemble:
-                    flows_rev = torch.cat(
-                        torch.split(flows, [2, 2], dim=1)[::-1], dim=1
-                    )
+               
             precomp = (
-                (self.backwarp_tenGrid + flows.reshape((2, 2, h, w)) * self.tenFlow_div)
+                (self.backWarp + flows.reshape((2, 2, h, w)) * self.tenFlow)
                 .permute(0, 2, 3, 1)
                 .to(dtype=self.dtype)
             )
@@ -275,4 +216,4 @@ class IFNet(nn.Module):
 
         frame = warped_img0 * mask + warped_img1 * (1 - mask)
         frame = frame[:, :, : self.height, : self.width][0]
-        return frame.permute(1, 2, 0).mul(255).float()
+        return frame.permute(1, 2, 0).mul(255).float(), f1

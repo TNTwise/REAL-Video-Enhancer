@@ -9,6 +9,7 @@ from .Util import (
     errorAndLog,
     modelsDirectory,
     check_bfloat16_support,
+    log
 )
 
 torch.set_float32_matmul_precision("high")
@@ -119,6 +120,7 @@ class InterpolateRifeTorch:
         self.stream = torch.cuda.Stream()
         self.prepareStream = torch.cuda.Stream()
         scale = 1
+        self.f1encode = None
         if UHDMode:
             scale = 0.5
         with torch.cuda.stream(self.prepareStream):
@@ -147,6 +149,18 @@ class InterpolateRifeTorch:
                 )
                 self.timestepDict[timestep] = timestep_tens
             # detect what rife arch to use
+            self.inputs = [
+                        torch.zeros(
+                            (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                        torch.zeros(
+                            (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                        torch.zeros(
+                            (1, 1, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    ]
+            log("interp arch"+ interpolateArch.lower())
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
@@ -156,25 +170,57 @@ class InterpolateRifeTorch:
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
                     v1 = False
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    )
+                    self.encode = torch.nn.Sequential(
+                            torch.nn.Conv2d(3, 16, 3, 2, 1),
+                            torch.nn.ConvTranspose2d(16, 4, 4, 2, 1)
+                        ).to(device=self.device, dtype=self.dtype)
                 case "rife413":
-                    from .InterpolateArchs.RIFE.rife413IFNET import IFNet
+                    from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
 
                     v1 = False
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    )
+                    self.encode = Head().to(device=self.device, dtype=self.dtype)
                 case "rife420":
-                    from .InterpolateArchs.RIFE.rife420IFNET import IFNet
+                    from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
 
                     v1 = False
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    )
+                    self.encode = Head().to(device=self.device, dtype=self.dtype)
                 case "rife421":
-                    from .InterpolateArchs.RIFE.rife421IFNET import IFNet
-
+                    from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
                     v1 = False
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    )
+                    self.encode = Head().to(device=self.device, dtype=self.dtype)
                 case "rife422lite":
-                    from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet
+                    from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=device
+                        ),
+                    )
+                    self.encode = Head().to(device=self.device, dtype=self.dtype)
 
                     v1 = False
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
-
+            self.v1 = v1
             # if 4.6 v1
             if v1:
                 self.tenFlow_div = torch.tensor(
@@ -273,21 +319,11 @@ class InterpolateRifeTorch:
                     ),
                 )
                 if not os.path.isfile(trt_engine_path):
-                    inputs = [
-                        torch.zeros(
-                            (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
-                        ),
-                        torch.zeros(
-                            (1, 3, self.ph, self.pw), dtype=self.dtype, device=device
-                        ),
-                        torch.zeros(
-                            (1, 1, self.ph, self.pw), dtype=self.dtype, device=device
-                        ),
-                    ]
+                    
                     self.flownet = torch_tensorrt.compile(
                         self.flownet,
                         ir="dynamo",
-                        inputs=inputs,
+                        inputs=self.inputs,
                         enabled_precisions={self.dtype},
                         debug=trt_debug,
                         workspace_size=trt_workspace_size,
@@ -297,7 +333,7 @@ class InterpolateRifeTorch:
                         device=device,
                     )
 
-                    torch_tensorrt.save(self.flownet, trt_engine_path, inputs=inputs)
+                    torch_tensorrt.save(self.flownet, trt_engine_path, inputs=self.inputs)
 
                 self.flownet = torch.export.load(trt_engine_path).module()
 
@@ -313,7 +349,12 @@ class InterpolateRifeTorch:
     def process(self, img0, img1, timestep):
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
-            output = self.flownet(img0, img1, timestep)
+            if not self.v1:
+                if self.f1encode is None:
+                    self.f1encode = self.encode(img1[:, :3])
+                output, self.f1encode = self.flownet(img0, img1, timestep, self.f1encode)
+            else:
+                output = self.flownet(img0, img1, timestep)
             output = self.tensor_to_frame(output)
         self.stream.synchronize()
         return output
