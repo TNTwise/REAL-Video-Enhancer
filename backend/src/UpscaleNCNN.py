@@ -66,10 +66,13 @@ class UpscaleNCNN:
         tilesize: int = 0,
     ):
         # only import if necessary
-        
-            
+
         self.model = UPSCALE(
-            gpuid=gpuid, model_str=modelPath, num_threads=num_threads, scale=scale, tilesize=tilesize
+            gpuid=gpuid,
+            model_str=modelPath,
+            num_threads=num_threads,
+            scale=scale,
+            tilesize=tilesize,
         )
         self.width = width
         self.height = height

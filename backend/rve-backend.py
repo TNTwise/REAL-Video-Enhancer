@@ -105,7 +105,7 @@ class HandleApplication:
             help="output video path or PIPE",
             type=str,
         )
-        
+
         parser.add_argument(
             "-l",
             "--overlap",

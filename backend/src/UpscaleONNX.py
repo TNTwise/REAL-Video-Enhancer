@@ -15,13 +15,14 @@ def getONNXScale(modelPath: str = "") -> int:
 
 
 class UpscaleONNX:
-    def __init__(self,
-                modelPath,
-                deviceID: int = 0, 
-                precision: str = "float32",
-                width: int = 1920,
-                height: int = 1080,
-                ):
+    def __init__(
+        self,
+        modelPath,
+        deviceID: int = 0,
+        precision: str = "float32",
+        width: int = 1920,
+        height: int = 1080,
+    ):
         self.width = width
         self.height = height
         self.modelPath = modelPath

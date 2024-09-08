@@ -107,7 +107,6 @@ class Render(FFMpegRender):
             self.renderThread = Thread(target=self.renderInterpolate)
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
 
-        
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -120,10 +119,9 @@ class Render(FFMpegRender):
             frameSetupFunction=self.setupRender,
             crf=crf,
             sharedMemoryID=sharedMemoryID,
-            channels=3
+            channels=3,
         )
 
-        
         self.sharedMemoryThread.start()
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
@@ -140,9 +138,9 @@ class Render(FFMpegRender):
         log("Starting Upscale")
         for i in range(self.totalInputFrames - 1):
             frame = self.readQueue.get()
-            '''if self.npMean.isEqualImages(frame):
+            """if self.npMean.isEqualImages(frame):
                 self.writeQueue.put(self.f0)
-            else:'''
+            else:"""
             self.f0 = self.upscale(self.frameSetupFunction(frame))
             self.writeQueue.put(self.f0)
         self.writeQueue.put(None)
@@ -183,7 +181,7 @@ class Render(FFMpegRender):
             setup_frame1 = self.frameSetupFunction(frame1)
             if frameNum != self.transitionFrame:
                 for n in range(self.ceilInterpolateFactor):
-                    timestep =   n / (self.ceilInterpolateFactor)
+                    timestep = n / (self.ceilInterpolateFactor)
                     if timestep == 0:
                         self.writeQueue.put(self.frame0)
                         continue
@@ -204,9 +202,6 @@ class Render(FFMpegRender):
 
         self.writeQueue.put(None)
         log("Finished Interpolation")
-    
-    
-            
 
     def setupUpscale(self):
         """
@@ -245,13 +240,16 @@ class Render(FFMpegRender):
                 gpuid=0,  # might have this be a setting
                 width=self.width,
                 height=self.height,
-                tilesize=self.tilesize
+                tilesize=self.tilesize,
             )
             self.setupRender = self.returnFrame
             self.upscale = upscaleNCNN.Upscale
         if self.backend == "directml":
             upscaleONNX = UpscaleONNX(
-                modelPath=self.upscaleModel, precision=self.precision, width=self.width, height=self.height
+                modelPath=self.upscaleModel,
+                precision=self.precision,
+                width=self.width,
+                height=self.height,
             )
             self.upscaleTimes = upscaleONNX.getScale()
             self.setupRender = upscaleONNX.bytesToFrame

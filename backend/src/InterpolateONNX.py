@@ -15,13 +15,14 @@ def getONNXScale(modelPath: str = "") -> int:
 
 
 class UpscaleONNX:
-    def __init__(self,
-                modelPath,
-                deviceID: int = 0, 
-                precision: str = "float32",
-                width: int = 1920,
-                height: int = 1080,
-                ):
+    def __init__(
+        self,
+        modelPath,
+        deviceID: int = 0,
+        precision: str = "float32",
+        width: int = 1920,
+        height: int = 1080,
+    ):
         self.width = width
         self.height = height
         self.modelPath = modelPath
@@ -51,14 +52,18 @@ class UpscaleONNX:
         image = image.__mul__(1.0 / 255.0)
         return np.ascontiguousarray(image)
 
-    def render(self, image0_as_np_array: np.ndarray, image1_as_np_array: np.ndarray, timestep) -> np.ndarray:
+    def render(
+        self, image0_as_np_array: np.ndarray, image1_as_np_array: np.ndarray, timestep
+    ) -> np.ndarray:
         timestep_tens = np.full(
-                    (1, 1, self.ph, self.pw),
-                    timestep,
-                    dtype=self.dtype,
-                    device=self.device,
-                )
-        input = np.concatenate((image0_as_np_array, image1_as_np_array, timestep_tens), axis=1)
+            (1, 1, self.ph, self.pw),
+            timestep,
+            dtype=self.dtype,
+            device=self.device,
+        )
+        input = np.concatenate(
+            (image0_as_np_array, image1_as_np_array, timestep_tens), axis=1
+        )
         onnx_input = {"x": input}
         onnx_output = self.inferenceSession.run(None, onnx_input)[0]
         return self.frameToBytes(onnx_output)
@@ -93,4 +98,3 @@ class UpscaleONNX:
         )
 
         return inference_session
-

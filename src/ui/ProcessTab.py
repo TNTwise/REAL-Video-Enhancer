@@ -79,23 +79,23 @@ class ProcessTab:
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
         cbs = (self.parent.backendComboBox, self.parent.methodComboBox)
         for combobox in cbs:
-            combobox.currentIndexChanged.connect(
-                self.switchInterpolationAndUpscale
-            )
+            combobox.currentIndexChanged.connect(self.switchInterpolationAndUpscale)
         # set tile size visible to false by default
         self.parent.tileSizeContainer.setVisible(False)
         # connect up tilesize container visiable
         self.parent.tilingCheckBox.stateChanged.connect(
-            lambda: self.parent.tileSizeContainer.setVisible(self.parent.tilingCheckBox.isChecked())
+            lambda: self.parent.tileSizeContainer.setVisible(
+                self.parent.tilingCheckBox.isChecked()
+            )
         )
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
             self.parent.updateVideoGUIDetails
         )
-        self.parent.modelComboBox.currentIndexChanged.connect(self.parent.updateVideoGUIDetails)
-
-    
+        self.parent.modelComboBox.currentIndexChanged.connect(
+            self.parent.updateVideoGUIDetails
+        )
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary

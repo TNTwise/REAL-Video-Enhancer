@@ -24,14 +24,15 @@ class BackendHandler:
             self.parent.downloadTorchCUDABtn.setEnabled(False)
             self.parent.downloadTorchROCmBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
-        
-        #disable as it is not complete
+
+        # disable as it is not complete
         try:
             self.parent.downloadDirectMLBtn.setEnabled(False)
             if getPlatform() != "win32":
                 self.parent.downloadDirectMLBtn.setEnabled(False)
         except Exception as e:
             print(e)
+
     def setupBackendDeps(self):
         # need pop up window
         from .DownloadDeps import DownloadDependencies

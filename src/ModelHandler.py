@@ -13,7 +13,12 @@ ncnnInterpolateModels = {
     "RIFE 4.6 (Fastest Model)": ("rife-v4.6", "rife-v4.6.tar.gz", 1, "rife46"),
     "RIFE 4.7 (Smoothest Model)": ("rife-v4.7", "rife-v4.7.tar.gz", 1, "rife47"),
     "RIFE 4.15": ("rife-v4.15", "rife-v4.15.tar.gz", 1, "rife413"),
-    "RIFE 4.18 (Recommended for realistic scenes)": ("rife-v4.18", "rife-v4.18.tar.gz", 1, "rife413"),
+    "RIFE 4.18 (Recommended for realistic scenes)": (
+        "rife-v4.18",
+        "rife-v4.18.tar.gz",
+        1,
+        "rife413",
+    ),
     "RIFE 4.22 (Latest General Model)": (
         "rife-v4.22",
         "rife-v4.22.tar.gz",
@@ -31,7 +36,12 @@ pytorchInterpolateModels = {
     "RIFE 4.6 (Fastest Model)": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
     "RIFE 4.7 (Smoothest Model)": ("rife4.7.pkl", "rife4.7.pkl", 1, "rife47"),
     "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
-    "RIFE 4.18 (Recommended for realistic scenes)": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
+    "RIFE 4.18 (Recommended for realistic scenes)": (
+        "rife4.18.pkl",
+        "rife4.18.pkl",
+        1,
+        "rife413",
+    ),
     "RIFE 4.22 (Latest General Model)": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
     "RIFE 4.22-lite (Recommended Model)": (
         "rife4.22-lite.pkl",
@@ -44,7 +54,12 @@ tensorrtInterpolateModels = {
     "RIFE 4.6 (Fastest Model)": ("rife4.6.pkl", "rife4.6.pkl", 1, "rife46"),
     "RIFE 4.7 (Smoothest Model)": ("rife4.7.pkl", "rife4.7.pkl", 1, "rife47"),
     "RIFE 4.15": ("rife4.15.pkl", "rife4.15.pkl", 1, "rife413"),
-    "RIFE 4.18 (Recommended for realistic scenes)": ("rife4.18.pkl", "rife4.18.pkl", 1, "rife413"),
+    "RIFE 4.18 (Recommended for realistic scenes)": (
+        "rife4.18.pkl",
+        "rife4.18.pkl",
+        1,
+        "rife413",
+    ),
     "RIFE 4.22 (Latest General Model)": ("rife4.22.pkl", "rife4.22.pkl", 1, "rife421"),
     "RIFE 4.22-lite (Recommended Model)": (
         "rife4.22-lite.pkl",
@@ -172,6 +187,7 @@ onnxUpscaleModels = {
     ),
 }
 
+totalModels = onnxInterpolateModels | onnxUpscaleModels | pytorchInterpolateModels | pytorchUpscaleModels | ncnnInterpolateModels | ncnnUpscaleModels | tensorrtInterpolateModels | tensorrtUpscaleModels
 
 def downloadModelsBasedOnInstalledBackend(installed_backends: list):
     if NetworkCheckPopup():

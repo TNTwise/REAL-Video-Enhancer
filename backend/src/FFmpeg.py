@@ -13,6 +13,7 @@ import time
 from time import sleep
 from threading import Thread
 
+
 def convertTime(remaining_time):
     """
     Converts seconds to hours, minutes and seconds
@@ -91,7 +92,6 @@ class FFMpegRender:
         crf: str = "18",
         sharedMemoryID: str = None,
         channels=3,
-
     ):
         """
         Generates FFmpeg I/O commands to be used with VideoIO
@@ -122,7 +122,9 @@ class FFMpegRender:
         self.crf = crf
         self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
-        self.videoPropertiesLocation = os.path.join(currentDirectory(), inputFile + "_VIDEODATA")
+        self.videoPropertiesLocation = os.path.join(
+            currentDirectory(), inputFile + "_VIDEODATA"
+        )
         if not os.path.exists(self.videoPropertiesLocation):
             os.makedirs(self.videoPropertiesLocation)
         self.subtitleFiles = []
@@ -142,27 +144,31 @@ class FFMpegRender:
 
         self.readQueue = queue.Queue(maxsize=50)
         self.writeQueue = queue.Queue(maxsize=50)
-    
 
-    def get_ffmpeg_streams(self,video_file):
+    def get_ffmpeg_streams(self, video_file):
         """Get a list of streams from the video file using FFmpeg."""
         try:
             result = subprocess.run(
-                [ffmpegPath(), '-i', video_file],
-                stderr=subprocess.PIPE,
-                text=True
+                [ffmpegPath(), "-i", video_file], stderr=subprocess.PIPE, text=True
             )
             return result.stderr
         except Exception as e:
             print(f"An error occurred while running FFmpeg: {e}")
             return None
 
-    def extract_subtitles(self,video_file, stream_index, subtitle_file):
+    def extract_subtitles(self, video_file, stream_index, subtitle_file):
         """Extract a specific subtitle stream from the video file."""
         try:
             subprocess.run(
-                [ffmpegPath(), '-i', video_file, '-map', f'0:{stream_index}', subtitle_file],
-                check=True
+                [
+                    ffmpegPath(),
+                    "-i",
+                    video_file,
+                    "-map",
+                    f"0:{stream_index}",
+                    subtitle_file,
+                ],
+                check=True,
             )
             print(f"Extracted subtitle stream {stream_index} to {subtitle_file}")
             self.subtitleFiles.append(subtitle_file)
@@ -170,13 +176,13 @@ class FFMpegRender:
             print(f"An error occurred while extracting subtitles: {e}")
 
     def getVideoSubs(self, video_file):
-
-
         ffmpeg_output = self.get_ffmpeg_streams(video_file)
         if not ffmpeg_output:
             return
 
-        subtitle_stream_pattern = re.compile(r'Stream #0:(\d+).*?Subtitle', re.MULTILINE | re.DOTALL)
+        subtitle_stream_pattern = re.compile(
+            r"Stream #0:(\d+).*?Subtitle", re.MULTILINE | re.DOTALL
+        )
         subtitle_streams = subtitle_stream_pattern.findall(ffmpeg_output)
 
         if not subtitle_streams:
@@ -184,9 +190,10 @@ class FFMpegRender:
             return
 
         for stream_index in subtitle_streams:
-            subtitle_file = os.path.join(self.videoPropertiesLocation, f'subtitle_{stream_index}.srt')
+            subtitle_file = os.path.join(
+                self.videoPropertiesLocation, f"subtitle_{stream_index}.srt"
+            )
             self.extract_subtitles(video_file, stream_index, subtitle_file)
-
 
     def getVideoProperties(self, inputFile: str = None):
         log("Getting Video Properties...")
@@ -243,7 +250,7 @@ class FFMpegRender:
                 "-",
                 "-i",
                 f"{self.inputFile}",
-                #"""["-i" + subtitle for subtitle in self.subtitleFiles],"""
+                # """["-i" + subtitle for subtitle in self.subtitleFiles],"""
                 "-r",
                 f"{self.fps * self.interpolateFactor}",
                 f"-crf",
@@ -257,7 +264,7 @@ class FFMpegRender:
             ]
             for i in self.encoder.split():
                 command.append(i)
-            
+
             command.append(
                 f"{self.outputFile}",
             )

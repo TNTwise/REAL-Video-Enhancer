@@ -46,6 +46,7 @@ from src.ui.SettingsTab import SettingsTab
 from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.Backendhandler import BackendHandler
+from src.ModelHandler import totalModels
 from src.ui.AnimationHandler import AnimationHandler
 from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
@@ -304,7 +305,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def getScale(self, method, modelName):
         if method == "Upscale":
-            scale = int(re.search(r"\d+x", modelName.lower()).group()[0])
+            scale = totalModels[modelName][2]
         elif method == "Interpolate":
             scale = 1
         return scale

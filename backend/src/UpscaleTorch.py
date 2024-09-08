@@ -3,7 +3,7 @@ import math
 import numpy as np
 import cv2
 import torch as torch
-import torch.nn.functional as F 
+import torch.nn.functional as F
 
 
 from src.Util import (
@@ -66,7 +66,6 @@ class UpscalePytorch:
         trt_workspace_size: int = 0,
         trt_cache_dir: str = modelsDirectory(),
     ):
-        
         if device == "default":
             if torch.cuda.is_available():
                 device = torch.device(
@@ -94,8 +93,12 @@ class UpscalePytorch:
             case _:
                 modulo = 1
         if all(t > 0 for t in self.tile):
-            self.pad_w = math.ceil(min(self.tile[0] + 2 * tile_pad, width) / modulo) * modulo
-            self.pad_h = math.ceil(min(self.tile[1] + 2 * tile_pad, height) / modulo) * modulo
+            self.pad_w = (
+                math.ceil(min(self.tile[0] + 2 * tile_pad, width) / modulo) * modulo
+            )
+            self.pad_h = (
+                math.ceil(min(self.tile[1] + 2 * tile_pad, height) / modulo) * modulo
+            )
         else:
             self.pad_w = width
             self.pad_h = height
@@ -265,10 +268,17 @@ class UpscalePytorch:
                 input_tile_width = input_end_x - input_start_x
                 input_tile_height = input_end_y - input_start_y
 
-                input_tile = img[:, :, input_start_y_pad:input_end_y_pad, input_start_x_pad:input_end_x_pad]
+                input_tile = img[
+                    :,
+                    :,
+                    input_start_y_pad:input_end_y_pad,
+                    input_start_x_pad:input_end_x_pad,
+                ]
 
                 h, w = input_tile.shape[2:]
-                input_tile = F.pad(input_tile, (0, self.pad_w - w, 0, self.pad_h - h), "replicate")
+                input_tile = F.pad(
+                    input_tile, (0, self.pad_w - w, 0, self.pad_h - h), "replicate"
+                )
 
                 # process tile
                 output_tile = self.model(input_tile)
@@ -288,8 +298,13 @@ class UpscalePytorch:
                 output_end_y_tile = output_start_y_tile + input_tile_height * scale
 
                 # put tile into output image
-                output[:, :, output_start_y:output_end_y, output_start_x:output_end_x] = output_tile[
-                    :, :, output_start_y_tile:output_end_y_tile, output_start_x_tile:output_end_x_tile
+                output[
+                    :, :, output_start_y:output_end_y, output_start_x:output_end_x
+                ] = output_tile[
+                    :,
+                    :,
+                    output_start_y_tile:output_end_y_tile,
+                    output_start_x_tile:output_end_x_tile,
                 ]
 
         return output

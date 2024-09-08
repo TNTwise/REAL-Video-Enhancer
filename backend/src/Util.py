@@ -4,6 +4,7 @@ import platform
 import numpy as np
 import cv2
 
+
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
 
@@ -50,18 +51,20 @@ def log(message: str):
     with open(os.path.join(cwd, "backend_log.txt"), "a") as f:
         f.write(message + "\n")
 
+
 def bytesTo100x100img(image: bytes, width, height) -> np.ndarray:
-        frame = np.frombuffer(image,dtype=np.uint8).reshape(height, width, 3)
-        frame = cv2.resize(
-                frame, dsize=(100, 100)
-            )
-        return frame
+    frame = np.frombuffer(image, dtype=np.uint8).reshape(height, width, 3)
+    frame = cv2.resize(frame, dsize=(100, 100))
+    return frame
+
 
 def currentDirectory():
     return cwd
 
+
 def ffmpegPath() -> str:
-    return str(os.path.join(currentDirectory(),'bin','ffmpeg'))
+    return str(os.path.join(currentDirectory(), "bin", "ffmpeg"))
+
 
 def modelsDirectory():
     return os.path.join(cwd, "models")
