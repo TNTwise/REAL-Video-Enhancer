@@ -11,7 +11,7 @@ from .Util import (
     check_bfloat16_support,
     log
 )
-
+from .version import __version__
 torch.set_float32_matmul_precision("high")
 torch.set_grad_enabled(False)
 
@@ -299,6 +299,7 @@ class InterpolateRifeTorch:
                         + f"_ensemble-{ensemble}"
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
+                        + f"backend_version-{__version__}"
                         + f"_trt-{tensorrt.__version__}"
                         + (
                             f"_workspace-{trt_workspace_size}"
