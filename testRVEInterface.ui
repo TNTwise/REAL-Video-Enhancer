@@ -1385,16 +1385,6 @@ QDoubleSpinBox::down-button {
                        <string>libx265</string>
                       </property>
                      </item>
-                     <item>
-                      <property name="text">
-                       <string>libvpx-vp9</string>
-                      </property>
-                     </item>
-                     <item>
-                      <property name="text">
-                       <string>libaom-av1</string>
-                      </property>
-                     </item>
                     </widget>
                    </item>
                   </layout>
