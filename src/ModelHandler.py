@@ -187,7 +187,7 @@ onnxUpscaleModels = {
     ),
 }
 
-totalModels = onnxInterpolateModels | onnxUpscaleModels | pytorchInterpolateModels | pytorchUpscaleModels | ncnnInterpolateModels | ncnnUpscaleModels | tensorrtInterpolateModels | tensorrtUpscaleModels
+totalModels = onnxInterpolateModels | onnxUpscaleModels | pytorchInterpolateModels | pytorchUpscaleModels | ncnnInterpolateModels | ncnnUpscaleModels | tensorrtInterpolateModels | tensorrtUpscaleModels # this doesnt include all models due to overwriting, but includes every case of every unique model name
 
 def downloadModelsBasedOnInstalledBackend(installed_backends: list):
     if NetworkCheckPopup():
