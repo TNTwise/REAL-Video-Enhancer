@@ -84,7 +84,7 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/WolframRhodium" target="_blank">WolframRhodium for rife v2 code.</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting rife v2 to older versions of rife</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For rife TRT inference code)</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For TRT engine generation code)</a></li>
         
   <li> <a rel="noopener noreferrer" href="https://github.com/feathericons/feather" target="_blank">feather icons</a></li>
 </ul>
