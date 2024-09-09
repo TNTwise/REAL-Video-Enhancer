@@ -267,7 +267,7 @@ def downloadFile(link, downloadLocation):
     )
 
     with open(downloadLocation, "wb") as f:
-        for chunk in response.iter_content(chunk_size=128):
+        for chunk in response.iter_content(chunk_size=1024):
             f.write(chunk)
 
 

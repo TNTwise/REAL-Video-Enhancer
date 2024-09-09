@@ -13,9 +13,9 @@ from .Util import (
     log
 )
 from .version import __version__
-torch.set_float32_matmul_precision("high")
+torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
-
+logging.basicConfig(level=logging.INFO)
 
 class InterpolateRifeTorch:
     """InterpolateRifeTorch class for video interpolation using RIFE model in PyTorch.
@@ -289,7 +289,7 @@ class InterpolateRifeTorch:
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
-                logging.basicConfig(level=logging.ERROR)
+                logging.basicConfig(level=logging.INFO)
                 trt_engine_path = os.path.join(
                     os.path.realpath(trt_cache_dir),
                     (
