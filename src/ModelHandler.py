@@ -75,6 +75,30 @@ ncnnUpscaleModels = {
         2,
         "SPAN",
     ),
+    "RealESRGAN (Animation) (2X)": (
+        "realesr-animevideov3-x2",
+        "realesr-animevideov3-x2.tar.gz",
+        2,
+        "compact",
+    ),
+    "RealESRGAN (Animation) (3X)": (
+        "realesr-animevideov3-x3",
+        "realesr-animevideov3-x3.tar.gz",
+        3,
+        "compact",
+    ),
+    "RealESRGAN (Animation) (4X)": (
+        "realesr-animevideov3-x4",
+        "realesr-animevideov3-x4.tar.gz",
+        4,
+        "compact",
+    ),
+    "RealESRGAN Plus (Animation Model) (4X)": (
+        "realesrgan-x4plus-anime",
+        "realesrgan-x4plus-anime.tar.gz",
+        4,
+        "esrgan",
+    ),
     "SPAN (Realistic) (High Quality Source) (4X)": (
         "4xNomos8k_span_otf_weak",
         "4xNomos8k_span_otf_weak.tar.gz",
@@ -98,6 +122,12 @@ ncnnUpscaleModels = {
         "2x_OpenProteus_Compact_i2_70K.tar.gz",
         2,
         "Compact",
+    ),
+    "RealESRGAN Plus (General Model) (4X)": (
+        "realesrgan-x4plus",
+        "realesrgan-x4plus.tar.gz",
+        4,
+        "esrgan",
     ),
 }
 pytorchUpscaleModels = {
