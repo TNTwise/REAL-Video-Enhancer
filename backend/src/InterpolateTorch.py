@@ -3,6 +3,7 @@ import torch.nn.functional as F
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 import math
 import os
+import logging
 from .Util import (
     currentDirectory,
     printAndLog,
@@ -288,7 +289,7 @@ class InterpolateRifeTorch:
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
-
+                logging.basicConfig(level=logging.ERROR)
                 trt_engine_path = os.path.join(
                     os.path.realpath(trt_cache_dir),
                     (
@@ -320,6 +321,7 @@ class InterpolateRifeTorch:
                     ),
                 )
                 if not os.path.isfile(trt_engine_path):
+                    printAndLog("Building TensorRT engine {}".format(trt_engine_path))
                     
                     self.flownet = torch_tensorrt.compile(
                         self.flownet,
@@ -332,10 +334,11 @@ class InterpolateRifeTorch:
                         max_aux_streams=trt_max_aux_streams,
                         optimization_level=trt_optimization_level,
                         device=device,
+                        reuse_cached_engines=False,
                     )
-
+                    printAndLog(f"Saving TensorRT engine to {trt_engine_path}")
                     torch_tensorrt.save(self.flownet, trt_engine_path, inputs=self.inputs)
-
+                printAndLog(f"Loading TensorRT engine from {trt_engine_path}")
                 self.flownet = torch.export.load(trt_engine_path).module()
 
     def handlePrecision(self, precision):
