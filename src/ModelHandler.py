@@ -69,74 +69,74 @@ tensorrtInterpolateModels = {
     ),
 }
 ncnnUpscaleModels = {
-    "SPAN (Animation) (2X)": (
+    "SPAN (Animation) (2X) (Fast)": (
         "2x_ModernSpanimationV2",
         "2x_ModernSpanimationV2.tar.gz",
         2,
         "SPAN",
     ),
-    "SPAN (Realistic) (Medium Quality Source) (4X)": (
-        "4xNomos8k_span_otf_medium",
-        "4xNomos8k_span_otf_medium.tar.gz",
-        4,
-        "SPAN",
-    ),
-    "SPAN (Realistic) (Low Quality Source) (4X)": (
-        "4xNomos8k_span_otf_strong",
-        "4xNomos8k_span_otf_strong.tar.gz",
-        4,
-        "SPAN",
-    ),
-    "RealCUGAN Pro (Animation) (2X)": (
-        "up2x-conservative",
-        "up2x-conservative.tar.gz",
-        2,
-        "compact",
-    ),
-    "RealCUGAN Pro (Animation) (3X)": (
-        "up3x-conservative",
-        "up2x-conservative.tar.gz",
-        3,
-        "compact",
-    ),
-    "RealESRGAN (Animation) (2X)": (
-        "realesr-animevideov3-x2",
-        "realesr-animevideov3-x2.tar.gz",
-        2,
-        "compact",
-    ),
-    "RealESRGAN (Animation) (3X)": (
-        "realesr-animevideov3-x3",
-        "realesr-animevideov3-x3.tar.gz",
-        3,
-        "compact",
-    ),
-    "RealESRGAN (Animation) (4X)": (
-        "realesr-animevideov3-x4",
-        "realesr-animevideov3-x4.tar.gz",
-        4,
-        "compact",
-    ),
-    "SPAN (Realistic) (High Quality Source) (4X)": (
+    "SPAN (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak",
         "4xNomos8k_span_otf_weak.tar.gz",
         4,
         "SPAN",
     ),
+    "SPAN (Realistic) (Medium Quality Source) (4X) (Fast)": (
+        "4xNomos8k_span_otf_medium",
+        "4xNomos8k_span_otf_medium.tar.gz",
+        4,
+        "SPAN",
+    ),
+    "SPAN (Realistic) (Low Quality Source) (4X) (Fast)": (
+        "4xNomos8k_span_otf_strong",
+        "4xNomos8k_span_otf_strong.tar.gz",
+        4,
+        "SPAN",
+    ),
+    "RealCUGAN Pro (Animation) (2X) (Slow)": (
+        "up2x-conservative",
+        "up2x-conservative.tar.gz",
+        2,
+        "compact",
+    ),
+    "RealCUGAN Pro (Animation) (3X) (Slow)": (
+        "up3x-conservative",
+        "up2x-conservative.tar.gz",
+        3,
+        "compact",
+    ),
+    "RealESRGAN (Animation) (2X) (Fast)": (
+        "realesr-animevideov3-x2",
+        "realesr-animevideov3-x2.tar.gz",
+        2,
+        "compact",
+    ),
+    "RealESRGAN (Animation) (3X) (Fast)": (
+        "realesr-animevideov3-x3",
+        "realesr-animevideov3-x3.tar.gz",
+        3,
+        "compact",
+    ),
+    "RealESRGAN (Animation) (4X) (Fast)": (
+        "realesr-animevideov3-x4",
+        "realesr-animevideov3-x4.tar.gz",
+        4,
+        "compact",
+    ),
     
-    "Compact (Realistic) (HD Input) (2X)": (
+    "Compact (Realistic) (HD Input) (2X) (Fast)": (
         "2x_OpenProteus_Compact_i2_70K",
         "2x_OpenProteus_Compact_i2_70K.tar.gz",
         2,
         "Compact",
     ),
-    "RealESRGAN Plus (General Model) (4X)": (
+    "RealESRGAN Plus (General Model) (4X) (Slow)": (
         "realesrgan-x4plus",
         "realesrgan-x4plus.tar.gz",
         4,
         "esrgan",
     ),
-    "RealESRGAN Plus (Animation Model) (4X)": (
+    "RealESRGAN Plus (Animation Model) (4X) (Slow)": (
         "realesrgan-x4plus-anime",
         "realesrgan-x4plus-anime.tar.gz",
         4,
@@ -144,37 +144,37 @@ ncnnUpscaleModels = {
     ),
 }
 pytorchUpscaleModels = {
-    "SPAN (Animation) (2X)": (
+    "SPAN (Animation) (2X) (Fast)": (
         "2x_ModernSpanimationV2.pth",
         "2x_ModernSpanimationV2.pth",
         2,
         "SPAN",
     ),
-    "Sudo Shuffle SPAN (Animation) (2X)": (
+    "Sudo Shuffle SPAN (Animation) (2X) (Fast)": (
         "2xSudoShuffleSPAN.pth",
         "2xSudoShuffleSPAN.pth",
         2,
         "SPAN",
     ),
-    "SPAN (Realistic) (High Quality Source) (4X)": (
+    "SPAN (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak.pth",
         "4xNomos8k_span_otf_weak.pth",
         4,
         "SPAN",
     ),
-    "SPAN (Realistic) (Medium Quality Source) (4X)": (
+    "SPAN (Realistic) (Medium Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_medium.pth",
         "4xNomos8k_span_otf_medium.pth",
         4,
         "SPAN",
     ),
-    "SPAN (Realistic) (Low Quality Source) (4X)": (
+    "SPAN (Realistic) (Low Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_strong.pth",
         "4xNomos8k_span_otf_strong.pth",
         4,
         "SPAN",
     ),
-    "Compact (Realistic) (HD Input) (2X)": (
+    "Compact (Realistic) (HD Input) (2X) (Fast)": (
         "2x_OpenProteus_Compact_i2_70K.pth",
         "2x_OpenProteus_Compact_i2_70K.pth",
         2,
@@ -182,31 +182,37 @@ pytorchUpscaleModels = {
     ),
 }
 tensorrtUpscaleModels = {
-    "SPAN (Animation) (2X)": (
+    "SPAN (Animation) (2X) (Fast)": (
         "2x_ModernSpanimationV2.pth",
         "2x_ModernSpanimationV2.pth",
         2,
         "SPAN",
     ),
-    "SPAN (Realistic) (High Quality Source) (4X)": (
+    """"Sudo Shuffle SPAN (Animation) (2X) (Fast)": (
+        "2xSudoShuffleSPAN.pth",
+        "2xSudoShuffleSPAN.pth",
+        2,
+        "SPAN",
+    ),"""
+    "SPAN (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak.pth",
         "4xNomos8k_span_otf_weak.pth",
         4,
         "SPAN",
     ),
-    "SPAN (Realistic) (Medium Quality Source) (4X)": (
+    "SPAN (Realistic) (Medium Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_medium.pth",
         "4xNomos8k_span_otf_medium.pth",
         4,
         "SPAN",
     ),
-    "SPAN (Realistic) (Low Quality Source) (4X)": (
+    "SPAN (Realistic) (Low Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_strong.pth",
         "4xNomos8k_span_otf_strong.pth",
         4,
         "SPAN",
     ),
-    "Compact (Realistic) (HD Input) (2X)": (
+    "Compact (Realistic) (HD Input) (2X) (Fast)": (
         "2x_OpenProteus_Compact_i2_70K.pth",
         "2x_OpenProteus_Compact_i2_70K.pth",
         2,
