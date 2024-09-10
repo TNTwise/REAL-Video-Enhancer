@@ -171,7 +171,10 @@ def videosPath() -> str:
     :return: The file path for the videos directory.
     :rtype: str
     """
-    return os.path.join(homedir, "Videos")
+    if getPlatform() == 'darwin':
+        return os.path.join(homedir, "Desktop")
+    else:
+        os.path.join(homedir, "Videos")
 
 
 def ffmpegPath() -> str:
