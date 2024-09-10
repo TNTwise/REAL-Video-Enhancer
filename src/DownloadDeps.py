@@ -14,9 +14,7 @@ from .Util import (
 )
 from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
-import subprocess
-import shutil
-import urllib.request
+from platform import machine
 
 
 class DownloadDependencies:
@@ -70,7 +68,10 @@ class DownloadDependencies:
             case "win32":
                 link += "x86_64-pc-windows-msvc-install_only.tar.gz"
             case "darwin":
-                link += "x86_64-apple-darwin-install_only.tar.gz"
+                if machine() == "arm64":
+                    link += "aarch64-apple-darwin-install_only.tar.gz"
+                else:
+                    link += "x86_64-apple-darwin-install_only.tar.gz"
         # probably can add macos support later
         printAndLog("Downloading Python")
         DownloadProgressPopup(
