@@ -93,7 +93,16 @@ ncnnUpscaleModels = {
         4,
         "SPAN",
     ),
-    "RealCUGAN Pro (Animation) (2X) (Slow)": (
+    
+    "Compact (Realistic) (HD Input) (2X) (Fast)": (
+        "2x_OpenProteus_Compact_i2_70K",
+        "2x_OpenProteus_Compact_i2_70K.tar.gz",
+        2,
+        "Compact",
+    ),
+
+}
+""""RealCUGAN Pro (Animation) (2X) (Slow)": (
         "up2x-conservative",
         "up2x-conservative.tar.gz",
         2,
@@ -122,27 +131,19 @@ ncnnUpscaleModels = {
         "realesr-animevideov3-x4.tar.gz",
         4,
         "compact",
-    ),
-    
-    "Compact (Realistic) (HD Input) (2X) (Fast)": (
-        "2x_OpenProteus_Compact_i2_70K",
-        "2x_OpenProteus_Compact_i2_70K.tar.gz",
-        2,
-        "Compact",
-    ),
-    "RealESRGAN Plus (General Model) (4X) (Slow)": (
-        "realesrgan-x4plus",
-        "realesrgan-x4plus.tar.gz",
-        4,
-        "esrgan",
-    ),
-    "RealESRGAN Plus (Animation Model) (4X) (Slow)": (
-        "realesrgan-x4plus-anime",
-        "realesrgan-x4plus-anime.tar.gz",
-        4,
-        "esrgan",
-    ),
-}
+    ),"""
+""""RealESRGAN Plus (General Model) (4X) (Slow)": (
+    "realesrgan-x4plus",
+    "realesrgan-x4plus.tar.gz",
+    4,
+    "esrgan",
+),
+"RealESRGAN Plus (Animation Model) (4X) (Slow)": (
+    "realesrgan-x4plus-anime",
+    "realesrgan-x4plus-anime.tar.gz",
+    4,
+    "esrgan",
+),"""
 pytorchUpscaleModels = {
     "SPAN (Animation) (2X) (Fast)": (
         "2x_ModernSpanimationV2.pth",
