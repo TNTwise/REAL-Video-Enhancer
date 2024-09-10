@@ -9,3 +9,4 @@ psutil
 py-cpuinfo
 distro
 pypresence
+certifi
