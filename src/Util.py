@@ -15,6 +15,14 @@ import webbrowser
 
 homedir = os.path.expanduser("~")
 
+def getPlatform() -> str:
+    """
+    Returns the current OS that the app is running on
+    Windows: win32
+    MacOS: darwin
+    Linux: linux
+    """
+    return sys.platform
 
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
@@ -32,7 +40,10 @@ if isFlatpak():
             "io.github.tntwise.REAL-Video-EnhancerV2",
         )
 else:
-    cwd = os.getcwd()
+    if getPlatform() == 'darwin':
+        cwd = os.path.join(f"{homedir}","Library","REAL-Video-Enhancer")    
+    else:
+        cwd = os.getcwd()
 
 
 def getAvailableDiskSpace() -> float:
@@ -104,14 +115,7 @@ def getOSInfo() -> str:
     return f"{system} {release} {architecture}"
 
 
-def getPlatform() -> str:
-    """
-    Returns the current OS that the app is running on
-    Windows: win32
-    MacOS: darwin
-    Linux: linux
-    """
-    return sys.platform
+
 
 
 def getRAMAmount() -> str:
