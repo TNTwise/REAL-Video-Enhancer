@@ -62,6 +62,8 @@ class ProcessTab:
                     models = tensorrtInterpolateModels
                 case "directml":
                     models = onnxInterpolateModels
+                case _:
+                    models = ncnnInterpolateModels # Return ncnn models if it errors out, this should fix macos
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
@@ -73,6 +75,8 @@ class ProcessTab:
                     models = tensorrtUpscaleModels
                 case "directml":
                     models = onnxUpscaleModels
+                case _:
+                    ncnnUpscaleModels # Return ncnn models if it errors out, this should fix macos
         return models
 
     def onTilingSwitch(self):
