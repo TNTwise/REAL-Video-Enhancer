@@ -40,10 +40,7 @@ if isFlatpak():
             "io.github.tntwise.REAL-Video-EnhancerV2",
         )
 else:
-    if getPlatform() == 'darwin':
-        cwd = os.path.join(f"{homedir}","Library","REAL-Video-Enhancer")    
-    else:
-        cwd = os.getcwd()
+    cwd = os.getcwd()
 
 
 def getAvailableDiskSpace() -> float:

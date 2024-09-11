@@ -89,7 +89,7 @@ class BackendHandler:
         for word in output:
             if "objc" in word:
                 continue
-            new_out += word
+            new_out += word + " "
         output = new_out
         # Find the part of the output containing the backends list
         start = output.find("[")
