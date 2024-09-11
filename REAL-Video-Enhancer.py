@@ -54,6 +54,11 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 
 # patch for macos
+if getPlatform() == "darwin":
+    # this will redirect to the _internal directory
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # this goes one step up, and goes into the actual directory. This is where backend will be copied to.
+    os.chdir("..")
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Main window class for the REAL Video Enhancer application.
