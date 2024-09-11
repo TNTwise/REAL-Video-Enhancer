@@ -82,8 +82,16 @@ class BackendHandler:
                 "--list_backends",
             ]
         )
-        output = output.getOutput()
-
+        output:str = output.getOutput()
+        output = output.split(" ")
+        # hack to filter out bad find
+        new_out = ""
+        for word in output:
+            print(word)
+            if "objc" in word:
+                continue
+            new_out += word
+        output = new_out
         # Find the part of the output containing the backends list
         start = output.find("[")
         end = output.find("]") + 1
