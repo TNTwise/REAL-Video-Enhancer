@@ -84,7 +84,7 @@ def install_requirements_in_venv():
 
 def build_executable():
     print("Building executable")
-    if getPlatform() == "win32":
+    if getPlatform() == "win32" or getPlatform() == 'darwin:
         command = [
             python_path(),
             "-m",
