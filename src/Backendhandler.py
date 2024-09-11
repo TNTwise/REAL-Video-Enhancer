@@ -87,7 +87,6 @@ class BackendHandler:
         # hack to filter out bad find
         new_out = ""
         for word in output:
-            print(word)
             if "objc" in word:
                 continue
             new_out += word
