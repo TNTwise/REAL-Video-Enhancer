@@ -32,7 +32,7 @@ if isFlatpak():
             "io.github.tntwise.REAL-Video-EnhancerV2",
         )
 else:
-    cwd = os.getcwd()
+    cwd = os.path.abspath(os.path.dirname(__file__))
 
 
 def getAvailableDiskSpace() -> float:
