@@ -97,7 +97,11 @@ jobs:
         run: cp -r backend dist/
       
       - name: compress archive
-        run: zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip dist/
+        run: |
+          cd dist
+          zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip REAL-Video-Enhancer
+          cd ..
+          cp dist/REAL-Video-Enhancer-2.0-MacOS_x86_64.zip REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
@@ -126,7 +130,11 @@ jobs:
         run: cp -r backend dist/
       
       - name: compress archive
-        run: zip -r REAL-Video-Enhancer-2.0-MacOS_arm64.zip dist/
+        run: |
+          cd dist
+          zip -r REAL-Video-Enhancer-2.0-MacOS_arm64.zip REAL-Video-Enhancer
+          cd ..
+          cp dist/REAL-Video-Enhancer-2.0-MacOS_arm64.zip REAL-Video-Enhancer-2.0-MacOS_arm64.zip
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
