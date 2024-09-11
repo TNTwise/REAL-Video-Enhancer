@@ -38,7 +38,6 @@ class DownloadDependencies:
         
         if not os.path.exists(backendDirectory()):
             print(str(backendDirectory()) + " Does not exist!")
-            return # returning for now
             backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"
             main_zip = os.path.join(currentDirectory(), "backend.tar.gz")
             main_folder = os.path.join(currentDirectory(), "repo")
