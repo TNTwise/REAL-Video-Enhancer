@@ -175,7 +175,7 @@ def videosPath() -> str:
     if getPlatform() == 'darwin':
         return os.path.join(homedir, "Desktop")
     else:
-        os.path.join(homedir, "Videos")
+        return os.path.join(homedir, "Videos")
 
 
 def ffmpegPath() -> str:

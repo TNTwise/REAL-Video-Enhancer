@@ -241,6 +241,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         videoHeight: int,
         outputDirectory: str,
     ):
+        print(
+            f"inputVideo: {inputVideo}\ninterpolationTimes: {interpolationTimes}\nupscaleTimes: {upscaleTimes}\nvideoFps: {videoFps}\nvideoWidth: {videoWidth}\nvideoHeight: {videoHeight}\noutputDirectory: {outputDirectory}"
+        )
         """
         Generates the default output file name based on the input file and the current settings
         """
@@ -304,6 +307,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 outputDirectory=outputDirectory,
             )
             self.outputFileText.setText(outputText)
+            print(outputText)
             return outputText
 
     def updateVideoGUIDetails(self):
