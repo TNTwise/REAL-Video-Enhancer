@@ -127,7 +127,7 @@ class HandleApplication:
         )
         parser.add_argument(
             "--interpolateModel",
-            help="Direct path to interpolation model, will automatically upscale if model is valid.",
+            help="Direct path to interpolation model, will automatically upscale if model is valid.\n(Downloadable Options: [rife46, rife47, rife415, rife418, rife420, rife422, rife422lite]))",
             type=str,
         )
         parser.add_argument(
