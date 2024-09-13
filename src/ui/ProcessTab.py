@@ -8,7 +8,7 @@ from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt, QPropertyAnimation
 
 from .AnimationHandler import AnimationHandler
-from .QTcustom import UpdateGUIThread
+from .QTcustom import UpdateGUIThread, RegularQTPopup
 from ..Util import (
     pythonPath,
     currentDirectory,
@@ -63,8 +63,8 @@ class ProcessTab:
                 case "directml":
                     models = onnxInterpolateModels
                 case _:
-                    log("Error: Invalid backend, returning ncnn models")
-                    models = ncnnInterpolateModels  # Return ncnn models if it errors out, this should fix macos
+                    log("Error: No backends found!")
+                    RegularQTPopup("Error: No backends found!")
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
@@ -77,8 +77,8 @@ class ProcessTab:
                 case "directml":
                     models = onnxUpscaleModels
                 case _:
-                    log("Error: Invalid backend, returning ncnn models")
-                    ncnnUpscaleModels  # Return ncnn models if it errors out, this should fix macos
+                    log("Error: No backends found!")
+                    RegularQTPopup("Error: No backends found!")
         return models
 
     def onTilingSwitch(self):
