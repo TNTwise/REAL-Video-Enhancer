@@ -251,7 +251,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
-            f"-c:v {self.settings['encoder']} -crf {qualityToCRF[self.settings['videoQuality']]}",
+            f"-c:v {self.settings['encoder']} -crf {qualityToCRF[self.settings['video_quality']]}",
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
         ]

@@ -360,9 +360,8 @@ class InterpolateRifeTorch:
                 )
             else:
                 output = self.flownet(img0, img1, timestep)
-            output = self.tensor_to_frame(output)
         self.stream.synchronize()
-        return output
+        return self.tensor_to_frame(output)
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
