@@ -279,8 +279,8 @@ class IFNet(nn.Module):
                 wimg = torch.reshape(wimg, (1, 6, self.paddedHeight, self.paddedWidth))
                 wf = torch.reshape(wf, (1, 16, self.paddedHeight, self.paddedWidth))
                 if self.ensemble:
-                    wimg_rev = torch.cat(torch.split(wimg, [3, 3], dim=1)[::-1], dim=1) # noqa
-                    wf_rev = torch.cat(torch.split(wf, [8, 8], dim=1)[::-1], dim=1) # noqa
+                    wimg_rev = torch.cat(torch.split(wimg, [3, 3], dim=1)[::-1], dim=1)  # noqa
+                    wf_rev = torch.cat(torch.split(wf, [8, 8], dim=1)[::-1], dim=1)  # noqa
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
         return (

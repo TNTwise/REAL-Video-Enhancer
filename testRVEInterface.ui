@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>929</width>
-    <height>752</height>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1374,7 +1374,26 @@ QDoubleSpinBox::down-button {
                     </widget>
                    </item>
                    <item>
+                    <spacer name="horizontalSpacer_9">
+                     <property name="orientation">
+                      <enum>Qt::Orientation::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
                     <widget class="QComboBox" name="encoder">
+                     <property name="minimumSize">
+                      <size>
+                       <width>100</width>
+                       <height>0</height>
+                      </size>
+                     </property>
                      <item>
                       <property name="text">
                        <string>libx264</string>
@@ -1388,6 +1407,67 @@ QDoubleSpinBox::down-button {
                     </widget>
                    </item>
                   </layout>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QWidget" name="widget_9" native="true">
+                <layout class="QHBoxLayout" name="horizontalLayout_25">
+                 <item>
+                  <widget class="QLabel" name="encoderLabel_2">
+                   <property name="font">
+                    <font>
+                     <pointsize>12</pointsize>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>Video Quality</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_10">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="video_quality">
+                   <property name="minimumSize">
+                    <size>
+                     <width>100</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Very High</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>High</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Medium</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Low</string>
+                    </property>
+                   </item>
+                  </widget>
                  </item>
                 </layout>
                </widget>

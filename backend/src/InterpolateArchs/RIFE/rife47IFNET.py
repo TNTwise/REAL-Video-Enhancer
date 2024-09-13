@@ -53,8 +53,6 @@ class MyPixelShuffle(nn.Module):
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 
-
-
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
         super(ResConv, self).__init__()
@@ -144,7 +142,7 @@ class IFNet(nn.Module):
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(self, img0, img1, timestep,f0):
+    def forward(self, img0, img1, timestep, f0):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
@@ -152,7 +150,6 @@ class IFNet(nn.Module):
         f1 = self.encode(img1[:, :3])
         fs = torch.cat([f0, f1], dim=1)
         fs_2 = torch.reshape(fs, (2, 4, self.paddedHeight, self.paddedWidth))
-        
 
         flows = None
         mask = None
@@ -162,11 +159,9 @@ class IFNet(nn.Module):
         blocks = [self.block0, self.block1, self.block2, self.block3]
         for block, scale in zip(blocks, self.scale_list):
             if flows is None:
-                
                 temp = torch.cat((imgs, fs, timestep), 1)
                 flows, mask = block(temp, scale=scale)
             else:
-                
                 temp = torch.cat(
                     (
                         wimg,
@@ -181,7 +176,6 @@ class IFNet(nn.Module):
 
                 flows = flows + fds
 
-               
             precomp = (
                 (self.backWarp + flows.reshape((2, 2, h, w)) * self.tenFlow)
                 .permute(0, 2, 3, 1)

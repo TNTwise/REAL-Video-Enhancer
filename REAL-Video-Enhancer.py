@@ -1,5 +1,6 @@
 import sys
 import os
+
 # patch for macos
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 import subprocess
@@ -59,6 +60,7 @@ if getPlatform() == "darwin":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # this goes one step up, and goes into the actual directory. This is where backend will be copied to.
     os.chdir("..")
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     """Main window class for the REAL Video Enhancer application.
@@ -328,7 +330,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif method == "Interpolate":
             interpolateTimes = self.interpolationMultiplierSpinBox.value()
         return interpolateTimes
-    
 
     def startRender(self):
         if self.isVideoLoaded:

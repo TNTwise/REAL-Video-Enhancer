@@ -82,7 +82,7 @@ class BackendHandler:
                 "--list_backends",
             ]
         )
-        output:str = output.getOutput()
+        output: str = output.getOutput()
         output = output.split(" ")
         # hack to filter out bad find
         new_out = ""

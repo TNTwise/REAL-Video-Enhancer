@@ -89,6 +89,12 @@ class SettingsTab:
                 str(self.parent.scene_detection_threshold.value()),
             )
         )
+        self.parent.scene_detection_threshold.valueChanged.connect(
+            lambda: self.settings.writeSetting(
+                "video_quality",
+                str(self.parent.video_quality.currentText()),
+            )
+        )
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
 
     def resetSettings(self):
@@ -115,6 +121,9 @@ class SettingsTab:
         self.parent.scene_detection_threshold.setValue(
             float(self.settings.settings["scene_detection_threshold"])
         )
+        self.parent.video_quality.setCurrentText(
+            self.settings.settings["video_quality"]
+        )
 
 
 class Settings:
@@ -133,6 +142,7 @@ class Settings:
             "scene_change_detection_enabled": "True",
             "discord_rich_presence": "True",
             "scene_detection_threshold": "2.0",
+            "video_quality": "High",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -142,6 +152,7 @@ class Settings:
             "scene_change_detection_enabled": ("True", "False"),
             "discord_rich_presence": ("True", "False"),
             "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
+            "video_quality": ("Low", "Medium", "High", "Very High"),
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):

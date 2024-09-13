@@ -63,7 +63,8 @@ class ProcessTab:
                 case "directml":
                     models = onnxInterpolateModels
                 case _:
-                    models = ncnnInterpolateModels # Return ncnn models if it errors out, this should fix macos
+                    log("Error: Invalid backend, returning ncnn models")
+                    models = ncnnInterpolateModels  # Return ncnn models if it errors out, this should fix macos
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
@@ -76,17 +77,19 @@ class ProcessTab:
                 case "directml":
                     models = onnxUpscaleModels
                 case _:
-                    ncnnUpscaleModels # Return ncnn models if it errors out, this should fix macos
+                    log("Error: Invalid backend, returning ncnn models")
+                    ncnnUpscaleModels  # Return ncnn models if it errors out, this should fix macos
         return models
 
     def onTilingSwitch(self):
         if self.parent.tilingCheckBox.isChecked():
             self.parent.tileSizeContainer.setVisible(True)
-            self.tileDownAnimationHandler.dropDownAnimation(self.parent.tileSizeContainer)
+            self.tileDownAnimationHandler.dropDownAnimation(
+                self.parent.tileSizeContainer
+            )
         else:
             self.tileUpAnimationHandler.moveUpAnimation(self.parent.tileSizeContainer)
             self.parent.tileSizeContainer.setVisible(False)
-            
 
     def QConnect(self):
         # connect file select buttons
@@ -100,9 +103,7 @@ class ProcessTab:
         # set tile size visible to false by default
         self.parent.tileSizeContainer.setVisible(False)
         # connect up tilesize container visiable
-        self.parent.tilingCheckBox.stateChanged.connect(
-            self.onTilingSwitch
-        )
+        self.parent.tilingCheckBox.stateChanged.connect(self.onTilingSwitch)
 
         self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
@@ -142,10 +143,8 @@ class ProcessTab:
             self.parent.interpolationContainer.setVisible(False)
             self.parent.upscaleContainer.setVisible(True)
             self.animationHandler.dropDownAnimation(self.parent.upscaleContainer)
-            
 
         self.parent.updateVideoGUIDetails()
-
 
     def run(
         self,
@@ -237,6 +236,7 @@ class ProcessTab:
 
     def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
+        qualityToCRF = {"Low": "28", "Medium": "23", "High": "18", "Very High": "15"}
         command = [
             f"{pythonPath()}",
             "-W",
@@ -251,7 +251,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
-            f"-c:v {self.settings['encoder']}",
+            f"-c:v {self.settings['encoder']} -crf {qualityToCRF[self.settings['videoQuality']]}",
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
         ]

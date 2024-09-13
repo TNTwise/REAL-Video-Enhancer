@@ -35,7 +35,7 @@ class DownloadDependencies:
         *NOTE
         tag is unused for now, as still in active development. just downloads the latest backend.
         """
-        
+
         if not os.path.exists(backendDirectory()):
             print(str(backendDirectory()) + " Does not exist!")
             backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"

@@ -189,8 +189,7 @@ class Render(FFMpegRender):
                     frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
                     self.writeQueue.put(frame)
             else:
-                
-                if self.backend != 'ncnn':
+                if self.backend != "ncnn":
                     self.interpolate(self.setup_frame0, setup_frame1, 0)
                 else:
                     self.undoSetup(self.setup_frame0)

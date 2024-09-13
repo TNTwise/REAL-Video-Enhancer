@@ -15,6 +15,7 @@ import webbrowser
 
 homedir = os.path.expanduser("~")
 
+
 def getPlatform() -> str:
     """
     Returns the current OS that the app is running on
@@ -23,6 +24,7 @@ def getPlatform() -> str:
     Linux: linux
     """
     return sys.platform
+
 
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
@@ -112,9 +114,6 @@ def getOSInfo() -> str:
     return f"{system} {release} {architecture}"
 
 
-
-
-
 def getRAMAmount() -> str:
     """
     Returns the amount of RAM in the system.
@@ -172,7 +171,7 @@ def videosPath() -> str:
     :return: The file path for the videos directory.
     :rtype: str
     """
-    if getPlatform() == 'darwin':
+    if getPlatform() == "darwin":
         return os.path.join(homedir, "Desktop")
     else:
         return os.path.join(homedir, "Videos")

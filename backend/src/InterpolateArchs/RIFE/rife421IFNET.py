@@ -163,8 +163,8 @@ class IFNet(nn.Module):
             else:
                 temp = torch.cat(
                     (
-                        wimg, # noqa
-                        wf, # noqa
+                        wimg,  # noqa
+                        wf,  # noqa
                         timeStep,
                         mask,
                         feat,

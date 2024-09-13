@@ -93,14 +93,12 @@ ncnnUpscaleModels = {
         4,
         "SPAN",
     ),
-    
     "Compact (Realistic) (HD Input) (2X) (Fast)": (
         "2x_OpenProteus_Compact_i2_70K",
         "2x_OpenProteus_Compact_i2_70K.tar.gz",
         2,
         "Compact",
     ),
-
 }
 """"RealCUGAN Pro (Animation) (2X) (Slow)": (
         "up2x-conservative",
@@ -237,7 +235,17 @@ onnxUpscaleModels = {
     ),
 }
 
-totalModels = onnxInterpolateModels | onnxUpscaleModels | pytorchInterpolateModels | pytorchUpscaleModels | ncnnInterpolateModels | ncnnUpscaleModels | tensorrtInterpolateModels | tensorrtUpscaleModels # this doesnt include all models due to overwriting, but includes every case of every unique model name
+totalModels = (
+    onnxInterpolateModels
+    | onnxUpscaleModels
+    | pytorchInterpolateModels
+    | pytorchUpscaleModels
+    | ncnnInterpolateModels
+    | ncnnUpscaleModels
+    | tensorrtInterpolateModels
+    | tensorrtUpscaleModels
+)  # this doesnt include all models due to overwriting, but includes every case of every unique model name
+
 
 def downloadModelsBasedOnInstalledBackend(installed_backends: list):
     if NetworkCheckPopup():

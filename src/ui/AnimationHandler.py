@@ -1,5 +1,12 @@
 from PySide6.QtWidgets import QWidget, QGraphicsOpacityEffect, QGraphicsItemAnimation
-from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QRect, QPoint, QSize, QParallelAnimationGroup
+from PySide6.QtCore import (
+    QPropertyAnimation,
+    QEasingCurve,
+    QRect,
+    QPoint,
+    QSize,
+    QParallelAnimationGroup,
+)
 
 
 class AnimationHandler:
@@ -30,14 +37,17 @@ class AnimationHandler:
         self.animation.setEndValue(color)
         self.animation.setEasingCurve(QEasingCurve.InOutQuad)
         self.animation.start()
-    
-
 
         self.animation.start()
 
     def dropDownAnimation(self, widget: QWidget, duration=200):
         start_geometry = widget.geometry()
-        end_geometry = QRect(start_geometry.x(), start_geometry.y(), start_geometry.width(), start_geometry.height())
+        end_geometry = QRect(
+            start_geometry.x(),
+            start_geometry.y(),
+            start_geometry.width(),
+            start_geometry.height(),
+        )
 
         # Move the widget above its final position
         start_geometry.moveTop(start_geometry.y() - start_geometry.height())
@@ -48,11 +58,16 @@ class AnimationHandler:
         self.animation.setEndValue(end_geometry)
         self.animation.setEasingCurve(QEasingCurve.Linear)
         self.animation.start()
-    
+
     def moveUpAnimation(self, widget: QWidget, duration=200):
         widget.setVisible(True)
         start_geometry = widget.geometry()
-        end_geometry = QRect(start_geometry.x(), start_geometry.y() - start_geometry.height(), start_geometry.width(), start_geometry.height())
+        end_geometry = QRect(
+            start_geometry.x(),
+            start_geometry.y() - start_geometry.height(),
+            start_geometry.width(),
+            start_geometry.height(),
+        )
 
         start_geometry.moveTop(start_geometry.y() + start_geometry.height())
 
@@ -68,7 +83,12 @@ class AnimationHandler:
 
         # Drop-down animation
         start_geometry = widget.geometry()
-        end_geometry = QRect(start_geometry.x(), start_geometry.y(), start_geometry.width(), start_geometry.height())
+        end_geometry = QRect(
+            start_geometry.x(),
+            start_geometry.y(),
+            start_geometry.width(),
+            start_geometry.height(),
+        )
         start_geometry.moveTop(start_geometry.y() - start_geometry.height())
 
         drop_down_animation = QPropertyAnimation(widget, b"geometry")
