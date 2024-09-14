@@ -136,6 +136,7 @@ class Render(FFMpegRender):
         self.inputstdinThread.start()
 
     def inputSTDINThread(self):
+        return
         sleep(10)
         self.isPaused = True
         self.hotUnload()
