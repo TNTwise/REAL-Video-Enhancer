@@ -173,11 +173,13 @@ class Render(FFMpegRender):
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
         self.setup_frame0 = self.frameSetupFunction(self.frame0)
-
+        if self.backend != "ncnn":
+            self.interpolate(self.setup_frame0, self.setup_frame0, 0) # hack to remove weird warped frame when caching encode
         for frameNum in range(self.totalInputFrames - 1):
             frame1 = self.readQueue.get()
             if frame1 is None:
                 break
+
             setup_frame1 = self.frameSetupFunction(frame1)
             if frameNum != self.transitionFrame:
                 for n in range(self.ceilInterpolateFactor):
