@@ -159,12 +159,23 @@ class IFNet(nn.Module):
 
         self.paddedHeight = backwarp_tenGrid.shape[2]
         self.paddedWidth = backwarp_tenGrid.shape[3]
+    def warp(self, tenInput, tenFlow):
+        tenFlow = torch.cat(
+            [tenFlow[:, 0:1] / self.tenFlow[0], tenFlow[:, 1:2] / self.tenFlow[1]], 1
+        )
+
+        g = (self.backWarp + tenFlow).permute(0, 2, 3, 1)
+        return torch.nn.functional.grid_sample(
+            input=tenInput,
+            grid=g,
+            mode="bilinear",
+            padding_mode="border",
+            align_corners=True,
+        )
 
     def forward(self, img0, img1, timestep, f0):
+        
         f1 = self.encode(img1[:, :3])
-        flow_list = []
-        merged = []
-        mask_list = []
         warped_img0 = img0
         warped_img1 = img1
         flow = None
@@ -174,16 +185,13 @@ class IFNet(nn.Module):
             if flow is None:
                 flow, mask, feat = block[i](torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1), None, scale=self.scaleList[i])
             else:
-                wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
-                wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
+                wf0 = self.warp(f0, flow[:, :2])
+                wf1 = self.warp(f1, flow[:, 2:4])
                 fd, m0, feat = block[i](torch.cat((warped_img0[:, :3], warped_img1[:, :3], wf0, wf1, timestep, mask, feat), 1), flow, scale=self.scaleList[i])
                 mask = m0
                 flow = flow + fd
-            mask_list.append(mask)
-            flow_list.append(flow)
-            warped_img0 = warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
-            warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
-            merged.append((warped_img0, warped_img1))
+            warped_img0 = self.warp(img0, flow[:, :2])
+            warped_img1 = self.warp(img1, flow[:, 2:4])
 
         mask = torch.sigmoid(mask)
         return (
