@@ -10,3 +10,6 @@ py-cpuinfo
 distro
 pypresence
 certifi
+yt-dlp
+validators
+

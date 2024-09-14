@@ -94,6 +94,7 @@ class ProcessTab:
     def QConnect(self):
         # connect file select buttons
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
+        self.parent.inputFileText.textChanged.connect(self.parent.openFileFromYoutubeLink)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
@@ -105,7 +106,6 @@ class ProcessTab:
         # connect up tilesize container visiable
         self.parent.tilingCheckBox.stateChanged.connect(self.onTilingSwitch)
 
-        self.parent.inputFileText.textChanged.connect(self.parent.updateVideoGUIDetails)
         self.parent.interpolationMultiplierSpinBox.valueChanged.connect(
             self.parent.updateVideoGUIDetails
         )

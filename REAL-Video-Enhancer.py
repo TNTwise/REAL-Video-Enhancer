@@ -53,6 +53,8 @@ from src.ModelHandler import totalModels
 from src.ui.AnimationHandler import AnimationHandler
 from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
+import yt_dlp
+import validators
 
 # patch for macos
 if getPlatform() == "darwin":
@@ -270,13 +272,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             interpolateTimes = self.getInterpolateTimes(method, modelName)
             scale = self.getScale(method, modelName)
             inputFile = self.inputFileText.text()
-            file_extension = os.path.splitext(inputFile)[1]
+
             text = (
                 f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
                 + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth*scale}x{self.videoHeight*scale}\n"
                 + f"Bitrate: {self.videoBitrate}\n"
                 + f"Encoder: {self.videoEncoder}\n"
-                + f"Container: {file_extension}\n"
+                + f"Container: {self.videoContainer}\n"
                 + f"Frame Count: {self.videoFrameCount}\n"
             )
             self.videoInfoTextEdit.setFontPointSize(10)
@@ -293,7 +295,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # check if there is a video loaded
         if self.isVideoLoaded:
-            inputFile = self.inputFileText.text()
+            inputFile = self.inputFile
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method, modelName)
@@ -387,6 +389,52 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enableProcessPage(self):
         self.processSettingsContainer.setEnabled(True)
 
+    def openFileFromYoutubeLink(self):
+        url = self.inputFileText.text()
+        if validators.url(url) and "youtube.com" in url or "youtu.be" in url:
+            ydl_opts = {
+                'format': 'bestvideo+bestaudio/best'
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(url, download=False)
+            self.videoContainer = info_dict['ext']
+            self.inputFile = info_dict['title'] + self.videoContainer
+            self.videoWidth = info_dict['width']
+            self.videoHeight = info_dict['height']
+            self.videoFps = info_dict['fps']
+            self.videoEncoder = info_dict['vcodec']
+            self.videoBitrate = info_dict['vbr']
+            self.videoFrameCount = int(info_dict['duration'] * info_dict['fps'])
+            self.outputFileText.setEnabled(True)
+            self.outputFileSelectButton.setEnabled(True)
+            self.isVideoLoaded = True
+            self.updateVideoGUIDetails()
+        else:
+            self.loadVideo(url) # load file from local storage if its not a youtube link
+
+    def loadVideo(self, inputFile):
+        if checkValidVideo(inputFile):
+            self.inputFile = inputFile
+            self.isVideoLoaded = True
+            # gets width and height from the res
+            self.videoWidth, self.videoHeight = getVideoRes(inputFile)
+            # get fps
+            self.videoFps = getVideoFPS(inputFile)
+            # get video length
+            self.videoLength = getVideoLength(inputFile)
+            # get video frame count
+            self.videoFrameCount = getVideoFrameCount(inputFile)
+            # get video encoder
+            self.videoEncoder = getVideoEncoder(inputFile)
+            # get video bitrate
+            self.videoBitrate = getVideoBitrate(inputFile)
+            # get video codec
+            self.videoCodec = getVideoEncoder(inputFile)
+            self.inputFileText.setText(inputFile)
+            self.videoContainer =  os.path.splitext(inputFile)[1]
+            self.outputFileText.setEnabled(True)
+            self.outputFileSelectButton.setEnabled(True)
+            self.updateVideoGUIDetails()
     # input file button
     def openInputFile(self):
         """
@@ -409,27 +457,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             dir=self.homeDir,
             filter=fileFilter,
         )
+        self.loadVideo(inputFile)
 
-        if checkValidVideo(inputFile):
-            self.inputFile = inputFile
-            self.isVideoLoaded = True
-            # gets width and height from the res
-            self.videoWidth, self.videoHeight = getVideoRes(inputFile)
-            # get fps
-            self.videoFps = getVideoFPS(inputFile)
-            # get video length
-            self.videoLength = getVideoLength(inputFile)
-            # get video frame count
-            self.videoFrameCount = getVideoFrameCount(inputFile)
-            # get video encoder
-            self.videoEncoder = getVideoEncoder(inputFile)
-            # get video bitrate
-            self.videoBitrate = getVideoBitrate(inputFile)
-            # get video codec
-            self.videoCodec = getVideoEncoder(inputFile)
-            self.inputFileText.setText(inputFile)
-            self.outputFileText.setEnabled(True)
-            self.outputFileSelectButton.setEnabled(True)
+
 
     # output file button
     def openOutputFolder(self):

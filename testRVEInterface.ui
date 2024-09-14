@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>929</width>
-    <height>839</height>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -474,7 +474,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                        </size>
                       </property>
                       <property name="readOnly">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
