@@ -182,6 +182,8 @@ class UpscalePytorch:
         self.model = None
         gc.collect()
         torch.cuda.empty_cache()
+        torch.cuda.reset_max_memory_allocated()
+        torch.cuda.reset_max_memory_cached()
     def hotReload(self):
         self._load()
     @torch.inference_mode()
