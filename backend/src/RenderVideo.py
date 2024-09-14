@@ -3,6 +3,8 @@ from queue import Queue, Empty
 from multiprocessing import shared_memory
 import os
 import math
+from time import sleep
+import sys
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
@@ -89,6 +91,7 @@ class Render(FFMpegRender):
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.frame0 = None
+        self.isPaused = False
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
@@ -123,12 +126,22 @@ class Render(FFMpegRender):
         )
 
         self.sharedMemoryThread.start()
+        self.inputstdinThread = Thread(target=self.inputSTDINThread)
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
 
         self.ffmpegReadThread.start()
         self.ffmpegWriteThread.start()
         self.renderThread.start()
+        self.inputstdinThread.start()
+
+    def inputSTDINThread(self):
+        sleep(10)
+        self.isPaused = True
+        self.hotUnload()
+        sleep(10)
+        self.hotReload()
+        self.isPaused = False
 
     def renderUpscale(self):
         """
@@ -136,13 +149,18 @@ class Render(FFMpegRender):
         self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
         log("Starting Upscale")
-        for i in range(self.totalInputFrames - 1):
-            frame = self.readQueue.get()
-            """if self.npMean.isEqualImages(frame):
+        while True:
+            if not self.isPaused:
+                frame = self.readQueue.get()
+                """if self.npMean.isEqualImages(frame):
+                    self.writeQueue.put(self.f0)
+                else:"""
+                if frame is None:
+                    break
+                self.f0 = self.upscale(self.frameSetupFunction(frame))
                 self.writeQueue.put(self.f0)
-            else:"""
-            self.f0 = self.upscale(self.frameSetupFunction(frame))
-            self.writeQueue.put(self.f0)
+            else:
+                sleep(1)
         self.writeQueue.put(None)
         log("Finished Upscale")
 
@@ -173,39 +191,43 @@ class Render(FFMpegRender):
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
         self.setup_frame0 = self.frameSetupFunction(self.frame0)
-        
+
         if self.backend != "ncnn":
             self.interpolate(self.setup_frame0, self.setup_frame0, 0) # hack to remove weird warped frame when caching encode
+        frameNum = 0
+        while True:
+            if not self.isPaused:
+                frame1 = self.readQueue.get()
+                if frame1 is None:
+                    break
 
-        for frameNum in range(self.totalInputFrames - 1):
-            frame1 = self.readQueue.get()
-            if frame1 is None:
-                break
+                setup_frame1 = self.frameSetupFunction(frame1)
+                if frameNum != self.transitionFrame:
+                    for n in range(self.ceilInterpolateFactor):
+                        timestep = n / (self.ceilInterpolateFactor)
+                        if timestep == 0:
+                            self.writeQueue.put(self.frame0)
+                            continue
 
-            setup_frame1 = self.frameSetupFunction(frame1)
-            if frameNum != self.transitionFrame:
-                for n in range(self.ceilInterpolateFactor):
-                    timestep = n / (self.ceilInterpolateFactor)
-                    if timestep == 0:
-                        self.writeQueue.put(self.frame0)
-                        continue
-
-                    frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
-                    self.writeQueue.put(frame)
-            else:
-                if self.backend != "ncnn":
-                    self.interpolate(self.setup_frame0, setup_frame1, 0)
+                        frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
+                        self.writeQueue.put(frame)
                 else:
-                    self.undoSetup(self.setup_frame0)
+                    if self.backend != "ncnn":
+                        self.interpolate(self.setup_frame0, setup_frame1, 0)
+                    else:
+                        self.undoSetup(self.setup_frame0)
 
-                for n in range(self.ceilInterpolateFactor):
-                    self.writeQueue.put(self.frame0)
-                try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
-                    self.transitionFrame = self.transitionQueue.get_nowait()
-                except Empty:
-                    self.transitionFrame = None
-            self.frame0 = frame1
-            self.setup_frame0 = setup_frame1
+                    for n in range(self.ceilInterpolateFactor):
+                        self.writeQueue.put(self.frame0)
+                    try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
+                        self.transitionFrame = self.transitionQueue.get_nowait()
+                    except Empty:
+                        self.transitionFrame = None
+                self.frame0 = frame1
+                self.setup_frame0 = setup_frame1
+                frameNum+=1
+            else:
+                sleep(1)
 
         self.writeQueue.put(None)
         log("Finished Interpolation")
@@ -233,6 +255,8 @@ class Render(FFMpegRender):
             self.upscaleTimes = upscalePytorch.getScale()
             self.setupRender = upscalePytorch.bytesToFrame
             self.upscale = upscalePytorch.renderToNPArray
+            self.hotUnload = upscalePytorch.hotUnload
+            self.hotReload = upscalePytorch.hotReload
 
         if self.backend == "ncnn":
             path, last_folder = os.path.split(self.upscaleModel)
@@ -284,6 +308,7 @@ class Render(FFMpegRender):
             self.setupRender = self.returnFrame
             self.undoSetup = interpolateRifeNCNN.uncacheFrame
             self.interpolate = interpolateRifeNCNN.process
+
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
                 interpolateModelPath=self.interpolateModel,
@@ -298,3 +323,5 @@ class Render(FFMpegRender):
             self.setupRender = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = self.returnFrame
             self.interpolate = interpolateRifePytorch.process
+            self.hotUnload = interpolateRifePytorch.hotUnload
+            self.hotReload = interpolateRifePytorch.hotReload

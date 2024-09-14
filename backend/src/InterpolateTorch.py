@@ -4,6 +4,7 @@ from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 import math
 import os
 import logging
+import gc
 from .Util import (
     currentDirectory,
     printAndLog,
@@ -116,30 +117,37 @@ class InterpolateRifeTorch:
         self.height = height
         self.device = device
         self.dtype = self.handlePrecision(dtype)
+        self.trt_workspace_size = trt_workspace_size
+        self.trt_max_aux_streams = trt_max_aux_streams
+        self.trt_optimization_level = trt_optimization_level
+        self.trt_cache_dir = trt_cache_dir
         self.backend = backend
         self.ceilInterpolateFactor = ceilInterpolateFactor
         # set up streams for async processing
         self.stream = torch.cuda.Stream()
         self.prepareStream = torch.cuda.Stream()
-        scale = 1
+        self.scale = 1
         self.f1encode = None
         self.rife46 = False
         v1 = False
         if UHDMode:
-            scale = 0.5
+            self.scale = 0.5
+        self._load()
+    @torch.inference_mode()
+    def _load(self):
         with torch.cuda.stream(self.prepareStream):
             state_dict = torch.load(
-                interpolateModelPath,
+                self.interpolateModel,
                 map_location=self.device,
                 weights_only=True,
                 mmap=True,
             )
 
-            tmp = max(32, int(32 / scale))
+            tmp = max(32, int(32 / self.scale))
             self.pw = math.ceil(self.width / tmp) * tmp
             self.ph = math.ceil(self.height / tmp) * tmp
             self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-            ad = ArchDetect(interpolateModelPath)
+            ad = ArchDetect(self.interpolateModel)
             interpolateArch = ad.getArch()
             # caching the timestep tensor in a dict with the timestep as a float for the key
             self.timestepDict = {}
@@ -154,9 +162,9 @@ class InterpolateRifeTorch:
                 self.timestepDict[timestep] = timestep_tens
             # detect what rife arch to use
             self.inputs = [
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=device),
-                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=device),
-                torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=device),
+                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
+                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
+                torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
             ]
             log("interp arch" + interpolateArch.lower())
             match interpolateArch.lower():
@@ -169,7 +177,7 @@ class InterpolateRifeTorch:
 
                     self.inputs.append(
                         torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=device
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
                     self.encode = torch.nn.Sequential(
@@ -181,7 +189,7 @@ class InterpolateRifeTorch:
 
                     self.inputs.append(
                         torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
@@ -190,7 +198,7 @@ class InterpolateRifeTorch:
 
                     self.inputs.append(
                         torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
@@ -199,7 +207,7 @@ class InterpolateRifeTorch:
 
                     self.inputs.append(
                         torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
@@ -209,7 +217,7 @@ class InterpolateRifeTorch:
 
                     self.inputs.append(
                         torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=device
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
@@ -264,8 +272,8 @@ class InterpolateRifeTorch:
                 ).to(device=self.device, dtype=self.dtype)
 
             self.flownet = IFNet(
-                scale=scale,
-                ensemble=ensemble,
+                scale=self.scale,
+                ensemble=False,
                 dtype=self.dtype,
                 device=self.device,
                 width=self.width,
@@ -288,30 +296,30 @@ class InterpolateRifeTorch:
 
                 logging.basicConfig(level=logging.INFO)
                 trt_engine_path = os.path.join(
-                    os.path.realpath(trt_cache_dir),
+                    os.path.realpath(self.trt_cache_dir),
                     (
                         f"{os.path.basename(self.interpolateModel)}"
                         + f"_{self.pw}x{self.ph}"
                         + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
-                        + f"_scale-{scale}"
-                        + f"_ensemble-{ensemble}"
+                        + f"_scale-{self.scale}"
+                        + f"_ensemble-False"
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
-                        + (f"rife_version-" + "v1" if v1 else "v2") 
+                        + (f"rife_version-" + "v1" if v1 else "v2")
                         + (
-                            f"_workspace-{trt_workspace_size}"
-                            if trt_workspace_size > 0
+                            f"_workspace-{self.trt_workspace_size}"
+                            if self.trt_workspace_size > 0
                             else ""
                         )
                         + (
-                            f"_aux-{trt_max_aux_streams}"
-                            if trt_max_aux_streams is not None
+                            f"_aux-{self.trt_max_aux_streams}"
+                            if self.trt_max_aux_streams is not None
                             else ""
                         )
                         + (
-                            f"_level-{trt_optimization_level}"
-                            if trt_optimization_level is not None
+                            f"_level-{self.trt_optimization_level}"
+                            if self.trt_optimization_level is not None
                             else ""
                         )
                         + ".dyn"
@@ -325,12 +333,12 @@ class InterpolateRifeTorch:
                         ir="dynamo",
                         inputs=self.inputs,
                         enabled_precisions={self.dtype},
-                        debug=trt_debug,
-                        workspace_size=trt_workspace_size,
+                        debug=self.trt_debug,
+                        workspace_size=self.trt_workspace_size,
                         min_block_size=1,
-                        max_aux_streams=trt_max_aux_streams,
-                        optimization_level=trt_optimization_level,
-                        device=device,
+                        max_aux_streams=self.trt_max_aux_streams,
+                        optimization_level=self.trt_optimization_level,
+                        device=self.device,
                         cache_built_engines=False,
                         reuse_cached_engines=False,
                     )
@@ -348,6 +356,17 @@ class InterpolateRifeTorch:
             return torch.float32
         if precision == "float16":
             return torch.float16
+
+    def hotUnload(self):
+        self.flownet = None
+        self.encode = None
+        self.tenFlow_div = None
+        self.backwarp_tenGrid = None
+        gc.collect()
+        torch.cuda.empty_cache()
+    @torch.inference_mode()
+    def hotReload(self):
+        self._load()
 
     @torch.inference_mode()
     def process(self, img0, img1, timestep):

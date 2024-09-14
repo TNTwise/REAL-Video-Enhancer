@@ -2,6 +2,7 @@ import os
 import math
 import numpy as np
 import cv2
+import gc
 import torch as torch
 import torch.nn.functional as F
 
@@ -56,7 +57,7 @@ class UpscalePytorch:
         self,
         modelPath: str,
         device="default",
-        tile_pad: int = 0,
+        tile_pad: int = 10,
         precision: str = "auto",
         width: int = 1920,
         height: int = 1080,
@@ -79,12 +80,22 @@ class UpscalePytorch:
         self.tile_pad = tile_pad
         self.dtype = self.handlePrecision(precision)
         self.device = device
-        model = self.loadModel(modelPath=modelPath, device=device, dtype=self.dtype)
-
         self.videoWidth = width
         self.videoHeight = height
         self.tilesize = tilesize
         self.tile = [self.tilesize, self.tilesize]
+        self.modelPath = modelPath
+        self.backend = backend
+        self.trt_cache_dir = trt_cache_dir
+        self.trt_workspace_size = trt_workspace_size
+
+        self._load()
+    @torch.inference_mode()
+    def _load(self):
+        model = self.loadModel(modelPath=self.modelPath, device=self.device, dtype=self.dtype)
+
+
+
         match self.scale:
             case 1:
                 modulo = 4
@@ -94,30 +105,30 @@ class UpscalePytorch:
                 modulo = 1
         if all(t > 0 for t in self.tile):
             self.pad_w = (
-                math.ceil(min(self.tile[0] + 2 * tile_pad, width) / modulo) * modulo
+                math.ceil(min(self.tile[0] + 2 * self.tile_pad, self.videoWidth) / modulo) * modulo
             )
             self.pad_h = (
-                math.ceil(min(self.tile[1] + 2 * tile_pad, height) / modulo) * modulo
+                math.ceil(min(self.tile[1] + 2 * self.tile_pad, self.videoHheight) / modulo) * modulo
             )
         else:
-            self.pad_w = width
-            self.pad_h = height
+            self.pad_w = self.videoWidth
+            self.pad_h = self.videoHeight
 
-        if backend == "tensorrt":
+        if self.backend == "tensorrt":
             import tensorrt as trt
             import torch_tensorrt
 
             trt_engine_path = os.path.join(
-                os.path.realpath(trt_cache_dir),
+                os.path.realpath(self.trt_cache_dir),
                 (
-                    f"{os.path.basename(modelPath)}"
+                    f"{os.path.basename(self.modelPath)}"
                     + f"_{self.pad_w}x{self.pad_h}"
                     + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
-                    + f"_{torch.cuda.get_device_name(device)}"
+                    + f"_{torch.cuda.get_device_name(self.device)}"
                     + f"_trt-{trt.__version__}"
                     + (
-                        f"_workspace-{trt_workspace_size}"
-                        if trt_workspace_size > 0
+                        f"_workspace-{self.trt_workspace_size}"
+                        if self.trt_workspace_size > 0
                         else ""
                     )
                     + ".ts"
@@ -129,7 +140,7 @@ class UpscalePytorch:
                     torch.zeros(
                         (1, 3, self.pad_h, self.pad_w),
                         dtype=self.dtype,
-                        device=device,
+                        device=self.device,
                     )
                 ]
                 dummy_input_cpu_fp32 = [
@@ -148,7 +159,7 @@ class UpscalePytorch:
                     inputs=inputs,
                     enabled_precisions={self.dtype},
                     device=torch_tensorrt.Device(gpu_id=0),
-                    workspace_size=trt_workspace_size,
+                    workspace_size=self.trt_workspace_size,
                     truncate_long_and_double=True,
                     min_block_size=1,
                 )
@@ -167,6 +178,12 @@ class UpscalePytorch:
         if precision == "float16":
             return torch.float16
 
+    def hotUnload(self):
+        self.model = None
+        gc.collect()
+        torch.cuda.empty_cache()
+    def hotReload(self):
+        self._load()
     @torch.inference_mode()
     def loadModel(
         self, modelPath: str, dtype: torch.dtype = torch.float32, device: str = "cuda"
