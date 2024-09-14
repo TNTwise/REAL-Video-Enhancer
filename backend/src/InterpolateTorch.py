@@ -355,7 +355,7 @@ class InterpolateRifeTorch:
             timestep = self.timestepDict[timestep]
             if not self.rife46:
                 if self.f1encode is None:
-                    self.f1encode = self.encode(img0[:, :3])
+                    self.f1encode = self.encode(img1[:, :3])
                 output, self.f1encode = self.flownet(
                     img0, img1, timestep, self.f1encode
                 )
