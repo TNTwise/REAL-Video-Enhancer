@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 from torch.nn.functional import interpolate
-
+from .warplayer import warp
 
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
@@ -161,61 +161,31 @@ class IFNet(nn.Module):
         self.paddedWidth = backwarp_tenGrid.shape[3]
 
     def forward(self, img0, img1, timestep, f0):
-        imgs = torch.cat([img0, img1], dim=1)
-        imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
         f1 = self.encode(img1[:, :3])
-        fs = torch.cat([f0, f1], dim=1)
-        fs_2 = torch.reshape(fs, (2, 4, self.paddedHeight, self.paddedWidth))
+        flow_list = []
+        merged = []
+        mask_list = []
         warped_img0 = img0
         warped_img1 = img1
-        flows = None
-        for block, scale in zip(self.blocks, self.scaleList):
-            if flows is None:
-                temp = torch.cat((imgs, fs, timestep), 1)
-                flows, mask, feat = block(temp, scale=scale)
+        flow = None
+        mask = None
+        block = [self.block0, self.block1, self.block2, self.block3]
+        for i in range(4):
+            if flow is None:
+                flow, mask, feat = block[i](torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1), None, scale=self.scaleList[i])
             else:
-                temp = torch.cat(
-                    (
-                        wimg,  # noqa
-                        wf,  # noqa
-                        timestep,
-                        mask,
-                        feat,
-                        (flows * (1 / scale) if scale != 1 else flows),
-                    ),
-                    1,
-                )
-                fds, mask, feat = block(temp, scale=scale)
-
-                flows = flows + fds
-
-            precomp = (
-                self.backWarp
-                + flows.reshape((2, 2, self.paddedHeight, self.paddedWidth))
-                * self.tenFlow
-            ).permute(0, 2, 3, 1)
-            if scale == 1:
-                warped_imgs = torch.nn.functional.grid_sample(
-                    imgs_2,
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
-            else:
-                warps = torch.nn.functional.grid_sample(
-                    torch.cat((imgs_2, fs_2), 1),
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
-                wimg, wf = torch.split(warps, [3, 4], dim=1)
-                wimg = torch.reshape(wimg, (1, 6, self.paddedHeight, self.paddedWidth))
-                wf = torch.reshape(wf, (1, 8, self.paddedHeight, self.paddedWidth))
+                wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
+                wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
+                fd, m0, feat = block[i](torch.cat((warped_img0[:, :3], warped_img1[:, :3], wf0, wf1, timestep, mask, feat), 1), flow, scale=self.scaleList[i])
+                mask = m0
+                flow = flow + fd
+            mask_list.append(mask)
+            flow_list.append(flow)
+            warped_img0 = warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
+            warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
+            merged.append((warped_img0, warped_img1))
 
         mask = torch.sigmoid(mask)
-        warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
         return (
             (warped_img0 * mask + warped_img1 * (1 - mask))[
                 :, :, : self.height, : self.width

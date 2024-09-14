@@ -123,6 +123,8 @@ class InterpolateRifeTorch:
         self.prepareStream = torch.cuda.Stream()
         scale = 1
         self.f1encode = None
+        self.rife46 = False
+        v1 = False
         if UHDMode:
             scale = 0.5
         with torch.cuda.stream(self.prepareStream):
@@ -160,12 +162,11 @@ class InterpolateRifeTorch:
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-
+                    self.rife46 = True
                     v1 = True
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
-                    v1 = False
                     self.inputs.append(
                         torch.zeros(
                             (1, 4, self.ph, self.pw), dtype=self.dtype, device=device
@@ -178,7 +179,6 @@ class InterpolateRifeTorch:
                 case "rife413":
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
 
-                    v1 = False
                     self.inputs.append(
                         torch.zeros(
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
@@ -188,7 +188,6 @@ class InterpolateRifeTorch:
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
 
-                    v1 = False
                     self.inputs.append(
                         torch.zeros(
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
@@ -198,13 +197,13 @@ class InterpolateRifeTorch:
                 case "rife421":
                     from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
 
-                    v1 = False
                     self.inputs.append(
                         torch.zeros(
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=device
                         ),
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
+                    v1=True
                 case "rife422lite":
                     from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
 
@@ -215,7 +214,7 @@ class InterpolateRifeTorch:
                     )
                     self.encode = Head().to(device=self.device, dtype=self.dtype)
 
-                    v1 = False
+                    v1 = True
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
             self.v1 = v1
@@ -299,6 +298,7 @@ class InterpolateRifeTorch:
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
+                        + (f"rife_version-" + "v1" if v1 else "v2") 
                         + (
                             f"_workspace-{trt_workspace_size}"
                             if trt_workspace_size > 0
@@ -331,6 +331,7 @@ class InterpolateRifeTorch:
                         max_aux_streams=trt_max_aux_streams,
                         optimization_level=trt_optimization_level,
                         device=device,
+                        cache_built_engines=False,
                         reuse_cached_engines=False,
                     )
                     printAndLog(f"Saving TensorRT engine to {trt_engine_path}")
@@ -352,7 +353,7 @@ class InterpolateRifeTorch:
     def process(self, img0, img1, timestep):
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
-            if not self.v1:
+            if not self.rife46:
                 if self.f1encode is None:
                     self.f1encode = self.encode(img1[:, :3])
                 output, self.f1encode = self.flownet(
