@@ -10,7 +10,6 @@ from .Util import (
 )
 from .version import version
 
-backends = ['directml','ncnn','pytorch','tensorrt']
 
 class BackendHandler:
     def __init__(self, parent):
@@ -83,13 +82,21 @@ class BackendHandler:
                 "--list_backends",
             ]
         )
-        output: str = output.getOutput()
+        output:str = output.getOutput()
+        output = output.split(" ")
         # hack to filter out bad find
-        backend_list =[]
-        for backend in backends:
-            if backend in output:
-                backend_list.append(backend)
+        new_out = ""
+        for word in output:
+            if "objc" in word:
+                continue
+            new_out += word + " "
+        output = new_out
+        # Find the part of the output containing the backends list
+        start = output.find("[")
+        end = output.find("]") + 1
+        backends_str = output[start:end]
 
         # Convert the string representation of the list to an actual list
+        backends = eval(backends_str)
 
-        return backend_list, output
+        return backends, output
