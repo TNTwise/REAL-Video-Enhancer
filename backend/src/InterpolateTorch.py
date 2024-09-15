@@ -129,7 +129,7 @@ class InterpolateRifeTorch:
         self.scale = 1
         self.f1encode = None
         self.rife46 = False
-        v1 = False
+        self.trt_debug = trt_debug
         if UHDMode:
             self.scale = 0.5
         self._load()
@@ -167,6 +167,7 @@ class InterpolateRifeTorch:
                 torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
             ]
             log("interp arch" + interpolateArch.lower())
+            v1=False
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
