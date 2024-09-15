@@ -139,8 +139,7 @@ class IFNet(nn.Module):
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
 
-    def forward(self, img0, img1, timeStep, f0):
-        f1 = self.encode(img1[:, :3])
+    def forward(self, img0, img1, timeStep, f0, f1):
         flow_list = []
         merged = []
         mask_list = []
@@ -171,4 +170,4 @@ class IFNet(nn.Module):
             .permute(1, 2, 0)
             .mul(255)
             .float()
-        ), f1
+        )

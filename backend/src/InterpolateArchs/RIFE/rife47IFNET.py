@@ -142,12 +142,11 @@ class IFNet(nn.Module):
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(self, img0, img1, timestep, f0):
+    def forward(self, img0, img1, timestep, f0, f1):
         # cant be cached
         h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
-        f1 = self.encode(img1[:, :3])
         fs = torch.cat([f0, f1], dim=1)
         fs_2 = torch.reshape(fs, (2, 4, self.paddedHeight, self.paddedWidth))
 
@@ -210,4 +209,4 @@ class IFNet(nn.Module):
 
         frame = warped_img0 * mask + warped_img1 * (1 - mask)
         frame = frame[:, :, : self.height, : self.width][0]
-        return frame.permute(1, 2, 0).mul(255).float(), f1
+        return frame.permute(1, 2, 0).mul(255).float()

@@ -166,6 +166,9 @@ class InterpolateRifeTorch:
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
                 torch.zeros((1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device),
             ]
+            self.encodedInput = [
+                torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
+            ]
             log("interp arch" + interpolateArch.lower())
             v1=False
             match interpolateArch.lower():
@@ -176,6 +179,11 @@ class InterpolateRifeTorch:
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
+                        ),
+                    )
                     self.inputs.append(
                         torch.zeros(
                             (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
@@ -193,10 +201,20 @@ class InterpolateRifeTorch:
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                        ),
+                    )
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
 
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                        ),
+                    )
                     self.inputs.append(
                         torch.zeros(
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
@@ -211,6 +229,11 @@ class InterpolateRifeTorch:
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                        ),
+                    )
                     self.encode = Head()
                     v1=True
                 case "rife422lite":
@@ -220,6 +243,12 @@ class InterpolateRifeTorch:
                         torch.zeros(
                             (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
+                    )
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
+                        ),
+                        
                     )
                     self.encode = Head()
 
@@ -293,9 +322,9 @@ class InterpolateRifeTorch:
                 for k, v in state_dict.items()
                 if "encode." in k 
             }
-            
-            self.encode.load_state_dict(state_dict=head_state_dict, strict=True)
-            self.encode.eval().to(device=self.device, dtype=self.dtype)
+            if not self.rife46:
+                self.encode.load_state_dict(state_dict=head_state_dict, strict=True)
+                self.encode.eval().to(device=self.device, dtype=self.dtype)
             self.flownet.load_state_dict(state_dict=state_dict, strict=False)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
             if self.backend == "tensorrt":
@@ -315,6 +344,7 @@ class InterpolateRifeTorch:
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
                         + (f"rife_version-" + "v1" if v1 else "v2")
+                        + (f"model_version-2")
                         + (
                             f"_workspace-{self.trt_workspace_size}"
                             if self.trt_workspace_size > 0
@@ -333,6 +363,31 @@ class InterpolateRifeTorch:
                         + ".dyn"
                     ),
                 )
+                if not self.rife46:
+                    encode_trt_engine_path = trt_engine_path.replace(".dyn", "_encode.dyn")
+                    if not os.path.isfile(encode_trt_engine_path):
+                        printAndLog("Building TensorRT engine {}".format(trt_engine_path))
+
+                        self.encode = torch_tensorrt.compile(
+                            self.encode,
+                            ir="dynamo",
+                            inputs=self.encodedInput,
+                            enabled_precisions={self.dtype},
+                            debug=self.trt_debug,
+                            workspace_size=self.trt_workspace_size,
+                            min_block_size=1,
+                            max_aux_streams=self.trt_max_aux_streams,
+                            optimization_level=self.trt_optimization_level,
+                            device=self.device,
+                            cache_built_engines=False,
+                            reuse_cached_engines=False,
+                        )
+                        printAndLog(f"Saving TensorRT engine to {encode_trt_engine_path}")
+                        torch_tensorrt.save(
+                            self.encode, encode_trt_engine_path, inputs=self.encodedInput
+                        )
+                    printAndLog(f"Loading TensorRT engine from {encode_trt_engine_path}")
+                    self.encode = torch.export.load(encode_trt_engine_path).module()
                 if not os.path.isfile(trt_engine_path):
                     printAndLog("Building TensorRT engine {}".format(trt_engine_path))
 
@@ -389,11 +444,14 @@ class InterpolateRifeTorch:
             if not self.rife46:
                 if self.f0encode is None:
                     self.f0encode = self.encode(img0[:, :3])
-                output, self.f0encode = self.flownet(
-                    img0, img1, timestep, self.f0encode
+                f1encode = self.encode(img1[:, :3])
+                output = self.flownet(
+                    img0, img1, timestep, self.f0encode, f1encode
                 )
+                self.f0encode = f1encode
             else:
                 output = self.flownet(img0, img1, timestep)
+            
         self.stream.synchronize()
         return self.tensor_to_frame(output)
 
@@ -408,6 +466,9 @@ class InterpolateRifeTorch:
         """
 
         return frame.byte().contiguous().cpu().numpy()
+    @torch.inference_mode()
+    def encode_Frame(self,frame:torch.Tensor):
+        return self.encode(frame[:, :3])
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:

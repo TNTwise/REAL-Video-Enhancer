@@ -160,10 +160,9 @@ class IFNet(nn.Module):
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
 
-    def forward(self, img0, img1, timestep, f0):
+    def forward(self, img0, img1, timestep, f0, f1):
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
-        f1 = self.encode(img1[:, :3])
         fs = torch.cat([f0, f1], dim=1)
         fs_2 = torch.reshape(fs, (2, 8, self.paddedHeight, self.paddedWidth))
         if self.ensemble:
@@ -290,4 +289,4 @@ class IFNet(nn.Module):
             .permute(1, 2, 0)
             .mul(255)
             .float()
-        ), f1
+        )

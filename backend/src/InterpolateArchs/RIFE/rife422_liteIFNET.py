@@ -173,9 +173,7 @@ class IFNet(nn.Module):
             align_corners=True,
         )
 
-    def forward(self, img0, img1, timestep, f0):
-        
-        f1 = self.encode(img1[:, :3])
+    def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0
         warped_img1 = img1
         flow = None
@@ -201,4 +199,4 @@ class IFNet(nn.Module):
             .permute(1, 2, 0)
             .mul(255)
             .float()
-        ), f1
+        )
