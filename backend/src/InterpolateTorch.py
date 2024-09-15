@@ -127,7 +127,7 @@ class InterpolateRifeTorch:
         self.stream = torch.cuda.Stream()
         self.prepareStream = torch.cuda.Stream()
         self.scale = 1
-        self.f1encode = None
+        self.f0encode = None
         self.rife46 = False
         self.trt_debug = trt_debug
         if UHDMode:
@@ -184,7 +184,7 @@ class InterpolateRifeTorch:
                     self.encode = torch.nn.Sequential(
                         torch.nn.Conv2d(3, 16, 3, 2, 1),
                         torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
-                    ).to(device=self.device, dtype=self.dtype)
+                    )
                 case "rife413":
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
 
@@ -193,7 +193,7 @@ class InterpolateRifeTorch:
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
-                    self.encode = Head().to(device=self.device, dtype=self.dtype)
+                    self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
 
@@ -202,7 +202,7 @@ class InterpolateRifeTorch:
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
-                    self.encode = Head().to(device=self.device, dtype=self.dtype)
+                    self.encode = Head()
                 case "rife421":
                     from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
 
@@ -211,7 +211,7 @@ class InterpolateRifeTorch:
                             (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
-                    self.encode = Head().to(device=self.device, dtype=self.dtype)
+                    self.encode = Head()
                     v1=True
                 case "rife422lite":
                     from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
@@ -221,7 +221,7 @@ class InterpolateRifeTorch:
                             (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
                         ),
                     )
-                    self.encode = Head().to(device=self.device, dtype=self.dtype)
+                    self.encode = Head()
 
                     v1 = True
                 case _:
@@ -288,9 +288,16 @@ class InterpolateRifeTorch:
                 for k, v in state_dict.items()
                 if "module." in k
             }
+            head_state_dict =  {
+                k.replace("encode.",""): v
+                for k, v in state_dict.items()
+                if "encode." in k 
+            }
+            
+            self.encode.load_state_dict(state_dict=head_state_dict, strict=True)
+            self.encode.eval().to(device=self.device, dtype=self.dtype)
             self.flownet.load_state_dict(state_dict=state_dict, strict=False)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
-
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
@@ -360,9 +367,10 @@ class InterpolateRifeTorch:
 
     def hotUnload(self):
         self.flownet = None
-        self.encode
-        self.tenFlow_div
-        self.backwarp_tenGrid
+        self.encode = None
+        self.tenFlow_div = None
+        self.backwarp_tenGrid = None
+        self.f0encode = None
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.reset_max_memory_allocated()
@@ -379,15 +387,19 @@ class InterpolateRifeTorch:
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
             if not self.rife46:
-                if self.f1encode is None:
-                    self.f1encode = self.encode(img1[:, :3])
-                output, self.f1encode = self.flownet(
-                    img0, img1, timestep, self.f1encode
+                if self.f0encode is None:
+                    self.f0encode = self.encode(img0[:, :3])
+                output, self.f0encode = self.flownet(
+                    img0, img1, timestep, self.f0encode
                 )
             else:
                 output = self.flownet(img0, img1, timestep)
         self.stream.synchronize()
         return self.tensor_to_frame(output)
+
+    @torch.inference_mode()
+    def uncacheFrame(self, n):
+        self.f0encode = None
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):

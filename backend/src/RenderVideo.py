@@ -208,8 +208,6 @@ class Render(FFMpegRender):
         self.frame0 = self.readQueue.get()
         self.setup_frame0 = self.frameSetupFunction(self.frame0)
 
-        if self.backend != "ncnn":
-            self.interpolate(self.setup_frame0, self.setup_frame0, 0) # hack to remove weird warped frame when caching encode
         frameNum = 0
         while True:
             if not self.isPaused:
@@ -228,10 +226,8 @@ class Render(FFMpegRender):
                         frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
                         self.writeQueue.put(frame)
                 else:
-                    if self.backend != "ncnn":
-                        self.interpolate(self.setup_frame0, setup_frame1, 0)
-                    else:
-                        self.undoSetup(self.setup_frame0)
+                    
+                    self.undoSetup(self.setup_frame0)
 
                     for n in range(self.ceilInterpolateFactor):
                         self.writeQueue.put(self.frame0)
@@ -341,7 +337,7 @@ class Render(FFMpegRender):
                 trt_optimization_level=self.trt_optimization_level,
             )
             self.setupRender = interpolateRifePytorch.frame_to_tensor
-            self.undoSetup = self.returnFrame
+            self.undoSetup = interpolateRifePytorch.uncacheFrame
             self.interpolate = interpolateRifePytorch.process
             self.hotUnload = interpolateRifePytorch.hotUnload
             self.hotReload = interpolateRifePytorch.hotReload
