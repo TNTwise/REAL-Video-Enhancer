@@ -380,10 +380,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass  # pass just incase internet error caused a skip
         # reset image preview
         self.previewLabel.clear()
-        self.startRenderButton.setVisible(True)
-        self.pauseRenderButton.setVisible(False)
         self.startRenderButton.clicked.disconnect()
         self.startRenderButton.clicked.connect(self.startRender)
+
         self.enableProcessPage()
 
     def disableProcessPage(self):

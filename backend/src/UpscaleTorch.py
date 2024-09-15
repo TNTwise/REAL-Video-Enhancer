@@ -227,7 +227,7 @@ class UpscalePytorch:
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
         while self.model is None:
-            sleep(0)
+            sleep(1)
         if self.tilesize == 0:
             output = self.renderImage(image)
         else:

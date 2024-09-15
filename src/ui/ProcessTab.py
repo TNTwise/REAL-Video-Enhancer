@@ -345,6 +345,10 @@ class ProcessTab:
         log(str(textOutput))
         self.renderProcess.wait()
         # done with render
+        # Have to swap the visibility of these here otherwise crash for some reason
+        self.parent.pauseRenderButton.setVisible(False)
+        self.parent.startRenderButton.setVisible(True)
+        self.parent.startRenderButton.setEnabled(True)
         self.parent.onRenderCompletion()
 
     def getRoundedPixmap(self, pixmap, corner_radius):
