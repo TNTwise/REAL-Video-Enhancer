@@ -13,7 +13,7 @@ from .Util import (
     check_bfloat16_support,
     log,
 )
-
+from time import sleep
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
@@ -358,23 +358,23 @@ class InterpolateRifeTorch:
             return torch.float16
 
     def hotUnload(self):
-        try:
-            del self.flownet
-            del self.encode
-            del self.tenFlow_div
-            del self.backwarp_tenGrid
-            gc.collect()
-            torch.cuda.empty_cache()
-            torch.cuda.reset_max_memory_allocated()
-            torch.cuda.reset_max_memory_cached()
-        except:
-            pass
+        self.flownet = None
+        self.encode
+        self.tenFlow_div
+        self.backwarp_tenGrid
+        gc.collect()
+        torch.cuda.empty_cache()
+        torch.cuda.reset_max_memory_allocated()
+        torch.cuda.reset_max_memory_cached()
+
     @torch.inference_mode()
     def hotReload(self):
         self._load()
 
     @torch.inference_mode()
     def process(self, img0, img1, timestep):
+        while self.flownet is None:
+            sleep(1)
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
             if not self.rife46:

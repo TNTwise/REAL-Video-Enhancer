@@ -37,6 +37,7 @@ class HandleApplication:
                 benchmark=self.args.benchmark,
                 encoder=self.args.custom_encoder,
                 # misc settingss
+                pausedFile=self.args.pausedFile,
                 sceneDetectMethod=self.args.sceneDetectMethod,
                 sceneDetectSensitivity=self.args.sceneDetectSensitivity,
                 sharedMemoryID=self.args.shared_memory_id,
@@ -196,6 +197,12 @@ class HandleApplication:
             "--list_backends",
             help="list out available backends",
             action="store_true",
+        )
+        parser.add_argument(
+            "--pausedFile",
+            help="File to store paused state (True means paused, false means stopped)",
+            type=str,
+            default=None,
         )
         return parser.parse_args()
 

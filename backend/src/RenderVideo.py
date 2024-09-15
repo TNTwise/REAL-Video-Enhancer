@@ -74,13 +74,16 @@ class Render(FFMpegRender):
         overwrite: bool = False,
         crf: str = "18",
         # misc
+        pausedFile = None,
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
         sharedMemoryID: str = None,
         trt_optimization_level: int = 3,
     ):
+        if pausedFile == None:
+            pausedFile = os.path.basename(inputFile) + '_paused_state.txt'
         self.inputFile = inputFile
-        self.pausedFile = os.path.basename(inputFile) + '_paused_state.txt'
+        self.pausedFile = pausedFile
         with open(self.pausedFile, 'w') as f:
             f.write("False")
         self.backend = backend
@@ -148,7 +151,9 @@ class Render(FFMpegRender):
             if activate:
                 if self.isPaused:
                     self.hotUnload()
+                    print("\nRender Paused")
                 else:
+                    print("\nResuming Render")
                     self.hotReload()
             self.prevState = self.isPaused
             sleep(1)
@@ -285,6 +290,8 @@ class Render(FFMpegRender):
             )
             self.setupRender = self.returnFrame
             self.upscale = upscaleNCNN.Upscale
+            self.hotUnload = upscaleNCNN.hotUnload
+            self.hotReload = upscaleNCNN.hotReload
         if self.backend == "directml":
             upscaleONNX = UpscaleONNX(
                 modelPath=self.upscaleModel,
@@ -318,6 +325,8 @@ class Render(FFMpegRender):
             self.setupRender = self.returnFrame
             self.undoSetup = interpolateRifeNCNN.uncacheFrame
             self.interpolate = interpolateRifeNCNN.process
+            self.hotReload = interpolateRifeNCNN.hotReload
+            self.hotUnload = interpolateRifeNCNN.hotUnload
 
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(

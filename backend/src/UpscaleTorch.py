@@ -5,7 +5,7 @@ import cv2
 import gc
 import torch as torch
 import torch.nn.functional as F
-
+from time import sleep
 
 from src.Util import (
     currentDirectory,
@@ -179,6 +179,7 @@ class UpscalePytorch:
             return torch.float16
 
     def hotUnload(self):
+
         self.model = None
         gc.collect()
         torch.cuda.empty_cache()
@@ -225,6 +226,8 @@ class UpscalePytorch:
 
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
+        while self.model is None:
+            sleep(0)
         if self.tilesize == 0:
             output = self.renderImage(image)
         else:

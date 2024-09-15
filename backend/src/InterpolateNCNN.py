@@ -1,5 +1,5 @@
 from rife_ncnn_vulkan_python import Rife
-
+from time import sleep
 
 class InterpolateRIFENCNN:
     def __init__(
@@ -13,17 +13,30 @@ class InterpolateRIFENCNN:
         self.interpolateModelPath = interpolateModelPath
         self.width = width
         self.height = height
+        self.gpuid = gpuid
+        self.threads = threads
+        self._load()
+
+    def _load(self):
         self.render = Rife(
-            gpuid=gpuid,
-            num_threads=threads,
+            gpuid=self.gpuid,
+            num_threads=self.threads,
             model=self.interpolateModelPath,
             uhd_mode=False,
             channels=3,
-            height=height,
-            width=width,
+            height=self.height,
+            width=self.width,
         )
 
+    def hotUnload(self):
+        self.render = None
+
+    def hotReload(self):
+        self._load()
+
     def process(self, img0, img1, timestep) -> bytes:
+        while self.render is None:
+            sleep(1)
         return self.render.process_bytes(img0, img1, timestep)
 
     def uncacheFrame(self, n):

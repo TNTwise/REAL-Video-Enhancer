@@ -93,6 +93,7 @@ class ProcessTab:
 
     def QConnect(self):
         # connect file select buttons
+
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.inputFileText.textChanged.connect(self.parent.openFileFromYoutubeLink)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
@@ -112,6 +113,9 @@ class ProcessTab:
         self.parent.modelComboBox.currentIndexChanged.connect(
             self.parent.updateVideoGUIDetails
         )
+        #connect up pausing
+        self.parent.pauseRenderButton.setVisible(False)
+        self.parent.pauseRenderButton.clicked.connect(self.pauseRender)
 
     def killRenderProcess(self):
         try:  # kills  render process if necessary
@@ -190,6 +194,14 @@ class ProcessTab:
         self.outputVideoWidth = videoWidth * self.upscaleTimes
         self.outputVideoHeight = videoHeight * self.upscaleTimes
 
+        # set up pausing
+        self.pausedFile = os.path.join(currentDirectory(), os.path.basename(inputFile)+ "_pausedState.txt")
+        self.parent.pauseRenderButton.setVisible(True) # switch to pause button on render
+        self.parent.startRenderButton.setVisible(False)
+        self.parent.startRenderButton.clicked.disconnect()
+        self.parent.startRenderButton.clicked.connect(self.resumeRender)
+
+
         # get most recent settings
         settings = Settings()
         settings.readSettings()
@@ -214,6 +226,18 @@ class ProcessTab:
         writeThread.start()
         self.startGUIUpdate()
 
+    def pauseRender(self):
+        with open(self.pausedFile,'w') as f:
+            f.write("True")
+        self.parent.pauseRenderButton.setVisible(False)
+        self.parent.startRenderButton.setVisible(True)
+        self.parent.startRenderButton.setEnabled(True)
+    def resumeRender(self):
+        with open(self.pausedFile,'w') as f:
+            f.write("False")
+        self.parent.pauseRenderButton.setVisible(True)
+        self.parent.pauseRenderButton.setEnabled(True)
+        self.parent.startRenderButton.setVisible(False)
     def startGUIUpdate(self):
         self.workerThread = UpdateGUIThread(
             parent=self,
@@ -254,6 +278,8 @@ class ProcessTab:
             f"-c:v {self.settings['encoder']} -crf {qualityToCRF[self.settings['video_quality']]}",
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
+            "--pausedFile",
+            f"{self.pausedFile}"
         ]
         if method == "Upscale":
             command += [

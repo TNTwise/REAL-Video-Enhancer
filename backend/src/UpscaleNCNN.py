@@ -1,5 +1,6 @@
 import numpy as np
 import os
+from time import sleep
 
 from upscale_ncnn_py import UPSCALE
 
@@ -67,18 +68,31 @@ class UpscaleNCNN:
     ):
         # only import if necessary
 
-        self.model = UPSCALE(
-            gpuid=gpuid,
-            model_str=modelPath,
-            num_threads=num_threads,
-            scale=scale,
-            tilesize=tilesize,
-        )
+        self.gpuid = gpuid
+        self.modelPath = modelPath
+        self.scale = scale
+        self.tilesize = tilesize
         self.width = width
         self.height = height
         self.scale = scale
+        self.threads = num_threads
+        self._load()
+    def _load(self):
+        self.model = UPSCALE(
+            gpuid=self.gpuid,
+            model_str=self.modelPath,
+            num_threads=self.threads,
+            scale=self.scale,
+            tilesize=self.tilesize,
+        )
+    def hotUnload(self):
+        self.model = None
 
+    def hotReload(self):
+        self._load()
     def Upscale(self, imageChunk):
+        while self.model is None:
+            sleep(1)
         output = self.model.process_bytes(imageChunk, self.width, self.height, 3)
         return np.ascontiguousarray(
             np.frombuffer(
