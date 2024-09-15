@@ -80,6 +80,9 @@ class Render(FFMpegRender):
         trt_optimization_level: int = 3,
     ):
         self.inputFile = inputFile
+        self.pausedFile = os.path.basename(inputFile) + '_paused_state.txt'
+        with open(self.pausedFile, 'w') as f:
+            f.write("False")
         self.backend = backend
         self.upscaleModel = upscaleModel
         self.interpolateModel = interpolateModel
@@ -136,13 +139,19 @@ class Render(FFMpegRender):
         self.inputstdinThread.start()
 
     def inputSTDINThread(self):
-        return
-        sleep(10)
-        self.isPaused = True
-        self.hotUnload()
-        sleep(10)
-        self.hotReload()
-        self.isPaused = False
+        activate = True
+        self.prevState = False
+        while not self.writingDone:
+            with open(self.pausedFile, 'r') as f:
+                self.isPaused = f.read().strip() == "True"
+                activate = self.prevState != self.isPaused
+            if activate:
+                if self.isPaused:
+                    self.hotUnload()
+                else:
+                    self.hotReload()
+            self.prevState = self.isPaused
+            sleep(1)
 
     def renderUpscale(self):
         """

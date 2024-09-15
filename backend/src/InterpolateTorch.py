@@ -358,14 +358,17 @@ class InterpolateRifeTorch:
             return torch.float16
 
     def hotUnload(self):
-        del self.flownet
-        del self.encode
-        del self.tenFlow_div
-        del self.backwarp_tenGrid
-        gc.collect()
-        torch.cuda.empty_cache()
-        torch.cuda.reset_max_memory_allocated()
-        torch.cuda.reset_max_memory_cached()
+        try:
+            del self.flownet
+            del self.encode
+            del self.tenFlow_div
+            del self.backwarp_tenGrid
+            gc.collect()
+            torch.cuda.empty_cache()
+            torch.cuda.reset_max_memory_allocated()
+            torch.cuda.reset_max_memory_cached()
+        except:
+            pass
     @torch.inference_mode()
     def hotReload(self):
         self._load()
