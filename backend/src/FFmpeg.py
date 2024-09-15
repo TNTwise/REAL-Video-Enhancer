@@ -394,4 +394,5 @@ class FFMpegRender:
 
         renderTime = time.time() - self.startTime
         self.writingDone = True
+
         printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")

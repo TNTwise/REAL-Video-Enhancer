@@ -42,6 +42,7 @@ from src.Util import (
     videosPath,
     checkForWritePermissions,
     getAvailableDiskSpace,
+    removeFile,
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab

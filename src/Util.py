@@ -251,7 +251,10 @@ def currentDirectory():
 
 
 def removeFile(file):
-    os.remove(file)
+    try:
+        os.remove(file)
+    except:
+        print("Failed to remove file!")
 
 
 def checkIfDeps() -> bool:

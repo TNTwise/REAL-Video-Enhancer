@@ -24,7 +24,11 @@ else:
     cwd = os.getcwd()
 with open(os.path.join(cwd, "backend_log.txt"), "w") as f:
     pass
-
+def removeFile(file):
+    try:
+        os.remove(file)
+    except:
+        print("Failed to remove file!")
 
 def warnAndLog(message: str):
     warnings.warn(message)

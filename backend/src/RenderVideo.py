@@ -8,7 +8,7 @@ import sys
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
-from .Util import printAndLog, log
+from .Util import printAndLog, log, removeFile
 from .NPMean import NPMeanSequential
 
 # try/except imports
@@ -177,6 +177,7 @@ class Render(FFMpegRender):
             else:
                 sleep(1)
         self.writeQueue.put(None)
+        removeFile(self.pausedFile)
         log("Finished Upscale")
 
     def renderInterpolate(self):
@@ -243,7 +244,7 @@ class Render(FFMpegRender):
                 frameNum+=1
             else:
                 sleep(1)
-
+        removeFile(self.pausedFile)
         self.writeQueue.put(None)
         log("Finished Interpolation")
 
