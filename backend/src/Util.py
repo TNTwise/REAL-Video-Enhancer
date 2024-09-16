@@ -81,7 +81,6 @@ def checkForPytorch() -> bool:
     try:
         import torch
         import torchvision
-        import spandrel
 
         return True
     except ImportError as e:
@@ -98,7 +97,6 @@ def checkForTensorRT() -> bool:
     try:
         import torch
         import torchvision
-        import spandrel
         import tensorrt
         import torch_tensorrt
 

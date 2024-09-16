@@ -214,7 +214,6 @@ class HandleApplication:
             try:
                 import torch
                 import torchvision
-                import spandrel
             except ImportError as e:
                 raise ImportError(f"Cannot use PyTorch as the backend! {e}")
 
@@ -222,7 +221,6 @@ class HandleApplication:
             try:
                 import torch
                 import torchvision
-                import spandrel
                 import tensorrt
                 import torch_tensorrt
             except ImportError as e:
