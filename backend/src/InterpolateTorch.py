@@ -147,6 +147,7 @@ class InterpolateRifeTorch:
             self.pw = math.ceil(self.width / tmp) * tmp
             self.ph = math.ceil(self.height / tmp) * tmp
             self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+            # detect what rife arch to use
             ad = ArchDetect(self.interpolateModel)
             interpolateArch = ad.getArch()
             # caching the timestep tensor in a dict with the timestep as a float for the key
@@ -160,7 +161,7 @@ class InterpolateRifeTorch:
                     device=self.device,
                 )
                 self.timestepDict[timestep] = timestep_tens
-            # detect what rife arch to use
+            
             self.inputs = [
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
@@ -179,77 +180,56 @@ class InterpolateRifeTorch:
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
+                    for i in range(2):
+                        self.inputs.append(
+                            torch.zeros(
+                                (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
+                            ),
+                        )
                     self.encode = torch.nn.Sequential(
                         torch.nn.Conv2d(3, 16, 3, 2, 1),
                         torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
                     )
                 case "rife413":
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
-
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
+                    for i in range(2):
+                        self.inputs.append(
+                            torch.zeros(
+                                (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                            ),
+                        )
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
-
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
+                    for i in range(2):
+                        self.inputs.append(
+                            torch.zeros(
+                                (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                            ),
+                        )
+                    
                     self.encode = Head()
                 case "rife421":
                     from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
-
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
+                    for i in range(2):
+                        self.inputs.append(
+                            torch.zeros(
+                                (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
+                            ),
+                        )
+                    
                     self.encode = Head()
                     v1=True
                 case "rife422lite":
                     from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
-
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
-                    )
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
-                        ),
+                    for i in range(2):
+                        self.inputs.append(
+                            torch.zeros(
+                                (1, 4, self.ph, self.pw), dtype=self.dtype, device=self.device
+                            ),
+                        )
+                    
                         
-                    )
                     self.encode = Head()
 
                     v1 = False
