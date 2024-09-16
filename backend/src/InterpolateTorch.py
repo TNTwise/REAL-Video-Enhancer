@@ -356,7 +356,7 @@ class InterpolateRifeTorch:
                             else ""
                         )
                         + (
-                            f"_level-5"
+                            f"_level-{self.trt_optimization_level}"
                             if self.trt_optimization_level is not None
                             else ""
                         )
@@ -377,7 +377,7 @@ class InterpolateRifeTorch:
                             workspace_size=self.trt_workspace_size,
                             min_block_size=1,
                             max_aux_streams=self.trt_max_aux_streams,
-                            optimization_level=5,
+                            optimization_level=self.trt_optimization_level,
                             device=self.device,
                             cache_built_engines=False,
                             reuse_cached_engines=False,
