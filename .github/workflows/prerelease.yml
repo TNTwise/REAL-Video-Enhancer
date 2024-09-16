@@ -94,7 +94,7 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/
+        run: cp -r backend dist/REAL-Video-Enhancer
       
       - name: compress archive
         run: |
