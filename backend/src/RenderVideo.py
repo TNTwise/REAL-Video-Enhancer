@@ -132,30 +132,31 @@ class Render(FFMpegRender):
         )
 
         self.sharedMemoryThread.start()
-        self.inputstdinThread = Thread(target=self.inputSTDINThread)
+        self.readPausedFileThread = Thread(target=self.readPausedFileThread)
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
 
         self.ffmpegReadThread.start()
         self.ffmpegWriteThread.start()
         self.renderThread.start()
-        self.inputstdinThread.start()
+        self.readPausedFileThread.start()
 
-    def inputSTDINThread(self):
+    def readPausedFileThread(self):
         activate = True
         self.prevState = False
         while not self.writingDone:
-            with open(self.pausedFile, 'r') as f:
-                self.isPaused = f.read().strip() == "True"
-                activate = self.prevState != self.isPaused
-            if activate:
-                if self.isPaused:
-                    self.hotUnload()
-                    print("\nRender Paused")
-                else:
-                    print("\nResuming Render")
-                    self.hotReload()
-            self.prevState = self.isPaused
+            if os.path.isfile(self.pausedFile):
+                with open(self.pausedFile, 'r') as f:
+                    self.isPaused = f.read().strip() == "True"
+                    activate = self.prevState != self.isPaused
+                if activate:
+                    if self.isPaused:
+                        self.hotUnload()
+                        print("\nRender Paused")
+                    else:
+                        print("\nResuming Render")
+                        self.hotReload()
+                self.prevState = self.isPaused
             sleep(1)
 
     def renderUpscale(self):
