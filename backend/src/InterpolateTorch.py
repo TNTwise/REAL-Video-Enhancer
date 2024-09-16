@@ -252,7 +252,7 @@ class InterpolateRifeTorch:
                     )
                     self.encode = Head()
 
-                    v1 = True
+                    v1 = False
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
             self.v1 = v1

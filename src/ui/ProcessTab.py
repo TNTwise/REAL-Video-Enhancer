@@ -41,6 +41,13 @@ class ProcessTab:
         self.animationHandler = AnimationHandler()
         self.tileUpAnimationHandler = AnimationHandler()
         self.tileDownAnimationHandler = AnimationHandler()
+        # encoder dict
+        # key is the name in RVE gui
+        # value is the encoder used
+        self.encoderDict = {
+            "libx264": "libx264",
+            "libx265": "lib265",
+        }
 
         # get default backend
         self.QConnect()
@@ -275,7 +282,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
-            f"-c:v {self.settings['encoder']} -crf {qualityToCRF[self.settings['video_quality']]}",
+            f"-c:v {self.encoderDict[self.settings['encoder']]} -crf {qualityToCRF[self.settings['video_quality']]}",
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
             "--pausedFile",
