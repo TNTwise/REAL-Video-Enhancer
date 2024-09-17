@@ -19,7 +19,7 @@ V2 Alpha 2 New Look!:
 </p>
 <h1>Features: </h1>
 <ul>
-  <li> <strong>NEW!</strong> Windows support. </li> 
+  <li> <strong>NEW!</strong> Windows support. !!! NOTICE !!! The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li> 
   <li> CUDA support. </li>
   <li> MacOS support. </li>
   <li>Support for Ubuntu 20.04+ on AppImage and Flatpak. </li>
