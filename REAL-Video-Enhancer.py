@@ -2,7 +2,10 @@ import sys
 import os
 
 # patch for macos
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+if sys.platform == 'darwin':
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # this goes one step up, and goes into the actual directory. This is where backend will be copied to.
+    os.chdir("..")
 import subprocess
 import re
 import math
@@ -57,12 +60,7 @@ from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackend
 import yt_dlp
 import validators
 
-# patch for macos
-if getPlatform() == "darwin":
-    # this will redirect to the _internal directory
-    os.chdir(os.path.dirname(os.path.abspath(__file__)))
-    # this goes one step up, and goes into the actual directory. This is where backend will be copied to.
-    os.chdir("..")
+
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
