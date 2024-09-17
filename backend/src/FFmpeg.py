@@ -272,7 +272,31 @@ class FFMpegRender:
             if self.overwrite:
                 command.append("-y")
             return command
-
+        else:
+            command = [
+                f"{ffmpegPath()}",
+                "-y",
+                "-v",
+                "warning",
+                "-stats",
+                "-f",
+                "rawvideo",
+                "-vcodec",
+                "rawvideo",
+                "-s",
+                f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
+                "-pix_fmt",
+                f"yuv420p",
+                "-r",
+                str(self.fps * self.interpolateFactor),
+                "-i",
+                "-",
+                "-benchmark",
+                "-f",
+                "null",
+                "-",
+            ]
+            return command
     def readinVideoFrames(self):
         log("Starting Video Read")
         self.readProcess = subprocess.Popen(
@@ -363,21 +387,24 @@ class FFMpegRender:
         self.startTime = time.time()
         self.framesRendered: int = 0
         self.last_length: int = 0
-
-        if self.benchmark:
-            while True:
-                frame = self.writeQueue.get()
-                self.previewFrame = frame
-                if frame is None:
-                    break
-                self.framesRendered += 1
-        else:
-            self.writeProcess = subprocess.Popen(
+        self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),
                 stdin=subprocess.PIPE,
                 text=True,
                 universal_newlines=True,
             )
+        
+        if self.benchmark:
+            while True:
+                frame = self.writeQueue.get()
+                self.previewFrame = frame
+                
+                if frame is None:
+                    break
+                self.writeProcess.stdin.buffer.write(frame)
+                self.framesRendered += 1
+        else:
+            
             while True:
                 frame = self.writeQueue.get()
 
