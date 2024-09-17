@@ -416,7 +416,7 @@ class InterpolateRifeTorch:
                     )
                     self.f0encode.copy_(f1encode,non_blocking=True)
                 else:
-                    output = self.flownet(img0, img1, timestep)
+                    output = self.flownet(self.img0, img1, timestep)
                 self.img0.copy_(img1,non_blocking=True)
         self.stream.synchronize()
         return self.tensor_to_frame(output)
