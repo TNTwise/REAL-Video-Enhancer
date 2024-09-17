@@ -187,12 +187,7 @@ tensorrtUpscaleModels = {
         2,
         "SPAN",
     ),
-    """"Sudo Shuffle SPAN (Animation) (2X) (Fast)": (
-        "2xSudoShuffleSPAN.pth",
-        "2xSudoShuffleSPAN.pth",
-        2,
-        "SPAN",
-    ),"""
+    
     "SPAN (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak.pth",
         "4xNomos8k_span_otf_weak.pth",

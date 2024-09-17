@@ -4,7 +4,6 @@ import platform
 import numpy as np
 import cv2
 
-
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
 
