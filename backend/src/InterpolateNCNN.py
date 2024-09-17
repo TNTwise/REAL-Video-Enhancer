@@ -15,7 +15,6 @@ class InterpolateRIFENCNN:
         self.height = height
         self.gpuid = gpuid
         self.threads = threads
-        self.img0 = None
         self._load()
 
     def _load(self):
@@ -38,11 +37,7 @@ class InterpolateRIFENCNN:
     def process(self, img0, img1, timestep) -> bytes:
         while self.render is None:
             sleep(1)
-        if self.img0 is None:
-            self.img0 = bytearray(img0)
-        img1 = bytearray(img1)
         frame = self.render.process_bytes(img0, img1, timestep)
-        self.img0 = img1
         return frame
 
     def uncacheFrame(self, n):
