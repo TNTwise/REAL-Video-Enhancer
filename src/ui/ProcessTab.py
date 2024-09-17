@@ -46,7 +46,7 @@ class ProcessTab:
         # value is the encoder used
         self.encoderDict = {
             "libx264": "libx264",
-            "libx265": "lib265",
+            "libx265": "libx265",
         }
 
         # get default backend
