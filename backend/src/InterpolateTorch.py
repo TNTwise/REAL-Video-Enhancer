@@ -18,7 +18,6 @@ torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
 
-
 class InterpolateRifeTorch:
     """InterpolateRifeTorch class for video interpolation using RIFE model in PyTorch.
 
@@ -310,7 +309,7 @@ class InterpolateRifeTorch:
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
-
+                torch_tensorrt.runtime.enable_cudagraphs()
                 logging.basicConfig(level=logging.INFO)
                 trt_engine_path = os.path.join(
                     os.path.realpath(self.trt_cache_dir),
@@ -420,17 +419,17 @@ class InterpolateRifeTorch:
         while self.flownet is None:
             sleep(1)
         with torch.cuda.stream(self.stream):
-            timestep = self.timestepDict[timestep]
-            if not self.rife46:
-                if self.f0encode is None:
-                    self.f0encode = self.encode(img0[:, :3])
-                f1encode = self.encode(img1[:, :3])
-                output = self.flownet(
-                    img0, img1, timestep, self.f0encode, f1encode
-                )
-                self.f0encode = f1encode
-            else:
-                output = self.flownet(img0, img1, timestep)
+                timestep = self.timestepDict[timestep]
+                if not self.rife46:
+                    if self.f0encode is None:
+                        self.f0encode = self.encode(img0[:, :3])
+                    f1encode = self.encode(img1[:, :3])
+                    output = self.flownet(
+                        img0, img1, timestep, self.f0encode, f1encode
+                    )
+                    self.f0encode = f1encode
+                else:
+                    output = self.flownet(img0, img1, timestep)
             
         self.stream.synchronize()
         return self.tensor_to_frame(output)
