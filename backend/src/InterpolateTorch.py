@@ -23,6 +23,18 @@ try: # temp
 except:
     pass 
 
+class Norm(torch.nn.Module):
+    def __init__(self, height, width, padding):
+        self.height = height
+        self.width = width
+        self.padding = padding
+        super().__init__()
+    @torch.inference_mode()
+    def forward(self,frame:torch.Tensor):
+        return F.pad(frame.reshape(self.height, self.width, 3).permute(2, 0, 1).unsqueeze(0).mul(255.0),self.padding)
+        
+        
+
 class InterpolateRifeTorch:
     """InterpolateRifeTorch class for video interpolation using RIFE model in PyTorch.
 
@@ -167,6 +179,7 @@ class InterpolateRifeTorch:
                 ).to(non_blocking=True)
                 self.timestepDict[timestep] = timestep_tens
             
+            # lay out inputs
             self.inputs = [
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
@@ -175,6 +188,7 @@ class InterpolateRifeTorch:
             self.encodedInput = [
                 torch.zeros((1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device),
             ]
+            self.normInput = [torch.zeros((1*3*self.height*self.width), dtype=self.dtype, device=self.device),]
             log("interp arch" + interpolateArch.lower())
             v1=False
             match interpolateArch.lower():
@@ -290,6 +304,8 @@ class InterpolateRifeTorch:
                 self.encode.eval().to(device=self.device, dtype=self.dtype)
             self.flownet.load_state_dict(state_dict=state_dict, strict=False)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
+            self.norm = Norm(self.height, self.width, self.padding)
+            self.norm.eval().to(device=self.device, dtype=self.dtype)
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
@@ -326,8 +342,33 @@ class InterpolateRifeTorch:
                         + ".dyn"
                     ),
                 )
+                norm_trt_engine_path = trt_engine_path.replace(".dyn", "_norm.dyn")
+                encode_trt_engine_path = trt_engine_path.replace(".dyn", "_encode.dyn")
+                # load norm engine
+                """if not os.path.isfile(norm_trt_engine_path):
+                    printAndLog("Building TensorRT engine {}".format(norm_trt_engine_path))
+                    self.norm = torch_tensorrt.compile(
+                        self.norm,
+                        ir="dynamo",
+                        inputs=self.normInput,
+                        enabled_precisions={self.dtype},
+                        debug=self.trt_debug,
+                        workspace_size=self.trt_workspace_size,
+                        min_block_size=1,
+                        max_aux_streams=40,
+                        optimization_level=3,
+                        device=self.device,
+                        cache_built_engines=False,
+                        reuse_cached_engines=False,
+                    )
+                    printAndLog(f"Saving TensorRT engine to {norm_trt_engine_path}")
+                    torch_tensorrt.save(
+                        self.norm, norm_trt_engine_path, inputs=self.normInput
+                    )
+                self.norm = torch.export.load(norm_trt_engine_path).module()"""
+                # load encode engine
                 if not self.rife46:
-                    encode_trt_engine_path = trt_engine_path.replace(".dyn", "_encode.dyn")
+                    
                     if not os.path.isfile(encode_trt_engine_path):
                         printAndLog("Building TensorRT engine {}".format(trt_engine_path))
 
@@ -351,6 +392,8 @@ class InterpolateRifeTorch:
                         )
                     printAndLog(f"Loading TensorRT engine from {encode_trt_engine_path}")
                     self.encode = torch.export.load(encode_trt_engine_path).module()
+
+                # load flow engine
                 if not os.path.isfile(trt_engine_path):
                     printAndLog("Building TensorRT engine {}".format(trt_engine_path))
 
@@ -441,20 +484,10 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
         with torch.cuda.stream(self.prepareStream):
-            frame = (
-                torch.frombuffer(
+            frame = torch.frombuffer(
                     frame,
                     dtype=torch.uint8,
-                )
-                .to(device=self.device, dtype=self.dtype, non_blocking=True)
-                .reshape(self.height, self.width, 3)
-                .permute(2, 0, 1)
-                .unsqueeze(0)
-                / 255.0
-            )
-            frame = F.pad(
-                (frame),
-                self.padding,
-            )
+                ).to(device=self.device, dtype=self.dtype, non_blocking=True)
+            frame = self.norm(frame)
         self.prepareStream.synchronize()
         return frame

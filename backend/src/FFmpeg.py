@@ -252,7 +252,6 @@ class FFMpegRender:
                 f"{self.inputFile}",
                 # """["-i" + subtitle for subtitle in self.subtitleFiles],"""
                 "-r",
-                f"{self.fps * self.interpolateFactor}",
                 f"-crf",
                 f"{self.crf}",
                 "-pix_fmt",
@@ -273,14 +272,20 @@ class FFMpegRender:
             command = [
                 f"{ffmpegPath()}",
                 "-y",
+                "-hide_banner",
+                "-v",
+                "warning",
+                "-stats",
                 "-f",
                 "rawvideo",
-                "-s",
-                f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
+                "-vcodec",
+                "rawvideo",
+                "-video_size",
+                f"{self.width*self.upscaleTimes}x{self.upscaleTimes*self.height}",
                 "-pix_fmt",
-                f"yuv420p",
+                "rgb24",
                 "-r",
-                str(self.fps * self.interpolateFactor),
+                str(self.fps* self.ceilInterpolateFactor),
                 "-i",
                 "-",
                 "-benchmark",
@@ -409,7 +414,6 @@ class FFMpegRender:
                         # Update other variables
                         self.previewFrame = frame
                         # Update progress bar
-                        # pbar.update(1)
                         self.framesRendered += 1
                 self.writeProcess.stdin.close()
                 self.writeProcess.wait()
