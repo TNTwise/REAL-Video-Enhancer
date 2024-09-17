@@ -12,7 +12,7 @@ from torch import Tensor
 from torch import nn as nn
 from torch.nn import functional as F
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 def q(inp, cache_mode):

@@ -1,6 +1,6 @@
 import torch.nn as nn
 
-from spandrel.util.timm import to_2tuple
+from ....util.timm import to_2tuple
 
 from .ops import bchw_to_blc, blc_to_bchw
 

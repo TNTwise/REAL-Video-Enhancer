@@ -5,7 +5,7 @@ from typing import Literal, Union
 import torch
 from typing_extensions import override
 
-from spandrel.util import KeyCondition
+from ...util import KeyCondition
 
 from ...__helpers.model_descriptor import (
     Architecture,

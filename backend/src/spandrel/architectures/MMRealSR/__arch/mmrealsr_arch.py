@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from torch.nn import init
 from torch.nn.modules.batchnorm import _BatchNorm  # type: ignore
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 @torch.no_grad()  # type: ignore

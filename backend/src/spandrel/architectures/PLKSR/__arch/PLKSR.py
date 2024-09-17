@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.init import trunc_normal_
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 # Since Pytorch's interleave is not supported by CoreML, we use this function instead for mobile conversion

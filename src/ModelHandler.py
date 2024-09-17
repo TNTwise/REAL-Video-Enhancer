@@ -263,8 +263,8 @@ def downloadModelsBasedOnInstalledBackend(installed_backends: list):
                         )
                     for model in pytorchUpscaleModels:
                         DownloadModel(model, pytorchUpscaleModels[model][1], "pytorch")
-                case "directml":
-                    for model in onnxInterpolateModels:
-                        DownloadModel(model, onnxInterpolateModels[model][1], "onnx")
-                    for model in onnxUpscaleModels:
-                        DownloadModel(model, onnxUpscaleModels[model][1], "onnx")
+        '''case "directml":
+            for model in onnxInterpolateModels:
+                DownloadModel(model, onnxInterpolateModels[model][1], "onnx")
+            for model in onnxUpscaleModels:
+                DownloadModel(model, onnxUpscaleModels[model][1], "onnx")'''

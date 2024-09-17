@@ -7,7 +7,7 @@ import math
 import torch
 import torch.nn as nn
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 from ...__arch_helpers import block as B
 from ...__arch_helpers.padding import pad_to_multiple

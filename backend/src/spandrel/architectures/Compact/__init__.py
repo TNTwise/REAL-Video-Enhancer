@@ -1,6 +1,6 @@
 from typing_extensions import override
 
-from spandrel.util import KeyCondition, get_scale_and_output_channels, get_seq_len
+from ...util import KeyCondition, get_scale_and_output_channels, get_seq_len
 
 from ...__helpers.model_descriptor import Architecture, ImageModelDescriptor, StateDict
 from .__arch.SRVGG import SRVGGNetCompact as Compact

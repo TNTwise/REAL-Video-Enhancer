@@ -5,8 +5,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from spandrel.util import store_hyperparameters  # type: ignore
-from spandrel.util.timm import trunc_normal_
+from ....util import store_hyperparameters  # type: ignore
+from ....util.timm import trunc_normal_
 
 
 class PreNorm(nn.Module):

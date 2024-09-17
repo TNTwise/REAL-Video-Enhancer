@@ -11,7 +11,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 from .common import MeanShift, ResBlock, Upsampler, default_conv
 

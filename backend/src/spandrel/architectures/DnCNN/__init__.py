@@ -5,7 +5,7 @@ from typing import Literal
 import torch
 from typing_extensions import override
 
-from spandrel.util import KeyCondition, get_seq_len
+from ...util import KeyCondition, get_seq_len
 
 from ...__helpers.model_descriptor import (
     Architecture,

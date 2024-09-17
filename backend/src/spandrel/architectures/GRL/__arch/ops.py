@@ -5,7 +5,7 @@ from math import prod
 import numpy as np
 import torch
 
-from spandrel.util.timm import to_2tuple
+from ....util.timm import to_2tuple
 
 
 def bchw_to_bhwc(x: torch.Tensor) -> torch.Tensor:

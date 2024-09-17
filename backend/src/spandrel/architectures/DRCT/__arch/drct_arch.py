@@ -3,8 +3,8 @@ import math
 import torch
 import torch.nn as nn
 
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import DropPath, to_2tuple, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import DropPath, to_2tuple, trunc_normal_
 
 
 class ChannelAttention(nn.Module):

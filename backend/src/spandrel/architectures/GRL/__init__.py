@@ -6,7 +6,7 @@ from typing import Literal
 import torch
 from typing_extensions import override
 
-from spandrel.util import (
+from ...util import (
     KeyCondition,
     get_pixelshuffle_params,
     get_scale_and_output_channels,

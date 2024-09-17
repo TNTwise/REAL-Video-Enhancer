@@ -12,8 +12,8 @@ from typing import Literal
 import torch
 import torch.nn as nn
 
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import to_2tuple, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import to_2tuple, trunc_normal_
 
 from ...__arch_helpers.padding import pad_to_multiple
 from .config import GRLConfig

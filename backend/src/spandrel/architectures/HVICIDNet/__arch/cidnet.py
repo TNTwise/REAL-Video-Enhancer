@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 from .HVI_transform import RGB_HVI
 from .LCA import HV_LCA, I_LCA

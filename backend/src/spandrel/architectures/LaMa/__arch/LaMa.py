@@ -12,7 +12,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.transforms.functional import InterpolationMode, rotate
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 class LearnableSpatialTransformWrapper(nn.Module):

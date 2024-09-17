@@ -14,8 +14,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import to_2tuple, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import to_2tuple, trunc_normal_
 
 
 # Shuffle operation for Categorization and UnCategorization operations.

@@ -7,7 +7,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops.layers.torch import Rearrange
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 ######################

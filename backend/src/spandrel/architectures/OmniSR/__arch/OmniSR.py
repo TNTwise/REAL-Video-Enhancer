@@ -12,7 +12,7 @@
 import torch
 import torch.nn as nn
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 from ...__arch_helpers.padding import pad_to_multiple
 from .OSAG import OSAG

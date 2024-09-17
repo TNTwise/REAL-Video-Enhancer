@@ -4,8 +4,8 @@ import torch
 from torch import nn
 from torch.nn.init import trunc_normal_
 
-from spandrel.architectures.__arch_helpers.dysample import DySample
-from spandrel.util import store_hyperparameters
+from ....architectures.__arch_helpers.dysample import DySample
+from ....util import store_hyperparameters
 
 
 class DCCM(nn.Sequential):

@@ -8,8 +8,8 @@ import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 from einops import rearrange, repeat
 
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import DropPath, to_2tuple, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import DropPath, to_2tuple, trunc_normal_
 
 
 class FastLeFF(nn.Module):

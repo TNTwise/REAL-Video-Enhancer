@@ -13,8 +13,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.checkpoint as checkpoint
 
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import DropPath, to_2tuple, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import DropPath, to_2tuple, trunc_normal_
 
 from ...__arch_helpers.padding import pad_to_multiple
 

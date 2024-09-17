@@ -9,9 +9,8 @@ import torch
 import torch.nn as nn
 from einops import rearrange
 from einops.layers.torch import Rearrange
-
-from spandrel.util import store_hyperparameters
-from spandrel.util.timm import DropPath, trunc_normal_
+from ....util import store_hyperparameters
+from ....util.timm import DropPath, trunc_normal_
 
 from ...__arch_helpers.padding import pad_to_multiple
 

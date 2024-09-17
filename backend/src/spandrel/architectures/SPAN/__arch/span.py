@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 from torch import nn as nn
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 def _make_pair(value):

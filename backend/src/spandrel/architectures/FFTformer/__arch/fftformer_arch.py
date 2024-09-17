@@ -5,7 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
 
-from spandrel.util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 def to_3d(x):
