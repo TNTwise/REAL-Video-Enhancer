@@ -416,8 +416,8 @@ class FFMpegRender:
                 # Update progress bar
                 # pbar.update(1)
                 self.framesRendered += 1
-            self.writeProcess.stdin.close()
-            self.writeProcess.wait()
+        self.writeProcess.stdin.close()
+        self.writeProcess.wait()
 
         renderTime = time.time() - self.startTime
         self.writingDone = True
