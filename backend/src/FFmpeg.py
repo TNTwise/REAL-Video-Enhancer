@@ -250,14 +250,14 @@ class FFMpegRender:
                 "-",
                 "-i",
                 f"{self.inputFile}",
-                # """["-i" + subtitle for subtitle in self.subtitleFiles],"""
-                "-r",
                 f"-crf",
                 f"{self.crf}",
                 "-pix_fmt",
                 self.pixelFormat,
                 "-c:a",
                 "copy",
+                "-loglevel",
+                "error",
             ]
             for i in self.encoder.split():
                 command.append(i)
