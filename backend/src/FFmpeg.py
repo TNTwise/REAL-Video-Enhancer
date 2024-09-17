@@ -8,7 +8,7 @@ import time
 import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
-from .Util import currentDirectory, log, printAndLog, ffmpegPath
+from .Util import currentDirectory, log, printAndLog, ffmpegPath, ffmpegLogFile
 import time
 from time import sleep
 from threading import Thread
@@ -259,8 +259,6 @@ class FFMpegRender:
                 self.pixelFormat,
                 "-c:a",
                 "copy",
-                "-loglevel",
-                "error",
             ]
             for i in self.encoder.split():
                 command.append(i)
@@ -271,16 +269,11 @@ class FFMpegRender:
 
             if self.overwrite:
                 command.append("-y")
-            return command
         else:
             command = [
                 f"{ffmpegPath()}",
                 "-y",
-                "-loglevel",
-                "error",
                 "-f",
-                "rawvideo",
-                "-vcodec",
                 "rawvideo",
                 "-s",
                 f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
@@ -295,7 +288,7 @@ class FFMpegRender:
                 "null",
                 "-",
             ]
-            return command
+        return command
     def readinVideoFrames(self):
         log("Starting Video Read")
         self.readProcess = subprocess.Popen(
@@ -386,39 +379,42 @@ class FFMpegRender:
         self.startTime = time.time()
         self.framesRendered: int = 1
         self.last_length: int = 0
-        self.writeProcess = subprocess.Popen(
-                self.getFFmpegWriteCommand(),
-                stdin=subprocess.PIPE,
-                text=True,
-                universal_newlines=True,
-            )
+        with open(ffmpegLogFile(), 'w') as f:
+            with subprocess.Popen(
+                        self.getFFmpegWriteCommand(),
+                        stdin=subprocess.PIPE,
+                        stderr=f,
+                        stdout=f,
+                        text=True,
+                        universal_newlines=True,
+                    ) as self.writeProcess:
         
-        if self.benchmark:
-            while True:
-                frame = self.writeQueue.get()
-                self.previewFrame = frame
-                
-                if frame is None:
-                    break
-                self.writeProcess.stdin.buffer.write(frame)
-                self.framesRendered += 1
-        else:
-            
-            while True:
-                frame = self.writeQueue.get()
+                if self.benchmark:
+                    while True:
+                        frame = self.writeQueue.get()
+                        self.previewFrame = frame
+                        
+                        if frame is None:
+                            break
+                        self.writeProcess.stdin.buffer.write(frame)
+                        self.framesRendered += 1
+                else:
+                    
+                    while True:
+                        frame = self.writeQueue.get()
 
-                if frame is None:
-                    break
-                self.writeProcess.stdin.buffer.write(frame)
-                # Update other variables
-                self.previewFrame = frame
-                # Update progress bar
-                # pbar.update(1)
-                self.framesRendered += 1
-        self.writeProcess.stdin.close()
-        self.writeProcess.wait()
+                        if frame is None:
+                            break
+                        self.writeProcess.stdin.buffer.write(frame)
+                        # Update other variables
+                        self.previewFrame = frame
+                        # Update progress bar
+                        # pbar.update(1)
+                        self.framesRendered += 1
+                self.writeProcess.stdin.close()
+                self.writeProcess.wait()
 
-        renderTime = time.time() - self.startTime
-        self.writingDone = True
+                renderTime = time.time() - self.startTime
+                self.writingDone = True
 
-        printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")
+                printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")

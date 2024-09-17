@@ -33,6 +33,11 @@ def warnAndLog(message: str):
     warnings.warn(message)
     log("WARN: " + message)
 
+def currentDirectory():
+    return cwd
+
+def ffmpegLogFile()->str:
+    return os.path.join(currentDirectory(),"ffmpeg_log.txt")
 
 def errorAndLog(message: str):
     log("ERROR: " + message)
@@ -60,9 +65,6 @@ def bytesTo100x100img(image: bytes, width, height) -> np.ndarray:
     frame = cv2.resize(frame, dsize=(100, 100))
     return frame
 
-
-def currentDirectory():
-    return cwd
 
 
 def ffmpegPath() -> str:
