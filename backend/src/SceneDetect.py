@@ -90,7 +90,7 @@ class SceneDetect(FFMpegRender):
     def getMeanTransitions(self):
         self.readThread.start()
         sceneChangeQueue = Queue()
-        detector = NPMeanSequential()
+        detector = NPMeanSequential(sensitivity=self.sceneChangeSensitivity)
         for frame_num in tqdm(range(self.totalInputFrames - 1)):
             frame = bytesTo100x100img(
                 self.readQueue.get(), width=self.width, height=self.height
