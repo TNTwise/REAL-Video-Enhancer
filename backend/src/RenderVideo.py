@@ -207,7 +207,6 @@ class Render(FFMpegRender):
         except AttributeError:
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
-        self.setup_frame0 = self.frameSetupFunction(self.frame0)
 
         frameNum = 0
         while True:
@@ -216,7 +215,6 @@ class Render(FFMpegRender):
                 if frame1 is None:
                     break
 
-                setup_frame1 = self.frameSetupFunction(frame1)
                 if frameNum != self.transitionFrame:
                     for n in range(self.ceilInterpolateFactor):
                         timestep = n / (self.ceilInterpolateFactor)
@@ -224,11 +222,11 @@ class Render(FFMpegRender):
                             self.writeQueue.put(self.frame0)
                             continue
 
-                        frame = self.interpolate(self.setup_frame0, setup_frame1, timestep)
+                        frame = self.interpolate(self.frame0, frame1, timestep)
                         self.writeQueue.put(frame)
                 else:
                     
-                    self.undoSetup(self.setup_frame0)
+                    self.undoSetup(self.frame0)
 
                     for n in range(self.ceilInterpolateFactor):
                         self.writeQueue.put(self.frame0)
@@ -237,7 +235,6 @@ class Render(FFMpegRender):
                     except Empty:
                         self.transitionFrame = None
                 self.frame0 = frame1
-                self.setup_frame0 = setup_frame1
                 frameNum+=1
             else:
                 sleep(1)

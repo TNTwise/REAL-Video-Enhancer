@@ -131,6 +131,7 @@ class InterpolateRifeTorch:
         self.stream = torch.cuda.Stream()
         self.prepareStream = torch.cuda.Stream()
         self.scale = 1
+        self.img0 = None
         self.f0encode = None
         self.rife46 = False
         self.trt_debug = trt_debug
@@ -163,7 +164,7 @@ class InterpolateRifeTorch:
                     timestep,
                     dtype=self.dtype,
                     device=self.device,
-                )
+                ).to(non_blocking=True)
                 self.timestepDict[timestep] = timestep_tens
             
             self.inputs = [
@@ -202,6 +203,7 @@ class InterpolateRifeTorch:
                                 (1, 8, self.ph, self.pw), dtype=self.dtype, device=self.device
                             ),
                         )
+                    v1 = True
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
@@ -425,23 +427,27 @@ class InterpolateRifeTorch:
             sleep(1)
         with torch.cuda.stream(self.stream):
                 timestep = self.timestepDict[timestep]
+                if self.img0 is None:
+                    self.img0 = self.frame_to_tensor(img0)
+                img1 = self.frame_to_tensor(img1)
                 if not self.rife46:
                     if self.f0encode is None:
-                        self.f0encode = self.encode(img0[:, :3])
+                        self.f0encode = self.encode(self.img0[:, :3])
                     f1encode = self.encode(img1[:, :3])
                     output = self.flownet(
-                        img0, img1, timestep, self.f0encode, f1encode
+                        self.img0, img1, timestep, self.f0encode, f1encode
                     )
-                    self.f0encode = f1encode
+                    self.f0encode.copy_(f1encode,non_blocking=True)
                 else:
                     output = self.flownet(img0, img1, timestep)
-            
+                self.img0.copy_(img1,non_blocking=True)
         self.stream.synchronize()
         return self.tensor_to_frame(output)
 
     @torch.inference_mode()
     def uncacheFrame(self, n):
         self.f0encode = None
+        self.img0 = None
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
