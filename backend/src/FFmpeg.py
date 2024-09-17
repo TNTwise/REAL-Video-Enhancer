@@ -276,7 +276,6 @@ class FFMpegRender:
             command = [
                 f"{ffmpegPath()}",
                 "-y",
-                "-v",
                 "-loglevel",
                 "error",
                 "-f",
@@ -385,7 +384,7 @@ class FFMpegRender:
         log("Rendering")
         #
         self.startTime = time.time()
-        self.framesRendered: int = 0
+        self.framesRendered: int = 1
         self.last_length: int = 0
         self.writeProcess = subprocess.Popen(
                 self.getFFmpegWriteCommand(),
