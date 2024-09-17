@@ -10,14 +10,16 @@ class NPMeanSequential:
         self.i0 = None
         self.i1 = None
 
-    def sceneDetect(self, img1):
+    def sceneDetect(self, img1, sensitivity:int=2):
+        #multiply sensitivity by 10 for more representative results
+        sensitivity = sensitivity * 10
         if self.i0 is None:
             self.i0 = img1
             self.image0mean = np.mean(self.i0)
             return
         self.i1 = img1
         img1mean = np.mean(self.i1)
-        if self.image0mean > img1mean + 20 or self.image0mean < img1mean - 20:
+        if self.image0mean > img1mean + sensitivity or self.image0mean < img1mean - sensitivity:
             self.image0mean = img1mean
             return True
         self.image0mean = img1mean
