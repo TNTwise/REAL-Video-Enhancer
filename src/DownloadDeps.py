@@ -172,10 +172,10 @@ class DownloadDependencies:
         # Nigthly test
         torchCUDALinuxDeps = [
             #"https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
-            "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2Bdedb7bdf33-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240826%2Bcu124-py3-none-any.whl",
+            "https://download.pytorch.org/whl/nightly/pytorch_triton-3.0.0%2B757b6a61e7-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch-2.5.0.dev20240909%2Bcu124-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124/torchvision-0.20.0.dev20240909%2Bcu124-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240909%2Bcu124-py3-none-any.whl",
             "safetensors",
             "einops",
         ]
@@ -220,7 +220,7 @@ class DownloadDependencies:
 
                 # nightly
                 tensorRTDeps += [
-                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240826%2Bcu124-cp311-cp311-linux_x86_64.whl"
+                    "https://download.pytorch.org/whl/nightly/cu124/torch_tensorrt-2.5.0.dev20240909%2Bcu124-cp311-cp311-linux_x86_64.whl"
                 ]
             case "win32":
                 tensorRTDeps = [

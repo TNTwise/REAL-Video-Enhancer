@@ -10,3 +10,7 @@ pnnx
 ncnn
 opencv-python
 scenedetect
+tensorrt==10.3.0
+tensorrt_cu12==10.3.0
+tensorrt-cu12_libs==10.3.0
+tensorrt_cu12_bindings==10.3.0
