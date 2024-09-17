@@ -17,6 +17,11 @@ from time import sleep
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
+try: # temp
+    import tensorrt
+    import torch_tensorrt
+except:
+    pass 
 
 class InterpolateRifeTorch:
     """InterpolateRifeTorch class for video interpolation using RIFE model in PyTorch.
@@ -231,7 +236,7 @@ class InterpolateRifeTorch:
                         
                     self.encode = Head()
 
-                    v1 = False
+                    v1 = True
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
             self.v1 = v1
