@@ -380,7 +380,7 @@ class InterpolateRifeTorch:
                             debug=self.trt_debug,
                             workspace_size=self.trt_workspace_size,
                             min_block_size=1,
-                            max_aux_streams=self.trt_max_aux_streams,
+                            max_aux_streams=100,
                             optimization_level=self.trt_optimization_level,
                             device=self.device,
                             cache_built_engines=False,
