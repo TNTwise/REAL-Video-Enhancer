@@ -31,7 +31,7 @@ class Norm(torch.nn.Module):
         super().__init__()
     @torch.inference_mode()
     def forward(self,frame:torch.Tensor):
-        return F.pad(frame.reshape(self.height, self.width, 3).permute(2, 0, 1).unsqueeze(0).mul(1/255.0),self.padding)
+        return F.pad(frame.reshape(self.height, self.width, 3).permute(2, 0, 1).unsqueeze(0).div(255.0),self.padding)
         
         
 
