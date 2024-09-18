@@ -1,16 +1,26 @@
-numpy==1.24.4
+sympy
+tqdm
+typing_extensions
+packaging
+requests
+opencv-python-headless
+pypresence
+mpmath
 pillow
-torch==2.3.1 --index-url https://download.pytorch.org/whl/cu121
-torchvision==0.18.1 --index-url https://download.pytorch.org/whl/cu121
+numpy<=1.26.4
 spandrel>=0.3.3
 pyinstaller
-onnx
-onnxruntime
 pnnx
 ncnn
-opencv-python
+upscale_ncnn_py
+rife-ncnn-vulkan-python-tntwise
 scenedetect
 tensorrt==10.3.0
 tensorrt_cu12==10.3.0
 tensorrt-cu12_libs==10.3.0
 tensorrt_cu12_bindings==10.3.0
+
+
+--pre torch==2.5.0  --extra-index-url https://pypi.nvidia.com
+--pre torchvision==0.20.0  --extra-index-url https://pypi.nvidia.com
+--pre torch_tensorrt==2.5.0  --extra-index-url https://pypi.nvidia.com
