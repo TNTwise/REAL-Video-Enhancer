@@ -8,7 +8,7 @@ pypresence
 mpmath
 pillow
 numpy<=1.26.4
-spandrel>=0.3.3
+https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl
 pyinstaller
 pnnx
 ncnn
