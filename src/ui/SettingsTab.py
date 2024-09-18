@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtWidgets import QMainWindow
-from ..Util import currentDirectory
+from ..Util import currentDirectory,getPlatform
 
 
 class SettingsTab:
@@ -104,6 +104,8 @@ class SettingsTab:
         self.parent.switchToSettingsPage()
 
     def connectSettingText(self):
+        self.parent.encoder.clear()
+        self.parent.encoder.addItems(self.settings.allowedSettings["encoder"] if getPlatform() != "darwin" else ["libx264", "libx265", "vp9"])
         self.parent.precision.setCurrentText(self.settings.settings["precision"])
         self.parent.tensorrt_optimization_level.setCurrentText(
             self.settings.settings["tensorrt_optimization_level"]
