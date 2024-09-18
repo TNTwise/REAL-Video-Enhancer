@@ -8,7 +8,7 @@ import time
 import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
-from .Util import currentDirectory, log, printAndLog, ffmpegPath, ffmpegLogFile
+from .Util import currentDirectory, log, printAndLog, ffmpegPath, ffmpegLogFile, removeFolder
 import time
 from time import sleep
 from threading import Thread
@@ -366,10 +366,10 @@ class FFMpegRender:
                 eta = self.calculateETA()
                 message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
                 self.realTimePrint(message)
-                if self.sharedMemoryID is not None:
+                if self.sharedMemoryID is not None and self.previewFrame is not None:
                     # Update the shared array
                     buffer[:fcs] = bytes(self.previewFrame)
-
+            
             time.sleep(0.1)
 
     def writeOutVideoFrames(self):
@@ -422,3 +422,4 @@ class FFMpegRender:
                 self.writingDone = True
 
                 printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")
+                removeFolder(self.videoPropertiesLocation)

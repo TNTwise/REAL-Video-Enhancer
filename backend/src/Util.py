@@ -3,6 +3,7 @@ import warnings
 import platform
 import numpy as np
 import cv2
+import shutil
 
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
@@ -26,6 +27,11 @@ with open(os.path.join(cwd, "backend_log.txt"), "w") as f:
 def removeFile(file):
     try:
         os.remove(file)
+    except:
+        print("Failed to remove file!")
+def removeFolder(folder):
+    try:
+        shutil.rmtree(folder)
     except:
         print("Failed to remove file!")
 
