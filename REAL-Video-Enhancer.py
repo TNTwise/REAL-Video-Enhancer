@@ -375,7 +375,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.processTab.workerThread.stop()
             self.processTab.workerThread.quit()
             self.processTab.workerThread.wait()
-        except AttributeError:
+        except:
             pass  # pass just incase internet error caused a skip
         # reset image preview
         self.previewLabel.clear()

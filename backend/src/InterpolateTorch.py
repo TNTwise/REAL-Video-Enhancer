@@ -131,6 +131,9 @@ class InterpolateRifeTorch:
         self.interpolateModel = interpolateModelPath
         self.width = width
         self.height = height
+        if self.height > 1080 or self.width > 1920 and dtype == "float16":
+            printAndLog("Warning: Half precision and UHD processing arent supported, falling back to float32")
+            dtype="float32"
         self.device = device
         self.dtype = self.handlePrecision(dtype)
         self.trt_workspace_size = trt_workspace_size
@@ -425,7 +428,8 @@ class InterpolateRifeTorch:
             return torch.float32
         if precision == "float16":
             return torch.float16
-
+        if precision == "bfloat16":
+            return torch.bfloat16
     def hotUnload(self):
         self.flownet = None
         self.encode = None

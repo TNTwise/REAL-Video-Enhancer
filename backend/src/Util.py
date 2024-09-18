@@ -116,7 +116,7 @@ def check_bfloat16_support() -> bool:
     import torch
 
     try:
-        x = torch.tensor([1.0], dtype=torch.bfloat16)
+        x = torch.tensor([1.0], dtype=torch.float16).cuda()
         return True
     except RuntimeError:
         return False
