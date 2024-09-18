@@ -132,8 +132,9 @@ class InterpolateRifeTorch:
         self.width = width
         self.height = height
         if self.height > 1080 or self.width > 1920 and dtype == "float16":
-            printAndLog("Warning: Half precision and UHD processing arent supported, falling back to float32")
-            dtype="float32"
+            printAndLog("Warning: Half precision and UHD processing arent supported, falling back to .5 scale and float32.")
+            UHDMode=True
+            dtype = "float32"
         self.device = device
         self.dtype = self.handlePrecision(dtype)
         self.trt_workspace_size = trt_workspace_size
