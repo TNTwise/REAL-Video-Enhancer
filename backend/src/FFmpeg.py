@@ -394,27 +394,14 @@ class FFMpegRender:
                         universal_newlines=True,
                     ) as self.writeProcess:
         
-                if self.benchmark:
-                    while True:
-                        frame = self.writeQueue.get()
-                        self.previewFrame = frame
-                        
-                        if frame is None:
-                            break
-                        self.writeProcess.stdin.buffer.write(frame)
-                        self.framesRendered += 1
-                else:
-                    
-                    while True:
-                        frame = self.writeQueue.get()
-
-                        if frame is None:
-                            break
-                        self.writeProcess.stdin.buffer.write(frame)
-                        # Update other variables
-                        self.previewFrame = frame
-                        # Update progress bar
-                        self.framesRendered += 1
+                while True:
+                    frame = self.writeQueue.get()
+                    if frame is None:
+                        break
+                    self.previewFrame = frame
+                    self.writeProcess.stdin.buffer.write(frame)
+                    self.framesRendered += 1
+            
                 self.writeProcess.stdin.close()
                 self.writeProcess.wait()
 

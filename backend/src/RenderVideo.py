@@ -1,10 +1,8 @@
 from threading import Thread
 from queue import Queue, Empty
-from multiprocessing import shared_memory
 import os
 import math
 from time import sleep
-import sys
 
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
