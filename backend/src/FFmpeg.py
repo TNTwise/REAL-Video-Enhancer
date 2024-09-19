@@ -110,6 +110,7 @@ class FFMpegRender:
         # upsacletimes will be set to the scale of the loaded model with spandrel
         self.upscaleTimes = upscaleTimes
         self.interpolateFactor = interpolateFactor
+        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.encoder = encoder
         self.pixelFormat = pixelFormat
         self.benchmark = benchmark
@@ -208,7 +209,6 @@ class FFMpegRender:
         self.height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.totalInputFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self.fps = cap.get(cv2.CAP_PROP_FPS)
-        log(f"Width: {self.width} Height: {self.height} FPS: {self.fps}"+ "output FPS:" + str(self.fps * self.interpolateFactor))
 
         self.outputFrameChunkSize = None
 
@@ -229,7 +229,7 @@ class FFMpegRender:
             "-",
         ]
         return command
-    
+
     def getFFmpegWriteCommand(self):
         log("Generating FFmpeg WRITE command...")
         if not self.benchmark:
@@ -245,7 +245,7 @@ class FFMpegRender:
                 "-s",
                 f"{self.width * self.upscaleTimes}x{self.height * self.upscaleTimes}",
                 "-r",
-                f"{self.fps * self.interpolateFactor}",
+                f"{self.fps * self.ceilInterpolateFactor}",
                 "-i",
                 "-",
                 "-i",
@@ -285,7 +285,7 @@ class FFMpegRender:
                 "-pix_fmt",
                 "rgb24",
                 "-r",
-                str(self.fps* self.interpolateFactor),
+                str(self.fps* self.ceilInterpolateFactor),
                 "-i",
                 "-",
                 "-benchmark",
