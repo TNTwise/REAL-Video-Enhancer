@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from einops import rearrange
 from torch.nn.init import trunc_normal_
 
-from  ....util import store_hyperparameters
+from ....util import store_hyperparameters
 
 
 def img2windows(img, H_sp, W_sp):

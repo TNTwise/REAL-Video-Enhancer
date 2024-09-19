@@ -77,6 +77,7 @@ class UpscaleNCNN:
         self.scale = scale
         self.threads = num_threads
         self._load()
+
     def _load(self):
         self.model = UPSCALE(
             gpuid=self.gpuid,
@@ -85,11 +86,13 @@ class UpscaleNCNN:
             scale=self.scale,
             tilesize=self.tilesize,
         )
+
     def hotUnload(self):
         self.model = None
 
     def hotReload(self):
         self._load()
+
     def Upscale(self, imageChunk):
         while self.model is None:
             sleep(1)

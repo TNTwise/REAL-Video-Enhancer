@@ -33,7 +33,9 @@ class sudo_SPANPlusArch(Architecture[sudo_SPANPlus]):  # noqa: N801
         num_in_ch = 3
         num_out_ch = 3
         blocks = [4]
-        feature_channels = state_dict["feats.0.conv.2.weight"].shape[0] # maybe this will work
+        feature_channels = state_dict["feats.0.conv.2.weight"].shape[
+            0
+        ]  # maybe this will work
         upscale = 2
         drop_rate = 0.0
         """upscale, num_out_ch = get_scale_and_output_channels(

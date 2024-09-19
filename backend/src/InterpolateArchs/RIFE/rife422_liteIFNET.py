@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch.nn.functional import interpolate
 from .warplayer import warp
 
+
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
@@ -159,6 +160,7 @@ class IFNet(nn.Module):
 
         self.paddedHeight = backwarp_tenGrid.shape[2]
         self.paddedWidth = backwarp_tenGrid.shape[3]
+
     def warp(self, tenInput, tenFlow):
         tenFlow = torch.cat(
             [tenFlow[:, 0:1] / self.tenFlow[0], tenFlow[:, 1:2] / self.tenFlow[1]], 1
@@ -181,11 +183,30 @@ class IFNet(nn.Module):
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
-                flow, mask, feat = block[i](torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1), None, scale=self.scaleList[i])
+                flow, mask, feat = block[i](
+                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+                    None,
+                    scale=self.scaleList[i],
+                )
             else:
                 wf0 = self.warp(f0, flow[:, :2])
                 wf1 = self.warp(f1, flow[:, 2:4])
-                fd, m0, feat = block[i](torch.cat((warped_img0[:, :3], warped_img1[:, :3], wf0, wf1, timestep, mask, feat), 1), flow, scale=self.scaleList[i])
+                fd, m0, feat = block[i](
+                    torch.cat(
+                        (
+                            warped_img0[:, :3],
+                            warped_img1[:, :3],
+                            wf0,
+                            wf1,
+                            timestep,
+                            mask,
+                            feat,
+                        ),
+                        1,
+                    ),
+                    flow,
+                    scale=self.scaleList[i],
+                )
                 mask = m0
                 flow = flow + fd
             warped_img0 = self.warp(img0, flow[:, :2])

@@ -72,17 +72,17 @@ class Render(FFMpegRender):
         overwrite: bool = False,
         crf: str = "18",
         # misc
-        pausedFile = None,
+        pausedFile=None,
         sceneDetectMethod: str = "pyscenedetect",
         sceneDetectSensitivity: float = 3.0,
         sharedMemoryID: str = None,
         trt_optimization_level: int = 3,
     ):
         if pausedFile == None:
-            pausedFile = os.path.basename(inputFile) + '_paused_state.txt'
+            pausedFile = os.path.basename(inputFile) + "_paused_state.txt"
         self.inputFile = inputFile
         self.pausedFile = pausedFile
-        with open(self.pausedFile, 'w') as f:
+        with open(self.pausedFile, "w") as f:
             f.write("False")
         self.backend = backend
         self.upscaleModel = upscaleModel
@@ -144,7 +144,7 @@ class Render(FFMpegRender):
         self.prevState = False
         while not self.writingDone:
             if os.path.isfile(self.pausedFile):
-                with open(self.pausedFile, 'r') as f:
+                with open(self.pausedFile, "r") as f:
                     self.isPaused = f.read().strip() == "True"
                     activate = self.prevState != self.isPaused
                 if activate:
@@ -212,25 +212,24 @@ class Render(FFMpegRender):
                 frame1 = self.readQueue.get()
                 if frame1 is None:
                     break
-                
+
                 if frameNum != self.transitionFrame:
-                    for n in range(self.ceilInterpolateFactor-1):
+                    for n in range(self.ceilInterpolateFactor - 1):
                         timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
                         frame = self.interpolate(self.frame0, frame1, timestep)
                         self.writeQueue.put(frame)
                 else:
-                    
                     self.undoSetup(self.frame0)
 
-                    for n in range(self.ceilInterpolateFactor-1):
+                    for n in range(self.ceilInterpolateFactor - 1):
                         self.writeQueue.put(self.frame0)
                     try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
                         self.transitionFrame = self.transitionQueue.get_nowait()
                     except Empty:
                         self.transitionFrame = None
-                
+
                 self.frame0 = frame1
-                frameNum+=1
+                frameNum += 1
             else:
                 sleep(1)
         removeFile(self.pausedFile)

@@ -6,6 +6,7 @@ import re
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt, QPropertyAnimation
+from BuildFFmpegCommand import BuildFFMpegCommand
 
 from .AnimationHandler import AnimationHandler
 from .QTcustom import UpdateGUIThread
@@ -44,12 +45,7 @@ class ProcessTab:
         # encoder dict
         # key is the name in RVE gui
         # value is the encoder used
-        self.encoderDict = {
-            "libx264": "libx264",
-            "libx265": "libx265",
-            "av1": "libsvtav1",
-            "vp9": "libvpx-vp9",
-        }
+        
 
         # get default backend
         self.QConnect()
@@ -216,6 +212,11 @@ class ProcessTab:
         settings.readSettings()
         self.settings = settings.settings
 
+        # get built ffmpeg command
+        buildFFMpegCommand = BuildFFMpegCommand(encoder=self.settings['encoder'],quality=self.settings['video_quality'])
+        self.buildFFMpegsettings = buildFFMpegCommand.buildFFmpeg()
+
+
         # discord rpc
         if self.settings["discord_rich_presence"] == "True":
             start_discordRPC(method, os.path.basename(self.inputFile), backend)
@@ -269,7 +270,7 @@ class ProcessTab:
 
     def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
-        qualityToCRF = {"Low": "28", "Medium": "23", "High": "18", "Very High": "15"}
+        
         command = [
             f"{pythonPath()}",
             "-W",
@@ -284,7 +285,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
-            f"-c:v {self.encoderDict[self.settings['encoder']]} -crf {qualityToCRF[self.settings['video_quality']]}",
+            {self.buildFFMpegSettings},
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
             "--pausedFile",

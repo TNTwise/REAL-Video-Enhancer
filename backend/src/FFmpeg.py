@@ -8,7 +8,14 @@ import time
 import math
 from tqdm import tqdm
 from multiprocessing import shared_memory
-from .Util import currentDirectory, log, printAndLog, ffmpegPath, ffmpegLogFile, removeFolder
+from .Util import (
+    currentDirectory,
+    log,
+    printAndLog,
+    ffmpegPath,
+    ffmpegLogFile,
+    removeFolder,
+)
 import time
 from time import sleep
 from threading import Thread
@@ -285,7 +292,7 @@ class FFMpegRender:
                 "-pix_fmt",
                 "rgb24",
                 "-r",
-                str(self.fps* self.ceilInterpolateFactor),
+                str(self.fps * self.ceilInterpolateFactor),
                 "-i",
                 "-",
                 "-benchmark",
@@ -294,6 +301,7 @@ class FFMpegRender:
                 "-",
             ]
         return command
+
     def readinVideoFrames(self):
         log("Starting Video Read")
         self.readProcess = subprocess.Popen(
@@ -371,7 +379,7 @@ class FFMpegRender:
                 if self.sharedMemoryID is not None and self.previewFrame is not None:
                     # Update the shared array
                     buffer[:fcs] = bytes(self.previewFrame)
-            
+
             time.sleep(0.1)
 
     def writeOutVideoFrames(self):
@@ -386,16 +394,15 @@ class FFMpegRender:
         self.startTime = time.time()
         self.framesRendered: int = 1
         self.last_length: int = 0
-        with open(ffmpegLogFile(), 'w') as f:
+        with open(ffmpegLogFile(), "w") as f:
             with subprocess.Popen(
-                        self.getFFmpegWriteCommand(),
-                        stdin=subprocess.PIPE,
-                        stderr=f,
-                        stdout=f,
-                        text=True,
-                        universal_newlines=True,
-                    ) as self.writeProcess:
-        
+                self.getFFmpegWriteCommand(),
+                stdin=subprocess.PIPE,
+                stderr=f,
+                stdout=f,
+                text=True,
+                universal_newlines=True,
+            ) as self.writeProcess:
                 while True:
                     frame = self.writeQueue.get()
                     if frame is None:
@@ -403,7 +410,7 @@ class FFMpegRender:
                     self.previewFrame = frame
                     self.writeProcess.stdin.buffer.write(frame)
                     self.framesRendered += 1
-            
+
                 self.writeProcess.stdin.close()
                 self.writeProcess.wait()
 

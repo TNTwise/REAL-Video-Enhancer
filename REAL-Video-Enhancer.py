@@ -2,7 +2,7 @@ import sys
 import os
 
 # patch for macos
-if sys.platform == 'darwin':
+if sys.platform == "darwin":
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # this goes one step up, and goes into the actual directory. This is where backend will be copied to.
     os.chdir("..")
@@ -59,8 +59,6 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import DownloadDepsDialog, RegularQTPopup, SettingUpBackendPopup
 import yt_dlp
 import validators
-
-
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -393,25 +391,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def openFileFromYoutubeLink(self):
         url = self.inputFileText.text()
         if validators.url(url) and "youtube.com" in url or "youtu.be" in url:
-            ydl_opts = {
-                'format': 'bestvideo+bestaudio/best'
-            }
+            ydl_opts = {"format": "bestvideo+bestaudio/best"}
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(url, download=False)
-            self.videoContainer = info_dict['ext']
-            self.inputFile = info_dict['title'] + self.videoContainer
-            self.videoWidth = info_dict['width']
-            self.videoHeight = info_dict['height']
-            self.videoFps = info_dict['fps']
-            self.videoEncoder = info_dict['vcodec']
-            self.videoBitrate = info_dict['vbr']
-            self.videoFrameCount = int(info_dict['duration'] * info_dict['fps'])
+            self.videoContainer = info_dict["ext"]
+            self.inputFile = info_dict["title"] + self.videoContainer
+            self.videoWidth = info_dict["width"]
+            self.videoHeight = info_dict["height"]
+            self.videoFps = info_dict["fps"]
+            self.videoEncoder = info_dict["vcodec"]
+            self.videoBitrate = info_dict["vbr"]
+            self.videoFrameCount = int(info_dict["duration"] * info_dict["fps"])
             self.outputFileText.setEnabled(True)
             self.outputFileSelectButton.setEnabled(True)
             self.isVideoLoaded = True
             self.updateVideoGUIDetails()
         else:
-            self.loadVideo(url) # load file from local storage if its not a youtube link
+            self.loadVideo(
+                url
+            )  # load file from local storage if its not a youtube link
 
     def loadVideo(self, inputFile):
         if checkValidVideo(inputFile):
@@ -432,10 +430,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             # get video codec
             self.videoCodec = getVideoEncoder(inputFile)
             self.inputFileText.setText(inputFile)
-            self.videoContainer =  os.path.splitext(inputFile)[1]
+            self.videoContainer = os.path.splitext(inputFile)[1]
             self.outputFileText.setEnabled(True)
             self.outputFileSelectButton.setEnabled(True)
             self.updateVideoGUIDetails()
+
     # input file button
     def openInputFile(self):
         """
@@ -459,8 +458,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             filter=fileFilter,
         )
         self.loadVideo(inputFile)
-
-
 
     # output file button
     def openOutputFolder(self):

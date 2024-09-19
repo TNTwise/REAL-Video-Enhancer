@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import shutil
 
+
 def isFlatpak():
     return "FLATPAK_ID" in os.environ
 
@@ -24,26 +25,34 @@ else:
     cwd = os.getcwd()
 with open(os.path.join(cwd, "backend_log.txt"), "w") as f:
     pass
+
+
 def removeFile(file):
     try:
         os.remove(file)
     except:
         print("Failed to remove file!")
+
+
 def removeFolder(folder):
     try:
         shutil.rmtree(folder)
     except:
         print("Failed to remove file!")
 
+
 def warnAndLog(message: str):
     warnings.warn(message)
     log("WARN: " + message)
 
+
 def currentDirectory():
     return cwd
 
-def ffmpegLogFile()->str:
-    return os.path.join(currentDirectory(),"ffmpeg_log.txt")
+
+def ffmpegLogFile() -> str:
+    return os.path.join(currentDirectory(), "ffmpeg_log.txt")
+
 
 def errorAndLog(message: str):
     log("ERROR: " + message)
@@ -70,7 +79,6 @@ def bytesTo100x100img(image: bytes, width, height) -> np.ndarray:
     frame = np.frombuffer(image, dtype=np.uint8).reshape(height, width, 3)
     frame = cv2.resize(frame, dsize=(100, 100))
     return frame
-
 
 
 def ffmpegPath() -> str:

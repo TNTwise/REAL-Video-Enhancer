@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.nn.functional import interpolate
 from .warplayer import warp
 
+
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
@@ -93,9 +94,9 @@ class IFBlock(nn.Module):
         self.in_planes = in_planes
 
     def forward(self, x, flow=None, scale=1):
-        x = interpolate(x, scale_factor= 1. / scale, mode="bilinear")
+        x = interpolate(x, scale_factor=1.0 / scale, mode="bilinear")
         if flow is not None:
-            flow = interpolate(flow, scale_factor= 1. / scale, mode="bilinear") / scale
+            flow = interpolate(flow, scale_factor=1.0 / scale, mode="bilinear") / scale
             x = torch.cat((x, flow), 1)
         feat = self.conv0(x)
         feat = self.convblock(feat)
@@ -150,11 +151,30 @@ class IFNet(nn.Module):
         block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
-                flow, mask, feat = block[i](torch.cat((img0[:, :3], img1[:, :3], f0, f1, timeStep), 1), None, scale=self.scaleList[i])
+                flow, mask, feat = block[i](
+                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timeStep), 1),
+                    None,
+                    scale=self.scaleList[i],
+                )
             else:
                 wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
                 wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
-                fd, m0, feat = block[i](torch.cat((warped_img0[:, :3], warped_img1[:, :3], wf0, wf1, timeStep, mask, feat), 1), flow, scale=self.scaleList[i])
+                fd, m0, feat = block[i](
+                    torch.cat(
+                        (
+                            warped_img0[:, :3],
+                            warped_img1[:, :3],
+                            wf0,
+                            wf1,
+                            timeStep,
+                            mask,
+                            feat,
+                        ),
+                        1,
+                    ),
+                    flow,
+                    scale=self.scaleList[i],
+                )
                 mask = m0
                 flow = flow + fd
             mask_list.append(mask)

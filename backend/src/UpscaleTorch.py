@@ -90,11 +90,12 @@ class UpscalePytorch:
         self.trt_workspace_size = trt_workspace_size
 
         self._load()
+
     @torch.inference_mode()
     def _load(self):
-        model = self.loadModel(modelPath=self.modelPath, device=self.device, dtype=self.dtype)
-
-
+        model = self.loadModel(
+            modelPath=self.modelPath, device=self.device, dtype=self.dtype
+        )
 
         match self.scale:
             case 1:
@@ -105,10 +106,16 @@ class UpscalePytorch:
                 modulo = 1
         if all(t > 0 for t in self.tile):
             self.pad_w = (
-                math.ceil(min(self.tile[0] + 2 * self.tile_pad, self.videoWidth) / modulo) * modulo
+                math.ceil(
+                    min(self.tile[0] + 2 * self.tile_pad, self.videoWidth) / modulo
+                )
+                * modulo
             )
             self.pad_h = (
-                math.ceil(min(self.tile[1] + 2 * self.tile_pad, self.videoHheight) / modulo) * modulo
+                math.ceil(
+                    min(self.tile[1] + 2 * self.tile_pad, self.videoHheight) / modulo
+                )
+                * modulo
             )
         else:
             self.pad_w = self.videoWidth
@@ -179,14 +186,15 @@ class UpscalePytorch:
             return torch.float16
 
     def hotUnload(self):
-
         self.model = None
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.reset_max_memory_allocated()
         torch.cuda.reset_max_memory_cached()
+
     def hotReload(self):
         self._load()
+
     @torch.inference_mode()
     def loadModel(
         self, modelPath: str, dtype: torch.dtype = torch.float32, device: str = "cuda"

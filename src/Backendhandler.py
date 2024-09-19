@@ -7,7 +7,7 @@ from .Util import (
     pythonPath,
     backendDirectory,
     isFlatpak,
-    networkCheck
+    networkCheck,
 )
 from .version import version
 
@@ -42,11 +42,11 @@ class BackendHandler:
         downloadDependencies.downloadBackend(version)
         if not checkIfDeps():
             from .ui.QTcustom import NetworkCheckPopup
+
             if NetworkCheckPopup():
                 # Dont flip these due to shitty code!
                 downloadDependencies.downloadFFMpeg()
                 downloadDependencies.downloadPython()
-                
 
     def recursivlyCheckIfDepsOnFirstInstallToMakeSureUserHasInstalledAtLeastOneBackend(
         self, firstIter=True
@@ -86,7 +86,7 @@ class BackendHandler:
                 "--list_backends",
             ]
         )
-        output:str = output.getOutput()
+        output: str = output.getOutput()
         output = output.split(" ")
         # hack to filter out bad find
         new_out = ""

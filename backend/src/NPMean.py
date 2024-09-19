@@ -6,11 +6,12 @@ class NPMeanSequential:
     takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
     """
 
-    def __init__(self, sensitivity:int=2):
+    def __init__(self, sensitivity: int = 2):
         self.i0 = None
         self.i1 = None
-        #multiply sensitivity by 10 for more representative results
+        # multiply sensitivity by 10 for more representative results
         self.sensitivity = sensitivity * 10
+
     def sceneDetect(self, img1):
         if self.i0 is None:
             self.i0 = img1
@@ -18,7 +19,10 @@ class NPMeanSequential:
             return
         self.i1 = img1
         img1mean = np.mean(self.i1)
-        if self.image0mean > img1mean + self.sensitivity or self.image0mean < img1mean - self.sensitivity:
+        if (
+            self.image0mean > img1mean + self.sensitivity
+            or self.image0mean < img1mean - self.sensitivity
+        ):
             self.image0mean = img1mean
             return True
         self.image0mean = img1mean

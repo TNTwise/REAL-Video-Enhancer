@@ -210,9 +210,11 @@ class HandleApplication:
         return os.path.join(self.args.modelPath, self.args.modelName)
 
     def checkArguments(self):
-        
-
-        if os.path.isfile(self.args.output) and not self.args.overwrite and not self.args.benchmark:
+        if (
+            os.path.isfile(self.args.output)
+            and not self.args.overwrite
+            and not self.args.benchmark
+        ):
             raise os.error("Output file already exists!")
 
 

@@ -187,7 +187,6 @@ tensorrtUpscaleModels = {
         2,
         "SPAN",
     ),
-    
     "SPAN (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak.pth",
         "4xNomos8k_span_otf_weak.pth",
@@ -258,8 +257,8 @@ def downloadModelsBasedOnInstalledBackend(installed_backends: list):
                         )
                     for model in pytorchUpscaleModels:
                         DownloadModel(model, pytorchUpscaleModels[model][1], "pytorch")
-        '''case "directml":
+        """case "directml":
             for model in onnxInterpolateModels:
                 DownloadModel(model, onnxInterpolateModels[model][1], "onnx")
             for model in onnxUpscaleModels:
-                DownloadModel(model, onnxUpscaleModels[model][1], "onnx")'''
+                DownloadModel(model, onnxUpscaleModels[model][1], "onnx")"""

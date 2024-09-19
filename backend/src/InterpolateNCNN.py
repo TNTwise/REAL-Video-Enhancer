@@ -1,6 +1,7 @@
 from rife_ncnn_vulkan_python import Rife
 from time import sleep
 
+
 class InterpolateRIFENCNN:
     def __init__(
         self,
