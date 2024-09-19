@@ -130,14 +130,14 @@ class Render(FFMpegRender):
         )
 
         self.sharedMemoryThread.start()
-        self.readPausedFileThread = Thread(target=self.readPausedFileThread)
+        self.readPausedFileThread1 = Thread(target=self.readPausedFileThread)
         self.ffmpegReadThread = Thread(target=self.readinVideoFrames)
         self.ffmpegWriteThread = Thread(target=self.writeOutVideoFrames)
 
         self.ffmpegReadThread.start()
         self.ffmpegWriteThread.start()
         self.renderThread.start()
-        self.readPausedFileThread.start()
+        self.readPausedFileThread1.start()
 
     def readPausedFileThread(self):
         activate = True
@@ -205,21 +205,17 @@ class Render(FFMpegRender):
         except AttributeError:
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
-
         frameNum = 0
         while True:
             if not self.isPaused:
+                self.writeQueue.put(self.frame0)
                 frame1 = self.readQueue.get()
                 if frame1 is None:
                     break
-
+                
                 if frameNum != self.transitionFrame:
-                    for n in range(self.ceilInterpolateFactor):
-                        timestep = n / (self.ceilInterpolateFactor)
-                        if timestep == 0:
-                            self.writeQueue.put(self.frame0)
-                            continue
-
+                    for n in range(self.ceilInterpolateFactor-1):
+                        timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
                         frame = self.interpolate(self.frame0, frame1, timestep)
                         self.writeQueue.put(frame)
                 else:
@@ -232,11 +228,13 @@ class Render(FFMpegRender):
                         self.transitionFrame = self.transitionQueue.get_nowait()
                     except Empty:
                         self.transitionFrame = None
+                
                 self.frame0 = frame1
                 frameNum+=1
             else:
                 sleep(1)
         removeFile(self.pausedFile)
+        self.writeQueue.put(self.frame0)
         self.writeQueue.put(None)
         log("Finished Interpolation")
 
