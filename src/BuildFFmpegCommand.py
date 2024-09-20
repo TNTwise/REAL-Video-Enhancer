@@ -23,4 +23,4 @@ class BuildFFMpegCommand:
         self.settings = settings.settings
 
     def buildFFmpeg(self):
-        return f"-c:v {self.encoder} -crf {self.qualityToCRF[self.quality]}"
+        return f"-c:v {self.encoderDict[self.encoder]} -crf {self.qualityToCRF[self.quality]}"
