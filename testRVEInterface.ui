@@ -1444,6 +1444,26 @@ QDoubleSpinBox::down-button {
                        <height>0</height>
                       </size>
                      </property>
+                     <item>
+                      <property name="text">
+                       <string>libx264</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>libx265</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>vp9</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>av1</string>
+                      </property>
+                     </item>
                     </widget>
                    </item>
                   </layout>

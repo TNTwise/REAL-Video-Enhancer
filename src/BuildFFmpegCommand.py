@@ -1,4 +1,4 @@
-from ui.SettingsTab import Settings
+from .ui.SettingsTab import Settings
 
 
 class BuildFFMpegCommand:

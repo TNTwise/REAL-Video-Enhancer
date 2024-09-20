@@ -6,7 +6,7 @@ import re
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath
 from PySide6.QtCore import Qt, QPropertyAnimation
-from BuildFFmpegCommand import BuildFFMpegCommand
+from ..BuildFFmpegCommand import BuildFFMpegCommand
 
 from .AnimationHandler import AnimationHandler
 from .QTcustom import UpdateGUIThread
@@ -285,7 +285,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings['precision']}",
             "--custom_encoder",
-            {self.buildFFMpegSettings},
+            f"{self.buildFFMpegsettings}",
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
             "--pausedFile",
