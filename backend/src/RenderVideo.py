@@ -210,9 +210,10 @@ class Render(FFMpegRender):
             if not self.isPaused:
                 self.writeQueue.put(self.frame0)
                 frame1 = self.readQueue.get()
-                setupFrame1 = self.frameSetupFunction(frame1)
                 if frame1 is None:
                     break
+                setupFrame1 = self.frameSetupFunction(frame1)
+                
 
                 if frameNum != self.transitionFrame:
                     for n in range(self.ceilInterpolateFactor - 1):
@@ -235,7 +236,7 @@ class Render(FFMpegRender):
             else:
                 sleep(1)
         removeFile(self.pausedFile)
-        self.writeQueue.put(self.frame0)
+       
         self.writeQueue.put(None)
         log("Finished Interpolation")
 
