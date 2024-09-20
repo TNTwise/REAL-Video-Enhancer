@@ -95,7 +95,6 @@ class FFMpegRender:
         pixelFormat: str = "yuv420p",
         benchmark: bool = False,
         overwrite: bool = False,
-        frameSetupFunction=None,
         crf: str = "18",
         sharedMemoryID: str = None,
         channels=3,
@@ -127,7 +126,6 @@ class FFMpegRender:
         self.writeOutPipe = False
         self.previewFrame = None
         self.crf = crf
-        self.frameSetupFunction = frameSetupFunction
         self.sharedMemoryID = sharedMemoryID
         self.videoPropertiesLocation = os.path.join(
             currentDirectory(), inputFile + "_VIDEODATA"

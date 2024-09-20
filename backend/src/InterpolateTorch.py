@@ -493,20 +493,15 @@ class InterpolateRifeTorch:
             sleep(1)
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
-            if self.img0 is None:
-                self.img0 = self.frame_to_tensor(img0)
-            img1 = self.frame_to_tensor(img1)
             if not self.rife46:
-                if self.f0encode is None:
-                    self.f0encode = self.encode(self.img0[:, :3])
-                f1encode = self.encode(img1[:, :3])
+                self.f0encode = self.encode(img0[:, :3])
+                self.f1encode = self.encode(img1[:, :3])
+                
                 output = self.flownet(
-                    self.img0, img1, timestep, self.f0encode, f1encode
+                    img0, img1, timestep, self.f0encode, self.f1encode
                 )
-                self.f0encode.copy_(f1encode, non_blocking=True)
             else:
                 output = self.flownet(self.img0, img1, timestep)
-            self.img0.copy_(img1, non_blocking=True)
         self.stream.synchronize()
         return self.tensor_to_frame(output)
 
@@ -535,5 +530,6 @@ class InterpolateRifeTorch:
                 dtype=torch.uint8,
             ).to(device=self.device, dtype=self.dtype, non_blocking=True)
             frame = self.norm(frame)
+            
         self.prepareStream.synchronize()
         return frame

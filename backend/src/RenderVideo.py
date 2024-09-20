@@ -123,7 +123,6 @@ class Render(FFMpegRender):
             pixelFormat=pixelFormat,
             benchmark=benchmark,
             overwrite=overwrite,
-            frameSetupFunction=self.setupRender,
             crf=crf,
             sharedMemoryID=sharedMemoryID,
             channels=3,
@@ -205,18 +204,20 @@ class Render(FFMpegRender):
         except AttributeError:
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
+        self.setupFrame0 = self.frameSetupFunction(self.frame0)
         frameNum = 0
         while True:
             if not self.isPaused:
                 self.writeQueue.put(self.frame0)
                 frame1 = self.readQueue.get()
+                setupFrame1 = self.frameSetupFunction(frame1)
                 if frame1 is None:
                     break
 
                 if frameNum != self.transitionFrame:
                     for n in range(self.ceilInterpolateFactor - 1):
                         timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
-                        frame = self.interpolate(self.frame0, frame1, timestep)
+                        frame = self.interpolate(self.setupFrame0, setupFrame1, timestep)
                         self.writeQueue.put(frame)
                 else:
                     self.undoSetup(self.frame0)
@@ -229,6 +230,7 @@ class Render(FFMpegRender):
                         self.transitionFrame = None
 
                 self.frame0 = frame1
+                self.setupFrame0 = setupFrame1
                 frameNum += 1
             else:
                 sleep(1)
@@ -258,7 +260,7 @@ class Render(FFMpegRender):
                 tilesize=self.tilesize,
             )
             self.upscaleTimes = upscalePytorch.getScale()
-            self.setupRender = upscalePytorch.bytesToFrame
+            self.frameSetupFunction = upscalePytorch.bytesToFrame
             self.upscale = upscalePytorch.renderToNPArray
             self.hotUnload = upscalePytorch.hotUnload
             self.hotReload = upscalePytorch.hotReload
@@ -278,7 +280,7 @@ class Render(FFMpegRender):
                 height=self.height,
                 tilesize=self.tilesize,
             )
-            self.setupRender = self.returnFrame
+            self.frameSetupFunction = self.returnFrame
             self.upscale = upscaleNCNN.Upscale
             self.hotUnload = upscaleNCNN.hotUnload
             self.hotReload = upscaleNCNN.hotReload
@@ -290,7 +292,7 @@ class Render(FFMpegRender):
                 height=self.height,
             )
             self.upscaleTimes = upscaleONNX.getScale()
-            self.setupRender = upscaleONNX.bytesToFrame
+            self.frameSetupFunction = upscaleONNX.bytesToFrame
             self.upscale = upscaleONNX.renderTensor
 
     def setupInterpolate(self):
@@ -312,7 +314,7 @@ class Render(FFMpegRender):
                 width=self.width,
                 height=self.height,
             )
-            self.setupRender = self.returnFrame
+            self.frameSetupFunction = self.returnFrame
             self.undoSetup = interpolateRifeNCNN.uncacheFrame
             self.interpolate = interpolateRifeNCNN.process
             self.hotReload = interpolateRifeNCNN.hotReload
@@ -329,7 +331,7 @@ class Render(FFMpegRender):
                 backend=self.backend,
                 trt_optimization_level=self.trt_optimization_level,
             )
-            self.setupRender = interpolateRifePytorch.frame_to_tensor
+            self.frameSetupFunction = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = interpolateRifePytorch.uncacheFrame
             self.interpolate = interpolateRifePytorch.process
             self.hotUnload = interpolateRifePytorch.hotUnload
