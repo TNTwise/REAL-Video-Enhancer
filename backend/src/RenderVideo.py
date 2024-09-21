@@ -26,7 +26,6 @@ try:
 except ImportError:
     log("WARN: unable to import directml.")
 
-
 class Render(FFMpegRender):
     """
     Subclass of FFmpegRender
@@ -95,6 +94,7 @@ class Render(FFMpegRender):
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.frame0 = None
+        self.doencodingOnFrame = False
         self.isPaused = False
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
@@ -177,7 +177,6 @@ class Render(FFMpegRender):
         self.writeQueue.put(None)
         removeFile(self.pausedFile)
         log("Finished Upscale")
-
     def renderInterpolate(self):
         """Method that performs interpolation between frames.\n
         This method takes in a chunk of frames and outputs an array that can be sent to ffmpeg.\n
@@ -205,6 +204,8 @@ class Render(FFMpegRender):
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
         self.frame0 = self.readQueue.get()
         self.setupFrame0 = self.frameSetupFunction(self.frame0)
+        if self.doencodingOnFrame:
+            self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
         frameNum = 0
         while True:
             if not self.isPaused:
@@ -213,12 +214,17 @@ class Render(FFMpegRender):
                 if frame1 is None:
                     break
                 setupFrame1 = self.frameSetupFunction(frame1)
+                if self.doencodingOnFrame:
+                    encodedFrame1 = self.encodeFrame(setupFrame1)
                 
 
                 if frameNum != self.transitionFrame:
                     for n in range(self.ceilInterpolateFactor - 1):
                         timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
-                        frame = self.interpolate(self.setupFrame0, setupFrame1, timestep)
+                        if self.doencodingOnFrame:
+                            frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=encodedFrame1)
+                        else:
+                            frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep)
                         self.writeQueue.put(frame)
                 else:
                     self.undoSetup(self.frame0)
@@ -232,6 +238,8 @@ class Render(FFMpegRender):
 
                 self.frame0 = frame1
                 self.setupFrame0 = setupFrame1
+                if self.doencodingOnFrame:
+                    self.encodedFrame0 = encodedFrame1
                 frameNum += 1
             else:
                 sleep(1)
@@ -337,3 +345,5 @@ class Render(FFMpegRender):
             self.interpolate = interpolateRifePytorch.process
             self.hotUnload = interpolateRifePytorch.hotUnload
             self.hotReload = interpolateRifePytorch.hotReload
+            self.encodeFrame = interpolateRifePytorch.encode_Frame
+            self.doencodingOnFrame = True
