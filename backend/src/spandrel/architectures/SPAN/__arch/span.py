@@ -150,6 +150,7 @@ class Conv3XC(nn.Module):
             self.eval_conv.weight.requires_grad = False
             self.eval_conv.bias.requires_grad = False  # type: ignore
             self.update_params()
+            
 
     def update_params(self):
         w1 = self.conv[0].weight.data.clone().detach()
@@ -190,13 +191,9 @@ class Conv3XC(nn.Module):
         self.eval_conv.bias.data = self.bias_concat.contiguous()  # type: ignore
 
     def forward(self, x):
-        if self.training:
-            pad = 1
-            x_pad = F.pad(x, (pad, pad, pad, pad), "constant", 0)
-            out = self.conv(x_pad) + self.sk(x)
-        else:
-            self.update_params()
-            out = self.eval_conv(x)
+        
+        
+        out = self.eval_conv(x)
 
         if self.has_relu:
             out = F.leaky_relu(out, negative_slope=0.05)
@@ -258,11 +255,11 @@ class SPAN(nn.Module):
         self.in_channels = num_in_ch
         self.out_channels = num_out_ch
         self.img_range = img_range
-        self.mean = torch.Tensor(rgb_mean).view(1, 3, 1, 1)
+        self.mean = torch.Tensor(rgb_mean).view(1, 3, 1, 1).cuda()
 
         self.no_norm: torch.Tensor | None
         if not norm:
-            self.register_buffer("no_norm", torch.zeros(1))
+            self.register_buffer("no_norm", torch.zeros(1).cuda())
         else:
             self.no_norm = None
 

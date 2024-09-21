@@ -66,6 +66,9 @@ class UpscalePytorch:
         # trt options
         trt_workspace_size: int = 0,
         trt_cache_dir: str = modelsDirectory(),
+        trt_optimization_level: int = 3,
+        trt_max_aux_streams: int | None = None,
+        trt_debug: bool = False,
     ):
         if device == "default":
             if torch.cuda.is_available():
@@ -88,95 +91,99 @@ class UpscalePytorch:
         self.backend = backend
         self.trt_cache_dir = trt_cache_dir
         self.trt_workspace_size = trt_workspace_size
+        self.trt_optimization_level = trt_optimization_level
+        self.trt_aux_streams = trt_max_aux_streams
+        self.trt_debug = trt_debug
 
+        # streams
+        self.stream = torch.cuda.Stream()
+        self.prepareStream = torch.cuda.Stream()
         self._load()
 
     @torch.inference_mode()
     def _load(self):
-        model = self.loadModel(
-            modelPath=self.modelPath, device=self.device, dtype=self.dtype
-        )
-
-        match self.scale:
-            case 1:
-                modulo = 4
-            case 2:
-                modulo = 2
-            case _:
-                modulo = 1
-        if all(t > 0 for t in self.tile):
-            self.pad_w = (
-                math.ceil(
-                    min(self.tile[0] + 2 * self.tile_pad, self.videoWidth) / modulo
-                )
-                * modulo
+        with torch.cuda.stream(self.prepareStream):
+            model = self.loadModel(
+                modelPath=self.modelPath, device=self.device, dtype=self.dtype
             )
-            self.pad_h = (
-                math.ceil(
-                    min(self.tile[1] + 2 * self.tile_pad, self.videoHheight) / modulo
-                )
-                * modulo
-            )
-        else:
-            self.pad_w = self.videoWidth
-            self.pad_h = self.videoHeight
 
-        if self.backend == "tensorrt":
-            import tensorrt as trt
-            import torch_tensorrt
-
-            trt_engine_path = os.path.join(
-                os.path.realpath(self.trt_cache_dir),
-                (
-                    f"{os.path.basename(self.modelPath)}"
-                    + f"_{self.pad_w}x{self.pad_h}"
-                    + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
-                    + f"_{torch.cuda.get_device_name(self.device)}"
-                    + f"_trt-{trt.__version__}"
-                    + (
-                        f"_workspace-{self.trt_workspace_size}"
-                        if self.trt_workspace_size > 0
-                        else ""
+            match self.scale:
+                case 1:
+                    modulo = 4
+                case 2:
+                    modulo = 2
+                case _:
+                    modulo = 1
+            if all(t > 0 for t in self.tile):
+                self.pad_w = (
+                    math.ceil(
+                        min(self.tile[0] + 2 * self.tile_pad, self.videoWidth) / modulo
                     )
-                    + ".ts"
-                ),
-            )
+                    * modulo
+                )
+                self.pad_h = (
+                    math.ceil(
+                        min(self.tile[1] + 2 * self.tile_pad, self.videoHeight) / modulo
+                    )
+                    * modulo
+                )
+            else:
+                self.pad_w = self.videoWidth
+                self.pad_h = self.videoHeight
 
-            if not os.path.isfile(trt_engine_path):
-                inputs = [
-                    torch.zeros(
-                        (1, 3, self.pad_h, self.pad_w),
-                        dtype=self.dtype,
+            if self.backend == "tensorrt":
+                import tensorrt as trt
+                import torch_tensorrt
+
+                trt_engine_path = os.path.join(
+                    os.path.realpath(self.trt_cache_dir),
+                    (
+                        f"{os.path.basename(self.modelPath)}"
+                        + f"_{self.pad_w}x{self.pad_h}"
+                        + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
+                        + f"_{torch.cuda.get_device_name(self.device)}"
+                        + f"_trt-{trt.__version__}"
+                        + (
+                            f"_workspace-{self.trt_workspace_size}"
+                            if self.trt_workspace_size > 0
+                            else ""
+                        )
+                        + ".dyn"
+                    ),
+                )
+
+                if not os.path.isfile(trt_engine_path):
+                    inputs = [
+                        torch.zeros(
+                            (1, 3, self.pad_h, self.pad_w),
+                            dtype=self.dtype,
+                            device=self.device,
+                        )
+                    ]
+
+                    module = torch_tensorrt.compile(
+                        model,
+                        ir="dynamo" ,
+                        inputs=inputs,
+                        enabled_precisions={self.dtype},
                         device=self.device,
+                        debug=self.trt_debug,
+                        workspace_size=self.trt_workspace_size,
+                        min_block_size=1,
+                        max_aux_streams=self.trt_aux_streams,
+                        optimization_level=self.trt_optimization_level,
+                        cache_built_engines=False,
+                        reuse_cached_engines=False,
                     )
-                ]
-                dummy_input_cpu_fp32 = [
-                    torch.zeros(
-                        (1, 3, 32, 32),
-                        dtype=torch.float32,
-                        device="cpu",
-                    )
-                ]
+                    printAndLog(f"Saving TensorRT engine to {trt_engine_path}")
+                    torch_tensorrt.save(module, trt_engine_path, inputs=inputs)
 
-                module = torch.jit.trace(model.float().cpu(), dummy_input_cpu_fp32)
-                module.to(device=self.device, dtype=self.dtype)
-                module = torch_tensorrt.compile(
-                    module,
-                    ir="ts",
-                    inputs=inputs,
-                    enabled_precisions={self.dtype},
-                    device=torch_tensorrt.Device(gpu_id=0),
-                    workspace_size=self.trt_workspace_size,
-                    truncate_long_and_double=True,
-                    min_block_size=1,
-                )
+                printAndLog(f"Loading TensorRT engine from {trt_engine_path}")
+                model = torch.export.load(trt_engine_path).module()
 
-                torch.jit.save(module, trt_engine_path)
-
-            model = torch.jit.load(trt_engine_path)
-
-        self.model = model
-
+            self.model = model
+        self.prepareStream.synchronize()
+    @torch.inference_mode()
     def handlePrecision(self, precision):
         if precision == "auto":
             return torch.float16 if check_bfloat16_support() else torch.float32
@@ -184,7 +191,7 @@ class UpscalePytorch:
             return torch.float32
         if precision == "float16":
             return torch.float16
-
+    @torch.inference_mode()
     def hotUnload(self):
         self.model = None
         gc.collect()
@@ -192,6 +199,7 @@ class UpscalePytorch:
         torch.cuda.reset_max_memory_allocated()
         torch.cuda.reset_max_memory_cached()
 
+    @torch.inference_mode()
     def hotReload(self):
         self._load()
 
@@ -212,20 +220,20 @@ class UpscalePytorch:
         if self.dtype == torch.float16:
             model.half()
         return model
-
+    
+    @torch.inference_mode()
     def bytesToFrame(self, frame):
-        return (
+        with torch.cuda.stream(self.prepareStream):
+            output = (
             torch.frombuffer(frame, dtype=torch.uint8)
-            .reshape(self.videoHeight, self.videoWidth, 3)
             .to(self.device, dtype=self.dtype)
+            .reshape(self.videoHeight, self.videoWidth, 3)
             .permute(2, 0, 1)
             .unsqueeze(0)
             .mul_(1 / 255)
-        )
-
-    def tensorToNPArray(self, image: torch.Tensor) -> np.array:
-        image = image.squeeze(0).permute(1, 2, 0).float().mul(255).cpu().numpy()
-        return image
+            )
+        self.prepareStream.synchronize()
+        return output
 
     @torch.inference_mode()
     def renderImage(self, image: torch.Tensor) -> torch.Tensor:
@@ -234,24 +242,26 @@ class UpscalePytorch:
 
     @torch.inference_mode()
     def renderToNPArray(self, image: torch.Tensor) -> torch.Tensor:
-        while self.model is None:
-            sleep(1)
-        if self.tilesize == 0:
-            output = self.renderImage(image)
-        else:
-            output = self.renderTiledImage(image)
-        output = (
-            output.squeeze(0)
-            .permute(1, 2, 0)
-            .float()
-            .clamp(0.0, 1.0)
-            .mul(255)
-            .byte()
-            .contiguous()
-            .detach()
-            .cpu()
-            .numpy()
-        )
+        with torch.cuda.stream(self.stream):
+            while self.model is None:
+                sleep(1)
+            if self.tilesize == 0:
+                output = self.renderImage(image)
+            else:
+                output = self.renderTiledImage(image)
+            output = (
+                output
+                .squeeze(0)
+                .permute(1, 2, 0)
+                .clamp(0.0, 1.0)
+                .mul(255)
+                .float()
+                .byte()
+                .contiguous()
+                .cpu()
+                .numpy()
+            )
+        self.stream.synchronize()
         return output
 
     def getScale(self):

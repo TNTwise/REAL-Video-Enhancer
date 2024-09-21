@@ -379,30 +379,8 @@ class InterpolateRifeTorch:
                         + ".dyn"
                     ),
                 )
-                norm_trt_engine_path = trt_engine_path.replace(".dyn", "_norm.dyn")
                 encode_trt_engine_path = trt_engine_path.replace(".dyn", "_encode.dyn")
-                # load norm engine
-                """if not os.path.isfile(norm_trt_engine_path):
-                    printAndLog("Building TensorRT engine {}".format(norm_trt_engine_path))
-                    self.norm = torch_tensorrt.compile(
-                        self.norm,
-                        ir="dynamo",
-                        inputs=self.normInput,
-                        enabled_precisions={self.dtype},
-                        debug=self.trt_debug,
-                        workspace_size=self.trt_workspace_size,
-                        min_block_size=1,
-                        max_aux_streams=40,
-                        optimization_level=3,
-                        device=self.device,
-                        cache_built_engines=False,
-                        reuse_cached_engines=False,
-                    )
-                    printAndLog(f"Saving TensorRT engine to {norm_trt_engine_path}")
-                    torch_tensorrt.save(
-                        self.norm, norm_trt_engine_path, inputs=self.normInput
-                    )
-                self.norm = torch.export.load(norm_trt_engine_path).module()"""
+               
                 # load encode engine
                 if not self.rife46:
                     if not os.path.isfile(encode_trt_engine_path):
@@ -461,6 +439,7 @@ class InterpolateRifeTorch:
                     )
                 printAndLog(f"Loading TensorRT engine from {trt_engine_path}")
                 self.flownet = torch.export.load(trt_engine_path).module()
+        self.prepareStream.synchronize()
 
     def handlePrecision(self, precision):
         if precision == "auto":
@@ -478,6 +457,8 @@ class InterpolateRifeTorch:
         self.tenFlow_div = None
         self.backwarp_tenGrid = None
         self.f0encode = None
+        self.stream = None
+        self.prepareStream = None
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.reset_max_memory_allocated()
