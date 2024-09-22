@@ -179,16 +179,15 @@ class IFNet(nn.Module):
         warped_img1 = img1
         flow = None
         mask = None
-        block = [self.block0, self.block1, self.block2, self.block3]
         for i in range(4):
             if flow is None:
-                flow, mask = block[i](
+                flow, mask = self.blocks[i](
                     torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
                     None,
                     scale=self.scaleList[i],
                 )
                 if self.ensemble:
-                    f_, m_ = block[i](
+                    f_, m_ = self.blocks[i](
                         torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
                         None,
                         scale=self.scaleList[i],
@@ -198,7 +197,7 @@ class IFNet(nn.Module):
             else:
                 wf0 = self.warp(f0, flow[:, :2])
                 wf1 = self.warp(f1, flow[:, 2:4])
-                fd, m0 = block[i](
+                fd, m0 = self.blocks[i](
                     torch.cat(
                         (
                             warped_img0[:, :3],
@@ -214,7 +213,7 @@ class IFNet(nn.Module):
                     scale=self.scaleList[i],
                 )
                 if self.ensemble:
-                    f_, m_ = block[i](
+                    f_, m_ = self.blocks[i](
                         torch.cat(
                             (
                                 warped_img1[:, :3],

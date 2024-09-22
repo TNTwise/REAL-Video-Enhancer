@@ -219,8 +219,8 @@ class InterpolateRifeTorch:
                     v1 = True
                 case "rife425":
                     from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
-                    _pad = 128
-                    num_ch_for_encode = 8
+                    _pad = 64
+                    num_ch_for_encode = 4
                     self.encode = Head()
                     v1 = True
                 case _:
