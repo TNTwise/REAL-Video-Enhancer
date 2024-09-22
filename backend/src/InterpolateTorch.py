@@ -238,7 +238,7 @@ class InterpolateRifeTorch:
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
 
                     num_ch_for_encode = 8
-                    v1 = True
+                    v1 = False
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
@@ -256,6 +256,13 @@ class InterpolateRifeTorch:
 
                     self.encode = Head()
                     num_ch_for_encode = 4
+                    v1 = True
+                case "rife425":
+                    print("ggfgdf\n\n\n")
+                    from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
+
+                    num_ch_for_encode = 8
+                    self.encode = Head()
                     v1 = True
                 case _:
                     errorAndLog("Invalid Interpolation Arch")

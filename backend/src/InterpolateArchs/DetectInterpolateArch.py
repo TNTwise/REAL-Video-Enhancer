@@ -38,6 +38,7 @@ class RIFE46:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
+            "module.block4.lastconv.0.bias"
         ]
 
 
@@ -70,6 +71,7 @@ class RIFE47:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
+            "module.block4.lastconv.0.bias"
         ]
 
 
@@ -99,6 +101,7 @@ class RIFE413:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
+            "module.block4.lastconv.0.bias"
         ]
 
 
@@ -118,6 +121,7 @@ class RIFE420:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
+            "module.block4.lastconv.0.bias"
         ]
 
 
@@ -137,6 +141,7 @@ class RIFE421:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
+            "module.block4.lastconv.0.bias"
         ]
 
 
@@ -156,10 +161,28 @@ class RIFE422lite:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
+            "module.block4.lastconv.0.bias"
+        ]
+class RIFE425:
+    def __init__():
+        pass
+
+    def __name__():
+        return "rife413"
+
+    def unique_shapes() -> dict:
+        return {"module.block4.lastconv.0.bias": "torch.Size([52])"}
+
+    def excluded_keys() -> tuple:
+        return [
+            "module.encode.0.weight",
+            "module.encode.0.bias",
+            "module.encode.1.weight",
+            "module.encode.1.bias",
         ]
 
 
-archs = [RIFE46, RIFE47, RIFE413, RIFE420, RIFE421, RIFE422lite]
+archs = [RIFE46, RIFE47, RIFE413, RIFE420, RIFE421, RIFE422lite, RIFE425]
 
 
 class ArchDetect:
@@ -189,7 +212,10 @@ class ArchDetect:
             # parse the unique shape and compare with the state_dict shape
             if type(arch.unique_shapes()) is dict:
                 for key1, uniqueshape1 in arch.unique_shapes().items():
-                    if not str(self.state_dict[key1].shape) == str(uniqueshape1):
+                    try: # the key might not be in the state_dict
+                        if not str(self.state_dict[key1].shape) == str(uniqueshape1):
+                            arch_dict[arch.__name__] = False
+                    except:
                         arch_dict[arch.__name__] = False
 
         for key, value in arch_dict.items():
