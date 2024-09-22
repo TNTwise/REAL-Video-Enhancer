@@ -260,7 +260,7 @@ class DownloadDependencies:
         NCNN deps
         """
         ncnnDeps = [
-            "rife-ncnn-vulkan-python-tntwise==1.4.1",
+            "rife-ncnn-vulkan-python-tntwise==1.4.2",
             "upscale_ncnn_py==1.2.0",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(ncnnDeps)
