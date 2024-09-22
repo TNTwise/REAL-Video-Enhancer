@@ -174,7 +174,9 @@ class InterpolateRifeTorch:
                 weights_only=True,
                 mmap=True,
             )
-
+            # detect what rife arch to use
+            ad = ArchDetect(self.interpolateModel)
+            interpolateArch = ad.getArch()
             log("interp arch" + interpolateArch.lower())
             v1 = False
             _pad = 32
@@ -196,7 +198,7 @@ class InterpolateRifeTorch:
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
 
                     num_ch_for_encode = 8
-                    v1 = False
+                    v1 = True
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
@@ -223,24 +225,14 @@ class InterpolateRifeTorch:
                     v1 = True
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
-            if not self.rife46:
-                for i in range(2):
-                    self.inputs.append(
-                        torch.zeros(
-                            (1, num_ch_for_encode, self.ph, self.pw),
-                            dtype=self.dtype,
-                            device=self.device,
-                        ),
-                    )
+            
             self.v1 = v1
 
             tmp = max(_pad, int(_pad / self.scale))
             self.pw = math.ceil(self.width / tmp) * tmp
             self.ph = math.ceil(self.height / tmp) * tmp
             self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-            # detect what rife arch to use
-            ad = ArchDetect(self.interpolateModel)
-            interpolateArch = ad.getArch()
+            
             # caching the timestep tensor in a dict with the timestep as a float for the key
             self.timestepDict = {}
             for n in range(self.ceilInterpolateFactor):
@@ -265,6 +257,15 @@ class InterpolateRifeTorch:
                     (1, 1, self.ph, self.pw), dtype=self.dtype, device=self.device
                 ),
             ]
+            if not self.rife46:
+                for i in range(2):
+                    self.inputs.append(
+                        torch.zeros(
+                            (1, num_ch_for_encode, self.ph, self.pw),
+                            dtype=self.dtype,
+                            device=self.device,
+                        ),
+                    )
             self.encodedInput = [
                 torch.zeros(
                     (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
