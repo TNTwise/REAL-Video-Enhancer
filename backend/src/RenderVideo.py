@@ -267,6 +267,7 @@ class Render(FFMpegRender):
                 height=self.height,
                 backend=self.backend,
                 tilesize=self.tilesize,
+                trt_optimization_level=self.trt_optimization_level,
             )
             self.upscaleTimes = upscalePytorch.getScale()
             self.frameSetupFunction = upscalePytorch.bytesToFrame
