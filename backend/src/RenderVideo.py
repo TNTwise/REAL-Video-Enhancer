@@ -91,9 +91,10 @@ class Render(FFMpegRender):
         self.precision = precision
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
         self.interpolateFactor = interpolateFactor
+        
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
-        self.frame0 = None
+        self.setupFrame0 = None
         self.doEncodingOnFrame = False
         self.isPaused = False
         self.sceneDetectMethod = sceneDetectMethod
@@ -107,13 +108,13 @@ class Render(FFMpegRender):
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
             self.setupUpscale()
-            self.renderThread = Thread(target=self.renderUpscale)
+            
             printAndLog("Using Upscaling Model: " + self.upscaleModel)
         if interpolateModel:
             self.setupInterpolate()
-            self.renderThread = Thread(target=self.renderInterpolate)
+            
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
-
+        self.renderThread = Thread(target=self.render)
         super().__init__(
             inputFile=inputFile,
             outputFile=outputFile,
@@ -155,26 +156,25 @@ class Render(FFMpegRender):
                         self.hotReload()
                 self.prevState = self.isPaused
             sleep(1)
-    
+
     def i0Norm(self,frame):
-        self.frame0 = frame
         self.setupFrame0 = self.frameSetupFunction(frame)
-        self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
+        if self.doEncodingOnFrame:
+            self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
 
     def i1Norm(self,frame):
         self.setupFrame1 = self.frameSetupFunction(frame)
         if self.doEncodingOnFrame:
-            self.encodedFrame1 = self.encodeFrame(self.setupFrame1)
-        
-    def onEndOfInterpolateCall(self, frame):
-        self.frame0 = frame
+            self.encodedFrame1 = self.encodeFrame(self.setupFrame1) 
+
+    def onEndOfInterpolateCall(self):
         self.setupFrame0 = self.setupFrame1
         if self.doEncodingOnFrame:
             self.encodedFrame0 = self.encodedFrame1
 
     def renderInterpolate(self, frame):
         
-        if self.frame0 is None:
+        if self.setupFrame0 is None:
             self.i0Norm(frame)
             return
         self.i1Norm(frame)
@@ -186,14 +186,15 @@ class Render(FFMpegRender):
             else:
                 frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
             self.writeQueue.put(frame)
+
         self.onEndOfInterpolateCall()
         
         
-    def putTransitionFrame(self):
+    def putTransitionFrame(self,frame):
         self.undoSetup()
 
         for n in range(self.ceilInterpolateFactor - 1):
-            self.writeQueue.put(self.frame0)
+            self.writeQueue.put(frame)
         
         self.currentTransitionFrameNumber = self.getTransitionFrame()
     def getTransitionFrame(self):
@@ -212,16 +213,18 @@ class Render(FFMpegRender):
                     break
                 if self.upscaleModel:
                     frame = self.upscale(self.frameSetupFunction(frame))
+                    
                 if self.interpolateModel:
-                    if self.transitionFrame == counter:
-                        self.putTransitionFrame()
+                    if self.currentTransitionFrameNumber == counter:
+                        self.putTransitionFrame(frame)
                         self.getTransitionFrame()
                     else:
-                        self.writeQueue.put(frame)
                         self.renderInterpolate(frame)
+                self.writeQueue.put(frame)
             else:
                 sleep(1)
             counter+=1
+        self.writeQueue.put(None)
         removeFile(self.pausedFile)
     def setupUpscale(self):
         """
@@ -304,6 +307,7 @@ class Render(FFMpegRender):
             self.interpolate = interpolateRifeNCNN.process
             self.hotReload = interpolateRifeNCNN.hotReload
             self.hotUnload = interpolateRifeNCNN.hotUnload
+            self.doEncodingOnFrame = False
 
         if self.backend == "pytorch" or self.backend == "tensorrt":
             interpolateRifePytorch = InterpolateRifeTorch(
@@ -322,4 +326,4 @@ class Render(FFMpegRender):
             self.hotUnload = interpolateRifePytorch.hotUnload
             self.hotReload = interpolateRifePytorch.hotReload
             self.encodeFrame = interpolateRifePytorch.encode_Frame
-            self.doEncodingOnFrame = True
+            self.doEncodingOnFrame = not(interpolateRifePytorch.rife46)

@@ -227,7 +227,7 @@ class UpscalePytorch:
         with torch.cuda.stream(self.prepareStream):
             output = (
             torch.frombuffer(frame, dtype=torch.uint8)
-            .to(self.device, dtype=self.dtype)
+            .to(self.device, dtype=self.dtype, non_blocking=True)
             .reshape(self.videoHeight, self.videoWidth, 3)
             .permute(2, 0, 1)
             .unsqueeze(0)
@@ -252,11 +252,6 @@ class UpscalePytorch:
                 output = self.renderTiledImage(image)
             output = (
                 output
-                .squeeze(0)
-                .permute(1, 2, 0)
-                .clamp(0.0, 1.0)
-                .mul(255)
-                .float()
                 .byte()
                 .contiguous()
                 .cpu()
