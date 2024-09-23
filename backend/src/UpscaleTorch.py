@@ -143,6 +143,7 @@ class UpscalePytorch:
                         + f"_{'fp16' if self.dtype == torch.float16 else 'fp32'}"
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"_trt-{trt.__version__}"
+                        + f"_opt-{self.trt_optimization_level}"
                         + (
                             f"_workspace-{self.trt_workspace_size}"
                             if self.trt_workspace_size > 0
