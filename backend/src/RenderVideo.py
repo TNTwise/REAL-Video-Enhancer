@@ -185,8 +185,9 @@ class Render(FFMpegRender):
                 frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
             else:
                 frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
-        
+            self.writeQueue.put(frame)
         self.onEndOfInterpolateCall()
+        
         
     def putTransitionFrame(self):
         self.undoSetup()
@@ -203,7 +204,7 @@ class Render(FFMpegRender):
 
     def render(self):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
-
+        counter = 0
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
@@ -212,13 +213,15 @@ class Render(FFMpegRender):
                 if self.upscaleModel:
                     frame = self.upscale(self.frameSetupFunction(frame))
                 if self.interpolateModel:
-                    self.writeQueue.put(frame)
-                    frame = self.renderInterpolate(frame)
-                    
-                self.writeQueue.put(frame)
+                    if self.transitionFrame == counter:
+                        self.putTransitionFrame()
+                        self.getTransitionFrame()
+                    else:
+                        self.writeQueue.put(frame)
+                        self.renderInterpolate(frame)
             else:
                 sleep(1)
-            
+            counter+=1
         removeFile(self.pausedFile)
     def setupUpscale(self):
         """
