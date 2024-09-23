@@ -156,28 +156,23 @@ class Render(FFMpegRender):
                 self.prevState = self.isPaused
             sleep(1)
 
+
     def renderUpscale(self):
         """
         self.setupRender, method that is mapped to the bytesToFrame in each respective backend
         self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
         """
         log("Starting Upscale")
-        while True:
-            if not self.isPaused:
-                frame = self.readQueue.get()
-                """if self.npMean.isEqualImages(frame):
-                    self.writeQueue.put(self.f0)
-                else:"""
-                if frame is None:
-                    break
-                self.f0 = self.upscale(self.frameSetupFunction(frame))
-                self.writeQueue.put(self.f0)
-            else:
-                sleep(1)
-        self.writeQueue.put(None)
-        removeFile(self.pausedFile)
+        frame = self.readQueue.get()
+        """if self.npMean.isEqualImages(frame):
+            self.writeQueue.put(self.f0)
+        else:"""
+        
+        self.f0 = self.upscale(self.frameSetupFunction(frame))
+        self.writeQueue.put(self.f0)
+        
         log("Finished Upscale")
-    def renderInterpolate(self):
+    def renderInterpolate(self, frame):
         """Method that performs interpolation between frames.\n
         This method takes in a chunk of frames and outputs an array that can be sent to ffmpeg.\n
         It starts by setting up the initial frame (frame0) using the frameSetupFunction.\n
@@ -198,57 +193,63 @@ class Render(FFMpegRender):
         """
 
         log("Starting Interpolation")
+        if self.frame0 is None:
+            self.frame0 = frame
+            self.setupFrame0 = self.frameSetupFunction(frame)
+            self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
+            return
+        
+        setupFrame1 = self.frameSetupFunction(frame)
+        encodedFrame1 = self.encodeFrame(frame)
+        if self.doEncodingOnFrame:
+            encodedFrame1 = self.encodeFrame(setupFrame1)
+        
+        for n in range(self.ceilInterpolateFactor - 1):
+            timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
+            if self.doEncodingOnFrame:
+                frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=encodedFrame1)
+            else:
+                frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep)
+
+        
+            
+        self.frame0 = frame
+        self.setupFrame0 = setupFrame1
+        if self.doEncodingOnFrame:
+            self.encodedFrame0 = encodedFrame1
+        
+    def putTransitionFrame(self):
+        self.undoSetup()
+
+        for n in range(self.ceilInterpolateFactor - 1):
+            self.writeQueue.put(self.frame0)
+        
+        self.currentTransitionFrameNumber = self.getTransitionFrame()
+    def getTransitionFrame(self):
         try:
             self.transitionFrame = self.transitionQueue.get()
         except AttributeError:
             self.transitionFrame = -1  # if there is no transition queue, set it to -1
-        self.frame0 = self.readQueue.get()
-        self.setupFrame0 = self.frameSetupFunction(self.frame0)
-        if self.doEncodingOnFrame:
-            self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
-        frameNum = 0
+
+    def render(self):
+        self.currentTransitionFrameNumber = self.getTransitionFrame()
+
         while True:
             if not self.isPaused:
-                self.writeQueue.put(self.frame0)
-                frame1 = self.readQueue.get()
-                if frame1 is None:
+                frame = self.readQueue.get()
+                if frame is None:
                     break
-                setupFrame1 = self.frameSetupFunction(frame1)
-                if self.doEncodingOnFrame:
-                    encodedFrame1 = self.encodeFrame(setupFrame1)
-                
-
-                if frameNum != self.transitionFrame:
-                    for n in range(self.ceilInterpolateFactor - 1):
-                        timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
-                        if self.doEncodingOnFrame:
-                            frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=encodedFrame1)
-                        else:
-                            frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep)
-                        self.writeQueue.put(frame)
-                else:
-                    self.undoSetup("")
-
-                    for n in range(self.ceilInterpolateFactor - 1):
-                        self.writeQueue.put(self.frame0)
-                    try:  # get_nowait sends an error out of the queue is empty, I would like a better solution than this though
-                        self.transitionFrame = self.transitionQueue.get_nowait()
-                    except Empty:
-                        self.transitionFrame = None
-                if frame1 is not None:
-                    self.frame0 = frame1
-                self.setupFrame0 = setupFrame1
-                if self.doEncodingOnFrame:
-                    self.encodedFrame0 = encodedFrame1
-                frameNum += 1
+                if self.upscaleModel:
+                    frame = self.upscale(self.frameSetupFunction(frame))
+                if self.interpolateModel:
+                    self.writeQueue.put(frame)
+                    frame = self.renderInterpolate(frame)
+                    
+                self.writeQueue.put(frame)
             else:
                 sleep(1)
+            
         removeFile(self.pausedFile)
-        for n in range(self.ceilInterpolateFactor - 1):
-            self.writeQueue.put(self.frame0)
-        self.writeQueue.put(None)
-        log("Finished Interpolation")
-
     def setupUpscale(self):
         """
         This is called to setup an upscaling model if it exists.

@@ -41,5 +41,5 @@ class InterpolateRIFENCNN:
         frame = self.render.process_bytes(img0, img1, timestep)
         return frame
 
-    def uncacheFrame(self, n):
+    def uncacheFrame(self):
         self.render.uncache_frame()

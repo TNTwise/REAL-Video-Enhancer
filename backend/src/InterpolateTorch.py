@@ -494,7 +494,7 @@ class InterpolateRifeTorch:
         return self.tensor_to_frame(output)
 
     @torch.inference_mode()
-    def uncacheFrame(self, n):
+    def uncacheFrame(self):
         self.f0encode = None
         self.img0 = None
 
