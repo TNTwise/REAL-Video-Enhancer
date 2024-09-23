@@ -155,68 +155,38 @@ class Render(FFMpegRender):
                         self.hotReload()
                 self.prevState = self.isPaused
             sleep(1)
+    
+    def i0Norm(self,frame):
+        self.frame0 = frame
+        self.setupFrame0 = self.frameSetupFunction(frame)
+        self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
 
-
-    def renderUpscale(self):
-        """
-        self.setupRender, method that is mapped to the bytesToFrame in each respective backend
-        self.upscale, method that takes in a chunk, and outputs an array that can be sent to ffmpeg
-        """
-        log("Starting Upscale")
-        frame = self.readQueue.get()
-        """if self.npMean.isEqualImages(frame):
-            self.writeQueue.put(self.f0)
-        else:"""
-        
-        self.f0 = self.upscale(self.frameSetupFunction(frame))
-        self.writeQueue.put(self.f0)
-        
-        log("Finished Upscale")
-    def renderInterpolate(self, frame):
-        """Method that performs interpolation between frames.\n
-        This method takes in a chunk of frames and outputs an array that can be sent to ffmpeg.\n
-        It starts by setting up the initial frame (frame0) using the frameSetupFunction.\n
-        Then, for each frame in the input frames, it retrieves the next frame (frame1) from the readQueue.\n
-        If frame1 is None, the loop breaks.\n
-        If the current frame number is not the transitionFrame, it performs interpolation by calling the interpolate method.\n
-        The interpolation is done by generating intermediate frames between frame0 and frame1 using the interpolateFactor.\n
-        The resulting frames are then added to the writeQueue.\n
-        If the current frame number is the transitionFrame, it uncaches the cached frame and adds it to the writeQueue.\n
-        After each iteration, frame0 is updated to setup_frame1.\n
-        Finally, None is added to the writeQueue to signal the end of interpolation.\n
-        *NOTE:
-        - The frameSetupFunction is used to convert the frames to the desired format.
-        - The transitionFrame is obtained from the transitionQueue.
-        - The interpolate method performs the actual interpolation between frames.
-        Returns:
-        None
-        """
-
-        log("Starting Interpolation")
-        if self.frame0 is None:
-            self.frame0 = frame
-            self.setupFrame0 = self.frameSetupFunction(frame)
-            self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
-            return
-        
-        setupFrame1 = self.frameSetupFunction(frame)
-        encodedFrame1 = self.encodeFrame(frame)
+    def i1Norm(self,frame):
+        self.setupFrame1 = self.frameSetupFunction(frame)
         if self.doEncodingOnFrame:
-            encodedFrame1 = self.encodeFrame(setupFrame1)
+            self.encodedFrame1 = self.encodeFrame(self.setupFrame1)
+        
+    def onEndOfInterpolateCall(self, frame):
+        self.frame0 = frame
+        self.setupFrame0 = self.setupFrame1
+        if self.doEncodingOnFrame:
+            self.encodedFrame0 = self.encodedFrame1
+
+    def renderInterpolate(self, frame):
+        
+        if self.frame0 is None:
+            self.i0Norm(frame)
+            return
+        self.i1Norm(frame)
         
         for n in range(self.ceilInterpolateFactor - 1):
             timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
             if self.doEncodingOnFrame:
-                frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=encodedFrame1)
+                frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
             else:
-                frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep)
-
+                frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
         
-            
-        self.frame0 = frame
-        self.setupFrame0 = setupFrame1
-        if self.doEncodingOnFrame:
-            self.encodedFrame0 = encodedFrame1
+        self.onEndOfInterpolateCall()
         
     def putTransitionFrame(self):
         self.undoSetup()
