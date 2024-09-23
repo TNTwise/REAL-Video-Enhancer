@@ -227,7 +227,7 @@ class Render(FFMpegRender):
                             frame = self.interpolate(img0=self.setupFrame0, img1=setupFrame1, timestep=timestep)
                         self.writeQueue.put(frame)
                 else:
-                    self.undoSetup(self.frame0)
+                    self.undoSetup("")
 
                     for n in range(self.ceilInterpolateFactor - 1):
                         self.writeQueue.put(self.frame0)
@@ -235,8 +235,8 @@ class Render(FFMpegRender):
                         self.transitionFrame = self.transitionQueue.get_nowait()
                     except Empty:
                         self.transitionFrame = None
-
-                self.frame0 = frame1
+                if frame1 is not None:
+                    self.frame0 = frame1
                 self.setupFrame0 = setupFrame1
                 if self.doEncodingOnFrame:
                     self.encodedFrame0 = encodedFrame1
@@ -244,7 +244,8 @@ class Render(FFMpegRender):
             else:
                 sleep(1)
         removeFile(self.pausedFile)
-       
+        for n in range(self.ceilInterpolateFactor - 1):
+            self.writeQueue.put(self.frame0)
         self.writeQueue.put(None)
         log("Finished Interpolation")
 
