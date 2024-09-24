@@ -493,9 +493,9 @@ class InterpolateRifeTorch:
                     img0, img1, timestep, f0encode, f1encode
                 )
             else:
-                output = self.tensor_to_frame(self.flownet(img0, img1, timestep))
+                output = self.flownet(img0, img1, timestep)
         self.stream.synchronize()
-        return output
+        return self.tensor_to_frame(output)
 
     @torch.inference_mode()
     def uncacheFrame(self):
