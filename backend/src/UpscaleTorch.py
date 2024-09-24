@@ -236,6 +236,8 @@ class UpscalePytorch:
         self.prepareStream.synchronize()
         return output
 
+   
+
     @torch.inference_mode()
     def renderImage(self, image: torch.Tensor) -> torch.Tensor:
         upscaledImage = self.model(image)

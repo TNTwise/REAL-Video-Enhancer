@@ -43,3 +43,5 @@ class InterpolateRIFENCNN:
 
     def uncacheFrame(self):
         self.render.uncache_frame()
+    
+        

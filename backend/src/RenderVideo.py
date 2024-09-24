@@ -91,6 +91,7 @@ class Render(FFMpegRender):
         self.precision = precision
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
         self.interpolateFactor = interpolateFactor
+        self.ncnn = self.backend == "ncnn"
         
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
@@ -168,9 +169,12 @@ class Render(FFMpegRender):
             self.encodedFrame1 = self.encodeFrame(self.setupFrame1) 
 
     def onEndOfInterpolateCall(self):
-        self.setupFrame0 = self.setupFrame1
-        if self.doEncodingOnFrame:
-            self.encodedFrame0 = self.encodedFrame1
+        if self.ncnn:
+            self.setupFrame1=self.setupFrame0
+        else:
+            self.copyFrame(self.setupFrame0,self.setupFrame1)
+            if self.doEncodingOnFrame:
+                self.copyFrame(self.encodedFrame0,self.encodedFrame1)
 
     def renderInterpolate(self, frame):
         
@@ -326,4 +330,5 @@ class Render(FFMpegRender):
             self.hotUnload = interpolateRifePytorch.hotUnload
             self.hotReload = interpolateRifePytorch.hotReload
             self.encodeFrame = interpolateRifePytorch.encode_Frame
+            self.copyFrame = interpolateRifePytorch.copyTensor
             self.doEncodingOnFrame = not(interpolateRifePytorch.rife46)

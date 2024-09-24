@@ -460,6 +460,12 @@ class InterpolateRifeTorch:
         if precision == "bfloat16":
             return torch.bfloat16
 
+    @torch.inference_mode()
+    def copyTensor(self, tensorToCopy: torch.Tensor, tensorCopiedTo: torch.Tensor):
+        with torch.cuda.stream(self.stream):
+            tensorToCopy.copy_(tensorCopiedTo, non_blocking=True)
+        self.stream.synchronize()
+
     def hotUnload(self):
         self.flownet = None
         self.encode = None
