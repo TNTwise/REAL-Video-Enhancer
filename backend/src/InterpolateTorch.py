@@ -472,8 +472,6 @@ class InterpolateRifeTorch:
         self.tenFlow_div = None
         self.backwarp_tenGrid = None
         self.f0encode = None
-        self.stream = None
-        self.prepareStream = None
         gc.collect()
         torch.cuda.empty_cache()
         torch.cuda.reset_max_memory_allocated()
