@@ -191,17 +191,19 @@ class Render(FFMpegRender):
                 frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
             self.writeQueue.put(frame)
 
+        
         self.onEndOfInterpolateCall()
         
-        
     def putTransitionFrame(self,frame):
-        self.setupFrame0 = None
+        self.i1Norm(frame)
+        
         self.undoSetup()
 
-        for n in range(self.ceilInterpolateFactor - 1):
+        for n in range(self.ceilInterpolateFactor-1):
             self.writeQueue.put(frame)
         
         self.currentTransitionFrameNumber = self.getTransitionFrame()
+        self.onEndOfInterpolateCall()
     def getTransitionFrame(self):
         try:
             return self.transitionQueue.get_nowait()
@@ -211,7 +213,7 @@ class Render(FFMpegRender):
 
     def render(self):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
-        counter = 0
+        counter = -1
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
