@@ -195,6 +195,7 @@ class Render(FFMpegRender):
         
         
     def putTransitionFrame(self,frame):
+        self.setupFrame0 = None
         self.undoSetup()
 
         for n in range(self.ceilInterpolateFactor - 1):
@@ -203,13 +204,13 @@ class Render(FFMpegRender):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
     def getTransitionFrame(self):
         try:
-            self.transitionFrame = self.transitionQueue.get()
-        except AttributeError:
-            self.transitionFrame = -1  # if there is no transition queue, set it to -1
+            return self.transitionQueue.get_nowait()
+        except:
+            return -1  # if there is no transition queue, set it to -1
 
     def render(self):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
-        counter = 0
+        counter = -1
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
