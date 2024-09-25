@@ -346,7 +346,7 @@ class InterpolateRifeTorch:
             }
             if not self.rife46:
                 self.encode.load_state_dict(state_dict=head_state_dict, strict=True)
-                self.encode.eval().to(device=self.device, dtype=self.dtype)
+                self.encode.eval().to(device=self.device).float()
             self.flownet.load_state_dict(state_dict=state_dict, strict=False)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
             self.norm = Norm(self.height, self.width, self.padding)
@@ -396,7 +396,7 @@ class InterpolateRifeTorch:
                         printAndLog(
                             "Building TensorRT engine {}".format(trt_engine_path)
                         )
-                        self.encode.float()
+                        
                         self.encode = torch_tensorrt.compile(
                             self.encode,
                             ir="dynamo",
