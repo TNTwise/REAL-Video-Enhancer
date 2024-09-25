@@ -268,7 +268,7 @@ class InterpolateRifeTorch:
                     )
             self.encodedInput = [
                 torch.zeros(
-                    (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
+                    (1, 3, self.ph, self.pw), dtype=torch.float32, device=self.device
                 ),
             ]
             self.normInput = [
@@ -282,7 +282,7 @@ class InterpolateRifeTorch:
             if v1:
                 self.tenFlow_div = torch.tensor(
                     [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
-                    dtype=self.dtype,
+                    dtype=torch.float32,
                     device=self.device,
                 )
                 tenHorizontal = (
@@ -396,12 +396,12 @@ class InterpolateRifeTorch:
                         printAndLog(
                             "Building TensorRT engine {}".format(trt_engine_path)
                         )
-
+                        self.encode.float()
                         self.encode = torch_tensorrt.compile(
                             self.encode,
                             ir="dynamo",
                             inputs=self.encodedInput,
-                            enabled_precisions={self.dtype},
+                            enabled_precisions={torch.float32},
                             debug=self.trt_debug,
                             workspace_size=self.trt_workspace_size,
                             min_block_size=1,
@@ -488,7 +488,6 @@ class InterpolateRifeTorch:
         with torch.cuda.stream(self.stream):
             timestep = self.timestepDict[timestep]
             if not self.rife46:
-                
                 output = self.flownet(
                     img0, img1, timestep, f0encode, f1encode
                 )
@@ -514,9 +513,9 @@ class InterpolateRifeTorch:
     def encode_Frame(self, frame: torch.Tensor):
         if not self.rife46:
             with torch.cuda.stream(self.prepareStream):
-                frame = self.encode(frame[:, :3])
+                frame = self.encode(frame[:, :3].float())
             self.prepareStream.synchronize()
-        return frame
+        return frame.half()
         
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
