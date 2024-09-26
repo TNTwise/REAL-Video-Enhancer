@@ -84,7 +84,7 @@ class SceneDetect(FFMpegRender):
             #    sceneChangeList += detectedFrameList
             match len(detectedFrameList):
                 case 1:
-                    sceneChangeQueue.put(detectedFrameList[0] - 1)
+                    sceneChangeQueue.put(detectedFrameList[0])
         return sceneChangeQueue
 
     def getMeanTransitions(self):
@@ -96,7 +96,7 @@ class SceneDetect(FFMpegRender):
                 self.readQueue.get(), width=self.width, height=self.height
             )
             if detector.sceneDetect(frame):
-                sceneChangeQueue.put(frame_num - 1)
+                sceneChangeQueue.put(frame_num )
         return sceneChangeQueue
 
     def getTransitions(self) -> Queue:

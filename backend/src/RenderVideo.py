@@ -207,7 +207,7 @@ class Render(FFMpegRender):
 
     def render(self):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
-        counter = -1
+        counter = 0
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
