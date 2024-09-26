@@ -177,7 +177,7 @@ class Render(FFMpegRender):
             if self.doEncodingOnFrame:
                 self.copyFrame(self.encodedFrame0,self.encodedFrame1)
 
-    def renderInterpolate(self, frame):
+    def renderInterpolate(self, frame, transition=False):
         
         if self.setupFrame0 is None:
             self.i0Norm(frame)
@@ -185,24 +185,19 @@ class Render(FFMpegRender):
         self.i1Norm(frame)
         
         for n in range(self.ceilInterpolateFactor - 1):
-            timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
-            if self.doEncodingOnFrame:
-                frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
-            else:
-                frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
+            if not transition:
+                timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
+                if self.doEncodingOnFrame:
+                    frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
+                else:
+                    frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
             self.writeQueue.put(frame)
 
         self.onEndOfInterpolateCall()
+    
+    
         
-        
-    def putTransitionFrame(self,frame):
-        self.setupFrame0 = None
-        self.undoSetup()
 
-        for n in range(self.ceilInterpolateFactor - 1):
-            self.writeQueue.put(frame)
-        
-        self.currentTransitionFrameNumber = self.getTransitionFrame()
     def getTransitionFrame(self):
         try:
             return self.transitionQueue.get_nowait()
@@ -212,7 +207,7 @@ class Render(FFMpegRender):
 
     def render(self):
         self.currentTransitionFrameNumber = self.getTransitionFrame()
-        counter = 0
+        counter = -1
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
@@ -223,11 +218,12 @@ class Render(FFMpegRender):
                     
                 if self.interpolateModel:
                     if self.currentTransitionFrameNumber == counter:
-                        self.putTransitionFrame(frame)
-                        self.getTransitionFrame()
+                        print("Placing transition frame at: " + str(counter))
+                        self.renderInterpolate(frame, True)
+                        self.currentTransitionFrameNumber = self.getTransitionFrame()
                     else:
                         self.renderInterpolate(frame)
-                self.writeQueue.put(frame)
+                    self.writeQueue.put(frame)
             else:
                 sleep(1)
             counter+=1
