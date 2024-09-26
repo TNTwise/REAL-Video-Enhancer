@@ -178,22 +178,22 @@ class Render(FFMpegRender):
                 self.copyFrame(self.encodedFrame0,self.encodedFrame1)
 
     def renderInterpolate(self, frame, transition=False):
-        
-        if self.setupFrame0 is None:
-            self.i0Norm(frame)
-            return
-        self.i1Norm(frame)
-        
-        for n in range(self.ceilInterpolateFactor - 1):
-            if not transition:
-                timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
-                if self.doEncodingOnFrame:
-                    frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
-                else:
-                    frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
-            self.writeQueue.put(frame)
+        if frame is not None:
+            if self.setupFrame0 is None:
+                self.i0Norm(frame)
+                return
+            self.i1Norm(frame)
+            
+            for n in range(self.ceilInterpolateFactor - 1):
+                if not transition:
+                    timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
+                    if self.doEncodingOnFrame:
+                        frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
+                    else:
+                        frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
+                self.writeQueue.put(frame)
 
-        self.onEndOfInterpolateCall()
+            self.onEndOfInterpolateCall()
     
     
         
