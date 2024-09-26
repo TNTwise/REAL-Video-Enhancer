@@ -218,7 +218,6 @@ class Render(FFMpegRender):
                     
                 if self.interpolateModel:
                     if self.currentTransitionFrameNumber == counter:
-                        print("Placing transition frame at: " + str(counter))
                         self.renderInterpolate(frame, True)
                         self.currentTransitionFrameNumber = self.getTransitionFrame()
                     else:
