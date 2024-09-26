@@ -223,7 +223,7 @@ class Render(FFMpegRender):
                     else:
                         self.renderInterpolate(frame)
                     self.writeQueue.put(frame)''' # old method
-                    self.renderInterpolate(frame, self.scDetectMethod(frame))
+                    self.renderInterpolate(frame, self.scdetect.processMeanTransition(frame))
                     self.writeQueue.put(frame)
             else:
                 sleep(1)

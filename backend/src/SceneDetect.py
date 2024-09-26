@@ -86,7 +86,8 @@ class SceneDetect(FFMpegRender):
         frame = bytesTo100x100img(
                 frame, width=self.width, height=self.height
             )
-        return self.meanDetector.sceneDetect(frame)
+        out = self.meanDetector.sceneDetect(frame)
+        return out
     
     def processPySceneDetectTransition(self,frame):
         frame = bytesTo100x100img(
