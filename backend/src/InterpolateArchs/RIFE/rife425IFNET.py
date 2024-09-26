@@ -202,7 +202,6 @@ class IFNetV2(nn.Module):
 
     def forward(self, img0, img1, timestep, f0, f1):
         # cant be cached
-        h, w = img0.shape[2], img0.shape[3]
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
         fs = torch.cat([f0, f1], dim=1)
@@ -225,14 +224,14 @@ class IFNetV2(nn.Module):
 
                 flows = flows + fds
 
-            precomp = (self.backWarp + flows.reshape((2, 2, h, w)) * self.tenFlow).permute(0, 2, 3, 1)
+            precomp = (self.backWarp + flows.reshape((2, 2, self.paddedHeight, self.paddedWidth)) * self.tenFlow).permute(0, 2, 3, 1)
             if scale == 1:
                 warped_imgs = torch.nn.functional.grid_sample(imgs_2, precomp, mode='bilinear', padding_mode='border', align_corners=True)
             else:
                 warps = torch.nn.functional.grid_sample(imgs_fs_2, precomp, mode='bilinear', padding_mode='border', align_corners=True)
                 wimg, wf = torch.split(warps, [3, 4], dim=1)
-                wimg = torch.reshape(wimg, (1, 6, h, w))
-                wf = torch.reshape(wf, (1, 8, h, w))
+                wimg = torch.reshape(wimg, (1, 6, self.paddedHeight, self.paddedWidth))
+                wf = torch.reshape(wf, (1, 8, self.paddedHeight, self.paddedWidth))
            
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])

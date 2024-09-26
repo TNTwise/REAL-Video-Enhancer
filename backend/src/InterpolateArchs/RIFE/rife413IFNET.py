@@ -277,125 +277,38 @@ class IFNetV2(nn.Module):
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
 
     def forward(self, img0, img1, timestep, f0, f1):
+        # cant be cached
         imgs = torch.cat([img0, img1], dim=1)
         imgs_2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
         fs = torch.cat([f0, f1], dim=1)
         fs_2 = torch.reshape(fs, (2, 8, self.paddedHeight, self.paddedWidth))
-        if self.ensemble:
-            fs_rev = torch.cat(torch.split(fs, [8, 8], dim=1)[::-1], dim=1)
-            imgs_rev = torch.cat([img1, img0], dim=1)
-
+       
+        imgs_fs_2 = torch.cat((imgs_2, fs_2), 1)
+        warped_img0 = img0
+        warped_img1 = img1
         flows = None
-        mask = None
+        flows = None
         for block, scale in zip(self.blocks, self.scaleList):
             if flows is None:
-                if self.ensemble:
-                    temp_ = torch.cat((imgs_rev, fs_rev, 1 - timestep), 1)
-                    flowss, masks = block(
-                        torch.cat(
-                            (
-                                temp,  # noqa
-                                temp_,
-                            ),
-                            0,
-                        ),
-                        scale=scale,
-                    )
-                    flows, flows_ = torch.split(flowss, [1, 1], dim=0)
-                    mask, mask_ = torch.split(masks, [1, 1], dim=0)
-                    flows = (
-                        flows
-                        + torch.cat(torch.split(flows_, [2, 2], dim=1)[::-1], dim=1)
-                    ) / 2
-                    mask = (mask - mask_) / 2
-
-                    flows_rev = torch.cat(
-                        torch.split(flows, [2, 2], dim=1)[::-1], dim=1
-                    )
-                else:
-                    temp = torch.cat((imgs, fs, timestep), 1)
-                    flows, mask = block(temp, scale=scale)
+                
+                temp = torch.cat((imgs, fs, timestep), 1)
+                flows, mask = block(temp, scale=scale)
             else:
-                if self.ensemble:
-                    temp = torch.cat(
-                        (
-                            wimg,  # noqa
-                            wf,  # noqa
-                            timestep,
-                            mask,
-                            (flows * (1 / scale) if scale != 1 else flows),
-                        ),
-                        1,
-                    )
-                    temp_ = torch.cat(
-                        (
-                            wimg_rev,  # noqa
-                            wf_rev,  # noqa
-                            1 - timestep,
-                            -mask,
-                            (flows_rev * (1 / scale) if scale != 1 else flows_rev),
-                        ),
-                        1,
-                    )
-                    fdss, masks = block(torch.cat((temp, temp_), 0), scale=scale)
-                    fds, fds_ = torch.split(fdss, [1, 1], dim=0)
-                    mask, mask_ = torch.split(masks, [1, 1], dim=0)
-                    fds = (
-                        fds + torch.cat(torch.split(fds_, [2, 2], dim=1)[::-1], dim=1)
-                    ) / 2
-                    mask = (mask - mask_) / 2
-                else:
-                    temp = torch.cat(
-                        (
-                            wimg,  # noqa
-                            wf,  # noqa
-                            timestep,
-                            mask,
-                            (flows * (1 / scale) if scale != 1 else flows),
-                        ),
-                        1,
-                    )
-                    fds, mask = block(temp, scale=scale)
+                
+                temp = torch.cat((wimg, wf, timestep, mask, (flows * (1 / scale) if scale != 1 else flows)), 1)
+                fds, mask = block(temp, scale=scale)
 
                 flows = flows + fds
 
-                if self.ensemble:
-                    flows_rev = torch.cat(
-                        torch.split(flows, [2, 2], dim=1)[::-1], dim=1
-                    )
-            precomp = (
-                (
-                    self.backWarp
-                    + flows.reshape((2, 2, self.paddedHeight, self.paddedWidth))
-                    * self.tenFlow
-                )
-                .permute(0, 2, 3, 1)
-                .to(dtype=self.dtype)
-            )
+            precomp = (self.backWarp + flows.reshape((2, 2, self.paddedHeight, self.paddedWidth)) * self.tenFlow).permute(0, 2, 3, 1)
             if scale == 1:
-                warped_imgs = torch.nn.functional.grid_sample(
-                    imgs_2,
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
+                warped_imgs = torch.nn.functional.grid_sample(imgs_2, precomp, mode='bilinear', padding_mode='border', align_corners=True)
             else:
-                warps = torch.nn.functional.grid_sample(
-                    torch.cat(
-                        (imgs_2.to(dtype=self.dtype), fs_2.to(dtype=self.dtype)), 1
-                    ).to(dtype=self.dtype),
-                    precomp,
-                    mode="bilinear",
-                    padding_mode="border",
-                    align_corners=True,
-                )
+                warps = torch.nn.functional.grid_sample(imgs_fs_2, precomp, mode='bilinear', padding_mode='border', align_corners=True)
                 wimg, wf = torch.split(warps, [3, 8], dim=1)
                 wimg = torch.reshape(wimg, (1, 6, self.paddedHeight, self.paddedWidth))
                 wf = torch.reshape(wf, (1, 16, self.paddedHeight, self.paddedWidth))
-                if self.ensemble:
-                    wimg_rev = torch.cat(torch.split(wimg, [3, 3], dim=1)[::-1], dim=1)  # noqa
-                    wf_rev = torch.cat(torch.split(wf, [8, 8], dim=1)[::-1], dim=1)  # noqa
+           
         mask = torch.sigmoid(mask)
         warped_img0, warped_img1 = torch.split(warped_imgs, [1, 1])
         return (
