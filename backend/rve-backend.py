@@ -151,9 +151,9 @@ class HandleApplication:
         )
         parser.add_argument(
             "--sceneDetectMethod",
-            help="Scene change detection to avoid interpolating transitions. (options=pyscenedetect, ffmpeg, none)",
+            help="Scene change detection to avoid interpolating transitions. (options=pyscenedetect, mean, none)",
             type=str,
-            default="pyscenedetect",
+            default="mean",
         )
         parser.add_argument(
             "--sceneDetectSensitivity",

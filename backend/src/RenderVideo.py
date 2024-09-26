@@ -217,11 +217,13 @@ class Render(FFMpegRender):
                     frame = self.upscale(self.frameSetupFunction(frame))
                     
                 if self.interpolateModel:
-                    if self.currentTransitionFrameNumber == counter:
+                    '''if self.currentTransitionFrameNumber == counter:
                         self.renderInterpolate(frame, True)
                         self.currentTransitionFrameNumber = self.getTransitionFrame()
                     else:
                         self.renderInterpolate(frame)
+                    self.writeQueue.put(frame)''' # old method
+                    self.renderInterpolate(frame, self.scDetectMethod(frame))
                     self.writeQueue.put(frame)
             else:
                 sleep(1)
@@ -290,12 +292,17 @@ class Render(FFMpegRender):
 
         if self.sceneDetectMethod != "none":
             printAndLog("Detecting Transitions")
-            scdetect = SceneDetect(
+            self.scdetect = SceneDetect(
                 inputFile=self.inputFile,
                 sceneChangeSensitivity=self.sceneDetectSensitivty,
                 sceneChangeMethod=self.sceneDetectMethod,
             )
-            self.transitionQueue = scdetect.getTransitions()
+            #probably should rename this to something more descriptive
+            if self.sceneDetectMethod == "mean":
+                self.scDetectMethod = self.scdetect.processMeanTransition
+            if self.sceneDetectMethod == "pyscenedetect":
+                self.scDetectMethod = self.scdetect.processPySceneDetectTransition
+            #self.transitionQueue = self.scdetect.getTransitions()
         else:
             self.transitionQueue = None
         if self.backend == "ncnn":
