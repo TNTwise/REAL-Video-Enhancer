@@ -64,6 +64,7 @@ class Render(FFMpegRender):
         interpolateModel=None,
         interpolateFactor: int = 1,
         tile_size=None,
+        rifeVersion: str = "v1",
         # ffmpeg settings
         encoder: str = "libx264",
         pixelFormat: str = "yuv420p",
@@ -92,7 +93,7 @@ class Render(FFMpegRender):
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
         self.interpolateFactor = interpolateFactor
         self.ncnn = self.backend == "ncnn"
-        
+        self.rifeVersion = rifeVersion
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.setupFrame0 = None
@@ -324,6 +325,7 @@ class Render(FFMpegRender):
                 device=self.device,
                 dtype=self.precision,
                 backend=self.backend,
+                rifeVersion=self.rifeVersion,
                 trt_optimization_level=self.trt_optimization_level,
             )
             self.frameSetupFunction = interpolateRifePytorch.frame_to_tensor

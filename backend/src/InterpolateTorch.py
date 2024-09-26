@@ -117,6 +117,7 @@ class InterpolateRifeTorch:
         backend: str = "pytorch",
         UHDMode: bool = False,
         ensemble: bool = False,
+        rifeVersion: str = "v1",
         # trt options
         trt_workspace_size: int = 0,
         trt_max_aux_streams: int | None = None,
@@ -161,6 +162,7 @@ class InterpolateRifeTorch:
         self.f0encode = None
         self.rife46 = False
         self.trt_debug = trt_debug
+        self.v1 = rifeVersion == "v1"
         if UHDMode:
             self.scale = 0.5
         self._load()
@@ -178,14 +180,13 @@ class InterpolateRifeTorch:
             ad = ArchDetect(self.interpolateModel)
             interpolateArch = ad.getArch()
             log("interp arch" + interpolateArch.lower())
-            v1 = False
+            
             _pad = 32
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
 
                     self.rife46 = True
-                    v1 = True
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
 
@@ -195,10 +196,12 @@ class InterpolateRifeTorch:
                         torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
                     )
                 case "rife413":
-                    from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
+                    if self.v1:
+                        from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
+                    else:
+                        from .InterpolateArchs.RIFE.rife413IFNET import IFNetV2 as IFNet, Head
 
                     num_ch_for_encode = 8
-                    v1 = True
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
@@ -206,27 +209,31 @@ class InterpolateRifeTorch:
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife421":
-                    from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
+                    if self.v1:
+                        from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
+                    else:
+                        from .InterpolateArchs.RIFE.rife421IFNET import IFNetV2 as IFNet, Head
 
                     num_ch_for_encode = 8
                     self.encode = Head()
-                    v1 = True
                 case "rife422lite":
-                    from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
-
+                    if self.v1:
+                        from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
+                    else:
+                        from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNetV2 as IFNet, Head
                     self.encode = Head()
                     num_ch_for_encode = 4
-                    v1 = True
                 case "rife425":
-                    from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
+                    if self.v1:
+                        from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
+                    else:
+                        from .InterpolateArchs.RIFE.rife425IFNET import IFNetV2 as IFNet, Head
                     _pad = 64
                     num_ch_for_encode = 4
                     self.encode = Head()
-                    v1 = True
                 case _:
                     errorAndLog("Invalid Interpolation Arch")
             
-            self.v1 = v1
 
             tmp = max(_pad, int(_pad / self.scale))
             self.pw = math.ceil(self.width / tmp) * tmp
@@ -279,7 +286,7 @@ class InterpolateRifeTorch:
                 ),
             ]
             # if 4.6 v1
-            if v1:
+            if self.v1:
                 self.tenFlow_div = torch.tensor(
                     [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
                     dtype=self.dtype,
@@ -368,7 +375,7 @@ class InterpolateRifeTorch:
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
-                        + (f"rife_version-" + "v1" if v1 else "v2")
+                        + (f"rife_version-" + "v1" if self.v1 else "v2")
                         + (f"model_version-2")
                         + (
                             f"_workspace-{self.trt_workspace_size}"

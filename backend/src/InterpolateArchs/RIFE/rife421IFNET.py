@@ -185,3 +185,98 @@ class IFNet(nn.Module):
             .mul(255)
             .float()
         )
+class IFNetV2(nn.Module):
+    def __init__(
+        self,
+        scale=1.0,
+        ensemble=False,
+        dtype=torch.float32,
+        device="cuda",
+        width=1920,
+        height=1080,
+        backwarp_tenGrid=None,
+        tenFlow_div=None,
+    ):
+        super(IFNetV2, self).__init__()
+        self.block0 = IFBlock(7 + 16, c=256)
+        self.block1 = IFBlock(8 + 4 + 16 + 8, c=192)
+        self.block2 = IFBlock(8 + 4 + 16 + 8, c=96)
+        self.block3 = IFBlock(8 + 4 + 16 + 8, c=48)
+        self.encode = Head()
+        self.device = device
+        self.dtype = dtype
+        self.scaleList = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.ensemble = ensemble
+        self.width = width
+        self.height = height
+        self.backWarp = backwarp_tenGrid
+        self.tenFlow = tenFlow_div
+
+        self.paddedHeight = backwarp_tenGrid.shape[2]
+        self.paddedWidth = backwarp_tenGrid.shape[3]
+
+        self.blocks = [self.block0, self.block1, self.block2, self.block3]
+
+    def forward(self, img0, img1, timeStep, f0, f1):
+        imgs = torch.cat([img0, img1], dim=1)
+        imgs2 = torch.reshape(imgs, (2, 3, self.paddedHeight, self.paddedWidth))
+        fs = torch.cat([f0, f1], dim=1)
+        fs2 = torch.reshape(fs, (2, 8, self.paddedHeight, self.paddedWidth))
+        warpedImg0 = img0
+        warpedImg1 = img1
+        flows = None
+        for block, scale in zip(self.blocks, self.scaleList):
+            if flows is None:
+                temp = torch.cat((imgs, fs, timeStep), 1)
+                flows, mask, feat = block(temp, scale=scale)
+            else:
+                temp = torch.cat(
+                    (
+                        wimg,  # noqa
+                        wf,  # noqa
+                        timeStep,
+                        mask,
+                        feat,
+                        (flows * (1 / scale) if scale != 1 else flows),
+                    ),
+                    1,
+                )
+                fds, mask, feat = block(temp, scale=scale)
+                flows = flows + fds
+
+            precomp = (
+                self.backWarp
+                + flows.reshape((2, 2, self.paddedHeight, self.paddedWidth))
+                * self.tenFlow
+            ).permute(0, 2, 3, 1)
+            if scale == 1:
+                warpedImgs = torch.nn.functional.grid_sample(
+                    imgs2,
+                    precomp,
+                    mode="bilinear",
+                    padding_mode="border",
+                    align_corners=True,
+                )
+            else:
+                imgsFs2 = torch.cat((imgs2, fs2), 1)
+                warps = torch.nn.functional.grid_sample(
+                    imgsFs2,
+                    precomp,
+                    mode="bilinear",
+                    padding_mode="border",
+                    align_corners=True,
+                )
+                wimg, wf = torch.split(warps, [3, 8], dim=1)
+                wimg = torch.reshape(wimg, (1, 6, self.paddedHeight, self.paddedWidth))
+                wf = torch.reshape(wf, (1, 16, self.paddedHeight, self.paddedWidth))
+
+        mask = torch.sigmoid(mask)
+        warpedImg0, warpedImg1 = torch.split(warpedImgs, [1, 1])
+        return (
+            (warpedImg0 * mask + warpedImg1 * (1 - mask))[
+                :, :, : self.height, : self.width
+            ][0]
+            .permute(1, 2, 0)
+            .mul(255)
+            .float()
+        )

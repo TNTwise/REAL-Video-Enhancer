@@ -25,6 +25,7 @@ class HandleApplication:
                 outputFile=self.args.output,
                 interpolateModel=self.args.interpolateModel,
                 interpolateFactor=self.args.interpolateFactor,
+                rifeVersion=self.args.rifeVersion,
                 upscaleModel=self.args.upscaleModel,
                 tile_size=self.args.tilesize,
                 # backend settings
@@ -200,9 +201,15 @@ class HandleApplication:
         )
         parser.add_argument(
             "--pausedFile",
-            help="File to store paused state (True means paused, false means stopped)",
+            help="File to store paused state (True means paused, False means unpaused)",
             type=str,
             default=None,
+        )
+        parser.add_argument(
+            "--rifeVersion",
+            help="version of rife (NOT ARCH) to use, this can make things slower or faster, default is v1 (v1,v2)",
+            type=str,
+            default='v1',
         )
         return parser.parse_args()
 
