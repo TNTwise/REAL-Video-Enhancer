@@ -519,6 +519,8 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def encode_Frame(self, frame: torch.Tensor):
+        while self.encode is None:
+            sleep(1)
         if not self.rife46:
             with torch.cuda.stream(self.prepareStream):
                 frame = self.encode(frame[:, :3])
@@ -527,6 +529,7 @@ class InterpolateRifeTorch:
         
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
+
         with torch.cuda.stream(self.prepareStream):
             frame = torch.frombuffer(
                 frame,
