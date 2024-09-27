@@ -158,7 +158,7 @@ class IFNet(nn.Module):
 
         self.paddedHeight = backwarp_tenGrid.shape[2]
         self.paddedWidth = backwarp_tenGrid.shape[3]
-
+        self.warped_img0 = None
     def warp(self, tenInput, tenFlow):
         tenFlow = torch.cat(
             [tenFlow[:, 0:1] / self.tenFlow[0], tenFlow[:, 1:2] / self.tenFlow[1]], 1
@@ -174,42 +174,41 @@ class IFNet(nn.Module):
         )
 
     def forward(self, img0, img1, timestep, f0, f1):
-        warped_img0 = img0
+        
         warped_img1 = img1
         flow = None
         mask = None
-        for i in range(4):
-            if flow is None:
-                flow, mask, feat = self.blocks[i](
-                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
-                    None,
-                    scale=self.scaleList[i],
-                )
-            else:
-                wf0 = self.warp(f0, flow[:, :2])
-                wf1 = self.warp(f1, flow[:, 2:4])
-                fd, m0, feat = self.blocks[i](
-                    torch.cat(
-                        (
-                            warped_img0[:, :3],
-                            warped_img1[:, :3],
-                            wf0,
-                            wf1,
-                            timestep,
-                            mask,
-                            feat,
-                        ),
-                        1,
-                    ),
-                    flow,
-                    scale=self.scaleList[i],
-                )
-                mask = m0
-                flow = flow + fd
+        flow, mask, feat = self.blocks[0](
+        torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+        None,
+        scale=self.scaleList[0],)
+        for i in range(1, 4):
             warped_img0 = self.warp(img0, flow[:, :2])
+            wf0 = self.warp(f0, flow[:, :2])
             warped_img1 = self.warp(img1, flow[:, 2:4])
+            wf1 = self.warp(f1, flow[:, 2:4])
+            fd, m0, feat = self.blocks[i](
+                torch.cat(
+                    (
+                        warped_img0[:, :3],
+                        warped_img1[:, :3],
+                        wf0,
+                        wf1,
+                        timestep,
+                        mask,
+                        feat,
+                    ),
+                    1,
+                ),
+                flow,
+                scale=self.scaleList[i],
+            )
+            mask = m0
+            flow = flow + fd
 
+        
         mask = torch.sigmoid(mask)
+        
         return (
             (warped_img0 * mask + warped_img1 * (1 - mask))[
                 :, :, : self.height, : self.width
