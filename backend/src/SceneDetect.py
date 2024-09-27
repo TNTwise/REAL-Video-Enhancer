@@ -99,7 +99,6 @@ class SceneDetect(FFMpegRender):
         self.frameNum += 1
         match len(detectedFrameList):
                 case 1:
-                    print("frame detected")
                     return True
         return False
 

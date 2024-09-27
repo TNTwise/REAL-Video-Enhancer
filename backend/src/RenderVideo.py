@@ -289,7 +289,9 @@ class Render(FFMpegRender):
             if self.sceneDetectMethod == "mean":
                 self.scDetectFunc = self.scdetect.processMeanTransition
             elif self.sceneDetectMethod == "pyscenedetect":
-                self.scDetectFunc = self.scdetect.processPySceneDetectTransition
+                #self.scDetectFunc = self.scdetect.processPySceneDetectTransition
+                self.scDetectFunc = self.scdetect.processMeanTransition
+                raise DeprecationWarning("PySceneDetect is not supported in the current version")
         
         else:
             self.scDetectFunc = lambda x: False
