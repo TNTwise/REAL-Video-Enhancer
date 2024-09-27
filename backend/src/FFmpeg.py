@@ -380,6 +380,16 @@ class FFMpegRender:
 
             time.sleep(0.1)
 
+    def openMPVProc(self):
+        self.mpv_process = subprocess.Popen(
+        ['mpv', '--no-correct-pts', f'--fps={self.fps * self.ceilInterpolateFactor}', '--demuxer-thread=no', '--', '-'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=False
+        )
+
+
     def writeOutVideoFrames(self):
         """
         Writes out frames either to ffmpeg or to pipe
@@ -389,6 +399,8 @@ class FFMpegRender:
         """
         log("Rendering")
         #
+
+        #self.openMPVProc()
         self.startTime = time.time()
         self.framesRendered: int = 1
         self.last_length: int = 0
@@ -406,6 +418,7 @@ class FFMpegRender:
                     if frame is None:
                         break
                     self.previewFrame = frame
+                    #self.mpv_process.stdin.buffer.write(frame)
                     self.writeProcess.stdin.buffer.write(frame)
                     self.framesRendered += 1
 

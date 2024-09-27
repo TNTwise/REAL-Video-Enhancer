@@ -294,7 +294,7 @@ class Render(FFMpegRender):
                 raise DeprecationWarning("PySceneDetect is not supported in the current version")
         
         else:
-            printAndLog("Scene Detection Disabled")
+            printAndLog("Scene Detection Disabled") 
             self.scDetectFunc = lambda x: False
         if self.backend == "ncnn":
             interpolateRifeNCNN = InterpolateRIFENCNN(
