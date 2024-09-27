@@ -279,7 +279,7 @@ class Render(FFMpegRender):
         log("Setting up Interpolation")
 
         if self.sceneDetectMethod != "none":
-            printAndLog("Detecting Transitions")
+            printAndLog("Scene Detection Enabled")
             self.scdetect = SceneDetect(
                 inputFile=self.inputFile,
                 sceneChangeSensitivity=self.sceneDetectSensitivty,
@@ -294,6 +294,7 @@ class Render(FFMpegRender):
                 raise DeprecationWarning("PySceneDetect is not supported in the current version")
         
         else:
+            printAndLog("Scene Detection Disabled")
             self.scDetectFunc = lambda x: False
         if self.backend == "ncnn":
             interpolateRifeNCNN = InterpolateRIFENCNN(
