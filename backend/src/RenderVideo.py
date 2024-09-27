@@ -195,19 +195,8 @@ class Render(FFMpegRender):
 
             self.onEndOfInterpolateCall()
     
-    
-        
-
-    def getTransitionFrame(self):
-        try:
-            return self.transitionQueue.get_nowait()
-        except:
-            return -1  # if there is no transition queue, set it to -1
-
 
     def render(self):
-        self.currentTransitionFrameNumber = self.getTransitionFrame()
-        counter = 0
         while True:
             if not self.isPaused:
                 frame = self.readQueue.get()
@@ -223,11 +212,10 @@ class Render(FFMpegRender):
                     else:
                         self.renderInterpolate(frame)
                     self.writeQueue.put(frame)''' # old method
-                    self.renderInterpolate(frame, self.scdetect.processMeanTransition(frame))
+                    self.renderInterpolate(frame, self.scDetectFunc(frame))
                     self.writeQueue.put(frame)
             else:
                 sleep(1)
-            counter+=1
         self.writeQueue.put(None)
         removeFile(self.pausedFile)
     def setupUpscale(self):
@@ -299,12 +287,12 @@ class Render(FFMpegRender):
             )
             #probably should rename this to something more descriptive
             if self.sceneDetectMethod == "mean":
-                self.scDetectMethod = self.scdetect.processMeanTransition
-            if self.sceneDetectMethod == "pyscenedetect":
-                self.scDetectMethod = self.scdetect.processPySceneDetectTransition
-            #self.transitionQueue = self.scdetect.getTransitions()
+                self.scDetectFunc = self.scdetect.processMeanTransition
+            elif self.sceneDetectMethod == "pyscenedetect":
+                self.scDetectFunc = self.scdetect.processPySceneDetectTransition
+        
         else:
-            self.transitionQueue = None
+            self.scDetectFunc = lambda x: False
         if self.backend == "ncnn":
             interpolateRifeNCNN = InterpolateRIFENCNN(
                 interpolateModelPath=self.interpolateModel,

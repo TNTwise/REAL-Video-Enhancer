@@ -94,11 +94,14 @@ class SceneDetect(FFMpegRender):
                 frame, width=self.width, height=self.height
             )
         detectedFrameList = self.adaptiveDetector.process_frame(
-                frame_num=0, frame_img=frame
+                frame_num=self.frameNum, frame_img=frame
             )
         self.frameNum += 1
-        if len(detectedFrameList) > 0:
-            exit()
+        match len(detectedFrameList):
+                case 1:
+                    print("frame detected")
+                    return True
+        return False
 
     def getTransitions(self) -> Queue:
         "Method that returns a list of ints where the scene changes are."
