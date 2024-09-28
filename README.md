@@ -82,7 +82,7 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/media2x/rife-ncnn-vulkan-python" target="_blank">rife ncnn vulkan python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
-  <li> <a rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">? for rife v2 code.</a></li>
+  <li> <a rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Rick astley for a good song</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting rife v2 to older versions of rife</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For TRT engine generation code)</a></li>
         
