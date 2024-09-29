@@ -126,3 +126,120 @@ class IFBlock(nn.Module):
         mask = tmp[:, 4:5]
         return flow, mask
 
+class IFNet(nn.Module):
+    def __init__(
+        self,
+        scale=1.0,
+        ensemble=False,
+        dtype=torch.float32,
+        device="cuda",
+        width=1920,
+        height=1080,
+        backwarp_tenGrid=None,
+        tenFlow_div=None,
+    ):
+        super(IFNet, self).__init__()
+        self.block0 = IFBlock(7 + 16, c=192)
+        self.block1 = IFBlock(8 + 4 + 16, c=128)
+        self.block2 = IFBlock(8 + 4 + 16, c=96)
+        self.block3 = IFBlock(8 + 4 + 16, c=64)
+        self.encode = Head()
+        self.device = device
+        self.dtype = dtype
+        self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.ensemble = ensemble
+        self.width = width
+        self.height = height
+        self.backWarp = backwarp_tenGrid
+        self.tenFlow = tenFlow_div
+
+        self.paddedHeight = backwarp_tenGrid.shape[2]
+        self.paddedWidth = backwarp_tenGrid.shape[3]
+
+        self.blocks = [self.block0, self.block1, self.block2, self.block3]
+
+    def warp(self, tenInput, tenFlow):
+        tenFlow = torch.cat(
+            [tenFlow[:, 0:1] / self.tenFlow[0], tenFlow[:, 1:2] / self.tenFlow[1]], 1
+        )
+
+        g = (self.backWarp + tenFlow).permute(0, 2, 3, 1)
+        return torch.nn.functional.grid_sample(
+            input=tenInput,
+            grid=g,
+            mode="bilinear",
+            padding_mode="border",
+            align_corners=True,
+        )
+
+    def forward(self, img0, img1, timestep, f0, f1):
+        warped_img0 = img0
+        warped_img1 = img1
+        flow = None
+        mask = None
+        for i in range(4):
+            if flow is None:
+                flow, mask = self.blocks[i](
+                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+                    None,
+                    scale=self.scale_list[i],
+                )
+                if self.ensemble:
+                    f_, m_ = self.blocks[i](
+                        torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
+                        None,
+                        scale=self.scale_list[i],
+                    )
+                    flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
+                    mask = (mask + (-m_)) / 2
+            else:
+                wf0 = self.warp(f0, flow[:, :2])
+                wf1 = self.warp(f1, flow[:, 2:4])
+                fd, m0 = self.blocks[i](
+                    torch.cat(
+                        (
+                            warped_img0[:, :3],
+                            warped_img1[:, :3],
+                            wf0,
+                            wf1,
+                            timestep,
+                            mask,
+                        ),
+                        1,
+                    ),
+                    flow,
+                    scale=self.scale_list[i],
+                )
+                if self.ensemble:
+                    f_, m_ = self.blocks[i](
+                        torch.cat(
+                            (
+                                warped_img1[:, :3],
+                                warped_img0[:, :3],
+                                wf1,
+                                wf0,
+                                1 - timestep,
+                                -mask,
+                            ),
+                            1,
+                        ),
+                        torch.cat((flow[:, 2:4], flow[:, :2]), 1),
+                        scale=self.scale_list[i],
+                    )
+                    fd = (fd + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
+                    mask = (m0 + (-m_)) / 2
+                else:
+                    mask = m0
+                flow = flow + fd
+            warped_img0 = self.warp(img0, flow[:, :2])
+            warped_img1 = self.warp(img1, flow[:, 2:4])
+        mask = torch.sigmoid(mask)
+        return (
+            (warped_img0 * mask + warped_img1 * (1 - mask))[
+                :, :, : self.height, : self.width
+            ][0]
+            .permute(1, 2, 0)
+            .mul(255)
+            .float()
+        )
+ 

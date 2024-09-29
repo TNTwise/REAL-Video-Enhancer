@@ -226,7 +226,7 @@ class IFNet(nn.Module):
                             1,
                         ),
                         torch.cat((flow[:, 2:4], flow[:, :2]), 1),
-                        scale=self.scale_list[i],
+                        scale=self.scaleList[i],
                     )
                     fd = (fd + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (m0 + (-m_)) / 2
