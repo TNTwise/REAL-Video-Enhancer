@@ -7,7 +7,6 @@ from time import sleep
 from .FFmpeg import FFMpegRender
 from .SceneDetect import SceneDetect
 from .Util import printAndLog, log, removeFile
-from .NPMean import NPMeanSequential
 
 # try/except imports
 try:
@@ -103,7 +102,6 @@ class Render(FFMpegRender):
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
         self.trt_optimization_level = trt_optimization_level
-        self.npMean = NPMeanSequential()
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -280,18 +278,14 @@ class Render(FFMpegRender):
 
         if self.sceneDetectMethod != "none":
             printAndLog("Scene Detection Enabled")
-            self.scdetect = SceneDetect(
-                inputFile=self.inputFile,
+            
+            scdetect = SceneDetect(
+                sceneChangeMethod=self.sceneDetectMethod, 
                 sceneChangeSensitivity=self.sceneDetectSensitivty,
-                sceneChangeMethod=self.sceneDetectMethod,
-            )
-            #probably should rename this to something more descriptive
-            if self.sceneDetectMethod == "mean":
-                self.scDetectFunc = self.scdetect.processMeanTransition
-            elif self.sceneDetectMethod == "pyscenedetect":
-                #self.scDetectFunc = self.scdetect.processPySceneDetectTransition
-                self.scDetectFunc = self.scdetect.processMeanTransition
-                raise DeprecationWarning("PySceneDetect is not supported in the current version")
+                width=self.width,
+                height=self.height,
+                )
+            self.scDetectFunc = scdetect.detect
         
         else:
             printAndLog("Scene Detection Disabled") 
