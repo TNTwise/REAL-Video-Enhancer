@@ -77,7 +77,7 @@ def log(message: str):
 
 def bytesToImg(image: bytes, width, height, outputWidth:int=None, outputHeight:int=None) -> np.ndarray:
     frame = np.frombuffer(image, dtype=np.uint8).reshape(height, width, 3)
-    if outputHeight and outputWidth is not None:
+    if outputHeight and outputWidth:
         frame = cv2.resize(frame, dsize=(100, 100))
     return frame
 
