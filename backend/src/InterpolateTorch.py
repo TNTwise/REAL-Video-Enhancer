@@ -179,9 +179,11 @@ class InterpolateRifeTorch:
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
+
                     self.rife46 = True
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
+
                     num_ch_for_encode = 4
                     self.encode = torch.nn.Sequential(
                         torch.nn.Conv2d(3, 16, 3, 2, 1),
@@ -189,23 +191,27 @@ class InterpolateRifeTorch:
                     )
                 case "rife413":
                     from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
+
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
+
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife421":
                     from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
+
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife422lite":
                     from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
-                    
+
                     self.encode = Head()
                     num_ch_for_encode = 4
                 case "rife425":
                     from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
+
                     _pad = 64
                     num_ch_for_encode = 4
                     self.encode = Head()
@@ -500,10 +506,12 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
         with torch.cuda.stream(self.prepareStream):
-            frame = self.norm(torch.frombuffer(
-                frame,
-                dtype=torch.uint8,
-            ).to(device=self.device, dtype=self.dtype, non_blocking=True))
+            frame = self.norm(
+                torch.frombuffer(
+                    frame,
+                    dtype=torch.uint8,
+                ).to(device=self.device, dtype=self.dtype, non_blocking=True)
+            )
 
         self.prepareStream.synchronize()
         return frame

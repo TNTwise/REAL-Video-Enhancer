@@ -142,9 +142,6 @@ class IFNet(nn.Module):
     def forward(self, img0, img1, timestep):
         f0 = self.encode(img0[:, :3])
         f1 = self.encode(img1[:, :3])
-        flow_list = []
-        merged = []
-        mask_list = []
         warped_img0 = img0
         warped_img1 = img1
         flow = None
@@ -204,20 +201,18 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            mask_list.append(mask)
-            flow_list.append(flow)
             warped_img0 = warp(
                 img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
             )
             warped_img1 = warp(
                 img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
             )
-            merged.append((warped_img0, warped_img1))
         mask = torch.sigmoid(mask)
         return (
-                warped_img0 * mask + warped_img1 * (1 - mask)
-                [:, :, : self.height, : self.width][0]
-                .squeeze(0)
-                .permute(1, 2, 0)
-                .mul(255)
-            )
+            (warped_img0 * mask + warped_img1 * (1 - mask))[  # maybe try padding here
+                :, :, : self.height, : self.width
+            ][0]
+            .squeeze(0)
+            .permute(1, 2, 0)
+            .mul(255)
+        )

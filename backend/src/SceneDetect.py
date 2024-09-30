@@ -166,4 +166,3 @@ class SceneDetect:
         frame = bytesToImg(frame, width=self.width, height=self.height)
         out = self.detector.sceneDetect(frame)
         return out
-
