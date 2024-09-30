@@ -39,15 +39,22 @@ class NPMeanSCDetect:
 
 class NPMeanSegmentedSCDetect:
     """
-    takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
+    takes in an image as np array and calculates the mean, with ability to use it for scene detect
+    Args:
+        sensitivity: int: sensitivity of the scene detect
+        segments: int: number of segments to split the image into
+        maxDetections: int: number of detections in a segmented scene to trigger a scene change, default is half the segments
     """
 
-    def __init__(self, sensitivity: int = 2, segments: int = 10):
+    def __init__(self, sensitivity: int = 2, segments: int = 10, maxDetections: int = None):
         self.i0 = None
         self.i1 = None
+        if maxDetections is None:
+            maxDetections = segments // 2 if segments > 1 else 1
         # multiply sensitivity by 10 for more representative results
         self.sensitivity = sensitivity * 10
         self.segments = segments
+        self.maxDetections = maxDetections
     
     def segmentImage(self, img: np.ndarray):
         # split image into segments
@@ -56,7 +63,7 @@ class NPMeanSegmentedSCDetect:
         h, w = img.shape[:2]
         segment_height = h // self.segments
         segment_width = w // self.segments
-
+        
         means = {}
         for i in range(self.segments):
             for j in range(self.segments):
@@ -76,13 +83,16 @@ class NPMeanSegmentedSCDetect:
             return
         self.i1 = img1
         segmentsImg2Mean = self.segmentImage(self.i1)
+        detections = 0
         for key,value in self.segmentsImg1Mean.items():
             if (
                 value > segmentsImg2Mean[key] + self.sensitivity
                 or value < segmentsImg2Mean[key] - self.sensitivity
             ):
                 self.segmentsImg1Mean = segmentsImg2Mean
-                return True
+                detections += 1
+                if detections >= self.maxDetections:
+                    return True
         self.segmentsImg1Mean = segmentsImg2Mean
         return False
 
@@ -137,10 +147,11 @@ class SceneDetect():
     ):
         self.width = width
         self.height = height
+        # this is just the argument from the command line, default is mean
         if sceneChangeMethod == "mean":
             self.detector = NPMeanSCDetect(sensitivity=sceneChangeSensitivity)
         elif sceneChangeMethod == "mean_segmented":
-            self.detector = NPMeanSegmentedSCDetect(sensitivity=sceneChangeSensitivity, segments=5)
+            self.detector = NPMeanSegmentedSCDetect(sensitivity=sceneChangeSensitivity, segments=4)
 
     def detect(self,frame):
         frame = bytesTo100x100img(
