@@ -168,9 +168,3 @@ class SceneDetect:
         out = self.detector.sceneDetect(frame)
         return out
 
-
-if __name__ == "__main__":
-    import sys
-
-    scdetect = SceneDetect(sys.argv[1])
-    scdetect.getTransitions()
