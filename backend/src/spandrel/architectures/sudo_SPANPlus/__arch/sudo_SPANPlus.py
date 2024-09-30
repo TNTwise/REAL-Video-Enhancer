@@ -366,7 +366,7 @@ class Conv3XC(nn.Module):
             stride=s,
             bias=bias,
         )
-        
+
         self.eval_conv.weight.requires_grad = False
         self.eval_conv.bias.requires_grad = False
         self.update_params()
@@ -410,7 +410,6 @@ class Conv3XC(nn.Module):
         self.eval_conv.bias.data = self.bias_concat
 
     def forward(self, x):
-        
         out = self.eval_conv(x)
 
         return out

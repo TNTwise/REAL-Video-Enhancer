@@ -107,7 +107,7 @@ class SettingsTab:
         if getPlatform() == "darwin":
             index = self.parent.encoder.findText("av1")
             self.parent.encoder.removeItem(index)
-      
+
         self.parent.precision.setCurrentText(self.settings.settings["precision"])
         self.parent.tensorrt_optimization_level.setCurrentText(
             self.settings.settings["tensorrt_optimization_level"]

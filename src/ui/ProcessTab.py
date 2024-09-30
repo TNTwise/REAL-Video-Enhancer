@@ -45,7 +45,6 @@ class ProcessTab:
         # encoder dict
         # key is the name in RVE gui
         # value is the encoder used
-        
 
         # get default backend
         self.QConnect()
@@ -100,7 +99,9 @@ class ProcessTab:
         # connect file select buttons
 
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
-        self.parent.inputFileText.textChanged.connect(self.parent.openFileFromYoutubeLink)
+        self.parent.inputFileText.textChanged.connect(
+            self.parent.openFileFromYoutubeLink
+        )
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
@@ -118,7 +119,7 @@ class ProcessTab:
         self.parent.modelComboBox.currentIndexChanged.connect(
             self.parent.updateVideoGUIDetails
         )
-        #connect up pausing
+        # connect up pausing
         self.parent.pauseRenderButton.setVisible(False)
         self.parent.pauseRenderButton.clicked.connect(self.pauseRender)
 
@@ -200,12 +201,15 @@ class ProcessTab:
         self.outputVideoHeight = videoHeight * self.upscaleTimes
 
         # set up pausing
-        self.pausedFile = os.path.join(currentDirectory(), os.path.basename(inputFile)+ "_pausedState.txt")
-        self.parent.pauseRenderButton.setVisible(True) # switch to pause button on render
+        self.pausedFile = os.path.join(
+            currentDirectory(), os.path.basename(inputFile) + "_pausedState.txt"
+        )
+        self.parent.pauseRenderButton.setVisible(
+            True
+        )  # switch to pause button on render
         self.parent.startRenderButton.setVisible(False)
         self.parent.startRenderButton.clicked.disconnect()
         self.parent.startRenderButton.clicked.connect(self.resumeRender)
-
 
         # get most recent settings
         settings = Settings()
@@ -213,9 +217,10 @@ class ProcessTab:
         self.settings = settings.settings
 
         # get built ffmpeg command
-        buildFFMpegCommand = BuildFFMpegCommand(encoder=self.settings['encoder'],quality=self.settings['video_quality'])
+        buildFFMpegCommand = BuildFFMpegCommand(
+            encoder=self.settings["encoder"], quality=self.settings["video_quality"]
+        )
         self.buildFFMpegsettings = buildFFMpegCommand.buildFFmpeg()
-
 
         # discord rpc
         if self.settings["discord_rich_presence"] == "True":
@@ -237,17 +242,19 @@ class ProcessTab:
         self.startGUIUpdate()
 
     def pauseRender(self):
-        with open(self.pausedFile,'w') as f:
+        with open(self.pausedFile, "w") as f:
             f.write("True")
         self.parent.pauseRenderButton.setVisible(False)
         self.parent.startRenderButton.setVisible(True)
         self.parent.startRenderButton.setEnabled(True)
+
     def resumeRender(self):
-        with open(self.pausedFile,'w') as f:
+        with open(self.pausedFile, "w") as f:
             f.write("False")
         self.parent.pauseRenderButton.setVisible(True)
         self.parent.pauseRenderButton.setEnabled(True)
         self.parent.startRenderButton.setVisible(False)
+
     def startGUIUpdate(self):
         self.workerThread = UpdateGUIThread(
             parent=self,
@@ -270,7 +277,7 @@ class ProcessTab:
 
     def renderToPipeThread(self, method: str, backend: str, interpolateTimes: int):
         # builds command
-        
+
         command = [
             f"{pythonPath()}",
             "-W",
@@ -289,7 +296,7 @@ class ProcessTab:
             "--tensorrt_opt_profile",
             f"{self.settings['tensorrt_optimization_level']}",
             "--pausedFile",
-            f"{self.pausedFile}"
+            f"{self.pausedFile}",
         ]
         if method == "Upscale":
             command += [

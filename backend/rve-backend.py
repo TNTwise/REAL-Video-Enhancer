@@ -151,7 +151,7 @@ class HandleApplication:
         )
         parser.add_argument(
             "--sceneDetectMethod",
-            help="Scene change detection to avoid interpolating transitions. (options=mean, mean_segmented, none)\nMean segmented splits up an image, and if an arbitrary number of segments changes are detected within the segments, it will trigger a scene change. (lower sensativity thresholds are not recommended)", 
+            help="Scene change detection to avoid interpolating transitions. (options=mean, mean_segmented, none)\nMean segmented splits up an image, and if an arbitrary number of segments changes are detected within the segments, it will trigger a scene change. (lower sensativity thresholds are not recommended)",
             type=str,
             default="mean",
         )
@@ -205,7 +205,7 @@ class HandleApplication:
             type=str,
             default=None,
         )
- 
+
         return parser.parse_args()
 
     def fullModelPathandName(self):

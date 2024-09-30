@@ -25,6 +25,7 @@ try:
 except ImportError:
     log("WARN: unable to import directml.")
 
+
 class Render(FFMpegRender):
     """
     Subclass of FFmpegRender
@@ -108,11 +109,11 @@ class Render(FFMpegRender):
         printAndLog("Using backend: " + self.backend)
         if upscaleModel:
             self.setupUpscale()
-            
+
             printAndLog("Using Upscaling Model: " + self.upscaleModel)
         if interpolateModel:
             self.setupInterpolate()
-            
+
             printAndLog("Using Interpolation Model: " + self.interpolateModel)
         self.renderThread = Thread(target=self.render)
         super().__init__(
@@ -157,23 +158,23 @@ class Render(FFMpegRender):
                 self.prevState = self.isPaused
             sleep(1)
 
-    def i0Norm(self,frame):
+    def i0Norm(self, frame):
         self.setupFrame0 = self.frameSetupFunction(frame)
         if self.doEncodingOnFrame:
             self.encodedFrame0 = self.encodeFrame(self.setupFrame0)
 
-    def i1Norm(self,frame):
+    def i1Norm(self, frame):
         self.setupFrame1 = self.frameSetupFunction(frame)
         if self.doEncodingOnFrame:
-            self.encodedFrame1 = self.encodeFrame(self.setupFrame1) 
+            self.encodedFrame1 = self.encodeFrame(self.setupFrame1)
 
     def onEndOfInterpolateCall(self):
         if self.ncnn:
-            self.setupFrame1=self.setupFrame0
+            self.setupFrame1 = self.setupFrame0
         else:
-            self.copyFrame(self.setupFrame0,self.setupFrame1)
+            self.copyFrame(self.setupFrame0, self.setupFrame1)
             if self.doEncodingOnFrame:
-                self.copyFrame(self.encodedFrame0,self.encodedFrame1)
+                self.copyFrame(self.encodedFrame0, self.encodedFrame1)
 
     def renderInterpolate(self, frame, transition=False):
         if frame is not None:
@@ -181,18 +182,27 @@ class Render(FFMpegRender):
                 self.i0Norm(frame)
                 return
             self.i1Norm(frame)
-            
+
             for n in range(self.ceilInterpolateFactor - 1):
                 if not transition:
                     timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
                     if self.doEncodingOnFrame:
-                        frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep, f0encode=self.encodedFrame0, f1encode=self.encodedFrame1)
+                        frame = self.interpolate(
+                            img0=self.setupFrame0,
+                            img1=self.setupFrame1,
+                            timestep=timestep,
+                            f0encode=self.encodedFrame0,
+                            f1encode=self.encodedFrame1,
+                        )
                     else:
-                        frame = self.interpolate(img0=self.setupFrame0, img1=self.setupFrame1, timestep=timestep)
+                        frame = self.interpolate(
+                            img0=self.setupFrame0,
+                            img1=self.setupFrame1,
+                            timestep=timestep,
+                        )
                 self.writeQueue.put(frame)
 
             self.onEndOfInterpolateCall()
-    
 
     def render(self):
         while True:
@@ -202,20 +212,21 @@ class Render(FFMpegRender):
                     break
                 if self.upscaleModel:
                     frame = self.upscale(self.frameSetupFunction(frame))
-                    
+
                 if self.interpolateModel:
-                    '''if self.currentTransitionFrameNumber == counter:
+                    """if self.currentTransitionFrameNumber == counter:
                         self.renderInterpolate(frame, True)
                         self.currentTransitionFrameNumber = self.getTransitionFrame()
                     else:
                         self.renderInterpolate(frame)
-                    self.writeQueue.put(frame)''' # old method
+                    self.writeQueue.put(frame)"""  # old method
                     self.renderInterpolate(frame, self.scDetectFunc(frame))
                     self.writeQueue.put(frame)
             else:
                 sleep(1)
         self.writeQueue.put(None)
         removeFile(self.pausedFile)
+
     def setupUpscale(self):
         """
         This is called to setup an upscaling model if it exists.
@@ -278,17 +289,17 @@ class Render(FFMpegRender):
 
         if self.sceneDetectMethod != "none":
             printAndLog("Scene Detection Enabled")
-            
+
             scdetect = SceneDetect(
-                sceneChangeMethod=self.sceneDetectMethod, 
+                sceneChangeMethod=self.sceneDetectMethod,
                 sceneChangeSensitivity=self.sceneDetectSensitivty,
                 width=self.width,
                 height=self.height,
-                )
+            )
             self.scDetectFunc = scdetect.detect
-        
+
         else:
-            printAndLog("Scene Detection Disabled") 
+            printAndLog("Scene Detection Disabled")
             self.scDetectFunc = lambda x: False
         if self.backend == "ncnn":
             interpolateRifeNCNN = InterpolateRIFENCNN(
@@ -322,4 +333,4 @@ class Render(FFMpegRender):
             self.hotReload = interpolateRifePytorch.hotReload
             self.encodeFrame = interpolateRifePytorch.encode_Frame
             self.copyFrame = interpolateRifePytorch.copyTensor
-            self.doEncodingOnFrame = not(interpolateRifePytorch.rife46)
+            self.doEncodingOnFrame = not (interpolateRifePytorch.rife46)

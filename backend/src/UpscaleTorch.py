@@ -164,7 +164,7 @@ class UpscalePytorch:
 
                     module = torch_tensorrt.compile(
                         model,
-                        ir="dynamo" ,
+                        ir="dynamo",
                         inputs=inputs,
                         enabled_precisions={self.dtype},
                         device=self.device,
@@ -184,6 +184,7 @@ class UpscalePytorch:
 
             self.model = model
         self.prepareStream.synchronize()
+
     @torch.inference_mode()
     def handlePrecision(self, precision):
         if precision == "auto":
@@ -192,6 +193,7 @@ class UpscalePytorch:
             return torch.float32
         if precision == "float16":
             return torch.float16
+
     @torch.inference_mode()
     def hotUnload(self):
         self.model = None
@@ -221,22 +223,20 @@ class UpscalePytorch:
         if self.dtype == torch.float16:
             model.half()
         return model
-    
+
     @torch.inference_mode()
     def bytesToFrame(self, frame):
         with torch.cuda.stream(self.prepareStream):
             output = (
-            torch.frombuffer(frame, dtype=torch.uint8)
-            .to(self.device, dtype=self.dtype, non_blocking=True)
-            .reshape(self.videoHeight, self.videoWidth, 3)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .mul_(1 / 255)
+                torch.frombuffer(frame, dtype=torch.uint8)
+                .to(self.device, dtype=self.dtype, non_blocking=True)
+                .reshape(self.videoHeight, self.videoWidth, 3)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                .mul_(1 / 255)
             )
         self.prepareStream.synchronize()
         return output
-
-   
 
     @torch.inference_mode()
     def renderImage(self, image: torch.Tensor) -> torch.Tensor:
@@ -252,13 +252,7 @@ class UpscalePytorch:
                 output = self.renderImage(image)
             else:
                 output = self.renderTiledImage(image)
-            output = (
-                output
-                .byte()
-                .contiguous()
-                .cpu()
-                .numpy()
-            )
+            output = output.byte().contiguous().cpu().numpy()
         self.stream.synchronize()
         return output
 

@@ -172,7 +172,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backend=self.backendComboBox.currentText(),
             method=self.methodComboBox.currentText(),
         )
-        
 
         self.downloadTab = DownloadTab(parent=self, installed_backends=self.backends)
         self.settingsTab = SettingsTab(

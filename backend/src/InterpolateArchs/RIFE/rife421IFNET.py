@@ -185,4 +185,3 @@ class IFNet(nn.Module):
             .mul(255)
             .float()
         )
-   

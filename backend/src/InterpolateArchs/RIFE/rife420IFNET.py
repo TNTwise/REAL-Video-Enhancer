@@ -126,6 +126,7 @@ class IFBlock(nn.Module):
         mask = tmp[:, 4:5]
         return flow, mask
 
+
 class IFNet(nn.Module):
     def __init__(
         self,
@@ -242,4 +243,3 @@ class IFNet(nn.Module):
             .mul(255)
             .float()
         )
- 

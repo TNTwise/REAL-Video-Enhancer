@@ -6,21 +6,38 @@ from .warplayer import warp
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
-        nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                  padding=padding, dilation=dilation, bias=True),        
-        nn.LeakyReLU(0.2, True)
+        nn.Conv2d(
+            in_planes,
+            out_planes,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            bias=True,
+        ),
+        nn.LeakyReLU(0.2, True),
     )
+
 
 def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
-        nn.Conv2d(in_planes, out_planes, kernel_size=kernel_size, stride=stride,
-                  padding=padding, dilation=dilation, bias=False),
+        nn.Conv2d(
+            in_planes,
+            out_planes,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            bias=False,
+        ),
         nn.BatchNorm2d(out_planes),
-        nn.LeakyReLU(0.2, True)
+        nn.LeakyReLU(0.2, True),
     )
-    
+
+
 class Head(nn.Module):
     def __init__(self):
         super(Head, self).__init__()
@@ -42,24 +59,25 @@ class Head(nn.Module):
             return [x0, x1, x2, x3]
         return x3
 
+
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
         super(ResConv, self).__init__()
-        self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1\
-)
+        self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1)
         self.beta = nn.Parameter(torch.ones((1, c, 1, 1)), requires_grad=True)
         self.relu = nn.LeakyReLU(0.2, True)
 
     def forward(self, x):
         return self.relu(self.conv(x) * self.beta + x)
 
+
 class IFBlock(nn.Module):
     def __init__(self, in_planes, c=64):
         super(IFBlock, self).__init__()
         self.conv0 = nn.Sequential(
-            conv(in_planes, c//2, 3, 2, 1),
-            conv(c//2, c, 3, 2, 1),
-            )
+            conv(in_planes, c // 2, 3, 2, 1),
+            conv(c // 2, c, 3, 2, 1),
+        )
         self.convblock = nn.Sequential(
             ResConv(c),
             ResConv(c),
@@ -71,14 +89,21 @@ class IFBlock(nn.Module):
             ResConv(c),
         )
         self.lastconv = nn.Sequential(
-            nn.ConvTranspose2d(c, 4*13, 4, 2, 1),
-            nn.PixelShuffle(2)
+            nn.ConvTranspose2d(c, 4 * 13, 4, 2, 1), nn.PixelShuffle(2)
         )
 
     def forward(self, x, flow=None, scale=1):
-        x = interpolate(x, scale_factor= 1. / scale, mode="bilinear", align_corners=False)
+        x = interpolate(
+            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+        )
         if flow is not None:
-            flow = interpolate(flow, scale_factor= 1. / scale, mode="bilinear", align_corners=False) * 1. / scale
+            flow = (
+                interpolate(
+                    flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+                )
+                * 1.0
+                / scale
+            )
             x = torch.cat((x, flow), 1)
         feat = self.conv0(x)
         feat = self.convblock(feat)
@@ -103,15 +128,15 @@ class IFNet(nn.Module):
         tenFlow_div=None,
     ):
         super(IFNet, self).__init__()
-        self.block0 = IFBlock(7+8, c=192)
-        self.block1 = IFBlock(8+4+8+8, c=128)
-        self.block2 = IFBlock(8+4+8+8, c=96)
-        self.block3 = IFBlock(8+4+8+8, c=64)
-        self.block4 = IFBlock(8+4+8+8, c=32)
+        self.block0 = IFBlock(7 + 8, c=192)
+        self.block1 = IFBlock(8 + 4 + 8 + 8, c=128)
+        self.block2 = IFBlock(8 + 4 + 8 + 8, c=96)
+        self.block3 = IFBlock(8 + 4 + 8 + 8, c=64)
+        self.block4 = IFBlock(8 + 4 + 8 + 8, c=32)
         self.encode = Head()
         self.device = device
         self.dtype = dtype
-        self.scaleList = [16/scale,8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.scaleList = [16 / scale, 8 / scale, 4 / scale, 2 / scale, 1 / scale]
         self.ensemble = ensemble
         self.width = width
         self.height = height

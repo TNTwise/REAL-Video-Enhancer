@@ -150,7 +150,6 @@ class Conv3XC(nn.Module):
             self.eval_conv.weight.requires_grad = False
             self.eval_conv.bias.requires_grad = False  # type: ignore
             self.update_params()
-            
 
     def update_params(self):
         w1 = self.conv[0].weight.data.clone().detach()
@@ -191,8 +190,6 @@ class Conv3XC(nn.Module):
         self.eval_conv.bias.data = self.bias_concat.contiguous()  # type: ignore
 
     def forward(self, x):
-        
-        
         out = self.eval_conv(x)
 
         if self.has_relu:
@@ -303,9 +300,4 @@ class SPAN(nn.Module):
         out = self.conv_cat(torch.cat([out_feature, out_b6, out_b1, out_b5_2], 1))
         output = self.upsampler(out)
 
-        return (output
-                .clamp(0.0, 1.0).squeeze(0)
-                .permute(1, 2, 0)
-                .mul(255)
-                .float()
-                )
+        return output.clamp(0.0, 1.0).squeeze(0).permute(1, 2, 0).mul(255).float()

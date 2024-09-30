@@ -38,7 +38,7 @@ class RIFE46:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
 
 
@@ -71,7 +71,7 @@ class RIFE47:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
 
 
@@ -101,7 +101,7 @@ class RIFE413:
             "module.caltime.6.bias",
             "module.caltime.8.weight",
             "module.caltime.8.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
 
 
@@ -121,7 +121,7 @@ class RIFE420:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
 
 
@@ -141,7 +141,7 @@ class RIFE421:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
 
 
@@ -161,8 +161,10 @@ class RIFE422lite:
             "module.encode.0.bias",
             "module.encode.1.weight",
             "module.encode.1.bias",
-            "module.block4.lastconv.0.bias"
+            "module.block4.lastconv.0.bias",
         ]
+
+
 class RIFE425:
     def __init__():
         pass
@@ -212,7 +214,7 @@ class ArchDetect:
             # parse the unique shape and compare with the state_dict shape
             if type(arch.unique_shapes()) is dict:
                 for key1, uniqueshape1 in arch.unique_shapes().items():
-                    try: # the key might not be in the state_dict
+                    try:  # the key might not be in the state_dict
                         if not str(self.state_dict[key1].shape) == str(uniqueshape1):
                             arch_dict[arch.__name__] = False
                     except:
