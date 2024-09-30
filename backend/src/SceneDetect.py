@@ -1,4 +1,3 @@
-from scenedetect import AdaptiveDetector, open_video
 from tqdm import tqdm
 from queue import Queue
 from .FFmpeg import FFMpegRender
