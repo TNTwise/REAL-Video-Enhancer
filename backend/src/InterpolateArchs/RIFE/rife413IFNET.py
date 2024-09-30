@@ -242,5 +242,4 @@ class IFNet(nn.Module):
             ][0]
             .permute(1, 2, 0)
             .mul(255)
-            .float()
         )

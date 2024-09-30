@@ -6,7 +6,6 @@ import os
 import logging
 import gc
 from .Util import (
-    currentDirectory,
     printAndLog,
     errorAndLog,
     modelsDirectory,
@@ -150,8 +149,6 @@ class InterpolateRifeTorch:
         self.backend = backend
         self.ceilInterpolateFactor = ceilInterpolateFactor
         # set up streams for async processing
-        self.stream = torch.cuda.Stream()
-        self.prepareStream = torch.cuda.Stream()
         self.scale = 1
         self.img0 = None
         self.f0encode = None
@@ -164,6 +161,8 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def _load(self):
+        self.stream = torch.cuda.Stream()
+        self.prepareStream = torch.cuda.Stream()
         with torch.cuda.stream(self.prepareStream):
             state_dict = torch.load(
                 self.interpolateModel,
@@ -180,61 +179,33 @@ class InterpolateRifeTorch:
             match interpolateArch.lower():
                 case "rife46":
                     from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-
                     self.rife46 = True
                 case "rife47":
                     from .InterpolateArchs.RIFE.rife47IFNET import IFNet
-
                     num_ch_for_encode = 4
                     self.encode = torch.nn.Sequential(
                         torch.nn.Conv2d(3, 16, 3, 2, 1),
                         torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
                     )
                 case "rife413":
-                    if self.v1:
-                        from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
-                    else:
-                        from .InterpolateArchs.RIFE.rife413IFNET import (
-                            IFNetV2 as IFNet,
-                            Head,
-                        )
-
+                    from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife420":
                     from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
-
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife421":
-                    if self.v1:
-                        from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
-                    else:
-                        from .InterpolateArchs.RIFE.rife421IFNET import (
-                            IFNetV2 as IFNet,
-                            Head,
-                        )
-
+                    from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
                     num_ch_for_encode = 8
                     self.encode = Head()
                 case "rife422lite":
-                    if self.v1:
-                        from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
-                    else:
-                        from .InterpolateArchs.RIFE.rife422_liteIFNET import (
-                            IFNetV2 as IFNet,
-                            Head,
-                        )
+                    from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
+                    
                     self.encode = Head()
                     num_ch_for_encode = 4
                 case "rife425":
-                    if self.v1:
-                        from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
-                    else:
-                        from .InterpolateArchs.RIFE.rife425IFNET import (
-                            IFNetV2 as IFNet,
-                            Head,
-                        )
+                    from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
                     _pad = 64
                     num_ch_for_encode = 4
                     self.encode = Head()
@@ -514,10 +485,6 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
-        """
-        Takes in a 4d tensor, undoes padding, and converts to np array for rendering
-        """
-
         return frame.byte().contiguous().cpu().numpy()
 
     @torch.inference_mode()
@@ -533,11 +500,10 @@ class InterpolateRifeTorch:
     @torch.inference_mode()
     def frame_to_tensor(self, frame) -> torch.Tensor:
         with torch.cuda.stream(self.prepareStream):
-            frame = torch.frombuffer(
+            frame = self.norm(torch.frombuffer(
                 frame,
                 dtype=torch.uint8,
-            ).to(device=self.device, dtype=self.dtype, non_blocking=True)
-            frame = self.norm(frame)
+            ).to(device=self.device, dtype=self.dtype, non_blocking=True))
 
         self.prepareStream.synchronize()
         return frame
