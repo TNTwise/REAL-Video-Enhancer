@@ -2,7 +2,7 @@ from tqdm import tqdm
 from queue import Queue
 from .FFmpeg import FFMpegRender
 from threading import Thread
-from .Util import bytesTo100x100img
+from .Util import bytesToImg
 from queue import Queue
 import numpy as np
 
@@ -163,7 +163,7 @@ class SceneDetect:
             )
 
     def detect(self, frame):
-        frame = bytesTo100x100img(frame, width=self.width, height=self.height)
+        frame = bytesToImg(frame, width=self.width, height=self.height)
         out = self.detector.sceneDetect(frame)
         return out
 
