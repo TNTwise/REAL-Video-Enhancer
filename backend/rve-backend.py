@@ -151,7 +151,7 @@ class HandleApplication:
         )
         parser.add_argument(
             "--sceneDetectMethod",
-            help="Scene change detection to avoid interpolating transitions. (options=mean, none)",
+            help="Scene change detection to avoid interpolating transitions. (options=mean, mean_segmented, none)\nMean segmented splits up an image, and if an arbitrary number of segments changes are detected within the segments, it will trigger a scene change.", 
             type=str,
             default="mean",
         )
@@ -205,12 +205,7 @@ class HandleApplication:
             type=str,
             default=None,
         )
-        parser.add_argument(
-            "--rifeVersion",
-            help="version of rife (NOT ARCH) to use, this can make things slower or faster, default is v1 (v1,v2)",
-            type=str,
-            default='v1',
-        )
+ 
         return parser.parse_args()
 
     def fullModelPathandName(self):
