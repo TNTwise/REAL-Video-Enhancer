@@ -18,11 +18,6 @@ from time import sleep
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
-try:  # temp
-    import tensorrt
-    import torch_tensorrt
-except:
-    pass
 
 
 class Norm(torch.nn.Module):
