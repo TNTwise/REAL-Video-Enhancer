@@ -135,28 +135,26 @@ class IFNet(nn.Module):
         self.height = height
         self.backwarp_tenGrid = backwarp_tenGrid
         self.tenFlow_div = tenFlow_div
-
+        self.block = [self.block0, self.block1, self.block2, self.block3]
         # self.contextnet = Contextnet()
         # self.unet = Unet()
 
-    def forward(self, img0, img1, timestep):
-        f0 = self.encode(img0[:, :3])
-        f1 = self.encode(img1[:, :3])
+    def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0
         warped_img1 = img1
         flow = None
         mask = None
-        block = [self.block0, self.block1, self.block2, self.block3]
+
         for i in range(4):
             if flow is None:
-                flow, mask = block[i](
-                    torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+                flow, mask = self.block[i](
+                    torch.cat((img0, img1, f0, f1, timestep), 1),
                     None,
                     scale=self.scale_list[i],
                 )
                 if self.ensemble:
-                    f_, m_ = block[i](
-                        torch.cat((img1[:, :3], img0[:, :3], f1, f0, 1 - timestep), 1),
+                    f_, m_ = self.block[i](
+                        torch.cat((img1, img0, f1, f0, 1 - timestep), 1),
                         None,
                         scale=self.scale_list[i],
                     )
@@ -165,11 +163,11 @@ class IFNet(nn.Module):
             else:
                 wf0 = warp(f0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid)
                 wf1 = warp(f1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid)
-                fd, m0 = block[i](
+                fd, m0 = self.block[i](
                     torch.cat(
                         (
-                            warped_img0[:, :3],
-                            warped_img1[:, :3],
+                            warped_img0,
+                            warped_img1,
                             wf0,
                             wf1,
                             timestep,
@@ -181,11 +179,11 @@ class IFNet(nn.Module):
                     scale=self.scale_list[i],
                 )
                 if self.ensemble:
-                    f_, m_ = block[i](
+                    f_, m_ = self.block[i](
                         torch.cat(
                             (
-                                warped_img1[:, :3],
-                                warped_img0[:, :3],
+                                warped_img1,
+                                warped_img0,
                                 wf1,
                                 wf0,
                                 1 - timestep,

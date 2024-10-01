@@ -175,11 +175,10 @@ class IFNet(nn.Module):
         )
 
     def forward(self, img0, img1, timestep, f0, f1):
-        warped_img1 = img1
         flow = None
         mask = None
         flow, mask, feat = self.blocks[0](
-            torch.cat((img0[:, :3], img1[:, :3], f0, f1, timestep), 1),
+            torch.cat((img0, img1, f0, f1, timestep), 1),
             None,
             scale=self.scaleList[0],
         )
@@ -191,8 +190,8 @@ class IFNet(nn.Module):
             fd, m0, feat = self.blocks[i](
                 torch.cat(
                     (
-                        warped_img0[:, :3],
-                        warped_img1[:, :3],
+                        warped_img0,
+                        warped_img1,
                         wf0,
                         wf1,
                         timestep,

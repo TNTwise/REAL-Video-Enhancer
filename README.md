@@ -19,7 +19,7 @@ V2 Alpha 2 New Look!:
 </p>
 <h1>Features: </h1>
 <ul>
-  <li> <strong>NEW!</strong> Windows support. <strong>!!! NOTICE !!!</strong> The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li> 
+  <li> <strong>NEW!</strong> Windows support. <strong>!!! NOTICE !!!</strong> The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li>
   <li> CUDA support. </li>
   <li> MacOS support. </li>
   <li>Support for Ubuntu 20.04+ on AppImage and Flatpak. </li>
@@ -34,27 +34,27 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 
 | RX 6650 XT | |
  |--|--|
-| rife-v4.6 | 31 fps 
+| rife-v4.6 | 31 fps
 | rife-v4.7 - v4.9 | 28 fps
-| rife-v4.10 - v4.15 | 23 fps 
-| rife-v4.16-lite | 31 fps 
+| rife-v4.10 - v4.15 | 23 fps
+| rife-v4.16-lite | 31 fps
 
 | RTX 3080 | |
 |--|--|
-| rife-v4.6 | 81 fps 
-| rife-v4.7 - v4.9 | 65 fps 
-| rife-v4.10 - v4.15 | 55 fps 
-| rife-v4.22 | 50 fps 
-| rife-v4.22-lite | 63 fps 
+| rife-v4.6 | 81 fps
+| rife-v4.7 - v4.9 | 65 fps
+| rife-v4.10 - v4.15 | 55 fps
+| rife-v4.22 | 50 fps
+| rife-v4.22-lite | 63 fps
 
 ## Benchmarks: (RIFE TensorRT 10.3)
 | RTX 3080 | |
 |--|--|
-| rife-v4.6 | 270 fps 
-| rife-v4.7 - v4.9 | 204 fps 
-| rife-v4.10 - v4.15 | 166 fps 
-| rife-v4.22 | 140 fps 
-| rife-v4.22-lite | 192 fps 
+| rife-v4.6 | 270 fps
+| rife-v4.7 - v4.9 | 204 fps
+| rife-v4.10 - v4.15 | 166 fps
+| rife-v4.22 | 140 fps
+| rife-v4.22-lite | 192 fps
 
 # Cloning:
 ```
@@ -84,8 +84,8 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
   <li> <a rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Rick astley for a good song</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting <strong>[REDACTED]</strong> to older versions of rife</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">vs-rife (For TRT engine generation code)</a></li>
-        
+  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">HolyWu For TRT engine generation code and some optimizations</a></li>
+
   <li> <a rel="noopener noreferrer" href="https://github.com/feathericons/feather" target="_blank">feather icons</a></li>
 </ul>
 
@@ -98,5 +98,3 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong" target="_blank" >4x-Nomos8k-SPAN series by Helaman</a> </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus" target="_blank" >OpenProteus by SiroSky</a> </li>
 </ul>
-
-
