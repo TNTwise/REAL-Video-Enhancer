@@ -431,6 +431,7 @@ class InterpolateRifeTorch:
                         device=self.device,
                         cache_built_engines=False,
                         reuse_cached_engines=False,
+                        num_avg_timing_iters=4,
                     )
                     printAndLog(f"Saving TensorRT engine to {trt_engine_path}")
                     torch_tensorrt.save(
