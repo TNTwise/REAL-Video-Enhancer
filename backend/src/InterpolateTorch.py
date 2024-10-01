@@ -491,7 +491,7 @@ class InterpolateRifeTorch:
 
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
-        return frame.byte().contiguous().cpu().numpy()
+        return frame.float().byte().contiguous().cpu().numpy()
 
     @torch.inference_mode()
     def encode_Frame(self, frame: torch.Tensor):

@@ -25,7 +25,7 @@ class HandleApplication:
                 outputFile=self.args.output,
                 interpolateModel=self.args.interpolateModel,
                 interpolateFactor=self.args.interpolateFactor,
-                rifeVersion=self.args.rifeVersion,
+                rifeVersion="v1", # some guy was angy about rifev2 being here, so I changed it to v1
                 upscaleModel=self.args.upscaleModel,
                 tile_size=self.args.tilesize,
                 # backend settings
