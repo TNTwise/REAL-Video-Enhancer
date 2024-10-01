@@ -24,20 +24,11 @@ from src.Util import printAndLog
 from mainwindow import Ui_MainWindow  # Import the UI class from the converted module
 from PySide6 import QtSvg  # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
-
+from src.InputHandler import VideoInputHandler
 # other imports
 from src.Util import (
-    checkValidVideo,
-    getVideoFPS,
-    getVideoRes,
-    getVideoLength,
-    getVideoFrameCount,
-    getVideoEncoder,
-    getVideoBitrate,
-    checkIfDeps,
-    pythonPath,
+    
     openLink,
-    getPlatform,
     getOSInfo,
     get_gpu_info,
     getRAMAmount,
@@ -45,7 +36,8 @@ from src.Util import (
     videosPath,
     checkForWritePermissions,
     getAvailableDiskSpace,
-    removeFile,
+    errorAndLog
+
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -388,53 +380,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enableProcessPage(self):
         self.processSettingsContainer.setEnabled(True)
 
-    def openFileFromYoutubeLink(self):
-        url = self.inputFileText.text()
-        if validators.url(url) and "youtube.com" in url or "youtu.be" in url:
-            ydl_opts = {"format": "bestvideo+bestaudio/best"}
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info_dict = ydl.extract_info(url, download=False)
-            self.videoContainer = info_dict["ext"]
-            self.inputFile = info_dict["title"] + self.videoContainer
-            self.videoWidth = info_dict["width"]
-            self.videoHeight = info_dict["height"]
-            self.videoFps = info_dict["fps"]
-            self.videoEncoder = info_dict["vcodec"]
-            self.videoBitrate = info_dict["vbr"]
-            self.videoFrameCount = int(info_dict["duration"] * info_dict["fps"])
-            self.outputFileText.setEnabled(True)
-            self.outputFileSelectButton.setEnabled(True)
-            self.isVideoLoaded = True
-            self.updateVideoGUIDetails()
-        else:
-            self.loadVideo(
-                url
-            )  # load file from local storage if its not a youtube link
+        
 
     def loadVideo(self, inputFile):
-        if checkValidVideo(inputFile):
-            self.inputFile = inputFile
-            self.isVideoLoaded = True
-            # gets width and height from the res
-            self.videoWidth, self.videoHeight = getVideoRes(inputFile)
-            # get fps
-            self.videoFps = getVideoFPS(inputFile)
-            # get video length
-            self.videoLength = getVideoLength(inputFile)
-            # get video frame count
-            self.videoFrameCount = getVideoFrameCount(inputFile)
-            # get video encoder
-            self.videoEncoder = getVideoEncoder(inputFile)
-            # get video bitrate
-            self.videoBitrate = getVideoBitrate(inputFile)
-            # get video codec
-            self.videoCodec = getVideoEncoder(inputFile)
-            self.inputFileText.setText(inputFile)
-            self.videoContainer = os.path.splitext(inputFile)[1]
-            self.outputFileText.setEnabled(True)
-            self.outputFileSelectButton.setEnabled(True)
-            self.updateVideoGUIDetails()
-
+        videoHandler = VideoInputHandler(inputText=inputFile)
+        if videoHandler.isYoutubeLink() and videoHandler.isValidYoutubeLink():
+            videoHandler.getDataFromYoutubeVideo()
+        elif videoHandler.isValidVideoFile():
+            videoHandler.getDataFromLocalVideo()
+        else:
+            RegularQTPopup("Not a valid input!")
+        
+        self.outputFileText.setEnabled(True)
+        self.outputFileSelectButton.setEnabled(True)
+        self.isVideoLoaded = True
+        self.updateVideoGUIDetails()
+        
     # input file button
     def openInputFile(self):
         """

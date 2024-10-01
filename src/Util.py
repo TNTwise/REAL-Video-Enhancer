@@ -466,6 +466,9 @@ def openLink(link: str):
     :type link: str
     """
     webbrowser.open(link)
+def errorAndLog(message: str):
+    log("ERROR: " + message)
+    raise os.error("ERROR: " + message)
 
 
 def checkForWritePermissions(dir):

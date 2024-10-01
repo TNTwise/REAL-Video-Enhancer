@@ -63,10 +63,32 @@ class VideoLoader:
 
 class VideoInputHandler(VideoLoader):
     def __init__(self, inputText):
+        self.inputText = inputText
         super().__init__(inputText)
 
-    def afterSelect(self):
-        self.outputFileText.setEnabled(True)
-        self.outputFileSelectButton.setEnabled(True)
-        self.isVideoLoaded = True
-        self.updateVideoGUIDetails()
+    def isYoutubeLink(self):
+        url = self.inputText
+        return validators.url(url) and "youtube.com" in url or "youtu.be" in url
+
+    def isValidVideoFile(self):
+        return checkValidVideo(self.inputText)
+    
+    def isValidYoutubeLink(self):
+        ydl_opts = {
+        'quiet': True,  # Suppress output
+        'noplaylist': True,  # Only check single video, not playlists
+        }
+
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            try:
+                # Extract info about the video
+                info_dict = ydl.extract_info(self.inputText, download=False)
+                # Check if there are available formats
+                if info_dict.get('formats'):
+                    return True  # Video is downloadable
+                else:
+                    return False  # No formats available
+            except Exception as e:
+                print(f"Error occurred: {e}")
+                return False
+        
