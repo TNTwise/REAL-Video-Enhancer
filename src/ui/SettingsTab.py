@@ -1,8 +1,8 @@
 import os
 
 from PySide6.QtWidgets import QMainWindow
-from ..Util import currentDirectory, getPlatform, homedir
-
+from ..Util import currentDirectory, getPlatform, homedir, checkForWritePermissions
+from .QTcustom import RegularQTPopup
 
 class SettingsTab:
     def __init__(
@@ -19,6 +19,7 @@ class SettingsTab:
         # disable half option if its not supported
         if not halfPrecisionSupport:
             self.parent.precision.removeItem(1)
+    
 
     """def connectWriteSettings(self):
         settings_and_combo_boxes = {
@@ -45,6 +46,7 @@ class SettingsTab:
                 )
             )
             print(setting)"""
+
 
     def connectWriteSettings(self):
         self.parent.precision.currentIndexChanged.connect(
@@ -95,7 +97,20 @@ class SettingsTab:
                 str(self.parent.video_quality.currentText()),
             )
         )
+        self.parent.output_folder_location.textChanged.connect(
+            lambda:self.writeOutputFolder()
+        )
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
+
+    def writeOutputFolder(self):
+        outputlocation = self.parent.output_folder_location.text()
+        if checkForWritePermissions(outputlocation):
+            self.settings.writeSetting(
+                    "output_folder_location",
+                    str(outputlocation),
+                )
+        else:
+            RegularQTPopup("No permissions to export here!")
 
     def resetSettings(self):
         self.settings.writeDefaultSettings()
@@ -128,6 +143,9 @@ class SettingsTab:
         self.parent.video_quality.setCurrentText(
             self.settings.settings["video_quality"]
         )
+        self.parent.output_folder_location.setText(
+            self.settings.settings["output_folder_location"]
+        )
 
 
 class Settings:
@@ -147,7 +165,7 @@ class Settings:
             "discord_rich_presence": "True",
             "scene_detection_threshold": "2.0",
             "video_quality": "High",
-            "output_video_path": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop")
+            "output_folder_location": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop")
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -158,7 +176,7 @@ class Settings:
             "discord_rich_presence": ("True", "False"),
             "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
             "video_quality": ("Low", "Medium", "High", "Very High"),
-            "output_video_path": ("ANY")
+            "output_folder_location": "ANY"
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):
@@ -226,8 +244,9 @@ class Settings:
         with open(self.settingsFile, "w") as file:
             for key, value in self.settings.items():
                 if key in self.defaultSettings:  # check if the key is valid
+                    print(value)
                     if (
-                        value in self.allowedSettings[key] or key == "ANY"
+                        value in self.allowedSettings[key] or self.allowedSettings[key] == "ANY"
                     ):  # check if it is in the allowed settings dict
                         file.write(f"{key},{value}\n")
                 else:

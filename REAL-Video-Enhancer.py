@@ -41,7 +41,7 @@ from src.Util import (
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
-from src.ui.SettingsTab import SettingsTab
+from src.ui.SettingsTab import SettingsTab, Settings
 from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.Backendhandler import BackendHandler
@@ -158,7 +158,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             halfPrecisionSupport = halfPrecisionSupport.group(1) == "true"
         else:
             halfPrecisionSupport = False
-
+        settings = Settings()
+        settings.readSettings()
+        self.settings = settings
         self.processTab = ProcessTab(
             parent=self,
             backend=self.backendComboBox.currentText(),
@@ -169,6 +171,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsTab = SettingsTab(
             parent=self, halfPrecisionSupport=halfPrecisionSupport
         )
+        
         self.moreTab = MoreTab(parent=self)
         # Startup Animation
         self.animationHandler = AnimationHandler()
@@ -280,7 +283,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Returns:
         None
         """
-
         # check if there is a video loaded
         if self.isVideoLoaded:
             inputFile = self.inputFileText.text()
@@ -303,8 +305,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             return outputText
 
     def updateVideoGUIDetails(self):
-        videoPath = videosPath()
-        self.setDefaultOutputFile(videoPath)
+        self.settings.readSettings()
+        self.setDefaultOutputFile(self.settings.settings["output_folder_location"])
         self.updateVideoGUIText()
 
     def getScale(self, method, modelName):

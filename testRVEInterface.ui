@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>929</width>
-    <height>801</height>
+    <height>839</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1312,8 +1312,8 @@ QDoubleSpinBox::down-button {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>434</width>
-                   <height>593</height>
+                   <width>729</width>
+                   <height>755</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -1538,7 +1538,7 @@ QDoubleSpinBox::down-button {
                       </spacer>
                      </item>
                      <item>
-                      <widget class="QLineEdit" name="outputFolderLocation">
+                      <widget class="QLineEdit" name="output_folder_location">
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
