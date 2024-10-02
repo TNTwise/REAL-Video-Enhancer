@@ -284,7 +284,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # check if there is a video loaded
         if self.isVideoLoaded:
-            inputFile = self.inputFile
+            inputFile = self.inputFileText.text()
             modelName = self.modelComboBox.currentText()
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method, modelName)
@@ -383,6 +383,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
 
     def loadVideo(self, inputFile):
+        
         videoHandler = VideoInputHandler(inputText=inputFile)
         if videoHandler.isYoutubeLink() and videoHandler.isValidYoutubeLink():
             videoHandler.getDataFromYoutubeVideo()
@@ -390,7 +391,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoHandler.getDataFromLocalVideo()
         else:
             RegularQTPopup("Not a valid input!")
+        (
+            self.videoWidth,
+            self.videoHeight,
+            self.videoFps,
+            self.videoLength,
+            self.videoFrameCount,
+            self.videoEncoder,
+            self.videoBitrate,
+            self.videoContainer,
+        ) = videoHandler.getData()
         
+        self.inputFileText.setText(inputFile)
         self.outputFileText.setEnabled(True)
         self.outputFileSelectButton.setEnabled(True)
         self.isVideoLoaded = True

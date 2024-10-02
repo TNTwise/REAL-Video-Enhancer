@@ -100,7 +100,7 @@ class ProcessTab:
 
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
         self.parent.inputFileText.textChanged.connect(
-            self.parent.openFileFromYoutubeLink
+            self.parent.loadVideo
         )
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
