@@ -260,7 +260,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             method = self.methodComboBox.currentText()
             interpolateTimes = self.getInterpolateTimes(method, modelName)
             scale = self.getScale(method, modelName)
-            inputFile = self.inputFileText.text()
 
             text = (
                 f"FPS: {round(self.videoFps,0)} -> {round(self.videoFps*interpolateTimes,0)}\n"
@@ -401,7 +400,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.videoBitrate,
             self.videoContainer,
         ) = videoHandler.getData()
-        
+
         self.inputFileText.setText(inputFile)
         self.outputFileText.setEnabled(True)
         self.outputFileSelectButton.setEnabled(True)

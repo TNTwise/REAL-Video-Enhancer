@@ -1,7 +1,7 @@
 import os
 
 from PySide6.QtWidgets import QMainWindow
-from ..Util import currentDirectory, getPlatform
+from ..Util import currentDirectory, getPlatform, homedir
 
 
 class SettingsTab:
@@ -147,6 +147,7 @@ class Settings:
             "discord_rich_presence": "True",
             "scene_detection_threshold": "2.0",
             "video_quality": "High",
+            "output_video_path": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop")
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -157,6 +158,7 @@ class Settings:
             "discord_rich_presence": ("True", "False"),
             "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
             "video_quality": ("Low", "Medium", "High", "Very High"),
+            "output_video_path": ("ANY")
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):
@@ -225,7 +227,7 @@ class Settings:
             for key, value in self.settings.items():
                 if key in self.defaultSettings:  # check if the key is valid
                     if (
-                        value in self.allowedSettings[key]
+                        value in self.allowedSettings[key] or key == "ANY"
                     ):  # check if it is in the allowed settings dict
                         file.write(f"{key},{value}\n")
                 else:
