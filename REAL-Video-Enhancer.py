@@ -392,6 +392,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             videoHandler.getDataFromLocalVideo()
         else:
             RegularQTPopup("Not a valid input!")
+            return
         (
             self.videoWidth,
             self.videoHeight,

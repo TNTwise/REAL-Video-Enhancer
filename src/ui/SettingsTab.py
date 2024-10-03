@@ -1,6 +1,6 @@
 import os
 
-from PySide6.QtWidgets import QMainWindow
+from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ..Util import currentDirectory, getPlatform, homedir, checkForWritePermissions
 from .QTcustom import RegularQTPopup
 
@@ -104,13 +104,14 @@ class SettingsTab:
 
     def writeOutputFolder(self):
         outputlocation = self.parent.output_folder_location.text()
-        if checkForWritePermissions(outputlocation):
-            self.settings.writeSetting(
-                    "output_folder_location",
-                    str(outputlocation),
-                )
-        else:
-            RegularQTPopup("No permissions to export here!")
+        if os.path.exists(outputlocation) and os.path.isdir(outputlocation):
+            if checkForWritePermissions(outputlocation):
+                self.settings.writeSetting(
+                        "output_folder_location",
+                        str(outputlocation),
+                    )
+            else:
+                RegularQTPopup("No permissions to export here!")
 
     def resetSettings(self):
         self.settings.writeDefaultSettings()
@@ -146,6 +147,26 @@ class SettingsTab:
         self.parent.output_folder_location.setText(
             self.settings.settings["output_folder_location"]
         )
+        self.parent.select_output_folder_location_btn.clicked.connect(
+            self.selectOutputFolder
+        )
+    
+    def selectOutputFolder(self):
+        outputFile = QFileDialog.getExistingDirectory(
+            parent=self.parent,
+            caption="Select Folder",
+            dir=os.path.expanduser("~"),
+        )
+        outputlocation = outputFile
+        if os.path.exists(outputlocation) and os.path.isdir(outputlocation):
+            if checkForWritePermissions(outputlocation):
+                self.settings.writeSetting(
+                        "output_folder_location",
+                        str(outputlocation),
+                    )
+                self.parent.output_folder_location.setText(outputlocation)
+            else:
+                RegularQTPopup("No permissions to export here!")
 
 
 class Settings:
@@ -244,7 +265,6 @@ class Settings:
         with open(self.settingsFile, "w") as file:
             for key, value in self.settings.items():
                 if key in self.defaultSettings:  # check if the key is valid
-                    print(value)
                     if (
                         value in self.allowedSettings[key] or self.allowedSettings[key] == "ANY"
                     ):  # check if it is in the allowed settings dict

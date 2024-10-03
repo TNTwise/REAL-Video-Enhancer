@@ -1529,9 +1529,12 @@ QDoubleSpinBox::down-button {
                        <property name="orientation">
                         <enum>Qt::Orientation::Horizontal</enum>
                        </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Policy::Minimum</enum>
+                       </property>
                        <property name="sizeHint" stdset="0">
                         <size>
-                         <width>255</width>
+                         <width>20</width>
                          <height>20</height>
                         </size>
                        </property>
@@ -1544,6 +1547,13 @@ QDoubleSpinBox::down-button {
                          <width>0</width>
                          <height>25</height>
                         </size>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QPushButton" name="select_output_folder_location_btn">
+                       <property name="text">
+                        <string>Select Output Folder</string>
                        </property>
                       </widget>
                      </item>
