@@ -214,14 +214,9 @@ class Render(FFMpegRender):
                     frame = self.upscale(self.frameSetupFunction(frame))
 
                 if self.interpolateModel:
-                    """if self.currentTransitionFrameNumber == counter:
-                        self.renderInterpolate(frame, True)
-                        self.currentTransitionFrameNumber = self.getTransitionFrame()
-                    else:
-                        self.renderInterpolate(frame)
-                    self.writeQueue.put(frame)"""  # old method
                     self.renderInterpolate(frame, self.scDetectFunc(frame))
-                    self.writeQueue.put(frame)
+                    
+                self.writeQueue.put(frame)
             else:
                 sleep(1)
         self.writeQueue.put(None)
