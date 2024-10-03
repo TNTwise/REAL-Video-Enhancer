@@ -127,11 +127,7 @@ class FFMpegRender:
         self.previewFrame = None
         self.crf = crf
         self.sharedMemoryID = sharedMemoryID
-        self.videoPropertiesLocation = os.path.join(
-            currentDirectory(), inputFile + "_VIDEODATA"
-        )
-        if not os.path.exists(self.videoPropertiesLocation):
-            os.makedirs(self.videoPropertiesLocation)
+        
         self.subtitleFiles = []
         self.sharedMemoryThread = Thread(
             target=lambda: self.writeOutInformation(self.outputFrameChunkSize)
@@ -162,6 +158,11 @@ class FFMpegRender:
             return None
 
     def extract_subtitles(self, video_file, stream_index, subtitle_file):
+        self.videoPropertiesLocation = os.path.join(
+            currentDirectory(), self.inputFile + "_VIDEODATA"
+        )
+        if not os.path.exists(self.videoPropertiesLocation):
+            os.makedirs(self.videoPropertiesLocation)
         """Extract a specific subtitle stream from the video file."""
         try:
             subprocess.run(
