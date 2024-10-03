@@ -76,7 +76,7 @@ jobs:
           path: REAL-Video-Enhancer-2.0-Windows.zip
           
   build-MacOS:
-    runs-on: macos-12
+    runs-on: macos-13
     permissions: write-all  
     steps:
       - uses: actions/checkout@v3
