@@ -48,6 +48,30 @@ class HandleApplication:
             half_prec_supp = False
             availableBackends = []
             printMSG = ""
+            
+            if checkForTensorRT():
+                """
+                checks for tensorrt availability, and the current gpu works with it (if half precision is supported)
+                Trt 10 only supports RTX 20 series and up.
+                Half precision is only availaible on RTX 20 series and up
+                """
+                import torch
+                half_prec_supp = check_bfloat16_support()
+                if half_prec_supp:
+                    import tensorrt
+                    
+
+                    availableBackends.append("tensorrt")
+                    printMSG += f"TensorRT Version: {tensorrt.__version__}\n"
+                else:
+                    printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
+            if checkForPytorch():
+                import torch
+
+                availableBackends.append("pytorch")
+                printMSG += f"PyTorch Version: {torch.__version__}\n"
+                half_prec_supp = check_bfloat16_support()
+                
             if checkForNCNN():
                 availableBackends.append("ncnn")
                 printMSG += f"NCNN Version: 20220729\n"
@@ -58,26 +82,6 @@ class HandleApplication:
 
                 printMSG += f"ONNXruntime Version: {ort.__version__}\n"
                 half_prec_supp = checkForDirectMLHalfPrecisionSupport()
-            if checkForPytorch():
-                import torch
-
-                availableBackends.append("pytorch")
-                printMSG += f"PyTorch Version: {torch.__version__}\n"
-                half_prec_supp = check_bfloat16_support()
-                if checkForTensorRT():
-                    """
-                    checks for tensorrt availability, and the current gpu works with it (if half precision is supported)
-                    Trt 10 only supports RTX 20 series and up.
-                    Half precision is only availaible on RTX 20 series and up
-                    """
-                    if half_prec_supp:
-                        import tensorrt
-
-                        availableBackends.append("tensorrt")
-                        printMSG += f"TensorRT Version: {tensorrt.__version__}\n"
-                    else:
-                        printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
-
             printMSG += f"Half precision support: {half_prec_supp}\n"
             print("Available Backends: " + str(availableBackends))
             print(printMSG)
