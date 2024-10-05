@@ -10,7 +10,7 @@ from torch_tensorrt.dynamo.conversion._ConversionContext import ConversionContex
 from torch_tensorrt.dynamo.conversion._ConverterRegistry import dynamo_tensorrt_converter
 from torch_tensorrt.dynamo.conversion.converter_utils import enforce_tensor_types, set_layer_name
 from torch_tensorrt.dynamo.types import TRTTensor
-
+import cupy as cp
 class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt.IPluginV3OneRuntime):
     def __init__(self) -> None:
         trt.IPluginV3.__init__(self)

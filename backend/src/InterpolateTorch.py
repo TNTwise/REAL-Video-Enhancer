@@ -344,11 +344,11 @@ class InterpolateRifeTorch:
             if self.backend == "tensorrt":
                 import tensorrt
                 import torch_tensorrt
-                from .warplayer_custom import WarpPluginCreator
-                registry = tensorrt.get_plugin_registry()
-                registry.register_creator(WarpPluginCreator())
+                #from .warplayer_custom import WarpPluginCreator
+                #registry = tensorrt.get_plugin_registry()
+                #registry.register_creator(WarpPluginCreator())
 
-                torch_tensorrt.runtime.enable_cudagraphs()
+                #torch_tensorrt.runtime.enable_cudagraphs()
                 logging.basicConfig(level=logging.INFO)
                 trt_engine_path = os.path.join(
                     os.path.realpath(self.trt_cache_dir),
