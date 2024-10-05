@@ -4,7 +4,10 @@ import math
 
 
 from torch.nn.functional import interpolate
-
+try:
+    from .custom_warplayer import warp
+except:
+    from .warplayer import warp
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -195,8 +198,8 @@ class IFNet(nn.Module):
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
-                wf0 = self.warp(f0, flow[:, :2])
-                wf1 = self.warp(f1, flow[:, 2:4])
+                wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
+                wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
                 fd, m0 = self.blocks[i](
                     torch.cat(
                         (
@@ -233,8 +236,8 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            warped_img0 = self.warp(img0, flow[:, :2])
-            warped_img1 = self.warp(img1, flow[:, 2:4])
+            warped_img0 = self.warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
+            warped_img1 = self.warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
         mask = torch.sigmoid(mask)
         return (
             (warped_img0 * mask + warped_img1 * (1 - mask))[

@@ -84,7 +84,7 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
   <li> <a rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Rick astley for a good song</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting <strong>[REDACTED]</strong> to older versions of rife</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">HolyWu For TRT engine generation code and some optimizations</a></li>
+  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">HolyWu For TRT engine generation code, inference code, optimizations, and fixing rife jagged lines when using trt.</a></li>
 
   <li> <a rel="noopener noreferrer" href="https://github.com/feathericons/feather" target="_blank">feather icons</a></li>
 </ul>

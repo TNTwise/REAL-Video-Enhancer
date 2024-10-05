@@ -1,7 +1,10 @@
 import torch
 import torch.nn as nn
 from torch.nn.functional import interpolate
-from .warplayer import warp
+try:
+    from .custom_warplayer import warp
+except:
+    from .warplayer import warp
 
 
 class MyPixelShuffle(nn.Module):
