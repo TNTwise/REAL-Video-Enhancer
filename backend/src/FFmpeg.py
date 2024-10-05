@@ -436,4 +436,3 @@ class FFMpegRender:
                 self.writingDone = True
 
                 printAndLog(f"\nTime to complete render: {round(renderTime, 2)}")
-                removeFolder(self.videoPropertiesLocation)

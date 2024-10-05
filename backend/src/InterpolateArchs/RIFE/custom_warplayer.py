@@ -11,6 +11,7 @@ from torch_tensorrt.dynamo.conversion._ConverterRegistry import dynamo_tensorrt_
 from torch_tensorrt.dynamo.conversion.converter_utils import enforce_tensor_types, set_layer_name
 from torch_tensorrt.dynamo.types import TRTTensor
 import cupy as cp
+import importerror # this causes an import error, because this file is still under development
 class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt.IPluginV3OneRuntime):
     def __init__(self) -> None:
         trt.IPluginV3.__init__(self)
