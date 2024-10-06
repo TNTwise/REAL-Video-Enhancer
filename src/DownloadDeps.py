@@ -88,7 +88,7 @@ class DownloadDependencies:
 
     def downloadFFMpeg(self):
         ffmpegTempPath = os.path.join(downloadTempDirectory(), "ffmpeg")
-        link = "https://github.com/TNTwise/Rife-Vulkan-Models/releases/download/models/"
+        link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/"
         match getPlatform():
             case "linux":
                 link += "ffmpeg"
