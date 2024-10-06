@@ -174,9 +174,9 @@ class IFNet(nn.Module):
         )
         for i in range(1, 4):
             warped_img0 = warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
-            wf0 = warp(f0, flow[:, :2])
+            wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
             warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
-            wf1 = warp(f1, flow[:, 2:4])
+            wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
             fd, m0, feat = self.blocks[i](
                 torch.cat(
                     (

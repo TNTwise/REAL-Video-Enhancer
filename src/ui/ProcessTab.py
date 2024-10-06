@@ -20,7 +20,7 @@ from ..Util import (
 )
 from ..DownloadModels import DownloadModel
 from .SettingsTab import Settings
-from ..DiscordRPC import start_discordRPC
+from ..DiscordRPC import DiscordRPC
 from ..ModelHandler import (
     ncnnInterpolateModels,
     ncnnUpscaleModels,
@@ -224,7 +224,8 @@ class ProcessTab:
 
         # discord rpc
         if self.settings["discord_rich_presence"] == "True":
-            start_discordRPC(method, os.path.basename(self.inputFile), backend)
+            self.discordRPC = DiscordRPC()
+            self.discordRPC.start_discordRPC(method, os.path.basename(self.inputFile), backend)
 
         DownloadModel(
             modelFile=self.modelFile,
@@ -366,6 +367,7 @@ class ProcessTab:
         self.parent.pauseRenderButton.setVisible(False)
         self.parent.startRenderButton.setVisible(True)
         self.parent.startRenderButton.setEnabled(True)
+        self.discordRPC.closeRPC()
         self.parent.onRenderCompletion()
 
     def getRoundedPixmap(self, pixmap, corner_radius):
