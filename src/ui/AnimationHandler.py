@@ -41,6 +41,7 @@ class AnimationHandler:
         self.animation.start()
 
     def dropDownAnimation(self, widget: QWidget, duration=200):
+        return
         start_geometry = widget.geometry()
         end_geometry = QRect(
             start_geometry.x(),
@@ -60,6 +61,7 @@ class AnimationHandler:
         self.animation.start()
 
     def moveUpAnimation(self, widget: QWidget, duration=200):
+        return
         widget.setVisible(True)
         start_geometry = widget.geometry()
         end_geometry = QRect(
@@ -79,6 +81,7 @@ class AnimationHandler:
         self.animation.start()
 
     def dropDownFadeInAnimation(self, widget: QWidget, duration=500):
+        return
         # Ensure the widget is initially hidden
 
         # Drop-down animation
