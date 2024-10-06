@@ -278,16 +278,16 @@ def downloadFile(link, downloadLocation):
 
 
 def checkValidVideo(video_path):
-    cap = cv2.VideoCapture(video_path)
+    cap = cv2.VideoCapture(video_path, cv2.CAP_FFMPEG)
 
     if not cap.isOpened():
         print(f"Error: Couldn't open the video file '{video_path}'")
         return False
 
     ret, frame = cap.read()
-    if not ret:
-        print(f"Error: Couldn't read frames from the video file '{video_path}'")
-        return False
+    #if not ret:
+    #    print(f"Error: Couldn't read frames from the video file '{video_path}'")
+    #    return False
 
     cap.release()
 
