@@ -1980,7 +1980,7 @@ QDoubleSpinBox::down-button {
                       <widget class="QWidget" name="discordRPCSettingsContainer" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_12">
                         <property name="spacing">
-                         <number>0</number>
+                         <number>10</number>
                         </property>
                         <property name="leftMargin">
                          <number>0</number>
