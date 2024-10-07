@@ -178,6 +178,7 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/nightly/cu124_pypi_pkg/torch_no_python-2.5.0.dev20240826%2Bcu124-py3-none-any.whl",
             "safetensors",
             "einops",
+            "cupy-cuda12x==13.3.0",
         ]
         torchCUDAWindowsDeps = [
             #"https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/spandrel-0.3.4-py3-none-any.whl",
@@ -189,6 +190,7 @@ class DownloadDependencies:
             # "torchvision==0.19.0",
             "safetensors",
             "einops",
+            "cupy-cuda12x==13.3.0",
         ]
         match getPlatform():
             case "win32":
