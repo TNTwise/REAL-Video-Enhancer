@@ -1,8 +1,14 @@
 import numpy as np
 import os
 from time import sleep
-from ncnn_vulkan import ncnn
 
+import numpy as np
+try:
+    from upscale_ncnn_py import UPSCALE
+    method = "upscale_ncnn_py"
+except:
+    from ncnn_vulkan import ncnn
+    method = "ncnn_vulkan"    
 class NCNNParam:
     """
     Puts the last time an op shows up in a param in a dict
@@ -52,7 +58,7 @@ def getNCNNScale(modelPath: str = "") -> int:
     scale = ncnnp.getPixelShuffleScale()
     return scale
 
-import numpy as np
+
 
 class UpscaleNCNN:
     def __init__(
@@ -80,36 +86,51 @@ class UpscaleNCNN:
         self._load()
 
     def _load(self):
-        self.net = ncnn.Net()
-        # Use vulkan compute
-        self.net.opt.use_vulkan_compute = True
+        if method == "ncnn_vulkan":
+            self.net = ncnn.Net()
+            # Use vulkan compute
+            self.net.opt.use_vulkan_compute = True
 
-        # Load model param and bin
-        self.net.load_param(self.modelPath + ".param")
-        self.net.load_model(self.modelPath + ".bin")
-
-        
+            # Load model param and bin
+            self.net.load_param(self.modelPath + ".param")
+            self.net.load_model(self.modelPath + ".bin")
+        elif method == "upscale_ncnn_py":
+            self.net = UPSCALE(
+            gpuid=self.gpuid,
+            model_str=self.modelPath,
+            num_threads=self.threads,
+            scale=self.scale,
+            tilesize=self.tilesize,
+        )
+          
         
     def hotUnload(self):
         self.model = None
 
     def hotReload(self):
         self._load()
-
-    def Upscale(self, imageChunk):
-        while self.net is None:
-            sleep(1)
-        self.ex = self.net.create_extractor()
+    
+    def procNCNNVk(self, imageChunk):
+        ex = self.net.create_extractor()
         mat_in = ncnn.Mat.from_pixels(imageChunk, ncnn.Mat.PixelType.PIXEL_RGB, self.width, self.height)
 
         mat_in.substract_mean_normalize(self.mean_vals, self.norm_vals)
         try:
             # Make sure the input and output names match the param file
-            self.ex.input("data", mat_in)
-            ret, mat_out = self.ex.extract("output")
+            ex.input("data", mat_in)
+            ret, mat_out = ex.extract("output")
             out = np.array(mat_out)
 
             # Transpose the output from `c, h, w` to `h, w, c` and put it back in 0-255 range
             return out.clip(0,1).__mul__(255.0).astype(np.uint8).transpose(1, 2, 0).tobytes()
         except:
             ncnn.destroy_gpu_instance()
+
+    def Upscale(self, imageChunk):
+        while self.net is None:
+            sleep(1)
+        if method == "ncnn_vulkan":
+            return self.procNCNNVk(imageChunk)
+        elif method == "upscale_ncnn_py":
+            return self.net.process_bytes(imageChunk, self.width, self.height, 3)
+        
