@@ -139,9 +139,9 @@ def getCPUInfo() -> str:
             )
             # Split the result by lines and return the second line which contains the CPU name
             return result.stdout.split("\n")[2].strip()
-        except subprocess.CalledProcessError as e:
+        except exception as e:
             print(f"An error occurred while getting CPU brand: {e}")
-            return None
+            return "X86_64 CPU"
     else:
         return cpuinfo.get_cpu_info()["brand_raw"]
 
