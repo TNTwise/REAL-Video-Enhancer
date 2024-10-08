@@ -86,10 +86,10 @@ class UpscaleNCNN:
         self.net.opt.use_vulkan_compute = True
 
         # Load model param and bin
-        self.load_param(self.modelPath + ".param")
-        self.load_model(self.modelPath + ".bin")
+        self.net.load_param(self.modelPath + ".param")
+        self.net.load_model(self.modelPath + ".bin")
 
-        self.ex = self.net.create_extractor()
+        
         
     def hotUnload(self):
         self.model = None
@@ -98,9 +98,10 @@ class UpscaleNCNN:
         self._load()
 
     def Upscale(self, imageChunk):
-        while self.model is None:
+        while self.net is None:
             sleep(1)
-        img_in = np.frombuffer(imageChunk, dtype=np.uint8).reshape(1080, 1920, 3)
+        self.ex = self.net.create_extractor()
+        img_in = np.frombuffer(imageChunk, dtype=np.uint8).reshape(self.height, self.width, 3)
         mat_in = ncnn.Mat.from_pixels(
             img_in,
             ncnn.Mat.PixelType.PIXEL_BGR,
@@ -115,7 +116,7 @@ class UpscaleNCNN:
             out = np.array(mat_out)
 
             # Transpose the output from `c, h, w` to `h, w, c` and put it back in 0-255 range
-            return out.transpose(1, 2, 0).__mul__(255.0).astype(np.uint8).tobytes()
+            return out.transpose(1, 2, 0).clip(0,1).__mul__(255.0).astype(np.uint8).tobytes()
 
         except:
             ncnn.destroy_gpu_instance()
