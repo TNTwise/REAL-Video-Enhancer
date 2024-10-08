@@ -1,7 +1,6 @@
 import numpy as np
 import os
 from time import sleep
-
 from ncnn_vulkan import ncnn
 
 class NCNNParam:
@@ -101,13 +100,8 @@ class UpscaleNCNN:
         while self.net is None:
             sleep(1)
         self.ex = self.net.create_extractor()
-        img_in = np.frombuffer(imageChunk, dtype=np.uint8).reshape(self.height, self.width, 3)
-        mat_in = ncnn.Mat.from_pixels(
-            img_in,
-            ncnn.Mat.PixelType.PIXEL_BGR,
-            img_in.shape[1],
-            img_in.shape[0]
-        )
+        mat_in = ncnn.Mat.from_pixels(imageChunk, ncnn.Mat.PixelType.PIXEL_RGB, self.width, self.height)
+
         mat_in.substract_mean_normalize(self.mean_vals, self.norm_vals)
         try:
             # Make sure the input and output names match the param file
@@ -116,7 +110,6 @@ class UpscaleNCNN:
             out = np.array(mat_out)
 
             # Transpose the output from `c, h, w` to `h, w, c` and put it back in 0-255 range
-            return out.transpose(1, 2, 0).clip(0,1).__mul__(255.0).astype(np.uint8).tobytes()
-
+            return out.clip(0,1).__mul__(255.0).astype(np.uint8).transpose(1, 2, 0).tobytes()
         except:
             ncnn.destroy_gpu_instance()
