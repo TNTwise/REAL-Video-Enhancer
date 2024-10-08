@@ -264,8 +264,12 @@ class DownloadDependencies:
         ncnnDeps = [
             "rife-ncnn-vulkan-python-tntwise==1.4.2",
             "upscale_ncnn_py==1.2.0",
+            "ncnn-vulkan==2022.7.29",
+            "numpy==1.26.4",
+            "opencv-python-headless",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(ncnnDeps)
+        self.pipInstall(['numpy==1.26.4','sympy'])
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [
