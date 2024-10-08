@@ -6,9 +6,10 @@ import numpy as np
 try:
     from upscale_ncnn_py import UPSCALE
     method = "upscale_ncnn_py"
+    s
 except:
-    from ncnn_vulkan import ncnn
-    method = "ncnn_vulkan"    
+    import ncnn
+    method = "ncnn_vulkan"   
 class NCNNParam:
     """
     Puts the last time an op shows up in a param in a dict
@@ -109,22 +110,39 @@ class UpscaleNCNN:
 
     def hotReload(self):
         self._load()
-    
+    def NCNNImageMatFromNP(self, npArray: np.array):
+        return ncnn.Mat.from_pixels(
+            npArray,
+            ncnn.Mat.PixelType.PIXEL_BGR,
+            self.width,
+            self.height,
+        )
+
+    def NormalizeImage(self, mat, norm_vals):
+        mean_vals = []
+        mat.substract_mean_normalize(mean_vals, norm_vals)
+
+    def ClampNPArray(self, nparray: np.array) -> np.array:
+        
+        return nparray.clip(0, 255)
+
+        
     def procNCNNVk(self, imageChunk):
         ex = self.net.create_extractor()
-        mat_in = ncnn.Mat.from_pixels(imageChunk, ncnn.Mat.PixelType.PIXEL_RGB, self.width, self.height)
+        frame = self.NCNNImageMatFromNP(imageChunk)
+        # norm
+        self.NormalizeImage(mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0])
+        # render frame
+        ex.input("data", frame)
+        ret, frame = ex.extract("output")
 
-        mat_in.substract_mean_normalize(self.mean_vals, self.norm_vals)
-        try:
-            # Make sure the input and output names match the param file
-            ex.input("data", mat_in)
-            ret, mat_out = ex.extract("output")
-            out = np.array(mat_out)
+        # norm
+        self.NormalizeImage(mat=frame, norm_vals=[255.0, 255.0, 255.0])
 
-            # Transpose the output from `c, h, w` to `h, w, c` and put it back in 0-255 range
-            return out.clip(0,1).__mul__(255.0).astype(np.uint8).transpose(1, 2, 0).tobytes()
-        except:
-            ncnn.destroy_gpu_instance()
+        frame = np.ascontiguousarray(frame)
+        frame = self.ClampNPArray(frame)
+        frame = frame.transpose(1, 2, 0)
+        return np.ascontiguousarray(frame, dtype=np.uint8)
 
     def Upscale(self, imageChunk):
         while self.net is None:

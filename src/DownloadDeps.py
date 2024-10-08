@@ -264,7 +264,7 @@ class DownloadDependencies:
         ncnnDeps = [
             "rife-ncnn-vulkan-python-tntwise==1.4.2",
             "upscale_ncnn_py==1.2.0",
-            "ncnn-vulkan==2023.6.18",
+            "ncnn==1.0.20240820",
             "numpy==1.26.4",
             "opencv-python-headless",
         ] + self.getPlatformIndependentDeps()
