@@ -229,7 +229,7 @@ def checkForNCNN() -> bool:
     """
     try:
         from rife_ncnn_vulkan_python import Rife
-        from upscale_ncnn_py import UPSCALE
+        from ncnn_vulkan import ncnn
 
         return True
     except ImportError as e:
