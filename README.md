@@ -78,7 +78,7 @@ python3 build.py --build_exe
   <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
   <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter for inspiration and mods to rife arch.</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/Final2x/realesrgan-ncnn-py" target="_blank">RealESRGAN NCNN python</a></li>
+  <li> <a rel="noopener noreferrer" href="https://pypi.org/project/ncnn-vulkan/2023.6.18/#description" target="_blank">ncnn vulkan python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/media2x/rife-ncnn-vulkan-python" target="_blank">rife ncnn vulkan python</a></li>
   <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
