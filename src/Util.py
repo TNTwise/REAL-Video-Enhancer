@@ -139,7 +139,7 @@ def getCPUInfo() -> str:
             )
             # Split the result by lines and return the second line which contains the CPU name
             return result.stdout.split("\n")[2].strip()
-        except exception as e:
+        except Exception as e:
             print(f"An error occurred while getting CPU brand: {e}")
             return "X86_64 CPU"
     else:
