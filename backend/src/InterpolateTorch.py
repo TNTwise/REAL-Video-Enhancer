@@ -350,7 +350,7 @@ class InterpolateRifeTorch:
 
                 #torch_tensorrt.runtime.enable_cudagraphs()
                 logging.basicConfig(level=logging.INFO)
-                trt_engine_path = os.path.join(
+                base_trt_engine_path = os.path.join(
                     os.path.realpath(self.trt_cache_dir),
                     (
                         f"{os.path.basename(self.interpolateModel)}"
@@ -378,10 +378,11 @@ class InterpolateRifeTorch:
                             if self.trt_optimization_level is not None
                             else ""
                         )
-                        + ".dyn"
+                        
                     ),
                 )
-                encode_trt_engine_path = trt_engine_path.replace(".dyn", "_encode.dyn")
+                trt_engine_path = base_trt_engine_path + ".dyn"
+                encode_trt_engine_path = base_trt_engine_path + "_encode.dyn"
 
                 # load encode engine
                 if not self.rife46:
