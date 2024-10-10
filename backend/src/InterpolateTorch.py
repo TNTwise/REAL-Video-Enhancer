@@ -118,6 +118,7 @@ class InterpolateRifeTorch:
         trt_optimization_level: int = 5,
         trt_cache_dir: str = modelsDirectory(),
         trt_debug: bool = False,
+        rife_trt_mode: str = "accurate",
     ):
         if device == "default":
             if torch.cuda.is_available():
@@ -155,6 +156,7 @@ class InterpolateRifeTorch:
         self.rife46 = False
         self.trt_debug = trt_debug
         self.v1 = rifeVersion == "v1"
+        self.rife_trt_mode = rife_trt_mode
         if UHDMode:
             self.scale = 0.5
         self._load()
@@ -322,6 +324,7 @@ class InterpolateRifeTorch:
                 height=self.height,
                 backwarp_tenGrid=self.backwarp_tenGrid,
                 tenFlow_div=self.tenFlow_div,
+                rife_trt_mode=self.rife_trt_mode,
             )
 
             state_dict = {
@@ -361,7 +364,7 @@ class InterpolateRifeTorch:
                         + f"_{torch.cuda.get_device_name(self.device)}"
                         + f"torch_tensorrt-{torch_tensorrt.__version__}"
                         + f"_trt-{tensorrt.__version__}"
-                        + (f"rife_version-" + "v1" if self.v1 else "v2")
+                        + (f"rife_trt_mode-" + self.rife_trt_mode)
                         + (f"model_version-2")
                         + (
                             f"_workspace-{self.trt_workspace_size}"

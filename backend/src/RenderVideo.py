@@ -77,6 +77,7 @@ class Render(FFMpegRender):
         sceneDetectSensitivity: float = 3.0,
         sharedMemoryID: str = None,
         trt_optimization_level: int = 3,
+        rife_trt_mode: str = "accurate",
     ):
         if pausedFile == None:
             pausedFile = os.path.basename(inputFile) + "_paused_state.txt"
@@ -103,6 +104,7 @@ class Render(FFMpegRender):
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
         self.trt_optimization_level = trt_optimization_level
+        self.rife_trt_mode = rife_trt_mode
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -214,7 +216,10 @@ class Render(FFMpegRender):
                     frame = self.upscale(self.frameSetupFunction(frame))
 
                 if self.interpolateModel:
-                    self.renderInterpolate(frame, self.scDetectFunc(frame))
+                    if self.sceneDetectMethod.lower() != "none":
+                        self.renderInterpolate(frame, self.scDetectFunc(frame))
+                    else:
+                        self.renderInterpolate(frame, False)
                     
                 self.writeQueue.put(frame)
             else:
@@ -320,6 +325,7 @@ class Render(FFMpegRender):
                 backend=self.backend,
                 rifeVersion=self.rifeVersion,
                 trt_optimization_level=self.trt_optimization_level,
+                rife_trt_mode=self.rife_trt_mode,
             )
             self.frameSetupFunction = interpolateRifePytorch.frame_to_tensor
             self.undoSetup = interpolateRifePytorch.uncacheFrame

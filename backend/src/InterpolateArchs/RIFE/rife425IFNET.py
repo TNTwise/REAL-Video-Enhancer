@@ -1,12 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.nn.functional import interpolate
-try:
-    from .custom_warplayer import warp
-except:
-    from .warplayer import warp
-
-
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -130,6 +124,7 @@ class IFNet(nn.Module):
         height=1080,
         backwarp_tenGrid=None,
         tenFlow_div=None,
+        rife_trt_mode: str = "accurate",
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 8, c=192)
@@ -146,11 +141,21 @@ class IFNet(nn.Module):
         self.height = height
         self.backWarp = backwarp_tenGrid
         self.tenFlow = tenFlow_div
-
+        
         self.paddedHeight = backwarp_tenGrid.shape[2]
         self.paddedWidth = backwarp_tenGrid.shape[3]
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3, self.block4]
+        if rife_trt_mode == "fast":
+            from .warplayer import warp
+        elif rife_trt_mode == "accurate":
+            try:
+                from .custom_warplayer import warp
+            except:
+                from .warplayer import warp
+        else:
+            raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
+        self.warp = warp
 
     def forward(self, img0, img1, timeStep, f0, f1):
         warped_img0 = img0
@@ -165,8 +170,8 @@ class IFNet(nn.Module):
                     scale=self.scaleList[i],
                 )
             else:
-                wf0 = warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
-                wf1 = warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
+                wf0 = self.warp(f0, flow[:, :2], self.tenFlow, self.backWarp)
+                wf1 = self.warp(f1, flow[:, 2:4], self.tenFlow, self.backWarp)
                 fd, m0, feat = self.blocks[i](
                     torch.cat(
                         (
@@ -185,8 +190,8 @@ class IFNet(nn.Module):
                 )
                 mask = m0
                 flow = flow + fd
-            warped_img0 = warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
-            warped_img1 = warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
+            warped_img0 = self.warp(img0, flow[:, :2], self.tenFlow, self.backWarp)
+            warped_img1 = self.warp(img1, flow[:, 2:4], self.tenFlow, self.backWarp)
         mask = torch.sigmoid(mask)
         return (
             (warped_img0 * mask + warped_img1 * (1 - mask))[

@@ -138,6 +138,7 @@ class IFNet(nn.Module):
         height=1080,
         backwarp_tenGrid=None,
         tenFlow_div=None,
+        rife_trt_mode="accurate",
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7 + 16, c=192)
@@ -158,20 +159,16 @@ class IFNet(nn.Module):
         self.paddedWidth = backwarp_tenGrid.shape[3]
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
-
-    def warp(self, tenInput, tenFlow):
-        tenFlow = torch.cat(
-            [tenFlow[:, 0:1] / self.tenFlow[0], tenFlow[:, 1:2] / self.tenFlow[1]], 1
-        )
-
-        g = (self.backWarp + tenFlow).permute(0, 2, 3, 1)
-        return torch.nn.functional.grid_sample(
-            input=tenInput,
-            grid=g,
-            mode="bilinear",
-            padding_mode="border",
-            align_corners=True,
-        )
+        if rife_trt_mode == "fast":
+            from .warplayer import warp
+        elif rife_trt_mode == "accurate":
+            try:
+                from .custom_warplayer import warp
+            except:
+                from .warplayer import warp
+        else:
+            raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
+        self.warp = warp
 
     def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0

@@ -104,6 +104,7 @@ class IFNet(nn.Module):
         height=1080,
         backwarp_tenGrid=None,
         tenFlow_div=None,
+        rife_trt_mode="fast",
     ):
         super(IFNet, self).__init__()
         self.block0 = IFBlock(7, c=192)
@@ -119,6 +120,16 @@ class IFNet(nn.Module):
         self.backwarp_tenGrid = backwarp_tenGrid
         self.tenFlow_div = tenFlow_div
         self.block = [self.block0, self.block1, self.block2, self.block3]
+        if rife_trt_mode == "fast":
+            from .warplayer import warp
+        elif rife_trt_mode == "accurate":
+            try:
+                from .custom_warplayer import warp
+            except:
+                from .warplayer import warp
+        else:
+            raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
+        self.warp = warp
 
     def forward(self, img0, img1, timestep):
         warped_img0 = img0
@@ -168,10 +179,10 @@ class IFNet(nn.Module):
                 flow = flow + f0
                 mask = mask + m0
             latest_mask = mask
-            warped_img0 = warp(
+            warped_img0 = self.warp(
                 img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
             )
-            warped_img1 = warp(
+            warped_img1 = self.warp(
                 img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
             )
 
