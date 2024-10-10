@@ -47,7 +47,7 @@ class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt
 
     def supports_format_combination(self, pos: int, in_out: list[trt.DynamicPluginTensorDesc], num_inputs: int) -> bool:
         assert pos < len(in_out)
-        assert num_inputs == 4
+        assert num_inputs == 2
 
         desc = in_out[pos].desc
         return desc.format == trt.TensorFormat.LINEAR and desc.type == trt.DataType.FLOAT

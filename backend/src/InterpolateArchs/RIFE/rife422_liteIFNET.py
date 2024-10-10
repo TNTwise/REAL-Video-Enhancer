@@ -170,8 +170,8 @@ class IFNet(nn.Module):
     
     def preprocwarp(self, tenFlow):
         tenFlow = torch.cat([tenFlow[:, 0:1] / self.tenFlow_div[0], tenFlow[:, 1:2] / self.tenFlow_div[1]], 1)
-        g = (self.backWarp + tenFlow).permute(0, 2, 3, 1) 
-        return tenFlow, g
+        g = (self.backWarp + tenFlow).permute(0, 2, 3, 1)
+        return g
 
     def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0
@@ -186,9 +186,8 @@ class IFNet(nn.Module):
                     scale=self.scaleList[i],
                 )
             else:
-                       
-                wf0 = self.warp(self.preprocwarp(f0))
-                wf1 = self.warp(self.preprocwarp(f1))
+                wf0 = self.warp(f0,self.preprocwarp(flow[:, :2]))
+                wf1 = self.warp(f1,self.preprocwarp(flow[:, 2:4]))
                 fd, m0, feat = self.blocks[i](
                     torch.cat(
                         (
@@ -207,8 +206,8 @@ class IFNet(nn.Module):
                 )
                 mask = m0
                 flow = flow + fd
-            warped_img0 = self.warp(self.preprocwarp(img0))
-            warped_img1 = self.warp(self.preprocwarp(img1))
+            warped_img0 = self.warp(img0,self.preprocwarp(flow[:, :2]))
+            warped_img1 = self.warp(img1,self.preprocwarp(flow[:, 2:4]))
 
         mask = torch.sigmoid(mask)
         return (
