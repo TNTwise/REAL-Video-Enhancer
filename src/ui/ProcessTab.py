@@ -320,6 +320,8 @@ class ProcessTab:
                 ),
                 "--interpolateFactor",
                 f"{interpolateTimes}",
+                "--rife_trt_mode",
+                f"{self.settings['rife_trt_mode']}",
             ]
         if self.settings["preview_enabled"] == "True":
             command += [

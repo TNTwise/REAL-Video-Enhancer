@@ -100,6 +100,12 @@ class SettingsTab:
         self.parent.output_folder_location.textChanged.connect(
             lambda:self.writeOutputFolder()
         )
+        self.parent.rife_trt_mode.currentIndexChanged.connect(
+            lambda: self.settings.writeSetting(
+                "rife_trt_mode",
+                self.parent.rife_trt_mode.currentText(),
+            )
+        )
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
 
     def writeOutputFolder(self):
@@ -150,7 +156,10 @@ class SettingsTab:
         self.parent.select_output_folder_location_btn.clicked.connect(
             self.selectOutputFolder
         )
-    
+        self.parent.rife_trt_mode.setCurrentText(
+            self.settings.settings["rife_trt_mode"]
+        )
+
     def selectOutputFolder(self):
         outputFile = QFileDialog.getExistingDirectory(
             parent=self.parent,
@@ -186,7 +195,8 @@ class Settings:
             "discord_rich_presence": "True",
             "scene_detection_threshold": "2.0",
             "video_quality": "High",
-            "output_folder_location": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop")
+            "output_folder_location": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop"),
+            "rife_trt_mode": "accurate",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -197,7 +207,8 @@ class Settings:
             "discord_rich_presence": ("True", "False"),
             "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
             "video_quality": ("Low", "Medium", "High", "Very High"),
-            "output_folder_location": "ANY"
+            "output_folder_location": "ANY",
+            "rife_trt_mode": ("fast", "accurate"),
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):
