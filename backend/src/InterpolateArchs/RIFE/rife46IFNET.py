@@ -4,10 +4,7 @@ import torch.nn.functional as F
 
 
 from torch.nn.functional import interpolate
-try:
-    from .custom_warplayer import warp
-except:
-    from .warplayer import warp
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
