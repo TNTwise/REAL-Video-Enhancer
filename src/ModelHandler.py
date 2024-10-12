@@ -233,17 +233,21 @@ onnxUpscaleModels = {
 # detect custom models
 createDirectory(customModelsPath())
 customPytorchUpscaleModels = {}
+customNCNNUpscaleModels = {}
 for model in os.listdir(customModelsPath()):
     pattern = r'\d+x|x+\d'
     matches = re.findall(pattern, model)
     if len(matches) > 0:
-        upscaleFactor = int(matches[0].replace("x", ""))
+        upscaleFactor = int(matches[0].replace("x", "")) # get the integer value of the upscale factor
+        if model.endswith(".bin"):
+            customNCNNUpscaleModels[model] = (model, model, upscaleFactor, "custom")
         if model.endswith(".pth"):
             customPytorchUpscaleModels[model] = (model, model, upscaleFactor, "custom")
     else:
         printAndLog(f"Custom model {model} does not have a valid upscale factor in the name")
 pytorchUpscaleModels = pytorchUpscaleModels | customPytorchUpscaleModels
-
+tensorrtUpscaleModels = tensorrtUpscaleModels | customPytorchUpscaleModels
+ncnnUpscaleModels = ncnnUpscaleModels | customNCNNUpscaleModels
 totalModels = (
     onnxInterpolateModels
     | onnxUpscaleModels

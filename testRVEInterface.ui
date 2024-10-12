@@ -1313,8 +1313,8 @@ QDoubleSpinBox::down-button {
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>446</width>
-                   <height>574</height>
+                   <width>729</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -2474,7 +2474,7 @@ background-color:white;
                    </property>
                    <property name="sizeHint" stdset="0">
                     <size>
-                     <width>230</width>
+                     <width>20</width>
                      <height>20</height>
                     </size>
                    </property>
@@ -2483,16 +2483,16 @@ background-color:white;
                  <item row="0" column="2">
                   <layout class="QGridLayout" name="gridLayout_10">
                    <item row="1" column="0">
-                    <widget class="QPushButton" name="pushButton">
+                    <widget class="QPushButton" name="selectNCNNCustomModel">
                      <property name="text">
                       <string>Select Model (NCNN/.bin+.param)</string>
                      </property>
                     </widget>
                    </item>
                    <item row="0" column="0">
-                    <widget class="QPushButton" name="select_output_folder_location_btn_2">
+                    <widget class="QPushButton" name="selectPytorchCustomModel">
                      <property name="text">
-                      <string>Select Model (PyTorch/.pth)</string>
+                      <string>Select Model (PyTorch/TensorRT/.pth)</string>
                      </property>
                     </widget>
                    </item>
