@@ -105,6 +105,7 @@ class Render(FFMpegRender):
         self.sharedMemoryID = sharedMemoryID
         self.trt_optimization_level = trt_optimization_level
         self.rife_trt_mode = rife_trt_mode
+        self.uncacheNextFrame = False
         # get video properties early
         self.getVideoProperties(inputFile)
 
@@ -202,6 +203,13 @@ class Render(FFMpegRender):
                             img1=self.setupFrame1,
                             timestep=timestep,
                         )
+                elif self.ncnn:
+                        self.interpolate(
+                            img0=self.setupFrame0,
+                            img1=self.setupFrame1,
+                            timestep=.5,
+                        )
+
                 self.writeQueue.put(frame)
 
             self.onEndOfInterpolateCall()
@@ -220,7 +228,7 @@ class Render(FFMpegRender):
                         self.renderInterpolate(frame, self.scDetectFunc(frame))
                     else:
                         self.renderInterpolate(frame, False)
-                    
+
                 self.writeQueue.put(frame)
             else:
                 sleep(1)
@@ -307,7 +315,7 @@ class Render(FFMpegRender):
                 width=self.width,
                 height=self.height,
             )
-            self.frameSetupFunction = self.returnFrame
+            self.frameSetupFunction = interpolateRifeNCNN.normFrame
             self.undoSetup = interpolateRifeNCNN.uncacheFrame
             self.interpolate = interpolateRifeNCNN.process
             self.hotReload = interpolateRifeNCNN.hotReload

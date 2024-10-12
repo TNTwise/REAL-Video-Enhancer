@@ -1,4 +1,4 @@
-from rife_ncnn_vulkan_python import Rife
+from rife_ncnn_vulkan_python import Rife, wrapped
 from time import sleep
 
 
@@ -41,5 +41,14 @@ class InterpolateRIFENCNN:
         frame = self.render.process_bytes(img0, img1, timestep)
         return frame
 
+    def normFrame(self,frame:bytes):
+        return frame
+        frame = bytearray(frame)
+        frame = wrapped.Image(
+            frame, self.width, self.height, 3
+        )
+        return frame
+
     def uncacheFrame(self):
+        return
         self.render.uncache_frame()
