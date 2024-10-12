@@ -26,7 +26,6 @@ class DownloadDependencies:
     def __init__(self):
         createDirectory(os.path.join(currentDirectory(), "python"))
         createDirectory(os.path.join(currentDirectory(), "bin"))
-        createDirectory(os.path.join(currentDirectory(), "pip_cache"))
 
     def downloadBackend(self, tag):
         """
@@ -114,7 +113,6 @@ class DownloadDependencies:
             "install",
             "-U",
             "--no-warn-script-location",
-            "--cache-dir=" + os.path.join(currentDirectory(), "pip_cache"),
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)

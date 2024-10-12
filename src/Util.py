@@ -153,6 +153,14 @@ def pythonPath() -> str:
         else os.path.join(cwd, "python", "python", "bin", "python3")
     )
 
+def customModelsPath() -> str:
+    """
+    Returns the file path for the custom models directory.
+
+    :return: The file path for the custom models directory.
+    :rtype: str
+    """
+    return os.path.join(cwd, "custom_models")
 
 def modelsPath() -> str:
     """

@@ -1,6 +1,8 @@
+import os
+import re
 from .DownloadModels import DownloadModel
 from .ui.QTcustom import NetworkCheckPopup
-
+from .Util import currentDirectory, customModelsPath, createDirectory, printAndLog
 """
 Key value pairs of the model name in the GUI
 Data inside the tuple:
@@ -228,6 +230,19 @@ onnxUpscaleModels = {
         "SPAN",
     ),
 }
+# detect custom models
+createDirectory(customModelsPath())
+customPytorchUpscaleModels = {}
+for model in os.listdir(customModelsPath()):
+    pattern = r'\d+x|x+\d'
+    matches = re.findall(pattern, model)
+    if len(matches) > 0:
+        upscaleFactor = int(matches[0].replace("x", ""))
+        if model.endswith(".pth"):
+            customPytorchUpscaleModels[model] = (model, model, upscaleFactor, "custom")
+    else:
+        printAndLog(f"Custom model {model} does not have a valid upscale factor in the name")
+pytorchUpscaleModels = pytorchUpscaleModels | customPytorchUpscaleModels
 
 totalModels = (
     onnxInterpolateModels
