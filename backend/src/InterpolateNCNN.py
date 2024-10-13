@@ -30,10 +30,10 @@ class InterpolateRIFENCNN:
         )
 
     def hotUnload(self):
-        pass
+        self.render._rife_object.__swig_destroy__()
 
     def hotReload(self):
-        pass
+        self._load()
 
     def process(self, img0, img1, timestep) -> bytes:
         while self.render is None:
