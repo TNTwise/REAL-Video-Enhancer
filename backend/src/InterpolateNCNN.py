@@ -30,10 +30,10 @@ class InterpolateRIFENCNN:
         )
 
     def hotUnload(self):
-        self.render = None
+        pass
 
     def hotReload(self):
-        self._load()
+        pass
 
     def process(self, img0, img1, timestep) -> bytes:
         while self.render is None:
