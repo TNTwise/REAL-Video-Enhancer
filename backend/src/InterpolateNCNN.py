@@ -30,7 +30,8 @@ class InterpolateRIFENCNN:
         )
 
     def hotUnload(self):
-        self.render._rife_object.__swig_destroy__()
+        self.render._rife_object.__swig_destroy__(self.render._rife_object)
+        self.render = None
 
     def hotReload(self):
         self._load()

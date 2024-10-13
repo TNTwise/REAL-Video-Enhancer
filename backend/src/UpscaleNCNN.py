@@ -107,6 +107,7 @@ class UpscaleNCNN:
         
     def hotUnload(self):
         self.model = None
+        self.net = None
 
     def hotReload(self):
         self._load()
