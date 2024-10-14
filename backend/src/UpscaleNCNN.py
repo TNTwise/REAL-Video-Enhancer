@@ -153,8 +153,8 @@ class UpscaleNCNN:
             if self.tilesize == 0:
                 return self.procNCNNVk(imageChunk)
             else:
-                npArray = np.frombuffer(imageChunk,dtype=np.uint8).reshape(self.height,self.width,3)
-                return self.upscaleTiledImage(imageChunk)
+                npArray = np.frombuffer(imageChunk,dtype=np.uint8).reshape(self.height,self.width,3).transpose(2,0,1)
+                return self.upscaleTiledImage(npArray)
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
         
