@@ -1,12 +1,11 @@
 import numpy as np
 import os
 from time import sleep
-
+import math
 import numpy as np
 try:
     from upscale_ncnn_py import UPSCALE
     method = "upscale_ncnn_py"
-    s
 except:
     import ncnn
     method = "ncnn_vulkan"   
@@ -71,6 +70,7 @@ class UpscaleNCNN:
         width: int = 1920,
         height: int = 1080,
         tilesize: int = 0,
+        tilePad = 10,
     ):
         # only import if necessary
 
@@ -82,6 +82,7 @@ class UpscaleNCNN:
         self.height = height
         self.scale = scale
         self.threads = num_threads
+        self.tilePad = tilePad
         self.mean_vals = []
         self.norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
         self._load()
@@ -149,7 +150,87 @@ class UpscaleNCNN:
         while self.net is None:
             sleep(1)
         if method == "ncnn_vulkan":
-            return self.procNCNNVk(imageChunk)
+            if self.tilesize == 0:
+                return self.procNCNNVk(imageChunk)
+            else:
+                npArray = np.frombuffer(imageChunk,dtype=np.uint8).reshape(self.height,self.width,3)
+                return self.upscaleTiledImage(imageChunk)
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
         
+    def upscaleTiledImage(self, img:np.array):
+        batch, channel, height, width = img.shape
+        output_shape = (batch, channel, height * self.scale, width * self.scale)
+
+        # Start with a black image
+        output = np.zeros(output_shape, dtype=img.dtype)
+
+        tiles_x = math.ceil(width / self.tilesize[0])
+        tiles_y = math.ceil(height / self.tilesize[1])
+
+        # Loop over all tiles
+        for y in range(tiles_y):
+            for x in range(tiles_x):
+                # Extract tile from input image
+                ofs_x = x * self.tilesize[0]
+                ofs_y = y * self.tilesize[1]
+
+                # Input tile area on total image
+                input_start_x = ofs_x
+                input_end_x = min(ofs_x + self.tilesize[0], width)
+                input_start_y = ofs_y
+                input_end_y = min(ofs_y + self.tilesize[1], height)
+
+                # Input tile area on total image with padding
+                input_start_x_pad = max(input_start_x - self.tilePad, 0)
+                input_end_x_pad = min(input_end_x + self.tilePad, width)
+                input_start_y_pad = max(input_start_y - self.tilePad, 0)
+                input_end_y_pad = min(input_end_y + self.tilePad, height)
+
+                # Input tile dimensions
+                input_tile_width = input_end_x - input_start_x
+                input_tile_height = input_end_y - input_start_y
+
+                # Extract the input tile with padding
+                input_tile = img[
+                    :,
+                    :,
+                    input_start_y_pad:input_end_y_pad,
+                    input_start_x_pad:input_end_x_pad,
+                ]
+
+                # Pad the input tile
+                h, w = input_tile.shape[2:]
+                pad_h = max(0, self.tilePad - h)
+                pad_w = max(0, self.tilePad - w)
+                input_tile = np.pad(input_tile, ((0, 0), (0, 0), (pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+
+                # Process tile using the model (assuming model is a function that can process numpy arrays)
+                output_tile = self.procNCNNVk(input_tile)
+
+                # Crop output tile to the expected size
+                output_tile = output_tile[:, :, :h * self.scale, :w * self.scale]
+
+                # Output tile area on total image
+                output_start_x = input_start_x * self.scale
+                output_end_x = input_end_x * self.scale
+                output_start_y = input_start_y * self.scale
+                output_end_y = input_end_y * self.scale
+
+                # Output tile area without padding
+                output_start_x_tile = (input_start_x - input_start_x_pad) * self.scale
+                output_end_x_tile = output_start_x_tile + input_tile_width * self.scale
+                output_start_y_tile = (input_start_y - input_start_y_pad) * self.scale
+                output_end_y_tile = output_start_y_tile + input_tile_height * self.scale
+
+                # Put tile into output image
+                output[
+                    :, :, output_start_y:output_end_y, output_start_x:output_end_x
+                ] = output_tile[
+                    :,
+                    :,
+                    output_start_y_tile:output_end_y_tile,
+                    output_start_x_tile:output_end_x_tile,
+                ]
+
+        return output
