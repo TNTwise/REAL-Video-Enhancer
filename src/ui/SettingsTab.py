@@ -90,7 +90,7 @@ class SettingsTab:
                 str(self.parent.scene_detection_threshold.value()),
             )
         )
-        self.parent.scene_detection_threshold.valueChanged.connect(
+        self.parent.video_quality.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
                 "video_quality",
                 str(self.parent.video_quality.currentText()),
