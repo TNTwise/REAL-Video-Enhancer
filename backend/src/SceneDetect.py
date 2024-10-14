@@ -1,10 +1,6 @@
-from tqdm import tqdm
-from queue import Queue
-from .FFmpeg import FFMpegRender
-from threading import Thread
-from .Util import bytesToImg
-from queue import Queue
 import numpy as np
+import cv2
+from .Util import bytesToImg
 
 
 class NPMeanSCDetect:
@@ -136,6 +132,27 @@ class VSSCDetect:
         # Assuming frames are numpy arrays
         return np.mean(np.abs(frame1.astype(float) - frame2.astype(float)))
 
+class NPMeanDiffSCDetect:
+    def __init__(self, sensitivity=2):
+        self.sensativity = sensitivity * 10 # multiply by 10 for more representative results
+        self.i0 = None
+        self.i1 = None
+        
+    def sceneDetect(self,img1):
+        if self.i0 is None:
+            self.i0 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+            return
+        
+        self.i1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
+        frame_diff = cv2.absdiff(self.i1, self.i0)
+        
+        mean_diff = np.mean(frame_diff)
+        if mean_diff > self.sensativity:
+            self.i0 = self.i1
+            return True
+        self.i0 = self.i1
+        return False
+
 
 class SceneDetect:
     """
@@ -157,10 +174,15 @@ class SceneDetect:
         # this is just the argument from the command line, default is mean
         if sceneChangeMethod == "mean":
             self.detector = NPMeanSCDetect(sensitivity=sceneChangeSensitivity)
+        if sceneChangeMethod == "mean_diff":
+            self.detector = NPMeanDiffSCDetect(sensitivity=sceneChangeSensitivity)
         elif sceneChangeMethod == "mean_segmented":
             self.detector = NPMeanSegmentedSCDetect(
                 sensitivity=sceneChangeSensitivity, segments=4
             )
+        else:
+            raise ValueError("Invalid scene change method")
+        
 
     def detect(self, frame):
         frame = bytesToImg(frame, width=self.width, height=self.height)
