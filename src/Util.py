@@ -153,6 +153,7 @@ def pythonPath() -> str:
         else os.path.join(cwd, "python", "python", "bin", "python3")
     )
 
+
 def customModelsPath() -> str:
     """
     Returns the file path for the custom models directory.
@@ -161,6 +162,7 @@ def customModelsPath() -> str:
     :rtype: str
     """
     return os.path.join(cwd, "custom_models")
+
 
 def modelsPath() -> str:
     """
@@ -293,7 +295,7 @@ def checkValidVideo(video_path):
         return False
 
     ret, frame = cap.read()
-    #if not ret:
+    # if not ret:
     #    print(f"Error: Couldn't read frames from the video file '{video_path}'")
     #    return False
 
@@ -474,6 +476,8 @@ def openLink(link: str):
     :type link: str
     """
     webbrowser.open(link)
+
+
 def errorAndLog(message: str):
     log("ERROR: " + message)
     raise os.error("ERROR: " + message)

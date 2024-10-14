@@ -94,7 +94,7 @@ class Render(FFMpegRender):
         self.upscaleTimes = 1  # if no upscaling, it will default to 1
         self.interpolateFactor = interpolateFactor
         # max timestep is a hack to make sure ncnn cache frames too early, and ncnn breaks if i modify the code at all so ig this is what we are doing
-        self.maxTimestep = (interpolateFactor- 1) / interpolateFactor
+        self.maxTimestep = (interpolateFactor - 1) / interpolateFactor
         self.ncnn = self.backend == "ncnn"
         self.rifeVersion = rifeVersion
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
@@ -206,11 +206,11 @@ class Render(FFMpegRender):
                             timestep=timestep,
                         )
                 elif self.ncnn:
-                        self.interpolate(
-                            img0=self.setupFrame0,
-                            img1=self.setupFrame1,
-                            timestep=self.maxTimestep,
-                        )
+                    self.interpolate(
+                        img0=self.setupFrame0,
+                        img1=self.setupFrame1,
+                        timestep=self.maxTimestep,
+                    )
 
                 self.writeQueue.put(frame)
 
@@ -316,7 +316,7 @@ class Render(FFMpegRender):
                 interpolateModelPath=self.interpolateModel,
                 width=self.width,
                 height=self.height,
-                max_timestep=self.maxTimestep
+                max_timestep=self.maxTimestep,
             )
             self.frameSetupFunction = interpolateRifeNCNN.normFrame
             self.undoSetup = interpolateRifeNCNN.uncacheFrame

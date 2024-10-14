@@ -141,7 +141,7 @@ class IFNet(nn.Module):
         self.height = height
         self.backWarp = backwarp_tenGrid
         self.tenFlow = tenFlow_div
-        
+
         self.paddedHeight = backwarp_tenGrid.shape[2]
         self.paddedWidth = backwarp_tenGrid.shape[3]
 

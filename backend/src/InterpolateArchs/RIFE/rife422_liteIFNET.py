@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from torch.nn.functional import interpolate
 
+
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
         super(MyPixelShuffle, self).__init__()
@@ -167,7 +168,6 @@ class IFNet(nn.Module):
         else:
             raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
         self.warp = warp
-    
 
     def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0

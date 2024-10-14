@@ -230,10 +230,13 @@ def checkForNCNN() -> bool:
     try:
         from rife_ncnn_vulkan_python import Rife
         import ncnn
+
         try:
             from upscale_ncnn_py import UPSCALE
         except:
-            printAndLog("Warning: Cannot import upscale_ncnn, falling back to ncnn processing. (This can be slow!)")
+            printAndLog(
+                "Warning: Cannot import upscale_ncnn, falling back to ncnn processing. (This can be slow!)"
+            )
         return True
     except ImportError as e:
         log(str(e))

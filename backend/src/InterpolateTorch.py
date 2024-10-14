@@ -348,10 +348,11 @@ class InterpolateRifeTorch:
                 import tensorrt
                 import torch_tensorrt
                 from .InterpolateArchs.RIFE.custom_warplayer import WarpPluginCreator
+
                 registry = tensorrt.get_plugin_registry()
                 registry.register_creator(WarpPluginCreator())
 
-                #torch_tensorrt.runtime.enable_cudagraphs()
+                # torch_tensorrt.runtime.enable_cudagraphs()
                 logging.basicConfig(level=logging.INFO)
                 base_trt_engine_path = os.path.join(
                     os.path.realpath(self.trt_cache_dir),
@@ -381,7 +382,6 @@ class InterpolateRifeTorch:
                             if self.trt_optimization_level is not None
                             else ""
                         )
-                        
                     ),
                 )
                 trt_engine_path = base_trt_engine_path + ".dyn"

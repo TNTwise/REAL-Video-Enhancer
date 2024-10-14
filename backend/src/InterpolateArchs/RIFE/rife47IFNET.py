@@ -4,6 +4,7 @@ import math
 
 
 from torch.nn.functional import interpolate
+
 try:
     from .custom_warplayer import warp
 except:
@@ -175,8 +176,12 @@ class IFNet(nn.Module):
                     flow = (flow + torch.cat((f_[:, 2:4], f_[:, :2]), 1)) / 2
                     mask = (mask + (-m_)) / 2
             else:
-                wf0 = self.warp(f0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid)
-                wf1 = self.warp(f1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid)
+                wf0 = self.warp(
+                    f0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
+                )
+                wf1 = self.warp(
+                    f1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
+                )
                 fd, m0 = self.block[i](
                     torch.cat(
                         (

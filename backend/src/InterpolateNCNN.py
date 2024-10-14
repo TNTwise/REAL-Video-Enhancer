@@ -1,5 +1,6 @@
-from rife_ncnn_vulkan_python import  wrapped
+from rife_ncnn_vulkan_python import wrapped
 from time import sleep
+
 # built-in imports
 import importlib
 import pathlib
@@ -33,7 +34,7 @@ class Rife:
         self.width = width
         self.channels = channels
         self.max_timestep = max_timestep
-        self.output_bytes = bytearray(width*height*channels)
+        self.output_bytes = bytearray(width * height * channels)
         self.raw_out_image = wrapped.Image(
             self.output_bytes, self.width, self.height, self.channels
         )
@@ -42,20 +43,25 @@ class Rife:
             self.scale = scale
         else:
             raise ValueError("scale should be a power of 2")
-        
+
         # determine if rife-v2 is used
         rife_v2 = ("rife-v2" in model) or ("rife-v3" in model)
         rife_v4 = "rife-v4" in model or "rife4" in model or "rife-4" in model
 
         # create raw RIFE wrapper object
         self._rife_object = wrapped.RifeWrapped(
-            gpuid, tta_mode, tta_temporal_mode, uhd_mode, num_threads, rife_v2, rife_v4, False
+            gpuid,
+            tta_mode,
+            tta_temporal_mode,
+            uhd_mode,
+            num_threads,
+            rife_v2,
+            rife_v4,
+            False,
         )
         self._load(model)
-        
 
     def _load(self, model: str, model_dir: pathlib.Path = None):
-
         # if model_dir is not specified
         if model_dir is None:
             model_dir = pathlib.Path(model)
@@ -82,9 +88,9 @@ class Rife:
         # Return the image immediately instead of doing the copy in the upstream part which cause black output problems
         # The reason is that the upstream code use ncnn::Mat::operator=(const Mat& m) does a reference copy which won't
         # change our OutImage data.
-        if timestep == 0.:
+        if timestep == 0.0:
             return image0
-        elif timestep == 1.:
+        elif timestep == 1.0:
             return image1
 
         image0_bytes = bytearray(image0.tobytes())
@@ -107,15 +113,18 @@ class Rife:
         return Image.frombytes(
             image0.mode, (image0.width, image0.height), bytes(output_bytes)
         )
-    def process_cv2(self, image0: np.ndarray, image1: np.ndarray, timestep: float = 0.5) -> np.ndarray:
-        if timestep == 0.:
+
+    def process_cv2(
+        self, image0: np.ndarray, image1: np.ndarray, timestep: float = 0.5
+    ) -> np.ndarray:
+        if timestep == 0.0:
             return image0
-        elif timestep == 1.:
+        elif timestep == 1.0:
             return image1
-        
+
         image0_bytes = bytearray(image0.tobytes())
         image1_bytes = bytearray(image1.tobytes())
-            
+
         self.channels = int(len(image0_bytes) / (image0.shape[1] * image0.shape[0]))
         self.output_bytes = bytearray(len(image0_bytes))
 
@@ -131,46 +140,55 @@ class Rife:
         )
 
         self._rife_object.process(raw_in_image0, raw_in_image1, timestep, raw_out_image)
-        
+
         return np.frombuffer(self.output_bytes, dtype=np.uint8).reshape(
             image0.shape[0], image0.shape[1], self.channels
         )
-    
+
     def uncache_frame(self):
         """
         Used in instances where the scene change is active, and the frame needs to be uncached.
         """
         self.image0_bytes = None
         self.raw_in_image0 = None
-        
 
-    def process_bytes(self, image0_bytes, image1_bytes, timestep: float = 0.5) -> np.ndarray:
-        #print(timestep)
-        if timestep == 0.:
+    def process_bytes(
+        self, image0_bytes, image1_bytes, timestep: float = 0.5
+    ) -> np.ndarray:
+        # print(timestep)
+        if timestep == 0.0:
             return image0_bytes
-        elif timestep == 1.:
+        elif timestep == 1.0:
             return image1_bytes
-        
+
         if self.image0_bytes is None:
             self.image0_bytes = bytearray(image0_bytes)
             self.raw_in_image0 = wrapped.Image(
                 self.image0_bytes, self.width, self.height, self.channels
             )
         image1_bytes = bytearray(image1_bytes)
-        
+
         raw_in_image1 = wrapped.Image(
             image1_bytes, self.width, self.height, self.channels
         )
-        
 
-        self._rife_object.process(self.raw_in_image0, raw_in_image1, timestep, self.raw_out_image)
+        self._rife_object.process(
+            self.raw_in_image0, raw_in_image1, timestep, self.raw_out_image
+        )
         if timestep == self.max_timestep:
             self.image0_bytes = image1_bytes
             self.raw_in_image0 = raw_in_image1
 
         return bytes(self.output_bytes)
-        
-    def process_fast(self, image0: np.ndarray, image1: np.ndarray, timestep: float = 0.5, shape: tuple = None, channels: int = 3) -> np.ndarray:
+
+    def process_fast(
+        self,
+        image0: np.ndarray,
+        image1: np.ndarray,
+        timestep: float = 0.5,
+        shape: tuple = None,
+        channels: int = 3,
+    ) -> np.ndarray:
         """
         An attempt at a faster implementation for NCNN that should speed it up significantly through better caching methods.
 
@@ -182,10 +200,10 @@ class Rife:
 
         :return: The processed image, format: np.ndarray.
         """
-        
-        if timestep == 0.:
+
+        if timestep == 0.0:
             return np.array(image0)
-        elif timestep == 1.:
+        elif timestep == 1.0:
             return np.array(image1)
 
         if self.height == None:
@@ -195,19 +213,16 @@ class Rife:
                 self.height, self.width = shape
 
         image1_bytes = bytearray(image1.tobytes())
-        raw_in_image1 = wrapped.Image(
-            image1_bytes, self.width, self.height, channels
-        )
+        raw_in_image1 = wrapped.Image(image1_bytes, self.width, self.height, channels)
 
         if self.image0_bytes is None:
             self.image0_bytes = bytearray(image0.tobytes())
             self.output_bytes = bytearray(len(self.image0_bytes))
-        
+
         raw_in_image0 = wrapped.Image(
             self.image0_bytes, self.width, self.height, channels
         )
 
-        
         raw_out_image = wrapped.Image(
             self.output_bytes, self.width, self.height, channels
         )
@@ -219,8 +234,15 @@ class Rife:
         return np.frombuffer(self.output_bytes, dtype=np.uint8).reshape(
             self.height, self.width, self.channels
         )
-    
-    def process_fast_torch(self, image0: np.ndarray, image1: np.ndarray, timestep: float = 0.5, shape: tuple = None, channels: int = 3) -> np.ndarray:
+
+    def process_fast_torch(
+        self,
+        image0: np.ndarray,
+        image1: np.ndarray,
+        timestep: float = 0.5,
+        shape: tuple = None,
+        channels: int = 3,
+    ) -> np.ndarray:
         """
         An attempt at a faster implementation for NCNN that should speed it up significantly through better caching methods.
 
@@ -265,9 +287,9 @@ class Rife:
         return torch.frombuffer(self.output_bytes, dtype=torch.uint8).reshape(
             self.height, self.width, self.channels
         )
-    
-class RIFE(Rife):
-    ...
+
+
+class RIFE(Rife): ...
 
 
 class InterpolateRIFENCNN:
@@ -280,7 +302,6 @@ class InterpolateRIFENCNN:
         gpuid: int = 0,
         max_timestep: int = 1,
     ):
-        
         self.max_timestep = max_timestep
         self.interpolateModelPath = interpolateModelPath
         self.width = width
@@ -314,12 +335,10 @@ class InterpolateRIFENCNN:
         frame = self.render.process_bytes(img0, img1, timestep)
         return frame
 
-    def normFrame(self,frame:bytes):
+    def normFrame(self, frame: bytes):
         return frame
         frame = bytearray(frame)
-        frame = wrapped.Image(
-            frame, self.width, self.height, 3
-        )
+        frame = wrapped.Image(frame, self.width, self.height, 3)
         return frame
 
     def uncacheFrame(self):

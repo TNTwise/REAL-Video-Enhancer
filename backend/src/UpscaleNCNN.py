@@ -3,12 +3,17 @@ import os
 from time import sleep
 import math
 import numpy as np
+
 try:
     from upscale_ncnn_py import UPSCALE
+
     method = "upscale_ncnn_py"
 except:
     import ncnn
-    method = "ncnn_vulkan"   
+
+    method = "ncnn_vulkan"
+
+
 class NCNNParam:
     """
     Puts the last time an op shows up in a param in a dict
@@ -59,7 +64,6 @@ def getNCNNScale(modelPath: str = "") -> int:
     return scale
 
 
-
 class UpscaleNCNN:
     def __init__(
         self,
@@ -70,7 +74,7 @@ class UpscaleNCNN:
         width: int = 1920,
         height: int = 1080,
         tilesize: int = 0,
-        tilePad = 10,
+        tilePad=10,
     ):
         # only import if necessary
 
@@ -98,20 +102,20 @@ class UpscaleNCNN:
             self.net.load_model(self.modelPath + ".bin")
         elif method == "upscale_ncnn_py":
             self.net = UPSCALE(
-            gpuid=self.gpuid,
-            model_str=self.modelPath,
-            num_threads=self.threads,
-            scale=self.scale,
-            tilesize=self.tilesize,
-        )
-          
-        
+                gpuid=self.gpuid,
+                model_str=self.modelPath,
+                num_threads=self.threads,
+                scale=self.scale,
+                tilesize=self.tilesize,
+            )
+
     def hotUnload(self):
         self.model = None
         self.net = None
 
     def hotReload(self):
         self._load()
+
     def NCNNImageMatFromNP(self, npArray: np.array):
         return ncnn.Mat.from_pixels(
             npArray,
@@ -125,10 +129,8 @@ class UpscaleNCNN:
         mat.substract_mean_normalize(mean_vals, norm_vals)
 
     def ClampNPArray(self, nparray: np.array) -> np.array:
-        
         return nparray.clip(0, 255)
 
-        
     def procNCNNVk(self, imageChunk):
         ex = self.net.create_extractor()
         frame = self.NCNNImageMatFromNP(imageChunk)
@@ -153,12 +155,16 @@ class UpscaleNCNN:
             if self.tilesize == 0:
                 return self.procNCNNVk(imageChunk)
             else:
-                npArray = np.frombuffer(imageChunk,dtype=np.uint8).reshape(self.height,self.width,3).transpose(2,0,1)
+                npArray = (
+                    np.frombuffer(imageChunk, dtype=np.uint8)
+                    .reshape(self.height, self.width, 3)
+                    .transpose(2, 0, 1)
+                )
                 return self.upscaleTiledImage(npArray)
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
-        
-    def upscaleTiledImage(self, img:np.array):
+
+    def upscaleTiledImage(self, img: np.array):
         batch, channel, height, width = img.shape
         output_shape = (batch, channel, height * self.scale, width * self.scale)
 
@@ -203,13 +209,17 @@ class UpscaleNCNN:
                 h, w = input_tile.shape[2:]
                 pad_h = max(0, self.tilePad - h)
                 pad_w = max(0, self.tilePad - w)
-                input_tile = np.pad(input_tile, ((0, 0), (0, 0), (pad_h, pad_h), (pad_w, pad_w)), mode='edge')
+                input_tile = np.pad(
+                    input_tile,
+                    ((0, 0), (0, 0), (pad_h, pad_h), (pad_w, pad_w)),
+                    mode="edge",
+                )
 
                 # Process tile using the model (assuming model is a function that can process numpy arrays)
                 output_tile = self.procNCNNVk(input_tile)
 
                 # Crop output tile to the expected size
-                output_tile = output_tile[:, :, :h * self.scale, :w * self.scale]
+                output_tile = output_tile[:, :, : h * self.scale, : w * self.scale]
 
                 # Output tile area on total image
                 output_start_x = input_start_x * self.scale

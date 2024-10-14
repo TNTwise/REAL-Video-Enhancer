@@ -190,6 +190,7 @@ class RIFE425:
             "transformer.layers.4.self_attn.merge.weight",
         ]
 
+
 class GMFSS:
     def __init__():
         pass
@@ -207,7 +208,6 @@ class GMFSS:
             "module.encode.1.weight",
             "module.encode.1.bias",
         ]
-    
 
 
 archs = [RIFE46, RIFE47, RIFE413, RIFE420, RIFE421, RIFE422lite, RIFE425, GMFSS]

@@ -25,7 +25,7 @@ class HandleApplication:
                 outputFile=self.args.output,
                 interpolateModel=self.args.interpolateModel,
                 interpolateFactor=self.args.interpolateFactor,
-                rifeVersion="v1", # some guy was angy about rifev2 being here, so I changed it to v1
+                rifeVersion="v1",  # some guy was angy about rifev2 being here, so I changed it to v1
                 upscaleModel=self.args.upscaleModel,
                 tile_size=self.args.tilesize,
                 # backend settings
@@ -49,7 +49,7 @@ class HandleApplication:
             half_prec_supp = False
             availableBackends = []
             printMSG = ""
-            
+
             if checkForTensorRT():
                 """
                 checks for tensorrt availability, and the current gpu works with it (if half precision is supported)
@@ -57,10 +57,10 @@ class HandleApplication:
                 Half precision is only availaible on RTX 20 series and up
                 """
                 import torch
+
                 half_prec_supp = check_bfloat16_support()
                 if half_prec_supp:
                     import tensorrt
-                    
 
                     availableBackends.append("tensorrt")
                     printMSG += f"TensorRT Version: {tensorrt.__version__}\n"
@@ -72,7 +72,7 @@ class HandleApplication:
                 availableBackends.append("pytorch")
                 printMSG += f"PyTorch Version: {torch.__version__}\n"
                 half_prec_supp = check_bfloat16_support()
-                
+
             if checkForNCNN():
                 availableBackends.append("ncnn")
                 printMSG += f"NCNN Version: 20220729\n"

@@ -72,11 +72,11 @@ class VideoInputHandler(VideoLoader):
 
     def isValidVideoFile(self):
         return checkValidVideo(self.inputText)
-    
+
     def isValidYoutubeLink(self):
         ydl_opts = {
-        'quiet': True,  # Suppress output
-        'noplaylist': True,  # Only check single video, not playlists
+            "quiet": True,  # Suppress output
+            "noplaylist": True,  # Only check single video, not playlists
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -84,11 +84,10 @@ class VideoInputHandler(VideoLoader):
                 # Extract info about the video
                 info_dict = ydl.extract_info(self.inputText, download=False)
                 # Check if there are available formats
-                if info_dict.get('formats'):
+                if info_dict.get("formats"):
                     return True  # Video is downloadable
                 else:
                     return False  # No formats available
             except Exception as e:
                 print(f"Error occurred: {e}")
                 return False
-        

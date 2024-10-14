@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ..Util import currentDirectory, getPlatform, homedir, checkForWritePermissions
 from .QTcustom import RegularQTPopup
 
+
 class SettingsTab:
     def __init__(
         self,
@@ -19,7 +20,6 @@ class SettingsTab:
         # disable half option if its not supported
         if not halfPrecisionSupport:
             self.parent.precision.removeItem(1)
-    
 
     """def connectWriteSettings(self):
         settings_and_combo_boxes = {
@@ -46,7 +46,6 @@ class SettingsTab:
                 )
             )
             print(setting)"""
-
 
     def connectWriteSettings(self):
         self.parent.precision.currentIndexChanged.connect(
@@ -98,7 +97,7 @@ class SettingsTab:
             )
         )
         self.parent.output_folder_location.textChanged.connect(
-            lambda:self.writeOutputFolder()
+            lambda: self.writeOutputFolder()
         )
         self.parent.rife_trt_mode.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
@@ -113,9 +112,9 @@ class SettingsTab:
         if os.path.exists(outputlocation) and os.path.isdir(outputlocation):
             if checkForWritePermissions(outputlocation):
                 self.settings.writeSetting(
-                        "output_folder_location",
-                        str(outputlocation),
-                    )
+                    "output_folder_location",
+                    str(outputlocation),
+                )
             else:
                 RegularQTPopup("No permissions to export here!")
 
@@ -170,9 +169,9 @@ class SettingsTab:
         if os.path.exists(outputlocation) and os.path.isdir(outputlocation):
             if checkForWritePermissions(outputlocation):
                 self.settings.writeSetting(
-                        "output_folder_location",
-                        str(outputlocation),
-                    )
+                    "output_folder_location",
+                    str(outputlocation),
+                )
                 self.parent.output_folder_location.setText(outputlocation)
             else:
                 RegularQTPopup("No permissions to export here!")
@@ -195,7 +194,9 @@ class Settings:
             "discord_rich_presence": "True",
             "scene_detection_threshold": "2.0",
             "video_quality": "High",
-            "output_folder_location": os.path.join(f"{homedir}", "Videos") if getPlatform() != "darwin" else os.path.join(f"{homedir}", "Desktop"),
+            "output_folder_location": os.path.join(f"{homedir}", "Videos")
+            if getPlatform() != "darwin"
+            else os.path.join(f"{homedir}", "Desktop"),
             "rife_trt_mode": "accurate",
         }
         self.allowedSettings = {
@@ -277,7 +278,8 @@ class Settings:
             for key, value in self.settings.items():
                 if key in self.defaultSettings:  # check if the key is valid
                     if (
-                        value in self.allowedSettings[key] or self.allowedSettings[key] == "ANY"
+                        value in self.allowedSettings[key]
+                        or self.allowedSettings[key] == "ANY"
                     ):  # check if it is in the allowed settings dict
                         file.write(f"{key},{value}\n")
                 else:

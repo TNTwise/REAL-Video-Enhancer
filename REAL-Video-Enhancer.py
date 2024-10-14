@@ -25,9 +25,9 @@ from mainwindow import Ui_MainWindow  # Import the UI class from the converted m
 from PySide6 import QtSvg  # Import the QtSvg module so svg icons can be used on windows
 from src.version import version
 from src.InputHandler import VideoInputHandler
+
 # other imports
 from src.Util import (
-    
     openLink,
     getOSInfo,
     get_gpu_info,
@@ -36,8 +36,7 @@ from src.Util import (
     videosPath,
     checkForWritePermissions,
     getAvailableDiskSpace,
-    errorAndLog
-
+    errorAndLog,
 )
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
@@ -171,7 +170,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsTab = SettingsTab(
             parent=self, halfPrecisionSupport=halfPrecisionSupport
         )
-        
+
         self.moreTab = MoreTab(parent=self)
         # Startup Animation
         self.animationHandler = AnimationHandler()
@@ -381,10 +380,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def enableProcessPage(self):
         self.processSettingsContainer.setEnabled(True)
 
-        
-
     def loadVideo(self, inputFile):
-        
         videoHandler = VideoInputHandler(inputText=inputFile)
         if videoHandler.isYoutubeLink() and videoHandler.isValidYoutubeLink():
             videoHandler.getDataFromYoutubeVideo()
@@ -409,7 +405,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.outputFileSelectButton.setEnabled(True)
         self.isVideoLoaded = True
         self.updateVideoGUIDetails()
-        
+
     # input file button
     def openInputFile(self):
         """

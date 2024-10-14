@@ -23,6 +23,7 @@ def time_limit(seconds):
     finally:
         timer.cancel()
 
+
 class DiscordRPC:
     def start_discordRPC(self, mode: str, videoName: str, backend: str):
         """
@@ -42,7 +43,8 @@ class DiscordRPC:
                         ipc_path = f"{os.getenv('XDG_RUNTIME_DIR')}/discord-ipc-{i}"
                         if not os.path.exists(ipc_path) or not os.path.isfile(ipc_path):
                             os.symlink(
-                                f"{os.getenv('HOME')}/.config/discord/{client_id}", ipc_path
+                                f"{os.getenv('HOME')}/.config/discord/{client_id}",
+                                ipc_path,
                             )
                 except:
                     log("Not flatpak")
@@ -50,7 +52,7 @@ class DiscordRPC:
                     self.RPC = Presence(client_id)  # Initialize the client class
                     self.RPC.connect()  # Start the handshake loop
 
-                    self. RPC.update(
+                    self.RPC.update(
                         state=f"{mode} Video",
                         details=f"Backend: {backend}",
                         large_image="logo-v2",
@@ -62,5 +64,6 @@ class DiscordRPC:
         # Can only update rich presence every 15 seconds
         except Exception as e:
             log("Timed out!")
+
     def closeRPC(self):
         self.RPC.close()

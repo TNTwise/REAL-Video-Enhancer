@@ -4,10 +4,12 @@ import math
 
 
 from torch.nn.functional import interpolate
+
 try:
     from .custom_warplayer import warp
 except:
     from .warplayer import warp
+
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -173,7 +175,6 @@ class IFNet(nn.Module):
         else:
             raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
         self.warp = warp
-   
 
     def forward(self, img0, img1, timestep, f0, f1):
         warped_img0 = img0

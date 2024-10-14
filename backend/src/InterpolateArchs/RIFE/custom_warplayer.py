@@ -10,12 +10,19 @@ import torch.nn.functional as F
 from torch.fx.node import Argument, Target
 from torch.library import custom_op, register_fake
 from torch_tensorrt.dynamo.conversion._ConversionContext import ConversionContext
-from torch_tensorrt.dynamo.conversion._ConverterRegistry import dynamo_tensorrt_converter
-from torch_tensorrt.dynamo.conversion.converter_utils import enforce_tensor_types, set_layer_name
+from torch_tensorrt.dynamo.conversion._ConverterRegistry import (
+    dynamo_tensorrt_converter,
+)
+from torch_tensorrt.dynamo.conversion.converter_utils import (
+    enforce_tensor_types,
+    set_layer_name,
+)
 from torch_tensorrt.dynamo.types import TRTTensor
 
 
-class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt.IPluginV3OneRuntime):
+class WarpPlugin(
+    trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt.IPluginV3OneRuntime
+):
     def __init__(self) -> None:
         trt.IPluginV3.__init__(self)
         trt.IPluginV3OneCore.__init__(self)
@@ -34,25 +41,40 @@ class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt
     def get_capability_interface(self, type: trt.PluginCapabilityType) -> Self:
         return self
 
-    def configure_plugin(self, inp: list[trt.DynamicPluginTensorDesc], out: list[trt.DynamicPluginTensorDesc]) -> None:
+    def configure_plugin(
+        self,
+        inp: list[trt.DynamicPluginTensorDesc],
+        out: list[trt.DynamicPluginTensorDesc],
+    ) -> None:
         pass
 
-    def get_output_data_types(self, input_types: list[trt.DataType]) -> list[trt.DataType]:
+    def get_output_data_types(
+        self, input_types: list[trt.DataType]
+    ) -> list[trt.DataType]:
         return [input_types[0]]
 
     def get_output_shapes(
-        self, inputs: list[trt.DimsExprs], shape_inputs: list[trt.DimsExprs], expr_builder: trt.IExprBuilder
+        self,
+        inputs: list[trt.DimsExprs],
+        shape_inputs: list[trt.DimsExprs],
+        expr_builder: trt.IExprBuilder,
     ) -> list[trt.DimsExprs]:
         return [inputs[0]]
 
-    def supports_format_combination(self, pos: int, in_out: list[trt.DynamicPluginTensorDesc], num_inputs: int) -> bool:
+    def supports_format_combination(
+        self, pos: int, in_out: list[trt.DynamicPluginTensorDesc], num_inputs: int
+    ) -> bool:
         assert pos < len(in_out)
         assert num_inputs == 4
 
         desc = in_out[pos].desc
-        return desc.format == trt.TensorFormat.LINEAR and desc.type == trt.DataType.FLOAT
+        return (
+            desc.format == trt.TensorFormat.LINEAR and desc.type == trt.DataType.FLOAT
+        )
 
-    def attach_to_context(self, resource_context: trt.IPluginResourceContext) -> WarpPlugin:
+    def attach_to_context(
+        self, resource_context: trt.IPluginResourceContext
+    ) -> WarpPlugin:
         return self.clone()
 
     def enqueue(
@@ -68,11 +90,21 @@ class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt
         itemsize = cp.dtype(dtype).itemsize
 
         with cp.cuda.ExternalStream(stream):
-            input0_mem = cp.cuda.UnownedMemory(inputs[0], np.prod(input_desc[0].dims) * itemsize, self)
-            input1_mem = cp.cuda.UnownedMemory(inputs[1], np.prod(input_desc[1].dims) * itemsize, self)
-            input2_mem = cp.cuda.UnownedMemory(inputs[2], np.prod(input_desc[2].dims) * itemsize, self)
-            input3_mem = cp.cuda.UnownedMemory(inputs[3], np.prod(input_desc[3].dims) * itemsize, self)
-            output_mem = cp.cuda.UnownedMemory(outputs[0], np.prod(output_desc[0].dims) * itemsize, self)
+            input0_mem = cp.cuda.UnownedMemory(
+                inputs[0], np.prod(input_desc[0].dims) * itemsize, self
+            )
+            input1_mem = cp.cuda.UnownedMemory(
+                inputs[1], np.prod(input_desc[1].dims) * itemsize, self
+            )
+            input2_mem = cp.cuda.UnownedMemory(
+                inputs[2], np.prod(input_desc[2].dims) * itemsize, self
+            )
+            input3_mem = cp.cuda.UnownedMemory(
+                inputs[3], np.prod(input_desc[3].dims) * itemsize, self
+            )
+            output_mem = cp.cuda.UnownedMemory(
+                outputs[0], np.prod(output_desc[0].dims) * itemsize, self
+            )
 
             input0_ptr = cp.cuda.MemoryPointer(input0_mem, 0)
             input1_ptr = cp.cuda.MemoryPointer(input1_mem, 0)
@@ -84,7 +116,9 @@ class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt
             input1_d = cp.ndarray(input_desc[1].dims, dtype=dtype, memptr=input1_ptr)
             input2_d = cp.ndarray(input_desc[2].dims, dtype=dtype, memptr=input2_ptr)
             input3_d = cp.ndarray(input_desc[3].dims, dtype=dtype, memptr=input3_ptr)
-            output_d = cp.ndarray((np.prod(output_desc[0].dims),), dtype=dtype, memptr=output_ptr)
+            output_d = cp.ndarray(
+                (np.prod(output_desc[0].dims),), dtype=dtype, memptr=output_ptr
+            )
 
             input0_t = torch.as_tensor(input0_d)
             input1_t = torch.as_tensor(input1_d)
@@ -97,7 +131,9 @@ class WarpPlugin(trt.IPluginV3, trt.IPluginV3OneCore, trt.IPluginV3OneBuild, trt
     def get_fields_to_serialize(self) -> trt.PluginFieldCollection_:
         return trt.PluginFieldCollection()
 
-    def on_shape_change(self, inp: list[trt.PluginTensorDesc], out: list[trt.PluginTensorDesc]) -> None:
+    def on_shape_change(
+        self, inp: list[trt.PluginTensorDesc], out: list[trt.PluginTensorDesc]
+    ) -> None:
         pass
 
     def set_tactic(self, tactic: int) -> None:
@@ -113,23 +149,40 @@ class WarpPluginCreator(trt.IPluginCreatorV3One):
         self.field_names = trt.PluginFieldCollection()
 
     def create_plugin(
-        self, name: str, field_collection: trt.PluginFieldCollection_, phase: trt.TensorRTPhase
+        self,
+        name: str,
+        field_collection: trt.PluginFieldCollection_,
+        phase: trt.TensorRTPhase,
     ) -> WarpPlugin:
         return WarpPlugin()
 
 
 @custom_op("vsrife::warp", mutates_args=())
 def warp_custom(
-    tenInput: torch.Tensor, tenFlow: torch.Tensor, tenFlow_div: torch.Tensor, backwarp_tenGrid: torch.Tensor
+    tenInput: torch.Tensor,
+    tenFlow: torch.Tensor,
+    tenFlow_div: torch.Tensor,
+    backwarp_tenGrid: torch.Tensor,
 ) -> torch.Tensor:
-    tenFlow = torch.cat([tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1)
+    tenFlow = torch.cat(
+        [tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1
+    )
     g = (backwarp_tenGrid + tenFlow).permute(0, 2, 3, 1)
-    return F.grid_sample(input=tenInput, grid=g, mode="bilinear", padding_mode="border", align_corners=True)
+    return F.grid_sample(
+        input=tenInput,
+        grid=g,
+        mode="bilinear",
+        padding_mode="border",
+        align_corners=True,
+    )
 
 
 @register_fake("vsrife::warp")
 def warp_fake(
-    tenInput: torch.Tensor, tenFlow: torch.Tensor, tenFlow_div: torch.Tensor, backwarp_tenGrid: torch.Tensor
+    tenInput: torch.Tensor,
+    tenFlow: torch.Tensor,
+    tenFlow_div: torch.Tensor,
+    backwarp_tenGrid: torch.Tensor,
 ) -> torch.Tensor:
     return tenInput
 
@@ -152,17 +205,24 @@ def ops_warp(
 ) -> Union[TRTTensor, Sequence[TRTTensor]]:
     creator = trt.get_plugin_registry().get_creator("WarpPlugin", version="1")
     field_collection = trt.PluginFieldCollection()
-    plugin = creator.create_plugin("WarpPlugin", field_collection=field_collection, phase=trt.TensorRTPhase.BUILD)
+    plugin = creator.create_plugin(
+        "WarpPlugin", field_collection=field_collection, phase=trt.TensorRTPhase.BUILD
+    )
     layer = ctx.net.add_plugin_v3(inputs=list(args), shape_inputs=[], plugin=plugin)
     set_layer_name(layer, target, name)
     return layer.get_output(0)
 
 
 def warp(
-    tenInput: torch.Tensor, tenFlow: torch.Tensor, tenFlow_div: torch.Tensor, backwarp_tenGrid: torch.Tensor
+    tenInput: torch.Tensor,
+    tenFlow: torch.Tensor,
+    tenFlow_div: torch.Tensor,
+    backwarp_tenGrid: torch.Tensor,
 ) -> torch.Tensor:
     dtype = tenInput.dtype
     tenInput = tenInput.to(torch.float)
     tenFlow = tenFlow.to(torch.float)
 
-    return torch.ops.vsrife.warp(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid).to(dtype)
+    return torch.ops.vsrife.warp(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid).to(
+        dtype
+    )

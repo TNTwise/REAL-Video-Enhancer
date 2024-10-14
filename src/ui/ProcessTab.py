@@ -99,9 +99,7 @@ class ProcessTab:
         # connect file select buttons
 
         self.parent.inputFileSelectButton.clicked.connect(self.parent.openInputFile)
-        self.parent.inputFileText.textChanged.connect(
-            self.parent.loadVideo
-        )
+        self.parent.inputFileText.textChanged.connect(self.parent.loadVideo)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
@@ -225,7 +223,9 @@ class ProcessTab:
         # discord rpc
         if self.settings["discord_rich_presence"] == "True":
             self.discordRPC = DiscordRPC()
-            self.discordRPC.start_discordRPC(method, os.path.basename(self.inputFile), backend)
+            self.discordRPC.start_discordRPC(
+                method, os.path.basename(self.inputFile), backend
+            )
 
         DownloadModel(
             modelFile=self.modelFile,
