@@ -6,13 +6,12 @@ import numpy as np
 
 try:
     from upscale_ncnn_py import UPSCALE
-
+    e
     method = "upscale_ncnn_py"
 except:
     import ncnn
 
     method = "ncnn_vulkan"
-
 
 class NCNNParam:
     """
@@ -77,13 +76,19 @@ class UpscaleNCNN:
         tilePad=10,
     ):
         # only import if necessary
-
+        self.pad_w = tilePad
+        self.pad_h = tilePad
         self.gpuid = gpuid
         self.modelPath = modelPath
         self.scale = scale
         self.tilesize = tilesize
         self.width = width
         self.height = height
+        self.tilewidth = width
+        self.tileheight = height
+        if tilesize != 0:
+            self.tilewidth = tilesize
+            self.tileheight = tilesize
         self.scale = scale
         self.threads = num_threads
         self.tilePad = tilePad
@@ -120,8 +125,8 @@ class UpscaleNCNN:
         return ncnn.Mat.from_pixels(
             npArray,
             ncnn.Mat.PixelType.PIXEL_BGR,
-            self.width,
-            self.height,
+            self.tilewidth,
+            self.tileheight,
         )
 
     def NormalizeImage(self, mat, norm_vals):
@@ -131,7 +136,7 @@ class UpscaleNCNN:
     def ClampNPArray(self, nparray: np.array) -> np.array:
         return nparray.clip(0, 255)
 
-    def procNCNNVk(self, imageChunk):
+    def procNCNNVk(self, imageChunk) -> np.ascontiguousarray:
         ex = self.net.create_extractor()
         frame = self.NCNNImageMatFromNP(imageChunk)
         # norm
@@ -142,62 +147,67 @@ class UpscaleNCNN:
 
         # norm
         self.NormalizeImage(mat=frame, norm_vals=[255.0, 255.0, 255.0])
-
-        frame = np.ascontiguousarray(frame)
+        frame = np.array(frame)
         frame = self.ClampNPArray(frame)
-        frame = frame.transpose(1, 2, 0)
-        return np.ascontiguousarray(frame, dtype=np.uint8)
+        return frame
 
     def Upscale(self, imageChunk):
         while self.net is None:
             sleep(1)
         if method == "ncnn_vulkan":
             if self.tilesize == 0:
-                return self.procNCNNVk(imageChunk)
+                return self.procNCNNVk(imageChunk).transpose(1, 2, 0)
             else:
                 npArray = (
                     np.frombuffer(imageChunk, dtype=np.uint8)
                     .reshape(self.height, self.width, 3)
                     .transpose(2, 0, 1)
-                )
-                return self.upscaleTiledImage(npArray)
+                )[np.newaxis, ...]
+                return self.renderTiledImage(npArray)
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
 
-    def upscaleTiledImage(self, img: np.array):
-        batch, channel, height, width = img.shape
-        output_shape = (batch, channel, height * self.scale, width * self.scale)
+    def renderTiledImage(
+        self,
+        img
+    ):
+        raise NotImplementedError("Tiling is not supported on this configuration!")
+        scale = self.scale
+        tile = self.tilesize
+        tile_pad = self.tilePad
 
-        # Start with a black image
+        batch, channel, height, width = img.shape
+        output_shape = (batch, channel, height * scale, width * scale)
+
+        # start with black image
         output = np.zeros(output_shape, dtype=img.dtype)
 
-        tiles_x = math.ceil(width / self.tilesize[0])
-        tiles_y = math.ceil(height / self.tilesize[1])
+        tiles_x = math.ceil(width / tile)
+        tiles_y = math.ceil(height / tile)
 
-        # Loop over all tiles
+        # loop over all tiles
         for y in range(tiles_y):
             for x in range(tiles_x):
-                # Extract tile from input image
-                ofs_x = x * self.tilesize[0]
-                ofs_y = y * self.tilesize[1]
+                # extract tile from input image
+                ofs_x = x * tile
+                ofs_y = y * tile
 
-                # Input tile area on total image
+                # input tile area on total image
                 input_start_x = ofs_x
-                input_end_x = min(ofs_x + self.tilesize[0], width)
+                input_end_x = min(ofs_x + tile, width)
                 input_start_y = ofs_y
-                input_end_y = min(ofs_y + self.tilesize[1], height)
+                input_end_y = min(ofs_y + tile, height)
 
-                # Input tile area on total image with padding
-                input_start_x_pad = max(input_start_x - self.tilePad, 0)
-                input_end_x_pad = min(input_end_x + self.tilePad, width)
-                input_start_y_pad = max(input_start_y - self.tilePad, 0)
-                input_end_y_pad = min(input_end_y + self.tilePad, height)
+                # input tile area on total image with padding
+                input_start_x_pad = max(input_start_x - tile_pad, 0)
+                input_end_x_pad = min(input_end_x + tile_pad, width)
+                input_start_y_pad = max(input_start_y - tile_pad, 0)
+                input_end_y_pad = min(input_end_y + tile_pad, height)
 
-                # Input tile dimensions
+                # input tile dimensions
                 input_tile_width = input_end_x - input_start_x
                 input_tile_height = input_end_y - input_start_y
 
-                # Extract the input tile with padding
                 input_tile = img[
                     :,
                     :,
@@ -205,35 +215,29 @@ class UpscaleNCNN:
                     input_start_x_pad:input_end_x_pad,
                 ]
 
-                # Pad the input tile
-                h, w = input_tile.shape[2:]
-                pad_h = max(0, self.tilePad - h)
-                pad_w = max(0, self.tilePad - w)
-                input_tile = np.pad(
-                    input_tile,
-                    ((0, 0), (0, 0), (pad_h, pad_h), (pad_w, pad_w)),
-                    mode="edge",
-                )
+                input_tile = np.pad(input_tile, 
+                           ((0, 0), (0, 0), (0, self.pad_h), (0, self.pad_w)), 
+                           mode='edge')
 
-                # Process tile using the model (assuming model is a function that can process numpy arrays)
-                output_tile = self.procNCNNVk(input_tile)
+                # process tile
+                output_tile = self.procNCNNVk(input_tile.squeeze(axis=0))[np.newaxis, ...]
+                print(output_tile.shape)
 
-                # Crop output tile to the expected size
-                output_tile = output_tile[:, :, : h * self.scale, : w * self.scale]
+                output_tile = output_tile[:, :, : h * scale, : w * scale]
 
-                # Output tile area on total image
-                output_start_x = input_start_x * self.scale
-                output_end_x = input_end_x * self.scale
-                output_start_y = input_start_y * self.scale
-                output_end_y = input_end_y * self.scale
+                # output tile area on total image
+                output_start_x = input_start_x * scale
+                output_end_x = input_end_x * scale
+                output_start_y = input_start_y * scale
+                output_end_y = input_end_y * scale
 
-                # Output tile area without padding
-                output_start_x_tile = (input_start_x - input_start_x_pad) * self.scale
-                output_end_x_tile = output_start_x_tile + input_tile_width * self.scale
-                output_start_y_tile = (input_start_y - input_start_y_pad) * self.scale
-                output_end_y_tile = output_start_y_tile + input_tile_height * self.scale
+                # output tile area without padding
+                output_start_x_tile = (input_start_x - input_start_x_pad) * scale
+                output_end_x_tile = output_start_x_tile + input_tile_width * scale
+                output_start_y_tile = (input_start_y - input_start_y_pad) * scale
+                output_end_y_tile = output_start_y_tile + input_tile_height * scale
 
-                # Put tile into output image
+                # put tile into output image
                 output[
                     :, :, output_start_y:output_end_y, output_start_x:output_end_x
                 ] = output_tile[
@@ -244,3 +248,4 @@ class UpscaleNCNN:
                 ]
 
         return output
+        
