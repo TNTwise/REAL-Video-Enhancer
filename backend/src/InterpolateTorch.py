@@ -263,57 +263,29 @@ class InterpolateRifeTorch:
                     (1, 3, self.ph, self.pw), dtype=self.dtype, device=self.device
                 ),
             ]
-            self.normInput = [
-                torch.zeros(
-                    (1 * 3 * self.height * self.width),
-                    dtype=self.dtype,
-                    device=self.device,
-                ),
-            ]
-            # if 4.6 v1
-            if self.v1:
-                self.tenFlow_div = torch.tensor(
-                    [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
-                    dtype=self.dtype,
-                    device=self.device,
+            
+            self.tenFlow_div = torch.tensor(
+                [(self.pw - 1.0) / 2.0, (self.ph - 1.0) / 2.0],
+                dtype=torch.float32,
+                device=self.device,
+            )
+            tenHorizontal = (
+                torch.linspace(
+                    -1.0, 1.0, self.pw, dtype=torch.float32, device=self.device
                 )
-                tenHorizontal = (
-                    torch.linspace(
-                        -1.0, 1.0, self.pw, dtype=self.dtype, device=self.device
-                    )
-                    .view(1, 1, 1, self.pw)
-                    .expand(-1, -1, self.ph, -1)
-                ).to(dtype=self.dtype, device=self.device)
-                tenVertical = (
-                    torch.linspace(
-                        -1.0, 1.0, self.ph, dtype=self.dtype, device=self.device
-                    )
-                    .view(1, 1, self.ph, 1)
-                    .expand(-1, -1, -1, self.pw)
-                ).to(dtype=self.dtype, device=self.device)
-                self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
-
-            else:
-                # if v2
-                h_mul = 2 / (self.pw - 1)
-                v_mul = 2 / (self.ph - 1)
-                self.tenFlow_div = (
-                    torch.Tensor([h_mul, v_mul])
-                    .to(device=self.device, dtype=self.dtype)
-                    .reshape(1, 2, 1, 1)
+                .view(1, 1, 1, self.pw)
+                .expand(-1, -1, self.ph, -1)
+            ).to(dtype=torch.float32, device=self.device)
+            tenVertical = (
+                torch.linspace(
+                    -1.0, 1.0, self.ph, dtype=torch.float32, device=self.device
                 )
+                .view(1, 1, self.ph, 1)
+                .expand(-1, -1, -1, self.pw)
+            ).to(dtype=torch.float32, device=self.device)
+            self.backwarp_tenGrid = torch.cat([tenHorizontal, tenVertical], 1)
 
-                self.backwarp_tenGrid = torch.cat(
-                    (
-                        (torch.arange(self.pw) * h_mul - 1)
-                        .reshape(1, 1, 1, -1)
-                        .expand(-1, -1, self.ph, -1),
-                        (torch.arange(self.ph) * v_mul - 1)
-                        .reshape(1, 1, -1, 1)
-                        .expand(-1, -1, -1, self.pw),
-                    ),
-                    dim=1,
-                ).to(device=self.device, dtype=self.dtype)
+       
 
             self.flownet = IFNet(
                 scale=self.scale,
