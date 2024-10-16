@@ -210,7 +210,6 @@ class IFNet(nn.Module):
             (warped_img0 * mask + warped_img1 * (1 - mask))[
                 :, :, : self.height, : self.width
             ][0]
-            .float()
             .permute(1, 2, 0)
             .mul(255)
         )
