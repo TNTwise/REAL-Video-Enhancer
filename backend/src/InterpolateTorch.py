@@ -456,7 +456,12 @@ class InterpolateRifeTorch:
         while self.flownet is None:
             sleep(1)
         with torch.cuda.stream(self.stream):
-            timestep = self.timestepDict[timestep]
+            timestep = torch.full(
+                    (1, 1, self.ph, self.pw),
+                    timestep,
+                    dtype=self.dtype,
+                    device=self.device,
+                ).to(non_blocking=True)
             if not self.rife46:
                 output = self.flownet(img0, img1, timestep, f0encode, f1encode)
             else:
@@ -477,10 +482,9 @@ class InterpolateRifeTorch:
     def encode_Frame(self, frame: torch.Tensor):
         while self.encode is None:
             sleep(1)
-        if not self.rife46:
-            with torch.cuda.stream(self.prepareStream):
-                frame = self.encode(frame[:, :3])
-            self.prepareStream.synchronize()
+        with torch.cuda.stream(self.prepareStream):
+            frame = self.encode(frame[:, :3])
+        self.prepareStream.synchronize()
         return frame
 
     @torch.inference_mode()

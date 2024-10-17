@@ -229,7 +229,6 @@ class IFNet(nn.Module):
             (warped_img0 * mask + warped_img1 * (1 - mask))[  # maybe try padding here
                 :, :, : self.height, : self.width
             ][0]
-            .squeeze(0)
             .permute(1, 2, 0)
             .mul(255)
         )

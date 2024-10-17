@@ -6,7 +6,6 @@ import numpy as np
 
 try:
     from upscale_ncnn_py import UPSCALE
-    e
     method = "upscale_ncnn_py"
 except:
     import ncnn
