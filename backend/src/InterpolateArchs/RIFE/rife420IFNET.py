@@ -136,8 +136,6 @@ class IFNet(nn.Module):
         device="cuda",
         width=1920,
         height=1080,
-        backwarp_tenGrid=None,
-        tenFlow_div=None,
         rife_trt_mode="accurate",
     ):
         super(IFNet, self).__init__()
@@ -152,11 +150,7 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.width = width
         self.height = height
-        self.backWarp = backwarp_tenGrid
-        self.tenFlow = tenFlow_div
 
-        self.paddedHeight = backwarp_tenGrid.shape[2]
-        self.paddedWidth = backwarp_tenGrid.shape[3]
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
         if rife_trt_mode == "fast":
@@ -170,7 +164,7 @@ class IFNet(nn.Module):
             raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
         self.warp = warp
 
-    def forward(self, img0, img1, timestep, f0, f1):
+    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid, f0, f1):
         warped_img0 = img0
         warped_img1 = img1
         flow = None

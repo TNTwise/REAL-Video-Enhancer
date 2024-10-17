@@ -6,11 +6,13 @@ import numpy as np
 
 try:
     from upscale_ncnn_py import UPSCALE
+
     method = "upscale_ncnn_py"
 except:
     import ncnn
 
     method = "ncnn_vulkan"
+
 
 class NCNNParam:
     """
@@ -166,10 +168,7 @@ class UpscaleNCNN:
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
 
-    def renderTiledImage(
-        self,
-        img
-    ):
+    def renderTiledImage(self, img):
         raise NotImplementedError("Tiling is not supported on this configuration!")
         scale = self.scale
         tile = self.tilesize
@@ -214,12 +213,16 @@ class UpscaleNCNN:
                     input_start_x_pad:input_end_x_pad,
                 ]
 
-                input_tile = np.pad(input_tile, 
-                           ((0, 0), (0, 0), (0, self.pad_h), (0, self.pad_w)), 
-                           mode='edge')
+                input_tile = np.pad(
+                    input_tile,
+                    ((0, 0), (0, 0), (0, self.pad_h), (0, self.pad_w)),
+                    mode="edge",
+                )
 
                 # process tile
-                output_tile = self.procNCNNVk(input_tile.squeeze(axis=0))[np.newaxis, ...]
+                output_tile = self.procNCNNVk(input_tile.squeeze(axis=0))[
+                    np.newaxis, ...
+                ]
                 print(output_tile.shape)
 
                 output_tile = output_tile[:, :, : h * scale, : w * scale]
@@ -247,4 +250,3 @@ class UpscaleNCNN:
                 ]
 
         return output
-        

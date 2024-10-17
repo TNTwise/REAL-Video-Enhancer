@@ -133,27 +133,31 @@ class VSSCDetect:
         # Assuming frames are numpy arrays
         return np.mean(np.abs(frame1.astype(float) - frame2.astype(float)))
 
+
 class NPMeanDiffSCDetect:
     def __init__(self, sensitivity=2):
-        self.sensativity = sensitivity * 10 # multiply by 10 for more representative results
+        self.sensativity = (
+            sensitivity * 10
+        )  # multiply by 10 for more representative results
         self.i0 = None
         self.i1 = None
-        
-    def sceneDetect(self,img1):
+
+    def sceneDetect(self, img1):
         if self.i0 is None:
             self.i0 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
             return
-        
+
         self.i1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
         frame_diff = cv2.absdiff(self.i1, self.i0)
-        
+
         mean_diff = np.mean(frame_diff)
         if mean_diff > self.sensativity:
             self.i0 = self.i1
             return True
         self.i0 = self.i1
         return False
-    
+
+
 class FFMPEGSceneDetect:
     def __init__(self, threshold=0.3, min_scene_length=15, history_size=30):
         self.threshold = threshold
@@ -168,15 +172,15 @@ class FFMPEGSceneDetect:
         # Convert to YUV color space
         yuv1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2YUV)
         yuv2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2YUV)
-        
+
         # Compute difference in Y (luminance) channel
-        diff_y = cv2.absdiff(yuv1[:,:,0], yuv2[:,:,0])
-        
+        diff_y = cv2.absdiff(yuv1[:, :, 0], yuv2[:, :, 0])
+
         # Compute histogram difference
         hist1 = cv2.calcHist([yuv1], [0], None, [256], [0, 256])
         hist2 = cv2.calcHist([yuv2], [0], None, [256], [0, 256])
         hist_diff = cv2.compareHist(hist1, hist2, cv2.HISTCMP_BHATTACHARYYA)
-        
+
         return np.mean(diff_y), hist_diff
 
     def sceneDetect(self, frame):
@@ -196,20 +200,28 @@ class FFMPEGSceneDetect:
 
         # Combine frame and histogram differences
         combined_diff = np.array(self.frame_diffs) * np.array(self.hist_diffs)
-        
+
         # Normalize the differences
-        normalized_diff = (combined_diff - np.min(combined_diff)) / (np.max(combined_diff) - np.min(combined_diff))
-        
+        normalized_diff = (combined_diff - np.min(combined_diff)) / (
+            np.max(combined_diff) - np.min(combined_diff)
+        )
+
         # Apply moving average filter
         window_size = 5
-        smoothed_diff = np.convolve(normalized_diff, np.ones(window_size)/window_size, mode='valid')
+        smoothed_diff = np.convolve(
+            normalized_diff, np.ones(window_size) / window_size, mode="valid"
+        )
 
         # Check if the latest smoothed difference exceeds the threshold
-        if smoothed_diff[-1] > self.threshold and self.frames_since_last_scene >= self.min_scene_length:
+        if (
+            smoothed_diff[-1] > self.threshold
+            and self.frames_since_last_scene >= self.min_scene_length
+        ):
             self.frames_since_last_scene = 0
             return True
 
         return False
+
 
 class SceneDetect:
     """
@@ -238,10 +250,13 @@ class SceneDetect:
                 sensitivity=sceneChangeSensitivity, segments=4
             )
         elif sceneChangeMethod == "ffmpeg":
-            self.detector = FFMPEGSceneDetect(threshold=sceneChangeSensitivity/10, min_scene_length=15, history_size=30)
+            self.detector = FFMPEGSceneDetect(
+                threshold=sceneChangeSensitivity / 10,
+                min_scene_length=15,
+                history_size=30,
+            )
         else:
             raise ValueError("Invalid scene change method")
-        
 
     def detect(self, frame):
         frame = bytesToImg(frame, width=self.width, height=self.height)

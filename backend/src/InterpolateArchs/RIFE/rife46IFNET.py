@@ -99,8 +99,6 @@ class IFNet(nn.Module):
         device="cuda",
         width=1920,
         height=1080,
-        backwarp_tenGrid=None,
-        tenFlow_div=None,
         rife_trt_mode="fast",
     ):
         super(IFNet, self).__init__()
@@ -114,8 +112,6 @@ class IFNet(nn.Module):
         self.device = device
         self.width = width
         self.height = height
-        self.backwarp_tenGrid = backwarp_tenGrid
-        self.tenFlow_div = tenFlow_div
         self.block = [self.block0, self.block1, self.block2, self.block3]
         if rife_trt_mode == "fast":
             from .warplayer import warp
@@ -128,7 +124,7 @@ class IFNet(nn.Module):
             raise ValueError("rife_trt_mode must be 'fast' or 'accurate'")
         self.warp = warp
 
-    def forward(self, img0, img1, timestep):
+    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid):
         warped_img0 = img0
         warped_img1 = img1
         flow = None
@@ -175,10 +171,10 @@ class IFNet(nn.Module):
                 mask = mask + m0
             latest_mask = mask
             warped_img0 = self.warp(
-                img0, flow[:, :2], self.tenFlow_div, self.backwarp_tenGrid
+                img0, flow[:, :2], tenFlow_div, backwarp_tenGrid
             )
             warped_img1 = self.warp(
-                img1, flow[:, 2:4], self.tenFlow_div, self.backwarp_tenGrid
+                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
             )
 
         temp = torch.sigmoid(latest_mask)
