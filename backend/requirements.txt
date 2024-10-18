@@ -9,6 +9,7 @@ mpmath
 pillow
 numpy<=1.26.4
 
+cupy
 ncnn
 upscale_ncnn_py
 rife-ncnn-vulkan-python-tntwise
