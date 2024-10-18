@@ -5,12 +5,6 @@ import math
 
 from torch.nn.functional import interpolate
 
-try:
-    from .custom_warplayer import warp
-except:
-    from .warplayer import warp
-
-
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
