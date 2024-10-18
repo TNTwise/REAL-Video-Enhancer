@@ -19,6 +19,6 @@ tensorrt_cu12==10.3.0
 tensorrt-cu12_libs==10.3.0
 tensorrt_cu12_bindings==10.3.0
 
-torch==2.5.0.dev20240909+cu124
-torchvision==0.20.0.dev20240909+cu124
-torch_tensorrt==2.5.0.dev20240909+cu124
+torch==2.5.0
+torchvision==0.20.0
+torch_tensorrt==2.5.0
