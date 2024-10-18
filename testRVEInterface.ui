@@ -1800,6 +1800,168 @@ QDoubleSpinBox::down-button {
                       </widget>
                      </item>
                      <item>
+                      <widget class="QWidget" name="sceneChangeDetectionSettingContainer" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_17">
+                        <property name="spacing">
+                         <number>10</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="label_20">
+                          <property name="font">
+                           <font>
+                            <pointsize>12</pointsize>
+                           </font>
+                          </property>
+                          <property name="text">
+                           <string>Scene Change Detection Enabled</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_3">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>40</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_24">
+                          <property name="maximumSize">
+                           <size>
+                            <width>25</width>
+                            <height>25</height>
+                           </size>
+                          </property>
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scene Change Detection:&lt;/p&gt;&lt;p&gt; - Enabled: Attempts to detect when scenes change in a video. When running an interpolation, it will avoide interpolating over these scene changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                          <property name="text">
+                           <string/>
+                          </property>
+                          <property name="pixmap">
+                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                          </property>
+                          <property name="scaledContents">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QCheckBox" name="scene_change_detection_enabled">
+                          <property name="text">
+                           <string/>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QWidget" name="widget_12" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_27">
+                        <property name="spacing">
+                         <number>10</number>
+                        </property>
+                        <property name="leftMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                         <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                         <number>0</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="label_37">
+                          <property name="font">
+                           <font>
+                            <pointsize>12</pointsize>
+                           </font>
+                          </property>
+                          <property name="text">
+                           <string>Scene Change Detection Method</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="horizontalSpacer_13">
+                          <property name="orientation">
+                           <enum>Qt::Orientation::Horizontal</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>305</width>
+                            <height>20</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                        <item>
+                         <widget class="QLabel" name="label_38">
+                          <property name="maximumSize">
+                           <size>
+                            <width>25</width>
+                            <height>25</height>
+                           </size>
+                          </property>
+                          <property name="toolTip">
+                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scene detection methods:&lt;/p&gt;&lt;p&gt; - mean: fastest, least accurate&lt;/p&gt;&lt;p&gt; - mean (segmented): fast, prone to overdetection&lt;/p&gt;&lt;p&gt; - ffmpeg: slow, accuate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                          </property>
+                          <property name="text">
+                           <string/>
+                          </property>
+                          <property name="pixmap">
+                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                          </property>
+                          <property name="scaledContents">
+                           <bool>true</bool>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="comboBox">
+                          <item>
+                           <property name="text">
+                            <string>ffmpeg</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>mean</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>mean_segmented</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item>
                       <widget class="QWidget" name="widget_7" native="true">
                        <layout class="QHBoxLayout" name="horizontalLayout_14">
                         <property name="spacing">
@@ -1874,81 +2036,6 @@ QDoubleSpinBox::down-button {
                           </property>
                           <property name="maximum">
                            <double>10.000000000000000</double>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="sceneChangeDetectionSettingContainer" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_17">
-                        <property name="spacing">
-                         <number>10</number>
-                        </property>
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QLabel" name="label_20">
-                          <property name="font">
-                           <font>
-                            <pointsize>12</pointsize>
-                           </font>
-                          </property>
-                          <property name="text">
-                           <string>Scene Change Detection Enabled</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer_3">
-                          <property name="orientation">
-                           <enum>Qt::Orientation::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_24">
-                          <property name="maximumSize">
-                           <size>
-                            <width>25</width>
-                            <height>25</height>
-                           </size>
-                          </property>
-                          <property name="toolTip">
-                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Scene Change Detection:&lt;/p&gt;&lt;p&gt; - Enabled: Attempts to detect when scenes change in a video. When running an interpolation, it will avoide interpolating over these scene changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="pixmap">
-                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                          </property>
-                          <property name="scaledContents">
-                           <bool>true</bool>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QCheckBox" name="scene_change_detection_enabled">
-                          <property name="text">
-                           <string/>
                           </property>
                          </widget>
                         </item>
@@ -2460,7 +2547,7 @@ background-color:white;
                     </font>
                    </property>
                    <property name="text">
-                    <string>Import Custom Upscale Model</string>
+                    <string>Import Custom Upscale Model (Not Available Yet!)</string>
                    </property>
                   </widget>
                  </item>
@@ -2484,6 +2571,9 @@ background-color:white;
                   <layout class="QGridLayout" name="gridLayout_10">
                    <item row="1" column="0">
                     <widget class="QPushButton" name="selectNCNNCustomModel">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
                      <property name="text">
                       <string>Select Model (NCNN/.bin+.param)</string>
                      </property>
@@ -2491,6 +2581,9 @@ background-color:white;
                    </item>
                    <item row="0" column="0">
                     <widget class="QPushButton" name="selectPytorchCustomModel">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
                      <property name="text">
                       <string>Select Model (PyTorch/TensorRT/.pth)</string>
                      </property>

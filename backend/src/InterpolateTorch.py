@@ -135,7 +135,7 @@ class InterpolateRifeTorch:
         self.img0 = None
         self.f0encode = None
         self.rife46 = False
-        self.trt_debug = trt_debug
+        self.trt_debug = True # cool little progressbar
         self.v1 = rifeVersion == "v1"
         self.rife_trt_mode = rife_trt_mode
         self.trt_static_shape = trt_static_shape
@@ -476,7 +476,7 @@ class InterpolateRifeTorch:
                             tuple(encodedInput),
                             device=self.device,
                             enabled_precisions={self.dtype},
-                            debug=True,
+                            debug=self.trt_debug,
                             num_avg_timing_iters=4,
                             workspace_size=self.trt_workspace_size,
                             min_block_size=1,
