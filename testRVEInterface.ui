@@ -350,7 +350,7 @@ QDoubleSpinBox::down-button {
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>378</width>
+                      <width>367</width>
                       <height>426</height>
                      </rect>
                     </property>
@@ -1940,7 +1940,7 @@ QDoubleSpinBox::down-button {
                          </widget>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="comboBox">
+                         <widget class="QComboBox" name="scene_change_detection_method">
                           <item>
                            <property name="text">
                             <string>ffmpeg</string>
@@ -2027,7 +2027,7 @@ QDoubleSpinBox::down-button {
                          </widget>
                         </item>
                         <item>
-                         <widget class="QDoubleSpinBox" name="scene_detection_threshold">
+                         <widget class="QDoubleSpinBox" name="scene_change_detection_threshold">
                           <property name="decimals">
                            <number>1</number>
                           </property>

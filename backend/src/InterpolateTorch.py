@@ -304,205 +304,208 @@ class InterpolateRifeTorch:
                 trt_engine_path = base_trt_engine_path + ".dyn"
                 encode_trt_engine_path = base_trt_engine_path + "_encode.dyn"
                 # lay out inputs
-                exampleInputs = [
-                    torch.zeros(
-                        [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
-                    ),
-                    torch.zeros(
-                        [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
-                    ),
-                    torch.zeros(
-                        [1, 1, self.ph, self.pw], dtype=self.dtype, device=self.device
-                    ),
-                    torch.zeros([2], dtype=torch.float, device=self.device),
-                    torch.zeros(
-                        [1, 2, self.ph, self.pw], dtype=torch.float, device=self.device
-                    ),
-                ]
-                if self.trt_static_shape:
-                    dynamic_shapes = None
-
-                    inputs = [
-                        torch_tensorrt.Input(
-                            shape=[1, 3, self.ph, self.pw], dtype=self.dtype
-                        ),
-                        torch_tensorrt.Input(
-                            shape=[1, 3, self.ph, self.pw], dtype=self.dtype
-                        ),
-                        torch_tensorrt.Input(
-                            shape=[1, 1, self.ph, self.pw], dtype=self.dtype
-                        ),
-                        torch_tensorrt.Input(shape=[2], dtype=torch.float),
-                        torch_tensorrt.Input(
-                            shape=[1, 2, self.ph, self.pw], dtype=torch.float
-                        ),
-                    ]
-                else:
-                    self.trt_min_shape.reverse()
-                    self.trt_opt_shape.reverse()
-                    self.trt_max_shape.reverse()
-
-                    _height = torch.export.Dim(
-                        "height",
-                        min=self.trt_min_shape[0] // tmp,
-                        max=self.trt_max_shape[0] // tmp,
-                    )
-                    _width = torch.export.Dim(
-                        "width",
-                        min=self.trt_min_shape[1] // tmp,
-                        max=self.trt_max_shape[1] // tmp,
-                    )
-                    dim_height = _height * tmp
-                    dim_width = _width * tmp
-                    dynamic_shapes = {
-                        "img0": {2: dim_height, 3: dim_width},
-                        "img1": {2: dim_height, 3: dim_width},
-                        "timestep": {2: dim_height, 3: dim_width},
-                        "tenFlow_div": {},
-                        "backwarp_tenGrid": {2: dim_height, 3: dim_width},
-                    }
-
-                    inputs = [
-                        torch_tensorrt.Input(
-                            min_shape=[1, 3] + self.trt_min_shape,
-                            opt_shape=[1, 3] + self.trt_opt_shape,
-                            max_shape=[1, 3] + self.trt_max_shape,
-                            dtype=self.dtype,
-                            name="img0",
-                        ),
-                        torch_tensorrt.Input(
-                            min_shape=[1, 3] + self.trt_min_shape,
-                            opt_shape=[1, 3] + self.trt_opt_shape,
-                            max_shape=[1, 3] + self.trt_max_shape,
-                            dtype=self.dtype,
-                            name="img1",
-                        ),
-                        torch_tensorrt.Input(
-                            min_shape=[1, 1] + self.trt_min_shape,
-                            opt_shape=[1, 1] + self.trt_opt_shape,
-                            max_shape=[1, 1] + self.trt_max_shape,
-                            dtype=self.dtype,
-                            name="timestep",
-                        ),
-                        torch_tensorrt.Input(
-                            shape=[2],
-                            dtype=torch.float,
-                            name="tenFlow_div",
-                        ),
-                        torch_tensorrt.Input(
-                            min_shape=[1, 2] + self.trt_min_shape,
-                            opt_shape=[1, 2] + self.trt_opt_shape,
-                            max_shape=[1, 2] + self.trt_max_shape,
-                            dtype=torch.float,
-                            name="backwarp_tenGrid",
-                        ),
-                    ]
-                # load encode engine
-                if not self.rife46:
-                    exampleInputs+=[
-                        torch.zeros(
-                            (1, num_ch_for_encode, self.ph, self.pw),
-                            dtype=self.dtype,
-                            device=self.device,
-                        ),
-                        torch.zeros(
-                            (1, num_ch_for_encode, self.ph, self.pw),
-                            dtype=self.dtype,
-                            device=self.device,
-                        ),
-                    ]
-                    if self.trt_static_shape:
-                        inputs+=[
-                            torch_tensorrt.Input(
-                                shape=[1, 1, self.ph, self.pw], dtype=self.dtype
-                            ),
-                            torch_tensorrt.Input(
-                                shape=[1, 1, self.ph, self.pw], dtype=self.dtype
-                            ),
-                        ]
-                    else:
-                        if not self.trt_static_shape:
-                            dynamic_shapes["f0"] = {2: dim_height, 3: dim_width}
-                            dynamic_shapes["f1"] = {2: dim_height, 3: dim_width}
-                        inputs+=[
-                            torch_tensorrt.Input(
-                                min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
-                                opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
-                                max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
-                                dtype=self.dtype,
-                                name="f0",
-                            ),
-                            torch_tensorrt.Input(
-                                min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
-                                opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
-                                max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
-                                dtype=self.dtype,
-                                name="f1",
-                            ),]
-
-                    encodedExampleInputs = [
-                        torch.zeros(
-                            (1, 3, self.ph, self.pw),
-                            dtype=self.dtype,
-                            device=self.device,
-                        ),
-                    ]
-                    encodedInput = [
-                        torch_tensorrt.Input(
-                            min_shape=[1, 3] + self.trt_min_shape,
-                            opt_shape=[1, 3] + self.trt_opt_shape,
-                            max_shape=[1, 3] + self.trt_max_shape,
-                            dtype=self.dtype,
-                            name="x",
-                        ),
-                    ]
-
-                    if not os.path.isfile(encode_trt_engine_path):
-                        printAndLog(
-                            "Building TensorRT engine {}".format(trt_engine_path)
-                        )
-                        if self.trt_static_shape:
-                            dynamic_encode_shapes = None
-                        else:
-                            dynamic_encode_shapes = {
-                            "x": {2: dim_height, 3: dim_width},
-                            }
-                        exported_encode_program = torch.export.export(
-                            self.encode, tuple(encodedExampleInputs), dynamic_shapes=dynamic_encode_shapes
-                        )
-                        
-                        self.encode = torch_tensorrt.dynamo.compile(
-                            exported_encode_program,
-                            tuple(encodedInput),
-                            device=self.device,
-                            enabled_precisions={self.dtype},
-                            debug=self.trt_debug,
-                            num_avg_timing_iters=4,
-                            workspace_size=self.trt_workspace_size,
-                            min_block_size=1,
-                            max_aux_streams=self.trt_max_aux_streams,
-                            optimization_level=self.trt_optimization_level,
-                        )
-                        printAndLog(
-                            f"Saving TensorRT engine to {encode_trt_engine_path}"
-                        )
-                        torch_tensorrt.save(
-                            self.encode,
-                            encode_trt_engine_path,
-                            output_format="torchscript",
-                            inputs=tuple(encodedExampleInputs),
-                        )
-                        
-                    printAndLog(
-                        f"Loading TensorRT engine from {encode_trt_engine_path}"
-                    )
-                    self.encode = torch.jit.load(encode_trt_engine_path).eval()
+                
 
                 # load flow engine
                 if not os.path.isfile(trt_engine_path):
-                    exported_program = torch.export.export(
-                        self.flownet, tuple(exampleInputs), dynamic_shapes=dynamic_shapes
-                    )
+                    exampleInputs = [
+                        torch.zeros(
+                            [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
+                        ),
+                        torch.zeros(
+                            [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
+                        ),
+                        torch.zeros(
+                            [1, 1, self.ph, self.pw], dtype=self.dtype, device=self.device
+                        ),
+                        torch.zeros([2], dtype=torch.float, device=self.device),
+                        torch.zeros(
+                            [1, 2, self.ph, self.pw], dtype=torch.float, device=self.device
+                        ),
+                    ]
+                    if self.trt_static_shape:
+                        dynamic_shapes = None
+
+                        inputs = [
+                            torch_tensorrt.Input(
+                                shape=[1, 3, self.ph, self.pw], dtype=self.dtype
+                            ),
+                            torch_tensorrt.Input(
+                                shape=[1, 3, self.ph, self.pw], dtype=self.dtype
+                            ),
+                            torch_tensorrt.Input(
+                                shape=[1, 1, self.ph, self.pw], dtype=self.dtype
+                            ),
+                            torch_tensorrt.Input(shape=[2], dtype=torch.float),
+                            torch_tensorrt.Input(
+                                shape=[1, 2, self.ph, self.pw], dtype=torch.float
+                            ),
+                        ]
+                    else:
+                        self.trt_min_shape.reverse()
+                        self.trt_opt_shape.reverse()
+                        self.trt_max_shape.reverse()
+
+                        _height = torch.export.Dim(
+                            "height",
+                            min=self.trt_min_shape[0] // tmp,
+                            max=self.trt_max_shape[0] // tmp,
+                        )
+                        _width = torch.export.Dim(
+                            "width",
+                            min=self.trt_min_shape[1] // tmp,
+                            max=self.trt_max_shape[1] // tmp,
+                        )
+                        dim_height = _height * tmp
+                        dim_width = _width * tmp
+                        dynamic_shapes = {
+                            "img0": {2: dim_height, 3: dim_width},
+                            "img1": {2: dim_height, 3: dim_width},
+                            "timestep": {2: dim_height, 3: dim_width},
+                            "tenFlow_div": {},
+                            "backwarp_tenGrid": {2: dim_height, 3: dim_width},
+                        }
+
+                        inputs = [
+                            torch_tensorrt.Input(
+                                min_shape=[1, 3] + self.trt_min_shape,
+                                opt_shape=[1, 3] + self.trt_opt_shape,
+                                max_shape=[1, 3] + self.trt_max_shape,
+                                dtype=self.dtype,
+                                name="img0",
+                            ),
+                            torch_tensorrt.Input(
+                                min_shape=[1, 3] + self.trt_min_shape,
+                                opt_shape=[1, 3] + self.trt_opt_shape,
+                                max_shape=[1, 3] + self.trt_max_shape,
+                                dtype=self.dtype,
+                                name="img1",
+                            ),
+                            torch_tensorrt.Input(
+                                min_shape=[1, 1] + self.trt_min_shape,
+                                opt_shape=[1, 1] + self.trt_opt_shape,
+                                max_shape=[1, 1] + self.trt_max_shape,
+                                dtype=self.dtype,
+                                name="timestep",
+                            ),
+                            torch_tensorrt.Input(
+                                shape=[2],
+                                dtype=torch.float,
+                                name="tenFlow_div",
+                            ),
+                            torch_tensorrt.Input(
+                                min_shape=[1, 2] + self.trt_min_shape,
+                                opt_shape=[1, 2] + self.trt_opt_shape,
+                                max_shape=[1, 2] + self.trt_max_shape,
+                                dtype=torch.float,
+                                name="backwarp_tenGrid",
+                            ),
+                        ]
+                    # load encode engine
+                    if not self.rife46:
+                        exampleInputs+=[
+                            torch.zeros(
+                                (1, num_ch_for_encode, self.ph, self.pw),
+                                dtype=self.dtype,
+                                device=self.device,
+                            ),
+                            torch.zeros(
+                                (1, num_ch_for_encode, self.ph, self.pw),
+                                dtype=self.dtype,
+                                device=self.device,
+                            ),
+                        ]
+                        if self.trt_static_shape:
+                            inputs+=[
+                                torch_tensorrt.Input(
+                                    shape=[1, 1, self.ph, self.pw], dtype=self.dtype
+                                ),
+                                torch_tensorrt.Input(
+                                    shape=[1, 1, self.ph, self.pw], dtype=self.dtype
+                                ),
+                            ]
+                        else:
+                            if not self.trt_static_shape:
+                                dynamic_shapes["f0"] = {2: dim_height, 3: dim_width}
+                                dynamic_shapes["f1"] = {2: dim_height, 3: dim_width}
+                            inputs+=[
+                                torch_tensorrt.Input(
+                                    min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
+                                    opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
+                                    max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
+                                    dtype=self.dtype,
+                                    name="f0",
+                                ),
+                                torch_tensorrt.Input(
+                                    min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
+                                    opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
+                                    max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
+                                    dtype=self.dtype,
+                                    name="f1",
+                                ),]
+
+                        encodedExampleInputs = [
+                            torch.zeros(
+                                (1, 3, self.ph, self.pw),
+                                dtype=self.dtype,
+                                device=self.device,
+                            ),
+                        ]
+                        encodedInput = [
+                            torch_tensorrt.Input(
+                                min_shape=[1, 3] + self.trt_min_shape,
+                                opt_shape=[1, 3] + self.trt_opt_shape,
+                                max_shape=[1, 3] + self.trt_max_shape,
+                                dtype=self.dtype,
+                                name="x",
+                            ),
+                        ]
+
+                        if not os.path.isfile(encode_trt_engine_path):
+                            printAndLog(
+                                "Building TensorRT engine {}".format(trt_engine_path)
+                            )
+                            if self.trt_static_shape:
+                                dynamic_encode_shapes = None
+                            else:
+                                dynamic_encode_shapes = {
+                                "x": {2: dim_height, 3: dim_width},
+                                }
+                            exported_encode_program = torch.export.export(
+                                self.encode, tuple(encodedExampleInputs), dynamic_shapes=dynamic_encode_shapes
+                            )
+                            
+                            self.encode = torch_tensorrt.dynamo.compile(
+                                exported_encode_program,
+                                tuple(encodedInput),
+                                device=self.device,
+                                enabled_precisions={self.dtype},
+                                debug=self.trt_debug,
+                                num_avg_timing_iters=4,
+                                workspace_size=self.trt_workspace_size,
+                                min_block_size=1,
+                                max_aux_streams=self.trt_max_aux_streams,
+                                optimization_level=self.trt_optimization_level,
+                            )
+                            printAndLog(
+                                f"Saving TensorRT engine to {encode_trt_engine_path}"
+                            )
+                            torch_tensorrt.save(
+                                self.encode,
+                                encode_trt_engine_path,
+                                output_format="torchscript",
+                                inputs=tuple(encodedExampleInputs),
+                            )
+                            
+                        printAndLog(
+                            f"Loading TensorRT engine from {encode_trt_engine_path}"
+                        )
+                        self.encode = torch.jit.load(encode_trt_engine_path).eval()
+                        exported_program = torch.export.export(
+                            self.flownet, tuple(exampleInputs), dynamic_shapes=dynamic_shapes
+                        )
+                    
+                    # build flow engine
                     printAndLog("Building TensorRT engine {}".format(trt_engine_path))
 
                     self.flownet = torch_tensorrt.dynamo.compile(

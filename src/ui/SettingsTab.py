@@ -84,10 +84,16 @@ class SettingsTab:
                 "True" if self.parent.discord_rich_presence.isChecked() else "False",
             )
         )
-        self.parent.scene_detection_threshold.valueChanged.connect(
+        self.parent.scene_change_detection_method.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
-                "scene_detection_threshold",
-                str(self.parent.scene_detection_threshold.value()),
+                "scene_change_detection_method",
+                self.parent.scene_change_detection_method.currentText(),
+            )
+        )
+        self.parent.scene_change_detection_threshold.valueChanged.connect(
+            lambda: self.settings.writeSetting(
+                "scene_change_detection_threshold",
+                str(self.parent.scene_change_detection_threshold.value()),
             )
         )
         self.parent.video_quality.currentIndexChanged.connect(
@@ -137,14 +143,17 @@ class SettingsTab:
         self.parent.preview_enabled.setChecked(
             self.settings.settings["preview_enabled"] == "True"
         )
-        self.parent.scene_change_detection_enabled.setChecked(
-            self.settings.settings["scene_change_detection_enabled"] == "True"
-        )
         self.parent.discord_rich_presence.setChecked(
             self.settings.settings["discord_rich_presence"] == "True"
         )
-        self.parent.scene_detection_threshold.setValue(
-            float(self.settings.settings["scene_detection_threshold"])
+        self.parent.scene_change_detection_enabled.setChecked(
+            self.settings.settings["scene_change_detection_enabled"] == "True"
+        )
+        self.parent.scene_change_detection_method.setCurrentText(
+            self.settings.settings["scene_change_detection_method"]
+        )
+        self.parent.scene_change_detection_threshold.setValue(
+            float(self.settings.settings["scene_change_detection_threshold"])
         )
         self.parent.video_quality.setCurrentText(
             self.settings.settings["video_quality"]
@@ -190,23 +199,26 @@ class Settings:
             "tensorrt_optimization_level": "3",
             "encoder": "libx264",
             "preview_enabled": "True",
+            "scene_change_detection_method": "mean",
             "scene_change_detection_enabled": "True",
+            "scene_change_detection_threshold": "2.0",
             "discord_rich_presence": "True",
-            "scene_detection_threshold": "2.0",
             "video_quality": "High",
             "output_folder_location": os.path.join(f"{homedir}", "Videos")
             if getPlatform() != "darwin"
             else os.path.join(f"{homedir}", "Desktop"),
             "rife_trt_mode": "accurate",
+
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
             "tensorrt_optimization_level": ("0", "1", "2", "3", "4", "5"),
             "encoder": ("libx264", "libx265", "vp9", "av1"),
             "preview_enabled": ("True", "False"),
+            "scene_change_detection_method": ('mean', 'mean_segmented', 'ffmpeg'),
             "scene_change_detection_enabled": ("True", "False"),
+            "scene_change_detection_threshold": [str(num / 10) for num in range(1, 100)],
             "discord_rich_presence": ("True", "False"),
-            "scene_detection_threshold": [str(num / 10) for num in range(1, 100)],
             "video_quality": ("Low", "Medium", "High", "Very High"),
             "output_folder_location": "ANY",
             "rife_trt_mode": ("fast", "accurate"),

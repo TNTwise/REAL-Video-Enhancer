@@ -333,7 +333,7 @@ class ProcessTab:
         else:
             command += [
                 "--sceneDetectSensitivity",
-                self.settings["scene_detection_threshold"],
+                self.settings["scene_change_detection_threshold"],
             ]
         if self.benchmarkMode:
             command += ["--benchmark"]

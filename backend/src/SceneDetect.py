@@ -3,7 +3,7 @@ import cv2
 from collections import deque
 from .Util import bytesToImg
 
-
+    
 class NPMeanSCDetect:
     """
     takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
@@ -93,46 +93,6 @@ class NPMeanSegmentedSCDetect:
                     return True
         self.segmentsImg1Mean = segmentsImg2Mean
         return False
-
-
-# could be an idea
-class VSSCDetect:
-    def __init__(self, threshold=0.05):
-        self.threshold = threshold
-
-    def detect(self, frames):
-        if len(frames) < 8:
-            raise ValueError(
-                "At least 8 frames are required for scene change detection"
-            )
-
-        results = []
-        for i in range(4, len(frames) - 3):
-            prev_diffs = [
-                self.calculate_diff(frames[j], frames[j + 1]) for j in range(i - 4, i)
-            ]
-            next_diffs = [
-                self.calculate_diff(frames[j], frames[j + 1]) for j in range(i, i + 3)
-            ]
-
-            mean_diff = np.mean(prev_diffs + next_diffs[1:])
-            max_diff = np.max(prev_diffs + next_diffs[1:])
-
-            std_dev = np.std(prev_diffs + next_diffs[1:])
-
-            dynamic_threshold = self.threshold + std_dev
-
-            next_diff = self.calculate_diff(frames[i], frames[i + 1])
-
-            is_scene_change = (next_diff - dynamic_threshold) > max_diff
-            results.append(is_scene_change)
-
-        return results
-
-    def calculate_diff(self, frame1, frame2):
-        # Assuming frames are numpy arrays
-        return np.mean(np.abs(frame1.astype(float) - frame2.astype(float)))
-
 
 class NPMeanDiffSCDetect:
     def __init__(self, sensitivity=2):
