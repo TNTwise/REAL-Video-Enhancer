@@ -138,7 +138,7 @@ class UpscaleNCNN:
         nparray = np.clip(nparray, 0, 255)
         return nparray
 
-    def procNCNNVk(self, frame) -> np.ascontiguousarray:
+    def procNCNNVk(self, frame: np.array) -> np.ascontiguousarray:
         ex = self.net.create_extractor()
         frame = self.ClampNPArray(frame)
         frame = self.NCNNImageMatFromNP(frame)
@@ -158,16 +158,11 @@ class UpscaleNCNN:
         while self.net is None:
             sleep(1)
         if method == "ncnn_vulkan":
+            frame = np.ascontiguousarray(np.frombuffer(imageChunk, dtype=np.uint8))
             if self.tilesize == 0:
-                frame = np.ascontiguousarray(np.frombuffer(imageChunk, dtype=np.uint8))
                 return self.procNCNNVk(frame)
             else:
-                npArray = (
-                    np.frombuffer(imageChunk, dtype=np.uint8)
-                    .reshape(self.height, self.width, 3)
-                    .transpose(2, 0, 1)
-                )[np.newaxis, ...]
-                return self.renderTiledImage(npArray)
+                return self.renderTiledImage(frame)
         elif method == "upscale_ncnn_py":
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
 
