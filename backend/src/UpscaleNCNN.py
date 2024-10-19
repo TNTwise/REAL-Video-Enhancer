@@ -6,7 +6,7 @@ import numpy as np
 
 try:
     from upscale_ncnn_py import UPSCALE
-
+    e
     method = "upscale_ncnn_py"
 except:
     import ncnn
@@ -135,11 +135,13 @@ class UpscaleNCNN:
         mat.substract_mean_normalize(mean_vals, norm_vals)
 
     def ClampNPArray(self, nparray: np.array) -> np.array:
-        return nparray.clip(0, 255)
+        nparray = np.clip(nparray, 0, 255)
+        return nparray
 
-    def procNCNNVk(self, imageChunk) -> np.ascontiguousarray:
+    def procNCNNVk(self, frame) -> np.ascontiguousarray:
         ex = self.net.create_extractor()
-        frame = self.NCNNImageMatFromNP(imageChunk)
+        frame = self.ClampNPArray(frame)
+        frame = self.NCNNImageMatFromNP(frame)
         # norm
         self.NormalizeImage(mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0])
         # render frame
@@ -147,17 +149,18 @@ class UpscaleNCNN:
         ret, frame = ex.extract("output")
 
         # norm
-        self.NormalizeImage(mat=frame, norm_vals=[255.0, 255.0, 255.0])
         frame = np.array(frame)
+        frame = frame.transpose(1, 2, 0) * 255
         frame = self.ClampNPArray(frame)
-        return frame
+        return np.ascontiguousarray(frame, dtype=np.uint8)
 
     def Upscale(self, imageChunk):
         while self.net is None:
             sleep(1)
         if method == "ncnn_vulkan":
             if self.tilesize == 0:
-                return self.procNCNNVk(imageChunk).transpose(1, 2, 0)
+                frame = np.ascontiguousarray(np.frombuffer(imageChunk, dtype=np.uint8))
+                return self.procNCNNVk(frame)
             else:
                 npArray = (
                     np.frombuffer(imageChunk, dtype=np.uint8)
