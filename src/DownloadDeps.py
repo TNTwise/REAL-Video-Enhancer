@@ -111,8 +111,8 @@ class DownloadDependencies:
             "-m",
             "pip",
             "install",
-            "-U",
             "--no-warn-script-location",
+            "--force",
             "--extra-index-url",
             "https://download.pytorch.org/whl/cu124"
         ] + deps
@@ -217,9 +217,12 @@ class DownloadDependencies:
             "ncnn==1.0.20240820",
             "numpy==1.26.4",
             "opencv-python-headless",
+            "mpmath",
+            "sympy==1.13.1",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(ncnnDeps)
-        self.pipInstall(["numpy==1.26.4", "sympy"])
+        #self.pipInstall(["numpy==1.26.4", "sympy","upscale_ncnn_py==1.2.0"])
+        #self.pipInstall(["upscale_ncnn_py==1.2.0"])
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [
