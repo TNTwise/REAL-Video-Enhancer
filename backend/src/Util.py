@@ -235,7 +235,7 @@ def checkForNCNN() -> bool:
             from upscale_ncnn_py import UPSCALE
         except:
             printAndLog(
-                "Warning: Cannot import upscale_ncnn, falling back to ncnn processing. (This can be slow!)"
+                "Warning: Cannot import upscale_ncnn, falling back to default ncnn processing. (Please install vcredlist on your computer to fix this!)"
             )
         return True
     except ImportError as e:
