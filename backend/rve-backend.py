@@ -95,7 +95,7 @@ class HandleApplication:
 
         """
         parser = argparse.ArgumentParser(
-            description="Upscale any image, with most torch models, using spandrel."
+            description="Backend to RVE, used to upscale and interpolate videos"
         )
 
         parser.add_argument(

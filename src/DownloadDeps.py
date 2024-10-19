@@ -210,7 +210,7 @@ class DownloadDependencies:
         NCNN deps
         """
         ncnnDeps = [
-            "rife-ncnn-vulkan-python-tntwise==1.4.2",
+            "rife-ncnn-vulkan-python-tntwise==1.4.4",
             "upscale_ncnn_py==1.2.0",
             "ncnn==1.0.20240820",
             "numpy==1.26.4",
