@@ -66,4 +66,7 @@ class DiscordRPC:
             log("Timed out!")
 
     def closeRPC(self):
-        self.RPC.close()
+        try:
+            self.RPC.close()
+        except:
+            pass

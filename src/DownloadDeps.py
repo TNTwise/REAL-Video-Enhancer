@@ -113,6 +113,7 @@ class DownloadDependencies:
             "install",
             "--no-warn-script-location",
             "--force",
+            " --no-cache-dir",
             "--extra-index-url",
             "https://download.pytorch.org/whl/cu124"
         ] + deps
