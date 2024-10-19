@@ -113,6 +113,8 @@ class DownloadDependencies:
             "install",
             "-U",
             "--no-warn-script-location",
+            "--extra-index-url",
+            "https://download.pytorch.org/whl/cu124"
         ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
