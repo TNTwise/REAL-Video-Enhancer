@@ -135,7 +135,7 @@ class InterpolateRifeTorch:
         self.img0 = None
         self.f0encode = None
         self.rife46 = False
-        self.trt_debug = True  # cool little progressbar
+        self.trt_debug = trt_debug # too much output, i would like a progress bar tho
         self.v1 = rifeVersion == "v1"
         self.rife_trt_mode = rife_trt_mode
         self.trt_static_shape = trt_static_shape
