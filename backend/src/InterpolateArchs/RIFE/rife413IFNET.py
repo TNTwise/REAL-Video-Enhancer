@@ -5,6 +5,7 @@ import math
 
 from torch.nn.functional import interpolate
 
+
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
@@ -150,7 +151,6 @@ class IFNet(nn.Module):
         self.ensemble = ensemble
         self.width = width
         self.height = height
-
 
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
         if rife_trt_mode == "fast":

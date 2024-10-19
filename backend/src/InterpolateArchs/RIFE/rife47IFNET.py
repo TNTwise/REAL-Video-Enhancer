@@ -173,9 +173,7 @@ class IFNet(nn.Module):
                     mask = (mask + (-m_)) / 2
             else:
                 wf0 = self.warp(f0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
-                wf1 = self.warp(
-                    f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
-                )
+                wf1 = self.warp(f1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
                 fd, m0 = self.block[i](
                     torch.cat(
                         (
@@ -212,12 +210,8 @@ class IFNet(nn.Module):
                 else:
                     mask = m0
                 flow = flow + fd
-            warped_img0 = self.warp(
-                img0, flow[:, :2], tenFlow_div, backwarp_tenGrid
-            )
-            warped_img1 = self.warp(
-                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
-            )
+            warped_img0 = self.warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = self.warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
         mask = torch.sigmoid(mask)
         return (
             (warped_img0 * mask + warped_img1 * (1 - mask))[  # maybe try padding here

@@ -170,12 +170,8 @@ class IFNet(nn.Module):
                 flow = flow + f0
                 mask = mask + m0
             latest_mask = mask
-            warped_img0 = self.warp(
-                img0, flow[:, :2], tenFlow_div, backwarp_tenGrid
-            )
-            warped_img1 = self.warp(
-                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
-            )
+            warped_img0 = self.warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = self.warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
 
         temp = torch.sigmoid(latest_mask)
         frame = warped_img0 * temp + warped_img1 * (1 - temp)

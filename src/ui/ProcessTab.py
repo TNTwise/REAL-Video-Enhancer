@@ -332,6 +332,8 @@ class ProcessTab:
             command += ["--sceneDetectMethod", "none"]
         else:
             command += [
+                "--sceneDetectMethod",
+                self.settings["scene_change_detection_method"],
                 "--sceneDetectSensitivity",
                 self.settings["scene_change_detection_threshold"],
             ]

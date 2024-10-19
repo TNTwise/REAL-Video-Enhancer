@@ -3,7 +3,7 @@ import cv2
 from collections import deque
 from .Util import bytesToImg
 
-    
+
 class NPMeanSCDetect:
     """
     takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
@@ -93,6 +93,7 @@ class NPMeanSegmentedSCDetect:
                     return True
         self.segmentsImg1Mean = segmentsImg2Mean
         return False
+
 
 class NPMeanDiffSCDetect:
     def __init__(self, sensitivity=2):

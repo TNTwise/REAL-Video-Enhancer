@@ -1943,17 +1943,17 @@ QDoubleSpinBox::down-button {
                          <widget class="QComboBox" name="scene_change_detection_method">
                           <item>
                            <property name="text">
-                            <string>ffmpeg</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
                             <string>mean</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
                             <string>mean_segmented</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>ffmpeg</string>
                            </property>
                           </item>
                          </widget>

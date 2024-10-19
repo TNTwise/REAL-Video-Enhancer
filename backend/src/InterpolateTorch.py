@@ -135,7 +135,7 @@ class InterpolateRifeTorch:
         self.img0 = None
         self.f0encode = None
         self.rife46 = False
-        self.trt_debug = True # cool little progressbar
+        self.trt_debug = True  # cool little progressbar
         self.v1 = rifeVersion == "v1"
         self.rife_trt_mode = rife_trt_mode
         self.trt_static_shape = trt_static_shape
@@ -304,23 +304,30 @@ class InterpolateRifeTorch:
                 trt_engine_path = base_trt_engine_path + ".dyn"
                 encode_trt_engine_path = base_trt_engine_path + "_encode.dyn"
                 # lay out inputs
-                
 
                 # load flow engine
                 if not os.path.isfile(trt_engine_path):
                     exampleInputs = [
                         torch.zeros(
-                            [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
+                            [1, 3, self.ph, self.pw],
+                            dtype=self.dtype,
+                            device=self.device,
                         ),
                         torch.zeros(
-                            [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
+                            [1, 3, self.ph, self.pw],
+                            dtype=self.dtype,
+                            device=self.device,
                         ),
                         torch.zeros(
-                            [1, 1, self.ph, self.pw], dtype=self.dtype, device=self.device
+                            [1, 1, self.ph, self.pw],
+                            dtype=self.dtype,
+                            device=self.device,
                         ),
                         torch.zeros([2], dtype=torch.float, device=self.device),
                         torch.zeros(
-                            [1, 2, self.ph, self.pw], dtype=torch.float, device=self.device
+                            [1, 2, self.ph, self.pw],
+                            dtype=torch.float,
+                            device=self.device,
                         ),
                     ]
                     if self.trt_static_shape:
@@ -403,7 +410,7 @@ class InterpolateRifeTorch:
                         ]
                     # load encode engine
                     if not self.rife46:
-                        exampleInputs+=[
+                        exampleInputs += [
                             torch.zeros(
                                 (1, num_ch_for_encode, self.ph, self.pw),
                                 dtype=self.dtype,
@@ -416,7 +423,7 @@ class InterpolateRifeTorch:
                             ),
                         ]
                         if self.trt_static_shape:
-                            inputs+=[
+                            inputs += [
                                 torch_tensorrt.Input(
                                     shape=[1, 1, self.ph, self.pw], dtype=self.dtype
                                 ),
@@ -428,21 +435,28 @@ class InterpolateRifeTorch:
                             if not self.trt_static_shape:
                                 dynamic_shapes["f0"] = {2: dim_height, 3: dim_width}
                                 dynamic_shapes["f1"] = {2: dim_height, 3: dim_width}
-                            inputs+=[
+                            inputs += [
                                 torch_tensorrt.Input(
-                                    min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
-                                    opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
-                                    max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
+                                    min_shape=[1, num_ch_for_encode]
+                                    + self.trt_min_shape,
+                                    opt_shape=[1, num_ch_for_encode]
+                                    + self.trt_opt_shape,
+                                    max_shape=[1, num_ch_for_encode]
+                                    + self.trt_max_shape,
                                     dtype=self.dtype,
                                     name="f0",
                                 ),
                                 torch_tensorrt.Input(
-                                    min_shape=[1, num_ch_for_encode] + self.trt_min_shape,
-                                    opt_shape=[1, num_ch_for_encode] + self.trt_opt_shape,
-                                    max_shape=[1, num_ch_for_encode] + self.trt_max_shape,
+                                    min_shape=[1, num_ch_for_encode]
+                                    + self.trt_min_shape,
+                                    opt_shape=[1, num_ch_for_encode]
+                                    + self.trt_opt_shape,
+                                    max_shape=[1, num_ch_for_encode]
+                                    + self.trt_max_shape,
                                     dtype=self.dtype,
                                     name="f1",
-                                ),]
+                                ),
+                            ]
 
                         encodedExampleInputs = [
                             torch.zeros(
@@ -469,12 +483,14 @@ class InterpolateRifeTorch:
                                 dynamic_encode_shapes = None
                             else:
                                 dynamic_encode_shapes = {
-                                "x": {2: dim_height, 3: dim_width},
+                                    "x": {2: dim_height, 3: dim_width},
                                 }
                             exported_encode_program = torch.export.export(
-                                self.encode, tuple(encodedExampleInputs), dynamic_shapes=dynamic_encode_shapes
+                                self.encode,
+                                tuple(encodedExampleInputs),
+                                dynamic_shapes=dynamic_encode_shapes,
                             )
-                            
+
                             self.encode = torch_tensorrt.dynamo.compile(
                                 exported_encode_program,
                                 tuple(encodedInput),
@@ -496,15 +512,17 @@ class InterpolateRifeTorch:
                                 output_format="torchscript",
                                 inputs=tuple(encodedExampleInputs),
                             )
-                            
+
                         printAndLog(
                             f"Loading TensorRT engine from {encode_trt_engine_path}"
                         )
                         self.encode = torch.jit.load(encode_trt_engine_path).eval()
                         exported_program = torch.export.export(
-                            self.flownet, tuple(exampleInputs), dynamic_shapes=dynamic_shapes
+                            self.flownet,
+                            tuple(exampleInputs),
+                            dynamic_shapes=dynamic_shapes,
                         )
-                    
+
                     # build flow engine
                     printAndLog("Building TensorRT engine {}".format(trt_engine_path))
 

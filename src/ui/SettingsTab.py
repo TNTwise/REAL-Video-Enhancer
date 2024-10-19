@@ -208,16 +208,17 @@ class Settings:
             if getPlatform() != "darwin"
             else os.path.join(f"{homedir}", "Desktop"),
             "rife_trt_mode": "accurate",
-
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
             "tensorrt_optimization_level": ("0", "1", "2", "3", "4", "5"),
             "encoder": ("libx264", "libx265", "vp9", "av1"),
             "preview_enabled": ("True", "False"),
-            "scene_change_detection_method": ('mean', 'mean_segmented', 'ffmpeg'),
+            "scene_change_detection_method": ("mean", "mean_segmented", "ffmpeg"),
             "scene_change_detection_enabled": ("True", "False"),
-            "scene_change_detection_threshold": [str(num / 10) for num in range(1, 100)],
+            "scene_change_detection_threshold": [
+                str(num / 10) for num in range(1, 100)
+            ],
             "discord_rich_presence": ("True", "False"),
             "video_quality": ("Low", "Medium", "High", "Very High"),
             "output_folder_location": "ANY",

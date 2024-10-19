@@ -168,7 +168,6 @@ class DownloadDependencies:
             "cupy-cuda12x==13.3.0",
         ]
         return self.getPlatformIndependentDeps() + torchCUDADeps
-                
 
     def getTensorRTDeps(self):
         """
@@ -184,7 +183,7 @@ class DownloadDependencies:
             "tensorrt_cu12_bindings==10.3.0",
             "torch_tensorrt==2.5.0",
         ]
-        
+
         return tensorRTDeps
 
     def downloadPyTorchCUDADeps(self):

@@ -151,7 +151,6 @@ class IFNet(nn.Module):
         self.width = width
         self.height = height
 
-
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
         if rife_trt_mode == "fast":
             from .warplayer import warp
