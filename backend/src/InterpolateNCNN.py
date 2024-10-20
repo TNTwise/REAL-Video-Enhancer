@@ -29,6 +29,8 @@ class Rife:
     ):
         self.image0_bytes = None
         self.raw_in_image0 = None
+        self.image1_bytes = None
+        self.raw_in_image1 = None
         self.channels = None
         self.height = height
         self.width = width
@@ -148,12 +150,12 @@ class Rife:
             image0.shape[0], image0.shape[1], self.channels
         )
 
-    def uncache_frame(self):
+    def patch_pause(self):
         """
         Used in instances where the scene change is active, and the frame needs to be uncached.
         """
-        self.image0_bytes = None
-        self.raw_in_image0 = None
+        self.image0_bytes = self.image1_bytes
+        self.raw_in_image0 = self.raw_in_image1
 
     def process_bytes(
         self, image0_bytes, image1_bytes, timestep: float = 0.5
@@ -163,24 +165,23 @@ class Rife:
             return image0_bytes
         elif timestep == 1.0:
             return image1_bytes
-
         if self.image0_bytes is None:
             self.image0_bytes = bytearray(image0_bytes)
             self.raw_in_image0 = wrapped.Image(
                 self.image0_bytes, self.width, self.height, self.channels
             )
-        image1_bytes = bytearray(image1_bytes)
+        self.image1_bytes = bytearray(image1_bytes)
 
-        raw_in_image1 = wrapped.Image(
-            image1_bytes, self.width, self.height, self.channels
+        self.raw_in_image1 = wrapped.Image(
+            self.image1_bytes, self.width, self.height, self.channels
         )
 
         self._rife_object.process(
-            self.raw_in_image0, raw_in_image1, timestep, self.raw_out_image
+            self.raw_in_image0, self.raw_in_image1, timestep, self.raw_out_image
         )
         if timestep == self.max_timestep:
-            self.image0_bytes = image1_bytes
-            self.raw_in_image0 = raw_in_image1
+            self.image0_bytes = self.image1_bytes
+            self.raw_in_image0 = self.raw_in_image1
 
         return bytes(self.output_bytes)
 
@@ -311,6 +312,7 @@ class InterpolateRIFENCNN:
         self.height = height
         self.gpuid = gpuid
         self.threads = threads
+        self.paused = False
         self._load()
 
     def _load(self):
@@ -326,14 +328,14 @@ class InterpolateRIFENCNN:
         )
 
     def hotUnload(self):
-        self.render._rife_object.__swig_destroy__(self.render._rife_object)
-        self.render = None
+        self.paused=True
+        self.render.patch_pause()
 
     def hotReload(self):
-        self._load()
+        self.paused = False
 
     def process(self, img0, img1, timestep) -> bytes:
-        while self.render is None:
+        while self.paused:
             sleep(1)
         frame = self.render.process_bytes(img0, img1, timestep)
         return frame
