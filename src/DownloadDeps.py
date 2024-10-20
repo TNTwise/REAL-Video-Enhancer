@@ -15,8 +15,31 @@ from .Util import (
 from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
 import os
 from platform import machine
+import subprocess
 
+def run_executable(exe_path):
+    try:
+        # Run the executable and wait for it to complete
+        result = subprocess.run(exe_path, check=True, capture_output=True, text=True)
 
+        # Print the output of the executable
+        print("STDOUT:", result.stdout)
+
+        # Print any error messages
+        print("STDERR:", result.stderr)
+
+        # Print the exit code
+        print("Exit Code:", result.returncode)
+
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while running the executable.")
+        print("Exit Code:", e.returncode)
+        print("Output:", e.output)
+        print("Error:", e.stderr)
+    except FileNotFoundError:
+        print("The specified executable was not found.")
+    except Exception as e:
+        print("An unexpected error occurred:", str(e))
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -55,6 +78,22 @@ class DownloadDependencies:
             # printAndLog("Moving Backend")
             # move(orig_backend_folder, moved_backed_folder)
             # printAndLog("Cleaning up")
+
+    def downloadVCREDLIST(self):
+        vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
+        link = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
+
+        printAndLog(
+            "Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed."
+        )
+        DownloadProgressPopup(
+            link=link,
+            downloadLocation=vcTempPath,
+            title="Downloading VC_redlist.x64.exe\nClick close after the download has completed\n if you already have it installed.",
+        )
+        # give executable permissions to ffmpeg
+        makeExecutable(vcTempPath)
+        run_executable([vcTempPath, '/install', '/quiet', '/norestart'])
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
