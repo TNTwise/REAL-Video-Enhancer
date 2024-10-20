@@ -9,13 +9,14 @@ from PySide6.QtCore import Qt, QPropertyAnimation
 from ..BuildFFmpegCommand import BuildFFMpegCommand
 
 from .AnimationHandler import AnimationHandler
-from .QTcustom import UpdateGUIThread
+from .QTcustom import UpdateGUIThread, RegularQTPopup
 from ..Util import (
     pythonPath,
     currentDirectory,
     modelsPath,
     printAndLog,
     log,
+    errorAndLog,
     backendDirectory,
 )
 from ..DownloadModels import DownloadModel
@@ -67,8 +68,9 @@ class ProcessTab:
                 case "directml":
                     models = onnxInterpolateModels
                 case _:
-                    log("Error: Invalid backend, returning ncnn models")
-                    models = ncnnInterpolateModels  # Return ncnn models if it errors out, this should fix macos
+                    RegularQTPopup("Failed to import any backends!, please try to reinstall the app!")
+                    errorAndLog("Failed to import any backends!")
+                    models = None
             self.parent.interpolationContainer.setVisible(True)
         if method == "Upscale":
             match backend:
@@ -81,8 +83,9 @@ class ProcessTab:
                 case "directml":
                     models = onnxUpscaleModels
                 case _:
-                    log("Error: Invalid backend, returning ncnn models")
-                    ncnnUpscaleModels  # Return ncnn models if it errors out, this should fix macos
+                    RegularQTPopup("Failed to import any backends!, please try to reinstall the app!")
+                    errorAndLog("Failed to import any backends!")
+                    models = None
         return models
 
     def onTilingSwitch(self):

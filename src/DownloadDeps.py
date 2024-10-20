@@ -12,7 +12,7 @@ from .Util import (
     downloadFile,
     backendDirectory,
 )
-from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup
+from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, RegularQTPopup
 import os
 from platform import machine
 import subprocess
@@ -36,10 +36,14 @@ def run_executable(exe_path):
         print("Exit Code:", e.returncode)
         print("Output:", e.output)
         print("Error:", e.stderr)
+        return False
     except FileNotFoundError:
         print("The specified executable was not found.")
+        return False
     except Exception as e:
         print("An unexpected error occurred:", str(e))
+        return False
+    return True
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -88,7 +92,11 @@ class DownloadDependencies:
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
-        run_executable([vcTempPath, '/install', '/quiet', '/norestart'])
+        while True:
+            if run_executable([vcTempPath, '/install', '/quiet', '/norestart']): #keep trying until user says yes
+                break
+            else:
+                RegularQTPopup("Please install click yes to allow VCRedlist to install!")
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
