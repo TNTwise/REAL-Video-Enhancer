@@ -152,10 +152,9 @@ class DownloadDependencies:
             "install",
             "--no-warn-script-location",
             "--force",
-            
             "--extra-index-url",
-            "https://download.pytorch.org/whl/cu124"
-        ] + deps + [" --no-cache-dir"]
+            "https://download.pytorch.org/whl/cu124",
+        ] + deps
         # totalDeps = self.get_total_dependencies(deps)
         totalDeps = len(deps)
         printAndLog("Downloading Deps: " + str(command))
