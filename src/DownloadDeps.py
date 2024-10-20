@@ -95,11 +95,9 @@ class DownloadDependencies:
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
-        while True:
-            if run_executable([vcTempPath, '/install', '/quiet', '/norestart']): #keep trying until user says yes
-                break
-            else:
-                RegularQTPopup("Please install click yes to allow VCRedlist to install!")
+        if not run_executable([vcTempPath, '/install', '/quiet', '/norestart']): #keep trying until user says yes
+            RegularQTPopup("Please click yes to allow VCRedlist to install!\nThe installer will now close.")
+
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
