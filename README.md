@@ -24,6 +24,11 @@
   * [People](#people) 
   * [Software](#software)
 * **[Custom Models](#custom-models)**
+* **[FAQ](#faq)**
+  * [General App Usage](#general-application-usage) 
+  * [TensorRT](#tensorrt-related-questions)
+  * [ROCm](#rocm-related-questions)
+  * [NCNN](#ncnn-related-questions)
 
 # Introduction
 
