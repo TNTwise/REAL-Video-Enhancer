@@ -95,7 +95,7 @@ def build_executable():
             "--icon=icons/logo-v2.ico",
             "--noconfirm",
             "--noupx",
-            "--noconsole",
+            #"--noconsole", this caused issues, maybe I can fix it later
         ]
     else:
         command = [
