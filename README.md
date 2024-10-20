@@ -29,7 +29,6 @@
 
 <strong>REAL Video Enhancer</strong>  is a redesigned and enhanced version of the original Rife ESRGAN App for Linux. This program offers convenient access to frame interpolation and upscaling functionalities on Linux, and is an alternative to outdated software like <a rel="noopener noreferrer" href="https://nmkd.itch.io/flowframes" target="_blank" >Flowframes</a> or <a rel="noopener noreferrer" href="https://github.com/mafiosnik777/enhancr" target="_blank">enhancr</a> on Windows.
 
-V2 Alpha 2 New Look!:
 <p align=center>
   <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/2.0/icons/demo.png" width = "100%">
 </p>
@@ -45,7 +44,6 @@ V2 Alpha 2 New Look!:
 </ul>
 
 # Hardware/Software Requirements
-
 |  | Minimum | Recommended | 
  |--|--|--|
 | CPU | Dual Core x64 bit | Quad core x64 bit
@@ -97,13 +95,12 @@ python3 build.py --build_exe
 
 # Credits:
 ### People:
-| Person | For | Link|
+| Person | For | Link |
 |--|--|--|
 | NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ 
 | Styler00dollar | RIFE models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar 
 | HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ 
 | Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ 
-
 
 ### Software: 
 | Software Used | For | Link|
@@ -121,13 +118,42 @@ python3 build.py --build_exe
 | cx_Freeze | Tool for creating standalone executables from Python scripts (Linux build) | https://github.com/marcelotduarte/cx_Freeze 
 | PyInstaller | Tool for creating standalone executables from Python scripts (Windows/Mac builds) | https://github.com/marcelotduarte/cx_Freeze 
 | Feather Icons | Open source icons library | https://github.com/feathericons/feather 
+|Python Standalone Builds | Backend inference using portable python, helps when porting to different platforms. | https://github.com/indygreg/python-build-standalone |
 
 
-# Custom models:
-
+# Custom Models:
 | Model | Author | Link |
 |--|--|--|
 | 4x-SPANkendata | Crustaceous D | [4x-SPANkendata](https://openmodeldb.info/models/4x-SPANkendata) 
 | 4x-ClearRealityV1 | Kim2091 | [4x-ClearRealityV1](https://openmodeldb.info/models/4x-ClearRealityV1) 
 | 4x-Nomos8k-SPAN series | Helaman | [4x-Nomos8k-SPAN series](https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong) 
 | OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) 
+
+# FAQ
+
+### General Application Usage
+* **Q:** What does this program attempt to accomplish?
+  * **A:**  Fast, efficient and easily accessable video interpolation (Ex: 24->48FPS) and video upscaling (Ex: 1920->3840)
+* **Q:** What backend should I use?
+  * **A:** <br/> **Modern Nvidia** (20 series and up), TensorRT is recommended. <br/>
+            **Older Nvidia**  (10 and 16 series), CUDA is recommended. <br/>
+            **Oldest Nvidia**  (900 series and below), NCNN is recommended. <br/>
+            **Modern AMD Linux** (6000 seies and up), ROCm is experimental. <br/>
+            **Other Cards (AMD/Intel)** NCNN is the only backend currently working. <br/>
+* **Q:** Why is it failing to recognize installed backends?
+  * **A:**  REAL Video Enhancer uses PIP and portable python for inference, this can sometimes have issues installing. Please attempt reinstalling the app before creating an issue.
+
+### TensorRT related questions
+* **Q:** Why does it take so long to begin inference?
+  * **A:**  TensorRT uses advanced optimization at the beginning of inference based on your device, this is only done once per resolution of video inputed.
+* **Q:** Why does the optimization and inference fail?
+  * **A:**  The most common way an optimization can fail is **Limited VRAM** There is no fix to this except using CUDA or NCNN instead.
+ 
+### ROCm related questions
+* **Q:** Why am I getting (Insert Error here)?
+  * **A:**  ROCM is buggy, please take a look at <a href="https://github.com/TNTwise/REAL-Video-Enhancer/wiki/ROCm-Help">ROCm Help</a>.
+
+### NCNN related questions
+* **Q:** Why am I getting (Insert Vulkan Error here)?
+  * **A:**  This usually is an OOM (Out Of Memory) error, this can indicate a weak iGPU or very old GPU, I recommeding trying out the <a href="https://colab.research.google.com/drive/1P9PIhOs5UV56gWp4hBYqjIf1MLE3gexz?usp=sharing">Colab Notebook</a>  instead.
+
