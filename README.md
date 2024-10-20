@@ -15,8 +15,15 @@
 * **[Features](#Features)**
 * **[Hardware Requirements](#hardware-requirements)**
 * **[Benchmarks](#benchmarks)**
+  * [NCNN](#rife-ncnn)
+  * [TensorRT](#rife-tensorrt-103)
 * **[Cloning](#cloning)**
 * **[Building](#building)**
+* **[Canary build](#canary-build)**
+* **[Credits](#credits)**
+  * [People](#people) 
+  * [Software](#software)
+* **[Custom Models](#custom-models)**
 
 # Introduction
 
@@ -85,37 +92,42 @@ git clone https://github.com/TNTwise/REAL-Video-Enhancer
 ```
 python3 build.py --build_exe
 ```
-## Download the Latest PRE-Release release here:
+# Canary Build:
 <strong> </strong> <a href="https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease">https://github.com/TNTwise/REAL-Video-Enhancer/releases/tag/prerelease</a>
 
-# Software used:
-
-<ul>
-  <li> <a rel="noopener noreferrer" href="https://ffmpeg.org/" target="_blank" >FFMpeg</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/nihui/rife-ncnn-vulkan" target="_blank" >rife-ncnn-vulkan</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/xinntao/Real-ESRGAN" target="_blank" >Real-ESRGAN</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/styler00dollar" target="_blank">Styler00dollar (For RIFE models [4.1-4.5],[4.7-4.12-lite]) and Sudo Shuffle Span</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/hzwer/Practical-RIFE" target="_blank" >RIFE</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/Breakthrough/PySceneDetect" target="_blank" >PySceneDetect</a>  </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/NevermindNilas/TheAnimeScripter" target="_blank" >TheAnimeScripter for inspiration and mods to rife arch.</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/chaiNNer-org/spandrel" target="_blank">Spandrel (For CUDA upscaling model arch support)</a></li>
-  <li> <a rel="noopener noreferrer" href="https://pypi.org/project/ncnn-vulkan/2023.6.18/#description" target="_blank">ncnn vulkan python</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/marcelotduarte/cx_Freeze" target="_blank">cx_Freeze</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/media2x/rife-ncnn-vulkan-python" target="_blank">rife ncnn vulkan python</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/hongyuanyu/SPAN" target="_blank">SPAN</a></li>
-  <li> <a rel="noopener noreferrer" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">Rick astley for a good song</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/elexor" target="_blank">elexor for porting <strong>[REDACTED]</strong> to older versions of rife</a></li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/HolyWu/vs-rife" target="_blank">HolyWu For TRT engine generation code, inference code, optimizations, and fixing rife jagged lines when using trt.</a></li>
-
-  <li> <a rel="noopener noreferrer" href="https://github.com/feathericons/feather" target="_blank">feather icons</a></li>
-</ul>
+# Credits:
+### People:
+| Person | For | Link||
+|--|--|--|--| 
+| NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ |
+| Styler00dollar | RIFE models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar |
+| HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ |
+| Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ |
 
 
-# Custom models used:
+### Software: 
+| Software Used | For | Link||
+|--|--|--|--| 
+| FFmpeg | Multimedia framework for handling video, audio, and other media files | https://ffmpeg.org/ |
+| PyTorch | Neural Network Inference (CUDA/ROCm) | https://pytorch.org/ |
+| NCNN | Neural Network Inference (Vulkan) | https://github.com/tencent/ncnn | 
+| RIFE | Real-Time Intermediate Flow Estimation for Video Frame Interpolation | https://github.com/hzwer/Practical-RIFE |
+| rife-ncnn-vulkan | Video frame interpolation implementation using NCNN and Vulkan | https://github.com/nihui/rife-ncnn-vulkan |
+| rife ncnn vulkan python | Python bindings for RIFE NCNN Vulkan implementation | https://github.com/media2x/rife-ncnn-vulkan-python |
+| ncnn python | Python bindings for NCNN Vulkan framework | https://pypi.org/project/ncnn |
+| Real-ESRGAN | Upscaling | https://github.com/xinntao/Real-ESRGAN |
+| SPAN | Upscaling | https://github.com/hongyuanyu/SPAN |
+| Spandrel | CUDA upscaling model architecture support | https://github.com/chaiNNer-org/spandrel |
+| cx_Freeze | Tool for creating standalone executables from Python scripts (Linux build) | https://github.com/marcelotduarte/cx_Freeze |
+| PyInstaller | Tool for creating standalone executables from Python scripts (Windows/Mac builds) | https://github.com/marcelotduarte/cx_Freeze |
+| Feather Icons | Open source icons library | https://github.com/feathericons/feather |
 
-<ul>
-  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-SPANkendata" target="_blank" >4x-SPANkendata by Crustaceous D</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-ClearRealityV1" target="_blank" >4x-ClearRealityV1 by Kim2091</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong" target="_blank" >4x-Nomos8k-SPAN series by Helaman</a> </li>
-  <li> <a rel="noopener noreferrer" href="https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus" target="_blank" >OpenProteus by SiroSky</a> </li>
-</ul>
+
+# Custom models:
+
+| Model | Author | Link |
+|--|--|--|
+| 4x-SPANkendata | Crustaceous D | [4x-SPANkendata](https://openmodeldb.info/models/4x-SPANkendata) |
+| 4x-ClearRealityV1 | Kim2091 | [4x-ClearRealityV1](https://openmodeldb.info/models/4x-ClearRealityV1) |
+| 4x-Nomos8k-SPAN series | Helaman | [4x-Nomos8k-SPAN series](https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong) |
+| OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) |
