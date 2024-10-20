@@ -121,7 +121,7 @@ python3 build.py --build_exe
 | SPAN | Upscaling | https://github.com/hongyuanyu/SPAN 
 | Spandrel | CUDA upscaling model architecture support | https://github.com/chaiNNer-org/spandrel 
 | cx_Freeze | Tool for creating standalone executables from Python scripts (Linux build) | https://github.com/marcelotduarte/cx_Freeze 
-| PyInstaller | Tool for creating standalone executables from Python scripts (Windows/Mac builds) | https://github.com/marcelotduarte/cx_Freeze 
+| PyInstaller | Tool for creating standalone executables from Python scripts (Windows/Mac builds) | https://github.com/pyinstaller/pyinstaller
 | Feather Icons | Open source icons library | https://github.com/feathericons/feather 
 |Python Standalone Builds | Backend inference using portable python, helps when porting to different platforms. | https://github.com/indygreg/python-build-standalone |
 
