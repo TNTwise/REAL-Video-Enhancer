@@ -69,27 +69,22 @@ class DownloadDependencies:
             moved_backed_folder = os.path.join(currentDirectory(), "backend")
 
             printAndLog("Downloading backend")
-            # urllib.request.urlretrieve(backend_url, main_zip)
             downloadFile(link=backend_url, downloadLocation=main_zip)
             printAndLog("Extracting backend")
             extractTarGZ(main_zip)
-            # printAndLog("Extracting backend")
-            # shutil.unpack_archive(main_zip, main_folder)
-            # printAndLog("Moving Backend")
-            # move(orig_backend_folder, moved_backed_folder)
-            # printAndLog("Cleaning up")
+         
 
     def downloadVCREDLIST(self):
         vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
         link = "https://aka.ms/vs/17/release/vc_redist.x64.exe"
 
         printAndLog(
-            "Downloading VC_redlist.x64.exe\nClick close after the download has completed if you already have it installed."
+            "Downloading VC_redlist.x64.exe\nClick yes after download is complete."
         )
         DownloadProgressPopup(
             link=link,
             downloadLocation=vcTempPath,
-            title="Downloading VC_redlist.x64.exe\nClick close after the download has completed\n if you already have it installed.",
+            title="Downloading VC_redlist.x64.exe\nClick yes after download is complete.",
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
