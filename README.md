@@ -5,11 +5,20 @@
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
 
-### Now out on flathub!
-<a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer</a>
 <p align=center>
   <img src="https://github.com/TNTwise/REAL-Video-Enhancer/raw/2.0/icons/logo-v2.svg" width = "25%">
 </p>
+
+# Table of Contents
+  
+* **[Introduction](#introduction)**
+* **[Features](#Features)**
+* **[Hardware Requirements](#hardware-requirements)**
+* **[Benchmarks](#benchmarks)**
+* **[Cloning](#cloning)**
+* **[Building](#building)**
+
+# Introduction
 
 <strong>REAL Video Enhancer</strong>  is a redesigned and enhanced version of the original Rife ESRGAN App for Linux. This program offers convenient access to frame interpolation and upscaling functionalities on Linux, and is an alternative to outdated software like <a rel="noopener noreferrer" href="https://nmkd.itch.io/flowframes" target="_blank" >Flowframes</a> or <a rel="noopener noreferrer" href="https://github.com/mafiosnik777/enhancr" target="_blank">enhancr</a> on Windows.
 
@@ -20,16 +29,28 @@ V2 Alpha 2 New Look!:
 <h1>Features: </h1>
 <ul>
   <li> <strong>NEW!</strong> Windows support. <strong>!!! NOTICE !!!</strong> The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li>
-  <li> CUDA support. </li>
-  <li> MacOS support. </li>
-  <li>Support for Ubuntu 20.04+ on AppImage and Flatpak. </li>
+  <li> MacOS support. (Depricated as 2.0, use 1.2 for now) </li>
+  <li> Support for Ubuntu 20.04+ on Executable and Flatpak. </li>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
   <li> Preview that shows latest frame that has been rendered. </li>
+  <li> TensorRT and NCNN for efficient inference across many GPUs. </li>
 </ul>
 
-## Benchmarks: (RIFE NCNN)
-Benchmarks done with 1920x1080 video, default settings.<br/>
+# Hardware/Software Requirements
+
+|  | Minimum | Recommended | 
+ |--|--|--|
+| CPU | Dual Core x64 bit | Quad core x64 bit
+| GPU | Vulkan 1.3 capable device | Nvidia RTX GPU (20 series and up)
+| RAM | 8 GB | 16 GB
+| Storage | 1 GB free (NCNN install only) | 10 GB free (TensorRT install)
+| Operating System | Windows 10/11 64bit | Any modern Linux distro (Ubuntu 20.04+)
+# Benchmarks:
+
+Benchmarks done with 1920x1080 video, default settings.
+
+### RIFE NCNN
 
 
 | RX 6650 XT | |
@@ -47,7 +68,7 @@ Benchmarks done with 1920x1080 video, default settings.<br/>
 | rife-v4.22 | 50 fps
 | rife-v4.22-lite | 63 fps
 
-## Benchmarks: (RIFE TensorRT 10.3)
+### RIFE TensorRT 10.3
 | RTX 3080 | |
 |--|--|
 | rife-v4.6 | 270 fps
