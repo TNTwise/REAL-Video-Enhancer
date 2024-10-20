@@ -16,7 +16,7 @@ from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, Regul
 import os
 from platform import machine
 import subprocess
-
+import sys
 def run_executable(exe_path):
     try:
         # Run the executable and wait for it to complete
@@ -55,8 +55,8 @@ class DownloadDependencies:
         createDirectory(os.path.join(currentDirectory(), "bin"))
 
     def downloadBackend(self, tag):
-        RegularQTPopup("You don't have the backend directory downloaded. Please reinstall the program!.")
-        exit()
+        RegularQTPopup("You don't have the backend directory downloaded. \nPlease reinstall the program!.")
+        sys.exit()
         """
         Downloads the backend based on the tag of release.
         The tag of release is equal to the tag of the version.
