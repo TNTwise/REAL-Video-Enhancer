@@ -12,11 +12,17 @@ from .Util import (
     downloadFile,
     backendDirectory,
 )
-from .ui.QTcustom import DownloadProgressPopup, DisplayCommandOutputPopup, RegularQTPopup
+from .ui.QTcustom import (
+    DownloadProgressPopup,
+    DisplayCommandOutputPopup,
+    RegularQTPopup,
+)
 import os
 from platform import machine
 import subprocess
 import sys
+
+
 def run_executable(exe_path):
     try:
         # Run the executable and wait for it to complete
@@ -44,6 +50,8 @@ def run_executable(exe_path):
         print("An unexpected error occurred:", str(e))
         return False
     return True
+
+
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
@@ -55,7 +63,6 @@ class DownloadDependencies:
         createDirectory(os.path.join(currentDirectory(), "bin"))
 
     def downloadBackend(self, tag):
-        
         """
         Downloads the backend based on the tag of release.
         The tag of release is equal to the tag of the version.
@@ -64,7 +71,9 @@ class DownloadDependencies:
         """
 
         if not os.path.exists(backendDirectory()):
-            RegularQTPopup("You don't have the backend directory downloaded. \nPlease reinstall the program!.")
+            RegularQTPopup(
+                "You don't have the backend directory downloaded. \nPlease reinstall the program!."
+            )
             sys.exit()
             print(str(backendDirectory()) + " Does not exist!")
             backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"
@@ -79,7 +88,6 @@ class DownloadDependencies:
             downloadFile(link=backend_url, downloadLocation=main_zip)
             printAndLog("Extracting backend")
             extractTarGZ(main_zip)
-         
 
     def downloadVCREDLIST(self):
         vcTempPath = os.path.join(currentDirectory(), "bin", "VC_redist.x64.exe")
@@ -95,9 +103,12 @@ class DownloadDependencies:
         )
         # give executable permissions to ffmpeg
         makeExecutable(vcTempPath)
-        if not run_executable([vcTempPath, '/install', '/quiet', '/norestart']): #keep trying until user says yes
-            RegularQTPopup("Please click yes to allow VCRedlist to install!\nThe installer will now close.")
-
+        if not run_executable(
+            [vcTempPath, "/install", "/quiet", "/norestart"]
+        ):  # keep trying until user says yes
+            RegularQTPopup(
+                "Please click yes to allow VCRedlist to install!\nThe installer will now close."
+            )
 
     def downloadPython(self):
         link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
@@ -264,8 +275,8 @@ class DownloadDependencies:
             "sympy==1.13.1",
         ] + self.getPlatformIndependentDeps()
         self.pipInstall(ncnnDeps)
-        #self.pipInstall(["numpy==1.26.4", "sympy","upscale_ncnn_py==1.2.0"])
-        #self.pipInstall(["upscale_ncnn_py==1.2.0"])
+        # self.pipInstall(["numpy==1.26.4", "sympy","upscale_ncnn_py==1.2.0"])
+        # self.pipInstall(["upscale_ncnn_py==1.2.0"])
 
     def downloadPyTorchROCmDeps(self):
         rocmLinuxDeps = [

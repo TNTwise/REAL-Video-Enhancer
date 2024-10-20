@@ -68,7 +68,9 @@ class ProcessTab:
                 case "directml":
                     models = onnxInterpolateModels
                 case _:
-                    RegularQTPopup("Failed to import any backends!, please try to reinstall the app!")
+                    RegularQTPopup(
+                        "Failed to import any backends!, please try to reinstall the app!"
+                    )
                     errorAndLog("Failed to import any backends!")
                     models = None
             self.parent.interpolationContainer.setVisible(True)
@@ -83,7 +85,9 @@ class ProcessTab:
                 case "directml":
                     models = onnxUpscaleModels
                 case _:
-                    RegularQTPopup("Failed to import any backends!, please try to reinstall the app!")
+                    RegularQTPopup(
+                        "Failed to import any backends!, please try to reinstall the app!"
+                    )
                     errorAndLog("Failed to import any backends!")
                     models = None
         return models

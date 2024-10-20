@@ -234,7 +234,6 @@ class UpscalePytorch:
                 .permute(2, 0, 1)
                 .unsqueeze(0)
                 .mul_(1 / 255)
-                
             )
         self.prepareStream.synchronize()
         return output
@@ -253,7 +252,17 @@ class UpscalePytorch:
                 output = self.renderImage(image)
             else:
                 output = self.renderTiledImage(image)
-            output = output.clamp(0.0, 1.0).squeeze(0).permute(1, 2, 0).mul(255).float().byte().contiguous().cpu().numpy()
+            output = (
+                output.clamp(0.0, 1.0)
+                .squeeze(0)
+                .permute(1, 2, 0)
+                .mul(255)
+                .float()
+                .byte()
+                .contiguous()
+                .cpu()
+                .numpy()
+            )
         self.stream.synchronize()
         return output
 

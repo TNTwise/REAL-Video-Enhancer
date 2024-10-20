@@ -44,9 +44,11 @@ if isFlatpak():
 else:
     cwd = os.getcwd()
 
+
 def log(message: str):
     with open(os.path.join(cwd, "frontend_log.txt"), "a") as f:
         f.write(message + "\n")
+
 
 def printAndLog(message: str, separate=False):
     """
@@ -57,9 +59,6 @@ def printAndLog(message: str, separate=False):
         message = message + "\n" + "---------------------"
     print(message)
     log(message=message)
-
-
-
 
 
 def getAvailableDiskSpace() -> float:

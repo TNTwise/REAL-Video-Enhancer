@@ -6,6 +6,7 @@ import numpy as np
 
 try:
     from upscale_ncnn_py import UPSCALE
+
     method = "upscale_ncnn_py"
 except:
     import ncnn
@@ -168,7 +169,9 @@ class UpscaleNCNN:
             return self.net.process_bytes(imageChunk, self.width, self.height, 3)
 
     def renderTiledImage(self, img: np.ndarray):
-        raise NotImplementedError("Tile rendering not implemented for default ncnn fallback, please install vcredlist from https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170")
+        raise NotImplementedError(
+            "Tile rendering not implemented for default ncnn fallback, please install vcredlist from https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170"
+        )
         """It will first crop input images to tiles, and then process each tile.
         Finally, all the processed tiles are merged into one images.
 
@@ -207,10 +210,14 @@ class UpscaleNCNN:
                 input_tile_width = input_end_x - input_start_x
                 input_tile_height = input_end_y - input_start_y
                 tile_idx = y * tiles_x + x + 1
-                input_tile = img[:, input_start_y_pad:input_end_y_pad, input_start_x_pad:input_end_x_pad]
+                input_tile = img[
+                    :,
+                    input_start_y_pad:input_end_y_pad,
+                    input_start_x_pad:input_end_x_pad,
+                ]
 
                 # upscale tile
-                output_tile = self.procNCNNVk(input_tile).transpose(2, 0,1)
+                output_tile = self.procNCNNVk(input_tile).transpose(2, 0, 1)
                 # output tile area on total image
                 output_start_x = input_start_x * self.scale
                 output_end_x = input_end_x * self.scale
@@ -224,7 +231,11 @@ class UpscaleNCNN:
                 output_end_y_tile = output_start_y_tile + input_tile_height * self.scale
 
                 # put tile into output image
-                self.output[:, output_start_y:output_end_y,
-                output_start_x:output_end_x] = output_tile[:, output_start_y_tile:output_end_y_tile,
-                                               output_start_x_tile:output_end_x_tile]
+                self.output[
+                    :, output_start_y:output_end_y, output_start_x:output_end_x
+                ] = output_tile[
+                    :,
+                    output_start_y_tile:output_end_y_tile,
+                    output_start_x_tile:output_end_x_tile,
+                ]
         return self.output

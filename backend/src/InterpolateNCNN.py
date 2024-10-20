@@ -328,7 +328,7 @@ class InterpolateRIFENCNN:
         )
 
     def hotUnload(self):
-        self.paused=True
+        self.paused = True
         self.render.patch_pause()
 
     def hotReload(self):
