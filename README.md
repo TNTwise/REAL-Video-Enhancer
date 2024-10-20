@@ -97,19 +97,18 @@ python3 build.py --build_exe
 
 # Credits:
 ### People:
-| Person | For | Link||
-|--|--|--|--
-| NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ |
-| Styler00dollar | RIFE models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar |
-| HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ |
-| Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ |
+| Person | For | Link|
+|--|--|--|
+| NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ 
+| Styler00dollar | RIFE models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar 
+| HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ 
+| Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ 
 
 
 ### Software: 
-| Software Used | For | Link||
-|--|--|--|--
-| FFmpeg | Multimedia framework for handling video, audio, and other media files |
-https://ffmpeg.org/ 
+| Software Used | For | Link|
+|--|--|--|
+| FFmpeg | Multimedia framework for handling video, audio, and other media files | https://ffmpeg.org/ 
 | PyTorch | Neural Network Inference (CUDA/ROCm) | https://pytorch.org/ 
 | NCNN | Neural Network Inference (Vulkan) | https://github.com/tencent/ncnn 
 | RIFE | Real-Time Intermediate Flow Estimation for Video Frame Interpolation | https://github.com/hzwer/Practical-RIFE 
