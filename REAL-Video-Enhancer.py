@@ -41,7 +41,6 @@ from src.Util import (
 from src.ui.ProcessTab import ProcessTab
 from src.ui.DownloadTab import DownloadTab
 from src.ui.SettingsTab import SettingsTab, Settings
-from src.ui.MoreTab import MoreTab
 from src.DownloadDeps import DownloadDependencies
 from src.Backendhandler import BackendHandler
 from src.ModelHandler import totalModels
@@ -171,7 +170,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             parent=self, halfPrecisionSupport=halfPrecisionSupport
         )
 
-        self.moreTab = MoreTab(parent=self)
         # Startup Animation
         self.animationHandler = AnimationHandler()
         self.animationHandler.fadeInAnimation(self)
