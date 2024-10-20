@@ -55,6 +55,8 @@ class DownloadDependencies:
         createDirectory(os.path.join(currentDirectory(), "bin"))
 
     def downloadBackend(self, tag):
+        RegularQTPopup("You don't have the backend directory downloaded. Please reinstall the program!.")
+        exit()
         """
         Downloads the backend based on the tag of release.
         The tag of release is equal to the tag of the version.
