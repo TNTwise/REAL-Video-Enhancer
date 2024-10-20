@@ -44,14 +44,35 @@ if isFlatpak():
 else:
     cwd = os.getcwd()
 
+def log(message: str):
+    with open(os.path.join(cwd, "frontend_log.txt"), "a") as f:
+        f.write(message + "\n")
+
+def printAndLog(message: str, separate=False):
+    """
+    Prints and logs a message to the log file
+    separate, if True, activates the divider
+    """
+    if separate:
+        message = message + "\n" + "---------------------"
+    print(message)
+    log(message=message)
+
+
+
+
 
 def getAvailableDiskSpace() -> float:
     """
     Returns the available disk space in GB.
     """
-    total, used, free = shutil.disk_usage("/")
-    available_space = free / (1024**3)
-    return available_space
+    try:
+        total, used, free = shutil.disk_usage("/")
+        available_space = free / (1024**3)
+        return available_space
+    except Exception as e:
+        printAndLog(f"An error occurred while getting available disk space: {e}")
+        return "Unknown"
 
 
 with open(os.path.join(cwd, "frontend_log.txt"), "w") as f:
@@ -101,26 +122,34 @@ def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
 
 
 def getOSInfo() -> str:
-    """
-    Returns the exact name of the operating system along with additional information like 64-bit.
-    """
-    system = platform.system()
-    release = platform.release()
-    architecture = platform.machine()
-    if system == "Linux":
-        distro_name = distro.name()
-        distro_version = distro.version()
-        return f"{distro_name} {distro_version} {architecture}"
-    return f"{system} {release} {architecture}"
+    try:
+        """
+        Returns the exact name of the operating system along with additional information like 64-bit.
+        """
+        system = platform.system()
+        release = platform.release()
+        architecture = platform.machine()
+        if system == "Linux":
+            distro_name = distro.name()
+            distro_version = distro.version()
+            return f"{distro_name} {distro_version} {architecture}"
+        return f"{system} {release} {architecture}"
+    except Exception as e:
+        printAndLog(f"An error occurred while getting OS information: {e}")
+        return "Unknown"
 
 
 def getRAMAmount() -> str:
     """
     Returns the amount of RAM in the system.
     """
-    ram = psutil.virtual_memory().total
-    ram_gb = ram / (1024**3)
-    return f"{ram_gb:.2f} GB"
+    try:
+        ram = psutil.virtual_memory().total
+        ram_gb = ram / (1024**3)
+        return f"{ram_gb:.2f} GB"
+    except Exception as e:
+        printAndLog(f"An error occurred while getting RAM amount: {e}")
+        return "Unknown"
 
 
 def getCPUInfo() -> str:
@@ -238,22 +267,6 @@ def warnAndLog(message: str):
 def createDirectory(dir: str):
     if not os.path.exists(dir):
         os.mkdir(dir)
-
-
-def printAndLog(message: str, separate=False):
-    """
-    Prints and logs a message to the log file
-    separate, if True, activates the divider
-    """
-    if separate:
-        message = message + "\n" + "---------------------"
-    print(message)
-    log(message=message)
-
-
-def log(message: str):
-    with open(os.path.join(cwd, "frontend_log.txt"), "a") as f:
-        f.write(message + "\n")
 
 
 def currentDirectory():
