@@ -55,8 +55,7 @@ class DownloadDependencies:
         createDirectory(os.path.join(currentDirectory(), "bin"))
 
     def downloadBackend(self, tag):
-        RegularQTPopup("You don't have the backend directory downloaded. \nPlease reinstall the program!.")
-        sys.exit()
+        
         """
         Downloads the backend based on the tag of release.
         The tag of release is equal to the tag of the version.
@@ -65,6 +64,8 @@ class DownloadDependencies:
         """
 
         if not os.path.exists(backendDirectory()):
+            RegularQTPopup("You don't have the backend directory downloaded. \nPlease reinstall the program!.")
+            sys.exit()
             print(str(backendDirectory()) + " Does not exist!")
             backend_url = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/flatpak-backends/backend-V2-stable.tar.gz"
             main_zip = os.path.join(currentDirectory(), "backend.tar.gz")
