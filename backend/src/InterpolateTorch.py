@@ -11,6 +11,7 @@ from .Util import (
     modelsDirectory,
     check_bfloat16_support,
     log,
+    warnAndLog
 )
 from time import sleep
 
@@ -102,9 +103,6 @@ class InterpolateRifeTorch:
         trt_debug: bool = False,
         rife_trt_mode: str = "accurate",
         trt_static_shape: bool = True,
-        trt_min_shape: list[int] = [128, 128],
-        trt_opt_shape: list[int] = [1920, 1080],
-        trt_max_shape: list[int] = [1920, 1080],
     ):
         if device == "default":
             if torch.cuda.is_available():
@@ -136,12 +134,27 @@ class InterpolateRifeTorch:
         self.f0encode = None
         self.rife46 = False
         self.trt_debug = trt_debug  # too much output, i would like a progress bar tho
-        self.v1 = rifeVersion == "v1"
         self.rife_trt_mode = rife_trt_mode
         self.trt_static_shape = trt_static_shape
-        self.trt_min_shape = trt_min_shape
-        self.trt_opt_shape = trt_opt_shape
-        self.trt_max_shape = trt_max_shape
+        if not self.trt_static_shape:
+            if self.height < 256 and self.width < 256:
+                trt_min_shape: list[int] = [1, 1]
+                trt_opt_shape: list[int] = [128, 128]
+                trt_max_shape: list[int] = [256, 256]
+            elif self.height <= 1080 and self.width <= 1920: # if its 1080p or lower
+                trt_min_shape: list[int] = [128, 128]
+                trt_opt_shape: list[int] = [1920, 1080]
+                trt_max_shape: list[int] = [1920, 1080]
+            elif self.height <= 2160 and self.width <= 3840: # if its 4k or lower
+                trt_min_shape: list[int] = [1921, 1921]
+                trt_opt_shape: list[int] = [3840, 2160]
+                trt_max_shape: list[int] = [3840, 2160]
+            else: # too big, give warning and switch to static
+                warnAndLog("Warning: Reso lution is really high, this will most likely not work at all!\nFalling back to static shape.")
+                trt_static_shape = True
+            self.trt_min_shape = trt_min_shape
+            self.trt_opt_shape = trt_opt_shape
+            self.trt_max_shape = trt_max_shape
 
         if UHDMode:
             self.scale = 0.5
@@ -517,11 +530,11 @@ class InterpolateRifeTorch:
                             f"Loading TensorRT engine from {encode_trt_engine_path}"
                         )
                         self.encode = torch.jit.load(encode_trt_engine_path).eval()
-                        exported_program = torch.export.export(
-                            self.flownet,
-                            tuple(exampleInputs),
-                            dynamic_shapes=dynamic_shapes,
-                        )
+                    exported_program = torch.export.export(
+                        self.flownet,
+                        tuple(exampleInputs),
+                        dynamic_shapes=dynamic_shapes,
+                    )
 
                     # build flow engine
                     printAndLog("Building TensorRT engine {}".format(trt_engine_path))
