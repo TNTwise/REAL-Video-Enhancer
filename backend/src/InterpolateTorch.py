@@ -478,15 +478,6 @@ class InterpolateRifeTorch:
                                 device=self.device,
                             ),
                         ]
-                        encodedInput = [
-                            torch_tensorrt.Input(
-                                min_shape=[1, 3] + self.trt_min_shape,
-                                opt_shape=[1, 3] + self.trt_opt_shape,
-                                max_shape=[1, 3] + self.trt_max_shape,
-                                dtype=self.dtype,
-                                name="x",
-                            ),
-                        ]
 
                         if not os.path.isfile(encode_trt_engine_path):
                             printAndLog(
@@ -494,10 +485,22 @@ class InterpolateRifeTorch:
                             )
                             if self.trt_static_shape:
                                 dynamic_encode_shapes = None
+                                encodedInput = torch_tensorrt.Input(
+                                shape=[1, 3, self.ph, self.pw], dtype=torch.float
+                                ),
                             else:
                                 dynamic_encode_shapes = {
                                     "x": {2: dim_height, 3: dim_width},
                                 }
+                                encodedInput = [
+                                    torch_tensorrt.Input(
+                                        min_shape=[1, 3] + self.trt_min_shape,
+                                        opt_shape=[1, 3] + self.trt_opt_shape,
+                                        max_shape=[1, 3] + self.trt_max_shape,
+                                        dtype=self.dtype,
+                                        name="x",
+                                    ),
+                                ]
                             exported_encode_program = torch.export.export(
                                 self.encode,
                                 tuple(encodedExampleInputs),
