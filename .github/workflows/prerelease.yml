@@ -129,14 +129,14 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/
-      
+        run: | 
+          mv dist/ bin/
+          cp -r backend bin/
+          
       - name: compress archive
         run: |
-          cd dist
-          zip -r REAL-Video-Enhancer-2.0-MacOS_arm64.zip REAL-Video-Enhancer
-          cd ..
-          cp dist/REAL-Video-Enhancer-2.0-MacOS_arm64.zip REAL-Video-Enhancer-2.0-MacOS_arm64.zip
+          zip -r REAL-Video-Enhancer-2.0-MacOS_arm64.zip bin/
+          
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
         with:
