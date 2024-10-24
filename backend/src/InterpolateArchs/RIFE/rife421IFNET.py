@@ -24,8 +24,10 @@ SOFTWARE.
 
 import torch
 import torch.nn as nn
-from torch.nn.functional import interpolate
-
+try:
+    from .interpolate import interpolate
+except:
+    from torch.nn.functional import interpolate
 
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):

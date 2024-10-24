@@ -26,8 +26,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-from torch.nn.functional import interpolate
+try:
+    from .interpolate import interpolate
+except:
+    from torch.nn.functional import interpolate
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
