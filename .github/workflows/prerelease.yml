@@ -84,7 +84,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11.9
+          python-version: 3.10.8
 
       - name: Install Python Dependencies
         run: |
@@ -95,14 +95,14 @@ jobs:
         run: python3 build.py --build_exe
         
       - name: copy backend
-        run: cp -r backend dist/REAL-Video-Enhancer
+        run: | 
+          mv dist/ bin/
+          cp -r backend bin/
+          
       
       - name: compress archive
         run: |
-          cd dist
-          zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip REAL-Video-Enhancer
-          cd ..
-          cp dist/REAL-Video-Enhancer-2.0-MacOS_x86_64.zip REAL-Video-Enhancer-2.0-MacOS_x86_64.zip
+          zip -r REAL-Video-Enhancer-2.0-MacOS_x86_64.zip bin/
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v3
