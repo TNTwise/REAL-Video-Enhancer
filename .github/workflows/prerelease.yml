@@ -84,13 +84,14 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.10.8
+          python-version: 3.11.9
 
       - name: Install Python Dependencies
         run: |
           brew install llvm@15
           brew install pyside
           python3 -m pip install -r requirements.txt
+          
       - name: Build
         run: python3 build.py --build_exe
         
@@ -126,7 +127,9 @@ jobs:
           brew install pyside@6
           python3 -m pip install -r requirements.txt
       - name: Build
-        run: python3 build.py --build_exe
+        run: |
+          python3 build.py
+          python3 build.py --build_exe
         
       - name: copy backend
         run: | 
