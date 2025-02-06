@@ -103,6 +103,7 @@ class FFmpegWrite(Buffer):
         ceilInterpolateFactor: int,
         video_encoder: EncoderSettings,
         audio_encoder: EncoderSettings,
+        subtitle_encoder: EncoderSettings,
         hdr_mode: bool,
         mpv_output: bool
     ):
@@ -123,6 +124,7 @@ class FFmpegWrite(Buffer):
         self.ceilInterpolateFactor = ceilInterpolateFactor
         self.video_encoder = video_encoder
         self.audio_encoder = audio_encoder
+        self.subtitle_encoder = subtitle_encoder
         self.mpv_output = mpv_output
         self.hdr_mode = hdr_mode
         self.writeQueue = queue.Queue(maxsize=100)
@@ -207,6 +209,7 @@ class FFmpegWrite(Buffer):
                     "1:s?",  # Map all subtitle streams from input 1
                 ]
                 command += self.audio_encoder.getPostInputSettings().split()
+                command += self.subtitle_encoder.getPostInputSettings().split()
                 
                 if not self.audio_encoder.getPresetTag() == "copy_audio":
                     command += [
@@ -237,8 +240,7 @@ class FFmpegWrite(Buffer):
             command += [
                 "-pix_fmt",
                 self.pixelFormat,
-                "-c:s",
-                "copy",
+                
             ]
 
             if self.custom_encoder is not None:

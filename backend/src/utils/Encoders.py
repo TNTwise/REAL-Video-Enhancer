@@ -49,10 +49,10 @@ class copySubtitles(SubtitleEncoder):
     postInputSettings = "-c:s copy"
 
 
-class svt(SubtitleEncoder):
-    preset_tag = "svt"
+class srt(SubtitleEncoder):
+    preset_tag = "srt"
     preInputsettings = None
-    postInputSettings = "-c:s svt"
+    postInputSettings = "-c:s srt"
 
 
 class ass(SubtitleEncoder):
@@ -62,7 +62,7 @@ class ass(SubtitleEncoder):
 
 
 class webvtt(SubtitleEncoder):
-    preset_tag = "ass"
+    preset_tag = "webvtt"
     preInputsettings = None
     postInputSettings = "-c:s webvtt"
 
@@ -161,6 +161,7 @@ class EncoderSettings:
         for encoder in encoder_type.__subclasses__():
             if encoder.preset_tag == self.encoder_preset:
                 return encoder
+        raise ValueError("No implemented encoder: " + str(self.encoder_preset))
 
     def getPreInputSettings(self) -> str:
         return self.encoder.preInputsettings

@@ -1,6 +1,8 @@
-# RVE 2.2.0 pre-release
+# RVE 2.2.5 pre-release
  - NOTE: Pre-releases are unstable, please use the stable build if you experience issues. 
-         New features will be added to this release over time, the current changelog is not final. 
+        New features will be added to this release over time, the current changelog is not final. 
+
+# RVE 2.2.0 
 ### Added
  - Hardware Encoding
  - Auto border cropping

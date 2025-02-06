@@ -199,6 +199,7 @@ class Render:
             ceilInterpolateFactor=self.ceilInterpolateFactor,
             video_encoder=video_encoder,
             audio_encoder=audio_encoder,
+            subtitle_encoder=subtitle_encoder,
             mpv_output=output_to_mpv,
             hdr_mode=hdr_mode,
         )
