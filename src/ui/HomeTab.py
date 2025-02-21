@@ -9,15 +9,18 @@ class HomeTab:
 
     def getChangelog(self):
         changeLog = ""
-        response = requests.get(
-            "https://api.github.com/repos/tntwise/real-video-enhancer/releases"
-        )
-        releases = response.json()
-        releaseTags = [release["tag_name"] for release in releases]
-        releaseBodies = [release["body"].replace(r"\r\n", "") for release in releases]
-        for releaseTag, releaseBody in zip(releaseTags, releaseBodies):
-            changeLog += "\n# " + releaseTag
-            changeLog += "\n" + releaseBody
+        try:
+            response = requests.get(
+                "https://api.github.com/repos/tntwise/real-video-enhancer/releases"
+            )
+            releases = response.json()
+            releaseTags = [release["tag_name"] for release in releases]
+            releaseBodies = [release["body"].replace(r"\r\n", "") for release in releases]
+            for releaseTag, releaseBody in zip(releaseTags, releaseBodies):
+                changeLog += "\n# " + releaseTag
+                changeLog += "\n" + releaseBody
+        except Exception:
+            pass
         return changeLog
 
     def QConnect(self):
