@@ -91,6 +91,16 @@ class av1(VideoEncoder):
     preInputsettings = None
     postInputSettings = "-c:v libsvtav1"
 
+class ffv1(VideoEncoder):
+    preset_tag = "ffv1"
+    preInputsettings = None
+    postInputSettings = "-c:v ffv1"
+
+class prores(VideoEncoder):
+    preset_tag = "prores"
+    preInputsettings = None
+    postInputSettings = "-c:v prores"
+
 
 class x264_vulkan(VideoEncoder):
     preset_tag = "x264_vulkan"
