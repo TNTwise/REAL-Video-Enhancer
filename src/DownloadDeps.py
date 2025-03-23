@@ -245,15 +245,16 @@ class DownloadDependencies:
         Pytorch CUDA deps
         TensorRT deps
         """
-        tensorRTDeps = [
-            "tensorrt==10.7.0.post1",
-            "tensorrt_cu12==10.7.0.post1",
-            "tensorrt-cu12_libs==10.7.0.post1",
-            "tensorrt_cu12_bindings==10.7.0.post1",
-            f"torch_tensorrt==2.6.0",
+        deps = [
+            "tensorrt==10.9.0.34",
+            "tensorrt_cu12==10.9.0.34",
+            "tensorrt-cu12_libs==10.9.0.34",
+            "tensorrt_cu12_bindings==10.9.0.34",
+            "--no-deps",
+            "torch_tensorrt==2.6.0",
         ]
 
-        return tensorRTDeps
+        return deps
 
     def downloadPyTorchCUDADeps(self, install: bool = True):
         if install:
