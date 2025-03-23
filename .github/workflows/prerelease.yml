@@ -138,7 +138,7 @@ jobs:
           path: REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip
 
   Release:
-    needs: [build-Windows, build-Linu, build-MacOS, build-MacOS_arm64]
+    needs: [build-Windows, build-Linux, build-MacOS, build-MacOS_arm64]
     runs-on: ubuntu-latest
     permissions:
       contents: write
