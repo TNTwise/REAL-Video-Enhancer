@@ -194,7 +194,7 @@ class PyInstaller(BuildManager):
             + " --icon=icons/logo-v2.ico" 
             + " --noconfirm"
             + " --noupx" 
-            + " --noconsole"
+            # + " --noconsole"
             + " --distpath"
             + f" {OUTPUT_FOLDER}"
             )
