@@ -107,7 +107,7 @@ class DownloadDependencies:
             )
 
     def downloadPython(self):
-        link = "https://github.com/indygreg/python-build-standalone/releases/download/20240814/cpython-3.11.9+20240814-"
+        link = "https://github.com/indygreg/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-"
         pyDir = os.path.join(
             CWD,
             "python",
