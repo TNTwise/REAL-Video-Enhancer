@@ -464,7 +464,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         """
 
-        fileFilter = "Video files (*.mp4 *.mov *.webm *.mkv)"
+        fileFilter = "Video files (*.mp4 *.mov *.webm *.mkv);;All files (*.*)"
         inputFile, _ = QFileDialog.getOpenFileName(
             parent=self,
             caption="Select File",
@@ -621,6 +621,8 @@ custom command args
 """
 
 if __name__ == "__main__":
+    from multiprocessing import freeze_support
+    freeze_support()
     if "--debug" in sys.argv:
         import trace
 

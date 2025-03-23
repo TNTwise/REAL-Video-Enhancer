@@ -23,17 +23,17 @@ jobs:
         run : |
           sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
       - name: Build
-        run: python3 build.py --build_exe
+        run: python3 build.py --build cx_freeze --copy_backend
       
       - name: compress archive
         run: |
-          zip -r REAL-Video-Enhancer-2.2.5-Linux.zip bin/
+          zip -r REAL-Video-Enhancer-2.2.1-Linux.zip bin/
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: REAL-Video-Enhancer-2.2.5-Linux.zip
-          path: REAL-Video-Enhancer-2.2.5-Linux.zip
+          name: REAL-Video-Enhancer-2.2.1-Linux.zip
+          path: REAL-Video-Enhancer-2.2.1-Linux.zip
           
   build-Windows:
     runs-on: windows-2019
@@ -52,23 +52,93 @@ jobs:
       
 
       - name: Build
-        run: python3 build.py --build_exe
+        run: python3 build.py --build pyinstaller --copy_backend
       
       - name: compress archive
         run: |
             cd dist
-            tar -a -c -f REAL-Video-Enhancer-2.2.5-Windows.zip REAL-Video-Enhancer
+            tar -a -c -f REAL-Video-Enhancer-2.2.1-Windows.zip REAL-Video-Enhancer
             cd ..
-            cp dist/REAL-Video-Enhancer-2.2.5-Windows.zip REAL-Video-Enhancer-2.2.5-Windows.zip
+            cp dist/REAL-Video-Enhancer-2.2.1-Windows.zip REAL-Video-Enhancer-2.2.1-Windows.zip
 
       - name: Save Archive as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: REAL-Video-Enhancer-2.2.5-Windows.zip
-          path: REAL-Video-Enhancer-2.2.5-Windows.zip
+          name: REAL-Video-Enhancer-2.2.1-Windows.zip
+          path: REAL-Video-Enhancer-2.2.1-Windows.zip
+
+  build-MacOS:
+    runs-on: macos-13
+    permissions: write-all  
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+
+      - name: Install Python Dependencies
+
+        run: |
+
+          brew install llvm@15
+          brew install pyside
+          python3 -m pip install -r requirements.txt
+
+      - name: Build
+
+        run: python3 build.py --build pyinstaller --copy_backend
+    
+      - name: compress archive
+        run: |
+          zip -r REAL-Video-Enhancer-2.2.1-MacOS_x86_64.zip dist/
+
+      - name: Save Archive as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: REAL-Video-Enhancer-2.2.1-MacOS_x86_64.zip
+          path: REAL-Video-Enhancer-2.2.1-MacOS_x86_64.zip
+
+  build-MacOS_arm64:
+
+    runs-on: macos-14
+
+    permissions: write-all  
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+
+        uses: actions/setup-python@v5
+
+        with:
+          python-version: 3.11.9
+
+      - name: Install Python Dependencies
+        run: |
+          brew install pyside@6
+          python3 -m pip install -r requirements.txt
+
+      - name: Build
+        run: |
+          python3 build.py --build pyinstaller --copy_backend
+
+      - name: compress archive
+        run: |
+
+
+          zip -r REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip dist/
+
+      - name: Save Archive as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip
+          path: REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip
 
   Release:
-    needs: [build-Windows, build-Linux]
+    needs: [build-Windows, build-Linu, build-MacOS, build-MacOS_arm64]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -93,15 +163,15 @@ jobs:
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1        
         with:
-          name: REAL Video Enhancer 2.2.5 Pre-Release
-          tag_name: prerelease_2.2.5
+          name: REAL Video Enhancer 2.2.1 Pre-Release
+          tag_name: prerelease_2.2.1
           body_path: ./RELEASE_BODY.md
           draft: false
           prerelease: true
           
           files: |
-              artifacts/REAL-Video-Enhancer-2.2.5-Windows.zip/REAL-Video-Enhancer-2.2.5-Windows.zip
-              artifacts/REAL-Video-Enhancer-2.2.5-Linux.zip/REAL-Video-Enhancer-2.2.5-Linux.zip
+              artifacts/REAL-Video-Enhancer-2.2.1-Windows.zip/REAL-Video-Enhancer-2.2.1-Windows.zip
+              artifacts/REAL-Video-Enhancer-2.2.1-Linux.zip/REAL-Video-Enhancer-2.2.1-Linux.zip
 
               
               

@@ -1,3 +1,4 @@
+from abc import  abstractmethod
 import os
 import subprocess
 import sys
@@ -5,56 +6,12 @@ import os
 import subprocess
 import sys
 import shutil
-
+import argparse
+import requests
 import urllib.request
 
-linux_and_mac_py_ver = "python3"
-
-
-def checkIfExeExists(exe):
-    path = shutil.which(exe)
-    return path is not None
-
-
-def getPlatform():
-    return sys.platform
-
-
-def python_path():
-    return (
-        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3"
-    )
-
-
-python_version = (
-    linux_and_mac_py_ver
-    if getPlatform() != "win32" and checkIfExeExists(linux_and_mac_py_ver)
-    else "python3"
-)
-
-
-def get_site_packages():
-    command = [
-        python_path(),
-        "-c",
-        'import site; print("\\n".join(site.getsitepackages()))',
-    ]
-    result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
-    site_packages = result.stdout.strip().split('\n')[0]
-    if os.path.exists(site_packages):
-        return site_packages
-    site_packages = site_packages.replace('dist','site')
-    if os.path.exists(site_packages):
-        return site_packages
-    print(site_packages)
-    raise FileNotFoundError("Unable to locate site packages for python venv!")
-
-
-def download_file(url, destination):
-    print(f"Downloading file from {url}")
-    urllib.request.urlretrieve(url, destination)
-    print("File downloaded successfully")
-
+PLATFORM = sys.platform
+OUTPUT_FOLDER = "dist"
 
 def zero_mainwindow_size():
     import xml.etree.ElementTree as ET
@@ -75,143 +32,260 @@ def zero_mainwindow_size():
 
     set_mainwindow_size_zero()
 
+def downloadFile(link, downloadLocation):
+    response = requests.get(
+        link,
+        stream=True,
+    )
 
-def build_gui():
-    print("Building GUI")
-    zero_mainwindow_size()
-    if getPlatform() == "darwin" or getPlatform() == "linux":
-        os.system(
-            f"{get_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"
-        )
-    if getPlatform() == "win32":
-        os.system(
-            r".\venv\Lib\site-packages\PySide6\uic.exe -g python testRVEInterface.ui > mainwindow.py"
-        )
+    with open(downloadLocation, "wb") as f:
+        for chunk in response.iter_content(chunk_size=1024):
+            f.write(chunk)
 
 
-def install_pip():
-    download_file("https://bootstrap.pypa.io/get-pip.py", "get-pip.py")
-    command = ["python3", "get-pip.py"]
-    subprocess.run(command)
+class PythonManager:
 
+    PYTHON_VENV_PATH = "venv\\Scripts\\python.exe" if PLATFORM == "win32" else "venv/bin/python3"
+    PYTHON_SYSTEM_EXECUTABLE = "python3"
 
-def install_pip_in_venv():
-    command = [
-        "venv\\Scripts\\python.exe" if getPlatform() == "win32" else "venv/bin/python3",
-        "get-pip.py",
-    ]
-    subprocess.run(command)
-
-
-def build_resources():
-    print("Building resources.rc")
-    if getPlatform() == "darwin" or getPlatform() == "linux":
-        os.system(
-            f"{get_site_packages()}/PySide6/Qt/libexec/rcc -g python resources.qrc > resources_rc.py"
-        )
-    if getPlatform() == "win32":
-        os.system(
-            r".\venv\Lib\site-packages\PySide6\rcc.exe -g python resources.qrc > resources_rc.py"
-        )
-
-
-def create_venv():
-    print("Creating virtual environment")
-    command = [python_version, "-m", "venv", "venv"]
-    subprocess.run(command)
-
-
-def install_requirements_in_venv():
-    print("Installing requirements in virtual environment")
-    command = [
-        python_path(),
-        "-m",
-        "pip",
-        "install",
-        "-r",
-        "requirements.txt",
-    ]
-
-    subprocess.run(command)
-
-
-def build_executable(dist_dir=None):
-    print("Building executable")
-    if getPlatform() == "win32" or getPlatform() == "darwin":
-        if dist_dir is None:
-            dist_dir = "dist"
+    def __init__(self):
+        if not os.path.exists("venv"):
+            self.setup_python()
+    
+    @classmethod
+    def run_venv_python(cls, command: str):
+        command = [cls.PYTHON_VENV_PATH,] + command.split()
+        subprocess.run(command)
+    
+    @classmethod
+    def pip_install_package_in_venv(cls, package: str):
         command = [
-            python_path(),
+            cls.PYTHON_VENV_PATH,
             "-m",
-            "PyInstaller",
-            "REAL-Video-Enhancer.py",
-            "--collect-all",
-            "PySide6",
-            "--icon=icons/logo-v2.ico",
-            "--noconfirm",
-            "--noupx",
-            "--distpath",
-            dist_dir,
-            # "--noconsole", this caused issues, maybe I can fix it later
+            "pip",
+            "install",
+            package,
         ]
-    else:
-        if dist_dir is None:
-            dist_dir = "bin"
+        subprocess.run(command)
+
+    def setup_python(self):
+        self.__create_venv()
+        self.__install_pip_in_venv()
+        self.__install_requirements_in_venv()
+
+    def __create_venv(self):
+        print("Creating virtual environment")
+        command = [self.PYTHON_SYSTEM_EXECUTABLE, "-m", "venv", "venv"]
+        subprocess.run(command)
+
+
+    def __install_pip_in_venv(self):
         command = [
-            python_path(),
+            self.PYTHON_VENV_PATH,
             "-m",
-            "cx_Freeze",
-            "REAL-Video-Enhancer.py",
-            "--target-dir",
-            dist_dir,
+            "ensurepip",
         ]
-    subprocess.run(command)
+        subprocess.run(command)
+
+    def __install_requirements_in_venv(self):
+        print("Installing requirements in virtual environment")
+        if not os.path.isfile("requirements.txt"):
+            raise FileNotFoundError("No requirements.txt in current directory!")
+        command = [
+            self.PYTHON_VENV_PATH,
+            "-m",
+            "pip",
+            "install",
+            "-r",
+            "requirements.txt",
+        ]
+
+        subprocess.run(command)
+        
+
+    def get_venv_site_packages(self):
+        command = [
+            self.PYTHON_VENV_PATH,
+            "-c",
+            'import site; print("\\n".join(site.getsitepackages()))',
+        ]
+        result = subprocess.run(command, stdout=subprocess.PIPE, text=True)
+        site_packages = result.stdout.strip().split('\n')[0]
+        if os.path.exists(site_packages):
+            return site_packages
+        site_packages = site_packages.replace('dist','site')
+        if os.path.exists(site_packages):
+            return site_packages
+        print(site_packages)
+        raise FileNotFoundError("Unable to locate site packages for python venv!")
+    
 
 
-def copy_backend(build_dir=None):
-    print("Copying backend")
-    if getPlatform() == "win32":
-        if build_dir is None:
-            build_dir = "dist"
-        try:
-            os.system(f"cp -r backend {build_dir}/REAL-Video-Enhancer/backend")
-        except Exception:
-            pass
-        if not os.path.exists(rf"{build_dir}\\REAL-Video-Enhancer\\backend"):
+class BuildManager:
+    def __init__(self):
+        shutil.rmtree(OUTPUT_FOLDER, ignore_errors=True)
+        self.python_manager = PythonManager()
+
+    
+
+    @abstractmethod
+    def build(self):
+        ...
+    
+    def download_file(self, url, destination):
+        print(f"Downloading file from {url}")
+        urllib.request.urlretrieve(url, destination)
+        print("File downloaded successfully")
+
+    def build_gui(self):
+        print("Building GUI")
+        zero_mainwindow_size()
+        if PLATFORM == "darwin" or PLATFORM == "linux":
             os.system(
-                f'xcopy "./backend" "./{build_dir}/REAL-Video-Enhancer/backend" /E /I'
+                f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"
             )
-    if getPlatform() == "linux":
-        if build_dir is None:
-            build_dir = "bin"
-        os.system(f"cp -r backend {build_dir}/")
+        if PLATFORM == "win32":
+            os.system(
+                r".\venv\Lib\site-packages\PySide6\uic.exe -g python testRVEInterface.ui > mainwindow.py"
+            )
+    
+    def build_resources(self):
+        print("Building resources.rc")
+        if PLATFORM == "darwin" or PLATFORM == "linux":
+            os.system(
+                f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/rcc -g python resources.qrc > resources_rc.py"
+            )
+        if PLATFORM == "win32":
+            os.system(
+                r".\venv\Lib\site-packages\PySide6\rcc.exe -g python resources.qrc > resources_rc.py"
+            )
+
+    
+    def copy_backend(self, build_dir=None):
+        print("Copying backend")
+        if PLATFORM == "win32":
+            if build_dir is None:
+                build_dir = "dist"
+            try:
+                os.system(f"cp -r backend {build_dir}/REAL-Video-Enhancer/backend")
+            except Exception:
+                pass
+            if not os.path.exists(rf"{build_dir}\\REAL-Video-Enhancer\\backend"):
+                os.system(
+                    f'xcopy "./backend" "./{build_dir}/REAL-Video-Enhancer/backend" /E /I'
+                )
+        if PLATFORM == "linux":
+            if build_dir is None:
+                build_dir = "bin"
+            os.system(f"cp -r backend {build_dir}/")
 
 
-def clean():
-    print("Cleaning up")
-    os.remove("get-pip.py")
+class PyInstaller(BuildManager):
+    pyinstaller_version = "pyinstaller==6.12.0"
 
+    def build(self):
+        print("Building executable")
 
-def build_venv():
-    create_venv()
-    install_pip_in_venv()
-    install_requirements_in_venv()
+        PythonManager.pip_install_package_in_venv(self.pyinstaller_version)
+        PythonManager.run_venv_python(
+            (
+              "-m PyInstaller" 
+            + " REAL-Video-Enhancer.py" 
+            + " --icon=icons/logo-v2.ico" 
+            + " --noconfirm"
+            + " --noupx" 
+            + " --noconsole"
+            + " --distpath"
+            + f" {OUTPUT_FOLDER}"
+            )
+        )
+            
+class CxFreeze(BuildManager):
 
+    cx_freeze_version = "cx_freeze==7.0.0"
 
-if len(sys.argv) > 1:
-    if sys.argv[1] == "--create_venv" or sys.argv[1] == "--build_exe":
-        build_venv()
+    def build(self):
+        print("Building executable")
 
-if not os.path.exists("venv"):
-    build_venv()
+        PythonManager.pip_install_package_in_venv(self.cx_freeze_version)
+        PythonManager.run_venv_python(
+            (
+              " -m"
+            + " cx_Freeze"
+            + " REAL-Video-Enhancer.py"
+            + " --target-dir"
+            + f" {OUTPUT_FOLDER}"
+            )
+        )
+        if PLATFORM == "linux":
+            try:
+                if not os.path.isfile('/usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0'):
+                    raise FileNotFoundError("Unable to build as libxcbcursor is not installed!")
+                
+                input_file = "/usr/lib/x86_64-linux-gnu/libxcb-cursor.so.0"
+            except FileNotFoundError:
+                try:
+                    print("libxcbcursor not found, downloading...")
+                    
+                    downloadFile("https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/libxcb-cursor.so.0","libxcb-cursor.so.0")
+                    input_file = "libxcb-cursor.so.0"
+                except requests.exceptions.ConnectionError:
+                    raise FileNotFoundError("libxcbcursor not installed, and no network available to download it!")
+            print("Copying libcursor to qt lib directory")
+            shutil.copy(input_file, f"{OUTPUT_FOLDER}/lib/PySide6/Qt/lib")
+            
 
-build_gui()
-build_resources()
+class Nuitka(BuildManager):
 
-if "--build_dir_override" in sys.argv:
-    build_dir = sys.argv[sys.argv.index("--build_dir_override") + 1]
-    build_executable(build_dir)
-    copy_backend(build_dir=build_dir)
-if "--build_exe" in sys.argv and "--build_dir_override" not in sys.argv:
-    build_executable()
-    copy_backend()
+    nuitka_version = "nuitka==2.6.7"
+
+    def build(self):
+        print("Building executable")
+
+        PythonManager.pip_install_package_in_venv(self.nuitka_version)
+        PythonManager.run_venv_python(
+            (
+              " -m nuitka" 
+            + " --standalone" 
+            + " --low-memory"
+            + " --include-package-data=PySide6"
+            + " --include-package-data=cpuinfo"
+            + " --enable-plugin=pyside6"
+            + " --include-qt-plugins=qml"
+            + " --show-progress" 
+            + " --show-scons" 
+            + f" --output-dir={OUTPUT_FOLDER}"
+            + " REAL-Video-Enhancer.py"
+            )
+        )
+
+if __name__ == "__main__":
+    
+    args = argparse.ArgumentParser()
+    args.add_argument("--build", help="Build the application with a specific builder.", default="gui", choices=["pyinstaller", "cx_freeze", "nuitka", "gui"])
+    args.add_argument("--copy_backend", help="Copy the backend to the build directory", action="store_true")    
+    args = args.parse_args()
+    BuildManager().python_manager.pip_install_package_in_venv("PySide6==6.8.0") # up to date pyside6 version to build the GUI
+    BuildManager().build_resources()
+    BuildManager().build_gui()
+    BuildManager().python_manager.setup_python()
+    if PLATFORM is not 'win32':
+        BuildManager().python_manager.pip_install_package_in_venv("PySide6==6.8.0") # linux/mac not impacted
+
+    match args.build:
+        case "pyinstaller":
+            builder = PyInstaller()
+        case "cx_freeze":
+            builder = CxFreeze()
+        case "nuitka":
+            builder = Nuitka()
+        case "gui":
+            exit()
+        case _:
+            raise ValueError("Invalid build option")
+    builder.build()
+    if args.copy_backend:
+        builder.copy_backend()
+    print("Build complete")
+
+    

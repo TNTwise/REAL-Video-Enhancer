@@ -129,6 +129,7 @@ class HandleApplication:
             video_encoder_preset=self.args.video_encoder_preset,
             audio_encoder_preset=self.args.audio_encoder_preset,
             audio_bitrate=self.args.audio_bitrate,
+            subtitle_encoder_preset=self.args.subtitle_encoder_preset,
             benchmark=self.args.benchmark,
             custom_encoder=self.args.custom_encoder,
             border_detect=self.args.border_detect,
