@@ -172,6 +172,8 @@ jobs:
           files: |
               artifacts/REAL-Video-Enhancer-2.2.1-Windows.zip/REAL-Video-Enhancer-2.2.1-Windows.zip
               artifacts/REAL-Video-Enhancer-2.2.1-Linux.zip/REAL-Video-Enhancer-2.2.1-Linux.zip
+              artifacts/REAL-Video-Enhancer-2.2.1-MacOS_x86_64.zip/REAL-Video-Enhancer-2.2.1-MacOS_x86_64.zip
+              artifacts/REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip/REAL-Video-Enhancer-2.2.1-MacOS_arm64.zip
 
               
               
