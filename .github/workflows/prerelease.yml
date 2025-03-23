@@ -27,6 +27,7 @@ jobs:
       
       - name: compress archive
         run: |
+          mv dist/ bin/
           zip -r REAL-Video-Enhancer-2.2.1-Linux.zip bin/
 
       - name: Save Archive as artifact
