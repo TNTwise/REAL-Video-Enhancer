@@ -308,8 +308,8 @@ class DownloadDependencies:
             "https://download.pytorch.org/whl/pytorch_triton_rocm-2.3.1-cp311-cp311-linux_x86_64.whl",
             "einops",
             "safetensors",
-            "https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
-            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp311-cp311-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/rocm5.7/torch-2.3.1%2Brocm5.7-cp312-cp312-linux_x86_64.whl",
+            "https://download.pytorch.org/whl/rocm5.7/torchvision-0.18.1%2Brocm5.7-cp312-cp312-linux_x86_64.whl",
         ]
         if PLATFORM == "linux":
             self.pip(rocmLinuxDeps, install)
