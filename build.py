@@ -7,7 +7,6 @@ import subprocess
 import sys
 import shutil
 import argparse
-import requests
 import urllib.request
 
 PLATFORM = sys.platform
@@ -32,16 +31,10 @@ def zero_mainwindow_size():
 
     set_mainwindow_size_zero()
 
-def downloadFile(link, downloadLocation):
-    response = requests.get(
-        link,
-        stream=True,
-    )
-
-    with open(downloadLocation, "wb") as f:
-        for chunk in response.iter_content(chunk_size=1024):
-            f.write(chunk)
-
+def download_file(url, destination):
+        print(f"Downloading file from {url}")
+        urllib.request.urlretrieve(url, destination)
+        print("File downloaded successfully")
 
 class PythonManager:
 
@@ -132,10 +125,6 @@ class BuildManager:
     def build(self):
         ...
     
-    def download_file(self, url, destination):
-        print(f"Downloading file from {url}")
-        urllib.request.urlretrieve(url, destination)
-        print("File downloaded successfully")
 
     def build_gui(self):
         print("Building GUI")
@@ -161,7 +150,7 @@ class BuildManager:
             )
 
     
-    def copy_backend(self, build_dir=None):
+    def copy_backend(self, build_dir="dist"):
         print("Copying backend")
         if PLATFORM == "win32":
             if build_dir is None:
@@ -174,10 +163,8 @@ class BuildManager:
                 os.system(
                     f'xcopy "./backend" "./{build_dir}/REAL-Video-Enhancer/backend" /E /I'
                 )
-        if PLATFORM == "linux":
-            if build_dir is None:
-                build_dir = "bin"
-            os.system(f"cp -r backend {build_dir}/")
+        else:
+            os.system(f"cp -r backend {build_dir}/backend")
 
 
 class PyInstaller(BuildManager):
@@ -194,7 +181,7 @@ class PyInstaller(BuildManager):
             + " --icon=icons/logo-v2.ico" 
             + " --noconfirm"
             + " --noupx" 
-            # + " --noconsole"
+            + " --noconsole" # i think this fixes weird macos dir shit
             + " --distpath"
             + f" {OUTPUT_FOLDER}"
             )
@@ -227,9 +214,10 @@ class CxFreeze(BuildManager):
                 try:
                     print("libxcbcursor not found, downloading...")
                     
-                    downloadFile("https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/libxcb-cursor.so.0","libxcb-cursor.so.0")
+                    download_file("https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/libxcb-cursor.so.0","libxcb-cursor.so.0")
                     input_file = "libxcb-cursor.so.0"
-                except requests.exceptions.ConnectionError:
+                except Exception as e:
+                    print(e)
                     raise FileNotFoundError("libxcbcursor not installed, and no network available to download it!")
             print("Copying libcursor to qt lib directory")
             shutil.copy(input_file, f"{OUTPUT_FOLDER}/lib/PySide6/Qt/lib")
@@ -269,7 +257,7 @@ if __name__ == "__main__":
     BuildManager().build_resources()
     BuildManager().build_gui()
     BuildManager().python_manager.setup_python()
-    if PLATFORM is not 'win32':
+    if PLATFORM != 'win32':
         BuildManager().python_manager.pip_install_package_in_venv("PySide6==6.8.0") # linux/mac not impacted
 
     match args.build:
