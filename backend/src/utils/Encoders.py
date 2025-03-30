@@ -99,7 +99,7 @@ class ffv1(VideoEncoder):
 class prores(VideoEncoder):
     preset_tag = "prores"
     preInputsettings = None
-    postInputSettings = "-c:v prores"
+    postInputSettings = "-c:v prores_ks"
 
 
 class x264_vulkan(VideoEncoder):
@@ -112,21 +112,21 @@ class x264_vulkan(VideoEncoder):
 class x264_nvenc(VideoEncoder):
     preset_tag = "x264_nvenc"
     preInputsettings = "-hwaccel cuda -hwaccel_output_format cuda"
-    postInputSettings = "-c:v h264_nvenc -preset slow"
+    postInputSettings = "-c:v h264_nvenc"
     qualityControlMode: str = "-cq:v"
 
 
 class x265_nvenc(VideoEncoder):
     preset_tag = "x265_nvenc"
     preInputsettings = "-hwaccel cuda -hwaccel_output_format cuda"
-    postInputSettings = "-c:v hevc_nvenc -preset slow"
+    postInputSettings = "-c:v hevc_nvenc"
     qualityControlMode: str = "-cq:v"
 
 
 class av1_nvenc(VideoEncoder):
     preset_tag = "av1_nvenc"
     preInputsettings = "-hwaccel cuda -hwaccel_output_format cuda"
-    postInputSettings = "-c:v av1_nvenc -preset slow"
+    postInputSettings = "-c:v av1_nvenc"
     qualityControlMode: str = "-cq:v"
 
 
