@@ -61,6 +61,7 @@ Section "install"
     createDirectory "$SMPROGRAMS\${COMPANYNAME}"
 	  createShortCut "$SMPROGRAMS\${COMPANYNAME}\${NAME}.lnk" "$INSTDIR\REAL-Video-Enhancer.exe" "" "$INSTDIR\logo-v2.ico"
     writeUninstaller "$INSTDIR\Uninstall.exe"
+    RMDir /r "$INSTDIR\backend" 
     # Registry information for add/remove programs
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${NAME}" "DisplayName" "${NAME}"
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${NAME}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
