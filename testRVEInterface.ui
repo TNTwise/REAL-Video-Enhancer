@@ -1981,7 +1981,7 @@ border-radius:10px;
                                            </size>
                                           </property>
                                           <property name="toolTip">
-                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder command:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;     -&lt;/span&gt; Encoder settings passed to FFMpeg, can be manually tweaked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder command:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;     -&lt;/span&gt; Encoder settings passed to FFmpeg, can be manually tweaked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                           </property>
                                           <property name="text">
                                            <string />
@@ -2083,7 +2083,7 @@ border-radius:10px;
                                         </size>
                                        </property>
                                        <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;HDR Mode:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;Enables necessary settings within ffmpeg to output a HDR video, and processces in rgb48 mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;HDR Mode:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;Enables necessary settings within ffmpeg to output an HDR video, and processes in RGB48 mode.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                        </property>
                                        <property name="text">
                                         <string />
@@ -2152,7 +2152,7 @@ border-radius:10px;
                                         </size>
                                        </property>
                                        <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Merge Subtitles&lt;/span&gt;&lt;/p&gt;&lt;p&gt; -Merges subtitles into output video, may cause issues with some audio tracks (yes AUDIO).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Merge Subtitles&lt;/span&gt;&lt;/p&gt;&lt;p&gt; -Merges subtitles into output video. May cause issues with some audio tracks (yes AUDIO).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                        </property>
                                        <property name="text">
                                         <string />
@@ -2363,7 +2363,7 @@ border-radius:10px;
                                         </size>
                                        </property>
                                        <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Split up processing upscaled frames into chunks.&lt;/p&gt;&lt;p&gt;Lowers VRAM usage, but also slows down render. &lt;/p&gt;&lt;p&gt;Only use when render failes due to VRAM limits.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Split up processing upscaled frames into chunks.&lt;/p&gt;&lt;p&gt;Lowers VRAM usage, but also slows down render. &lt;/p&gt;&lt;p&gt;Only use when render fails due to VRAM limits.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                        </property>
                                        <property name="text">
                                         <string />
@@ -2598,7 +2598,7 @@ border-radius:10px;
                                         </size>
                                        </property>
                                        <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ensembles flow, can produce better results.&lt;/p&gt;&lt;p&gt;Only compadible with older RIFE models and GMFSS&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ensembles flow, can produce better results.&lt;/p&gt;&lt;p&gt;Only compatible with older RIFE models and GMFSS.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                        </property>
                                        <property name="text">
                                         <string />
@@ -2658,7 +2658,7 @@ border-radius:10px;
                                         </size>
                                        </property>
                                        <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase video length instead of framerate when interpolating.&lt;/p&gt;&lt;p&gt;Audio and Subtitles will not be transfered to output video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase video length instead of framerate when interpolating.&lt;/p&gt;&lt;p&gt;Audio and subtitles will not be transferred to the output video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                        </property>
                                        <property name="text">
                                         <string />
