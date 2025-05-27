@@ -427,7 +427,7 @@ class Render:
             self.upscaleModel = os.path.join(path, last_folder)
             self.modelScale = getNCNNScale(modelPath=self.upscaleModel) 
             self.upscaleTimes = self.modelScale if not self.override_upscale_scale else self.override_upscale_scale
-            self.upscaleOption = self.upscaleNCNNObject(scale=self.upscaleTimes)
+            self.upscaleOption = self.upscaleNCNNObject(scale=self.modelScale)
 
         if self.backend == "directml":  # i dont want to work with this shit
             from .onnx.UpscaleONNX import UpscaleONNX
