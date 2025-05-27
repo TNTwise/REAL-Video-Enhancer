@@ -123,7 +123,6 @@ def resize_image_bytes(image_bytes: bytes, width: int, height: int, target_width
     Returns:
         bytes: The resized image in bytes.
     """
-    log(f"Resizing image from {width}x{height} to {target_width}x{target_height}")
     if target_width == width and target_height == height:
         return image_bytes
     channels = len(bytes(image_bytes)) / (height * width) # 3 if RGB24/SDR, 6 if RGB48/HDR
