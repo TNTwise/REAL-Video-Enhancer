@@ -3,7 +3,7 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 ![license](https://img.shields.io/github/license/tntwise/real-video-enhancer)
-![Version](https://img.shields.io/badge/Version-2.3.6-blue)
+![Version](https://img.shields.io/badge/Version-2.3.8-blue)
 ![downloads_total](https://img.shields.io/github/downloads/tntwise/REAL-Video-Enhancer/total.svg?label=downloads%40total)
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
@@ -40,7 +40,7 @@
 
 # Introduction
 
-<strong>REAL Video Enhancer</strong>  is a redesigned and enhanced version of the original Rife ESRGAN App for Linux. This program offers convenient access to frame interpolation and upscaling functionalities on Windows, Linux and MacOS , and is an alternative to outdated software like <a rel="noopener noreferrer" href="https://nmkd.itch.io/flowframes" target="_blank" >Flowframes</a> or <a rel="noopener noreferrer" href="https://github.com/mafiosnik777/enhancr" target="_blank">enhancr</a>.
+<strong>REAL Video Enhancer</strong>  is a redesigned and enhanced version of the original Rife ESRGAN App for Linux. This program offers convenient access to frame interpolation and upscaling functionalities on Windows, Linux and MacOS, and is an alternative to outdated software like <a rel="noopener noreferrer" href="https://nmkd.itch.io/flowframes" target="_blank" >Flowframes</a> or <a rel="noopener noreferrer" href="https://github.com/mafiosnik777/enhancr" target="_blank">enhancr</a>.
 
 <p align=center>
   <img src="https://github.com/TNTwise/REAL-Video-Enhancer/blob/v2-main/screenshots/demo.png?raw=true" width = "100%">
@@ -128,7 +128,7 @@
 git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer 
 
 # Stable
-git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer --branch 2.3.6
+git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer --branch 2.3.8
 ```
 # Building:
 
@@ -161,6 +161,7 @@ python3 build.py --build BUILD_OPTION --copy_backend
 | Software Used | For | Link|
 |--|--|--|
 | FFmpeg | Multimedia framework for handling video, audio, and other media files | https://ffmpeg.org/ 
+| QT | GUI framework | https://qt.io/
 | FFMpeg Builds | Pre-compiled builds of FFMpeg. | Windows/Linux:  https://github.com/BtbN/FFmpeg-Builds, MacOS: https://github.com/eko5624/mpv-mac
 | PyTorch | Neural Network Inference (CUDA/ROCm/TensorRT) | https://pytorch.org/ 
 | NCNN | Neural Network Inference (Vulkan) | https://github.com/tencent/ncnn 

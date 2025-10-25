@@ -1,45 +1,11 @@
 import os
-from PySide6.QtWidgets import QMainWindow
-from .QTcustom import RegularQTPopup, NetworkCheckPopup, addNotificationToButton, remove_combobox_item_by_text
+from PySide6.QtWidgets import QMainWindow, QMessageBox
+from .QTcustom import RegularQTPopup, NetworkCheckPopup, remove_combobox_item_by_text
 from ..DownloadDeps import DownloadDependencies
-from ..DownloadModels import DownloadModel
-from ..ModelHandler import (
-    ncnnInterpolateModels,
-    pytorchInterpolateModels,
-    ncnnUpscaleModels,
-    pytorchUpscaleModels,
-)
-import os
-
-
-from PySide6.QtWidgets import QMessageBox
-
-from PySide6.QtWidgets import QMessageBox
 from .Updater import ApplicationUpdater
-from ..constants import IS_FLATPAK, MODELS_PATH, PLATFORM, CWD, USE_LOCAL_BACKEND, HOME_PATH, BACKEND_PATH, PYTHON_EXECUTABLE_PATH, PYTHON_DIRECTORY, PLATFORM, IS_FLATPAK, CWD, CPU_ARCH
+from ..constants import IS_FLATPAK, PLATFORM, CWD, USE_LOCAL_BACKEND, HOME_PATH, PLATFORM, IS_FLATPAK, CWD, CPU_ARCH
 from ..BuiltInTorchVersions import TorchVersion
 from ..Util import FileHandler
-
-def downloadModelsBasedOnInstalledBackend(installed_backends: list):
-    if NetworkCheckPopup():
-        for backend in installed_backends:
-            match backend:
-                case "ncnn":
-                    for model in ncnnInterpolateModels:
-                        DownloadModel(
-                            model, ncnnInterpolateModels[model][1], MODELS_PATH
-                        )
-                    for model in ncnnUpscaleModels:
-                        DownloadModel(model, ncnnUpscaleModels[model][1], MODELS_PATH)
-                case "pytorch":  # no need for tensorrt as it uses pytorch models
-                    for model in pytorchInterpolateModels:
-                        DownloadModel(
-                            model, pytorchInterpolateModels[model][1], MODELS_PATH
-                        )
-                    for model in pytorchUpscaleModels:
-                        DownloadModel(
-                            model, pytorchUpscaleModels[model][1], MODELS_PATH
-                        )
 
 
 class DownloadTab:
@@ -115,14 +81,7 @@ class DownloadTab:
         self.parent.downloadDirectMLBtn.clicked.connect(
             lambda: self.download("directml", True)
         )
-        self.parent.downloadAllModelsBtn.clicked.connect(
-            lambda: downloadModelsBasedOnInstalledBackend(
-                ["ncnn", "pytorch", "tensorrt", "directml"]
-            )
-        )
-        self.parent.downloadSomeModelsBasedOnInstalledBackendbtn.clicked.connect(
-            lambda: downloadModelsBasedOnInstalledBackend(self.backends)
-        )
+        
         self.parent.uninstallNCNNBtn.clicked.connect(
             lambda: self.download("ncnn", False)
         )

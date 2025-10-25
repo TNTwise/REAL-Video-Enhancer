@@ -1,9 +1,9 @@
 import queue
+import sys
 from abc import ABC, abstractmethod
 import os
 import subprocess
 import queue
-import sys
 import time
 import cv2
 import numpy as np
@@ -36,7 +36,7 @@ class FFmpegRead(Buffer):
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
         self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
-
+        #self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
         else:
@@ -44,7 +44,8 @@ class FFmpegRead(Buffer):
                 self.inputFrameChunkSize = width * height * 3 // 2
             else:
                 self.inputFrameChunkSize = width * height * 3
-
+        command = self.command()
+        log("FFMPEG READ COMMAND: " + str(command))
         self.readProcess = subprocess_popen_without_terminal(
             self.command(),
             stdout=subprocess.PIPE,
@@ -53,15 +54,14 @@ class FFmpegRead(Buffer):
         self.readQueue = queue.Queue(maxsize=25)
 
     def command(self):
-        log("Generating FFmpeg READ command...")
         
         command = [
             f"{FFMPEG_PATH}",
             "-i",
             f"{self.inputFile}",
         ]
-        
-        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih" # fix dar != sar
+
+        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih" #+ ":in_range=limited:out_range=full,format=yuv420p" if self.yuv420pMOD == "yuv420p" else "" # fix dar != sar
         #if not self.hdr_mode:
         #    if self.input_pixel_format == "yuv420p":
         #        filter_string += ":in_range=tv:out_range=pc" # color shifts a smidgen but helps with artifacts when converting yuv to raw
@@ -182,7 +182,6 @@ class FFmpegWrite(Buffer):
         self.color_space = color_space
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
-        log(f"FFmpegWrite parameters: inputFile={inputFile}, outputFile={outputFile}, width={width}, height={height}, start_time={start_time}, end_time={end_time}, fps={fps}, crf={crf}, audio_bitrate={audio_bitrate}, pixelFormat={pixelFormat}, overwrite={overwrite}, custom_encoder={custom_encoder}, benchmark={benchmark}, slowmo_mode={slowmo_mode}, upscaleTimes={upscaleTimes}, interpolateFactor={interpolateFactor}, ceilInterpolateFactor={ceilInterpolateFactor}, video_encoder={video_encoder}, audio_encoder={audio_encoder}, subtitle_encoder={subtitle_encoder}, hdr_mode={hdr_mode}, mpv_output={mpv_output}, merge_subtitles={merge_subtitles}")
         self.outputFPS = (
             (self.fps * self.interpolateFactor)
             if not self.slowmo_mode
@@ -190,9 +189,10 @@ class FFmpegWrite(Buffer):
         )
         self.ffmpeg_log = open(FFMPEG_LOG_FILE, "w", encoding='utf-8')
         try:
-
+            command = self.command()
+            log("\nFFMPEG WRITE COMMAND: " + str(command) + "\n")
             self.writeProcess = subprocess_popen_without_terminal(
-                self.command(),
+                command,
                 stdin=subprocess.PIPE,
                 stderr=self.ffmpeg_log,
                 stdout=subprocess.PIPE if self.mpv_output else self.ffmpeg_log,
@@ -386,7 +386,7 @@ class FFmpegWrite(Buffer):
                 "-",
             ]
 
-        log("FFMPEG WRITE COMMAND: " + str(command))
+        
         return command
 
     def get_num_frames_rendered(self):
@@ -440,7 +440,7 @@ class FFmpegWrite(Buffer):
             log("Benchmark mode enabled, skipping subtitle merge.")
             return
 
-        temp_output = self.outputFile + ".temp.mkv"
+        temp_output = self.outputFile + "-" + str(os.getpid()) + "-temp.mkv"
         os.rename(self.outputFile, temp_output)
 
         command = [
@@ -462,9 +462,6 @@ class FFmpegWrite(Buffer):
             self.outputFile,
         ]
 
-        if self.overwrite:
-            command.append("-y")
-
         log("Merging subtitles with command: " + " ".join(command))
 
         try:
@@ -472,6 +469,7 @@ class FFmpegWrite(Buffer):
             if result.returncode != 0:
                 log("Failed to merge subtitles. FFmpeg error:")
                 log(result.stderr.decode())
+                os.remove(self.outputFile) # Remove incomplete output file
                 os.rename(temp_output, self.outputFile)  # Restore original file
                 return
             os.remove(temp_output)

@@ -134,7 +134,44 @@ class FileHandler:
             )
             iteration += 1
         return output_file
+    @staticmethod
+    def getDefaultOutputFolder() -> str:
+        """
+        Returns the default output folder based on the operating system.
+        """
+        videos_folder = os.path.join(f"{HOME_PATH}", "Videos")
+        
+        if PLATFORM == "linux":
+            try:
+                result = subprocess.run(
+                    ["xdg-user-dir", "VIDEOS"], capture_output=True, text=True
+                ).stdout.strip()
+                if os.path.isdir(result):
+                    videos_folder = result
+            except Exception as e:
+                log(f"An error occurred while getting the Videos folder on Linux: {e}")
 
+        if PLATFORM == "win32":
+            try:
+                import ctypes
+                from ctypes import wintypes
+
+                CSIDL_MYVIDEO = 0x000e
+                SHGFP_TYPE_CURRENT = 0
+
+                buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
+                ctypes.windll.shell32.SHGetFolderPathW(
+                    None, CSIDL_MYVIDEO, None, SHGFP_TYPE_CURRENT, buf
+                )
+                if os.path.isdir(buf.value):
+                    videos_folder = buf.value
+            except Exception as e:
+                log(f"An error occurred while getting the Videos folder on Windows: {e}")
+
+        if PLATFORM == "darwin":
+            videos_folder = os.path.join(f"{HOME_PATH}", "Desktop")
+
+        return videos_folder
 
 def log(message: str):
     

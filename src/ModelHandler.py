@@ -62,12 +62,7 @@ pytorchInterpolateModels = {
         1,
         "gmfss",
     ),
-    "GIMM (Slow Model, Realistic/General)": (
-        "GIMMVFI_RAFT.pth",
-        "GIMMVFI_RAFT.pth",
-        1,
-        "gimm",
-    ),
+    
     "IFRNet (Fast Model, Realistic only)": (
         "IFRNet_Vimeo90K.pth",
         "IFRNet_Vimeo90K.pth",
@@ -609,9 +604,9 @@ for model in os.listdir(CUSTOM_MODELS_PATH):
     model_path = os.path.join(CUSTOM_MODELS_PATH, model)
     if os.path.exists(model_path):
         if not os.path.isfile(model_path):
-            customNCNNUpscaleModels[model] = (model, model, 1, "custom")
+            customNCNNUpscaleModels[model] = (model, model, 4, "custom")
     if model.endswith(".pth") or model.endswith(".safetensors"):
-        customPytorchUpscaleModels[model] = (model, model, 1, "custom")
+        customPytorchUpscaleModels[model] = (model, model, 4, "custom")
 
 
 pytorchUpscaleModels = pytorchUpscaleModels | customPytorchUpscaleModels

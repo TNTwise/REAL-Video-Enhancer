@@ -104,6 +104,16 @@ class ProcessTab:
             self.tileUpAnimationHandler.moveUpAnimation(self.parent.tileSizeContainer)
             self.parent.tileSizeContainer.setVisible(False)
 
+    def openOutputFolderInExplorer(self):
+        output_folder = os.path.dirname(self.parent.outputFileText.text())
+        if os.path.isdir(output_folder):
+            if PLATFORM == "win32":
+                os.startfile(output_folder)
+            elif PLATFORM == "darwin":
+                subprocess.Popen(["open", output_folder])
+            else:
+                subprocess.Popen(["xdg-open", output_folder])
+
     def QConnect(self):
         # connect file select buttons
         self.parent.addToRenderQueueButton.clicked.connect(self.parent.addToRenderQueue)
@@ -120,6 +130,7 @@ class ProcessTab:
         self.parent.batchSelectButton.clicked.connect(self.parent.openBatchFiles)
         self.parent.inputFileText.textChanged.connect(self.parent.loadVideo)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
+        self.parent.openOutputFolderButton.clicked.connect(self.openOutputFolderInExplorer)
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
         # set tile size visible to false by default

@@ -5,8 +5,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>0</width>
-    <height>0</height>
+    <width>1000</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -225,7 +225,7 @@ QScrollBar:horizontal{
              <string notr="true" />
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="homePage">
              <property name="styleSheet">
@@ -892,7 +892,7 @@ background-color: #1f232a
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>500</width>
+                  <width>600</width>
                   <height>16777215</height>
                  </size>
                 </property>
@@ -934,7 +934,7 @@ background-color: #1f232a
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>500</width>
+                     <width>600</width>
                      <height>16777215</height>
                     </size>
                    </property>
@@ -1089,9 +1089,9 @@ background-color:#343b47
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-454</y>
-                                   <width>470</width>
-                                   <height>878</height>
+                                   <y>0</y>
+                                   <width>516</width>
+                                   <height>984</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -1182,32 +1182,32 @@ background-color:#343b47
                                        </property>
                                       </widget>
                                      </item>
-                                     <item>
-                                      <widget class="QLineEdit" name="inputFileText">
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
-                                       </property>
-                                       <property name="minimumSize">
-                                        <size>
-                                         <width>0</width>
-                                         <height>30</height>
-                                        </size>
-                                       </property>
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>230</width>
-                                         <height>30</height>
-                                        </size>
-                                       </property>
-                                       <property name="readOnly">
-                                        <bool>false</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
                                     </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="inputFileText">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>30</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>1000</width>
+                                      <height>30</height>
+                                     </size>
+                                    </property>
+                                    <property name="readOnly">
+                                     <bool>false</bool>
+                                    </property>
                                    </widget>
                                   </item>
                                   <item>
@@ -1256,15 +1256,9 @@ background-color:#343b47
                                       </widget>
                                      </item>
                                      <item>
-                                      <widget class="QLineEdit" name="outputFileText">
+                                      <widget class="QPushButton" name="openOutputFolderButton">
                                        <property name="enabled">
                                         <bool>false</bool>
-                                       </property>
-                                       <property name="sizePolicy">
-                                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                                         <horstretch>0</horstretch>
-                                         <verstretch>0</verstretch>
-                                        </sizepolicy>
                                        </property>
                                        <property name="minimumSize">
                                         <size>
@@ -1274,13 +1268,62 @@ background-color:#343b47
                                        </property>
                                        <property name="maximumSize">
                                         <size>
-                                         <width>230</width>
+                                         <width>16777215</width>
                                          <height>30</height>
                                         </size>
+                                       </property>
+                                       <property name="font">
+                                        <font>
+                                         <pointsize>12</pointsize>
+                                        </font>
+                                       </property>
+                                       <property name="styleSheet">
+                                        <string notr="true" />
+                                       </property>
+                                       <property name="text">
+                                        <string>Open Output Folder</string>
                                        </property>
                                       </widget>
                                      </item>
                                     </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QLineEdit" name="outputFileText">
+                                    <property name="enabled">
+                                     <bool>false</bool>
+                                    </property>
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
+                                    </property>
+                                    <property name="minimumSize">
+                                     <size>
+                                      <width>0</width>
+                                      <height>30</height>
+                                     </size>
+                                    </property>
+                                    <property name="maximumSize">
+                                     <size>
+                                      <width>10000</width>
+                                      <height>30</height>
+                                     </size>
+                                    </property>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="Line" name="line">
+                                    <property name="autoFillBackground">
+                                     <bool>false</bool>
+                                    </property>
+                                    <property name="styleSheet">
+                                     <string notr="true">background: white</string>
+                                    </property>
+                                    <property name="orientation">
+                                     <enum>Qt::Orientation::Horizontal</enum>
+                                    </property>
                                    </widget>
                                   </item>
                                   <item>
@@ -2159,52 +2202,67 @@ text-align: center;
                                    </widget>
                                   </item>
                                   <item>
-                                   <widget class="QTextEdit" name="videoInfoTextEdit">
-                                    <property name="enabled">
-                                     <bool>false</bool>
-                                    </property>
+                                   <widget class="QWidget" name="widget_26" native="true">
                                     <property name="sizePolicy">
-                                     <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+                                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                                       <horstretch>0</horstretch>
                                       <verstretch>0</verstretch>
                                      </sizepolicy>
                                     </property>
-                                    <property name="minimumSize">
-                                     <size>
-                                      <width>0</width>
-                                      <height>190</height>
-                                     </size>
-                                    </property>
                                     <property name="maximumSize">
                                      <size>
-                                      <width>100000</width>
-                                      <height>180</height>
+                                      <width>42344</width>
+                                      <height>200</height>
                                      </size>
                                     </property>
-                                    <property name="accessibleDescription">
-                                     <string notr="true" />
-                                    </property>
-                                    <property name="styleSheet">
-                                     <string notr="true">
+                                    <layout class="QHBoxLayout" name="horizontalLayout_22">
+                                     <item>
+                                      <widget class="QTextEdit" name="inputVideoInfoTextEdit">
+                                       <property name="enabled">
+                                        <bool>false</bool>
+                                       </property>
+                                       <property name="sizePolicy">
+                                        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+                                         <horstretch>0</horstretch>
+                                         <verstretch>0</verstretch>
+                                        </sizepolicy>
+                                       </property>
+                                       <property name="minimumSize">
+                                        <size>
+                                         <width>0</width>
+                                         <height>190</height>
+                                        </size>
+                                       </property>
+                                       <property name="maximumSize">
+                                        <size>
+                                         <width>100000</width>
+                                         <height>180</height>
+                                        </size>
+                                       </property>
+                                       <property name="accessibleDescription">
+                                        <string notr="true" />
+                                       </property>
+                                       <property name="styleSheet">
+                                        <string notr="true">
 QTextEdit:disabled{color:white;}</string>
-                                    </property>
-                                    <property name="verticalScrollBarPolicy">
-                                     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-                                    </property>
-                                    <property name="horizontalScrollBarPolicy">
-                                     <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-                                    </property>
-                                    <property name="sizeAdjustPolicy">
-                                     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
-                                    </property>
-                                    <property name="lineWrapMode">
-                                     <enum>QTextEdit::LineWrapMode::NoWrap</enum>
-                                    </property>
-                                    <property name="readOnly">
-                                     <bool>true</bool>
-                                    </property>
-                                    <property name="html">
-                                     <string notr="true">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
+                                       </property>
+                                       <property name="verticalScrollBarPolicy">
+                                        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                                       </property>
+                                       <property name="horizontalScrollBarPolicy">
+                                        <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                                       </property>
+                                       <property name="sizeAdjustPolicy">
+                                        <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+                                       </property>
+                                       <property name="lineWrapMode">
+                                        <enum>QTextEdit::LineWrapMode::NoWrap</enum>
+                                       </property>
+                                       <property name="readOnly">
+                                        <bool>true</bool>
+                                       </property>
+                                       <property name="html">
+                                        <string notr="true">&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd"&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name="qrichtext" content="1" /&gt;&lt;meta charset="utf-8" /&gt;&lt;style type="text/css"&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
@@ -2214,14 +2272,799 @@ li.checked::marker { content: "\2612"; }
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;FPS:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Resolution:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Frame Count:&lt;/span&gt;&lt;/p&gt;
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Bitrate:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Encoder:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Container:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Color Space:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Pixel Format:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Is HDR:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"&gt;&lt;span style=" font-size:10pt;"&gt;Bit Depth:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                       </property>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                 </layout>
+                                </widget>
+                               </widget>
+                              </item>
+                             </layout>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
+                         <widget class="QWidget" name="tab_6">
+                          <attribute name="title">
+                           <string>Encoder Options</string>
+                          </attribute>
+                          <layout class="QHBoxLayout" name="horizontalLayout_43">
+                           <item>
+                            <widget class="QWidget" name="widget_6" native="true">
+                             <layout class="QVBoxLayout" name="verticalLayout_15">
+                              <item>
+                               <widget class="QScrollArea" name="scrollArea_7">
+                                <property name="widgetResizable">
+                                 <bool>true</bool>
+                                </property>
+                                <widget class="QWidget" name="encoderSettings">
+                                 <property name="geometry">
+                                  <rect>
+                                   <x>0</x>
+                                   <y>0</y>
+                                   <width>428</width>
+                                   <height>484</height>
+                                  </rect>
+                                 </property>
+                                 <layout class="QVBoxLayout" name="verticalLayout_40">
+                                  <item>
+                                   <widget class="QWidget" name="widget_34" native="true">
+                                    <property name="sizePolicy">
+                                     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                                      <horstretch>0</horstretch>
+                                      <verstretch>0</verstretch>
+                                     </sizepolicy>
                                     </property>
+                                    <layout class="QVBoxLayout" name="verticalLayout_36">
+                                     <property name="spacing">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="leftMargin">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="topMargin">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="rightMargin">
+                                      <number>0</number>
+                                     </property>
+                                     <property name="bottomMargin">
+                                      <number>0</number>
+                                     </property>
+                                     <item>
+                                      <widget class="QWidget" name="widget_33" native="true">
+                                       <layout class="QVBoxLayout" name="verticalLayout_9">
+                                        <property name="leftMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="topMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="rightMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="bottomMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <item>
+                                         <widget class="QLabel" name="label_74">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>15</pointsize>
+                                            <underline>true</underline>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Encoder Settings</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QWidget" name="widget_32" native="true">
+                                          <layout class="QHBoxLayout" name="horizontalLayout_51">
+                                           <item>
+                                            <widget class="QScrollArea" name="scrollArea_6">
+                                             <property name="minimumSize">
+                                              <size>
+                                               <width>0</width>
+                                               <height>50</height>
+                                              </size>
+                                             </property>
+                                             <property name="verticalScrollBarPolicy">
+                                              <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+                                             </property>
+                                             <property name="horizontalScrollBarPolicy">
+                                              <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+                                             </property>
+                                             <property name="widgetResizable">
+                                              <bool>true</bool>
+                                             </property>
+                                             <widget class="QWidget" name="scrollAreaWidgetContents_6">
+                                              <property name="geometry">
+                                               <rect>
+                                                <x>0</x>
+                                                <y>0</y>
+                                                <width>918</width>
+                                                <height>48</height>
+                                               </rect>
+                                              </property>
+                                              <layout class="QHBoxLayout" name="horizontalLayout_54">
+                                               <item>
+                                                <widget class="QLineEdit" name="EncoderCommand">
+                                                 <property name="minimumSize">
+                                                  <size>
+                                                   <width>900</width>
+                                                   <height>30</height>
+                                                  </size>
+                                                 </property>
+                                                </widget>
+                                               </item>
+                                              </layout>
+                                             </widget>
+                                            </widget>
+                                           </item>
+                                           <item>
+                                            <widget class="QLabel" name="label_75">
+                                             <property name="maximumSize">
+                                              <size>
+                                               <width>25</width>
+                                               <height>25</height>
+                                              </size>
+                                             </property>
+                                             <property name="toolTip">
+                                              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder command:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;     -&lt;/span&gt; Encoder settings passed to FFMpeg, can be manually tweaked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                             </property>
+                                             <property name="text">
+                                              <string />
+                                             </property>
+                                             <property name="pixmap">
+                                              <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                             </property>
+                                             <property name="scaledContents">
+                                              <bool>true</bool>
+                                             </property>
+                                            </widget>
+                                           </item>
+                                          </layout>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QWidget" name="widget_15" native="true">
+                                    <layout class="QVBoxLayout" name="verticalLayout_26">
+                                     <item>
+                                      <widget class="QWidget" name="widget_17" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_15">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Video Encoder</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_9">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_54">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Compression algorithm for video, most common is libx264&lt;/p&gt;&lt;p&gt;- Any encoder without a device label is a CPU encoder.&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Lossy Encoders:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- libx264 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov, avi&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- libx265 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- vp9 (&lt;span style=" font-weight:700;"&gt;mkv, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- av1 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Lossless Encoders:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- prores (&lt;span style=" font-weight:700;"&gt;mkv, mov&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- ffv1 (&lt;span style=" font-weight:700;"&gt;mkv, avi&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="encoder">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>libx264</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>libx265</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>vp9</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>av1</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>prores</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>ffv1</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>x264_vulkan (experimental)</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>x264_nvenc</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>x265_nvenc</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>av1_nvenc (40 series and up)</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>x264_vaapi</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>x265_vaapi</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>av1_vaapi</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_16" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_36">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel_2">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Video Encoder Speed</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_22">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>237</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_55">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder Speed:&lt;/span&gt;&lt;/p&gt;&lt;p&gt; - Speed at which the encoder processes the video, &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Slower&lt;/span&gt; processing time means &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Better results for the file size&lt;/span&gt;&lt;span style=" text-decoration: underline;"&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="video_encoder_speed">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>fastest</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>fast</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>medium</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>slow</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>placebo</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_18" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_33">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel_5">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Video Quality</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_17">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>40</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="video_quality">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>Very_High</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>High</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>Medium</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>Low</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_27" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_44">
+                                        <item>
+                                         <widget class="QLabel" name="label_49">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Video Container</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_19">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>437</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_50">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Video Container&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Changes the video container in the default output file generated container.&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700;"&gt;mkv &lt;/span&gt;is &lt;span style=" font-weight:700;"&gt;recomended&lt;/span&gt; due to its extensive support for different formats.&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;WARNING: Changing this &lt;/span&gt;&lt;span style=" font-weight:700; text-decoration: underline;"&gt;MAY&lt;/span&gt;&lt;span style=" font-weight:700;"&gt; break encoder compadibility. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Please look at the audio and video encoder tooltips for compadibility.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="video_container">
+                                          <item>
+                                           <property name="text">
+                                            <string>mkv</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>mp4</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>mov</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>webm</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>avi</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_21" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_35">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel_7">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Video Pixel Format</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_20">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>469</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_58">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Pixel Format&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- D&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;efines how color information is stored for each pixel in a video frame.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv420p: Most common, removes the most information. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov, avi, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv422p: In between 420p and 444p. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv444p: Keeps the most information. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;br/&gt;&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;yuv 420/422/444 p10le: 10 bit version of each. (MKV and MP4 containers only) &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="video_pixel_format">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv420p</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv422p</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv444p</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv420p (10 bit)</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv422p (10 bit)</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>yuv444p (10 bit)</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_20" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_34">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel_10">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Audio Encoder</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_30">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>382</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_56">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Audio Encoder&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700;"&gt;Recommended &lt;/span&gt;to use &lt;span style=" font-weight:700;"&gt;aac&lt;/span&gt; if the video container is &lt;span style=" font-weight:700;"&gt;not mkv, &lt;/span&gt;or if the output video has audio isses.&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;copy_audio: No re-encoding is done on the output&lt;/p&gt;&lt;p&gt;- aac: Most common, and high quality.&lt;/p&gt;&lt;p&gt;- libmp3lame: Used less, low quality.&lt;/p&gt;&lt;p&gt;- opus: Used for &lt;span style=" font-weight:700;"&gt;webm&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="audio_encoder">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>copy_audio</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>aac</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>libmp3lame</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>opus</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="widget_36" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                        <item>
+                                         <widget class="QLabel" name="encoderLabel_6">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>Audio Bitrate</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_18">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>494</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_57">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Audio Bitrate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;Higher bitrate = higher quality&lt;/p&gt;&lt;p&gt;   - Only applies to &lt;span style=" font-weight:700;"&gt;aac &lt;/span&gt;and &lt;span style=" font-weight:700;"&gt;libmp3lame&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string />
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QComboBox" name="audio_bitrate">
+                                          <property name="minimumSize">
+                                           <size>
+                                            <width>0</width>
+                                            <height>0</height>
+                                           </size>
+                                          </property>
+                                          <item>
+                                           <property name="text">
+                                            <string>320k</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>192k</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>128k</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>96k</string>
+                                           </property>
+                                          </item>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                    </layout>
                                    </widget>
                                   </item>
                                  </layout>
@@ -2407,7 +3250,7 @@ border-radius:10px;
                                 <x>0</x>
                                 <y>0</y>
                                 <width>393</width>
-                                <height>510</height>
+                                <height>430</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -2438,133 +3281,6 @@ border-radius:10px;
                                <property name="bottomMargin">
                                 <number>11</number>
                                </property>
-                               <item alignment="Qt::AlignmentFlag::AlignTop">
-                                <widget class="QWidget" name="widget_34" native="true">
-                                 <property name="sizePolicy">
-                                  <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                                   <horstretch>0</horstretch>
-                                   <verstretch>0</verstretch>
-                                  </sizepolicy>
-                                 </property>
-                                 <layout class="QVBoxLayout" name="verticalLayout_36">
-                                  <property name="spacing">
-                                   <number>0</number>
-                                  </property>
-                                  <property name="leftMargin">
-                                   <number>0</number>
-                                  </property>
-                                  <property name="topMargin">
-                                   <number>0</number>
-                                  </property>
-                                  <property name="rightMargin">
-                                   <number>0</number>
-                                  </property>
-                                  <property name="bottomMargin">
-                                   <number>0</number>
-                                  </property>
-                                  <item>
-                                   <widget class="QWidget" name="widget_33" native="true">
-                                    <layout class="QVBoxLayout" name="verticalLayout_9">
-                                     <property name="leftMargin">
-                                      <number>0</number>
-                                     </property>
-                                     <property name="topMargin">
-                                      <number>0</number>
-                                     </property>
-                                     <property name="rightMargin">
-                                      <number>0</number>
-                                     </property>
-                                     <property name="bottomMargin">
-                                      <number>0</number>
-                                     </property>
-                                     <item>
-                                      <widget class="QLabel" name="label_74">
-                                       <property name="font">
-                                        <font>
-                                         <pointsize>15</pointsize>
-                                         <underline>true</underline>
-                                        </font>
-                                       </property>
-                                       <property name="text">
-                                        <string>Encoder Command</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QWidget" name="widget_32" native="true">
-                                       <layout class="QHBoxLayout" name="horizontalLayout_51">
-                                        <item>
-                                         <widget class="QScrollArea" name="scrollArea_6">
-                                          <property name="minimumSize">
-                                           <size>
-                                            <width>0</width>
-                                            <height>50</height>
-                                           </size>
-                                          </property>
-                                          <property name="verticalScrollBarPolicy">
-                                           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-                                          </property>
-                                          <property name="horizontalScrollBarPolicy">
-                                           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
-                                          </property>
-                                          <property name="widgetResizable">
-                                           <bool>true</bool>
-                                          </property>
-                                          <widget class="QWidget" name="scrollAreaWidgetContents_6">
-                                           <property name="geometry">
-                                            <rect>
-                                             <x>0</x>
-                                             <y>0</y>
-                                             <width>918</width>
-                                             <height>48</height>
-                                            </rect>
-                                           </property>
-                                           <layout class="QHBoxLayout" name="horizontalLayout_54">
-                                            <item>
-                                             <widget class="QLineEdit" name="EncoderCommand">
-                                              <property name="minimumSize">
-                                               <size>
-                                                <width>900</width>
-                                                <height>30</height>
-                                               </size>
-                                              </property>
-                                             </widget>
-                                            </item>
-                                           </layout>
-                                          </widget>
-                                         </widget>
-                                        </item>
-                                        <item>
-                                         <widget class="QLabel" name="label_75">
-                                          <property name="maximumSize">
-                                           <size>
-                                            <width>25</width>
-                                            <height>25</height>
-                                           </size>
-                                          </property>
-                                          <property name="toolTip">
-                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder command:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;     -&lt;/span&gt; Encoder settings passed to FFMpeg, can be manually tweaked.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                          </property>
-                                          <property name="text">
-                                           <string />
-                                          </property>
-                                          <property name="pixmap">
-                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                                          </property>
-                                          <property name="scaledContents">
-                                           <bool>true</bool>
-                                          </property>
-                                         </widget>
-                                        </item>
-                                       </layout>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                 </layout>
-                                </widget>
-                               </item>
                                <item alignment="Qt::AlignmentFlag::AlignTop">
                                 <widget class="QWidget" name="generalContainer" native="true">
                                  <property name="sizePolicy">
@@ -3106,6 +3822,11 @@ border-radius:10px;
                                 </widget>
                                </item>
                                <item>
+                                <widget class="QWidget" name="widget_19" native="true">
+                                 <layout class="QHBoxLayout" name="horizontalLayout_23" />
+                                </widget>
+                               </item>
+                               <item>
                                 <spacer name="verticalSpacer">
                                  <property name="orientation">
                                   <enum>Qt::Orientation::Vertical</enum>
@@ -3537,8 +4258,8 @@ QTabWidget::pane { /* The tab widget frame */
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>470</width>
-                   <height>488</height>
+                   <width>863</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -3580,8 +4301,8 @@ QTabWidget::pane { /* The tab widget frame */
                              <rect>
                               <x>0</x>
                               <y>0</y>
-                              <width>480</width>
-                              <height>173</height>
+                              <width>805</width>
+                              <height>535</height>
                              </rect>
                             </property>
                             <layout class="QVBoxLayout" name="verticalLayout_25">
@@ -3977,637 +4698,6 @@ QTabWidget::pane { /* The tab widget frame */
                              </item>
                             </layout>
                            </widget>
-                          </widget>
-                         </item>
-                        </layout>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                    <widget class="QWidget" name="tab">
-                     <attribute name="title">
-                      <string>Encoders Settings</string>
-                     </attribute>
-                     <layout class="QVBoxLayout" name="verticalLayout_34">
-                      <item>
-                       <widget class="QWidget" name="widget_15" native="true">
-                        <layout class="QVBoxLayout" name="verticalLayout_26">
-                         <item>
-                          <widget class="QWidget" name="widget_17" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_15">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Video Encoder</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_9">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>40</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_54">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Compression algorithm for video, most common is libx264&lt;/p&gt;&lt;p&gt;- Any encoder without a device label is a CPU encoder.&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Lossy Encoders:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- libx264 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov, avi&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- libx265 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- vp9 (&lt;span style=" font-weight:700;"&gt;mkv, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- av1 (&lt;span style=" font-weight:700;"&gt;mkv, mp4, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Lossless Encoders:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- prores (&lt;span style=" font-weight:700;"&gt;mkv, mov&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;- ffv1 (&lt;span style=" font-weight:700;"&gt;mkv, avi&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="encoder">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>libx264</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>libx265</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>vp9</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>av1</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>prores</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>ffv1</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>x264_vulkan (experimental)</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>x264_nvenc</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>x265_nvenc</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>av1_nvenc (40 series and up)</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>x264_vaapi</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>x265_vaapi</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>av1_vaapi</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_6" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_36">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel_2">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Video Encoder Speed</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_22">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>237</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_55">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Encoder Speed:&lt;/span&gt;&lt;/p&gt;&lt;p&gt; - Speed at which the encoder processes the video, &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Slower&lt;/span&gt; processing time means &lt;span style=" font-weight:700; text-decoration: underline;"&gt;Better results for the file size&lt;/span&gt;&lt;span style=" text-decoration: underline;"&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="video_encoder_speed">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>fastest</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>fast</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>medium</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>slow</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>placebo</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_18" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_33">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel_5">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Video Quality</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_17">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>40</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="video_quality">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>Very_High</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>High</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>Medium</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>Low</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_27" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_44">
-                            <item>
-                             <widget class="QLabel" name="label_49">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Video Container</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_19">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>437</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_50">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Video Container&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Changes the video container in the default output file generated container.&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700;"&gt;mkv &lt;/span&gt;is &lt;span style=" font-weight:700;"&gt;recomended&lt;/span&gt; due to its extensive support for different formats.&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;WARNING: Changing this &lt;/span&gt;&lt;span style=" font-weight:700; text-decoration: underline;"&gt;MAY&lt;/span&gt;&lt;span style=" font-weight:700;"&gt; break encoder compadibility. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Please look at the audio and video encoder tooltips for compadibility.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="video_container">
-                              <item>
-                               <property name="text">
-                                <string>mkv</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>mp4</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>mov</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>webm</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>avi</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_21" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_35">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel_7">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Video Pixel Format</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_20">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>469</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_58">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Pixel Format&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- D&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;efines how color information is stored for each pixel in a video frame.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv420p: Most common, removes the most information. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mp4, mov, avi, webm&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv422p: In between 420p and 444p. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;/p&gt;&lt;p&gt;&lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;- yuv444p: Keeps the most information. &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;br/&gt;&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-family:'Droid Sans Mono','monospace','monospace'; font-size:9pt; color:#cccccc;"&gt;yuv 420/422/444 p10le: 10 bit version of each. (MKV and MP4 containers only) &lt;/span&gt;(&lt;span style=" font-weight:700;"&gt;mkv, mov, mp4&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="video_pixel_format">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>yuv420p</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>yuv422p</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>yuv444p</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>yuv420p10le</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>yuv422p10le</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>yuv444p10le</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_20" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_34">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel_10">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Audio Encoder</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_30">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>382</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_56">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Audio Encoder&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- &lt;span style=" font-weight:700;"&gt;Recommended &lt;/span&gt;to use &lt;span style=" font-weight:700;"&gt;aac&lt;/span&gt; if the video container is &lt;span style=" font-weight:700;"&gt;not mkv, &lt;/span&gt;or if the output video has audio isses.&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;copy_audio: No re-encoding is done on the output&lt;/p&gt;&lt;p&gt;- aac: Most common, and high quality.&lt;/p&gt;&lt;p&gt;- libmp3lame: Used less, low quality.&lt;/p&gt;&lt;p&gt;- opus: Used for &lt;span style=" font-weight:700;"&gt;webm&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="audio_encoder">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>copy_audio</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>aac</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>libmp3lame</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>opus</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
-                          </widget>
-                         </item>
-                         <item>
-                          <widget class="QWidget" name="widget_16" native="true">
-                           <layout class="QHBoxLayout" name="horizontalLayout_2">
-                            <item>
-                             <widget class="QLabel" name="encoderLabel_6">
-                              <property name="font">
-                               <font>
-                                <pointsize>12</pointsize>
-                               </font>
-                              </property>
-                              <property name="text">
-                               <string>Audio Bitrate</string>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <spacer name="horizontalSpacer_18">
-                              <property name="orientation">
-                               <enum>Qt::Orientation::Horizontal</enum>
-                              </property>
-                              <property name="sizeHint" stdset="0">
-                               <size>
-                                <width>494</width>
-                                <height>20</height>
-                               </size>
-                              </property>
-                             </spacer>
-                            </item>
-                            <item>
-                             <widget class="QLabel" name="label_57">
-                              <property name="maximumSize">
-                               <size>
-                                <width>25</width>
-                                <height>25</height>
-                               </size>
-                              </property>
-                              <property name="toolTip">
-                               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;Audio Bitrate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;- &lt;/span&gt;Higher bitrate = higher quality&lt;/p&gt;&lt;p&gt;   - Only applies to &lt;span style=" font-weight:700;"&gt;aac &lt;/span&gt;and &lt;span style=" font-weight:700;"&gt;libmp3lame&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                              </property>
-                              <property name="text">
-                               <string />
-                              </property>
-                              <property name="pixmap">
-                               <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                              </property>
-                              <property name="scaledContents">
-                               <bool>true</bool>
-                              </property>
-                             </widget>
-                            </item>
-                            <item>
-                             <widget class="QComboBox" name="audio_bitrate">
-                              <property name="minimumSize">
-                               <size>
-                                <width>0</width>
-                                <height>0</height>
-                               </size>
-                              </property>
-                              <item>
-                               <property name="text">
-                                <string>320k</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>192k</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>128k</string>
-                               </property>
-                              </item>
-                              <item>
-                               <property name="text">
-                                <string>96k</string>
-                               </property>
-                              </item>
-                             </widget>
-                            </item>
-                           </layout>
                           </widget>
                          </item>
                         </layout>
@@ -5313,133 +5403,85 @@ background-color:white;
 </string>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <item row="2" column="0">
-               <widget class="QWidget" name="modelSelectContainer" native="true">
-                <layout class="QVBoxLayout" name="verticalLayout_15">
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="QLabel" name="label_25">
+              <item row="4" column="0">
+               <widget class="QWidget" name="widget_10" native="true">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_8">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="encoderLabel_4">
                    <property name="font">
                     <font>
-                     <pointsize>25</pointsize>
-                     <underline>true</underline>
+                     <pointsize>12</pointsize>
                     </font>
                    </property>
                    <property name="text">
-                    <string>Models</string>
+                    <string>Import Custom Upscale Model</string>
                    </property>
                   </widget>
                  </item>
-                 <item>
-                  <widget class="QWidget" name="pytorchBackendInstallerContainer_5" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_22">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QPushButton" name="downloadAllModelsBtn">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>50</width>
-                        <height>45</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string />
-                      </property>
-                      <property name="icon">
-                       <iconset resource="resources.qrc">
-                        <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
-                      </property>
-                      <property name="iconSize">
-                       <size>
-                        <width>30</width>
-                        <height>30</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_26">
-                      <property name="text">
-                       <string>All Models for all Backends</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
+                 <item row="0" column="1">
+                  <spacer name="horizontalSpacer_12">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Policy::MinimumExpanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
                  </item>
-                 <item>
-                  <widget class="QWidget" name="pytorchBackendInstallerContainer_6" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_23">
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QPushButton" name="downloadSomeModelsBasedOnInstalledBackendbtn">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>50</width>
-                        <height>45</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string />
-                      </property>
-                      <property name="icon">
-                       <iconset resource="resources.qrc">
-                        <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
-                      </property>
-                      <property name="iconSize">
-                       <size>
-                        <width>30</width>
-                        <height>30</height>
-                       </size>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_27">
-                      <property name="text">
-                       <string>All models for Installed Backends</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
+                 <item row="0" column="2">
+                  <layout class="QGridLayout" name="gridLayout_10">
+                   <item row="1" column="0">
+                    <widget class="QPushButton" name="selectNCNNCustomModel">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="text">
+                      <string>Select Model (NCNN/.bin+.param)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0">
+                    <widget class="QPushButton" name="selectPytorchCustomModel">
+                     <property name="enabled">
+                      <bool>true</bool>
+                     </property>
+                     <property name="text">
+                      <string>Select Model (PyTorch/TensorRT/.pth)</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
                  </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="0">
+               <widget class="QWidget" name="ApplicationUpdateContainer" native="true">
+                <layout class="QVBoxLayout" name="verticalLayout_30">
+                 <property name="leftMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>9</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>9</number>
+                 </property>
                 </layout>
                </widget>
               </item>
@@ -5520,7 +5562,7 @@ background-color:white;
                         </size>
                        </property>
                        <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;PyTorch Version&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- This is the version downloaded&lt;/p&gt;&lt;p&gt;- 2.6: Supports older CUDA enabled GPUs&lt;/p&gt;&lt;p&gt;- 2.7: Supports all RTX cards, faster and recomended.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=" font-weight:700;"&gt;PyTorch Version&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- This is the version downloaded&lt;/p&gt;&lt;p&gt;- 2.6: Supports older CUDA enabled GPUs&lt;/p&gt;&lt;p&gt;- 2.8: Supports all RTX cards, faster and recomended.&lt;/p&gt;&lt;p&gt;- 2.9: Experimental.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                        </property>
                        <property name="toolTipDuration">
                         <number>0</number>
@@ -5640,8 +5682,8 @@ color: red;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>791</width>
-                      <height>162</height>
+                      <width>845</width>
+                      <height>333</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -5999,88 +6041,6 @@ color: red;
                    </widget>
                   </widget>
                  </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="5" column="0">
-               <widget class="QWidget" name="widget_10" native="true">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_8">
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="encoderLabel_4">
-                   <property name="font">
-                    <font>
-                     <pointsize>12</pointsize>
-                    </font>
-                   </property>
-                   <property name="text">
-                    <string>Import Custom Upscale Model</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <spacer name="horizontalSpacer_12">
-                   <property name="orientation">
-                    <enum>Qt::Orientation::Horizontal</enum>
-                   </property>
-                   <property name="sizeType">
-                    <enum>QSizePolicy::Policy::MinimumExpanding</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>20</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                 <item row="0" column="2">
-                  <layout class="QGridLayout" name="gridLayout_10">
-                   <item row="1" column="0">
-                    <widget class="QPushButton" name="selectNCNNCustomModel">
-                     <property name="enabled">
-                      <bool>true</bool>
-                     </property>
-                     <property name="text">
-                      <string>Select Model (NCNN/.bin+.param)</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QPushButton" name="selectPytorchCustomModel">
-                     <property name="enabled">
-                      <bool>true</bool>
-                     </property>
-                     <property name="text">
-                      <string>Select Model (PyTorch/TensorRT/.pth)</string>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item row="0" column="0">
-               <widget class="QWidget" name="ApplicationUpdateContainer" native="true">
-                <layout class="QVBoxLayout" name="verticalLayout_30">
-                 <property name="leftMargin">
-                  <number>9</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>9</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>9</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>9</number>
-                 </property>
                 </layout>
                </widget>
               </item>

@@ -2,7 +2,7 @@ import os
 
 from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ..constants import PLATFORM, HOME_PATH
-from ..Util import currentDirectory, checkForWritePermissions, open_folder, log
+from ..Util import currentDirectory, checkForWritePermissions, open_folder, log, FileHandler
 from .QTcustom import RegularQTPopup
 from ..GenerateFFMpegCommand import FFMpegCommand
 from ..VideoInfo import VideoLoader
@@ -21,6 +21,8 @@ class SettingsTab:
         self.color_space = None
         self.color_primaries = None
         self.color_transfer = None
+        self.in_pix_fmt = ""
+        self.hdr_mode = False
         self.ffmpeg_settings_dict = {
             "encoder": self.parent.encoder,
             "audio_encoder": self.parent.audio_encoder,
@@ -54,9 +56,16 @@ class SettingsTab:
         for key, value in self.ffmpeg_settings_dict.items():
             self.settings.writeSetting(key, value.currentText())
         
-        pixel_fmt = self.settings.settings['video_pixel_format']
-        
-        hdr_mode = False
+        self.out_pixel_fmt = self.settings.settings['video_pixel_format']
+        pxfmtDict = {
+                "yuv420p": "yuv420p",
+                "yuv422p": "yuv422p",
+                "yuv444p": "yuv444p",
+                "yuv420p (10 bit)": "yuv420p10le",
+                "yuv422p (10 bit)": "yuv422p10le",
+                "yuv444p (10 bit)": "yuv444p10le",
+            }
+        self.out_pixel_fmt = pxfmtDict[self.out_pixel_fmt]
 
         input_file = self.parent.inputFileText.text()
         if input_file and len(input_file) > 1: # caching is nice
@@ -65,36 +74,38 @@ class SettingsTab:
                 self.ffmpegInfoWrapper = VideoLoader(self.input_file)
                 self.ffmpegInfoWrapper.loadVideo()
                 self.ffmpegInfoWrapper.getData()
+                self.hdr_mode = (self.ffmpegInfoWrapper.is_hdr) and self.settings.settings['auto_hdr_mode'] == "True"
+                self.color_space = self.ffmpegInfoWrapper.color_space
+                self.color_primaries = self.ffmpegInfoWrapper.color_primaries
+                self.color_transfer = self.ffmpegInfoWrapper.color_transfer
+                self.in_pix_fmt = self.ffmpegInfoWrapper.pixel_format
 
-        if self.ffmpegInfoWrapper:
-            hdr_mode = (self.ffmpegInfoWrapper.is_hdr) and self.settings.settings['auto_hdr_mode'] == "True"
-            if hdr_mode:
-                pxfmtdict = {
-                            "yuv420p": "yuv420p10le",
-                            "yuv422": "yuv422p10le",
-                            "yuv444": "yuv444p10le",
-                        }
 
-                if pixel_fmt in pxfmtdict:
-                    pixel_fmt = pxfmtdict[pixel_fmt]
-            self.color_space = self.ffmpegInfoWrapper.color_space
-            self.color_primaries = self.ffmpegInfoWrapper.color_primaries
-            self.color_transfer = self.ffmpegInfoWrapper.color_transfer
+        if self.hdr_mode or ("10" in self.in_pix_fmt and self.settings.settings['auto_hdr_mode'] == "True"):
+            pxfmtDict = {
+                        "yuv420p": "yuv420p10le",
+                        "yuv422p": "yuv422p10le",
+                        "yuv444p": "yuv444p10le",
+                    }
+
+            if self.out_pixel_fmt in pxfmtDict:
+                self.out_pixel_fmt = pxfmtDict[self.out_pixel_fmt]
+
 
         command = FFMpegCommand(
-        self.settings.settings['encoder'].replace(' (experimental)', '').replace(' (40 series and up)', ''),
-        self.settings.settings['video_encoder_speed'],
-        self.settings.settings['video_quality'],
-        pixel_fmt,
-        self.settings.settings['audio_encoder'],
-        self.settings.settings['audio_bitrate'],
-        hdr_mode,
-        self.color_space,
-        self.color_primaries,
-        self.color_transfer,
-    ).build_command()
-        self.parent.EncoderCommand.setText(" ".join(command),
-        )
+            self.settings.settings['encoder'].replace(' (experimental)', '').replace(' (40 series and up)', ''),
+            self.settings.settings['video_encoder_speed'],
+            self.settings.settings['video_quality'],
+            self.out_pixel_fmt,
+            self.settings.settings['audio_encoder'],
+            self.settings.settings['audio_bitrate'],
+            self.hdr_mode,
+            self.color_space if self.in_pix_fmt != "yuv420p" else None,
+            self.color_primaries,
+            self.color_transfer,    
+        ).build_command()
+        self.parent.EncoderCommand.setText(" ".join(command))
+        self.parent.updateVideoGUIText()
          
 
     def connectWriteSettings(self):
@@ -361,6 +372,7 @@ class Settings:
         The default settings are set here, and are overwritten by the settings in the settings file if it exists and the legnth of the settings is the same as the default settings.
         The key is equal to the name of the widget of the setting in the settings tab.
         """
+        output_folder_default = FileHandler.getDefaultOutputFolder()
         self.defaultSettings = {
             "precision": "auto",
             "tensorrt_optimization_level": "3",
@@ -375,12 +387,8 @@ class Settings:
             "scene_change_detection_threshold": "3.5",
             "discord_rich_presence": "False",
             "video_quality": "High",
-            "output_folder_location": os.path.join(f"{HOME_PATH}", "Videos")
-            if PLATFORM != "darwin"
-            else os.path.join(f"{HOME_PATH}", "Desktop"),
-            "last_input_folder_location": os.path.join(f"{HOME_PATH}", "Videos")
-            if PLATFORM != "darwin"
-            else os.path.join(f"{HOME_PATH}", "Desktop"),
+            "output_folder_location": output_folder_default,
+            "last_input_folder_location": output_folder_default,
             "uhd_mode": "True",
             "ncnn_gpu_id": "0",
             "pytorch_gpu_id": "0",

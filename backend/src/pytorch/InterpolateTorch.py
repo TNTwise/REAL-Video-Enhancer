@@ -7,7 +7,6 @@ from ..utils.SSIM import SSIM
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
-from .InterpolateGIMM import InterpolateGIMMTorch
 from .InterpolateGMFSS import InterpolateGMFSSTorch
 from .InterpolateRIFE import InterpolateRifeTorch,  InterpolateRIFEDRBA
 from .InterpolateIFRNET import InterpolateIFRNetTorch
@@ -25,7 +24,5 @@ class InterpolateFactory:
                 return InterpolateRifeTorch
             case "gmfss":
                 return InterpolateGMFSSTorch
-            case "gimm":
-                return InterpolateGIMMTorch
             case "ifrnet":
                 return InterpolateIFRNetTorch  # IFRNet is a RIFE based architecture

@@ -1,3 +1,15 @@
+# RVE 2.3.8 pre-release
+### Added
+ - Open output folder button
+ - Cap output scale based on model scale
+### Changed 
+ - UI Tweaks
+### Fixed
+ - ROCm showing cuda on front end.
+ - GMFSS not working
+### Removed
+ - GIMM.
+ - locking the app to 1 instance.
 # RVE 2.3.7
 ### Added:
  - PyTorch 2.9

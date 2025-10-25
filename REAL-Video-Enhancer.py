@@ -340,25 +340,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.animationHandler.fadeInAnimation(self.stackedWidget)
 
     def updateVideoGUIText(self):
+        self.settings.readSettings()
         if self.isVideoLoaded:
             upscaleModelName = self.upscaleModelComboBox.currentText()
             interpolateModelName = self.interpolateModelComboBox.currentText()
             interpolateTimes = self.getInterpolationMultiplier(interpolateModelName)
             scale = self.getUpscaleModelScale(upscaleModelName)
-            text = (
+            new_bitrate = 8 if "10" not in self.settingsTab.in_pix_fmt else 10
+            inputText = (
                 f"FPS: {round(self.videoFps, 0)} -> {round(self.videoFps * interpolateTimes, 0)}\n"
                 + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth * scale}x{self.videoHeight * scale}\n"
                 + f"Frame Count: {self.videoFrameCount} -> {int(round(self.videoFrameCount * interpolateTimes, 0))}\n"
-                + f"Bitrate: {self.videoBitrate}\n"
-                + f"Encoder: {self.videoEncoder}\n"
-                + f"Container: {self.videoContainer}\n"
-                + f"Color Space: {self.colorSpace}\n"
-                + f"Pixel Format: {self.pixelFMT}\n"
-                + f"HDR: {self.videoHDR}\n"
-                + f"Bit Depth: {self.videoBitDepth} bit\n"
+                + f"Encoder: {self.videoEncoder} -> {self.settings.settings['encoder']}\n"
+                + f"Container: {self.videoContainer} -> {self.settings.settings['video_container']}\n"
+                + f"Color Space: {self.colorSpace} -> {self.colorSpace}\n"
+                + f"Pixel Format: {self.settingsTab.in_pix_fmt} -> {self.settingsTab.out_pixel_fmt}\n"
+                + f"HDR: {self.videoHDR} -> {self.videoHDR if self.settings.settings['auto_hdr_mode'] == 'True' else 'False'}\n"
+                + f"Bit Depth: {self.videoBitDepth} bit -> {new_bitrate if self.settings.settings['auto_hdr_mode'] == 'True' else 8} bit\n"
             )
-            self.videoInfoTextEdit.setFontPointSize(10)
-            self.videoInfoTextEdit.setText(text)
+            
+            self.inputVideoInfoTextEdit.setFontPointSize(10)
+            self.inputVideoInfoTextEdit.setText(inputText)
 
     def getInterpolationMultiplier(self, interpolateModelName):
         if interpolateModelName == "None" or not self.interpolateCheckBox.isChecked():
@@ -427,6 +429,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         isDeblur = self.deblurCheckBox.isChecked()
         isDenoise = self.denoiseCheckBox.isChecked()
         isDecompress = self.decompressCheckBox.isChecked()
+        
         self.interpolationContainer.setVisible(isInterpolate)
         self.interpolateContainer_2.setVisible(isInterpolate)
         self.deblurContainer.setVisible(isDeblur)
@@ -446,7 +449,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.startTimeSpinBox.setMaximum(self.videoLength)
         self.endTimeSpinBox.setMaximum(self.videoLength)
         self.timeInVideoScrollBar.setMaximum(self.videoLength)
-        
+        if isUpscale and (self.upscaleModelComboBox.currentText() != "" or self.upscaleModelComboBox.currentText() != "None"):
+            try:
+                max_scale = totalModels[self.upscaleModelComboBox.currentText()][2]
+                self.upscaleScaleSpinBox.setMaximum(max_scale if max_scale > 0 else 4)
+            except KeyError: # idk why it does this, gui is shit tbh.
+                self.upscaleScaleSpinBox.setMaximum(4)
+
     def getCurrentRenderOptions(self, input_file=None, output_path=None):
         interpolate = self.interpolateModelComboBox.currentText()
         upscale = self.upscaleModelComboBox.currentText()
@@ -679,6 +688,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             child.setEnabled(False)
         for child in self.renderQueueTab.children():
             child.setEnabled(False)
+        for child in self.encoderSettings.children():
+            child.setEnabled(False)
         self.RenderedPreviewControlsContainer.setEnabled(False)
         self.scrollArea_4.setEnabled(True)
         self.scrollAreaWidgetContents_4.setEnabled(False)
@@ -690,6 +701,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for child in self.advancedSettings.children():
             child.setEnabled(True)
         for child in self.renderQueueTab.children():
+            child.setEnabled(True)
+        for child in self.encoderSettings.children():
             child.setEnabled(True)
         self.RenderedPreviewControlsContainer.setEnabled(True)
         self.scrollAreaWidgetContents_4.setEnabled(True)
@@ -753,6 +766,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.outputFileText.setEnabled(True)
 
         self.outputFileSelectButton.setEnabled(True)
+        self.openOutputFolderButton.setEnabled(True)    
         self.isVideoLoaded = True
         self.updateVideoGUIDetails()
 
@@ -915,11 +929,11 @@ def main():
     app.setStyle("Fusion")
     app.setPalette(Palette())
 
-    if not "--unlock" in sys.argv:
+    """if not "--unlock" in sys.argv:
         lock_file = QLockFile(LOCKFILE)
         if not lock_file.tryLock(10):
             QMessageBox.warning(None, "Instance Running", "Another instance is already running.")
-            sys.exit(0)
+            sys.exit(0)"""
 
     # setting the pallette
     window = MainWindow()
@@ -933,7 +947,6 @@ def main():
 """
 custom command args
 --debug: runs the app in debug mode
---unlock: allows more than one instance to be launched
 --fullscreen: runs the app in fullscreen
 --swap-flatpak-checks: swaps the flatpak checks, ex if the app is running in flatpak, it will run as if it is not
 """

@@ -392,11 +392,11 @@ class InterpolateRifeTorch(BaseInterpolate):
                 
                 flownet_engine = trtHandler.build_engine(self.flownet, self.dtype, self.device, flownet_inputs, trt_engine_name=base_trt_engine_name, trt_multi_precision_engine=True, dynamic_shapes=flownet_dynamic_shapes,)
                 trtHandler.save_engine(flownet_engine, base_trt_engine_name, flownet_inputs)
-                torch.cuda.empty_cache()
+                TorchUtils.clear_cache()
                 if self.encode:
                     encode_engine = trtHandler.build_engine(self.encode, self.dtype, self.device, encode_inputs, trt_engine_name=encode_trt_engine_name, trt_multi_precision_engine=True, dynamic_shapes=encode_dynamic_shapes,)
                     trtHandler.save_engine(encode_engine, encode_trt_engine_name, encode_inputs)
-                torch.cuda.empty_cache()
+                TorchUtils.clear_cache()
             self.flownet = trtHandler.load_engine(base_trt_engine_name)
 
             if self.encode:

@@ -11,7 +11,7 @@ from .FFmpegBuffers import FFmpegRead, FFmpegWrite, MPVOutput
 from .FFmpeg import InformationWriteOut
 from .utils.Encoders import EncoderSettings
 from .utils.SceneDetect import SceneDetect
-from .utils.Util import log, bytesToImg, resize_image_bytes
+from .utils.Util import log, resize_image_bytes
 from .utils.BorderDetect import BorderDetect
 from .utils.VideoInfo import OpenCVInfo
 import numpy as np
@@ -215,7 +215,7 @@ class Render:
         log(f"Interpolate Factor: {self.interpolateFactor}")
         log(f"Total Output Frames: {self.totalOutputFrames}")
         log("Model Scale: " + str(self.modelScale))
-        print("HDR Mode: " + str(hdr_mode), file=sys.stderr)
+        log("HDR Mode: " + str(hdr_mode))
 
         self.readBuffer = FFmpegRead(  # input width
             inputFile=inputFile,

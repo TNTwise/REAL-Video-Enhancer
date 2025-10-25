@@ -101,6 +101,7 @@ class FFMpegInfoWrapper(VideoInfo):
     def __init__(self, input_file: str):
         self.input_file = input_file
         self.stream_line = None
+        self.stream_line_2 = None
         self._get_ffmpeg_info()
 
     def _get_ffmpeg_info(self):
@@ -124,9 +125,14 @@ class FFMpegInfoWrapper(VideoInfo):
             for line in self.ffmpeg_output_raw.split("\n"):
                 if "Stream #" in line and "Video" in line:
                     self.stream_line = line
+                    self.ffmpeg_output_raw = self.ffmpeg_output_raw.replace(line, "")
                     break
-            
-            
+
+            for line in self.ffmpeg_output_raw.split("\n"):
+                if "Stream #" in line and "Video" in line:
+                    self.stream_line_2 = line
+                    self.ffmpeg_output_raw = self.ffmpeg_output_raw.replace(line, "")
+                    break
             if self.stream_line is None:
                 log("No video stream found in the input file.")
         except Exception:
@@ -157,18 +163,25 @@ class FFMpegInfoWrapper(VideoInfo):
     
     def check_color_opt(self, color_opt:str) -> str | None:
         if self.stream_line:
+            if "ffv1" in self.get_codec():
+                string_pattern = "1,"
+            else:
+                string_pattern = "),"
             try:
                 match color_opt:
                     case "Space":
-                        color_opt_detected = self.stream_line.split("),")[1].split(",")[1].split("/")[0].strip()
+                        color_opt_detected = self.stream_line_2.split(",")[1].split("(")[1].strip()
                         if color_opt_detected not in FFMPEG_COLORSPACES:
-                            return None
+                            color_opt_detected = self.stream_line.split(string_pattern)[1].split(",")[1].split("/")[0].strip()
+                            if color_opt_detected not in FFMPEG_COLORSPACES:
+                                return None
+
                     case "Primaries":
-                        color_opt_detected = self.stream_line.split("),")[1].split("/")[1].strip()
+                        color_opt_detected = self.stream_line.split(string_pattern)[1].split("/")[1].strip()
                         if color_opt_detected not in FFMPEG_COLOR_PRIMARIES:
                             return None
                     case "Transfer":
-                        color_opt_detected = self.stream_line.split("),")[1].split("/")[2].replace(")","").split(",")[0].strip()
+                        color_opt_detected = self.stream_line.split(string_pattern)[1].split("/")[2].replace(")","").split(",")[0].strip()
                         if color_opt_detected not in FFMPEG_COLOR_TRC:
                             return None
 
@@ -317,7 +330,7 @@ def print_video_info(video_info: VideoInfo):
 __all__ = ["FFMpegInfoWrapper", "OpenCVInfo", "print_video_info"]
 
 if __name__ == "__main__":
-    video_path = "/home/pax/Downloads/Life Untouched 4K Demo.mp4"
+    video_path = "/home/pax/Downloads/ffv1_youtube_test2.mkv"
     #video_path = "/home/pax/Documents/test/LG New York HDR UHD 4K Demo.ts"
     #video_path = "/home/pax/Documents/test/out.mkv"
     #video_path = "/home/pax/Videos/TVアニメ「WIND BREAKER Season 2」ノンクレジットオープニング映像「BOYZ」SixTONES [AWlUVr7Du04]_gmfss-pro_deh264-span_janai-v2_72.0fps_3840x2160.mkv"

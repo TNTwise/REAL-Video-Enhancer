@@ -49,6 +49,8 @@ class InterpolateGMFSSTorch(BaseInterpolate):
         self.hdr_mode = hdr_mode # used in base interpolate class (ik inheritance is bad leave me alone)
         self.dynamicScaledOpticalFlow = dynamicScaledOpticalFlow
         self.UHDMode = UHDMode
+        self.gpu_id = gpu_id
+
         self.CompareNet = None
         self.max_timestep = max_timestep
         if UHDMode:
@@ -74,8 +76,8 @@ class InterpolateGMFSSTorch(BaseInterpolate):
 
     @torch.inference_mode()
     def _load(self):
-        self.stream = self.torchUtils.init_stream()
-        self.prepareStream = self.torchUtils.init_stream()
+        self.stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)  
+        self.prepareStream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
         with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
             if self.dynamicScaledOpticalFlow:
                 from ..utils.SSIM import SSIM

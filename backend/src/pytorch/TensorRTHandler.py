@@ -33,6 +33,7 @@ with suppress_stdout_stderr():
     import tensorrt as trt
     from torch._export.converter import TS2EPConverter
     from torch.export.exported_program import ExportedProgram
+    from .TorchUtils import TorchUtils
 
 def torchscript_to_dynamo(
             model: torch.nn.Module, example_inputs: list[torch.Tensor]
@@ -43,7 +44,7 @@ def torchscript_to_dynamo(
                 module, sample_args=tuple(example_inputs), sample_kwargs=None
             ).convert()
             del module
-            torch.cuda.empty_cache()
+            TorchUtils.clear_cache()
             return exported_program
 
 def nnmodule_to_dynamo(
@@ -145,7 +146,7 @@ class TorchTensorRTHandler:
         """
         start_time = time.time()
         trt_engine_name += self.trt_path_appendix
-        torch.cuda.empty_cache()
+        TorchUtils.clear_cache()
         """Builds a TensorRT engine from the provided model."""
         print(
             f"Building TensorRT engine {os.path.basename(trt_engine_name)}. This may take a while...",
@@ -155,7 +156,7 @@ class TorchTensorRTHandler:
         with suppress_stdout_stderr():
             exported_program = nnmodule_to_dynamo(model, example_inputs, dynamic_shapes=dynamic_shapes)
 
-            torch.cuda.empty_cache()
+            TorchUtils.clear_cache()
 
             exported_program = self.grid_sample_decomp(exported_program)
             
@@ -178,7 +179,7 @@ class TorchTensorRTHandler:
             f"TensorRT engine built in {time.time() - start_time:.2f} seconds.",
             file=sys.stderr,
         )
-        torch.cuda.empty_cache()
+        TorchUtils.clear_cache()
         return model_trt
 
     def save_engine(self, trt_engine: torch.jit.ScriptModule, trt_engine_name: str, example_inputs: list[torch.Tensor]):
@@ -192,7 +193,7 @@ class TorchTensorRTHandler:
                 output_format="torchscript",
                 inputs=tuple(example_inputs),
         )
-        torch.cuda.empty_cache()
+        TorchUtils.clear_cache()
 
     def load_engine(self, trt_engine_name: str) -> torch.jit.ScriptModule:
         """Loads a TensorRT engine from the specified path."""

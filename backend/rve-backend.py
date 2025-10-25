@@ -2,6 +2,8 @@ import os
 import argparse
 import sys
 from src.version import __version__
+from src.utils.Util import log
+
 
 class HandleApplication:
     def __init__(self):
@@ -14,7 +16,7 @@ class HandleApplication:
             """from pyinstrument import Profiler
             profiler = Profiler()
             profiler.start()"""
-            
+
             from src.utils.VideoInfo import OpenCVInfo, print_video_info
             
             if self.args.print_video_info:
@@ -35,6 +37,13 @@ class HandleApplication:
             download_ffmpeg()
 
             if not self.batchProcessing():
+                buffer_str = "=" * len(str(sys.argv[0]))
+                log(buffer_str, False)
+                log("RVE Backend Version: " + __version__, False)
+                log(buffer_str, False)
+                log("CLI Arguments: ", False)
+                log(str(sys.argv), False)
+                log(buffer_str, False)
                 self.renderVideo()
 
         else:

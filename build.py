@@ -30,9 +30,9 @@ def zero_mainwindow_size():
             width = geometry.find("width")
             height = geometry.find("height")
             if width is not None:
-                width.text = "0"
+                width.text = "1000"
             if height is not None:
-                height.text = "0"
+                height.text = "700"
             tree.write(path)
 
     set_mainwindow_size_zero()

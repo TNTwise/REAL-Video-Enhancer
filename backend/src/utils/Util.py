@@ -59,11 +59,14 @@ def errorAndLog(message: str):
 
 
 
-def log(message: str):
+def log(message: str, show_backend = True):
     """
     Log is now depricated, just using print now.
     """
-    print("BACKEND: " + message, file=sys.stderr)
+    if show_backend:
+        print("BACKEND: " + message, file=sys.stderr)
+    else:
+        print(message, file=sys.stderr)
     #message = message + "\n\n\n\n" + "-" * len(message)
     #print(message, file=sys.stderr)
 

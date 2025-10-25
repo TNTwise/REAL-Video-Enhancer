@@ -7,7 +7,7 @@ from ..utils.BackendDetect import (
 backendDetect = BackendDetect()
 
 from ..utils.Util import (
-    warnAndLog,
+    log,
     CudaChecker
 )
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
@@ -45,11 +45,12 @@ class DummyContextManager:
 
 class TorchUtils:
     # device and precision are in string formats, loaded straight from the command line arguments
-    def __init__(self, width, height, device_type:str, hdr_mode=False, padding=None, ):
+    def __init__(self, width, height, device_type:str, hdr_mode=False, padding=None, gpu_id=0):
         self.width = width
         self.height = height
         self.hdr_mode = hdr_mode
         self.padding = padding
+        self.gpu_id = gpu_id
         if device_type == "auto":
             self.device_type = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "xpu" if torch.xpu.is_available() else "cpu"    
         else:
@@ -59,9 +60,8 @@ class TorchUtils:
             del test_tensor
             self.use_numpy = True
         except Exception as e:
-            warnAndLog(f"Failed to create a Numpy tensor, This will heavily reduce performance.")
+            log(f"Failed to create a Numpy tensor, This will heavily reduce performance.")
             self.use_numpy = False
-        self.__init_stream_func = self.__init_stream_function()
         self.__run_stream_func = self.__run_stream_function()
         self.__sync_all_streams_func = self.__sync_all_streams_function()
     
@@ -74,19 +74,21 @@ class TorchUtils:
             return dummy_function  # CPU does not require explicit synchronization
         if self.device_type == "xpu":
             return torch.xpu.synchronize
-        return lambda: warnAndLog(f"Unknown device type {self.device_type}, skipping stream synchronization.")
-    
-    def __init_stream_function(self)-> callable:
+        return lambda: log(f"Unknown device type {self.device_type}, skipping stream synchronization.")
+
+    def init_stream(self, gpu_id = 0) -> torch.Stream:
         """
         Initializes the stream based on the device type.
         """
+        log(f"Initializing stream for device {self.device_type} (GPU ID: {gpu_id})")
+        device = self.handle_device(self.device_type, gpu_id)
         if self.device_type == "cuda":
-            return torch.cuda.Stream
+            return torch.cuda.Stream(device=device)
         elif self.device_type == "xpu":
-            return torch.xpu.Stream
+            return torch.xpu.Stream(device=device)
         else:
-            return DummyContextManager # For CPU and MPS, we can use a dummy stream
-    
+            return DummyContextManager()  # For CPU and MPS, we can use a dummy stream
+
     def __run_stream_function(self) -> callable:
         """
         Runs the stream based on the device type.
@@ -97,10 +99,8 @@ class TorchUtils:
             return torch.xpu.stream
         else:
             return  dummy_context_manager # For CPU and MPS, we can use a dummy context manager
-    
-    def init_stream(self):
-        return self.__init_stream_func()
-        
+
+
     def run_stream(self, stream):
         return self.__run_stream_func(stream) 
 
@@ -113,7 +113,7 @@ class TorchUtils:
             case "cpu":
                 pass  # CPU does not require explicit synchronization
             case _:
-                warnAndLog(f"Unknown device type {self.device_type}, skipping stream synchronization.")
+                log(f"Unknown device type {self.device_type}, skipping stream synchronization.")
                 # For other devices, we assume no synchronization is needed.
         
     def sync_all_streams(self):
@@ -126,7 +126,8 @@ class TorchUtils:
     def handle_device(device, gpu_id: int = 0) -> torch.device:
         """
         returns device based on gpu id and device parameter
-    """
+        """
+        log(f"Handling device: {device}, GPU ID: {gpu_id}")
         if device == "auto":
             if torch.cuda.is_available():
                 torchdevice = torch.device("cuda", gpu_id)
@@ -146,6 +147,7 @@ class TorchUtils:
 
     @staticmethod
     def handle_precision(precision) -> torch.dtype:
+        log(f"Handling precision: {precision}")
         if precision == "auto":
             return torch.float16 if backendDetect.get_half_precision() else torch.float32
         if precision == "float32":
@@ -194,6 +196,8 @@ class TorchUtils:
     def clear_cache():
         if HAS_PYTORCH_CUDA:
             torch.cuda.empty_cache()
+            torch.cuda.reset_max_memory_allocated()
+            torch.cuda.reset_max_memory_cached()
     
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
