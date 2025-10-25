@@ -1,4 +1,5 @@
-# RVE 2.3.8 pre-release
+# RVE 2.3.9
+# RVE 2.3.8
 ### Added
  - Open output folder button
  - Cap output scale based on model scale
