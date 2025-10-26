@@ -3,7 +3,7 @@ import math
 
 import gc
 from .TorchUtils import TorchUtils
-from .spandrel.UpscaleModelWrapper import UpscaleModelWrapper
+from .UpscaleModelWrapper import UpscaleModelWrapper
 import torch as torch
 import torch.nn.functional as F
 import sys
