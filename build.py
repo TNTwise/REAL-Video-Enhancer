@@ -280,29 +280,34 @@ class Nuitka(BuildManager):
 if __name__ == "__main__":
     
     args = argparse.ArgumentParser()
+    args.add_argument("--run", help="Run the application", action="store_true")
     args.add_argument("--build", help="Build the application with a specific builder.", default="gui", choices=["pyinstaller", "cx_freeze", "nuitka", "gui"])
     args.add_argument("--copy_backend", help="Copy the backend to the build directory", action="store_true")    
     args = args.parse_args()
     if not os.path.exists("venv") or not args.build == "gui":
         BuildManager().python_manager.setup_python()
-    BuildManager().build_resources()
-    BuildManager().build_gui()
+        
+    if args.run:
+        PythonManager.run_venv_python("REAL-Video-Enhancer.py")
+    else:
+        BuildManager().build_resources()
+        BuildManager().build_gui()
+        
+        match args.build:
+            case "pyinstaller":
+                builder = PyInstaller()
+            case "cx_freeze":
+                builder = CxFreeze()
+            case "nuitka":
+                builder = Nuitka()
+            case "gui":
+                exit()
+            case _:
+                raise ValueError("Invalid build option")
+        builder.build()
+        builder.patch_for_xcbcursor()
+        if args.copy_backend:
+            builder.copy_backend()
+        print("Build complete")
     
-    match args.build:
-        case "pyinstaller":
-            builder = PyInstaller()
-        case "cx_freeze":
-            builder = CxFreeze()
-        case "nuitka":
-            builder = Nuitka()
-        case "gui":
-            exit()
-        case _:
-            raise ValueError("Invalid build option")
-    builder.build()
-    builder.patch_for_xcbcursor()
-    if args.copy_backend:
-        builder.copy_backend()
-    print("Build complete")
-
     
