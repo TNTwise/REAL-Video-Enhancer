@@ -66,7 +66,7 @@ class UpscaleModelWrapper:
                     self.__scale = 4
                     state_dict = torch.load(self.__model_path, map_location=self.__device)
                     model.load_state_dict(state_dict=state_dict)
-                    self.__model = model
+                    self.__model = model.to(self.__device, dtype=self.__precision)
                     self.inference_helper = AnimeSRInferenceHelper(model=self.__model, scale=self.__scale)
                 
                 except Exception as e:

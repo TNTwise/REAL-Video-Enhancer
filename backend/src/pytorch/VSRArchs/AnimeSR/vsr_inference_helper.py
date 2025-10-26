@@ -1,5 +1,6 @@
 import torch
 import gc
+from ...TorchUtils import TorchUtils
 class AnimeSRInferenceHelper:
     def __init__(self, model, scale):
         self.scale = scale
@@ -12,8 +13,8 @@ class AnimeSRInferenceHelper:
         return self.model.state_dict()
 
     def __call__(self, frame: torch.Tensor):
-        
         # fill the queue to render with multiple frames for the model
+        #TorchUtils.clear_cache()
         if len(self.frame_cache) == 0:
             height, width = frame.shape[2:]
             self.state = frame.new_zeros(1, 64, height, width)
@@ -21,6 +22,7 @@ class AnimeSRInferenceHelper:
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame)
         x = torch.cat(self.frame_cache, dim=1)
+        #TorchUtils.clear_cache()
         #print(x.shape, file=sys.stderr)
         #sys.exit()
         self.out, self.state = self.model(x, self.out, self.state)
@@ -28,7 +30,8 @@ class AnimeSRInferenceHelper:
         self.frame_cache.pop(0)
         
         self.frame_cache.append(frame)
-        gc.collect()
+        #gc.collect()
+        #TorchUtils.clear_cache()
         return self.out
 
             
