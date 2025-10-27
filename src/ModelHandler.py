@@ -507,6 +507,12 @@ tensorrtDenoiseModels = {
         "RTMoSR",
     ),"""
 ncnnDecompressModels = {
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn",
+        "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn.tar.gz",
+        1,
+        "SuperUltraCompact",
+    ),
     "DeH264 SPAN (Fast) (Medium/Low Quality Source)": (
         "1x_DeH264_SPAN.ncnn",
         "1x_DeH264_SPAN.ncnn.tar.gz",
@@ -524,14 +530,13 @@ ncnnDecompressModels = {
     
 }
 pytorchDecompressModels = {
-    "DeH264 RTMoSR Unshuffle (UltraFast) (High Quality Source)": (
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors",
+        "deH264_SuperUltraCompact.safetensors",
         1,
-        "RTMoSR",
+        "SuperUltraCompact",
     ),
-
-        "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
+    "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
         "1xDeH264_RTMoSR.pth",
         "1xDeH264_RTMoSR.pth",
         1,
@@ -551,11 +556,11 @@ pytorchDecompressModels = {
     )
 }
 tensorrtDecompressModels = {
-    "DeH264 RTMoSR Unshuffle (UltraFast) (High Quality Source)": (
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors",
+        "deH264_SuperUltraCompact.safetensors",
         1,
-        "RTMoSR",
+        "SuperUltraCompact",
     ),
 
         "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
