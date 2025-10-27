@@ -14,7 +14,7 @@ class AnimeSRInferenceHelper:
 
     def __call__(self, frame: torch.Tensor):
         # fill the queue to render with multiple frames for the model
-        #TorchUtils.clear_cache()
+        TorchUtils.clear_cache()
         if len(self.frame_cache) == 0:
             height, width = frame.shape[2:]
             self.state = frame.new_zeros(1, 64, height, width)
@@ -22,16 +22,17 @@ class AnimeSRInferenceHelper:
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame)
         x = torch.cat(self.frame_cache, dim=1)
-        #TorchUtils.clear_cache()
+        TorchUtils.clear_cache()
         #print(x.shape, file=sys.stderr)
         #sys.exit()
         self.out, self.state = self.model(x, self.out, self.state)
+        TorchUtils.clear_cache()
         # remove frame from cache
         self.frame_cache.pop(0)
-        
+        TorchUtils.clear_cache()
         self.frame_cache.append(frame)
         #gc.collect()
-        #TorchUtils.clear_cache()
+        TorchUtils.clear_cache()
         return self.out
 
             

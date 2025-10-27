@@ -140,8 +140,8 @@ class UpscalePytorch:
                 device=self.device,
                 precision=self.dtype,
             )
-
-            match self.upscale_model_wrapper.get_scale():
+            self.scale = self.upscale_model_wrapper.get_scale()
+            match self.scale:
                 case 1:
                     modulo = 4
                 case 2:

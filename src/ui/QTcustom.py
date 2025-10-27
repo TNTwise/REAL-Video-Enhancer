@@ -643,20 +643,6 @@ class IndependentQTPopup(QtWidgets.QDialog):
         self.setLayout(layout)
         self.exec()
         app.exec_()
-        
-    
-
-"""class ThreadedQTPopup():
-    def __init__(self, message):
-        self.message = message
-        popup = IndependentQTPopup()
-        self.proc = Process(popup.start, args=(message,))
-        self.proc.start()
-
-    def terminate(self):
-        if self.proc.is_alive():
-            self.proc.terminate()
-            self.proc.join()     """
 
 def NetworkCheckPopup(hostname="https://raw.githubusercontent.com") -> bool:
     if not networkCheck(hostname=hostname):

@@ -31,8 +31,8 @@ class UpscaleModelWrapper:
             model(test_input)
             output = model(test_input)
             self.__model.load_state_dict(model.state_dict()) # reload state dict to fix span
-            del model
             TorchUtils.clear_cache()
+            del model
 
     def __test_model_precision(self):
         test_input = torch.randn(1, 3, 64, 64).to(self.__device, dtype=self.__precision)
