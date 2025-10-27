@@ -100,7 +100,7 @@ class SettingsTab:
             self.settings.settings['audio_encoder'],
             self.settings.settings['audio_bitrate'],
             self.hdr_mode,
-            self.color_space,# if self.in_pix_fmt != "yuv420p" else None,
+            self.color_space if self.in_pix_fmt != "yuv420p" else None,
             self.color_primaries,
             self.color_transfer,    
         ).build_command()

@@ -36,7 +36,7 @@ class FFmpegRead(Buffer):
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
         self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
-        self.yuv420pMOD = False
+        #self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
         else:
@@ -61,7 +61,7 @@ class FFmpegRead(Buffer):
             f"{self.inputFile}",
         ]
 
-        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih" + (":in_range=limited:out_range=full,format=yuv444p" if self.input_pixel_format == "yuv420p" else "") # fix dar != sar
+        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih" #+ ":in_range=limited:out_range=full,format=yuv420p" if self.yuv420pMOD == "yuv420p" else "" # fix dar != sar
         #if not self.hdr_mode:
         #    if self.input_pixel_format == "yuv420p":
         #        filter_string += ":in_range=tv:out_range=pc" # color shifts a smidgen but helps with artifacts when converting yuv to raw
