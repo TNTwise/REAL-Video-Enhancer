@@ -341,7 +341,7 @@ class ProcessTab:
                         self.status = "Rendering"
 
                     if "this may take a while" in line.lower():
-                        self.status = "Building Engine"
+                        self.status = "Building Engine, this may take a while."
 
 
                     if any(char.isalpha() for char in line):
@@ -415,6 +415,8 @@ class ProcessTab:
 
 
     def onRenderCompletion(self):
+        self.eta = 0
+        self.fps = 0
         try:
             self.renderProcess.wait()
         except Exception:
@@ -476,8 +478,16 @@ class ProcessTab:
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
             self.parent.progressBar.setValue(self.currentFrame)
-            self.parent.FPS.setText(f"FPS: {self.fps}")
-            self.parent.ETA.setText(f"ETA: {self.eta}")
+            if self.fps != 0:
+                self.parent.FPS.setVisible(True)
+                self.parent.FPS.setText(f"FPS: {self.fps}")
+            else:
+                self.parent.FPS.setVisible(False)
+            if self.eta != 0:
+                self.parent.ETA.setVisible(True)
+                self.parent.ETA.setText(f"ETA: {self.eta}")
+            else:
+                self.parent.ETA.setVisible(False)
             self.parent.STATUS.setText(f"Status: {self.status}")
         if not qimage.isNull():
             label_width = self.parent.previewLabel.width()
