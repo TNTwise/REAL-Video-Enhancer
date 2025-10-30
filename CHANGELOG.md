@@ -1,4 +1,6 @@
 # RVE 2.3.9
+### Fixed
+ - Random crash after rendering a few times.
 # RVE 2.3.8
 ### Added
  - Open output folder button

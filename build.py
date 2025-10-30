@@ -18,7 +18,7 @@ print(f"CPU Arch: {CPU_ARCH}")
 print(f"OUTPUT_FOLDER: {OUTPUT_FOLDER}")
 
 
-def zero_mainwindow_size():
+def set_mainwindow_size():
     import xml.etree.ElementTree as ET
 
     def set_mainwindow_size_zero(path="testRVEInterface.ui"):
@@ -154,7 +154,7 @@ class BuildManager:
     
     def build_gui(self):
         print("Building GUI")
-        zero_mainwindow_size()
+        set_mainwindow_size()
         if PLATFORM == "darwin" or PLATFORM == "linux":
             os.system(
                 f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"

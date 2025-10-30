@@ -360,8 +360,6 @@ class ProcessTab:
             self.parent.OutputFilesListWidget.addItem(
                 renderOptions.outputPath
             )  # add the file to the list widget
-
-            self.workerThread.unlink_shared_memory()
         try:
             self.pausedSharedMemory.close()
             self.pausedSharedMemory.unlink()

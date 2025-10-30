@@ -176,14 +176,6 @@ class UpdateGUIThread(QThread):
         self.outputVideoHeight = height
         self.outputVideoWidth = width
 
-    def unlink_shared_memory(self):
-        try:
-            self.shm.close()
-            self.shm.unlink()
-            print("Closed Read Memory")
-        except Exception as e:
-            log(f"No read memory {str(e)}")
-
     def run(self):
         while True:
             with QMutexLocker(self._mutex):
@@ -230,7 +222,6 @@ class UpdateGUIThread(QThread):
     def stop(self):
         with QMutexLocker(self._mutex):
             self._stop_flag = True
-        self.unlink_shared_memory()
 
 
 # custom threads
