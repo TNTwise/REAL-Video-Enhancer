@@ -84,12 +84,18 @@
 | 2x-OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) 
 | 2x-AnimeJaNai V2 and V3 Sharp | The Database | [AnimeJanai](https://github.com/the-database/mpv-upscale-2x_animejanai)
 | 2x-AniSD | SiroSky | [AniSD](https://github.com/Sirosky/Upscale-Hub/releases/tag/AniSD)
+| AnimeSR | Tencent ARC | [AnimeSR](https://github.com/TencentARC/AnimeSR)
 
 ### Decompression Models:
 | Model | Author | Link |
 |--|--|--|
 | DeH264 | Helaman | [1xDeH264_realplksr](https://github.com/Phhofm/models/releases/tag/1xDeH264_realplksr) 
 
+### Denoise Models:
+| Model | Author | Link |
+|--|--|--|
+| DRUnet | cszn | [DRUnet](https://github.com/cszn/DPIR)
+| DnCNN | czsn | [DnCNN](https://github.com/cszn/DPIR)
 
 # Backends
   | Backend | Hardware | 

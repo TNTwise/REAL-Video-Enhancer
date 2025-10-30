@@ -269,6 +269,7 @@ class UpscalePytorch:
                             )
                 model = trtHandler.load_engine(trt_engine_name=self.trt_engine_name)
                 self.upscale_model_wrapper.load_model(model)
+                
 
         self.torchUtils.clear_cache()
         self.torchUtils.sync_all_streams()
@@ -289,8 +290,7 @@ class UpscalePytorch:
     @torch.inference_mode()
     def __call__(self, image: bytes) -> torch.Tensor:
         image = self.torchUtils.frame_to_tensor(image, self.f2tstream, self.device, self.dtype)
-        with self.torchUtils.run_stream(self.stream), torch.amp.autocast(
-            enabled=self.dtype == torch.float16,device_type="cuda"):
+        with self.torchUtils.run_stream(self.stream):
             while self.upscale_model_wrapper is None:
                 sleep(1)
             if self.tilesize == 0:

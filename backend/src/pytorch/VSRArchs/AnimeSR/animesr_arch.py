@@ -4,7 +4,9 @@ from torch.nn.functional import interpolate
 from torch.nn import init
 from torch.nn.modules.batchnorm import _BatchNorm
 
-
+"""
+Originally from Tencent ARC, Modified by HolyWu
+"""
 def default_init_weights(module_list, scale=1, bias_fill=0, **kwargs):
     """Initialize network weights.
 
