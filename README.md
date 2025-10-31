@@ -72,7 +72,6 @@
 |--|--|--|
 | RIFE 4.6,4.7,4.15,4.18,4.22,4.22-lite,4.25 | Hzwer | [Practical-RIFE](https://github.com/hzwer/Practical-RIFE) 
 | GMFSS | 98mxr | [GMFSS_Fortuna](https://github.com/98mxr/GMFSS_Fortuna) 
-| GIMM | GSeanCDAT | [GIMM](https://github.com/GSeanCDAT/GIMM-VFI) 
 | IFRNet | ltkong218 | [IFRnet](https://github.com/ltkong218/IFRNet)
 
 ### Upscale Models:
