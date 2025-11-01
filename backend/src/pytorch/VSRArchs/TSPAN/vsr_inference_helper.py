@@ -14,7 +14,6 @@ class TemporalSPANInferenceHelper:
         return self.model.state_dict()
 
     def __call__(self, frame: torch.Tensor):
-        TorchUtils.clear_cache() 
         if len(self.frame_cache) == 0:
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame.unsqueeze(1))

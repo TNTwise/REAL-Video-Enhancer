@@ -7,6 +7,8 @@ class UpscaleModelWrapper:
         self.__model_path = model_path
         self.__device = device
         self.__precision = precision
+        self.__dummy_input_pre_channels = None
+        self.__channels = 3
         self.load_model()
         self.set_precision(self.__precision)
         self.__test_model_precision()
@@ -43,8 +45,14 @@ class UpscaleModelWrapper:
                 log(f"Model precision {self.__precision} not supported, falling back to float32: {e}")
                 self.set_precision(torch.float32)
                 self.__test_inference(test_input)
-            
-
+    
+    def get_dummy_input(self, width: int, height: int) -> torch.Tensor:
+        assert self.__dummy_input_pre_channels is not None, "Dummy input pre channels not set."
+        dummy_input = self.__dummy_input_pre_channels.copy()
+        dummy_input.append(self.__channels)
+        dummy_input.append(height)
+        dummy_input.append(width)
+        return torch.zeros(dummy_input, dtype=self.__precision, device=self.__device)
     @torch.inference_mode()
     def load_model(self, model=None) -> torch.nn.Module:
         if not model:
@@ -56,6 +64,7 @@ class UpscaleModelWrapper:
                 model = model.model
                 self.__model = model
                 self.inference_helper = self.__model
+                self.__dummy_input_pre_channels = [1]
 
             except (UnsupportedModelError) as e:
                 try:
@@ -68,11 +77,12 @@ class UpscaleModelWrapper:
                     model.load_state_dict(state_dict=state_dict)
                     self.__model = model.to(self.__device, dtype=self.__precision)
                     self.inference_helper = AnimeSRInferenceHelper(model=self.__model, scale=self.__scale)
-                
+                    self.__dummy_input_pre_channels = [3]
                 except Exception as e:
                     try:
                         from .VSRArchs.TSPAN import tspan, vsr_inference_helper
                         self.__scale = 2
+                        self.__dummy_input_pre_channels = [1, 5,]
                         model = tspan.TemporalSPAN(upscale=self.__scale)
                         state_dict = torch.load(self.__model_path, map_location=self.__device)
                         model.load_state_dict(state_dict=state_dict['params_ema'], strict=False)
@@ -82,7 +92,8 @@ class UpscaleModelWrapper:
                     except Exception as e:
                         log(f"Model at {self.__model_path} is not supported: {e}")
                         raise e
-
+        else:
+            self.inference_helper = model
     def __call__(self, *args, **kwargs):
         assert self.inference_helper is not None, "Inference helper is not initialized."
         return self.inference_helper(*args, **kwargs)

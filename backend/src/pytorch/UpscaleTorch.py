@@ -138,9 +138,10 @@ class UpscalePytorch:
             self.upscale_model_wrapper = UpscaleModelWrapper(
                 model_path=self.modelPath,
                 device=self.device,
-                precision=self.dtype,
+                precision=self.dtype
             )
             self.scale = self.upscale_model_wrapper.get_scale()
+            
             match self.scale:
                 case 1:
                     modulo = 4
@@ -167,8 +168,8 @@ class UpscalePytorch:
                 self.pad_h = math.ceil(self.videoHeight / modulo) * modulo
 
             if self.backend == "tensorrt":
+                self.tensorrt_example_inputs = self.upscale_model_wrapper.get_dummy_input(self.pad_w, self.pad_h)
                 from .TensorRTHandler import TorchTensorRTHandler
-
 
                 trtHandler = TorchTensorRTHandler(
                     model_parent_path=os.path.dirname(self.modelPath),
@@ -207,7 +208,7 @@ class UpscalePytorch:
                 self.trt_engine_name = self.trt_engine_static_name if self.trt_static_shape else self.trt_engine_dynamic_name
 
                 if not trtHandler.check_engine_exists(self.trt_engine_name):
-                    inputs = (torch.zeros([1, 3, self.pad_h, self.pad_w], dtype=self.dtype, device=self.device),)
+                    
                     if self.trt_static_shape:
                         dynamic_shapes = None
                         
@@ -227,7 +228,7 @@ class UpscalePytorch:
                             self.upscale_model_wrapper.get_model(),
                             self.dtype,
                             self.device,
-                            example_inputs=inputs,
+                            example_inputs=self.tensorrt_example_inputs,
                             trt_engine_name=self.trt_engine_name,
                             trt_multi_precision_engine=False,
                             dynamic_shapes=dynamic_shapes,
@@ -235,7 +236,7 @@ class UpscalePytorch:
                         trtHandler.save_engine(
                             trt_engine,
                             self.trt_engine_name,
-                            example_inputs=inputs,
+                            example_inputs=self.tensorrt_example_inputs,
                         )
 
                     except Exception as e:
@@ -253,14 +254,14 @@ class UpscalePytorch:
                                     self.upscale_model_wrapper.get_model(),
                                     self.dtype,
                                     self.device,
-                                    example_inputs=inputs,
+                                    example_inputs=self.tensorrt_example_inputs,
                                     trt_engine_name=self.trt_engine_static_name,
                                     trt_multi_precision_engine=False,
                                 )
                                 trtHandler.save_engine(
                                     trt_engine,
                                     self.trt_engine_static_name,
-                                    example_inputs=inputs,
+                                    example_inputs=self.tensorrt_example_inputs,
                                 )
                             self.trt_engine_name = self.trt_engine_static_name
                         else:
