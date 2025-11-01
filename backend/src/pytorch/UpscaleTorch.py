@@ -168,7 +168,7 @@ class UpscalePytorch:
                 self.pad_h = math.ceil(self.videoHeight / modulo) * modulo
 
             if self.backend == "tensorrt":
-                self.tensorrt_example_inputs = self.upscale_model_wrapper.get_dummy_input(self.pad_w, self.pad_h)
+                self.tensorrt_example_inputs = (self.upscale_model_wrapper.get_dummy_input(self.pad_w, self.pad_h),) # gotta make a tuple cause im dumb.
                 from .TensorRTHandler import TorchTensorRTHandler
 
                 trtHandler = TorchTensorRTHandler(
