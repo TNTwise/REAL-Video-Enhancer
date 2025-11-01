@@ -70,8 +70,18 @@ class UpscaleModelWrapper:
                     self.inference_helper = AnimeSRInferenceHelper(model=self.__model, scale=self.__scale)
                 
                 except Exception as e:
-                    log(f"Model at {self.__model_path} is not supported: {e}")
-                    raise e
+                    try:
+                        from .VSRArchs.TSPAN import tspan, vsr_inference_helper
+                        self.__scale = 2
+                        model = tspan.TemporalSPAN(upscale=self.__scale)
+                        state_dict = torch.load(self.__model_path, map_location=self.__device)
+                        model.load_state_dict(state_dict=state_dict['params_ema'], strict=False)
+                        self.__model = model.to(self.__device, dtype=self.__precision)
+                        self.inference_helper = vsr_inference_helper.TemporalSPANInferenceHelper(model=self.__model, scale=self.__scale)
+
+                    except Exception as e:
+                        log(f"Model at {self.__model_path} is not supported: {e}")
+                        raise e
 
     def __call__(self, *args, **kwargs):
         assert self.inference_helper is not None, "Inference helper is not initialized."
