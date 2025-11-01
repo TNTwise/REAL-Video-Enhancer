@@ -154,7 +154,7 @@ class BuildManager:
     
     def build_gui(self):
         print("Building GUI")
-        set_mainwindow_size()
+        #set_mainwindow_size()
         if PLATFORM == "darwin" or PLATFORM == "linux":
             os.system(
                 f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"
@@ -286,12 +286,12 @@ if __name__ == "__main__":
     args = args.parse_args()
     if not os.path.exists("venv") or not args.build == "gui":
         BuildManager().python_manager.setup_python()
-        
+    BuildManager().build_gui()
     if args.run:
         PythonManager.run_venv_python("REAL-Video-Enhancer.py")
     else:
         BuildManager().build_resources()
-        BuildManager().build_gui()
+        
         
         match args.build:
             case "pyinstaller":
