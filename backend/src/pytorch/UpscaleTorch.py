@@ -300,13 +300,9 @@ class UpscalePytorch:
 
             else:
                 output = self.renderTiledImage(image)
-            
-        self.torchUtils.sync_stream(self.stream)
-        
-        with self.torchUtils.run_stream(self.convertStream):
             output = self.torchUtils.tensor_to_frame(output)
-            
-        self.torchUtils.sync_all_streams()
+        
+        self.torchUtils.sync_stream(self.stream)
         return output
  
     def getScale(self):
