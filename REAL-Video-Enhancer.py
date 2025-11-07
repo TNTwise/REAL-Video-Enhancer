@@ -52,7 +52,7 @@ from src.Backendhandler import BackendHandler
 from src.ModelHandler import totalModels
 from src.ui.AnimationHandler import AnimationHandler
 from src.ui.QTstyle import Palette
-from src.ui.QTcustom import RegularQTPopup, NotificationOverlay, IndependentQTPopup
+from src.ui.QTcustom import RegularQTPopup, NotificationOverlay, TextOutputPopup
 from src.ui.RenderQueue import RenderQueue, RenderOptions
 from src.VideoInfo import VideoLoader
 
@@ -165,7 +165,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backendHandler.getAvailableBackends()
         )
         end_time = time.time()
-
+        if "ERROR" in self.fullOutput.upper():
+            TextOutputPopup(f"ERROR DETECTED IN BACKEND SETUP!\n{self.fullOutput}", title="FATAL ERROR")
         
 
         # set default home page

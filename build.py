@@ -281,6 +281,7 @@ if __name__ == "__main__":
     
     args = argparse.ArgumentParser()
     args.add_argument("--run", help="Run the application", action="store_true")
+    args.add_argument("--run_backend", help="Run the backend", action="store_true")
     args.add_argument("--build", help="Build the application with a specific builder.", default="gui", choices=["pyinstaller", "cx_freeze", "nuitka", "gui"])
     args.add_argument("--copy_backend", help="Copy the backend to the build directory", action="store_true")    
     args = args.parse_args()
@@ -289,6 +290,8 @@ if __name__ == "__main__":
     BuildManager().build_gui()
     if args.run:
         PythonManager.run_venv_python("REAL-Video-Enhancer.py")
+    elif args.run_backend:
+        PythonManager.run_venv_python("backend/rve-backend.py")
     else:
         BuildManager().build_resources()
         

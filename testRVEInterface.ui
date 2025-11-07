@@ -1096,9 +1096,9 @@ background-color:#343b47
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>0</y>
+                                   <y>-55</y>
                                    <width>470</width>
-                                   <height>1009</height>
+                                   <height>1040</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -1590,6 +1590,78 @@ background-color:#343b47
                                           </property>
                                           <property name="value">
                                            <double>2.000000000000000</double>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                       </layout>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QWidget" name="sloMoModeContainer" native="true">
+                                       <layout class="QHBoxLayout" name="horizontalLayout_31">
+                                        <property name="leftMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="topMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="rightMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <property name="bottomMargin">
+                                         <number>0</number>
+                                        </property>
+                                        <item>
+                                         <widget class="QLabel" name="label_36">
+                                          <property name="font">
+                                           <font>
+                                            <pointsize>12</pointsize>
+                                           </font>
+                                          </property>
+                                          <property name="text">
+                                           <string>SloMo Mode</string>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <spacer name="horizontalSpacer_16">
+                                          <property name="orientation">
+                                           <enum>Qt::Orientation::Horizontal</enum>
+                                          </property>
+                                          <property name="sizeHint" stdset="0">
+                                           <size>
+                                            <width>226</width>
+                                            <height>20</height>
+                                           </size>
+                                          </property>
+                                         </spacer>
+                                        </item>
+                                        <item>
+                                         <widget class="QLabel" name="label_39">
+                                          <property name="maximumSize">
+                                           <size>
+                                            <width>25</width>
+                                            <height>25</height>
+                                           </size>
+                                          </property>
+                                          <property name="toolTip">
+                                           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase video length instead of framerate when interpolating.&lt;/p&gt;&lt;p&gt;Audio and Subtitles will not be transfered to output video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                          </property>
+                                          <property name="text">
+                                           <string/>
+                                          </property>
+                                          <property name="pixmap">
+                                           <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                                          </property>
+                                          <property name="scaledContents">
+                                           <bool>true</bool>
+                                          </property>
+                                         </widget>
+                                        </item>
+                                        <item>
+                                         <widget class="QCheckBox" name="sloMoModeCheckBox">
+                                          <property name="text">
+                                           <string/>
                                           </property>
                                          </widget>
                                         </item>
@@ -3256,7 +3328,7 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>460</width>
+                                <width>430</width>
                                 <height>516</height>
                                </rect>
                               </property>
@@ -3757,66 +3829,6 @@ border-radius:10px;
                                      </item>
                                      <item>
                                       <widget class="QCheckBox" name="ensembleCheckBox">
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                    </layout>
-                                   </widget>
-                                  </item>
-                                  <item>
-                                   <widget class="QWidget" name="sloMoModeContainer" native="true">
-                                    <layout class="QHBoxLayout" name="horizontalLayout_31">
-                                     <item>
-                                      <widget class="QLabel" name="label_36">
-                                       <property name="font">
-                                        <font>
-                                         <pointsize>12</pointsize>
-                                        </font>
-                                       </property>
-                                       <property name="text">
-                                        <string>SloMo Mode</string>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <spacer name="horizontalSpacer_16">
-                                       <property name="orientation">
-                                        <enum>Qt::Orientation::Horizontal</enum>
-                                       </property>
-                                       <property name="sizeHint" stdset="0">
-                                        <size>
-                                         <width>226</width>
-                                         <height>20</height>
-                                        </size>
-                                       </property>
-                                      </spacer>
-                                     </item>
-                                     <item>
-                                      <widget class="QLabel" name="label_39">
-                                       <property name="maximumSize">
-                                        <size>
-                                         <width>25</width>
-                                         <height>25</height>
-                                        </size>
-                                       </property>
-                                       <property name="toolTip">
-                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase video length instead of framerate when interpolating.&lt;/p&gt;&lt;p&gt;Audio and Subtitles will not be transfered to output video.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                                       </property>
-                                       <property name="text">
-                                        <string/>
-                                       </property>
-                                       <property name="pixmap">
-                                        <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                                       </property>
-                                       <property name="scaledContents">
-                                        <bool>true</bool>
-                                       </property>
-                                      </widget>
-                                     </item>
-                                     <item>
-                                      <widget class="QCheckBox" name="sloMoModeCheckBox">
                                        <property name="text">
                                         <string/>
                                        </property>

@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import contextlib
+from .colors import Colors
 # non standard python libraries
 try:
     import numpy as np
@@ -57,7 +58,8 @@ def errorAndLog(message: str):
 
 
 
-
+def log_error(message: str):
+    log(Colors.RED + "ERROR: "+ message + Colors.RESET, show_backend=False)
 
 def log(message: str, show_backend = True):
     """

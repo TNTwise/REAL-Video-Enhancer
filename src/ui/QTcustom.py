@@ -5,6 +5,8 @@ import requests
 import time
 import numpy as np
 from multiprocessing import shared_memory
+import re
+import html
 
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -117,6 +119,79 @@ def show_layout_widgets(layout):
             widget = item.widget()
             if widget is not None:
                 widget.setVisible(True)  # Show the widget
+
+
+# Simple ANSI -> HTML converter for SGR (color/bold/reset) sequences
+_ANSI_SGR_RE = re.compile(r"\x1b\[([0-9;]*)m")
+
+# basic color maps (ANSI SGR codes)
+_ANSI_COLORS = {
+    30: "black",
+    31: "red",
+    32: "green",
+    33: "yellow",
+    34: "blue",
+    35: "magenta",
+    36: "cyan",
+    37: "white",
+    90: "gray",
+}
+
+def ansi_to_html(text: str) -> str:
+    """Convert a text containing ANSI SGR escape sequences to a safe HTML string.
+
+    This is intentionally small and handles common SGR codes: reset (0), bold (1),
+    foreground colors (30-37) and bright colors (90-97).
+    """
+    if not text:
+        return ""
+
+    # Escape HTML first
+    escaped = html.escape(text)
+
+    parts = _ANSI_SGR_RE.split(escaped)
+    out = []
+    open_spans = 0
+    i = 0
+    while i < len(parts):
+        chunk = parts[i]
+        out.append(chunk)
+        i += 1
+        if i < len(parts):
+            code_chunk = parts[i]
+            i += 1
+            codes = [int(c) for c in code_chunk.split(";") if c != ""] if code_chunk else [0]
+            # if reset present, close all open spans
+            if 0 in codes:
+                if open_spans:
+                    out.append("</span>" * open_spans)
+                    open_spans = 0
+                continue
+
+            styles = []
+            if 1 in codes:
+                styles.append("font-weight:bold")
+            # foreground colors
+            for c in codes:
+                if c in _ANSI_COLORS:
+                    styles.append(f"color: {_ANSI_COLORS[c]}")
+                elif 90 <= c <= 97:
+                    # bright colors approximate to same names (could be tuned)
+                    base = c - 60
+                    color = _ANSI_COLORS.get(base, None)
+                    if color:
+                        styles.append(f"color: {color}")
+
+            if styles:
+                out.append(f"<span style=\"{';'.join(styles)}\">")
+                open_spans += 1
+
+    if open_spans:
+        out.append("</span>" * open_spans)
+
+    # Replace newlines with <br> for HTML display
+    result = ''.join(out).replace('\n', '<br>')
+    return result
 
 class NotificationOverlay(QWidget):
     def __init__(self, message, parent=None, timeout=3000):
@@ -573,6 +648,52 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.plainTextEdit.setPlainText(self.totalCommandOutput)
         self.plainTextEdit.setTextCursor(cursor)
 
+
+class TextOutputPopup(QtWidgets.QDialog):
+    """
+    Simple popup to display text information
+    """
+
+    def __init__(self, message: str, title: str = "Information"):
+        super().__init__()
+        self.message = message
+        self.title = title
+        self.setup_ui()
+        self.setLayout(self.gridLayout)
+        self.exec()
+
+    """
+    Initializes all threading bs
+    """
+
+    def setup_ui(self):
+        # beginning of bullshit
+        self.setWindowTitle(self.title)
+        self.setStyleSheet(styleSheet())
+        self.setMinimumSize(700, 400)
+
+        self.centralwidget = QtWidgets.QWidget(parent=self)
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setObjectName("gridLayout")
+        # Use QTextEdit to allow colored/HTML content (converted from ANSI)
+        self.textEdit = QtWidgets.QTextEdit(parent=self.centralwidget)
+        self.textEdit.setObjectName("textEdit")
+        self.textEdit.setReadOnly(True)
+        self.textEdit.setAcceptRichText(True)
+        # Convert any ANSI in the message to HTML for display
+        try:
+            self.textEdit.setHtml(ansi_to_html(self.message))
+        except Exception:
+            self.textEdit.setPlainText(self.message)
+        self.textEdit.setVerticalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+        )
+        self.textEdit.setHorizontalScrollBarPolicy(
+            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+        )
+        self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
+        
 
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):

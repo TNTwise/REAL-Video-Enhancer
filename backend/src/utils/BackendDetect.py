@@ -1,5 +1,5 @@
 
-from .Util import log, suppress_stdout_stderr
+from .Util import log_error, suppress_stdout_stderr
 
 class BackendDetect:
     def __init__(self):
@@ -19,24 +19,29 @@ class BackendDetect:
                     import tensorrt
                     import torch_tensorrt
                 self.__tensorrt = tensorrt
+            except ImportError as e:
+                pass
             except Exception as e:
-                log(str(e))
+                log_error("FATAL: " + str(e))
+        except ImportError as e:
+            pass
         except Exception as e:
-            log(str(e))
-        
+            log_error("FATAL: " + str(e))
         try:
             from rife_ncnn_vulkan_python import Rife
             import ncnn
 
             try:
                 from upscale_ncnn_py import UPSCALE
-            except Exception:
-                log(
+            except ImportError:
+                log_error(
                     "Warning: Cannot import upscale_ncnn, falling back to default ncnn processing. (Please install vcredlist on your computer to fix this!)"
                 )
             self.__ncnn = ncnn
+        except ImportError as e:
+            pass
         except Exception as e:
-            log(str(e))
+            log_error("FATAL: " + str(e))
 
 
 
@@ -62,7 +67,7 @@ class BackendDetect:
             x = self.__torch.tensor([1.0], dtype=self.__torch.float16).to(device="cuda" if self.pytorch_device == "rocm" else self.pytorch_device)
             return True
         except Exception as e:
-            log(str(e))
+            log_error(str(e))
             return False    
     
     def get_gpus_torch(self):
@@ -106,7 +111,7 @@ class BackendDetect:
                         SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX
                     )
                 except Exception as e:
-                    log(str(e))
+                    log_error(str(e))
             devices = []
             try:
                 with suppress_stdout_stderr():
@@ -122,5 +127,5 @@ class BackendDetect:
             except Exception:
                 return ["CPU"]
             except Exception as e:
-                log(str(e))
+                log_error(str(e))
                 return "Unable to get NCNN GPU"
