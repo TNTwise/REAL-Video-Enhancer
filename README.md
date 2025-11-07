@@ -78,7 +78,6 @@
 | Model | Author | Link |
 |--|--|--|
 | 4x-SPANkendata | Crustaceous D | [4x-SPANkendata](https://openmodeldb.info/models/4x-SPANkendata) 
-| 4x-ClearRealityV1 | Kim2091 | [4x-ClearRealityV1](https://openmodeldb.info/models/4x-ClearRealityV1) 
 | 4x-Nomos8k-SPAN series | Helaman | [4x-Nomos8k-SPAN series](https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong) 
 | 2x-OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) 
 | 2x-AnimeJaNai V2 and V3 Sharp | The Database | [AnimeJanai](https://github.com/the-database/mpv-upscale-2x_animejanai)
