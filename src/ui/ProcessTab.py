@@ -7,7 +7,7 @@ from multiprocessing import shared_memory
 
 from PySide6 import QtGui
 from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QColor, QFontMetrics
-from PySide6.QtCore import Qt, QSize, QUrl
+from PySide6.QtCore import Qt, QSize, QUrl, QRectF
 from PySide6.QtWidgets import QMessageBox
 
 from .RenderQueue import RenderQueue
@@ -316,12 +316,26 @@ class ProcessTab:
                 kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
-            self.renderProcess = subprocess.Popen(
-                command,
-                **kwargs,
-            )
+            # Launch the render subprocess and log the command; handle startup errors
+            try:
+                log(f"Starting render process: {command}")
+                self.renderProcess = subprocess.Popen(
+                    command,
+                    **kwargs,
+                )
+                log(f"Render process started, pid={getattr(self.renderProcess, 'pid', 'unknown')}")
+            except Exception as e:
+                log(f"Failed to start render process: {e}")
+                try:
+                    RegularQTPopup(f"Failed to start render process:\n{e}")
+                except Exception:
+                    pass
+                # Skip this renderOptions and continue with next
+                self.return_codes.append(-1)
+                continue
             textOutput = []
-            for line in iter(self.renderProcess.stdout.readline, b""):
+            # read text lines until EOF (use empty string sentinel since universal_newlines=True)
+            for line in iter(self.renderProcess.stdout.readline, ""):
                 if self.renderProcess.poll() is not None:
                     break  # Exit the loop if the process has terminated
 
@@ -432,31 +446,31 @@ class ProcessTab:
             pass  # pass just incase internet error caused a skip
 
     def getRoundedPixmap(self, pixmap, corner_radius):
+        # Create a fresh QPixmap to draw into so we never paint a device
+        # that may be painted elsewhere. Use explicit begin()/end() and
+        # always end the painter in a finally block to avoid leaving an
+        # active painter which can cause the "QPainter::begin" error.
         size = pixmap.size()
-        mask = QPixmap(size)
-        mask.fill(Qt.transparent)  # type: ignore
-
-        painter = QPainter(mask)
-        painter.setRenderHint(QPainter.Antialiasing)  # type: ignore
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)  # type: ignore
-
-        path = QPainterPath()
-        path.addRoundedRect(
-            0, 0, size.width(), size.height(), corner_radius, corner_radius
-        )
-
-        painter.setClipPath(path)
-        painter.drawPixmap(0, 0, pixmap)
-        painter.end()
-
         rounded_pixmap = QPixmap(size)
-        rounded_pixmap.fill(Qt.transparent)  # type: ignore
+        rounded_pixmap.fill(Qt.transparent)
 
-        painter = QPainter(rounded_pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)  # type: ignore
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)  # type: ignore
-        painter.drawPixmap(0, 0, mask)
-        painter.end()
+        painter = QPainter()
+        if not painter.begin(rounded_pixmap):
+            log("Failed to begin QPainter on rounded_pixmap")
+            return pixmap
+        try:
+            painter.setRenderHint(QPainter.Antialiasing)
+            painter.setRenderHint(QPainter.SmoothPixmapTransform)
+
+            rect = QRectF(0.0, 0.0, float(size.width()), float(size.height()))
+            path = QPainterPath()
+            path.addRoundedRect(rect, float(corner_radius), float(corner_radius))
+
+            painter.setClipPath(path)
+            painter.drawPixmap(0, 0, pixmap)
+        finally:
+            if painter.isActive():
+                painter.end()
 
         return rounded_pixmap
 
@@ -468,36 +482,44 @@ class ProcessTab:
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
 
-        if self.renderTextOutputList is not None:
-            # print(self.renderTextOutputList)
-            self.parent.renderOutput.setPlainText(
-                self.splitListIntoStringWithNewLines(self.renderTextOutputList)
-            )
-            scrollbar = self.parent.renderOutput.verticalScrollBar()
-            scrollbar.setValue(scrollbar.maximum())
-            self.parent.progressBar.setValue(self.currentFrame)
-            if self.fps != 0:
-                self.parent.FPS.setVisible(True)
-                self.parent.FPS.setText(f"FPS: {self.fps}")
-            else:
-                self.parent.FPS.setVisible(False)
-            if self.eta != 0:
-                self.parent.ETA.setVisible(True)
-                self.parent.ETA.setText(f"ETA: {self.eta}")
-            else:
-                self.parent.ETA.setVisible(False)
-            self.parent.STATUS.setText(f"Status: {self.status}")
-        if not qimage.isNull():
-            label_width = self.parent.previewLabel.width()
-            label_height = self.parent.previewLabel.height()
+        # Prevent re-entrant updates
+        if getattr(self, "_updating_preview", False):
+            return
+        self._updating_preview = True
+        try:
+            if self.renderTextOutputList is not None:
+                # print(self.renderTextOutputList)
+                self.parent.renderOutput.setPlainText(
+                    self.splitListIntoStringWithNewLines(self.renderTextOutputList)
+                )
+                scrollbar = self.parent.renderOutput.verticalScrollBar()
+                scrollbar.setValue(scrollbar.maximum())
+                self.parent.progressBar.setValue(self.currentFrame)
+                if self.fps != 0:
+                    self.parent.FPS.setVisible(True)
+                    self.parent.FPS.setText(f"FPS: {self.fps}")
+                else:
+                    self.parent.FPS.setVisible(False)
+                if self.eta != 0:
+                    self.parent.ETA.setVisible(True)
+                    self.parent.ETA.setText(f"ETA: {self.eta}")
+                else:
+                    self.parent.ETA.setVisible(False)
+                self.parent.STATUS.setText(f"Status: {self.status}")
+            # qimage may be None (if producer failed); guard against that
+            if qimage is not None and not qimage.isNull():
+                label_width = self.parent.previewLabel.width()
+                label_height = self.parent.previewLabel.height()
 
-            p = qimage.scaled(
-                label_width, label_height, Qt.AspectRatioMode.KeepAspectRatio
-            )  # type: ignore
-            pixmap = QtGui.QPixmap.fromImage(p)
+                p = qimage.scaled(
+                    label_width, label_height, Qt.AspectRatioMode.KeepAspectRatio
+                )  # type: ignore
+                pixmap = QtGui.QPixmap.fromImage(p)
 
-            roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
-            self.parent.previewLabel.setPixmap(roundedPixmap)
+                roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
+                self.parent.previewLabel.setPixmap(roundedPixmap)
+        finally:
+            self._updating_preview = False
 
     def build_command(self, renderOptions: RenderOptions):
         if (
