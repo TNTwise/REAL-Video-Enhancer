@@ -47,7 +47,9 @@ class DownloadTab:
             if CPU_ARCH == "arm64":
                 remove_combobox_item_by_text(self.parent.pytorch_backend, "XPU")
                 remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
-        
+        if IS_FLATPAK:
+            remove_combobox_item_by_text(self.parent.pytorch_backend, "XPU")
+            remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
         if PLATFORM == "darwin":
             if CPU_ARCH == "arm64":
                 self.parent.pytorch_backend.clear()
