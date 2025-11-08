@@ -14,7 +14,7 @@ class BackendHandler:
         self.settings = settings
 
     def getAvailableBackends(self):
-        from .ui.QTcustom import SettingUpBackendPopup, RegularQTPopup
+        from .ui.QTcustom import SettingUpBackendPopup, TextOutputPopup
 
         output = SettingUpBackendPopup(
             [
@@ -27,18 +27,10 @@ class BackendHandler:
         )
         return_code = str(output.getReturnCode()).strip()
         output: str = output.getOutput()
+        if "ERROR" in output or "TRACEBACK" in output or return_code == "1":
+            TextOutputPopup(f"ERROR DETECTED IN BACKEND SETUP!\n{output}", title="FATAL ERROR")
+            exit(1)
         
-        """if return_code == "1":
-            reply = QMessageBox.question(
-                self.parent,
-                "",
-                f"Getting available backends failed!\nDelete {PYTHON_DIRECTORY} and exit?",
-                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                QMessageBox.StandardButton.No,  # type: ignore
-            )
-            if reply == QMessageBox.Yes:  # type: ignore
-                FileHandler.removeFolder(PYTHON_DIRECTORY)
-                os._exit(0)"""
         output = output.split(" ")
         # hack to filter out bad find
         new_out = ""
