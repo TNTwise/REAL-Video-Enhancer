@@ -165,7 +165,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             backendHandler.getAvailableBackends()
         )
         end_time = time.time()
-        if "ERROR" in self.fullOutput.upper():
+        if "ERROR" in self.fullOutput.upper() or "TRACEBACK" in self.fullOutput.upper():
             TextOutputPopup(f"ERROR DETECTED IN BACKEND SETUP!\n{self.fullOutput}", title="FATAL ERROR")
             exit(1)
         
