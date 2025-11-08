@@ -2,7 +2,7 @@ import os
 import sys
 import subprocess
 import contextlib
-from .colors import Colors
+from .Colors import Colors
 # non standard python libraries
 try:
     import numpy as np

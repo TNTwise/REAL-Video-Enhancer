@@ -167,6 +167,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         end_time = time.time()
         if "ERROR" in self.fullOutput.upper():
             TextOutputPopup(f"ERROR DETECTED IN BACKEND SETUP!\n{self.fullOutput}", title="FATAL ERROR")
+            exit(1)
         
 
         # set default home page

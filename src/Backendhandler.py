@@ -28,7 +28,7 @@ class BackendHandler:
         return_code = str(output.getReturnCode()).strip()
         output: str = output.getOutput()
         
-        if return_code == "1":
+        """if return_code == "1":
             reply = QMessageBox.question(
                 self.parent,
                 "",
@@ -38,7 +38,7 @@ class BackendHandler:
             )
             if reply == QMessageBox.Yes:  # type: ignore
                 FileHandler.removeFolder(PYTHON_DIRECTORY)
-                os._exit(0)
+                os._exit(0)"""
         output = output.split(" ")
         # hack to filter out bad find
         new_out = ""
