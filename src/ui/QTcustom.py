@@ -37,7 +37,6 @@ from PySide6.QtGui import (
     QImage,
     QKeySequence,
     QLinearGradient,
-    QPainter,
     QPalette,
     QPixmap,
     QRadialGradient,

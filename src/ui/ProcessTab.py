@@ -51,6 +51,7 @@ class ProcessTab:
         self.currentFrame = 0
         self.fps = 0
         self.eta = 0
+        self.max_frames = 0
         self.isPreview = False
         self.userKilled = False
         self.currentRenderOptions = None
@@ -293,14 +294,8 @@ class ProcessTab:
                 renderOptions.videoWidth * renderOptions.overrideUpscaleScale,
                 renderOptions.videoHeight * renderOptions.overrideUpscaleScale,
             )
-            self.parent.progressBar.setRange(
-                0,
-                # only set the range to multiply the frame count if the method is interpolate
-                int(
-                    renderOptions.videoFrameCount
-                    * math.ceil(renderOptions.interpolateTimes)
-                ),
-            )
+            self.max_frames = int(renderOptions.videoFrameCount * math.ceil(renderOptions.interpolateTimes))
+            
             command = self.build_command(renderOptions)
             log(str(command))
 
@@ -467,7 +462,11 @@ class ProcessTab:
         """
         Called by the worker QThread, and updates the GUI elements: Progressbar, Preview, FPS
         """
-
+        self.parent.progressBar.setRange(
+                0,
+                # only set the range to multiply the frame count if the method is interpolate
+                self.max_frames
+            )
         if self.renderTextOutputList is not None:
             # print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
@@ -475,6 +474,7 @@ class ProcessTab:
             )
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
+            
             self.parent.progressBar.setValue(self.currentFrame)
             if self.fps != 0:
                 self.parent.FPS.setVisible(True)
@@ -496,8 +496,8 @@ class ProcessTab:
             )  # type: ignore
             pixmap = QtGui.QPixmap.fromImage(p)
 
-            roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
-            self.parent.previewLabel.setPixmap(roundedPixmap)
+            # roundedPixmap = self.getRoundedPixmap(pixmap, corner_radius=10)
+            self.parent.previewLabel.setPixmap(pixmap)
 
     def build_command(self, renderOptions: RenderOptions):
         if (
