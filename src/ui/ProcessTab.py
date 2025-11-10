@@ -357,7 +357,6 @@ class ProcessTab:
                 renderOptions.outputPath
             )  # add the file to the list widget
 
-            self.workerThread.unlink_shared_memory()
         try:
             self.pausedSharedMemory.close()
             self.pausedSharedMemory.unlink()
@@ -467,6 +466,11 @@ class ProcessTab:
         """
 
         if self.renderTextOutputList is not None:
+            self.parent.progressBar.setRange(
+                0,
+                # only set the range to multiply the frame count if the method is interpolate
+                self.max_value
+            )
             # print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
                 self.splitListIntoStringWithNewLines(self.renderTextOutputList)
