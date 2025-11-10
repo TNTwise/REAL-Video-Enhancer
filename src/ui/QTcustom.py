@@ -5,8 +5,6 @@ import requests
 import time
 import numpy as np
 from multiprocessing import shared_memory
-import re
-import html
 
 from PySide6.QtCore import QThread, Signal, QMutex, QMutexLocker
 from PySide6 import QtWidgets, QtCore, QtGui
@@ -37,6 +35,7 @@ from PySide6.QtGui import (
     QImage,
     QKeySequence,
     QLinearGradient,
+    QPainter,
     QPalette,
     QPixmap,
     QRadialGradient,
@@ -119,79 +118,6 @@ def show_layout_widgets(layout):
             if widget is not None:
                 widget.setVisible(True)  # Show the widget
 
-
-# Simple ANSI -> HTML converter for SGR (color/bold/reset) sequences
-_ANSI_SGR_RE = re.compile(r"\x1b\[([0-9;]*)m")
-
-# basic color maps (ANSI SGR codes)
-_ANSI_COLORS = {
-    30: "black",
-    31: "red",
-    32: "green",
-    33: "yellow",
-    34: "blue",
-    35: "magenta",
-    36: "cyan",
-    37: "white",
-    90: "gray",
-}
-
-def ansi_to_html(text: str) -> str:
-    """Convert a text containing ANSI SGR escape sequences to a safe HTML string.
-
-    This is intentionally small and handles common SGR codes: reset (0), bold (1),
-    foreground colors (30-37) and bright colors (90-97).
-    """
-    if not text:
-        return ""
-
-    # Escape HTML first
-    escaped = html.escape(text)
-
-    parts = _ANSI_SGR_RE.split(escaped)
-    out = []
-    open_spans = 0
-    i = 0
-    while i < len(parts):
-        chunk = parts[i]
-        out.append(chunk)
-        i += 1
-        if i < len(parts):
-            code_chunk = parts[i]
-            i += 1
-            codes = [int(c) for c in code_chunk.split(";") if c != ""] if code_chunk else [0]
-            # if reset present, close all open spans
-            if 0 in codes:
-                if open_spans:
-                    out.append("</span>" * open_spans)
-                    open_spans = 0
-                continue
-
-            styles = []
-            if 1 in codes:
-                styles.append("font-weight:bold")
-            # foreground colors
-            for c in codes:
-                if c in _ANSI_COLORS:
-                    styles.append(f"color: {_ANSI_COLORS[c]}")
-                elif 90 <= c <= 97:
-                    # bright colors approximate to same names (could be tuned)
-                    base = c - 60
-                    color = _ANSI_COLORS.get(base, None)
-                    if color:
-                        styles.append(f"color: {color}")
-
-            if styles:
-                out.append(f"<span style=\"{';'.join(styles)}\">")
-                open_spans += 1
-
-    if open_spans:
-        out.append("</span>" * open_spans)
-
-    # Replace newlines with <br> for HTML display
-    result = ''.join(out).replace('\n', '<br>')
-    return result
-
 class NotificationOverlay(QWidget):
     def __init__(self, message, parent=None, timeout=3000):
         super().__init__(parent)
@@ -243,8 +169,6 @@ class UpdateGUIThread(QThread):
         self._stop_flag = False  # Boolean flag to control stopping
         self._mutex = QMutex()  # Atomic flag to control stopping
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
-        # Keep a reference so we can close it when the thread stops
-        self.shm = None
         self.outputVideoHeight = None
         self.outputVideoWidth = None
 
@@ -259,29 +183,24 @@ class UpdateGUIThread(QThread):
                     break
             try:
                 if self.outputVideoHeight and self.outputVideoWidth:
-                    # Open the shared memory, read the bytes, then close it immediately
-                    shm = shared_memory.SharedMemory(name=self.imagePreviewSharedMemoryID)
-                    try:
-                        expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
-                        image_bytes = shm.buf[:expected_size].tobytes()
-                        if len(image_bytes) < expected_size:
-                            image_bytes += b"\x00" * (expected_size - len(image_bytes))
-                        # Convert image bytes back to numpy array
-                        image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
-                            (self.outputVideoHeight, self.outputVideoWidth, 3)
-                        )
-                        pixmap = self.convert_cv_qt(image_array)
-                        self.latestPreviewPixmap.emit(pixmap)
-                    finally:
-                        # Always close the SharedMemory handle after reading to avoid leaks
-                        try:
-                            shm.close()
-                        except Exception:
-                            pass
-            except Exception:
+                    self.shm = shared_memory.SharedMemory(
+                        name=self.imagePreviewSharedMemoryID
+                    )
+                    image_bytes = self.shm.buf[
+                        : self.outputVideoHeight * self.outputVideoWidth * 3
+                    ].tobytes()
+                    expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
+                    if len(image_bytes) < expected_size:
+                        image_bytes += b"\x00" * (expected_size - len(image_bytes))
+                    # Convert image bytes back to numpy array
+                    image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
+                        (self.outputVideoHeight, self.outputVideoWidth, 3)
+                    )
+                    pixmap = self.convert_cv_qt(image_array)
+                    self.latestPreviewPixmap.emit(pixmap)
+            except FileNotFoundError:
                 # print("preview not available")
-                #self.latestPreviewPixmap.emit(None)
-                pass
+                self.latestPreviewPixmap.emit(None)
             except OSError:
                 log("Out of memory.")
             time.sleep(0.2)
@@ -303,16 +222,6 @@ class UpdateGUIThread(QThread):
     def stop(self):
         with QMutexLocker(self._mutex):
             self._stop_flag = True
-        # If a shared memory handle remained, close it
-        try:
-            if hasattr(self, "shm") and self.shm is not None:
-                try:
-                    self.shm.close()
-                except Exception:
-                    pass
-                self.shm = None
-        except Exception:
-            pass
 
 
 # custom threads
@@ -647,52 +556,6 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.plainTextEdit.setPlainText(self.totalCommandOutput)
         self.plainTextEdit.setTextCursor(cursor)
 
-
-class TextOutputPopup(QtWidgets.QDialog):
-    """
-    Simple popup to display text information
-    """
-
-    def __init__(self, message: str, title: str = "Information"):
-        super().__init__()
-        self.message = message
-        self.title = title
-        self.setup_ui()
-        self.setLayout(self.gridLayout)
-        self.exec()
-
-    """
-    Initializes all threading bs
-    """
-
-    def setup_ui(self):
-        # beginning of bullshit
-        self.setWindowTitle(self.title)
-        self.setStyleSheet(styleSheet())
-        self.setMinimumSize(700, 400)
-
-        self.centralwidget = QtWidgets.QWidget(parent=self)
-        self.centralwidget.setObjectName("centralwidget")
-        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
-        self.gridLayout.setObjectName("gridLayout")
-        # Use QTextEdit to allow colored/HTML content (converted from ANSI)
-        self.textEdit = QtWidgets.QTextEdit(parent=self.centralwidget)
-        self.textEdit.setObjectName("textEdit")
-        self.textEdit.setReadOnly(True)
-        self.textEdit.setAcceptRichText(True)
-        # Convert any ANSI in the message to HTML for display
-        try:
-            self.textEdit.setHtml(ansi_to_html(self.message))
-        except Exception:
-            self.textEdit.setPlainText(self.message)
-        self.textEdit.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
-        )
-        self.textEdit.setHorizontalScrollBarPolicy(
-            QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
-        )
-        self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
-        
 
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
