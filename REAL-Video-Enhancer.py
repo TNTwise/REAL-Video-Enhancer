@@ -678,6 +678,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.previewLabel.setVisible(True)
 
         self.disableProcessPage()
+        
         self.processTab.run(renderQueue)
 
     def disableProcessPage(self):
