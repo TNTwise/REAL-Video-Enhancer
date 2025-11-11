@@ -286,9 +286,7 @@ class ProcessTab:
         self.createPausedSharedMemory()
 
         for renderOptions in renderQueue.getQueue():
-            if renderOptions.backend == "tensorrt":
-                self.parent.STATUS.setText("Building Engine, this may take a while.")
-
+            
             self.isPreview = renderOptions.isPreview
             self.currentRenderOptions = renderOptions
 
