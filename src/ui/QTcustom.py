@@ -243,8 +243,6 @@ class UpdateGUIThread(QThread):
         self._stop_flag = False  # Boolean flag to control stopping
         self._mutex = QMutex()  # Atomic flag to control stopping
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
-        # Keep a reference so we can close it when the thread stops
-        self.shm = None
         self.outputVideoHeight = None
         self.outputVideoWidth = None
 
@@ -259,28 +257,55 @@ class UpdateGUIThread(QThread):
                     break
             try:
                 if self.outputVideoHeight and self.outputVideoWidth:
-                    # Open the shared memory, read the bytes, then close it immediately
-                    shm = shared_memory.SharedMemory(name=self.imagePreviewSharedMemoryID)
-                    try:
-                        expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
-                        image_bytes = shm.buf[:expected_size].tobytes()
-                        if len(image_bytes) < expected_size:
-                            image_bytes += b"\x00" * (expected_size - len(image_bytes))
-                        # Convert image bytes back to numpy array
-                        image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
-                            (self.outputVideoHeight, self.outputVideoWidth, 3)
-                        )
-                        pixmap = self.convert_cv_qt(image_array)
-                        self.latestPreviewPixmap.emit(pixmap)
-                    finally:
-                        # Always close the SharedMemory handle after reading to avoid leaks
-                        try:
-                            shm.close()
-                        except Exception:
-                            pass
-            except Exception:
+
+
+
+                    self.shm = shared_memory.SharedMemory(
+
+
+                        name=self.imagePreviewSharedMemoryID
+
+
+                    )
+
+
+                    image_bytes = self.shm.buf[
+
+
+                        : self.outputVideoHeight * self.outputVideoWidth * 3
+
+
+                    ].tobytes()
+
+
+                    expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
+
+
+                    if len(image_bytes) < expected_size:
+
+
+                        image_bytes += b"\x00" * (expected_size - len(image_bytes))
+
+
+                    # Convert image bytes back to numpy array
+
+
+                    image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
+
+
+                        (self.outputVideoHeight, self.outputVideoWidth, 3)
+
+
+                    )
+
+
+                    pixmap = self.convert_cv_qt(image_array)
+
+
+                    self.latestPreviewPixmap.emit(pixmap)
+            except FileNotFoundError:
                 # print("preview not available")
-                #self.latestPreviewPixmap.emit(None)
+                self.latestPreviewPixmap.emit(None)
                 pass
             except OSError:
                 log("Out of memory.")
@@ -303,16 +328,7 @@ class UpdateGUIThread(QThread):
     def stop(self):
         with QMutexLocker(self._mutex):
             self._stop_flag = True
-        # If a shared memory handle remained, close it
-        try:
-            if hasattr(self, "shm") and self.shm is not None:
-                try:
-                    self.shm.close()
-                except Exception:
-                    pass
-                self.shm = None
-        except Exception:
-            pass
+        
 
 
 # custom threads
