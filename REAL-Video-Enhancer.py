@@ -694,6 +694,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.scrollArea_4.setEnabled(True)
         self.scrollAreaWidgetContents_4.setEnabled(False)
         self.widget_5.setEnabled(True)
+        self.outputFileContainer.setEnabled(True)
+        self.openOutputFolderButton.setEnabled(True)
+        self.outputFileContainer.setEnabled(True)
 
     def enableProcessPage(self):
         for child in self.generalSettings.children():
