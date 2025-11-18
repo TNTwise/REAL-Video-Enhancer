@@ -62,6 +62,12 @@ pytorchInterpolateModels = {
         1,
         "gmfss",
     ),
+    "GIMM (Slow Model, Realistic/General)": (
+        "GIMMVFI_RAFT.pth",
+        "GIMMVFI_RAFT.pth",
+        1,
+        "gimm",
+    ),
     
     "IFRNet (Fast Model, Realistic only)": (
         "IFRNet_Vimeo90K.pth",
