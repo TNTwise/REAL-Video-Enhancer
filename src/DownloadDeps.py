@@ -267,9 +267,10 @@ class DownloadDependencies:
         deps: list,
         install: bool = True,
     ):  # going to have to make this into a qt module pop up
-        if IS_STEAM and PLATFORM == "linux":
+        command = []
+        if PLATFORM == "linux" and IS_STEAM:
             command += ["env", "-u", "LD_LIBRARY_PATH", "-u", "STEAM_RUNTIME"]
-        command = [
+        command += [
             PYTHON_EXECUTABLE_PATH,
             "-m",
             "pip",
