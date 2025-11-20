@@ -8,10 +8,9 @@ except:
 import sys
 import os
 import time
-if not IS_STEAM:
-    os.environ["PYTHONNOUSERSITE"] = "1" # Prevents python from installing packages in user site
-    os.environ["PYTHONIOENCODING"] = "utf-8"
-    os.environ["NVIDIA_TENSORRT_DISABLE_INTERNAL_PIP"] = "0"
+os.environ["PYTHONNOUSERSITE"] = "1" # Prevents python from installing packages in user site
+os.environ["PYTHONIOENCODING"] = "utf-8"
+os.environ["NVIDIA_TENSORRT_DISABLE_INTERNAL_PIP"] = "0"
 os.environ["PYTHON_JIT"] = "1" # enable python's experimental JIT for better performance in python 3.13
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import (
