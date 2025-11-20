@@ -14,6 +14,7 @@ from .constants import (
     CWD,
     CPU_ARCH,
     USE_LOCAL_BACKEND,
+    IS_STEAM
 )
 from .version import version, backend_dev_version
 from .Util import (
@@ -275,6 +276,8 @@ class DownloadDependencies:
         origTemp = os.environ.get("TMPDIR")
         os.environ["TMPDIR"] = TEMP_DOWNLOAD_PATH
         if install:
+            if IS_STEAM and PLATFORM == "linux":
+                command += ["env", "-u", "LD_LIBRARY_PATH", "-u", "STEAM_RUNTIME"]
             command += [
                 "--no-warn-script-location",
                 "--isolated",
