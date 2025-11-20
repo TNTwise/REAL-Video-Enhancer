@@ -268,15 +268,31 @@ class DownloadDependencies:
         install: bool = True,
     ):  # going to have to make this into a qt module pop up
         command = []
-        
+        if PLATFORM == "linux" and IS_STEAM:
+            # Define the list of environment variables known to conflict with Steam/Linux Runtime
+            conflict_vars = [
+                'LD_LIBRARY_PATH',
+                'STEAM_RUNTIME',
+                'SYSTEM_LD_LIBRARY_PATH',
+                'PRESSURE_VESSEL_RUNTIME',
+                'PRESSURE_VESSEL_RUNTIME_BASE',
+                'CUDA_PATH', # Might conflict with GPU-aware packages
+            ]
+
+            log("Cleaning up conflicting Steam environment variables...")
+
+            for var in conflict_vars:
+                if var in os.environ:
+                    log(f"Unsetting {var}: {os.environ[var]}")
+                    del os.environ[var] # This removes the variable for the current process
         command += [
             PYTHON_EXECUTABLE_PATH,
             "-m",
             "pip",
             "install" if install else "uninstall",
         ]
-        #origTemp = os.environ.get("TMPDIR")
-        #os.environ["TMPDIR"] = TEMP_DOWNLOAD_PATH
+        origTemp = os.environ.get("TMPDIR")
+        os.environ["TMPDIR"] = TEMP_DOWNLOAD_PATH
         if install:
             command += [
                 "--no-warn-script-location",
@@ -285,6 +301,8 @@ class DownloadDependencies:
                 "https://download.pytorch.org/whl/test/", 
                 "--extra-index-url",
                 "https://download.pytorch.org/whl/", # search this first, needs to be last in the list 
+                "--trusted-host",
+                "download.pytorch.org",
             ]
         else:
             command += ["-y"]
@@ -314,8 +332,8 @@ class DownloadDependencies:
             title="Purging Cache",
             progressBarLength=1,
         )
-        #if origTemp:
-        #    os.environ["TMPDIR"] = str(origTemp)
+        if origTemp:
+            os.environ["TMPDIR"] = str(origTemp)
         return return_code
 
     def getPlatformIndependentDeps(self):

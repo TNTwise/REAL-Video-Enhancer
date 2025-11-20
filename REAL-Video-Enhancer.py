@@ -1,4 +1,4 @@
-from src.constants import CUSTOM_MODELS_PATH, MODELS_PATH, CWD, LOCKFILE, IS_INSTALLED, TEMP_DOWNLOAD_PATH, USE_LOCAL_BACKEND, PLATFORM
+from src.constants import CUSTOM_MODELS_PATH, IS_STEAM, MODELS_PATH, CWD,  IS_INSTALLED, TEMP_DOWNLOAD_PATH, USE_LOCAL_BACKEND, PLATFORM
 import os
 try: 
     os.makedirs(CWD) if not os.path.exists(CWD) else None
@@ -8,9 +8,10 @@ except:
 import sys
 import os
 import time
-os.environ["PYTHONNOUSERSITE"] = "1" # Prevents python from installing packages in user site
-os.environ["PYTHONIOENCODING"] = "utf-8"
-os.environ["NVIDIA_TENSORRT_DISABLE_INTERNAL_PIP"] = "0"
+if not IS_STEAM:
+    os.environ["PYTHONNOUSERSITE"] = "1" # Prevents python from installing packages in user site
+    os.environ["PYTHONIOENCODING"] = "utf-8"
+    os.environ["NVIDIA_TENSORRT_DISABLE_INTERNAL_PIP"] = "0"
 os.environ["PYTHON_JIT"] = "1" # enable python's experimental JIT for better performance in python 3.13
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import (
