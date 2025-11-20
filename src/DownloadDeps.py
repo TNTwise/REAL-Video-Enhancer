@@ -267,6 +267,8 @@ class DownloadDependencies:
         deps: list,
         install: bool = True,
     ):  # going to have to make this into a qt module pop up
+        if IS_STEAM and PLATFORM == "linux":
+            command += ["env", "-u", "LD_LIBRARY_PATH", "-u", "STEAM_RUNTIME"]
         command = [
             PYTHON_EXECUTABLE_PATH,
             "-m",
@@ -276,12 +278,9 @@ class DownloadDependencies:
         origTemp = os.environ.get("TMPDIR")
         os.environ["TMPDIR"] = TEMP_DOWNLOAD_PATH
         if install:
-            if IS_STEAM and PLATFORM == "linux":
-                command += ["env", "-u", "LD_LIBRARY_PATH", "-u", "STEAM_RUNTIME"]
             command += [
                 "--no-warn-script-location",
                 "--isolated",
-                "-vvv",
                 "--extra-index-url",
                 "https://download.pytorch.org/whl/test/", 
                 "--extra-index-url",
