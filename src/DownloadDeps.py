@@ -277,6 +277,8 @@ class DownloadDependencies:
         if install:
             command += [
                 "--no-warn-script-location",
+                "--isolated",
+                "-vvv",
                 "--extra-index-url",
                 "https://download.pytorch.org/whl/test/", 
                 "--extra-index-url",
