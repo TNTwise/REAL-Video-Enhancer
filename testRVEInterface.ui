@@ -168,6 +168,62 @@ QScrollBar:horizontal{
 		background:#2c313c; /*change background here*/
 		color:transparent;
 }
+QTabWidget::pane { /* The tab widget frame */
+                border-top: 0px solid #C2C7CB;
+                top: -0.5em;
+                background: transparent;
+            }
+
+            QTabWidget::tab-bar {
+                alignment: left;
+            }
+
+            QTabBar::tab {
+                background: #1f232a;
+                border: 0px solid #C4C4C3;
+                border-bottom-color: #C2C7CB; /* same as the pane color */
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+				  border-bottom-left-radius: 4px;
+                border-bottom-right-radius: 4px;
+                min-width: 8ex;
+                padding: 6px;
+				 color: #fff;
+            }
+
+            QTabBar::tab:selected{
+                background:#676e7b;
+            }
+            QTabBar::tab:hover {
+				background: #343b47;
+				}
+
+            QTabBar::tab:selected {
+                border-color: transparent;
+                border-bottom-color: transparent; /* same as pane color */
+            }
+
+            QTabBar::tab:!selected {
+                margin-top: 2px; /* make non-selected tabs look smaller */
+            }
+
+            QTabBar::tab:selected {
+                /* expand/overlap to the left and right by 4px */
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+
+            QTabBar::tab:first:selected {
+                margin-left: 0; /* the first selected tab should not overlap */
+            }
+
+            QTabBar::tab:last:selected {
+                margin-right: 0; /* the last selected tab should not overlap */
+            }
+
+            QTabBar::tab:only-one {
+                margin: 0; /* if there is only one tab, it should not overlap */
+            }
 </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -232,7 +288,7 @@ QScrollBar:horizontal{
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>4</number>
             </property>
             <widget class="QWidget" name="homePage">
              <property name="styleSheet">
@@ -543,62 +599,7 @@ QSpinBox::down-button {
         width: 20px;
         height: 15px;
     }
-QTabWidget::pane { /* The tab widget frame */
-                border-top: 0px solid #C2C7CB;
-                top: -0.5em;
-                background: transparent;
-            }
 
-            QTabWidget::tab-bar {
-                alignment: left;
-            }
-
-            QTabBar::tab {
-                background: #1f232a;
-                border: 0px solid #C4C4C3;
-                border-bottom-color: #C2C7CB; /* same as the pane color */
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-				  border-bottom-left-radius: 4px;
-                border-bottom-right-radius: 4px;
-                min-width: 8ex;
-                padding: 6px;
-				 color: #fff;
-            }
-
-            QTabBar::tab:selected{
-                background:#676e7b;
-            }
-            QTabBar::tab:hover {
-				background: #343b47;
-				}
-
-            QTabBar::tab:selected {
-                border-color: transparent;
-                border-bottom-color: transparent; /* same as pane color */
-            }
-
-            QTabBar::tab:!selected {
-                margin-top: 2px; /* make non-selected tabs look smaller */
-            }
-
-            QTabBar::tab:selected {
-                /* expand/overlap to the left and right by 4px */
-                margin-left: 2px;
-                margin-right: 2px;
-            }
-
-            QTabBar::tab:first:selected {
-                margin-left: 0; /* the first selected tab should not overlap */
-            }
-
-            QTabBar::tab:last:selected {
-                margin-right: 0; /* the last selected tab should not overlap */
-            }
-
-            QTabBar::tab:only-one {
-                margin: 0; /* if there is only one tab, it should not overlap */
-            }
 
 
 QListWidget{
@@ -1096,8 +1097,8 @@ background-color:#343b47
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-55</y>
-                                   <width>470</width>
+                                   <y>0</y>
+                                   <width>373</width>
                                    <height>1040</height>
                                   </rect>
                                  </property>
@@ -3328,8 +3329,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>430</width>
-                                <height>516</height>
+                                <width>380</width>
+                                <height>389</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -5572,100 +5573,6 @@ background-color:white;
                   </widget>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_46">
-                   <item>
-                    <layout class="QGridLayout" name="gridLayout_9">
-                     <item row="0" column="2">
-                      <widget class="QComboBox" name="pytorch_version"/>
-                     </item>
-                     <item row="0" column="1">
-                      <widget class="QLabel" name="label_64">
-                       <property name="maximumSize">
-                        <size>
-                         <width>25</width>
-                         <height>25</height>
-                        </size>
-                       </property>
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;PyTorch Version&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- This is the version downloaded&lt;/p&gt;&lt;p&gt;- 2.6: Supports older CUDA enabled GPUs&lt;/p&gt;&lt;p&gt;- 2.8: Supports all RTX cards, faster and recomended.&lt;/p&gt;&lt;p&gt;- 2.9: Experimental.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="toolTipDuration">
-                        <number>0</number>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                       <property name="pixmap">
-                        <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                       </property>
-                       <property name="scaledContents">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="0">
-                      <widget class="QLabel" name="label_53">
-                       <property name="text">
-                        <string>PyTorch Backend</string>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="2" column="2">
-                      <widget class="QComboBox" name="pytorch_backend">
-                       <item>
-                        <property name="text">
-                         <string>CUDA</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>ROCm</string>
-                        </property>
-                       </item>
-                       <item>
-                        <property name="text">
-                         <string>xpu</string>
-                        </property>
-                       </item>
-                      </widget>
-                     </item>
-                     <item row="2" column="1">
-                      <widget class="QLabel" name="label_66">
-                       <property name="maximumSize">
-                        <size>
-                         <width>25</width>
-                         <height>25</height>
-                        </size>
-                       </property>
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;PyTorch Backend&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- CUDA: NVIDIA GPUs 10 series and up&lt;/p&gt;&lt;p&gt;- ROCm: AMD (Linux Only) 7000 series(maybe) and up&lt;/p&gt;&lt;p&gt;- xpu: Intel: idk fam, dunno if this even works lowkey&lt;/p&gt;&lt;p&gt;- MPS: Apple Mac M series SOCs only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                       </property>
-                       <property name="toolTipDuration">
-                        <number>0</number>
-                       </property>
-                       <property name="text">
-                        <string/>
-                       </property>
-                       <property name="pixmap">
-                        <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
-                       </property>
-                       <property name="scaledContents">
-                        <bool>true</bool>
-                       </property>
-                      </widget>
-                     </item>
-                     <item row="0" column="0">
-                      <widget class="QLabel" name="label_65">
-                       <property name="text">
-                        <string>PyTorch Version</string>
-                       </property>
-                      </widget>
-                     </item>
-                    </layout>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
                   <widget class="QLabel" name="low_storage_label">
                    <property name="font">
                     <font>
@@ -5683,50 +5590,18 @@ color: red;
                   </widget>
                  </item>
                  <item>
-                  <widget class="QScrollArea" name="scrollArea_2">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
+                  <widget class="QTabWidget" name="tabWidget_2">
+                   <property name="currentIndex">
+                    <number>0</number>
                    </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>16777215</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="widgetResizable">
-                    <bool>true</bool>
-                   </property>
-                   <widget class="QWidget" name="scrollAreaWidgetContents_2">
-                    <property name="geometry">
-                     <rect>
-                      <x>0</x>
-                      <y>0</y>
-                      <width>928</width>
-                      <height>178</height>
-                     </rect>
-                    </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_13">
-                     <property name="leftMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="topMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="rightMargin">
-                      <number>0</number>
-                     </property>
-                     <property name="bottomMargin">
-                      <number>0</number>
-                     </property>
+                   <widget class="QWidget" name="tab_7">
+                    <attribute name="title">
+                     <string>Automatic Download</string>
+                    </attribute>
+                    <layout class="QHBoxLayout" name="horizontalLayout_41">
                      <item>
-                      <widget class="QWidget" name="pytorchBackendInstallerContainer_4" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_9">
+                      <widget class="QWidget" name="pytorchBackendInstallerContainer_5" native="true">
+                       <layout class="QHBoxLayout" name="horizontalLayout_37">
                         <property name="leftMargin">
                          <number>0</number>
                         </property>
@@ -5740,7 +5615,7 @@ color: red;
                          <number>0</number>
                         </property>
                         <item>
-                         <widget class="QPushButton" name="downloadNCNNBtn">
+                         <widget class="QPushButton" name="downloadRecommendedBtn">
                           <property name="sizePolicy">
                            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                             <horstretch>0</horstretch>
@@ -5769,297 +5644,498 @@ color: red;
                          </widget>
                         </item>
                         <item>
-                         <widget class="QPushButton" name="uninstallNCNNBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
+                         <widget class="QLabel" name="label_25">
                           <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_10">
-                          <property name="text">
-                           <string>NCNN Vulkan (All GPUs, slower inference, small download)</string>
+                           <string>Install Recommended Dependencies</string>
                           </property>
                          </widget>
                         </item>
                        </layout>
                       </widget>
                      </item>
+                    </layout>
+                   </widget>
+                   <widget class="QWidget" name="tab">
+                    <attribute name="title">
+                     <string>Advanced</string>
+                    </attribute>
+                    <layout class="QHBoxLayout" name="horizontalLayout_69">
                      <item>
-                      <widget class="QWidget" name="pytorchBackendInstallerContainer" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_6">
-                        <property name="leftMargin">
-                         <number>0</number>
+                      <widget class="QScrollArea" name="scrollArea_2">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="styleSheet">
+                        <string notr="true"/>
+                       </property>
+                       <property name="widgetResizable">
+                        <bool>true</bool>
+                       </property>
+                       <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                        <property name="geometry">
+                         <rect>
+                          <x>0</x>
+                          <y>0</y>
+                          <width>928</width>
+                          <height>326</height>
+                         </rect>
                         </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="downloadTorchBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="uninstallTorchBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_6">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="text">
-                           <string>PyTorch (NVIDIA/CUDA, AMD/ROCm (Linux Only), INTEL/xpu, MacOS/MPS)</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="pytorchBackendInstallerContainer_2" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_24">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="downloadTensorRTBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="uninstallTensorRTBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_8">
-                          <property name="text">
-                           <string>TensorRT (Nvidia RTX 20 series and up, fastest inference, largest download)</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item>
-                      <widget class="QWidget" name="directMLBackendInstallerContainer" native="true">
-                       <layout class="QHBoxLayout" name="horizontalLayout_8">
-                        <property name="leftMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="topMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="rightMargin">
-                         <number>0</number>
-                        </property>
-                        <property name="bottomMargin">
-                         <number>0</number>
-                        </property>
-                        <item>
-                         <widget class="QPushButton" name="downloadDirectMLBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="uninstallDirectMLBtn">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>50</width>
-                            <height>45</height>
-                           </size>
-                          </property>
-                          <property name="text">
-                           <string/>
-                          </property>
-                          <property name="icon">
-                           <iconset resource="resources.qrc">
-                            <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
-                          </property>
-                          <property name="iconSize">
-                           <size>
-                            <width>30</width>
-                            <height>30</height>
-                           </size>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QLabel" name="label_28">
-                          <property name="text">
-                           <string>DirectML - NOT IMPLEMENTED YET (All DirectX12 capable GPUs, faster inference, small download, Windows only)</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
+                        <layout class="QVBoxLayout" name="verticalLayout_13">
+                         <property name="leftMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="topMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="rightMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_46">
+                           <item>
+                            <layout class="QGridLayout" name="gridLayout_9">
+                             <item row="0" column="2">
+                              <widget class="QComboBox" name="pytorch_version"/>
+                             </item>
+                             <item row="0" column="1">
+                              <widget class="QLabel" name="label_64">
+                               <property name="maximumSize">
+                                <size>
+                                 <width>25</width>
+                                 <height>25</height>
+                                </size>
+                               </property>
+                               <property name="toolTip">
+                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;PyTorch Version&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- This is the version downloaded&lt;/p&gt;&lt;p&gt;- 2.6: Supports older CUDA enabled GPUs&lt;/p&gt;&lt;p&gt;- 2.8: Supports all RTX cards, faster and recomended.&lt;/p&gt;&lt;p&gt;- 2.9: Experimental.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                               </property>
+                               <property name="toolTipDuration">
+                                <number>0</number>
+                               </property>
+                               <property name="text">
+                                <string/>
+                               </property>
+                               <property name="pixmap">
+                                <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                               </property>
+                               <property name="scaledContents">
+                                <bool>true</bool>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="2" column="0">
+                              <widget class="QLabel" name="label_53">
+                               <property name="text">
+                                <string>PyTorch Backend</string>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="2" column="2">
+                              <widget class="QComboBox" name="pytorch_backend">
+                               <item>
+                                <property name="text">
+                                 <string>CUDA</string>
+                                </property>
+                               </item>
+                               <item>
+                                <property name="text">
+                                 <string>ROCm</string>
+                                </property>
+                               </item>
+                               <item>
+                                <property name="text">
+                                 <string>xpu</string>
+                                </property>
+                               </item>
+                              </widget>
+                             </item>
+                             <item row="2" column="1">
+                              <widget class="QLabel" name="label_66">
+                               <property name="maximumSize">
+                                <size>
+                                 <width>25</width>
+                                 <height>25</height>
+                                </size>
+                               </property>
+                               <property name="toolTip">
+                                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;PyTorch Backend&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- CUDA: NVIDIA GPUs 10 series and up&lt;/p&gt;&lt;p&gt;- ROCm: AMD (Linux Only) 7000 series(maybe) and up&lt;/p&gt;&lt;p&gt;- xpu: Intel: idk fam, dunno if this even works lowkey&lt;/p&gt;&lt;p&gt;- MPS: Apple Mac M series SOCs only.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                               </property>
+                               <property name="toolTipDuration">
+                                <number>0</number>
+                               </property>
+                               <property name="text">
+                                <string/>
+                               </property>
+                               <property name="pixmap">
+                                <pixmap resource="resources.qrc">:/icons/icons/info.svg</pixmap>
+                               </property>
+                               <property name="scaledContents">
+                                <bool>true</bool>
+                               </property>
+                              </widget>
+                             </item>
+                             <item row="0" column="0">
+                              <widget class="QLabel" name="label_65">
+                               <property name="text">
+                                <string>PyTorch Version</string>
+                               </property>
+                              </widget>
+                             </item>
+                            </layout>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <widget class="QWidget" name="pytorchBackendInstallerContainer_4" native="true">
+                           <layout class="QHBoxLayout" name="horizontalLayout_9">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QPushButton" name="downloadNCNNBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="uninstallNCNNBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLabel" name="label_10">
+                              <property name="text">
+                               <string>NCNN Vulkan (All GPUs, slower inference, small download)</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QWidget" name="pytorchBackendInstallerContainer" native="true">
+                           <layout class="QHBoxLayout" name="horizontalLayout_6">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QPushButton" name="downloadTorchBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="uninstallTorchBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLabel" name="label_6">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="text">
+                               <string>PyTorch (NVIDIA/CUDA, AMD/ROCm (Linux Only), INTEL/xpu, MacOS/MPS)</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QWidget" name="pytorchBackendInstallerContainer_2" native="true">
+                           <layout class="QHBoxLayout" name="horizontalLayout_24">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QPushButton" name="downloadTensorRTBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="uninstallTensorRTBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLabel" name="label_8">
+                              <property name="text">
+                               <string>TensorRT (Nvidia RTX 20 series and up, fastest inference, largest download)</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QWidget" name="directMLBackendInstallerContainer" native="true">
+                           <layout class="QHBoxLayout" name="horizontalLayout_8">
+                            <property name="leftMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="topMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="rightMargin">
+                             <number>0</number>
+                            </property>
+                            <property name="bottomMargin">
+                             <number>0</number>
+                            </property>
+                            <item>
+                             <widget class="QPushButton" name="downloadDirectMLBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/download.svg</normaloff>:/icons/icons/download.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QPushButton" name="uninstallDirectMLBtn">
+                              <property name="sizePolicy">
+                               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                <horstretch>0</horstretch>
+                                <verstretch>0</verstretch>
+                               </sizepolicy>
+                              </property>
+                              <property name="maximumSize">
+                               <size>
+                                <width>50</width>
+                                <height>45</height>
+                               </size>
+                              </property>
+                              <property name="text">
+                               <string/>
+                              </property>
+                              <property name="icon">
+                               <iconset resource="resources.qrc">
+                                <normaloff>:/icons/icons/trash-2.svg</normaloff>:/icons/icons/trash-2.svg</iconset>
+                              </property>
+                              <property name="iconSize">
+                               <size>
+                                <width>30</width>
+                                <height>30</height>
+                               </size>
+                              </property>
+                             </widget>
+                            </item>
+                            <item>
+                             <widget class="QLabel" name="label_28">
+                              <property name="text">
+                               <string>DirectML - NOT IMPLEMENTED YET (All DirectX12 capable GPUs, faster inference, small download, Windows only)</string>
+                              </property>
+                             </widget>
+                            </item>
+                           </layout>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
                       </widget>
                      </item>
                     </layout>

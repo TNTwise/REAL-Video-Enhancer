@@ -5,6 +5,7 @@ from ..DownloadDeps import DownloadDependencies
 from .Updater import ApplicationUpdater
 from ..constants import IS_FLATPAK, PLATFORM, CWD, USE_LOCAL_BACKEND, HOME_PATH, PLATFORM, IS_FLATPAK, CWD, CPU_ARCH
 from ..BuiltInTorchVersions import TorchVersion
+from .GPUDetect import GPUDetect
 from ..Util import FileHandler
 
 
@@ -72,6 +73,11 @@ class DownloadTab:
         self.parent.ApplicationUpdateContainer.setVisible(False)
         self.QButtonConnect()
     
+    def installRecommended(self):
+        """vendor = GPUDetect.getVendor()
+        if vendor == None:
+            self.download("ncnn")"""
+        GPUDetect().getModelOfGPU()
     def QButtonConnect(self):
         self.parent.downloadNCNNBtn.clicked.connect(lambda: self.download("ncnn", True))
         self.parent.downloadTorchBtn.clicked.connect(
@@ -82,6 +88,9 @@ class DownloadTab:
         )
         self.parent.downloadDirectMLBtn.clicked.connect(
             lambda: self.download("directml", True)
+        )
+        self.parent.downloadRecommendedBtn.clicked.connect(
+            self.installRecommended
         )
         
         self.parent.uninstallNCNNBtn.clicked.connect(
