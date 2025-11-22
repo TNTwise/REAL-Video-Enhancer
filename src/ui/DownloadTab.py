@@ -73,11 +73,7 @@ class DownloadTab:
         self.parent.ApplicationUpdateContainer.setVisible(False)
         self.QButtonConnect()
     
-    def installRecommended(self):
-        """vendor = GPUDetect.getVendor()
-        if vendor == None:
-            self.download("ncnn")"""
-        GPUDetect().getModelOfGPU()
+    
     def QButtonConnect(self):
         self.parent.downloadNCNNBtn.clicked.connect(lambda: self.download("ncnn", True))
         self.parent.downloadTorchBtn.clicked.connect(
@@ -164,8 +160,14 @@ class DownloadTab:
         except Exception as e:
             print(e)
 
+    def installRecommended(self):
+        pytorch_backend = GPUDetect().getPyTorchFeatures()
+        if pytorch_backend:
+            self.download("torch", install=True, pytorch_backend=pytorch_backend)
+        elif PLATFORM == 'darwin' and CPU_ARCH == "arm64":
+            self.download("torch", install=True, pytorch_backend="mps")
 
-    def download(self, dep, install: bool = True):
+    def download(self, dep, install: bool = True, pytorch_backend:str = None):
         """
         Downloads the specified dependency.
         Parameters:
@@ -188,7 +190,7 @@ class DownloadTab:
                     return
         pytorch_ver:TorchVersion|None = None
         current_pytorch_version = self.parent.pytorch_version.currentText().split()[0]
-        current_pytorch_backend = self.parent.pytorch_backend.currentText().split()[0].lower()
+        current_pytorch_backend = self.parent.pytorch_backend.currentText().split()[0].lower() if not pytorch_backend else pytorch_backend
         for version in self.torch_versions:
             if version.torch_version == current_pytorch_version:
                 pytorch_ver = version
@@ -199,7 +201,6 @@ class DownloadTab:
                 "Please select a valid PyTorch version from the dropdown."
             )
             return
-        
         if current_pytorch_backend == "cuda" or dep.lower() == "tensorrt":
             pytorch_backend = pytorch_ver.cuda_version
         elif current_pytorch_backend == "rocm":
@@ -209,10 +210,11 @@ class DownloadTab:
         elif current_pytorch_backend == "mps":
             pytorch_backend = pytorch_ver.mps_version
         
+        
         if NetworkCheckPopup(
             "https://pypi.org/"
         ):  # check for network before installing
-            return_code = self.downloadDeps.downloadPythonDeps(dep, pytorch_ver.torch_version, torchvision_ver, pytorch_backend, install)
+            return_code = self.downloadDeps.downloadPythonDeps(dep, pytorch_ver.torch_version, torchvision_ver, pytorch_backend.lower(), install)
             if return_code == 0:
                 RegularQTPopup(
                     "Download Complete\nPlease restart the application to apply changes."
