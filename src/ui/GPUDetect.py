@@ -65,7 +65,7 @@ class GPUDetect:
                 log("Couldnt find gpu model, " + self.gpu_info)
         return model
     
-    def getPyTorchFeatures(self) -> str:
+    def getPyTorchFeatures(self) -> str | None:
         if int(self.getModelOfGPU()[0]) >= 2 and self.getVendor() == "Nvidia":
             return "cuda"
         return None

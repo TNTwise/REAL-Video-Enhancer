@@ -166,6 +166,8 @@ class DownloadTab:
             self.download("torch", install=True, pytorch_backend=pytorch_backend)
         elif PLATFORM == 'darwin' and CPU_ARCH == "arm64":
             self.download("torch", install=True, pytorch_backend="mps")
+        else:
+            self.download("ncnn")
 
     def download(self, dep, install: bool = True, pytorch_backend:str = None):
         """
