@@ -163,6 +163,18 @@ class FFMpegCommand:
                         command +=["-level","5"]
                     case "Low":
                         command +=["-level","6"]
+            case "utvideo":
+                command +=["-c:v","utvideo"]
+                match self._video_quality:
+                    case "Very_High":
+                        command +=["-compression_level","0"]
+                    case "High":
+                        command +=["-compression_level","1"]
+                    case "Medium":
+                        command +=["-compression_level","3"]
+                    case "Low":
+                        command +=["-compression_level","5"]
+                        
             case "prores":
                 command +=["-c:v","prores_ks"]
                 match self._video_quality:

@@ -410,6 +410,7 @@ class Settings:
                 "av1",
                 "prores",
                 "ffv1",
+                "utvideo",
                 "x264_vulkan (experimental)",
                 "x264_nvenc",
                 "x265_nvenc",
