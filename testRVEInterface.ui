@@ -2654,6 +2654,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                             <string>av1_vaapi</string>
                                            </property>
                                           </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>h264_amf</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>h265_amf</string>
+                                           </property>
+                                          </item>
+                                          <item>
+                                           <property name="text">
+                                            <string>av1_amf</string>
+                                           </property>
+                                          </item>
                                          </widget>
                                         </item>
                                        </layout>
