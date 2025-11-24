@@ -270,9 +270,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.VideoPreview.show()
         #self.playbutton.clicked.connect(lambda: player.play())
         if (file_to_open is not None and os.path.isfile(file_to_open) and len(self.backends) > 0):
-            self.openInputFile(file_to_open)
+            self.loadVideo(file_to_open)
             self.switchToProcessingPage()
-
+            self.settings.writeSetting("last_input_folder_location", str(os.path.dirname(file_to_open)))
 
     def QConnect(self):
         # connect buttons to switch menus
