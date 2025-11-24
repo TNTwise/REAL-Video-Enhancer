@@ -1,6 +1,8 @@
 # RVE 2.3.9
 ### Added
  - AnimeSR
+ - More encoding options.
+ - Auto select best backend based on model and hardware.
 ### Fixed
  - Random crash after rendering a few times.
 # RVE 2.3.8
