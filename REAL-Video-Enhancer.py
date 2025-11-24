@@ -93,7 +93,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         killRenderProcess(): Terminates the render process.
         closeEvent(event): Handles the close event of the main window."""
 
-    def __init__(self):
+    def __init__(self, file_to_open=None):
         super().__init__()
 
         # set up base variables
@@ -269,6 +269,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #player.setVideoOutput(self.VideoPreview)
         #self.VideoPreview.show()
         #self.playbutton.clicked.connect(lambda: player.play())
+        if (file_to_open is not None and os.path.isfile(file_to_open) and len(self.backends) > 0):
+            self.openInputFile(file_to_open)
+            self.switchToProcessingPage()
 
 
     def QConnect(self):
@@ -927,7 +930,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
 
-def main():
+def main(file_to_open=None):
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     app.setPalette(Palette())
@@ -939,7 +942,7 @@ def main():
             sys.exit(0)"""
 
     # setting the pallette
-    window = MainWindow()
+    window = MainWindow(file_to_open=file_to_open)
 
     if "--fullscreen" in sys.argv:
         window.showFullScreen()
@@ -965,4 +968,5 @@ if __name__ == "__main__":
         )
         tracer.run("main()")
     else:
-        main()
+        file_to_open = sys.argv[1] if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]) else None
+        main(file_to_open)
