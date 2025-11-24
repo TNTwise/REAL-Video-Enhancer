@@ -174,7 +174,7 @@ class FFMpegCommand:
                         command +=["-compression_level","3"]
                     case "Low":
                         command +=["-compression_level","5"]
-                        
+
             case "prores":
                 command +=["-c:v","prores_ks"]
                 match self._video_quality:
@@ -311,8 +311,41 @@ class FFMpegCommand:
                     case "Low":
                         command +=["-crf","28"]
 
+            case "h264_amf":
+                command +=["-c:v","h264_amf"]
+                match self._video_quality:
+                    case "Very_High":
+                        command +=["-crf","15"]
+                    case "High":
+                        command +=["-crf","18"]
+                    case "Medium":
+                        command +=["-crf","23"]
+                    case "Low":
+                        command +=["-crf","28"]
+            case "h265_amf":
+                command +=["-c:v","hevc_amf"]
+                match self._video_quality:
+                    case "Very_High":
+                        command +=["-crf","15"]
+                    case "High":
+                        command +=["-crf","18"]
+                    case "Medium":
+                        command +=["-crf","23"]
+                    case "Low":
+                        command +=["-crf","28"]
+            case "av1_amf":
+                command +=["-c:v","av1_amf"]
+                match self._video_quality:
+                    case "Very_High":
+                        command +=["-crf","15"]
+                    case "High":
+                        command +=["-crf","18"]
+                    case "Medium":
+                        command +=["-crf","23"]
+                    case "Low":
+                        command +=["-crf","28"]
             case _:
-                command +=["-c:v","libx264"]
+                command +=["-c:v", self._video_encoder]
                 match self._video_quality:
                     case "Very_High":
                         command +=["-crf","15"]
