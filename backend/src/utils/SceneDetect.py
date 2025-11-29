@@ -215,6 +215,22 @@ class PySceneDetect(BaseDetector):
 
         return len(frameList) > 0
 
+class PyTorchSudoSceneDetect(BaseDetector):
+    def __init__(self, model_path: str = None, torchUtils=None, **kwargs):
+        from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
+        import torch
+        from ..pytorch.TorchUtils import TorchUtils
+        self.torch = torch
+        self.model = InferenceSceneChangeDetectEfficientNet()
+        self.i0 = None
+    def sceneDetect(self, frame):
+        frame = self.torch.from_numpy(frame).to(dtype=self.torch.float32, device='cpu')
+        if self.i0 is None:
+            self.i0 = frame
+            return False
+        out = self.model(self.i0, frame)
+        self.i0 = frame
+        return out
 
 class SceneDetect:
     """
@@ -240,16 +256,18 @@ class SceneDetect:
             "mean_segmented": NPMeanSegmentedSCDetect,
             "ffmpeg": FFMPEGSceneDetect,
             "pyscenedetect": PySceneDetect,
+            "sudo_pytorch": PyTorchSudoSceneDetect,
             "none": BaseDetector,
         }
 
         assert self.sceneChangeMethod in scmethoddict, "Invalid Scene Change Method"
-        self.detector = scmethoddict[self.sceneChangeMethod](
+        self.detector: BaseDetector = scmethoddict[self.sceneChangeMethod](
             threshold=sceneChangeSensitivity
         )
 
     def detect(self, frame):
         if self.sceneChangeMethod != "none":
             frame = bytesToImg(frame, width=self.width, height=self.height)
+        
         out = self.detector.sceneDetect(frame)
         return out
