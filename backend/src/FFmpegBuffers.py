@@ -14,6 +14,7 @@ from .utils.Util import (
     subprocess_popen_without_terminal,
 )
 from .utils.Encoders import  EncoderSettings
+from .utils.Frame import Frame
 
 class Buffer(ABC):
     @abstractmethod
@@ -22,7 +23,25 @@ class Buffer(ABC):
 
 
 class FFmpegRead(Buffer):
-    def __init__(self, inputFile, width, height, start_time, end_time, borderX, borderY, hdr_mode, color_space=None, color_primaries=None, color_transfer=None, input_pixel_format: str | None = None):
+    def __init__(
+            self, 
+            inputFile, 
+            width, 
+            height, 
+            start_time, 
+            end_time, 
+            borderX, 
+            borderY, 
+            hdr_mode,
+            backend: str = "pytorch",
+            device: str = "cuda",
+            gpu_id: int = 0,
+            dtype: str = "float16",
+            color_space=None, 
+            color_primaries=None, 
+            color_transfer=None, 
+            input_pixel_format: str | None = None):
+        
         self.inputFile = inputFile
         self.width = width
         self.height = height
@@ -31,6 +50,10 @@ class FFmpegRead(Buffer):
         self.borderX = borderX
         self.borderY = borderY
         self.hdr_mode = hdr_mode
+        self.backend = backend
+        self.device = device
+        self.gpu_id = gpu_id
+        self.dtype = dtype
         self.color_space = color_space
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
@@ -108,10 +131,13 @@ class FFmpegRead(Buffer):
             chunk = self.read_frame()
             if chunk is None:
                 break
-            self.readQueue.put(chunk)
+            frame = Frame(self.backend, self.width, self.height, self.device, self.gpu_id, self.hdr_mode, self.dtype)
+            frame.set_frame_bytes(chunk)
+            frame.set_frame_tensor(chunk)
+            self.readQueue.put(frame)
         self.readQueue.put(None)
 
-    def get(self):
+    def get(self) -> Frame:
         return self.readQueue.get()
 
     def close(self):

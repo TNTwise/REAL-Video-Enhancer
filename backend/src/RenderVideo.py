@@ -226,6 +226,10 @@ class Render:
             borderX=self.borderX,
             borderY=self.borderY,
             hdr_mode=hdr_mode,
+            backend=self.backend,
+            device=self.device,
+            gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
+            dtype=self.precision,
             color_space=color_space,
             color_primaries=color_primaries,
             color_transfer=color_transfer,
@@ -361,7 +365,7 @@ class Render:
                 
                 
                 if self.override_upscale_scale:
-                    frame = resize_image_bytes(frame,
+                    frame = resize_image_bytes(frame.get_frame_bytes(),
                                                width=self.width*self.modelScale,
                                                height=self.height*self.modelScale,
                                                target_width=self.width*self.override_upscale_scale,
@@ -371,7 +375,7 @@ class Render:
                 self.informationHandler.setFramesRendered(frames_rendered)
                 self.informationHandler.setPreviewFrame(frame)
                 
-                self.writeBuffer.writeQueue.put(frame)
+                self.writeBuffer.writeQueue.put(frame.get_frame_bytes())
                 frames_rendered += int(self.ceilInterpolateFactor)
             else:
                 sleep(1)

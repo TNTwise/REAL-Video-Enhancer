@@ -1,9 +1,6 @@
 import torch
 import torch.nn.functional as F
-from abc import ABCMeta, abstractmethod
-from queue import Queue
-
-from ..utils.SSIM import SSIM
+from typing import Generator
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
@@ -16,6 +13,7 @@ import sys
 from ..utils.Util import (
     errorAndLog, log
 )
+from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
@@ -180,7 +178,6 @@ class InterpolateRifeTorch(BaseInterpolate):
                         width=self.width,
                         height=self.height,
                         hdr_mode=self.hdr_mode,
-                        padding=self.padding if need_pad else None,
                         device_type=self.device_type,
                         )
         
@@ -415,17 +412,17 @@ class InterpolateRifeTorch(BaseInterpolate):
     @torch.inference_mode()
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
-    ):  # type: ignore
+    ) -> Generator[Frame, Frame, Frame]:  
         
         if self.frame0 is None:
-                self.frame0 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, device=self.device, dtype=self.dtype)
+                self.frame0 = F.pad(img1.get_frame_tensor(),self.padding)
                 if self.encode:
                     self.encode0 = self.encode_Frame(self.frame0, self.prepareStream)
                 return
         
-        frame1 = self.torchUtils.frame_to_tensor(img1, self.f2tStream, device=self.device, dtype=self.dtype)
+        frame1 = F.pad(img1.get_frame_tensor(),self.padding)
         
         if self.encode:
             encode1 = self.encode_Frame(frame1, self.f2tStream)
@@ -487,9 +484,9 @@ class InterpolateRifeTorch(BaseInterpolate):
                                 self.tenFlow_div,
                                 self.backwarp_tenGrid,
                             )
-                    output = self.torchUtils.tensor_to_frame(output[:, :, :self.height, :self.width])
-                    
-                    yield output
+                    retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
+                    retFrame.set_frame_tensor(output)
+                    yield retFrame
 
                 else:
                     yield img1

@@ -75,11 +75,6 @@ class PauseManager:
     def pause_manager(self):
         if self.paused_shared_memory_id is not None:
             return self.pausedSharedMemory.buf[0] == 1
-            
-
-
-        
-
 
 class InformationWriteOut:
     def __init__(
