@@ -12,16 +12,16 @@ class InferenceSceneChangeDetectEfficientNet:
         frame_0 = F.interpolate(frame_0.unsqueeze(0), 
                             size=(256, 256), 
                             mode='bilinear', 
-                            align_corners=False)
+                            )
         frame_1 = F.interpolate(frame_1.unsqueeze(0),
                             size=(256, 256), 
                             mode='bilinear', 
-                            align_corners=False)
+                            )
         #shape: (1, 3, 256, 256)
         
         input_tensor = torch.cat((frame_0.squeeze(0), frame_1.squeeze(0)), dim=0)
         #shape: (6, 256, 256)
-        input_tensor = input_tensor.squeeze().to(dtype=torch.float32, device='cpu')
+        input_tensor = input_tensor.to(dtype=torch.float32, device='cpu')
         output = self.model(input_tensor)
-        return output[0][0] >= 0.4
         # Return True if scene change detected, else False
+        return output[0][0] >= 0.85

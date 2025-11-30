@@ -327,9 +327,12 @@ class Render:
                     frame = extraRestoration(frame)
 
                 if self.interpolateModel:
+                    sceneDetect = self.sceneDetect.detect(frame)
+                    if sceneDetect:
+                        log("Scene Change Detected at output frame: " + str(frames_rendered) + "\n\n\nfdskjfsdhjkf")
                     interpolated_frames = self.interpolateOption(
                         img1=frame,
-                        transition=self.sceneDetect.detect(frame),
+                        transition=sceneDetect,
                     )
                     if not interpolated_frames:
                         return
