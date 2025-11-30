@@ -2,8 +2,8 @@ import torch
 import torch.nn.functional as F
 class InferenceSceneChangeDetectEfficientNet:
     def __init__(self):
-        self.model = torch.jit.load("/home/pax/real-video-enhancer/backend/src/pytorch/scenechangedetect/sudo_efficientnet_scenedetect.pt", map_location='cpu').float()
-    
+        self.model = torch.jit.load("/home/pax/real-video-enhancer/backend/src/pytorch/scenechangedetect/sudo_efficientnet_scenedetect.pt", map_location='cpu')
+        self.model.eval()
     @torch.inference_mode()
     def __call__(self, frame_0: torch.Tensor, frame_1: torch.Tensor) -> bool:
         frame_0 = frame_0.permute(2, 0, 1)  #shape: (3, H, W)
@@ -21,7 +21,7 @@ class InferenceSceneChangeDetectEfficientNet:
         
         input_tensor = torch.cat((frame_0.squeeze(0), frame_1.squeeze(0)), dim=0)
         #shape: (6, 256, 256)
-        input_tensor = input_tensor.to(dtype=torch.float32, device='cpu')
+        input_tensor = input_tensor
         output = self.model(input_tensor)
         # Return True if scene change detected, else False
         return output[0][0] >= 0.85
