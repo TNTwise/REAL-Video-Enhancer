@@ -21,11 +21,10 @@ def change_first_layer(m):
                 return True
     return False
 
-netD = timm.create_model("tf_efficientnetv2_b0", num_classes=2, pretrained=True, in_chans=6)
+netD = timm.create_model("maxxvitv2_nano_rw_256.sw_in1k", num_classes=2, pretrained=True, in_chans=6)
 #change_first_layer(netD)
 
 # Check the modified first layer
-print(netD.conv_stem)
 
 def custom_forward(self, x):
     x = x.unsqueeze(0)
@@ -47,13 +46,13 @@ netD.forward = funcType(custom_forward, netD)
 source_code = inspect.getsource(netD.forward)
 print(source_code)
 
-netD.load_state_dict(torch.load("sc_efficientnetv2b0_17957_256.pth"))
+netD.load_state_dict(torch.load("sc_maxxvitv2_nano_rw_256.sw_in1k_256px_b100_30k_coloraug0.4.pth"))
 
 dummy_input = torch.rand(6, 256, 256).cuda()
 netD.cuda()
 res = netD(dummy_input)  # Call forward method with dummy input
 print(res)
-
+print(netD.code)
 # Export the model to ONNX format
 with torch.no_grad():
     torch.jit.trace(netD, dummy_input).save("sudo_efficientnet_scenedetect.pt")

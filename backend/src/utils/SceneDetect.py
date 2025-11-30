@@ -216,7 +216,7 @@ class PySceneDetect(BaseDetector):
         return len(frameList) > 0
 
 class PyTorchSudoSceneDetect(BaseDetector):
-    def __init__(self, model_path: str = None, torchUtils=None, **kwargs):
+    def __init__(self, **kwargs):
         from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
         import torch
         from ..pytorch.TorchUtils import TorchUtils
@@ -224,13 +224,26 @@ class PyTorchSudoSceneDetect(BaseDetector):
         self.model = InferenceSceneChangeDetectEfficientNet()
         self.i0 = None
     def sceneDetect(self, frame):
-        frame = self.torch.from_numpy(frame).to(dtype=self.torch.float32, device='cpu')
+        frame = self.torch.from_numpy(frame).to(dtype=self.torch.float16, device='cuda').permute(2, 0, 1).div(255.)
+        frame = self.torch.nn.functional.interpolate(frame.unsqueeze(0), 
+                            size=(256, 256), 
+                            mode='bilinear', 
+                            align_corners=False, 
+                            ).squeeze(0)
         if self.i0 is None:
             self.i0 = frame
             return False
         out = self.model(self.i0, frame)
         self.i0 = frame
         return out
+
+class RVESceneDetect(BaseDetector):
+    def __init__(self, **kwargs):
+        self.pass2 = PyTorchSudoSceneDetect()
+        self.pass1 = PySceneDetect()
+    def sceneDetect(self, frame):
+        return self.pass1.sceneDetect(frame) or self.pass2.sceneDetect(frame)
+        
 
 class SceneDetect:
     """
@@ -257,6 +270,7 @@ class SceneDetect:
             "ffmpeg": FFMPEGSceneDetect,
             "pyscenedetect": PySceneDetect,
             "sudo_pytorch": PyTorchSudoSceneDetect,
+            # "rve": RVESceneDetect,
             "none": BaseDetector,
         }
 
