@@ -161,47 +161,19 @@ class TorchUtils:
             tensorToCopy.copy_(tensorCopiedTo, non_blocking=True)
         
             self.sync_stream(stream)
-
+    @staticmethod
     @torch.inference_mode()
-    def frame_to_tensor(self, frame, device: torch.device, dtype: torch.dtype) -> torch.Tensor: # stream might be None
-        # Source element dtype (CPU raw bytes)
-        src_dtype = torch.uint16 if self.hdr_mode else torch.uint8
-        numel = self.width * self.height * 3
-
-        # Use a persistent pinned CPU buffer for CUDA device transfers to allow non-blocking .to()
-        if self.device_type == "cuda" and HAS_PYTORCH_CUDA:
-            # allocate or reallocate pinned buffer if needed
-            if (self._pinned_buffer is None
-                    or self._pinned_buffer_numel < numel
-                    or self._pinned_buffer_dtype != src_dtype):
-                self._pinned_buffer = torch.empty(numel, dtype=src_dtype, pin_memory=True)
-                self._pinned_buffer_numel = numel
-                self._pinned_buffer_dtype = src_dtype
-
-            # Create a temporary CPU tensor view of the incoming bytes and copy into pinned buffer
-            cpu_view = torch.frombuffer(frame, dtype=src_dtype, count=numel)
-            # copy_ on CPU (synchronous) but keeps pinned buffer for async device transfer
-            self._pinned_buffer[:numel].copy_(cpu_view, non_blocking=False)
-
-            # async transfer pinned -> device on the target stream
-            frame_dev = self._pinned_buffer.to(device=device, non_blocking=True)
-        else:
-            # fallback: direct frombuffer (CPU or non-CUDA devices)
-            frame_dev = torch.frombuffer(frame, dtype=src_dtype, count=numel).to(device=device, non_blocking=True)
-
-        # Run the rest of the pipeline on the target device/stream
-        frame = (
-            frame_dev
-            .div(65535.0 if self.hdr_mode else 255.0)
+    def frame_to_tensor(frame, device: torch.device, dtype: torch.dtype, hdr_mode, width, height) -> torch.Tensor: # stream might be None
+        return (
+            torch.frombuffer(frame, dtype=torch.uint16 if hdr_mode else torch.uint8, count=width * height * 3
+).to(device=device, non_blocking=True)
+            .div(65535.0 if hdr_mode else 255.0)
             .clamp(0.0, 1.0)
-            .reshape(self.height, self.width, 3)
+            .reshape(height, width, 3)
             .permute(2, 0, 1)
             .unsqueeze(0)
             .contiguous()
             ).to(dtype=dtype, non_blocking=True)
-
-        # No explicit sync for CPU here.
-        return frame
     
     @staticmethod
     def clear_cache():

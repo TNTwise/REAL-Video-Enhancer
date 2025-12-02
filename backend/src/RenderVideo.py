@@ -346,14 +346,14 @@ class Render:
                                 interpolated_frame
                             )
                         if self.override_upscale_scale:
-                            interpolated_frame = resize_image_bytes(interpolated_frame,
+                            interpolated_frame = resize_image_bytes(interpolated_frame.get_frame_bytes(),
                                                width=self.width*self.modelScale,
                                                height=self.height*self.modelScale,
                                                target_width=self.width*self.override_upscale_scale,
                                                target_height=self.height*self.override_upscale_scale,)
-                        self.informationHandler.setPreviewFrame(interpolated_frame)
+                        self.informationHandler.setPreviewFrame(interpolated_frame.get_frame_bytes())
                         self.informationHandler.setFramesRendered(frames_rendered)
-                        self.writeBuffer.writeQueue.put(interpolated_frame)
+                        self.writeBuffer.writeQueue.put(interpolated_frame.get_frame_bytes())
                 
                 
 
@@ -373,7 +373,7 @@ class Render:
 
                 
                 self.informationHandler.setFramesRendered(frames_rendered)
-                self.informationHandler.setPreviewFrame(frame)
+                self.informationHandler.setPreviewFrame(frame.get_frame_bytes())
                 
                 self.writeBuffer.writeQueue.put(frame.get_frame_bytes())
                 frames_rendered += int(self.ceilInterpolateFactor)
