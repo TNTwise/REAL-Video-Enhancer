@@ -45,15 +45,23 @@ class DummyContextManager:
 
 class TorchUtils:
     # device and precision are in string formats, loaded straight from the command line arguments
-    def __init__(self, width, height, device_type:str, hdr_mode=False, gpu_id=0):
+    def __init__(self, width, height, device_type:str, hdr_mode=False, padding=None, gpu_id=0):
         self.width = width
         self.height = height
         self.hdr_mode = hdr_mode
+        self.padding = padding
         self.gpu_id = gpu_id
         if device_type == "auto":
             self.device_type = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "xpu" if torch.xpu.is_available() else "cpu"    
         else:
             self.device_type = device_type
+        try:
+            test_tensor = torch.tensor([1.0]).cpu().numpy()
+            del test_tensor
+            self.use_numpy = True
+        except Exception as e:
+            log(f"Failed to create a Numpy tensor, This will heavily reduce performance.")
+            self.use_numpy = False
         self.__run_stream_func = self.__run_stream_function()
         self.__sync_all_streams_func = self.__sync_all_streams_function()
 
@@ -161,19 +169,53 @@ class TorchUtils:
             tensorToCopy.copy_(tensorCopiedTo, non_blocking=True)
         
             self.sync_stream(stream)
-    @staticmethod
+
     @torch.inference_mode()
-    def frame_to_tensor(frame, device: torch.device, dtype: torch.dtype, hdr_mode, width, height) -> torch.Tensor: # stream might be None
-        return (
-            torch.frombuffer(frame, dtype=torch.uint16 if hdr_mode else torch.uint8, count=width * height * 3
-).to(device=device, non_blocking=True)
-            .div(65535.0 if hdr_mode else 255.0)
-            .clamp(0.0, 1.0)
-            .reshape(height, width, 3)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .contiguous()
-            ).to(dtype=dtype, non_blocking=True)
+    def frame_to_tensor(self, frame, stream: torch.Stream, device: torch.device, dtype: torch.dtype) -> torch.Tensor: # stream might be None
+        with self.run_stream(stream):  # type: ignore
+            # Source element dtype (CPU raw bytes)
+            src_dtype = torch.uint16 if self.hdr_mode else torch.uint8
+            numel = self.width * self.height * 3
+
+            # Use a persistent pinned CPU buffer for CUDA device transfers to allow non-blocking .to()
+            if self.device_type == "cuda" and HAS_PYTORCH_CUDA:
+                # allocate or reallocate pinned buffer if needed
+                if (self._pinned_buffer is None
+                        or self._pinned_buffer_numel < numel
+                        or self._pinned_buffer_dtype != src_dtype):
+                    self._pinned_buffer = torch.empty(numel, dtype=src_dtype, pin_memory=True)
+                    self._pinned_buffer_numel = numel
+                    self._pinned_buffer_dtype = src_dtype
+
+                # Create a temporary CPU tensor view of the incoming bytes and copy into pinned buffer
+                cpu_view = torch.frombuffer(frame, dtype=src_dtype, count=numel)
+                # copy_ on CPU (synchronous) but keeps pinned buffer for async device transfer
+                self._pinned_buffer[:numel].copy_(cpu_view, non_blocking=False)
+
+                # async transfer pinned -> device on the target stream
+                frame_dev = self._pinned_buffer.to(device=device, non_blocking=True)
+            else:
+                # fallback: direct frombuffer (CPU or non-CUDA devices)
+                frame_dev = torch.frombuffer(frame, dtype=src_dtype, count=numel).to(device=device, non_blocking=True)
+
+            # Run the rest of the pipeline on the target device/stream
+            frame = (
+                frame_dev
+                .div(65535.0 if self.hdr_mode else 255.0)
+                .clamp(0.0, 1.0)
+                .reshape(self.height, self.width, 3)
+                .permute(2, 0, 1)
+                .unsqueeze(0)
+                .contiguous()
+                ).to(dtype=dtype, non_blocking=True)
+
+            if self.padding:
+                frame = F.pad(frame, self.padding)
+
+            self.sync_stream(stream)
+
+        # No explicit sync for CPU here.
+        return frame
     
     @staticmethod
     def clear_cache():
@@ -182,22 +224,35 @@ class TorchUtils:
             torch.cuda.reset_max_memory_allocated()
             torch.cuda.reset_max_memory_cached()
     
-    @staticmethod
     @torch.inference_mode()
-    def tensor_to_frame(frame: torch.Tensor, hdr_mode: bool = False) -> bytes:
+    def tensor_to_frame(self, frame: torch.Tensor):
         # Prepare the tensor
         tensor = (
             frame.squeeze(0)
             .permute(1, 2, 0)
             .clamp(0., 1.)
-            .mul(65535.0 if hdr_mode else 255.0)
+            .mul(65535.0 if self.hdr_mode else 255.0)
             .round()
-            .to(torch.uint16 if hdr_mode else torch.uint8)
+            .to(torch.uint16 if self.hdr_mode else torch.uint8)
             .contiguous()
             .detach()
             .cpu()
-            .numpy()
         )
-        return tensor
-        
-                
+        if self.use_numpy:
+            # Convert to numpy array if possible
+            return tensor.numpy()
+        else:
+            np_dtype = np.uint16 if self.hdr_mode else np.uint8
+            return np.array(tensor.tolist(), dtype=np_dtype)
+    
+    @staticmethod
+    @torch.inference_mode()
+    def np_to_tensor(arr: np.ndarray, device, dtype):
+        import torch
+        return torch.from_numpy(arr).to(device=device, dtype=dtype).permute(2, 0, 1).unsqueeze(0)
+
+    
+    @staticmethod
+    @torch.inference_mode()
+    def tensor_to_np(tensor: torch.Tensor) -> np.ndarray:
+        return tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()

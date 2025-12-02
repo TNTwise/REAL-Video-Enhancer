@@ -4,13 +4,13 @@ from collections import deque
 import sys
 from .Util import bytesToImg
 from .PySceneDetectUtils import ContentDetector
-
+from ..utils.Frame import Frame
 
 class BaseDetector:
     def __init__(self, threshold: int = 0):
         pass
 
-    def sceneDetect(self, frame):
+    def sceneDetect(self, frame: Frame):
         return False
 
 
@@ -26,12 +26,12 @@ class NPMeanSCDetect(BaseDetector):
         self.sensitivity = threshold * 10
 
     # a simple scene detect based on mean
-    def sceneDetect(self, img1):
+    def sceneDetect(self, frame: Frame):
         if self.i0 is None:
-            self.i0 = img1
+            self.i0 = frame.get_frame_np()
             self.image0mean = np.mean(self.i0)
             return
-        self.i1 = img1
+        self.i1 = frame.get_frame_np()
         img1mean = np.mean(self.i1)
         if (
             self.image0mean > img1mean + self.sensitivity
@@ -84,7 +84,8 @@ class NPMeanSegmentedSCDetect(BaseDetector):
         return means
 
     # a simple scene detect based on mean
-    def sceneDetect(self, img1):
+    def sceneDetect(self, img1: Frame):
+        img1 = img1.get_frame_np()
         if self.i0 is None:
             self.i0 = img1
             self.segmentsImg1Mean = self.segmentImage(self.i0)
@@ -113,7 +114,8 @@ class NPMeanDiffSCDetect(BaseDetector):
         self.i0 = None
         self.i1 = None
 
-    def sceneDetect(self, img1):
+    def sceneDetect(self, img1: Frame):
+        img1 = img1.get_frame_np()
         if self.i0 is None:
             self.i0 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
             return
@@ -155,6 +157,7 @@ class FFMPEGSceneDetect(BaseDetector):
         return np.mean(diff_y), hist_diff
 
     def sceneDetect(self, frame):
+        frame = frame.get_frame_np()
         if self.prev_frame is None:
             self.prev_frame = frame
             return False
@@ -195,14 +198,14 @@ class FFMPEGSceneDetect(BaseDetector):
 
 
 class PySceneDetect(BaseDetector):
-    def __init__(self, threshold=2, min_scene_length=30):
+    def __init__(self, threshold=2):
         self.detector = ContentDetector(
             threshold=threshold * 10, min_scene_len=1
         )  # has to be 1 to stay synced
         self.frameNum = 0
 
-    def sceneDetect(self, frame: np.ndarray):
-        frame = cv2.resize(frame, (640, 360))
+    def sceneDetect(self, frame: Frame):
+        frame = cv2.resize(frame.get_frame_np(), (640, 360))
         frameList = self.detector.process_frame(self.frameNum, frame)
         self.frameNum += 1
         if len(frameList) > 0:
@@ -216,16 +219,14 @@ class PySceneDetect(BaseDetector):
         return len(frameList) > 0
 
 class PyTorchSudoSceneDetect(BaseDetector):
-    def __init__(self, **kwargs):
+    def __init__(self, threshold=0):
         from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
         import torch
-        from ..pytorch.TorchUtils import TorchUtils
         self.torch = torch
-        self.model = InferenceSceneChangeDetectEfficientNet()
+        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold)
         self.i0 = None
-    def sceneDetect(self, frame):
-        frame = self.torch.from_numpy(frame).to(dtype=self.torch.float16, device='cuda').permute(2, 0, 1).div(255.)
-        frame = self.torch.nn.functional.interpolate(frame.unsqueeze(0), 
+    def sceneDetect(self, frame: Frame):
+        frame = self.torch.nn.functional.interpolate(frame.get_frame_tensor().unsqueeze(0), 
                             size=(256, 256), 
                             mode='bilinear', 
                             align_corners=False, 
@@ -279,9 +280,5 @@ class SceneDetect:
             threshold=sceneChangeSensitivity
         )
 
-    def detect(self, frame):
-        if self.sceneChangeMethod != "none":
-            frame = bytesToImg(frame, width=self.width, height=self.height)
-        
-        out = self.detector.sceneDetect(frame)
-        return out
+    def detect(self, frame: Frame) -> bool:
+        return self.detector.sceneDetect(frame)

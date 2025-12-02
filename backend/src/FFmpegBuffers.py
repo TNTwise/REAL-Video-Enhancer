@@ -133,7 +133,6 @@ class FFmpegRead(Buffer):
                 break
             frame = Frame(self.backend, self.width, self.height, self.device, self.gpu_id, self.hdr_mode, self.dtype)
             frame.set_frame_bytes(chunk)
-            frame.set_frame_tensor(chunk)
             self.readQueue.put(frame)
         self.readQueue.put(None)
 

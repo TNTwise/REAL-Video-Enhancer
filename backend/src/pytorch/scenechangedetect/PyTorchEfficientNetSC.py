@@ -1,7 +1,8 @@
 import torch
 import torch.nn.functional as F
 class InferenceSceneChangeDetectEfficientNet:
-    def __init__(self):
+    def __init__(self, threshold=0.3):
+        self.threshold = threshold
         self.model = torch.jit.load("/home/pax/real-video-enhancer/backend/src/pytorch/scenechangedetect/sudo_maxxvit_scenedetect.pt", map_location='cuda').half()
         self.model.eval()
     @torch.inference_mode()
@@ -10,4 +11,4 @@ class InferenceSceneChangeDetectEfficientNet:
         output = self.model(frame)
         # Return True if scene change detected, else False
         
-        return output[0][0] > 0.3
+        return output[0][0] > self.threshold
