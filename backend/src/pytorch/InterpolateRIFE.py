@@ -416,18 +416,19 @@ class InterpolateRifeTorch(BaseInterpolate):
         transition=False,
     ) -> Generator[Frame, Frame, Frame]:  
         
-        if self.frame0 is None:
-                self.frame0 = F.pad(img1.get_frame_tensor(),self.padding)
-                if self.encode:
-                    self.encode0 = self.encode_Frame(self.frame0, self.prepareStream)
-                return
-        
-        frame1 = F.pad(img1.get_frame_tensor(),self.padding)
-        
-        if self.encode:
-            encode1 = self.encode_Frame(frame1, self.f2tStream)
-        
         with self.torchUtils.run_stream(self.stream):  # type: ignore
+            with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
+                if self.frame0 is None:
+                    self.frame0 = F.pad(img1.get_frame_tensor(),self.padding)
+                    if self.encode:
+                        self.encode0 = self.encode_Frame(self.frame0, self.prepareStream)
+                    return
+            
+                frame1 = F.pad(img1.get_frame_tensor(),self.padding)
+            self.torchUtils.sync_stream(self.prepareStream)
+            
+            if self.encode:
+                encode1 = self.encode_Frame(frame1, self.f2tStream)
 
 
             if self.dynamicScaledOpticalFlow:

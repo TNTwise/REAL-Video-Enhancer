@@ -49,7 +49,6 @@ class TorchUtils:
         self.width = width
         self.height = height
         self.hdr_mode = hdr_mode
-        self.padding = padding
         self.gpu_id = gpu_id
         if device_type == "auto":
             self.device_type = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "xpu" if torch.xpu.is_available() else "cpu"    
@@ -208,9 +207,6 @@ class TorchUtils:
                 .unsqueeze(0)
                 .contiguous()
                 ).to(dtype=dtype, non_blocking=True)
-
-            if self.padding:
-                frame = F.pad(frame, self.padding)
 
             self.sync_stream(stream)
 
