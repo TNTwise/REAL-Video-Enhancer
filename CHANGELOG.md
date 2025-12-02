@@ -5,6 +5,8 @@
  - Auto select best backend based on model and hardware.
 ### Fixed
  - Random crash after rendering a few times.
+### Changed
+ - Backend changes.
 # RVE 2.3.8
 ### Added
  - Open output folder button
