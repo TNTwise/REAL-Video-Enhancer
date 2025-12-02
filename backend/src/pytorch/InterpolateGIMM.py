@@ -1,5 +1,5 @@
 import torch
-
+import torch.nn.functional as F
 from .TorchUtils import TorchUtils
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate
@@ -10,7 +10,7 @@ from ..utils.Util import (
     warnAndLog,
     log,
 )
-
+from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
@@ -46,12 +46,12 @@ class InterpolateGIMMTorch(BaseInterpolate):
         tmp = max(_pad, int(_pad / self.scale))
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
-        padding = (0, self.pw - self.width, 0, self.ph - self.height)
+        self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+        self.device_type = device
         self.torchUtils = TorchUtils(
             width=width,
             height=height,
             hdr_mode=hdr_mode,
-            padding=padding,
             device_type=device,
         )
         self.device = self.torchUtils.handle_device(device, gpu_id=gpu_id)
@@ -142,14 +142,17 @@ class InterpolateGIMMTorch(BaseInterpolate):
     @torch.inference_mode()
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
     ):  # type: ignore
         with self.torchUtils.run_stream(self.stream):  # type: ignore
-            if self.frame0 is None:
-                self.frame0 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
-                return
-            frame1 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
+            with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
+                if self.frame0 is None:
+                    self.frame0 = F.pad(img1.get_frame_tensor(), self.padding)
+                    return
+                frame1 = F.pad(img1.get_frame_tensor(), self.padding)
+            self.torchUtils.sync_stream(self.prepareStream)
+            
             for n in range(self.ceilInterpolateFactor - 1):
                 if not transition:
                     timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
@@ -170,8 +173,10 @@ class InterpolateGIMMTorch(BaseInterpolate):
                         # if there are nans in output, reload with float32 precision and process.... dumb fix but whatever
                         raise ValueError("Nans in output")
 
-                    output = self.torchUtils.tensor_to_frame(output)
-                    yield output
+                    output = output[:, :, : self.height, : self.width]
+                    retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
+                    retFrame.set_frame_tensor(output)
+                    yield retFrame
 
                 else:
                     yield img1

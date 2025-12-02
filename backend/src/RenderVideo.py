@@ -373,9 +373,9 @@ class Render:
 
                 
                 self.informationHandler.setFramesRendered(frames_rendered)
-                self.informationHandler.setPreviewFrame(frame.get_frame_bytes())
+                self.informationHandler.setPreviewFrame(frame.get_frame_bytes() if type(frame) != bytes else frame)
                 
-                self.writeBuffer.writeQueue.put(frame.get_frame_bytes())
+                self.writeBuffer.writeQueue.put(frame.get_frame_bytes() if type(frame) != bytes else frame)
                 frames_rendered += int(self.ceilInterpolateFactor)
             else:
                 sleep(1)

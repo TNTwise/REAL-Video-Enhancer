@@ -8,7 +8,8 @@ from ..utils.Util import (
     warnAndLog,
     log,
 )
-
+from ..utils.Frame import Frame
+from typing import Generator
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
@@ -58,7 +59,6 @@ class InterpolateIFRNetTorch(BaseInterpolate):
             self.width,
             self.height,
             hdr_mode=self.hdr_mode,
-            padding=self.padding,
             device_type=device
         )
         self.device = self.torchUtils.handle_device(device, gpu_id=gpu_id)
@@ -125,17 +125,19 @@ class InterpolateIFRNetTorch(BaseInterpolate):
     @torch.inference_mode()
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
-    ):  # type: ignore
+    ) -> Generator[Frame, Frame, Frame]:  # type: ignore
 
         with self.torchUtils.run_stream(self.stream):  # type: ignore
-            if self.frame0 is None:
-                self.frame0 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
-                self.frame0 = torch.cat([self.frame0 for _ in range(self.ceilInterpolateFactor-1)], dim=0)
-                return
-            frame1 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
-            frame1 = torch.cat([frame1 for _ in range(self.ceilInterpolateFactor-1)], dim=0)
+            with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
+                if self.frame0 is None:
+                    self.frame0 = torch.nn.functional.pad(img1.get_frame_tensor(), self.padding)
+                    self.frame0 = torch.cat([self.frame0 for _ in range(self.ceilInterpolateFactor-1)], dim=0)
+                    return
+                frame1 = torch.nn.functional.pad(img1.get_frame_tensor(), self.padding)
+                frame1 = torch.cat([frame1 for _ in range(self.ceilInterpolateFactor-1)], dim=0)
+            self.torchUtils.sync_stream(self.prepareStream)  # type: ignore
             
             if transition:
                 for n in range(self.ceilInterpolateFactor - 1):
@@ -146,12 +148,10 @@ class InterpolateIFRNetTorch(BaseInterpolate):
                 self.timestep,
             )
             for frame in frames: 
-                img = self.torchUtils.tensor_to_frame(
-                    frame[:, :self.height, :self.width]
-                ) 
+                retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
+                retFrame.set_frame_tensor(frame[:, :self.height, :self.width]) 
                 if not transition:
-                    yield img
-
+                    yield retFrame
             self.torchUtils.copy_tensor(self.frame0, frame1, self.prepareStream)
 
         self.torchUtils.sync_all_streams()

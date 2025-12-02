@@ -10,6 +10,7 @@ import sys
 from time import sleep
 
 from ..utils.Util import log, CudaChecker
+from ..utils.Frame import Frame
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 import numpy as np
 def process_output(output, hdr_mode):
@@ -289,21 +290,24 @@ class UpscalePytorch:
         self._load()
     
     @torch.inference_mode()
-    def __call__(self, image: bytes) -> torch.Tensor:
-        image = self.torchUtils.frame_to_tensor(image, self.f2tstream, self.device, self.dtype)
+    def __call__(self, image: Frame) -> Frame:
+        with self.torchUtils.run_stream(self.f2tstream):  # type: ignore
+            image_tensor = image.get_frame_tensor()
+        self.torchUtils.sync_stream(self.f2tstream)
+        
         with self.torchUtils.run_stream(self.stream):
             while self.upscale_model_wrapper is None:
                 sleep(1)
             if self.tilesize == 0:
-
-                output = self.upscale_model_wrapper(image)
-
+                output = self.upscale_model_wrapper(image_tensor)
             else:
-                output = self.renderTiledImage(image)
-            output = self.torchUtils.tensor_to_frame(output)
+                output = self.renderTiledImage(image_tensor)
+            
+            retFrame = Frame(self.backend, self.videoWidth * self.scale, self.videoHeight * self.scale, image.device, gpu_id=image.gpu_id, hdr_mode=self.hdr_mode, dtype=image.dtype)
+            retFrame.set_frame_tensor(output)
         
         self.torchUtils.sync_stream(self.stream)
-        return output
+        return retFrame
  
     def getScale(self):
         return self.upscale_model_wrapper.get_scale()
