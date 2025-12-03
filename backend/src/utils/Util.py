@@ -106,7 +106,7 @@ def get_pytorch_vram() -> int:
         return 0
 
 
-def resize_image_np(image: np.ndarray, target_width: int, target_height: int) -> np.ndarray:
+def resize_image_np(image, target_width: int, target_height: int):
     """
     Resizes the image to the target resolution.
     
