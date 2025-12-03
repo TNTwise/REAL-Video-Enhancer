@@ -80,6 +80,7 @@ class InterpolateGMFSSTorch(BaseInterpolate):
     def _load(self):
         self.stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)  
         self.prepareStream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
+        self.copy_stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
         with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
             if self.dynamicScaledOpticalFlow:
                 from ..utils.SSIM import SSIM
@@ -182,6 +183,6 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                     yield img1
 
 
-            self.torchUtils.copy_tensor(self.frame0, frame1, self.prepareStream)
+            self.torchUtils.copy_tensor(self.frame0, frame1, self.copy_stream)
 
         self.torchUtils.sync_all_streams()

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 from ..architectures import (
+    ArtCNN,
     ATD,
     CRAFT,
     DAT,
@@ -56,6 +57,7 @@ Modifying this registry will affect all `ModelLoader` instances without a custom
 """
 
 MAIN_REGISTRY.add(
+    ArchSupport.from_architecture(ArtCNN.ArtCNNArch()),
     ArchSupport.from_architecture(Compact.CompactArch()),
     ArchSupport.from_architecture(SwiftSRGAN.SwiftSRGANArch()),
     ArchSupport.from_architecture(HAT.HATArch()),

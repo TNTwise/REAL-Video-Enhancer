@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from collections import deque
 import sys
-from .Util import bytesToImg
+from .Util import resize_image_np
 from .PySceneDetectUtils import ContentDetector
 from ..utils.Frame import Frame
 

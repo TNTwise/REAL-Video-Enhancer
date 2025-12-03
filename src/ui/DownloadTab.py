@@ -21,7 +21,7 @@ class DownloadTab:
         self.backends = backends
         self.applicationUpdater = ApplicationUpdater()
 
-
+        self.has_enough_space = True
         if IS_FLATPAK:
             minimum_space_required = 7
         else:
@@ -31,7 +31,7 @@ class DownloadTab:
             self.parent.downloadTorchBtn.setEnabled(False)
             self.parent.downloadTensorRTBtn.setEnabled(False)
             self.parent.low_storage_label.setVisible(True)
-
+            self.has_enough_space = False
         # disable as it is not complete
         try:
             self.parent.downloadDirectMLBtn.setEnabled(False)
@@ -162,9 +162,9 @@ class DownloadTab:
 
     def installRecommended(self):
         pytorch_backend = GPUDetect().getPyTorchFeatures()
-        if pytorch_backend:
+        if pytorch_backend and self.has_enough_space:
             self.download("torch", install=True, pytorch_backend=pytorch_backend)
-        elif PLATFORM == 'darwin' and CPU_ARCH == "arm64":
+        elif PLATFORM == 'darwin' and CPU_ARCH == "arm64" and self.has_enough_space:
             self.download("torch", install=True, pytorch_backend="mps")
         else:
             self.download("ncnn")

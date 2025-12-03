@@ -106,6 +106,35 @@ def get_pytorch_vram() -> int:
         return 0
 
 
+def resize_image_np(image: np.ndarray, target_width: int, target_height: int) -> np.ndarray:
+    """
+    Resizes the image to the target resolution.
+    
+    Args:
+        image (np.ndarray): The input image as a numpy array.
+        target_width (int): The target width for resizing.
+        target_height (int): The target height for resizing.
+    
+    Returns:
+        np.ndarray: The resized image as a numpy array.
+    """
+    height, width = image.shape[:2]
+    if target_width == width and target_height == height:
+        return image
+    if target_width < width or target_height < height:
+        # Best for downscaling
+        interpolation = cv2.INTER_AREA
+    else:
+        # Best for upscaling
+        interpolation = cv2.INTER_LANCZOS4
+
+    try:
+        resized_image = cv2.resize(image, (target_width, target_height), interpolation=interpolation)
+    except Exception:
+        resized_image = cv2.resize(image, (target_width, target_height))
+    return resized_image
+
+
 def resize_image_bytes(image_bytes: bytes, width: int, height: int, target_width: int, target_height: int) -> bytes:
     """
     Resizes the image to the target resolution.
