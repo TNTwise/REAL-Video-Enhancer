@@ -252,3 +252,18 @@ class TorchUtils:
     @torch.inference_mode()
     def tensor_to_np(tensor: torch.Tensor) -> np.ndarray:
         return tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()
+
+    @staticmethod
+    @torch.inference_mode()
+    def resize_tensor(
+        tensor: torch.Tensor,
+        new_width: int,
+        new_height: int,
+        mode: str = "bilinear",
+    ) -> torch.Tensor:
+        return F.interpolate(
+            tensor,
+            size=(new_height, new_width),
+            mode=mode,
+            align_corners=False if mode in ["linear", "bilinear", "bicubic", "trilinear"] else None,
+        )

@@ -2,7 +2,6 @@ import numpy as np
 import cv2
 from collections import deque
 import sys
-from .Util import resize_image_np
 from .PySceneDetectUtils import ContentDetector
 from ..utils.Frame import Frame
 
@@ -205,7 +204,7 @@ class PySceneDetect(BaseDetector):
         self.frameNum = 0
 
     def sceneDetect(self, frame: Frame):
-        frame = cv2.resize(frame.get_frame_np(), (640, 360))
+        frame = frame.clone().resize_frame(320, 180).get_frame_np()
         frameList = self.detector.process_frame(self.frameNum, frame)
         self.frameNum += 1
         if len(frameList) > 0:
@@ -226,11 +225,7 @@ class PyTorchSudoSceneDetect(BaseDetector):
         self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold)
         self.i0 = None
     def sceneDetect(self, frame: Frame):
-        frame = self.torch.nn.functional.interpolate(frame.get_frame_tensor().unsqueeze(0), 
-                            size=(256, 256), 
-                            mode='bilinear', 
-                            align_corners=False, 
-                            ).squeeze(0)
+        frame = frame.clone().resize_frame(256,256).get_frame_tensor().squeeze(0)
         if self.i0 is None:
             self.i0 = frame
             return False
