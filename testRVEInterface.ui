@@ -288,7 +288,7 @@ QTabWidget::pane { /* The tab widget frame */
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>3</number>
             </property>
             <widget class="QWidget" name="homePage">
              <property name="styleSheet">
@@ -2391,7 +2391,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>453</width>
+                                   <width>438</width>
                                    <height>520</height>
                                   </rect>
                                  </property>
@@ -3349,8 +3349,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>460</width>
-                                <height>516</height>
+                                <width>373</width>
+                                <height>379</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -4572,6 +4572,11 @@ QTabWidget::pane { /* The tab widget frame */
                                   </item>
                                   <item>
                                    <property name="text">
+                                    <string>sudo_maxxvit</string>
+                                   </property>
+                                  </item>
+                                  <item>
+                                   <property name="text">
                                     <string>pyscenedetect</string>
                                    </property>
                                   </item>
@@ -5635,7 +5640,7 @@ color: red;
                       <x>0</x>
                       <y>0</y>
                       <width>928</width>
-                      <height>377</height>
+                      <height>291</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">

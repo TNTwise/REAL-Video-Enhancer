@@ -132,6 +132,7 @@ class HandleApplication:
             interpolateFactor=self.args.interpolate_factor,
             upscaleModel=self.args.upscale_model,
             extraRestorationModels=self.args.extra_restoration_models,
+            sceneDetectModel=self.args.scene_detect_model,
             tile_size=self.args.tilesize,
             # backend settings
             device=self.args.device,
@@ -265,6 +266,12 @@ class HandleApplication:
             help="Scene change detection to avoid interpolating transitions. (options=mean, mean_segmented, none)\nMean segmented splits up an image, and if an arbitrary number of segments changes are detected within the segments, it will trigger a scene change. (lower sensativity thresholds are not recommended)",
             type=str,
             default="pyscenedetect",
+        )
+        parser.add_argument(
+            "--scene_detect_model",
+            help="Path to scene change model to use with model-based scene detection.",
+            type=str,
+            default=None,
         )
         parser.add_argument(
             "--scene_detect_threshold",

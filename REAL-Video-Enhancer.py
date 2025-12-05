@@ -464,6 +464,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         deblur = self.deblurModelComboBox.currentText()
         denoise = self.denoiseModelComboBox.currentText()
         decompress = self.decompressModelComboBox.currentText()
+        scene_detect_method = self.scene_change_detection_method.currentText()
         input_file = self.inputFileText.text() if input_file is None else input_file
         output_path = self.outputFileText.text() if output_path is None else output_path
         interpolateModelFile = None
@@ -471,6 +472,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         deblurModelFile = None
         denoiseModelFile = None
         decompressModelFile = None
+        scene_detect_model_file = None
         if not self.interpolateCheckBox.isChecked():
             interpolate = None
         if not self.upscaleCheckBox.isChecked():
@@ -491,7 +493,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         backend = self.backendComboBox.currentText()
         upscaleModelArch = "custom"
-        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels = getModels(backend)
+        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, sceneChangeModels = getModels(backend)
 
         if interpolate:
             interpolateDownloadFile = interpolateModels[interpolate][1]
@@ -501,6 +503,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 modelFile=interpolateModelFile,
                 downloadModelFile=interpolateDownloadFile,
             )
+            if "sudo" in scene_detect_method:
+                scene_detect_model_file = sceneChangeModels[scene_detect_method][0]
+                scene_detect_download_file = sceneChangeModels[scene_detect_method][1]
+                dm_scene = DownloadModel(
+                    modelFile=scene_detect_model_file,
+                    downloadModelFile=scene_detect_download_file,
+                )
+                if not dm_scene.downloadModel():
+                    NotificationOverlay(
+                        "Unable to download scene detection model, please check your network and try again.",
+                        self,
+                        timeout=1500,
+                    )
+                    return 1
             if not dm.downloadModel():
                 NotificationOverlay(
                     "Unable to download model, please check your network and try again.",
@@ -601,6 +617,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             denoiseModelFile=denoiseModelFile,
             decompressModelFile=decompressModelFile,
             interpolateModelFile=interpolateModelFile,
+            sceneChangeModelFile=scene_detect_model_file,
             hdrMode=hdrmode,
             overrideUpscaleScale=upscaleTimes,
             encoderCommand=self.EncoderCommand.text(),

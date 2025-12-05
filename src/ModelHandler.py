@@ -606,7 +606,14 @@ onnxUpscaleModels = {
         "SPAN",
     ),
 }
-
+pytorchSceneChangeModels = {
+    "sudo_maxxvit": (
+        "sudo_maxxvit_scenedetect.pt",
+        "sudo_maxxvit_scenedetect.pt",
+        1,
+        "sudo_maxxvit",
+    )
+}
 
 
 
@@ -656,18 +663,21 @@ def getModels(backend:str):
             deblurModels = ncnnDeblurModels
             denoiseModels = ncnnDenoiseModels
             decompressModels = ncnnDecompressModels
+            sceneChangeModels = {}
         case "pytorch":
             interpolateModels = pytorchInterpolateModels
             upscaleModels = pytorchUpscaleModels
             deblurModels = pytorchDeblurModels
             denoiseModels = pytorchDenoiseModels
             decompressModels = pytorchDecompressModels
+            sceneChangeModels = pytorchSceneChangeModels
         case "tensorrt":
             interpolateModels = tensorrtInterpolateModels
             upscaleModels = tensorrtUpscaleModels
             deblurModels = tensorrtDeblurModels
             denoiseModels = tensorrtDenoiseModels
             decompressModels = tensorrtDecompressModels
+            sceneChangeModels = pytorchSceneChangeModels
         case "directml":
             interpolateModels = onnxInterpolateModels
             upscaleModels = onnxUpscaleModels
@@ -678,7 +688,7 @@ def getModels(backend:str):
             )
             errorAndLog("Failed to import any backends!")
             return {}
-    return interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels
+    return interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, sceneChangeModels
 
 def getModelDisplayName(model: str):
     try:

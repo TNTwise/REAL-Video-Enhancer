@@ -69,6 +69,7 @@ class Render:
         interpolateModel=None,
         interpolateFactor: int = 1,
         extraRestorationModels=None,
+        sceneDetectModel: str = None,
         tile_size=None,
         drba=False,
         # ffmpeg settings
@@ -119,6 +120,7 @@ class Render:
         self.upscaleOption = None
         self.isPaused = False
         self.drba = drba
+        self.sceneDetectModelPath = sceneDetectModel
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
@@ -474,6 +476,10 @@ class Render:
             sceneChangeSensitivity=self.sceneDetectSensitivty,
             width=self.width,
             height=self.height,
+            model_path=self.sceneDetectModelPath,
+            model_backend=self.backend,
+            model_dtype=self.precision,
+            model_device=self.device,
         )
         if self.sceneDetectMethod != "none":
             log("Scene Detection Enabled")

@@ -81,7 +81,7 @@ class ProcessTab:
         returns
         the current models available given a method (interpolate, upscale) and a backend (ncnn, tensorrt, pytorch)
         """
-        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels = getModels(backend)
+        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, _ = getModels(backend)
         self.parent.interpolateModelComboBox.clear()
         self.parent.upscaleModelComboBox.clear()
         self.parent.deblurModelComboBox.clear()
@@ -630,6 +630,14 @@ class ProcessTab:
                 "--scene_detect_threshold",
                 self.settings.settings["scene_change_detection_threshold"],
             ]
+            if renderOptions.sceneChangeModelFile:
+                command += [
+                    "--scene_detect_model",
+                    os.path.join(
+                        MODELS_PATH,
+                        renderOptions.sceneChangeModelFile,
+                    ),
+                ]
 
         if renderOptions.benchmarkMode:
             command += ["--benchmark"]

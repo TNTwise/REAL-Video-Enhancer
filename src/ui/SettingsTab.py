@@ -430,6 +430,7 @@ class Settings:
                 "mean",
                 "mean_segmented",
                 "pyscenedetect",
+                "sudo_maxxvit",
             ),
             "scene_change_detection_enabled": ("True", "False"),
             "scene_change_detection_threshold": [
