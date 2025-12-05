@@ -12,6 +12,7 @@ class InferenceSceneChangeDetectEfficientNet:
 
     @torch.inference_mode()
     def __call__(self, frame_0: torch.Tensor, frame_1: torch.Tensor) -> bool:
+        # frame format: (C, H, W), values in [0, 1] or [0, 255]
         frame = torch.cat((frame_0, frame_1), dim=0)
         output = self.model(frame)
 

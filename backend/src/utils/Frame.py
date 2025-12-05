@@ -1,5 +1,5 @@
 from typing import Any, Optional
-from .Util import resize_image_np
+from .Util import resize_image_np, log
 _pytorch_device = None
 _pytorch_dtype = None
 _pytorch_stream = None
@@ -34,6 +34,7 @@ class Frame:
         self.hdr_mode = hdr_mode
         self.dtype = dtype
         import numpy as np
+        self.tensor_conversions = 0
         self.np = np
         self._tensor: Optional[Any] = None
         self._np: Optional[np.ndarray] = None
@@ -70,7 +71,12 @@ class Frame:
         self._np = frame
 
     # --- Lazy Getters ---
+    
     def get_frame_tensor(self) -> Any:
+        """
+        Get the frame as a torch tensor in format (1, C, H, W).
+        """
+        
         if self._tensor is None:
             if self._bytes is not None:
                 self._tensor = _torch_utils.frame_to_tensor(
@@ -91,6 +97,9 @@ class Frame:
         return self._bytes
 
     def get_frame_np(self) -> Any:
+        """
+        Get the frame as a numpy array in format (H, W, C).
+        """
         if self._np is None:
             if self._tensor is not None:
                 self._np = _torch_utils.tensor_to_np(self._tensor)

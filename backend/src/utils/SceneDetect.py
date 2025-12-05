@@ -207,7 +207,7 @@ class PySceneDetect(BaseDetector):
         self.frameNum = 0
 
     def sceneDetect(self, frame: Frame):
-        frame = frame.clone().resize_frame(320, 180).get_frame_np()
+        frame = frame.clone().resize_frame(256, 256).get_frame_np()
         frameList = self.detector.process_frame(self.frameNum, frame)
         self.frameNum += 1
         if len(frameList) > 0:
@@ -243,16 +243,13 @@ class PyTorchSudoSceneDetect(ModelDetector):
 
 class NCNNSudoSceneDetect(ModelDetector):
     def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu"):
-        from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
-        import torch
-        self.torch = torch
-        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold)
+        from ..ncnn.NCNNEfficientNetSC import InferenceSceneChangeDetectEfficientNetNCNN
+        self.model = InferenceSceneChangeDetectEfficientNetNCNN(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device)
         self.i0 = None
     def sceneDetect(self, frame: Frame):
-        frame = frame.clone().resize_frame(256,256).get_frame_tensor().squeeze(0)
+        frame = frame.clone().resize_frame(256,256).get_frame_np()
         if self.i0 is None:
             self.i0 = frame
-            self.model.model.to(dtype=frame.dtype, device=frame.device)
             return False
         out = self.model(self.i0, frame)
         self.i0 = frame

@@ -612,6 +612,12 @@ pytorchSceneChangeModels = {
         "sudo_maxxvit_scenedetect.pt",
         1,
         "sudo_maxxvit",
+    ),
+    "sudo_efficientnet": (
+        "sudo_efficientnet_scenedetect.pt",
+        "sudo_efficientnet_scenedetect.pt",
+        1,
+        "sudo_efficientnet",
     )
 }
 
