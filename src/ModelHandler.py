@@ -620,6 +620,14 @@ pytorchSceneChangeModels = {
         "sudo_efficientnet",
     )
 }
+ncnnSceneChangeModels = {
+    "sudo_efficientnet": (
+        "sudo_efficientnet_scenedetect",
+        "sudo_efficientnet_scenedetect.tar.gz",
+        1,
+        "sudo_efficientnet",
+    )
+}
 
 
 
@@ -669,7 +677,7 @@ def getModels(backend:str):
             deblurModels = ncnnDeblurModels
             denoiseModels = ncnnDenoiseModels
             decompressModels = ncnnDecompressModels
-            sceneChangeModels = {}
+            sceneChangeModels = ncnnSceneChangeModels
         case "pytorch":
             interpolateModels = pytorchInterpolateModels
             upscaleModels = pytorchUpscaleModels

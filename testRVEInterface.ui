@@ -2391,7 +2391,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>438</width>
+                                   <width>453</width>
                                    <height>520</height>
                                   </rect>
                                  </property>
@@ -3349,8 +3349,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>373</width>
-                                <height>379</height>
+                                <width>380</width>
+                                <height>389</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -4572,7 +4572,7 @@ QTabWidget::pane { /* The tab widget frame */
                                   </item>
                                   <item>
                                    <property name="text">
-                                    <string>sudo_maxxvit</string>
+                                    <string>sudo_efficientnet</string>
                                    </property>
                                   </item>
                                   <item>
@@ -5640,7 +5640,7 @@ color: red;
                       <x>0</x>
                       <y>0</y>
                       <width>928</width>
-                      <height>291</height>
+                      <height>377</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
