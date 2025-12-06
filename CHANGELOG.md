@@ -3,6 +3,7 @@
  - AnimeSR
  - More encoding options.
  - Auto select best backend based on model and hardware.
+ - Sudo Scene detect Models
 ### Fixed
  - Random crash after rendering a few times.
 ### Changed

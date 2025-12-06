@@ -157,7 +157,7 @@ python3 build.py --build BUILD_OPTION --copy_backend
 | Person | For | Link |
 |--|--|--|
 | NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ 
-| Styler00dollar | RIFE ncnn models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar 
+| Styler00dollar | RIFE ncnn models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span, and Scene Detect Models | https://github.com/styler00dollar 
 | HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ 
 | Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ 
 

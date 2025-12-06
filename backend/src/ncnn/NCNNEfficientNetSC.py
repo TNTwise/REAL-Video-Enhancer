@@ -7,7 +7,7 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
     Takes numpy arrays as inputs instead of torch tensors.
     """
 
-    def __init__(self, threshold=0.3, model_path="", model_dtype="float32", model_device="cpu"):
+    def __init__(self, threshold=0.3, model_path="", model_dtype="float32", model_device="cpu", model_gpu_id=0):
         """
         Initialize the NCNN scene change detector.
 
@@ -28,6 +28,8 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         self.net = ncnn.Net()
         # Enable Vulkan if available for GPU acceleration
         self.net.opt.use_vulkan_compute = True
+
+        self.net.set_vulkan_device(model_gpu_id)
 
         # Load param and bin files
         # Expecting model_path to be the base path (e.g., "model" for "model.param" and "model.bin")

@@ -281,6 +281,7 @@ class SceneDetect:
         model_backend: str = "pytorch",
         model_dtype: str = "float32",
         model_device: str = "cpu",
+        model_gpu_id: int = 0,
     ):
         self.width = width
         self.height = height
@@ -301,7 +302,7 @@ class SceneDetect:
             )
         else:
             assert model_path is not None and os.path.exists(model_path),  "Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter"
-            model = PyTorchSudoSceneDetect if model_backend == "pytorch" else NCNNSudoSceneDetect
+            model = PyTorchSudoSceneDetect if model_backend == "pytorch" or model_backend == "tensorrt" else NCNNSudoSceneDetect
             self.detector: ModelDetector = model(
                 threshold=sceneChangeSensitivity,
                 model_path=model_path,

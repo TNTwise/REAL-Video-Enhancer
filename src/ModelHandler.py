@@ -613,15 +613,15 @@ pytorchSceneChangeModels = {
         1,
         "sudo_maxxvit",
     ),
-    "sudo_efficientnet": (
-        "sudo_efficientnet_scenedetect.pt",
-        "sudo_efficientnet_scenedetect.pt",
+    "sudo_scene_detect": ( # efficientnet doesnt work too well, so im gonna use maxxvit until i figure out efficientnet issues
+        "sudo_maxxvit_scenedetect.pt",
+        "sudo_maxxvit_scenedetect.pt",
         1,
         "sudo_efficientnet",
     )
 }
 ncnnSceneChangeModels = {
-    "sudo_efficientnet": (
+    "sudo_scene_detect": (
         "sudo_efficientnet_scenedetect",
         "sudo_efficientnet_scenedetect.tar.gz",
         1,

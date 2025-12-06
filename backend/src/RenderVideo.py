@@ -480,6 +480,7 @@ class Render:
             model_backend=self.backend,
             model_dtype=self.precision,
             model_device=self.device,
+            model_gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
         )
         if self.sceneDetectMethod != "none":
             log("Scene Detection Enabled")

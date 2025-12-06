@@ -382,7 +382,7 @@ class Settings:
             "audio_encoder": "copy_audio",
             "audio_bitrate": "192k",
             "preview_enabled": "True",
-            "scene_change_detection_method": "pyscenedetect",
+            "scene_change_detection_method": "sudo_scene_detect",
             "scene_change_detection_enabled": "True",
             "scene_change_detection_threshold": "3.5",
             "discord_rich_presence": "False",
@@ -430,7 +430,7 @@ class Settings:
                 "mean",
                 "mean_segmented",
                 "pyscenedetect",
-                "sudo_efficientnet",
+                "sudo_scene_detect",
             ),
             "scene_change_detection_enabled": ("True", "False"),
             "scene_change_detection_threshold": [

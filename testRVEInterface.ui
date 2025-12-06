@@ -1098,7 +1098,7 @@ background-color:#343b47
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>470</width>
+                                   <width>373</width>
                                    <height>1040</height>
                                   </rect>
                                  </property>
@@ -4572,7 +4572,7 @@ QTabWidget::pane { /* The tab widget frame */
                                   </item>
                                   <item>
                                    <property name="text">
-                                    <string>sudo_efficientnet</string>
+                                    <string>sudo_scene_detect</string>
                                    </property>
                                   </item>
                                   <item>
@@ -5640,7 +5640,7 @@ color: red;
                       <x>0</x>
                       <y>0</y>
                       <width>928</width>
-                      <height>377</height>
+                      <height>302</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
