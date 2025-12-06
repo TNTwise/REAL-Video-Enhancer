@@ -370,7 +370,7 @@ class DownloadDependencies:
                 deps += [
                     "rife-ncnn-vulkan-python-tntwise==1.4.5",
                     "upscale_ncnn_py==1.2.0",
-                    "ncnn==1.0.20240820",
+                    "ncnn==1.0.20250916",
                     "numpy==2.2.2",
                 ]
                 return_code = self.pip(deps, install)

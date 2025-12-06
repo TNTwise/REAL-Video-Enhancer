@@ -15,6 +15,7 @@ class InferenceSceneChangeDetectEfficientNet:
         # frame format: (C, H, W), values in [0, 1] or [0, 255]
         frame = torch.cat((frame_0, frame_1), dim=0)
         output = self.model(frame)
-
+        if output[0][0] > self.threshold:
+            print(f"Scene change detected with confidence {output[0][0]:.4f}")
         # Return True if scene change detected, else False
         return output[0][0] > self.threshold 

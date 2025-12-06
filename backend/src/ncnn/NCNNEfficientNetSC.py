@@ -22,6 +22,8 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         self.threshold = threshold * 0.1
         self.ncnn = ncnn
 
+        self.debug = False
+
         # Load NCNN model
         self.net = ncnn.Net()
         # Enable Vulkan if available for GPU acceleration
@@ -65,7 +67,6 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         if frame.shape[0] != 256 or frame.shape[1] != 256:
             
             frame = cv2.resize(frame, (256, 256), interpolation=cv2.INTER_LINEAR)
-        cv2.imwrite("debug_frame.png", (frame * 255).astype(np.uint8))
         # Convert to NCNN Mat (expects H, W, C format with contiguous memory)
         frame = np.ascontiguousarray(frame)
 
@@ -77,6 +78,9 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
             frame.shape[1],  # width
             frame.shape[0],  # height
         )
+        mean_vals = []
+        norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
+        mat.substract_mean_normalize(mean_vals, norm_vals)
         
         return mat
 
@@ -115,7 +119,17 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         # Create combined mat - ncnn expects (C, H, W) so we reshape accordingly
         # For a model expecting batch of 2: we treat it as 6 channels
         combined_flat = combined.reshape(-1, h, w).astype(np.float32)
-        combined_mat = self.ncnn.Mat(combined_flat)
+        
+        if self.debug:
+            np.save("debug_combined_input.npy", combined_flat)
+            # visualize channels 0-2 (first frame) and 3-5 (second frame)
+            vis0 = np.transpose(combined_flat[:3], (1, 2, 0))
+            vis1 = np.transpose(combined_flat[3:6], (1, 2, 0))
+            cv2.imwrite("debug_input_frame0.png", np.clip(vis0 * 255, 0, 255).astype(np.uint8))
+            cv2.imwrite("debug_input_frame1.png", np.clip(vis1 * 255, 0, 255).astype(np.uint8))
+            print("input stats:", combined_flat.min(), combined_flat.max(), combined_flat.mean())
+
+        combined_mat = self.ncnn.Mat(combined_flat) 
 
         ex.input(self.input_name, combined_mat)
 
@@ -127,8 +141,6 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
             return False
 
         # Get output value
+        
         output = np.array(output_mat)
-        if output.flat[0]*10*10*10*10*10 > self.threshold:
-            print(f"Scene change detected with score: {output.flat[0]}")
-        # Return True if scene change detected
-        return output.flat[0] *10*10*10*10*10 > self.threshold
+        return output[0] > self.threshold
