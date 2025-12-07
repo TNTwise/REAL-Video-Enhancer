@@ -291,10 +291,13 @@ class UpscalePytorch:
     
     @torch.inference_mode()
     def __call__(self, image: Frame) -> Frame:
+        dtype = image.dtype
+        gpu_id = image.gpu_id
+        device = image.device
         with self.torchUtils.run_stream(self.f2tstream):  # type: ignore
             image_tensor = image.get_frame_tensor()
+        del image
         self.torchUtils.sync_stream(self.f2tstream)
-        
         with self.torchUtils.run_stream(self.stream):
             while self.upscale_model_wrapper is None:
                 sleep(1)
@@ -303,7 +306,9 @@ class UpscalePytorch:
             else:
                 output = self.renderTiledImage(image_tensor)
             
-            retFrame = Frame(self.backend, self.videoWidth * self.scale, self.videoHeight * self.scale, image.device, gpu_id=image.gpu_id, hdr_mode=self.hdr_mode, dtype=image.dtype)
+            
+            retFrame = Frame(self.backend, self.videoWidth * self.scale, self.videoHeight * self.scale, device=device, gpu_id=gpu_id, hdr_mode=self.hdr_mode, dtype=dtype)
+            
             retFrame.set_frame_tensor(output)
         
         self.torchUtils.sync_stream(self.stream)

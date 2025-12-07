@@ -320,7 +320,8 @@ class Render:
         profiler = Profiler()
         profiler.start()
         """
-
+       
+        
         while True:
             if not self.informationHandler.get_is_paused():
                 frame = self.readBuffer.get()
@@ -378,6 +379,7 @@ class Render:
             else:
                 sleep(1)
         self.writeBuffer.writeQueue.put(None)
+
         """
         tracer.stop()
         tracer.save()

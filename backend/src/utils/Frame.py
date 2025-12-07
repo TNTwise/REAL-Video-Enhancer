@@ -1,4 +1,8 @@
 from typing import Any, Optional
+try:
+    import numpy as np
+except ImportError:
+    pass
 from .Util import resize_image_np, log
 _pytorch_device = None
 _pytorch_dtype = None
@@ -22,6 +26,7 @@ def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
         _pytorch_stream = _torch_utils.init_stream(gpu_id=gpu_id)
         _pytorch_device = _torch_utils.handle_device(device, gpu_id)
         _pytorch_dtype = _torch_utils.handle_precision(dtype)
+        print("Initialized Frame PyTorch utils")
 
 
 class Frame:
@@ -33,9 +38,8 @@ class Frame:
         self.device = device
         self.hdr_mode = hdr_mode
         self.dtype = dtype
-        import numpy as np
+        
         self.tensor_conversions = 0
-        self.np = np
         self._tensor: Optional[Any] = None
         self._np: Optional[np.ndarray] = None
         self._bytes: Optional[bytes] = None
@@ -68,7 +72,7 @@ class Frame:
         self._tensor = frame
 
     def set_frame_np(self, frame: Any):
-        if not isinstance(frame, self.np.ndarray):
+        if not isinstance(frame, np.ndarray):
             raise TypeError(f"Expected np.ndarray, got {type(frame).__name__}")
         self._invalidate_cache("np")
         self._np = frame
@@ -126,7 +130,7 @@ class Frame:
         # Assuming raw RGB/BGR bytes
         channels = 3
         
-        return self.np.frombuffer(data, dtype=self.np.uint8 if not self.hdr_mode else self.np.uint16).reshape(
+        return np.frombuffer(data, dtype=np.uint8 if not self.hdr_mode else np.uint16).reshape(
             self.height, self.width, int(channels)
         )
 
@@ -160,7 +164,7 @@ class Frame:
         np_frame = self.get_frame_np()
         if self.hdr_mode:
             # Convert from HDR (uint16) to SDR (uint8)
-            np_frame = (self.np.clip(np_frame.astype(self.np.float32) / 65535.0, 0, 1) * 255).astype(self.np.uint8)
+            np_frame = (np.clip(np_frame.astype(np.float32) / 65535.0, 0, 1) * 255).astype(np.uint8)
         return np_frame
 
     
