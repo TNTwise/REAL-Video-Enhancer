@@ -57,18 +57,11 @@ class UpscaleModelWrapper:
         dummy_input.append(height)
         dummy_input.append(width)
         return torch.zeros(dummy_input, dtype=self.__precision, device=self.__device)
+    
     @torch.inference_mode()
     def load_model(self, model=None) -> torch.nn.Module:
         if not model:
             from .spandrel import ModelLoader, ImageModelDescriptor, UnsupportedModelError
-            model = ModelLoader().load_from_file(self.__model_path)
-            assert isinstance(model, ImageModelDescriptor)
-            self.__scale = model.scale
-            model = model.model
-            self.__model = model
-            self.inference_helper = self.__model
-            self.__dummy_input_pre_channels = [1]
-            self.__inference_mode = 'spandrel'
             try:
                 model = ModelLoader().load_from_file(self.__model_path)
                 assert isinstance(model, ImageModelDescriptor)
