@@ -133,72 +133,6 @@ class NPMeanDiffSCDetect(BaseDetector):
         return False
 
 
-class FFMPEGSceneDetect(BaseDetector):
-    def __init__(self, threshold=0.3, min_scene_length=1, history_size=30):
-        self.threshold = threshold / 10
-        self.min_scene_length = min_scene_length
-        self.history_size = history_size
-        self.frame_diffs = deque(maxlen=history_size)
-        self.hist_diffs = deque(maxlen=history_size)
-        self.prev_frame = None
-        self.frames_since_last_scene = 0
-
-    def compute_frame_difference(self, frame1, frame2):
-        # Convert to YUV color space
-        yuv1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2YUV)
-        yuv2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2YUV)
-
-        # Compute difference in Y (luminance) channel
-        diff_y = cv2.absdiff(yuv1[:, :, 0], yuv2[:, :, 0])
-
-        # Compute histogram difference
-        hist1 = cv2.calcHist([yuv1], [0], None, [256], [0, 256])
-        hist2 = cv2.calcHist([yuv2], [0], None, [256], [0, 256])
-        hist_diff = cv2.compareHist(hist1, hist2, cv2.HISTCMP_BHATTACHARYYA)
-
-        return np.mean(diff_y), hist_diff
-
-    def sceneDetect(self, frame):
-        frame = frame.get_frame_np()
-        if self.prev_frame is None:
-            self.prev_frame = frame
-            return False
-
-        diff_y, hist_diff = self.compute_frame_difference(self.prev_frame, frame)
-        self.frame_diffs.append(diff_y)
-        self.hist_diffs.append(hist_diff)
-
-        self.prev_frame = frame
-        self.frames_since_last_scene += 1
-
-        if len(self.frame_diffs) < self.history_size:
-            return False
-
-        # Combine frame and histogram differences
-        combined_diff = np.array(self.frame_diffs) * np.array(self.hist_diffs)
-
-        # Normalize the differences
-        normalized_diff = (combined_diff - np.min(combined_diff)) / (
-            np.max(combined_diff) - np.min(combined_diff)
-        )
-
-        # Apply moving average filter
-        window_size = 5
-        smoothed_diff = np.convolve(
-            normalized_diff, np.ones(window_size) / window_size, mode="valid"
-        )
-
-        # Check if the latest smoothed difference exceeds the threshold
-        if (
-            smoothed_diff[-1] > self.threshold
-            and self.frames_since_last_scene >= self.min_scene_length
-        ):
-            self.frames_since_last_scene = 0
-            return True
-
-        return False
-
-
 class PySceneDetect(BaseDetector):
     def __init__(self, threshold=2):
         self.detector = ContentDetector(
@@ -207,7 +141,7 @@ class PySceneDetect(BaseDetector):
         self.frameNum = 0
 
     def sceneDetect(self, frame: Frame):
-        frame = frame.clone().resize_frame(256, 256).get_frame_np()
+        frame = cv2.resize(frame.get_np_sdr(), (640, 360))
         frameList = self.detector.process_frame(self.frameNum, frame)
         self.frameNum += 1
         if len(frameList) > 0:
@@ -290,7 +224,6 @@ class SceneDetect:
             "mean": NPMeanSCDetect,
             "mean_diff": NPMeanDiffSCDetect,
             "mean_segmented": NPMeanSegmentedSCDetect,
-            "ffmpeg": FFMPEGSceneDetect,
             "pyscenedetect": PySceneDetect,
             "none": BaseDetector,
         }

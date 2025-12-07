@@ -59,6 +59,7 @@ class FFmpegRead(Buffer):
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
         self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
+        self.yuv420pMOD = False
         #self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6

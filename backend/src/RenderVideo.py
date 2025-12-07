@@ -348,14 +348,13 @@ class Render:
                                 interpolated_frame
                             )
                         if self.override_upscale_scale:
-                            interpolated_frame = resize_image_bytes(interpolated_frame.get_frame_bytes(),
-                                               width=self.width*self.modelScale,
-                                               height=self.height*self.modelScale,
-                                               target_width=self.width*self.override_upscale_scale,
-                                               target_height=self.height*self.override_upscale_scale,)
-                        self.informationHandler.setPreviewFrame(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
+                            interpolated_frame._invalidate_cache("bytes")
+                            interpolated_frame = interpolated_frame.resize_frame(self.width*self.override_upscale_scale,
+                                               self.height*self.override_upscale_scale)
+                            
+                        self.informationHandler.setPreviewFrame(interpolated_frame.get_frame_bytes(clear_cache=True))
                         self.informationHandler.setFramesRendered(frames_rendered)
-                        self.writeBuffer.writeQueue.put(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
+                        self.writeBuffer.writeQueue.put(interpolated_frame.get_frame_bytes(clear_cache=True))
                 
                 
 
@@ -367,17 +366,14 @@ class Render:
                 
                 
                 if self.override_upscale_scale:
-                    frame = resize_image_bytes(frame.get_frame_bytes(),
-                                               width=self.width*self.modelScale,
-                                               height=self.height*self.modelScale,
-                                               target_width=self.width*self.override_upscale_scale,
-                                               target_height=self.height*self.override_upscale_scale,)
-
+                    frame._invalidate_cache("bytes")
+                    frame = frame.resize_frame(self.width*self.override_upscale_scale,
+                                               self.height*self.override_upscale_scale)
                 
                 self.informationHandler.setFramesRendered(frames_rendered)
-                self.informationHandler.setPreviewFrame(frame.get_frame_bytes() if type(frame) != bytes else frame)
+                self.informationHandler.setPreviewFrame(frame.get_frame_bytes(clear_cache=True))
                 
-                self.writeBuffer.writeQueue.put(frame.get_frame_bytes() if type(frame) != bytes else frame)
+                self.writeBuffer.writeQueue.put(frame.get_frame_bytes(clear_cache=True))
                 frames_rendered += int(self.ceilInterpolateFactor)
             else:
                 sleep(1)

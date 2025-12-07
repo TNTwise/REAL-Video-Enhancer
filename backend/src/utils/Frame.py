@@ -46,10 +46,13 @@ class Frame:
     def _invalidate_cache(self, keep: str):
         """Clear cached representations except the one being set."""
         if keep != "tensor":
+            del self._tensor
             self._tensor = None
         if keep != "np":
+            del self._np
             self._np = None
         if keep != "bytes":
+            del self._bytes
             self._bytes = None
 
     def set_frame_bytes(self, frame: bytes):
@@ -72,7 +75,7 @@ class Frame:
 
     # --- Lazy Getters ---
     
-    def get_frame_tensor(self) -> Any:
+    def get_frame_tensor(self, clear_cache:bool =False) -> Any:
         """
         Get the frame as a torch tensor in format (1, C, H, W).
         """
@@ -86,33 +89,45 @@ class Frame:
                 self._tensor = _torch_utils.np_to_tensor(
                     self._np, _pytorch_device, _pytorch_dtype
                 )
+        if clear_cache:
+            self._invalidate_cache("tensor")
+            
         return self._tensor
 
-    def get_frame_bytes(self) -> bytes:
+    def get_frame_bytes(self, clear_cache: bool = False) -> bytes:
         if self._bytes is None:
             if self._tensor is not None:
                 self._bytes = _torch_utils.tensor_to_frame(self._tensor)
             elif self._np is not None:
                 self._bytes = self._np_to_bytes(self._np)
+
+        if clear_cache:
+            self._invalidate_cache("bytes")
+
         return self._bytes
 
-    def get_frame_np(self) -> Any:
+    def get_frame_np(self, clear_cache: bool = False) -> Any:
         """
         Get the frame as a numpy array in format (H, W, C).
         """
         if self._np is None:
             if self._tensor is not None:
                 self._np = _torch_utils.tensor_to_np(self._tensor)
+                
             elif self._bytes is not None:
                 self._np = self._bytes_to_np(self._bytes)
+
+        if clear_cache:
+            self._invalidate_cache("np")
         return self._np
 
     # --- Conversion helpers ---
     def _bytes_to_np(self, data: bytes) -> Any:
         # Assuming raw RGB/BGR bytes
-        channels = 6 if self.hdr_mode else 3
+        channels = 3
+        
         return self.np.frombuffer(data, dtype=self.np.uint8 if not self.hdr_mode else self.np.uint16).reshape(
-            self.height, self.width, channels
+            self.height, self.width, int(channels)
         )
 
     def _np_to_bytes(self, arr: Any) -> bytes:
@@ -137,6 +152,18 @@ class Frame:
         self.width = new_width
         self.height = new_height
         return self
+    
+    def get_np_sdr(self):
+        """
+        Get the frame as a numpy array in SDR format (H, W, C) with dtype uint8.
+        """
+        np_frame = self.get_frame_np()
+        if self.hdr_mode:
+            # Convert from HDR (uint16) to SDR (uint8)
+            np_frame = (self.np.clip(np_frame.astype(self.np.float32) / 65535.0, 0, 1) * 255).astype(self.np.uint8)
+        return np_frame
+
+    
     def clone(self) -> "Frame":
         new_frame = Frame(
             backend=self.backend,
