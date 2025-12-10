@@ -159,8 +159,7 @@ class TorchTensorRTHandler:
         )
         
         with suppress_stdout_stderr():
-            #exported_program = nnmodule_to_dynamo(model, example_inputs, dynamic_shapes=dynamic_shapes)
-            exported_program = model
+            exported_program = nnmodule_to_dynamo(model, example_inputs, dynamic_shapes=dynamic_shapes)
             TorchUtils.clear_cache()
 
             exported_program = self.grid_sample_decomp(exported_program)
