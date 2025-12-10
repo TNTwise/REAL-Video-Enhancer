@@ -155,11 +155,11 @@ class PySceneDetect(BaseDetector):
         return len(frameList) > 0
 
 class PyTorchSudoSceneDetect(ModelDetector):
-    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu"):
+    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", model_backend="pytorch", model_gpu_id=0, **kwargs):
         from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
         import torch
         self.torch = torch
-        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device)
+        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device, model_backend=model_backend)
         self.i0 = None
     def sceneDetect(self, frame: Frame):
         frame = self.torch.nn.functional.interpolate(frame.get_frame_tensor(), 
@@ -176,7 +176,7 @@ class PyTorchSudoSceneDetect(ModelDetector):
         return out
 
 class NCNNSudoSceneDetect(ModelDetector):
-    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu"):
+    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", **kwargs):
         from ..ncnn.NCNNEfficientNetSC import InferenceSceneChangeDetectEfficientNetNCNN
         self.model = InferenceSceneChangeDetectEfficientNetNCNN(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device)
         self.i0 = None
@@ -240,7 +240,9 @@ class SceneDetect:
                 threshold=sceneChangeSensitivity,
                 model_path=model_path,
                 model_dtype=model_dtype,
-                model_device=model_device
+                model_device=model_device,
+                model_backend=model_backend,
+                model_gpu_id=model_gpu_id,
             )
 
     def detect(self, frame: Frame) -> bool:

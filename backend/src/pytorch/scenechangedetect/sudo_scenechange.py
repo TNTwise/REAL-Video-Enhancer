@@ -52,10 +52,10 @@ dummy_input = torch.rand(6, 256, 256).cuda()
 netD.cuda()
 res = netD(dummy_input)  # Call forward method with dummy input
 print(res)
-print(netD.code)
 # Export the model to ONNX format
 with torch.no_grad():
-    torch.jit.trace(netD, dummy_input).save("sudo_efficientnet_scenedetect.pt")
+    exported = torch.export.export(netD, (dummy_input,))
+    torch.export.save(exported, "sudo_efficientnet_scenedetect.pt2")
     dynamic_axes = {
         "input": {0: "batch_size", 2: "width", 3: "height"},
         "output": {0: "batch_size"}
