@@ -66,10 +66,12 @@ class Frame:
         self._bytes = frame
 
     def set_frame_tensor(self, frame: Any):
+        # might need to sync streams here
         if _torch is not None and not isinstance(frame, _torch.Tensor):
             raise TypeError(f"Expected torch.Tensor, got {type(frame).__name__}")
         self._invalidate_cache("tensor")
         self._tensor = frame
+        _torch_utils.sync_all_streams()
 
     def set_frame_np(self, frame: Any):
         if not isinstance(frame, np.ndarray):
