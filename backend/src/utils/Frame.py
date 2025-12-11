@@ -98,7 +98,7 @@ class Frame:
         if clear_cache:
             self._invalidate_cache("tensor")
             
-        return self._tensor
+        return self._tensor.clone() # this helps so the frame wont be overwritten? have to test later.
 
     def get_frame_bytes(self, clear_cache: bool = False) -> bytes:
         if self._bytes is None:
