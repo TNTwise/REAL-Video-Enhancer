@@ -149,7 +149,7 @@ jobs:
           path: REAL-Video-Enhancer-${{ env.APP_VERSION }}-Windows-Setup_x86_64.exe
 
   build-MacOS:
-    runs-on: macos-13
+    runs-on: macos-14-large
     permissions: write-all  
     steps:
 
