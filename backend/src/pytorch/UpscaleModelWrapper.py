@@ -105,4 +105,4 @@ class UpscaleModelWrapper:
                 self.inference_helper = TemporalSPANInferenceHelper(model=model, scale=self.__scale)
     def __call__(self, *args, **kwargs):
         assert self.inference_helper is not None, "Inference helper is not initialized."
-        return self.inference_helper(*args, **kwargs)
+        return self.inference_helper(*args, **kwargs).clone()

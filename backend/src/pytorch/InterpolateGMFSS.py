@@ -176,7 +176,7 @@ class InterpolateGMFSSTorch(BaseInterpolate):
 
                     output = output[:, :, : self.height, : self.width]
                     retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
-                    retFrame.set_frame_tensor(output)
+                    retFrame.set_frame_tensor(output.clone())
                     yield retFrame
                 else:
                     self.flownet.reset_cache_after_transition()
