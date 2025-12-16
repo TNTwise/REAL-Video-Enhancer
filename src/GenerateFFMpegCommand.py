@@ -154,15 +154,7 @@ class FFMpegCommand:
                     
             case "ffv1":
                 command +=["-c:v","ffv1"]
-                match self._video_quality:
-                    case "Very_High":
-                        command +=["-level","3"]
-                    case "High":
-                        command +=["-level","4"]
-                    case "Medium":
-                        command +=["-level","5"]
-                    case "Low":
-                        command +=["-level","6"]
+                
             case "utvideo":
                 command +=["-c:v","utvideo"]
                 match self._video_quality:
