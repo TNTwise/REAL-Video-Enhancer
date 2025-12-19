@@ -102,17 +102,21 @@ QPushButton:hover{
 	background-color:#343b47;
 }
 
-QCheckBox{
-color:#fff;
-background-color:#fff;
+QCheckBox::indicator:unchecked{
+    border : 1px solid white;
+    border-radius: 2px;
+    width: 14px;
+    height: 14px;
+    left: 2px;
 }
-QCheckBox::indicator{
-border : 1px solid white;
-border-radius: 2px;
+QCheckBox::indicator:checked {
+    image: url(:/icons/icons/check-square.svg);
+    color: white;
+    border-radius: 2px;
+    width: 20px;
+    height: 20px;
 }
-QCheckBox::indicator::checked{
-background-color:white;
-}
+
 QScrollBar:vertical{
 	max-width: 8px;
 	}
@@ -288,7 +292,7 @@ QTabWidget::pane { /* The tab widget frame */
              <string notr="true"/>
             </property>
             <property name="currentIndex">
-             <number>3</number>
+             <number>2</number>
             </property>
             <widget class="QWidget" name="homePage">
              <property name="styleSheet">
@@ -546,13 +550,7 @@ QProgressBar{
 	border-radius: 10px;
 	
  }
-QCheckBox::indicator{
-border : 1px solid white;
-border-radius: 2px;
-}
-QCheckBox::indicator::checked{
-background-color:white;
-}
+
 QDoubleSpinBox{
 	background-color:#2c313c;
 	padding:5px 10px;
@@ -1098,7 +1096,7 @@ background-color:#343b47
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>373</width>
+                                   <width>470</width>
                                    <height>1040</height>
                                   </rect>
                                  </property>
@@ -1445,6 +1443,9 @@ background-color:#343b47
                                          <widget class="QCheckBox" name="interpolateCheckBox">
                                           <property name="text">
                                            <string/>
+                                          </property>
+                                          <property name="tristate">
+                                           <bool>false</bool>
                                           </property>
                                          </widget>
                                         </item>
@@ -3349,8 +3350,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>380</width>
-                                <height>389</height>
+                                <width>460</width>
+                                <height>516</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -4195,13 +4196,7 @@ QProgressBar{
 	border-radius: 10px;
 	
  }
-QCheckBox::indicator{
-border : 1px solid white;
-border-radius: 2px;
-}
-QCheckBox::indicator::checked{
-background-color:white;
-}
+
 
 Line{
 color:white;
@@ -5414,10 +5409,7 @@ background-color:#16191d
 QScrollArea{
 	background:transparent;
 }
-QCheckBox{
-color:white;
 
-}
 QLineEdit{
 background-color:#2c313c;
 border-radius: 10px;
@@ -5640,7 +5632,7 @@ color: red;
                       <x>0</x>
                       <y>0</y>
                       <width>928</width>
-                      <height>302</height>
+                      <height>377</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
