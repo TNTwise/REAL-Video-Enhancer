@@ -19,7 +19,7 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         """
         import ncnn
 
-        self.threshold = threshold * 0.1
+        self.threshold = 1 - threshold * 0.1
         self.ncnn = ncnn
 
         self.debug = False

@@ -14,7 +14,7 @@ class InferenceSceneChangeDetectEfficientNet:
                  model_device="cpu", 
                  model_backend="pytorch",
                  ):
-        self.threshold = threshold * .1
+        self.threshold = 1 - threshold * .1
         model_dtype = TorchUtils.handle_precision(model_dtype)
         model_device = TorchUtils.handle_device(model_device)
         self.model_path = model_path
