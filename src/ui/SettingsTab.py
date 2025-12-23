@@ -395,7 +395,7 @@ class Settings:
             "auto_border_cropping": "False",
             "video_container": "mkv",
             "video_pixel_format": "yuv420p",
-            "pytorch_version": "2.9.0" if PLATFORM == "darwin" else "2.8.0",
+            "pytorch_version": "2.9.0",
             "pytorch_backend": "CUDA",
             "auto_hdr_mode": "True",
         }
