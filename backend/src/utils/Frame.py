@@ -59,26 +59,28 @@ class Frame:
             del self._bytes
             self._bytes = None
 
-    def set_frame_bytes(self, frame: bytes):
+    def set_frame_bytes(self, frame: bytes) -> "Frame":
         if not isinstance(frame, bytes):
             raise TypeError(f"Expected bytes, got {type(frame).__name__}")
         self._invalidate_cache("bytes")
         self._bytes = frame
-
-    def set_frame_tensor(self, frame: Any):
+        return self
+    
+    def set_frame_tensor(self, frame: Any) -> "Frame":
         # might need to sync streams here
         if _torch is not None and not isinstance(frame, _torch.Tensor):
             raise TypeError(f"Expected torch.Tensor, got {type(frame).__name__}")
         self._invalidate_cache("tensor")
         self._tensor = frame.clone()
-        # _torch_utils.sync_all_streams()
+        _torch_utils.sync_all_streams()
+        return self
 
-    def set_frame_np(self, frame: Any):
+    def set_frame_np(self, frame: Any) -> "Frame":
         if not isinstance(frame, np.ndarray):
             raise TypeError(f"Expected np.ndarray, got {type(frame).__name__}")
         self._invalidate_cache("np")
         self._np = frame
-
+        return self
     # --- Lazy Getters ---
     
     def get_frame_tensor(self, clear_cache:bool =False) -> Any:
@@ -187,3 +189,14 @@ class Frame:
         if self._bytes is not None:
             new_frame.set_frame_bytes(self._bytes)
         return new_frame
+    
+    def get_dummy_frame(self) -> "Frame":
+        return Frame(
+            backend=self.backend,
+            width=self.width,
+            height=self.height,
+            device=self.device,
+            gpu_id=self.gpu_id,
+            hdr_mode=self.hdr_mode,
+            dtype=self.dtype,
+        )

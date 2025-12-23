@@ -485,10 +485,8 @@ class InterpolateRifeTorch(BaseInterpolate):
                                 self.tenFlow_div,
                                 self.backwarp_tenGrid,
                             )
-                    output = output[:, :, : self.height, : self.width]
-                    retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
-                    retFrame.set_frame_tensor(output.clone())
-                    yield retFrame
+                    
+                    yield img1.get_dummy_frame().set_frame_tensor(output[:, :, : self.height, : self.width])
 
                 else:
                     yield img1

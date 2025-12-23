@@ -149,7 +149,7 @@ class InterpolateIFRNetTorch(BaseInterpolate):
             )
             for frame in frames: 
                 retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
-                retFrame.set_frame_tensor(frame[:, :self.height, :self.width].clone()) 
+                retFrame.set_frame_tensor(frame[:, :self.height, :self.width]) 
                 if not transition:
                     yield retFrame
             self.torchUtils.copy_tensor(self.frame0, frame1, self.prepareStream)

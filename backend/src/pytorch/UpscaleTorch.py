@@ -298,6 +298,7 @@ class UpscalePytorch:
             image_tensor = image.get_frame_tensor()
         del image
         self.torchUtils.sync_stream(self.f2tstream)
+
         with self.torchUtils.run_stream(self.stream):
             while self.upscale_model_wrapper is None:
                 sleep(1)
@@ -305,7 +306,6 @@ class UpscalePytorch:
                 output = self.upscale_model_wrapper(image_tensor)
             else:
                 output = self.renderTiledImage(image_tensor)
-            
             
             retFrame = Frame(self.backend, self.videoWidth * self.scale, self.videoHeight * self.scale, device=device, gpu_id=gpu_id, hdr_mode=self.hdr_mode, dtype=dtype)
             
