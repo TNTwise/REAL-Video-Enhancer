@@ -294,6 +294,7 @@ class ProcessTab:
                 renderOptions.videoWidth * renderOptions.overrideUpscaleScale,
                 renderOptions.videoHeight * renderOptions.overrideUpscaleScale,
             )
+            self.workerThread.createNewSharedMemory()
             self.max_value = renderOptions.videoFrameCount * renderOptions.interpolateTimes
             command = self.build_command(renderOptions)
             log(str(command))
@@ -354,6 +355,7 @@ class ProcessTab:
             self.parent.OutputFilesListWidget.addItem(
                 renderOptions.outputPath
             )  # add the file to the list widget
+            self.workerThread.deleteSharedMemory()
 
         try:
             self.pausedSharedMemory.close()

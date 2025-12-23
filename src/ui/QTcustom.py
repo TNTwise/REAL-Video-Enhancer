@@ -240,6 +240,7 @@ class UpdateGUIThread(QThread):
     def __init__(self, parent, imagePreviewSharedMemoryID):
         super().__init__()
         self._parent = parent
+        self.shm = None
         self._stop_flag = False  # Boolean flag to control stopping
         self._mutex = QMutex()  # Atomic flag to control stopping
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
@@ -249,34 +250,33 @@ class UpdateGUIThread(QThread):
     def setOutputVideoRes(self, width, height):
         self.outputVideoHeight = height
         self.outputVideoWidth = width
+    
+    def createNewSharedMemory(self):
+        if self.outputVideoHeight and self.outputVideoWidth:
+            self.shm = shared_memory.SharedMemory(
+                name=self.imagePreviewSharedMemoryID, create=True, size = 3 * self.outputVideoHeight * self.outputVideoWidth
+            )
+        else:
+            raise ValueError("Output video resolution not set.")
+
+    def deleteSharedMemory(self):
+        if self.shm is not None:
+            self.shm.close()
+            self.shm.unlink()
+            self.shm = None
 
     def run(self):
         while True:
             with QMutexLocker(self._mutex):
                 if self._stop_flag:
+                    self.deleteSharedMemory()
                     break
             try:
-                if self.outputVideoHeight and self.outputVideoWidth:
-
-
-
-                    self.shm = shared_memory.SharedMemory(
-
-
-                        name=self.imagePreviewSharedMemoryID
-
-
-                    )
-
-
+                if self.outputVideoHeight and self.outputVideoWidth and self.shm is not None:
+                    
                     image_bytes = self.shm.buf[
-
-
                         : self.outputVideoHeight * self.outputVideoWidth * 3
-
-
                     ].tobytes()
-
 
                     expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
 
@@ -326,6 +326,7 @@ class UpdateGUIThread(QThread):
         return convert_to_Qt_format
 
     def stop(self):
+        
         with QMutexLocker(self._mutex):
             self._stop_flag = True
         

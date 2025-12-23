@@ -106,15 +106,16 @@ class InformationWriteOut:
         self.sharedMemoryChunkSize = sharedMemoryChunkSize
 
         if self.sharedMemoryID is not None:
-            try:
-                self.shm = shared_memory.SharedMemory(
-                    name=self.sharedMemoryID, create=True, size=sharedMemoryChunkSize
-                )
-            except FileExistsError:
-                log(f"Shared memory with name {self.sharedMemoryID} already exists. Connecting to it.")
-                self.shm = shared_memory.SharedMemory(
-                    name=self.sharedMemoryID
-                )
+            while True:
+                try:
+                    self.shm = shared_memory.SharedMemory(
+                        name=self.sharedMemoryID
+                    )
+                    break
+                except FileNotFoundError:
+                    log(f"Waiting for shared memory to be created: {self.sharedMemoryID}")
+                    time.sleep(0.5)
+            
         self.pausedManager = PauseManager(paused_shared_memory_id)
         self.isPaused = False
         self.stop = False
