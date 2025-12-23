@@ -437,7 +437,7 @@ class Settings:
                 str(num / 10) for num in range(1, 100)
             ],
             "discord_rich_presence": ("True", "False"),
-            "video_quality": ("Low", "Medium", "High", "Very_High"),
+            "video_quality": ("Low", "Medium", "High", "Very_High", "Ultra", "Lossless"),
             "output_folder_location": "ANY",
             "last_input_folder_location": "ANY",
             "uhd_mode": ("True", "False"),
