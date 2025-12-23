@@ -172,11 +172,8 @@ class InterpolateGIMMTorch(BaseInterpolate):
                     if torch.isnan(output).any():
                         # if there are nans in output, reload with float32 precision and process.... dumb fix but whatever
                         raise ValueError("Nans in output")
-
-                    output = output[:, :, : self.height, : self.width]
-                    retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
-                    retFrame.set_frame_tensor(output)
-                    yield retFrame
+                    
+                    yield img1.get_dummy_frame().set_frame_tensor(output[:, :, : self.height, : self.width].to(self.dtype))
 
                 else:
                     yield img1

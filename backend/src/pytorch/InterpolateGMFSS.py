@@ -172,12 +172,15 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                     while self.flownet is None:
                         sleep(1)
                     timestep = self.timestepDict[timestep]
-                    output = self.flownet.forward(self.frame0, frame1, timestep, closest_value)
 
-                    output = output[:, :, : self.height, : self.width]
-                    retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
-                    retFrame.set_frame_tensor(output)
-                    yield retFrame
+                    yield (
+                        img1
+                        .get_dummy_frame()
+                        .set_frame_tensor(
+                            self.flownet.forward(self.frame0, frame1, timestep, closest_value)
+                            [:, :, : self.height, : self.width]
+                            )
+                        )
                 else:
                     self.flownet.reset_cache_after_transition()
                     yield img1
