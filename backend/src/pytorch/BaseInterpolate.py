@@ -1,4 +1,3 @@
-
 import torch
 from abc import ABCMeta, abstractmethod
 from queue import Queue
@@ -10,11 +9,13 @@ from .UpscaleTorch import UpscalePytorch
 import logging
 import gc
 from ..utils.Util import CudaChecker
+
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
+
 
 class DynamicScale:
     def __init__(self, possible_values: dict, CompareNet: SSIM):
@@ -35,7 +36,7 @@ class BaseInterpolate(metaclass=ABCMeta):
     @abstractmethod
     def _load(self):
         """Loads in the model"""
-        self.HAS_PYTORCH_CUDA = checkForCUDAPytorch()
+        self.HAS_PYTORCH_CUDA = HAS_PYTORCH_CUDA
         self.device = torch.device("cuda")
         self.dtype = torch.float32
         self.width = 1920
@@ -50,9 +51,6 @@ class BaseInterpolate(metaclass=ABCMeta):
         self.doEncodingOnFrame = False  # set this by default
         self.hdr_mode = False
         self.CompareNet = None
-
-    
-
 
     def hotUnload(self):
         self.flownet = None
@@ -81,11 +79,7 @@ class BaseInterpolate(metaclass=ABCMeta):
     ):  # type: ignore
         """Perform processing"""
 
-
-    
     @torch.inference_mode()
     def uncacheFrame(self):
-        self.f0encode = None
+        self.f0encode = None 
         self.img0 = None
-
-    
