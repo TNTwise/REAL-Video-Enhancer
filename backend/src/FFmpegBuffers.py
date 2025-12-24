@@ -200,6 +200,7 @@ class FFmpegWrite(Buffer):
         self.subtitle_encoder = subtitle_encoder
         self.mpv_output = mpv_output
         self.hdr_mode = hdr_mode
+        self.merge_subtitles = merge_subtitles
         self.writeQueue = queue.Queue(maxsize=25)
         self.previewFrame = None
         self.framesRendered: int = 1
@@ -315,6 +316,10 @@ class FFmpegWrite(Buffer):
 
             if not self.slowmo_mode:
                 command += [
+                    # Input 1: original file for audio/subtitles.
+                    # Put timestamp hygiene flags *before* the input they apply to.
+                    "-fflags",
+                    "+genpts",
                     "-i",
                     f"{self.inputFile}",
                     "-map",
@@ -322,11 +327,19 @@ class FFmpegWrite(Buffer):
                     "-map",
                     "1:a?",
                     "-map",
-                    "1:s?", 
-                    "-fflags",
-                    "+genpts",
+                    "1:s?",
+                ]
+
+                # Output timestamp/interleave hygiene.
+                command += [
                     "-avoid_negative_ts",
                     "make_zero",
+                    "-max_interleave_delta",
+                    "0",
+                    "-muxpreload",
+                    "0",
+                    "-muxdelay",
+                    "0",
                 ]
 
                 
@@ -380,6 +393,13 @@ class FFmpegWrite(Buffer):
                     self.pixelFormat,
 
                 ]
+
+                # MP4/MOV: improve seekability by moving the moov atom to the front.
+                if self.outputFile and self.outputFileExtension.lower() in ("mp4", "mov", "m4v"):
+                    command += [
+                        "-movflags",
+                        "+faststart",
+                    ]
             command +=[
                 f"{self.outputFile}",
             ]
@@ -455,58 +475,6 @@ class FFmpegWrite(Buffer):
             return
         
         
-
-    def merge_subtitles(self):
-        if self.slowmo_mode:
-            log("Slowmo mode enabled, skipping subtitle merge.")
-            return
-
-        if not self.outputFile:
-            log("No output file specified, skipping subtitle merge.")
-            return
-        
-        if self.benchmark:
-            log("Benchmark mode enabled, skipping subtitle merge.")
-            return
-
-        temp_output = self.outputFile + "-" + str(os.getpid()) + "-temp." + self.outputFileExtension
-        
-
-        command = [
-            f"{FFMPEG_PATH}",
-            "-loglevel",
-            "error",
-            "-i",
-            self.outputFile,
-            "-i",
-            self.inputFile,
-            "-c",
-            "copy",
-            "-c:s",
-            "copy",
-            "-map",
-            "0",
-            "-map",
-            "1:s?",
-            temp_output,
-        ]
-
-        log("Merging subtitles with command: " + " ".join(command))
-
-        try:
-            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if result.returncode != 0:
-                log("Failed to merge subtitles. FFmpeg error:")
-                log(result.stderr.decode())
-                os.remove(temp_output)
-                return
-            os.remove(self.outputFile)
-            os.rename(temp_output, self.outputFile)
-            log("Subtitles merged successfully.")
-        except Exception as e:
-            log("Exception occurred while merging subtitles: " + str(e))
-            os.rename(temp_output, self.outputFile)  # Restore original file
-
 
     def onErroredExit(self):
         log("FFmpeg failed to render the video.")
