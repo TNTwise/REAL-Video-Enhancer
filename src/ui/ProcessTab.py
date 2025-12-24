@@ -303,7 +303,9 @@ class ProcessTab:
                 "stdout": subprocess.PIPE,
                 "stderr": subprocess.STDOUT,
                 "universal_newlines": True,
-
+                "text": True,                 # return str instead of bytes
+                "encoding": "utf-8",          # decode using utf-8
+                "errors": "replace",
             }
 
             if PLATFORM == "win32":
