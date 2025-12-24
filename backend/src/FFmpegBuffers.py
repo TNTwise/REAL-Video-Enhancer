@@ -321,7 +321,12 @@ class FFmpegWrite(Buffer):
                     "0:v",  # Map video stream from input 0
                     "-map",
                     "1:a?",
-
+                    "-map",
+                    "1:s?", 
+                    "-fflags",
+                    "+genpts",
+                    "-avoid_negative_ts",
+                    "make_zero",
                 ]
 
                 
@@ -439,7 +444,6 @@ class FFmpegWrite(Buffer):
             exit_code = self.writeProcess.returncode
 
             renderTime = time.time() - self.startTime
-            self.merge_subtitles()
             log(f"\nTime to complete render: {round(renderTime, 2)}")
             
         except Exception as e:
@@ -465,15 +469,15 @@ class FFmpegWrite(Buffer):
             log("Benchmark mode enabled, skipping subtitle merge.")
             return
 
-        temp_output = self.outputFile + "-" + str(os.getpid()) + "-temp.mkv"
-        os.rename(self.outputFile, temp_output)
+        temp_output = self.outputFile + "-" + str(os.getpid()) + "-temp." + self.outputFileExtension
+        
 
         command = [
             f"{FFMPEG_PATH}",
             "-loglevel",
             "error",
             "-i",
-            temp_output,
+            self.outputFile,
             "-i",
             self.inputFile,
             "-c",
@@ -484,7 +488,7 @@ class FFmpegWrite(Buffer):
             "0",
             "-map",
             "1:s?",
-            self.outputFile,
+            temp_output,
         ]
 
         log("Merging subtitles with command: " + " ".join(command))
@@ -494,10 +498,10 @@ class FFmpegWrite(Buffer):
             if result.returncode != 0:
                 log("Failed to merge subtitles. FFmpeg error:")
                 log(result.stderr.decode())
-                os.remove(self.outputFile) # Remove incomplete output file
-                os.rename(temp_output, self.outputFile)  # Restore original file
+                os.remove(temp_output)
                 return
-            os.remove(temp_output)
+            os.remove(self.outputFile)
+            os.rename(temp_output, self.outputFile)
             log("Subtitles merged successfully.")
         except Exception as e:
             log("Exception occurred while merging subtitles: " + str(e))
