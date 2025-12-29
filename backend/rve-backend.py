@@ -33,8 +33,11 @@ class HandleApplication:
 
             self.checkArguments()
 
-            from src.utils.GetFFMpeg import download_ffmpeg
-            download_ffmpeg()
+            if self.args.ffmpeg_path == None:
+                from src.utils.GetFFMpeg import download_ffmpeg
+                self.ffmpeg_path = download_ffmpeg()
+            else:
+                self.ffmpeg_path = self.args.ffmpeg_path
 
             if not self.batchProcessing():
                 buffer_str = "=" * len(str(sys.argv[0]))
@@ -141,6 +144,7 @@ class HandleApplication:
             pytorch_gpu_id=self.args.pytorch_gpu_id,
             ncnn_gpu_id=self.args.ncnn_gpu_id,
             # ffmpeg settings
+            ffmpeg_path = self.ffmpeg_path,
             start_time=self.args.start_time,
             end_time=self.args.end_time,
             overwrite=self.args.overwrite,
@@ -208,6 +212,13 @@ class HandleApplication:
             default=None,
             help="End of video to be rendered in seconds",
             type=float,
+        )
+
+        parser.add_argument(
+            "--ffmpeg_path",
+            default="./bin/ffmpeg",
+            help="Path to the ffmpeg executable",
+            type=str,
         )
 
         parser.add_argument(

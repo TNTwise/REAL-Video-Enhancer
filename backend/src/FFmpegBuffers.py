@@ -8,7 +8,7 @@ import time
 import cv2
 import numpy as np
 
-from .constants import FFMPEG_PATH, FFMPEG_LOG_FILE
+from .constants import FFMPEG_LOG_FILE
 from .utils.Util import (
     log,
     subprocess_popen_without_terminal,
@@ -40,7 +40,9 @@ class FFmpegRead(Buffer):
             color_space=None, 
             color_primaries=None, 
             color_transfer=None, 
-            input_pixel_format: str | None = None):
+            input_pixel_format: str | None = None,
+            ffmpeg_path: str = "./bin/ffmpeg",
+        ):
         
         self.inputFile = inputFile
         self.width = width
@@ -59,6 +61,7 @@ class FFmpegRead(Buffer):
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
         self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
+        self.ffmpeg_path = ffmpeg_path
         #self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
@@ -79,7 +82,7 @@ class FFmpegRead(Buffer):
     def command(self):
         
         command = [
-            f"{FFMPEG_PATH}",
+            f"{self.ffmpeg_path}",
             "-i",
             f"{self.inputFile}",
         ]
@@ -173,6 +176,7 @@ class FFmpegWrite(Buffer):
         color_space: str = None,
         color_primaries: str = None,
         color_transfer: str = None,
+        ffmpeg_path: str = "./bin/ffmpeg",
     ):
         self.inputFile = inputFile
         self.outputFile = outputFile
@@ -208,6 +212,7 @@ class FFmpegWrite(Buffer):
         self.color_space = color_space
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
+        self.ffmpeg_path = ffmpeg_path
         self.outputFPS = (
             (self.fps * self.interpolateFactor)
             if not self.slowmo_mode
@@ -232,7 +237,7 @@ class FFmpegWrite(Buffer):
     def command(self):
         if self.mpv_output:
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-loglevel",
                 "error",
                 "-framerate",
@@ -287,7 +292,7 @@ class FFmpegWrite(Buffer):
         if not self.benchmark:
             # maybe i can split this so i can just use ffmpeg normally like with vspipe
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-loglevel",
                 "error",
             ]

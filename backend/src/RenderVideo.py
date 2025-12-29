@@ -73,6 +73,7 @@ class Render:
         tile_size=None,
         drba=False,
         # ffmpeg settings
+        ffmpeg_path: str = "./bin/ffmpeg",
         start_time=None,
         end_time=None,
         custom_encoder: str = "libx264",
@@ -138,7 +139,7 @@ class Render:
         self.extraRestorationModels = []
         
 
-        videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time)
+        videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time, ffmpeg_path=ffmpeg_path)
         
         if not videoInfo.is_valid_video:
             log("Input video is not valid!")
@@ -169,7 +170,7 @@ class Render:
 
         if border_detect:  # border detect has to be put before everything, to overwrite the width and height
             print("Detecting borders", file=sys.stderr)
-            borderDetect = BorderDetect(inputFile=self.inputFile)
+            borderDetect = BorderDetect(inputFile=self.inputFile, ffmpeg_path=ffmpeg_path)
             self.width, self.height, self.borderX, self.borderY = (
                 borderDetect.getBorders()
             )
@@ -236,6 +237,7 @@ class Render:
             color_primaries=color_primaries,
             color_transfer=color_transfer,
             input_pixel_format=input_pix_fmt,
+            ffmpeg_path=ffmpeg_path,
         )
 
         self.writeBuffer = FFmpegWrite(
@@ -265,6 +267,7 @@ class Render:
             color_space=color_space,
             color_primaries=color_primaries,
             color_transfer=color_transfer,
+            ffmpeg_path=ffmpeg_path,
         )
 
         shm_mul = self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes

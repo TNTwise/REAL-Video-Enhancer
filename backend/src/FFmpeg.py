@@ -2,15 +2,12 @@ from multiprocessing import shared_memory
 import sys
 import time
 import numpy as np
-import subprocess
 
 if __name__ != "__main__":
     from .utils.Util import log, padFrame, subprocess_popen_without_terminal
-    from .constants import FFMPEG_PATH
 else:
     def log(message):
         print(message)
-    FFMPEG_PATH = "ffmpeg"  # Default to ffmpeg in PATH if not running as a module
 
 def hdr_to_sdr(hdr_frame, width, height):
     """

@@ -539,6 +539,8 @@ class ProcessTab:
             f"{self.settings.settings['pytorch_gpu_id']}",
             "--cwd",
             f"{CWD}",
+            "--ffmpeg_path",
+            f"{FFMPEG_PATH}",
 
         ]
 

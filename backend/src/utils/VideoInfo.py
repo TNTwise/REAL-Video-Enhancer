@@ -64,11 +64,9 @@ FFMPEG_COLOR_TRC = [
 ]
 
 if not __name__ == "__main__":
-    from ..constants import FFMPEG_PATH
     from .Util import log, subprocess_popen_without_terminal
 
 else:
-    FFMPEG_PATH = "./bin/ffmpeg"
     from Util import log, subprocess_popen_without_terminal
 
 class VideoInfo(ABC):
@@ -98,15 +96,16 @@ class VideoInfo(ABC):
     def get_bit_depth(self) -> int: ...
 
 class FFMpegInfoWrapper(VideoInfo):
-    def __init__(self, input_file: str):
+    def __init__(self, input_file: str, ffmpeg_path: str = "./bin/ffmpeg"):
         self.input_file = input_file
+        self.ffmpeg_path = ffmpeg_path
         self.stream_line = None
         self.stream_line_2 = None
         self._get_ffmpeg_info()
 
     def _get_ffmpeg_info(self):
         command = [
-                FFMPEG_PATH,
+                self.ffmpeg_path,
                 "-i",
                 self.input_file,
                 "-t",
@@ -240,13 +239,13 @@ class FFMpegInfoWrapper(VideoInfo):
 
 
 class OpenCVInfo(VideoInfo):
-    def __init__(self, input_file: str, start_time: Optional[float] = None, end_time: Optional[float] = None):
+    def __init__(self, input_file: str, start_time: Optional[float] = None, end_time: Optional[float] = None, ffmpeg_path: str = "./bin/ffmpeg"):
         log("Getting Input Video Properties")
         self.input_file = input_file
         self.start_time = start_time
         self.end_time = end_time
         self.cap = cv2.VideoCapture(input_file)
-        self.ffmpeg_info = FFMpegInfoWrapper(input_file)
+        self.ffmpeg_info = FFMpegInfoWrapper(input_file, ffmpeg_path=ffmpeg_path)
 
     def is_valid_video(self):
         #frame_count = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)

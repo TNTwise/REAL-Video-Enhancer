@@ -30,10 +30,6 @@ if IS_FLATPAK:
                 HOME_PATH, ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
             )
         )
-FFMPEG_PATH = (
-    os.path.join(CWD, "bin", "ffmpeg.exe")
-    if PLATFORM == "win32"
-    else os.path.join(CWD, "bin", "ffmpeg")
-)
+
 FFMPEG_LOG_FILE = os.path.join(CWD, "ffmpeg_log.txt")
 MODELS_DIRECTORY = os.path.join(CWD, "models")
