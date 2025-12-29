@@ -14,11 +14,13 @@ class DownloadTab:
         self,
         parent: QMainWindow,
         backends: list,
+        skip_info_popup: bool = False,
     ):
         self.parent = parent
         self.torch_versions:list[TorchVersion] = [version for version in TorchVersion.__subclasses__()]
         self.downloadDeps = DownloadDependencies()
         self.backends = backends
+        self.skip_info_popup = skip_info_popup
         self.applicationUpdater = ApplicationUpdater()
 
         self.has_enough_space = True
@@ -177,19 +179,6 @@ class DownloadTab:
         Returns:
         - None
         """
-        if install and ("torch" in dep.lower() or "tensorrt" in dep.lower()):
-            if PLATFORM != "darwin":
-                reply = QMessageBox.question(
-                    self.parent,
-                    "",
-                    "Old GTX cards require torch version 2.6.0.\nContinue installation?",
-                    QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                    QMessageBox.StandardButton.No,  # type: ignore
-                )
-                if reply == QMessageBox.Yes:  # type: ignore
-                    pass
-                else:
-                    return
         pytorch_ver:TorchVersion|None = None
         current_pytorch_version = self.parent.pytorch_version.currentText().split()[0]
         current_pytorch_backend = self.parent.pytorch_backend.currentText().split()[0].lower() if not pytorch_backend else pytorch_backend
@@ -217,9 +206,9 @@ class DownloadTab:
             "https://pypi.org/"
         ):  # check for network before installing
             return_code = self.downloadDeps.downloadPythonDeps(dep, pytorch_ver.torch_version, torchvision_ver, pytorch_backend.lower(), install)
-            if return_code == 0:
+            if return_code == 0 and not self.skip_info_popup:
                 RegularQTPopup(
                     "Download Complete\nPlease restart the application to apply changes."
                 )
-            else:
+            elif return_code != 0:
                 RegularQTPopup("Download Failed!\nPlease check logs for more info.")

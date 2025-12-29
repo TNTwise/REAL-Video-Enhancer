@@ -172,12 +172,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.anyBackendsInstalled = len(self.backends) > 0
         if not self.anyBackendsInstalled:
-            self.processBtn.setEnabled(False) # disable process button if no backends are available
-            self.stackedWidget.setCurrentIndex(4)
-            self.homeBtn.setChecked(False)
-            self.downloadBtn.setChecked(True)
-            self.processBtn.setToolTip("Please install at least one backend to enable processing.")
-            self.processBtn.setToolTipDuration(0)
+            reply = QMessageBox.question(
+            self,
+            "",
+            "Do you want to use automatic installation?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,  # type: ignore
+            )
+            automaticInstall = reply == QMessageBox.Yes  # type: ignore
+            if automaticInstall:
+                self.downloadTab = DownloadTab(parent=self, backends=self.backends, skip_info_popup=True)
+                self.downloadTab.installRecommended()
+                self.backends, self.fullOutput = (
+                    backendHandler.getAvailableBackends()
+                )
+                self.anyBackendsInstalled = len(self.backends) > 0
+            else:
+                self.processBtn.setEnabled(False) # disable process button if no backends are available
+                self.stackedWidget.setCurrentIndex(4)
+                self.homeBtn.setChecked(False)
+                self.downloadBtn.setChecked(True)
+                self.processBtn.setToolTip("Please install at least one backend to enable processing.")
+                self.processBtn.setToolTipDuration(0)
 
 
 
