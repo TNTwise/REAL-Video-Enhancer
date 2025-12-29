@@ -175,7 +175,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             reply = QMessageBox.question(
             self,
             "",
-            "Do you want to use automatic installation?",
+            "Do you want to use simple installation?\n(Recommended for most users)",
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,  # type: ignore
             )
