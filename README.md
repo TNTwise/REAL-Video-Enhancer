@@ -49,7 +49,7 @@
 <ul>
   <li> Windows support. <strong>!!! NOTICE !!!</strong> The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li>
   <li> Ubuntu 22.04+ support on Executable and Flatpak. (20.04 can work but is now legacy) </li>
-  <li> MacOS 14+ arm/x86 support </li>
+  <li> MacOS 15+ arm/x86 support </li>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
   <li> Preview that shows latest frame that has been rendered. </li>
