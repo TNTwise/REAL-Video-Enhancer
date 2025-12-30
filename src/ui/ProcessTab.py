@@ -387,13 +387,14 @@ class ProcessTab:
         self.parent.FPS.setText("FPS: ")
         self.parent.ETA.setText("ETA: ")
         self.parent.STATUS.setText("Status: ")
+        self.parent.renderQueue.clear()
         if self.currentRenderOptions.isPreview:
             from PySide6.QtMultimedia import QMediaPlayer
             try:
                 def onScroll(preview:QMediaPlayer, value):
                     preview.setPosition(value)
 
-                self.parent.renderQueue.clear()
+                
 
                 player = QMediaPlayer()
                 player.setSource(QUrl.fromLocalFile(self.currentRenderOptions.outputPath))
