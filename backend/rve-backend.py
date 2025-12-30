@@ -16,11 +16,16 @@ class HandleApplication:
             """from pyinstrument import Profiler
             profiler = Profiler()
             profiler.start()"""
+            if self.args.ffmpeg_path == None:
+                from src.utils.GetFFMpeg import download_ffmpeg
+                self.ffmpeg_path = download_ffmpeg()
+            else:
+                self.ffmpeg_path = self.args.ffmpeg_path
 
             from src.utils.VideoInfo import OpenCVInfo, print_video_info
             
             if self.args.print_video_info:
-                video_info = OpenCVInfo(self.args.print_video_info)
+                video_info = OpenCVInfo(self.args.print_video_info, ffmpeg_path=self.ffmpeg_path)
                 print_video_info(video_info)
                 #profiler.stop()
                 #print(profiler.output_text(unicode=True, color=True))
@@ -33,11 +38,7 @@ class HandleApplication:
 
             self.checkArguments()
 
-            if self.args.ffmpeg_path == None:
-                from src.utils.GetFFMpeg import download_ffmpeg
-                self.ffmpeg_path = download_ffmpeg()
-            else:
-                self.ffmpeg_path = self.args.ffmpeg_path
+            
 
             if not self.batchProcessing():
                 buffer_str = "=" * len(str(sys.argv[0]))

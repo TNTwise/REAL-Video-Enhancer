@@ -418,7 +418,7 @@ class FFmpegWrite(Buffer):
         else: # Benchmark mode
 
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-hide_banner",
                 "-loglevel",
                 "error",
