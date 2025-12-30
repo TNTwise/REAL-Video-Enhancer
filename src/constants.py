@@ -42,6 +42,7 @@ if not USE_LOCAL_BACKEND:
         )
 else:
     CWD = os.getcwd()
+    
 if IS_FLATPAK:
     CWD = (
         os.path.join(

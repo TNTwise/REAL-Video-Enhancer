@@ -1,6 +1,7 @@
 import subprocess
 import re
 import os
+from .constants import FFMPEG_PATH
 
 class RVEBackendWrapper:
     def __init__(self, input_file: str):
@@ -16,6 +17,8 @@ class RVEBackendWrapper:
             os.path.join(BACKEND_PATH, "rve-backend.py"),
             "--print_video_info",
             self.input_file,
+            "--ffmpeg_path",
+            f"{FFMPEG_PATH}",
         ]
 
         result = subprocess_popen_without_terminal(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE, errors="replace")
