@@ -31,7 +31,7 @@ class HandleApplication:
                 #print(profiler.output_text(unicode=True, color=True))
                 sys.exit(0)
             else:
-                video_info = OpenCVInfo(self.args.input)
+                video_info = OpenCVInfo(self.args.print_video_info, ffmpeg_path=self.ffmpeg_path)
                 print_video_info(video_info)
                 
             
