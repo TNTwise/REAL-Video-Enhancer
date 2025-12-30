@@ -272,7 +272,7 @@ class UpdateGUIThread(QThread):
                     self.deleteSharedMemory()
                     break
             try:
-                if self.outputVideoHeight and self.outputVideoWidth and self.shm is not None:
+                if self.outputVideoHeight and self.outputVideoWidth and self.shm:
                     
                     image_bytes = self.shm.buf[
                         : self.outputVideoHeight * self.outputVideoWidth * 3
@@ -303,7 +303,7 @@ class UpdateGUIThread(QThread):
 
 
                     self.latestPreviewPixmap.emit(pixmap)
-            except FileNotFoundError:
+            except (FileNotFoundError, TypeError):
                 # print("preview not available")
                 self.latestPreviewPixmap.emit(None)
                 pass

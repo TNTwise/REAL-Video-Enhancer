@@ -366,9 +366,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             scale = self.getUpscaleModelScale(upscaleModelName)
             new_bitrate = 8 if "10" not in self.settingsTab.in_pix_fmt else 10
             inputText = (
-                f"FPS: {round(self.videoFps, 0)} -> {round(self.videoFps * interpolateTimes, 0)}\n"
+                f"FPS: {round(self.videoFps, 0)} -> {round(self.videoFps * interpolateTimes, 0) if not self.sloMoModeCheckBox.isChecked() else round(self.videoFps, 0)}\n"
                 + f"Resolution: {self.videoWidth}x{self.videoHeight} -> {self.videoWidth * scale}x{self.videoHeight * scale}\n"
-                + f"Frame Count: {self.videoFrameCount} -> {int(round(self.videoFrameCount * self.interpolationMultiplierSpinBox.value(), 0))}\n"
+                + f"Frame Count: {self.videoFrameCount} -> {int(round(self.videoFrameCount * interpolateTimes, 0))}\n"
                 + f"Encoder: {self.videoEncoder} -> {self.settings.settings['encoder']}\n"
                 + f"Container: {self.videoContainer} -> {self.settings.settings['video_container']}\n"
                 + f"Color Space: {self.colorSpace} -> {self.colorSpace}\n"
@@ -381,7 +381,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.inputVideoInfoTextEdit.setText(inputText)
 
     def getInterpolationMultiplier(self, interpolateModelName):
-        if interpolateModelName == "None" or not self.interpolateCheckBox.isChecked() or self.sloMoModeCheckBox.isChecked():
+        if interpolateModelName == "None" or not self.interpolateCheckBox.isChecked():
             interpolateTimes = 1
         else:
             interpolateTimes = self.interpolationMultiplierSpinBox.value()
@@ -413,7 +413,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             denoiseModelName = self.denoiseModelComboBox.currentText()
             interpolateModelName = self.interpolateModelComboBox.currentText()
             
-            interpolateTimes = self.getInterpolationMultiplier(interpolateModelName)
+            interpolateTimes = self.getInterpolationMultiplier(interpolateModelName) if not self.sloMoModeCheckBox.isChecked() else 1
             scale = self.getUpscaleModelScale(upscaleModelName)
             container = self.settings.settings["video_container"]
 
