@@ -163,7 +163,7 @@ class ProcessTab:
         self.parent.deblurCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.denoiseCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.decompressCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)   
-
+        self.parent.sloMoModeCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)  
         self.parent.backendComboBox.currentIndexChanged.connect(
             lambda: self.populateModels(self.parent.backendComboBox.currentText())
         )
