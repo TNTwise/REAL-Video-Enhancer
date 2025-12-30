@@ -260,10 +260,13 @@ class UpdateGUIThread(QThread):
             raise ValueError("Output video resolution not set.")
 
     def deleteSharedMemory(self):
-        if self.shm is not None:
-            self.shm.close()
-            self.shm.unlink()
-            self.shm = None
+        try:
+            if self.shm is not None:
+                    self.shm.close()
+                    self.shm.unlink()
+                    self.shm = None
+        except Exception:
+            pass
 
     def run(self):
         while True:
@@ -303,7 +306,7 @@ class UpdateGUIThread(QThread):
 
 
                     self.latestPreviewPixmap.emit(pixmap)
-            except FileNotFoundError:
+            except Exception:
                 # print("preview not available")
                 self.latestPreviewPixmap.emit(None)
                 pass
