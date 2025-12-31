@@ -292,38 +292,34 @@ class UpdateGUIThread(QThread):
                     # Convert image bytes back to numpy array
 
 
-                    image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
+                    image_array = np.frombuffer(image_bytes, dtype=np.uint8 if self.channels == 3 else np.uint16).reshape(
 
 
-                        (self.outputVideoHeight, self.outputVideoWidth, self.channels)
+                        (self.outputVideoHeight, self.outputVideoWidth, 3)
 
 
                     )
-
 
                     pixmap = self.convert_cv_qt(image_array)
 
 
                     self.latestPreviewPixmap.emit(pixmap)
-            except Exception:
-                # print("preview not available")
-                self.latestPreviewPixmap.emit(None)
-                pass
-            except OSError:
-                log("Out of memory.")
+                    
+            except Exception as e:
+                log(f"Error in UpdateGUIThread: {e}")
+                
             time.sleep(0.2)
 
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         # rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
-        h, w, ch = cv_img.shape
-        bytes_per_line = ch * w
+        bytes_per_line = self.channels * self.outputVideoWidth
         convert_to_Qt_format = QtGui.QImage(
             cv_img.data,
-            w,
-            h,
+            self.outputVideoWidth,
+            self.outputVideoHeight,
             bytes_per_line,
-            QtGui.QImage.Format_RGB888,  # type: ignore
+            QtGui.QImage.Format_RGB888 if self.channels == 3 else QtGui.QImage.Format_RGB16,  # type: ignore
         )
         return convert_to_Qt_format
 

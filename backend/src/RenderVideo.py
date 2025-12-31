@@ -277,10 +277,11 @@ class Render:
         )
 
         shm_mul = self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes
+        hdr_mul = 6 if hdr_mode else 3
 
         self.informationHandler = InformationWriteOut(
             sharedMemoryID=sharedMemoryID,
-            sharedMemoryChunkSize=self.originalHeight*self.originalWidth*3*shm_mul*shm_mul,
+            sharedMemoryChunkSize=self.originalHeight*self.originalWidth*shm_mul*shm_mul*hdr_mul,
             paused_shared_memory_id=pause_shared_memory_id,
             outputWidth=self.originalWidth*shm_mul,
             outputHeight=self.originalHeight*shm_mul,
