@@ -304,7 +304,7 @@ class UpdateGUIThread(QThread):
 
 
                     self.latestPreviewPixmap.emit(pixmap)
-                    
+
             except Exception as e:
                 log(f"Error in UpdateGUIThread: {e}")
                 
@@ -319,7 +319,7 @@ class UpdateGUIThread(QThread):
             self.outputVideoWidth,
             self.outputVideoHeight,
             bytes_per_line,
-            QtGui.QImage.Format_RGB888 if self.channels == 3 else QtGui.QImage.Format_RGB16,  # type: ignore
+            QtGui.QImage.Format_RGB888
         )
         return convert_to_Qt_format
 
