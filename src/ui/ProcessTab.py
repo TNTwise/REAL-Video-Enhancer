@@ -2,7 +2,7 @@ import subprocess
 import os
 from threading import Thread
 import re
-import math
+from time import sleep
 from multiprocessing import shared_memory
 
 from PySide6 import QtGui
@@ -195,6 +195,7 @@ class ProcessTab:
         self.parent.startRenderButton.setVisible(False)
 
     def startGUIUpdate(self):
+        
         self.workerThread = UpdateGUIThread(
             parent=self,
             imagePreviewSharedMemoryID=IMAGE_SHARED_MEMORY_ID,
@@ -294,7 +295,7 @@ class ProcessTab:
                 renderOptions.videoWidth * renderOptions.overrideUpscaleScale,
                 renderOptions.videoHeight * renderOptions.overrideUpscaleScale,
             )
-            self.workerThread.createNewSharedMemory()
+            self.workerThread.createNewSharedMemory(channels=6 if renderOptions.hdrMode else 3)
             self.max_value = renderOptions.videoFrameCount * renderOptions.interpolateTimes
             command = self.build_command(renderOptions)
             log(str(command))

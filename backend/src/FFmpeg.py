@@ -9,33 +9,7 @@ else:
     def log(message):
         print(message)
 
-def hdr_to_sdr(hdr_frame, width, height):
-    """
-    Converts HDR frame (uint16) to SDR (uint8) using tone mapping
-    """
-    # Convert buffer to numpy array
-    hdr_frame = np.frombuffer(hdr_frame, dtype=np.uint16)
-    hdr_frame = hdr_frame.reshape((height, width, 3))
-    
-    # Normalize to 0-1 range
-    hdr_normalized = hdr_frame.astype(np.float32) / 65535.0
-    
-    # Apply tone mapping (Reinhard operator)
-    # This preserves details in highlights and shadows
-    L = 0.2126 * hdr_normalized[:,:,0] + 0.7152 * hdr_normalized[:,:,1] + 0.0722 * hdr_normalized[:,:,2]
-    L_white = np.max(L)  # Max luminance value
-    
-    L_tone_mapped = L * (1 + L / (L_white * L_white)) / (1 + L)
-    
-    # Scale each color channel
-    ratio = np.divide(L_tone_mapped, L, out=np.ones_like(L), where=L!=0)
-    ratio = ratio[:,:,np.newaxis]
-    sdr_normalized = hdr_normalized * ratio
-    
-    # Convert back to uint8 (0-255)
-    sdr_frame = (sdr_normalized * 255).clip(0, 255).astype(np.uint8)
-    
-    return sdr_frame.tobytes()
+
 
 
 def convertTime(remaining_time):
@@ -154,7 +128,7 @@ class InformationWriteOut:
         return f"{hours}:{minutes}:{seconds}"
 
     def setPreviewFrame(self, frame):
-        self.previewFrame = frame if not self.hdr_mode else hdr_to_sdr(frame, self.croppedOutputWidth, self.croppedOututHeight)
+        self.previewFrame = frame
 
     def setFramesRendered(self, framesRendered: int):
         self.framesRendered = framesRendered

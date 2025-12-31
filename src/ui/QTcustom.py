@@ -246,15 +246,15 @@ class UpdateGUIThread(QThread):
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
         self.outputVideoHeight = None
         self.outputVideoWidth = None
-
     def setOutputVideoRes(self, width, height):
         self.outputVideoHeight = height
         self.outputVideoWidth = width
     
-    def createNewSharedMemory(self):
+    def createNewSharedMemory(self, channels: int):
+        self.channels = channels
         if self.outputVideoHeight and self.outputVideoWidth:
             self.shm = shared_memory.SharedMemory(
-                name=self.imagePreviewSharedMemoryID, create=True, size = 3 * self.outputVideoHeight * self.outputVideoWidth
+                name=self.imagePreviewSharedMemoryID, create=True, size = self.channels * self.outputVideoHeight * self.outputVideoWidth
             )
         else:
             raise ValueError("Output video resolution not set.")
@@ -278,11 +278,10 @@ class UpdateGUIThread(QThread):
                 if self.outputVideoHeight and self.outputVideoWidth and self.shm is not None:
                     
                     image_bytes = self.shm.buf[
-                        : self.outputVideoHeight * self.outputVideoWidth * 3
+                        : self.outputVideoHeight * self.outputVideoWidth * self.channels
                     ].tobytes()
 
-                    expected_size = self.outputVideoHeight * self.outputVideoWidth * 3
-
+                    expected_size = self.outputVideoHeight * self.outputVideoWidth * self.channels
 
                     if len(image_bytes) < expected_size:
 
@@ -296,7 +295,7 @@ class UpdateGUIThread(QThread):
                     image_array = np.frombuffer(image_bytes, dtype=np.uint8).reshape(
 
 
-                        (self.outputVideoHeight, self.outputVideoWidth, 3)
+                        (self.outputVideoHeight, self.outputVideoWidth, self.channels)
 
 
                     )
