@@ -29,9 +29,8 @@ def suppress_stdout_stderr():
             os.close(old_stderr_fd)
 
 try:
-    from ..constants import CWD, PLATFORM
+    from ..constants import PLATFORM
 except ImportError:
-    CWD = os.getcwd()
     PLATFORM = sys.platform
 
 

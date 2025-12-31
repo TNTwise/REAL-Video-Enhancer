@@ -3,7 +3,6 @@ import stat
 import zipfile
 import shutil
 from .Util import log
-from ..constants import CWD
 
 class FileHandler:
     @staticmethod
@@ -12,7 +11,7 @@ class FileHandler:
         Returns the available disk space in GB.
         """
         try:
-            total, used, free = shutil.disk_usage(CWD)
+            total, used, free = shutil.disk_usage(os.getcwd())
             available_space = free / (1024**3)
             return available_space
         except Exception as e:

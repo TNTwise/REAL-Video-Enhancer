@@ -1,13 +1,9 @@
-from ..constants import CPU_ARCH, PLATFORM, CWD
+from ..constants import CPU_ARCH, PLATFORM
 import os
 import sys
 
-download_path = os.path.join(CWD, "ffmpeg")
-
-
-
-def download_ffmpeg():
-    from .FileHandler import FileHandler
+def download_ffmpeg(cwd: str = os.getcwd()) -> str | None:
+    download_path = os.path.join(cwd, "ffmpeg")
     link = "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/"
     match PLATFORM:
         case "linux":

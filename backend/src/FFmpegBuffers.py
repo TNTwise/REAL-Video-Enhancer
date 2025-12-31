@@ -8,7 +8,6 @@ import time
 import cv2
 import numpy as np
 
-from .constants import FFMPEG_LOG_FILE
 from .utils.Util import (
     log,
     subprocess_popen_without_terminal,
@@ -177,6 +176,7 @@ class FFmpegWrite(Buffer):
         color_primaries: str = None,
         color_transfer: str = None,
         ffmpeg_path: str = "./bin/ffmpeg",
+        ffmpeg_log_file: str = "ffmpeg_log.txt",
     ):
         self.inputFile = inputFile
         self.outputFile = outputFile
@@ -213,12 +213,13 @@ class FFmpegWrite(Buffer):
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
         self.ffmpeg_path = ffmpeg_path
+        self.ffmpeg_log_file = ffmpeg_log_file
         self.outputFPS = (
             (self.fps * self.interpolateFactor)
             if not self.slowmo_mode
             else self.fps
         )
-        self.ffmpeg_log = open(FFMPEG_LOG_FILE, "w", encoding='utf-8')
+        self.ffmpeg_log = open(self.ffmpeg_log_file, "w", encoding='utf-8')
         try:
             command = self.command()
             log("\nFFMPEG WRITE COMMAND: " + str(command) + "\n")
@@ -484,12 +485,12 @@ class FFmpegWrite(Buffer):
     def onErroredExit(self):
         log("FFmpeg failed to render the video.")
         try:
-            with open(FFMPEG_LOG_FILE, "r") as f:
+            with open(self.ffmpeg_log_file, "r") as f:
                 log("FULL FFMPEG LOG:")
                 for line in f.readlines():
                     log(line)
 
-            with open(FFMPEG_LOG_FILE, "r") as f:
+            with open(self.ffmpeg_log_file, "r") as f:
                 for line in f.readlines():
                     if f"[{self.outputFileExtension}" in line:
                         log(line)

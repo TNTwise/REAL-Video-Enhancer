@@ -64,6 +64,7 @@ class Render:
         precision="float16",
         pytorch_gpu_id: int = 0,
         ncnn_gpu_id: int = 0,
+        cwd: str = os.getcwd(),
         # model settings
         upscaleModel=None,
         interpolateModel=None,
@@ -138,7 +139,11 @@ class Render:
         self.trt_dynamic_shapes = trt_dynamic_shapes
         self.extraRestorationModels = []
         
-
+        if cwd:
+            log("Working Directory: " + cwd)
+        else:
+            cwd = os.getcwd()
+            log("No Working Directory specified, using current directory: " + cwd)
         videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time, ffmpeg_path=ffmpeg_path)
         
         if not videoInfo.is_valid_video:
@@ -268,6 +273,7 @@ class Render:
             color_primaries=color_primaries,
             color_transfer=color_transfer,
             ffmpeg_path=ffmpeg_path,
+            ffmpeg_log_file=os.path.join(cwd, "ffmpeg_log.txt"),
         )
 
         shm_mul = self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes

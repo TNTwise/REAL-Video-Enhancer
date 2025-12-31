@@ -144,6 +144,7 @@ class HandleApplication:
             precision=self.args.precision if self.args.device != "cpu" else "float32",
             pytorch_gpu_id=self.args.pytorch_gpu_id,
             ncnn_gpu_id=self.args.ncnn_gpu_id,
+            cwd=self.args.cwd,
             # ffmpeg settings
             ffmpeg_path = self.ffmpeg_path,
             start_time=self.args.start_time,
