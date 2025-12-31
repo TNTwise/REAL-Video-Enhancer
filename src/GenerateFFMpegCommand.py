@@ -7,6 +7,7 @@ class FFMpegCommand:
                  video_pixel_format: str,
                  audio_encoder: str,
                  audio_bitrate: str,
+                 subtitle_encoder: str,
                  hdr_mode: bool,
                  color_space: str,
                  color_primaries: str,
@@ -21,6 +22,7 @@ class FFMpegCommand:
         self._color_space = color_space
         self._color_primaries = color_primaries
         self._color_transfer = color_transfer
+        self._subtitle_encoder = subtitle_encoder
     
     def _get_video_quality(self, 
                            quality: str,
@@ -212,6 +214,18 @@ class FFMpegCommand:
         
         if self._audio_encoder != "copy_audio":
             command += ["-b:a",self._audio_bitrate]
+
+        match self._subtitle_encoder:
+            case "copy_subtitle":
+                command +=["-c:s","copy"]
+            case "srt":
+                command +=["-c:s","srt"]
+            case "ass":
+                command +=["-c:s","ass"]
+            case "webvtt":
+                command +=["-c:s","webvtt"]
+            case _:
+                command +=["-c:s","copy"]
 
         return command
 

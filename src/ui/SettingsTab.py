@@ -99,10 +99,11 @@ class SettingsTab:
             self.out_pixel_fmt,
             self.settings.settings['audio_encoder'],
             self.settings.settings['audio_bitrate'],
+            self.settings.settings['subtitle_encoder'],  
             self.hdr_mode,
             self.color_space if self.in_pix_fmt != "yuv420p" else None,
             self.color_primaries,
-            self.color_transfer,    
+            self.color_transfer,  
         ).build_command()
         self.parent.EncoderCommand.setText(" ".join(command))
         self.parent.updateVideoGUIText()
@@ -110,6 +111,11 @@ class SettingsTab:
 
     def connectWriteSettings(self):
         
+        self.parent.subtitle_encoder.currentIndexChanged.connect(
+            lambda: self.settings.writeSetting(
+                "subtitle_encoder", self.parent.subtitle_encoder.currentText()
+            )
+        )
 
         self.parent.precision.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
@@ -250,6 +256,9 @@ class SettingsTab:
         self.parent.video_encoder_speed.currentIndexChanged.connect(
             self.updateFFMpegCommand
         )
+        self.parent.subtitle_encoder.currentIndexChanged.connect(
+            self.updateFFMpegCommand
+        )
 
     def writeOutputFolder(self):
         outputlocation = self.parent.output_folder_location.text()
@@ -345,6 +354,9 @@ class SettingsTab:
         self.parent.video_encoder_speed.setCurrentText(
             self.settings.settings["video_encoder_speed"]
         )
+        self.parent.subtitle_encoder.setCurrentText(
+            self.settings.settings["subtitle_encoder"]
+        )
 
     def selectOutputFolder(self):
         outputFile = QFileDialog.getExistingDirectory(
@@ -380,6 +392,7 @@ class Settings:
             "encoder": "libx264",
             "video_encoder_speed": "medium",
             "audio_encoder": "copy_audio",
+            "subtitle_encoder": "copy_subtitle",
             "audio_bitrate": "192k",
             "preview_enabled": "True",
             "scene_change_detection_method": "sudo_scene_detect",
@@ -425,6 +438,7 @@ class Settings:
             "video_encoder_speed": ("placebo","slow", "medium", "fast", "fastest"),
             "audio_encoder": ("aac", "libmp3lame", "opus", "copy_audio"),
             "audio_bitrate": "ANY",
+            "subtitle_encoder": ("copy_subtitle","srt","ass","webvtt"),
             "preview_enabled": ("True", "False"),
             "scene_change_detection_method": (
                 "mean",
