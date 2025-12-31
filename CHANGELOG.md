@@ -9,6 +9,7 @@
  - Random crash after rendering a few times.
 ### Changed
  - Backend changes.
+ - Speed up HDR processing.
 # RVE 2.3.8
 ### Added
  - Open output folder button
