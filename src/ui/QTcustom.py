@@ -299,7 +299,10 @@ class UpdateGUIThread(QThread):
 
 
                     )
-
+                    if self.channels == 6:
+                        # Convert HDR to SDR
+                        image_array = (image_array >> 8).astype(np.uint8)
+                        
                     pixmap = self.convert_cv_qt(image_array)
 
 
@@ -313,7 +316,7 @@ class UpdateGUIThread(QThread):
     def convert_cv_qt(self, cv_img):
         """Convert from an opencv image to QPixmap"""
         # rgb_image = cv2.resize(cv_img, (1280, 720)) #Cound resize image if need be
-        bytes_per_line = self.channels * self.outputVideoWidth
+        bytes_per_line = 3 * self.outputVideoWidth
         convert_to_Qt_format = QtGui.QImage(
             cv_img.data,
             self.outputVideoWidth,
