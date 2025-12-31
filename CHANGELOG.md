@@ -5,6 +5,7 @@
  - Auto select best backend based on model and hardware.
  - Sudo Scene detect Models
  - Simple installation option.
+ - Subtitle encoding options.
 ### Fixed
  - Random crash after rendering a few times.
 ### Changed
