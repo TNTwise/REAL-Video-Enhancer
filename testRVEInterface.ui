@@ -2646,11 +2646,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                           </item>
                                           <item>
                                            <property name="text">
-                                            <string>x264_vulkan (experimental)</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
                                             <string>x264_nvenc</string>
                                            </property>
                                           </item>
@@ -2662,21 +2657,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                           <item>
                                            <property name="text">
                                             <string>av1_nvenc (40 series and up)</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
-                                            <string>h264_amf</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
-                                            <string>h265_amf</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
-                                            <string>av1_amf</string>
                                            </property>
                                           </item>
                                          </widget>

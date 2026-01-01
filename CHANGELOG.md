@@ -12,7 +12,7 @@
  - Backend changes.
  - Speed up HDR processing.
 ### Removed
- - VAAPI encoders.
+ - VAAPI, AMF, Vulkan encoders. Too unstable and cannot easily support.
 # RVE 2.3.8
 ### Added
  - Open output folder button
