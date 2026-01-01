@@ -49,7 +49,7 @@
 <ul>
   <li> Windows support. <strong>!!! NOTICE !!!</strong> The bin can be detected as a trojan. This is a false positive caused by pyinstaller.</li>
   <li> Ubuntu 22.04+ support on Executable and Flatpak. (20.04 can work but is now legacy) </li>
-  <li> MacOS 14+ arm/x86 support </li>
+  <li> MacOS 15+ arm/x86 support </li>
   <li> Discord RPC support for Discord system package and Discord flatpak. </li>
   <li> Scene change detection to preserve sharp transitions. </li>
   <li> Preview that shows latest frame that has been rendered. </li>
@@ -72,24 +72,28 @@
 |--|--|--|
 | RIFE 4.6,4.7,4.15,4.18,4.22,4.22-lite,4.25 | Hzwer | [Practical-RIFE](https://github.com/hzwer/Practical-RIFE) 
 | GMFSS | 98mxr | [GMFSS_Fortuna](https://github.com/98mxr/GMFSS_Fortuna) 
-| GIMM | GSeanCDAT | [GIMM](https://github.com/GSeanCDAT/GIMM-VFI) 
 | IFRNet | ltkong218 | [IFRnet](https://github.com/ltkong218/IFRNet)
 
 ### Upscale Models:
 | Model | Author | Link |
 |--|--|--|
 | 4x-SPANkendata | Crustaceous D | [4x-SPANkendata](https://openmodeldb.info/models/4x-SPANkendata) 
-| 4x-ClearRealityV1 | Kim2091 | [4x-ClearRealityV1](https://openmodeldb.info/models/4x-ClearRealityV1) 
 | 4x-Nomos8k-SPAN series | Helaman | [4x-Nomos8k-SPAN series](https://openmodeldb.info/models/4x-Nomos8k-span-otf-strong) 
 | 2x-OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) 
 | 2x-AnimeJaNai V2 and V3 Sharp | The Database | [AnimeJanai](https://github.com/the-database/mpv-upscale-2x_animejanai)
 | 2x-AniSD | SiroSky | [AniSD](https://github.com/Sirosky/Upscale-Hub/releases/tag/AniSD)
+| AnimeSR | Tencent ARC | [AnimeSR](https://github.com/TencentARC/AnimeSR)
 
 ### Decompression Models:
 | Model | Author | Link |
 |--|--|--|
 | DeH264 | Helaman | [1xDeH264_realplksr](https://github.com/Phhofm/models/releases/tag/1xDeH264_realplksr) 
 
+### Denoise Models:
+| Model | Author | Link |
+|--|--|--|
+| DRUnet | cszn | [DRUnet](https://github.com/cszn/DPIR)
+| DnCNN | czsn | [DnCNN](https://github.com/cszn/DPIR)
 
 # Backends
   | Backend | Hardware | 
@@ -153,7 +157,7 @@ python3 build.py --build BUILD_OPTION --copy_backend
 | Person | For | Link |
 |--|--|--|
 | NevermindNilas | Some backend and reference code and working with me on many projects | https://github.com/NevermindNilas/ 
-| Styler00dollar | RIFE ncnn models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span and benchmarking | https://github.com/styler00dollar 
+| Styler00dollar | RIFE ncnn models (4.1-4.5, 4.7-4.12-lite), Sudo Shuffle Span, and Scene Detect Models | https://github.com/styler00dollar 
 | HolyWu | TensorRT engine generation code, inference optimizations, and RIFE jagged lines fixes | https://github.com/HolyWu/ 
 | Rick Astley | Amazing music | https://www.youtube.com/watch?v=dQw4w9WgXcQ 
 

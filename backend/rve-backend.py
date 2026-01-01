@@ -16,25 +16,29 @@ class HandleApplication:
             """from pyinstrument import Profiler
             profiler = Profiler()
             profiler.start()"""
+            if self.args.ffmpeg_path == None:
+                from src.utils.GetFFMpeg import download_ffmpeg
+                self.ffmpeg_path = download_ffmpeg()
+            else:
+                self.ffmpeg_path = self.args.ffmpeg_path
 
             from src.utils.VideoInfo import OpenCVInfo, print_video_info
             
             if self.args.print_video_info:
-                video_info = OpenCVInfo(self.args.print_video_info)
+                video_info = OpenCVInfo(self.args.print_video_info, ffmpeg_path=self.ffmpeg_path)
                 print_video_info(video_info)
                 #profiler.stop()
                 #print(profiler.output_text(unicode=True, color=True))
                 sys.exit(0)
             else:
-                video_info = OpenCVInfo(self.args.input)
+                video_info = OpenCVInfo(self.args.input, ffmpeg_path=self.ffmpeg_path)
                 print_video_info(video_info)
                 
             
 
             self.checkArguments()
 
-            from src.utils.GetFFMpeg import download_ffmpeg
-            download_ffmpeg()
+            
 
             if not self.batchProcessing():
                 buffer_str = "=" * len(str(sys.argv[0]))
@@ -132,6 +136,7 @@ class HandleApplication:
             interpolateFactor=self.args.interpolate_factor,
             upscaleModel=self.args.upscale_model,
             extraRestorationModels=self.args.extra_restoration_models,
+            sceneDetectModel=self.args.scene_detect_model,
             tile_size=self.args.tilesize,
             # backend settings
             device=self.args.device,
@@ -139,7 +144,9 @@ class HandleApplication:
             precision=self.args.precision if self.args.device != "cpu" else "float32",
             pytorch_gpu_id=self.args.pytorch_gpu_id,
             ncnn_gpu_id=self.args.ncnn_gpu_id,
+            cwd=self.args.cwd,
             # ffmpeg settings
+            ffmpeg_path = self.ffmpeg_path,
             start_time=self.args.start_time,
             end_time=self.args.end_time,
             overwrite=self.args.overwrite,
@@ -210,6 +217,13 @@ class HandleApplication:
         )
 
         parser.add_argument(
+            "--ffmpeg_path",
+            default="./bin/ffmpeg",
+            help="Path to the ffmpeg executable",
+            type=str,
+        )
+
+        parser.add_argument(
             "-l",
             "--overlap",
             help="overlap size on tiled rendering (default=10)",
@@ -265,6 +279,12 @@ class HandleApplication:
             help="Scene change detection to avoid interpolating transitions. (options=mean, mean_segmented, none)\nMean segmented splits up an image, and if an arbitrary number of segments changes are detected within the segments, it will trigger a scene change. (lower sensativity thresholds are not recommended)",
             type=str,
             default="pyscenedetect",
+        )
+        parser.add_argument(
+            "--scene_detect_model",
+            help="Path to scene change model to use with model-based scene detection.",
+            type=str,
+            default=None,
         )
         parser.add_argument(
             "--scene_detect_threshold",

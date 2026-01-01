@@ -3,13 +3,14 @@ import math
 
 import gc
 from .TorchUtils import TorchUtils
-from .spandrel.UpscaleModelWrapper import UpscaleModelWrapper
+from .UpscaleModelWrapper import UpscaleModelWrapper
 import torch as torch
 import torch.nn.functional as F
 import sys
 from time import sleep
 
 from ..utils.Util import log, CudaChecker
+from ..utils.Frame import Frame
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 import numpy as np
 def process_output(output, hdr_mode):
@@ -138,10 +139,11 @@ class UpscalePytorch:
             self.upscale_model_wrapper = UpscaleModelWrapper(
                 model_path=self.modelPath,
                 device=self.device,
-                precision=self.dtype,
+                precision=self.dtype
             )
-
-            match self.upscale_model_wrapper.get_scale():
+            self.scale = self.upscale_model_wrapper.get_scale()
+            
+            match self.scale:
                 case 1:
                     modulo = 4
                 case 2:
@@ -167,8 +169,8 @@ class UpscalePytorch:
                 self.pad_h = math.ceil(self.videoHeight / modulo) * modulo
 
             if self.backend == "tensorrt":
+                self.tensorrt_example_inputs = (self.upscale_model_wrapper.get_dummy_input(self.pad_w, self.pad_h),) # gotta make a tuple cause im dumb.
                 from .TensorRTHandler import TorchTensorRTHandler
-
 
                 trtHandler = TorchTensorRTHandler(
                     model_parent_path=os.path.dirname(self.modelPath),
@@ -207,7 +209,7 @@ class UpscalePytorch:
                 self.trt_engine_name = self.trt_engine_static_name if self.trt_static_shape else self.trt_engine_dynamic_name
 
                 if not trtHandler.check_engine_exists(self.trt_engine_name):
-                    inputs = (torch.zeros([1, 3, self.pad_h, self.pad_w], dtype=self.dtype, device=self.device),)
+                    
                     if self.trt_static_shape:
                         dynamic_shapes = None
                         
@@ -227,7 +229,7 @@ class UpscalePytorch:
                             self.upscale_model_wrapper.get_model(),
                             self.dtype,
                             self.device,
-                            example_inputs=inputs,
+                            example_inputs=self.tensorrt_example_inputs,
                             trt_engine_name=self.trt_engine_name,
                             trt_multi_precision_engine=False,
                             dynamic_shapes=dynamic_shapes,
@@ -235,7 +237,7 @@ class UpscalePytorch:
                         trtHandler.save_engine(
                             trt_engine,
                             self.trt_engine_name,
-                            example_inputs=inputs,
+                            example_inputs=self.tensorrt_example_inputs,
                         )
 
                     except Exception as e:
@@ -253,14 +255,14 @@ class UpscalePytorch:
                                     self.upscale_model_wrapper.get_model(),
                                     self.dtype,
                                     self.device,
-                                    example_inputs=inputs,
+                                    example_inputs=self.tensorrt_example_inputs,
                                     trt_engine_name=self.trt_engine_static_name,
                                     trt_multi_precision_engine=False,
                                 )
                                 trtHandler.save_engine(
                                     trt_engine,
                                     self.trt_engine_static_name,
-                                    example_inputs=inputs,
+                                    example_inputs=self.tensorrt_example_inputs,
                                 )
                             self.trt_engine_name = self.trt_engine_static_name
                         else:
@@ -269,6 +271,7 @@ class UpscalePytorch:
                             )
                 model = trtHandler.load_engine(trt_engine_name=self.trt_engine_name)
                 self.upscale_model_wrapper.load_model(model)
+                
 
         self.torchUtils.clear_cache()
         self.torchUtils.sync_all_streams()
@@ -287,26 +290,29 @@ class UpscalePytorch:
         self._load()
     
     @torch.inference_mode()
-    def __call__(self, image: bytes) -> torch.Tensor:
-        image = self.torchUtils.frame_to_tensor(image, self.f2tstream, self.device, self.dtype)
-        with self.torchUtils.run_stream(self.stream), torch.amp.autocast(
-            enabled=self.dtype == torch.float16,device_type="cuda"):
+    def __call__(self, image: Frame) -> Frame:
+        dtype = image.dtype
+        gpu_id = image.gpu_id
+        device = image.device
+        with self.torchUtils.run_stream(self.f2tstream):  # type: ignore
+            image_tensor = image.get_frame_tensor()
+        del image
+        self.torchUtils.sync_stream(self.f2tstream)
+
+        with self.torchUtils.run_stream(self.stream):
             while self.upscale_model_wrapper is None:
                 sleep(1)
             if self.tilesize == 0:
-
-                output = self.upscale_model_wrapper(image)
-
+                output = self.upscale_model_wrapper(image_tensor)
             else:
-                output = self.renderTiledImage(image)
+                output = self.renderTiledImage(image_tensor)
             
-        self.torchUtils.sync_stream(self.stream)
+            retFrame = Frame(self.backend, self.videoWidth * self.scale, self.videoHeight * self.scale, device=device, gpu_id=gpu_id, hdr_mode=self.hdr_mode, dtype=dtype)
+            
+            retFrame.set_frame_tensor(output)
         
-        with self.torchUtils.run_stream(self.convertStream):
-            output = self.torchUtils.tensor_to_frame(output)
-            
-        self.torchUtils.sync_all_streams()
-        return output
+        self.torchUtils.sync_stream(self.stream)
+        return retFrame
  
     def getScale(self):
         return self.upscale_model_wrapper.get_scale()

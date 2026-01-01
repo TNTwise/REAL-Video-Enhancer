@@ -8,12 +8,12 @@ import time
 import cv2
 import numpy as np
 
-from .constants import FFMPEG_PATH, FFMPEG_LOG_FILE
 from .utils.Util import (
     log,
     subprocess_popen_without_terminal,
 )
 from .utils.Encoders import  EncoderSettings
+from .utils.Frame import Frame
 
 class Buffer(ABC):
     @abstractmethod
@@ -22,7 +22,27 @@ class Buffer(ABC):
 
 
 class FFmpegRead(Buffer):
-    def __init__(self, inputFile, width, height, start_time, end_time, borderX, borderY, hdr_mode, color_space=None, color_primaries=None, color_transfer=None, input_pixel_format: str | None = None):
+    def __init__(
+            self, 
+            inputFile, 
+            width, 
+            height, 
+            start_time, 
+            end_time, 
+            borderX, 
+            borderY, 
+            hdr_mode,
+            backend: str = "pytorch",
+            device: str = "cuda",
+            gpu_id: int = 0,
+            dtype: str = "float16",
+            color_space=None, 
+            color_primaries=None, 
+            color_transfer=None, 
+            input_pixel_format: str | None = None,
+            ffmpeg_path: str = "./bin/ffmpeg",
+        ):
+        
         self.inputFile = inputFile
         self.width = width
         self.height = height
@@ -31,11 +51,16 @@ class FFmpegRead(Buffer):
         self.borderX = borderX
         self.borderY = borderY
         self.hdr_mode = hdr_mode
+        self.backend = backend
+        self.device = device
+        self.gpu_id = gpu_id
+        self.dtype = dtype
         self.color_space = color_space
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
         self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
+        self.ffmpeg_path = ffmpeg_path
         #self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
@@ -56,7 +81,7 @@ class FFmpegRead(Buffer):
     def command(self):
         
         command = [
-            f"{FFMPEG_PATH}",
+            f"{self.ffmpeg_path}",
             "-i",
             f"{self.inputFile}",
         ]
@@ -108,10 +133,12 @@ class FFmpegRead(Buffer):
             chunk = self.read_frame()
             if chunk is None:
                 break
-            self.readQueue.put(chunk)
+            frame = Frame(self.backend, self.width, self.height, self.device, self.gpu_id, self.hdr_mode, self.dtype)
+            frame.set_frame_bytes(chunk)
+            self.readQueue.put(frame)
         self.readQueue.put(None)
 
-    def get(self):
+    def get(self) -> Frame:
         return self.readQueue.get()
 
     def close(self):
@@ -148,6 +175,8 @@ class FFmpegWrite(Buffer):
         color_space: str = None,
         color_primaries: str = None,
         color_transfer: str = None,
+        ffmpeg_path: str = "./bin/ffmpeg",
+        ffmpeg_log_file: str = "ffmpeg_log.txt",
     ):
         self.inputFile = inputFile
         self.outputFile = outputFile
@@ -175,6 +204,7 @@ class FFmpegWrite(Buffer):
         self.subtitle_encoder = subtitle_encoder
         self.mpv_output = mpv_output
         self.hdr_mode = hdr_mode
+        self.merge_subtitles = merge_subtitles
         self.writeQueue = queue.Queue(maxsize=25)
         self.previewFrame = None
         self.framesRendered: int = 1
@@ -182,12 +212,14 @@ class FFmpegWrite(Buffer):
         self.color_space = color_space
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
+        self.ffmpeg_path = ffmpeg_path
+        self.ffmpeg_log_file = ffmpeg_log_file
         self.outputFPS = (
             (self.fps * self.interpolateFactor)
             if not self.slowmo_mode
             else self.fps
         )
-        self.ffmpeg_log = open(FFMPEG_LOG_FILE, "w", encoding='utf-8')
+        self.ffmpeg_log = open(self.ffmpeg_log_file, "w", encoding='utf-8')
         try:
             command = self.command()
             log("\nFFMPEG WRITE COMMAND: " + str(command) + "\n")
@@ -206,7 +238,7 @@ class FFmpegWrite(Buffer):
     def command(self):
         if self.mpv_output:
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-loglevel",
                 "error",
                 "-framerate",
@@ -261,7 +293,7 @@ class FFmpegWrite(Buffer):
         if not self.benchmark:
             # maybe i can split this so i can just use ffmpeg normally like with vspipe
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-loglevel",
                 "error",
             ]
@@ -290,13 +322,30 @@ class FFmpegWrite(Buffer):
 
             if not self.slowmo_mode:
                 command += [
+                    # Input 1: original file for audio/subtitles.
+                    # Put timestamp hygiene flags *before* the input they apply to.
+                    "-fflags",
+                    "+genpts",
                     "-i",
                     f"{self.inputFile}",
                     "-map",
                     "0:v",  # Map video stream from input 0
                     "-map",
                     "1:a?",
+                    "-map",
+                    "1:s?",
+                ]
 
+                # Output timestamp/interleave hygiene.
+                command += [
+                    "-avoid_negative_ts",
+                    "make_zero",
+                    "-max_interleave_delta",
+                    "0",
+                    "-muxpreload",
+                    "0",
+                    "-muxdelay",
+                    "0",
                 ]
 
                 
@@ -350,6 +399,13 @@ class FFmpegWrite(Buffer):
                     self.pixelFormat,
 
                 ]
+
+                # MP4/MOV: improve seekability by moving the moov atom to the front.
+                if self.outputFile and self.outputFileExtension.lower() in ("mp4", "mov", "m4v"):
+                    command += [
+                        "-movflags",
+                        "+faststart",
+                    ]
             command +=[
                 f"{self.outputFile}",
             ]
@@ -363,7 +419,7 @@ class FFmpegWrite(Buffer):
         else: # Benchmark mode
 
             command = [
-                f"{FFMPEG_PATH}",
+                f"{self.ffmpeg_path}",
                 "-hide_banner",
                 "-loglevel",
                 "error",
@@ -414,7 +470,6 @@ class FFmpegWrite(Buffer):
             exit_code = self.writeProcess.returncode
 
             renderTime = time.time() - self.startTime
-            self.merge_subtitles()
             log(f"\nTime to complete render: {round(renderTime, 2)}")
             
         except Exception as e:
@@ -427,67 +482,15 @@ class FFmpegWrite(Buffer):
         
         
 
-    def merge_subtitles(self):
-        if self.slowmo_mode:
-            log("Slowmo mode enabled, skipping subtitle merge.")
-            return
-
-        if not self.outputFile:
-            log("No output file specified, skipping subtitle merge.")
-            return
-        
-        if self.benchmark:
-            log("Benchmark mode enabled, skipping subtitle merge.")
-            return
-
-        temp_output = self.outputFile + "-" + str(os.getpid()) + "-temp.mkv"
-        os.rename(self.outputFile, temp_output)
-
-        command = [
-            f"{FFMPEG_PATH}",
-            "-loglevel",
-            "error",
-            "-i",
-            temp_output,
-            "-i",
-            self.inputFile,
-            "-c",
-            "copy",
-            "-c:s",
-            "copy",
-            "-map",
-            "0",
-            "-map",
-            "1:s?",
-            self.outputFile,
-        ]
-
-        log("Merging subtitles with command: " + " ".join(command))
-
-        try:
-            result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            if result.returncode != 0:
-                log("Failed to merge subtitles. FFmpeg error:")
-                log(result.stderr.decode())
-                os.remove(self.outputFile) # Remove incomplete output file
-                os.rename(temp_output, self.outputFile)  # Restore original file
-                return
-            os.remove(temp_output)
-            log("Subtitles merged successfully.")
-        except Exception as e:
-            log("Exception occurred while merging subtitles: " + str(e))
-            os.rename(temp_output, self.outputFile)  # Restore original file
-
-
     def onErroredExit(self):
         log("FFmpeg failed to render the video.")
         try:
-            with open(FFMPEG_LOG_FILE, "r") as f:
+            with open(self.ffmpeg_log_file, "r") as f:
                 log("FULL FFMPEG LOG:")
                 for line in f.readlines():
                     log(line)
 
-            with open(FFMPEG_LOG_FILE, "r") as f:
+            with open(self.ffmpeg_log_file, "r") as f:
                 for line in f.readlines():
                     if f"[{self.outputFileExtension}" in line:
                         log(line)

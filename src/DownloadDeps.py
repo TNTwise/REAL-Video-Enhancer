@@ -14,6 +14,7 @@ from .constants import (
     CWD,
     CPU_ARCH,
     USE_LOCAL_BACKEND,
+    IS_STEAM
 )
 from .version import version, backend_dev_version
 from .Util import (
@@ -266,7 +267,25 @@ class DownloadDependencies:
         deps: list,
         install: bool = True,
     ):  # going to have to make this into a qt module pop up
-        command = [
+        command = []
+        if PLATFORM == "linux" and IS_STEAM:
+            # Define the list of environment variables known to conflict with Steam/Linux Runtime
+            conflict_vars = [
+                'LD_LIBRARY_PATH',
+                'STEAM_RUNTIME',
+                'SYSTEM_LD_LIBRARY_PATH',
+                'PRESSURE_VESSEL_RUNTIME',
+                'PRESSURE_VESSEL_RUNTIME_BASE',
+                'CUDA_PATH', # Might conflict with GPU-aware packages
+            ]
+
+            log("Cleaning up conflicting Steam environment variables...")
+
+            for var in conflict_vars:
+                if var in os.environ:
+                    log(f"Unsetting {var}: {os.environ[var]}")
+                    del os.environ[var] # This removes the variable for the current process
+        command += [
             PYTHON_EXECUTABLE_PATH,
             "-m",
             "pip",
@@ -277,6 +296,7 @@ class DownloadDependencies:
         if install:
             command += [
                 "--no-warn-script-location",
+                "--isolated",
                 "--extra-index-url",
                 "https://download.pytorch.org/whl/test/", 
                 "--extra-index-url",
@@ -350,7 +370,7 @@ class DownloadDependencies:
                 deps += [
                     "rife-ncnn-vulkan-python-tntwise==1.4.5",
                     "upscale_ncnn_py==1.2.0",
-                    "ncnn==1.0.20240820",
+                    "ncnn==1.0.20250916",
                     "numpy==2.2.2",
                 ]
                 return_code = self.pip(deps, install)

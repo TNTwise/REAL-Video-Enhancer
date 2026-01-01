@@ -31,6 +31,7 @@ class FileHandler:
         except Exception as e:
             log(f"An error occurred while getting available disk space: {e}")
             return 0
+        
     @staticmethod
     def moveFolder(prev: str, new: str):
         """
@@ -364,55 +365,6 @@ def extractTarGZ(file):
         f.extractall()
     removeFile(file)
     os.chdir(origCWD)
-
-
-def get_gpu_info():
-    if PLATFORM == "win32":
-        try:
-            output = subprocess.check_output(
-                "wmic path win32_VideoController get name", shell=True
-            ).decode()
-            return output.strip().split("\n")[1]
-        except Exception:
-            return "Unable to retrieve GPU info on Windows"
-
-    elif PLATFORM == "darwin":  # macOS
-        try:
-            output = subprocess.check_output(
-                "system_profiler SPDisplaysDataType | grep Vendor", shell=True
-            ).decode()
-            return output.strip().split(":")[1].strip()
-        except Exception:
-            return "Unable to retrieve GPU info on macOS"
-
-    elif PLATFORM == "linux":
-        try:
-            # Try lspci command first
-            output = subprocess.check_output("lspci | grep -i vga", shell=True).decode()
-            return output.strip().split(":")[2].strip()
-        except Exception:
-            try:
-                # If lspci fails, try reading from /sys/class/graphics
-                with open("/sys/class/graphics/fb0/device/vendor", "r") as f:
-                    vendor_id = f.read().strip()
-                return f"Vendor ID: {vendor_id}"
-            except Exception:
-                return "Unable to retrieve GPU info on Linux"
-
-    else:
-        return "Unsupported operating system"
-
-
-def getVendor():
-    """
-    Gets GPU vendor of the system
-    vendors = ["Intel", "AMD", "Nvidia"]
-    """
-    gpuInfo = get_gpu_info()
-    vendors = ["Intel", "AMD", "Nvidia"]
-    for vendor in vendors:
-        if vendor.lower() in gpuInfo.lower():
-            return vendor
 
 
 def openLink(link: str):

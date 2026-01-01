@@ -49,7 +49,6 @@ class TorchUtils:
         self.width = width
         self.height = height
         self.hdr_mode = hdr_mode
-        self.padding = padding
         self.gpu_id = gpu_id
         if device_type == "auto":
             self.device_type = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "xpu" if torch.xpu.is_available() else "cpu"    
@@ -64,7 +63,12 @@ class TorchUtils:
             self.use_numpy = False
         self.__run_stream_func = self.__run_stream_function()
         self.__sync_all_streams_func = self.__sync_all_streams_function()
-    
+
+        # persistent pinned buffer for async GPU uploads
+        self._pinned_buffer = None
+        self._pinned_buffer_numel = 0
+        self._pinned_buffer_dtype = None
+
     def __sync_all_streams_function(self):
         if self.device_type == "cuda":
             return torch.cuda.synchronize
@@ -168,7 +172,7 @@ class TorchUtils:
     @torch.inference_mode()
     def frame_to_tensor(self, frame, stream: torch.Stream, device: torch.device, dtype: torch.dtype) -> torch.Tensor: # stream might be None
         with self.run_stream(stream):  # type: ignore
-            # ... (tensor creation and manipulation) ...
+             # ... (tensor creation and manipulation) ...
             frame = torch.frombuffer(
                     frame,
                     dtype=torch.uint16 if self.hdr_mode else torch.uint8,
@@ -183,12 +187,9 @@ class TorchUtils:
                 .unsqueeze(0)
                 .contiguous()
                 ).to(dtype=dtype, non_blocking=True)
-
-            if self.padding:
-                frame = F.pad(frame, self.padding)
                 
             self.sync_stream(stream)
-            
+
         # No explicit sync for CPU here.
         return frame
     
@@ -219,4 +220,30 @@ class TorchUtils:
         else:
             np_dtype = np.uint16 if self.hdr_mode else np.uint8
             return np.array(tensor.tolist(), dtype=np_dtype)
-                
+    
+    @staticmethod
+    @torch.inference_mode()
+    def np_to_tensor(arr: np.ndarray, device, dtype):
+        import torch
+        return torch.from_numpy(arr).to(device=device, dtype=dtype).permute(2, 0, 1).unsqueeze(0)
+
+    
+    @staticmethod
+    @torch.inference_mode()
+    def tensor_to_np(tensor: torch.Tensor) -> np.ndarray:
+        return tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()
+
+    @staticmethod
+    @torch.inference_mode()
+    def resize_tensor(
+        tensor: torch.Tensor,
+        new_width: int,
+        new_height: int,
+        mode: str = "bilinear",
+    ) -> torch.Tensor:
+        return F.interpolate(
+            tensor,
+            size=(new_height, new_width),
+            mode=mode,
+            align_corners=False if mode in ["linear", "bilinear", "bicubic", "trilinear"] else None,
+        )

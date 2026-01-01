@@ -35,17 +35,22 @@ with suppress_stdout_stderr():
     from torch.export.exported_program import ExportedProgram
     from .TorchUtils import TorchUtils
 
+def _normalize_example_inputs(example_inputs):
+    # Accept torch.Tensor or sequence of tensors; always return a tuple of args
+    if isinstance(example_inputs, torch.Tensor):
+        return (example_inputs,)
+    # If already a list/tuple
+    if len(example_inputs) == 1 and isinstance(example_inputs[0], torch.Tensor):
+        return (example_inputs[0],)
+    return tuple(example_inputs)
+
 def torchscript_to_dynamo(
-            model: torch.nn.Module, example_inputs: list[torch.Tensor]
-        ) -> ExportedProgram:
-            """Converts a TorchScript module to a Dynamo program."""
-            module = torch.jit.trace(model, example_inputs)
-            exported_program = TS2EPConverter(
-                module, sample_args=tuple(example_inputs), sample_kwargs=None
-            ).convert()
-            del module
-            TorchUtils.clear_cache()
-            return exported_program
+    model: torch.ScriptModule, example_inputs
+) -> ExportedProgram:
+    """Converts a TorchScript module to a Dynamo program."""
+    sample_args = _normalize_example_inputs(example_inputs)
+    traced = torch.jit.trace(model, sample_args)
+    return TS2EPConverter(traced, sample_args=sample_args, sample_kwargs=None).convert()
 
 def nnmodule_to_dynamo(
     model: torch.nn.Module, example_inputs: list[torch.Tensor], dynamic_shapes=None
@@ -155,7 +160,6 @@ class TorchTensorRTHandler:
         
         with suppress_stdout_stderr():
             exported_program = nnmodule_to_dynamo(model, example_inputs, dynamic_shapes=dynamic_shapes)
-
             TorchUtils.clear_cache()
 
             exported_program = self.grid_sample_decomp(exported_program)

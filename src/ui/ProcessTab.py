@@ -2,7 +2,7 @@ import subprocess
 import os
 from threading import Thread
 import re
-import math
+from time import sleep
 from multiprocessing import shared_memory
 
 from PySide6 import QtGui
@@ -51,6 +51,7 @@ class ProcessTab:
         self.currentFrame = 0
         self.fps = 0
         self.eta = 0
+        self.max_value = 0
         self.isPreview = False
         self.userKilled = False
         self.currentRenderOptions = None
@@ -80,7 +81,7 @@ class ProcessTab:
         returns
         the current models available given a method (interpolate, upscale) and a backend (ncnn, tensorrt, pytorch)
         """
-        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels = getModels(backend)
+        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, _ = getModels(backend)
         self.parent.interpolateModelComboBox.clear()
         self.parent.upscaleModelComboBox.clear()
         self.parent.deblurModelComboBox.clear()
@@ -162,7 +163,7 @@ class ProcessTab:
         self.parent.deblurCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.denoiseCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.decompressCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)   
-
+        self.parent.sloMoModeCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)  
         self.parent.backendComboBox.currentIndexChanged.connect(
             lambda: self.populateModels(self.parent.backendComboBox.currentText())
         )
@@ -194,6 +195,7 @@ class ProcessTab:
         self.parent.startRenderButton.setVisible(False)
 
     def startGUIUpdate(self):
+        
         self.workerThread = UpdateGUIThread(
             parent=self,
             imagePreviewSharedMemoryID=IMAGE_SHARED_MEMORY_ID,
@@ -285,7 +287,7 @@ class ProcessTab:
         self.createPausedSharedMemory()
 
         for renderOptions in renderQueue.getQueue():
-
+            
             self.isPreview = renderOptions.isPreview
             self.currentRenderOptions = renderOptions
 
@@ -293,14 +295,8 @@ class ProcessTab:
                 renderOptions.videoWidth * renderOptions.overrideUpscaleScale,
                 renderOptions.videoHeight * renderOptions.overrideUpscaleScale,
             )
-            self.parent.progressBar.setRange(
-                0,
-                # only set the range to multiply the frame count if the method is interpolate
-                int(
-                    renderOptions.videoFrameCount
-                    * math.ceil(renderOptions.interpolateTimes)
-                ),
-            )
+            self.workerThread.createNewSharedMemory(channels=6 if renderOptions.hdrMode else 3)
+            self.max_value = renderOptions.videoFrameCount * renderOptions.interpolateTimes
             command = self.build_command(renderOptions)
             log(str(command))
 
@@ -308,7 +304,9 @@ class ProcessTab:
                 "stdout": subprocess.PIPE,
                 "stderr": subprocess.STDOUT,
                 "universal_newlines": True,
-
+                "text": True,                 # return str instead of bytes
+                "encoding": "utf-8",          # decode using utf-8
+                "errors": "replace",
             }
 
             if PLATFORM == "win32":
@@ -341,7 +339,7 @@ class ProcessTab:
                         self.status = "Rendering"
 
                     if "this may take a while" in line.lower():
-                        self.status = "Building Engine"
+                        self.status = "Building Engine, this may take a while."
 
 
                     if any(char.isalpha() for char in line):
@@ -360,8 +358,8 @@ class ProcessTab:
             self.parent.OutputFilesListWidget.addItem(
                 renderOptions.outputPath
             )  # add the file to the list widget
+            self.workerThread.deleteSharedMemory()
 
-            self.workerThread.unlink_shared_memory()
         try:
             self.pausedSharedMemory.close()
             self.pausedSharedMemory.unlink()
@@ -390,13 +388,14 @@ class ProcessTab:
         self.parent.FPS.setText("FPS: ")
         self.parent.ETA.setText("ETA: ")
         self.parent.STATUS.setText("Status: ")
+        self.parent.renderQueue.clear()
         if self.currentRenderOptions.isPreview:
             from PySide6.QtMultimedia import QMediaPlayer
             try:
                 def onScroll(preview:QMediaPlayer, value):
                     preview.setPosition(value)
 
-                self.parent.renderQueue.clear()
+                
 
                 player = QMediaPlayer()
                 player.setSource(QUrl.fromLocalFile(self.currentRenderOptions.outputPath))
@@ -415,6 +414,8 @@ class ProcessTab:
 
 
     def onRenderCompletion(self):
+        self.eta = 0
+        self.fps = 0
         try:
             self.renderProcess.wait()
         except Exception:
@@ -469,6 +470,11 @@ class ProcessTab:
         """
 
         if self.renderTextOutputList is not None:
+            self.parent.progressBar.setRange(
+                0,
+                # only set the range to multiply the frame count if the method is interpolate
+                self.max_value
+            )
             # print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
                 self.splitListIntoStringWithNewLines(self.renderTextOutputList)
@@ -476,8 +482,16 @@ class ProcessTab:
             scrollbar = self.parent.renderOutput.verticalScrollBar()
             scrollbar.setValue(scrollbar.maximum())
             self.parent.progressBar.setValue(self.currentFrame)
-            self.parent.FPS.setText(f"FPS: {self.fps}")
-            self.parent.ETA.setText(f"ETA: {self.eta}")
+            if self.fps != 0:
+                self.parent.FPS.setVisible(True)
+                self.parent.FPS.setText(f"FPS: {self.fps}")
+            else:
+                self.parent.FPS.setVisible(False)
+            if self.eta != 0:
+                self.parent.ETA.setVisible(True)
+                self.parent.ETA.setText(f"ETA: {self.eta}")
+            else:
+                self.parent.ETA.setVisible(False)
             self.parent.STATUS.setText(f"Status: {self.status}")
         if not qimage.isNull():
             label_width = self.parent.previewLabel.width()
@@ -527,6 +541,8 @@ class ProcessTab:
             f"{self.settings.settings['pytorch_gpu_id']}",
             "--cwd",
             f"{CWD}",
+            "--ffmpeg_path",
+            f"{FFMPEG_PATH}",
 
         ]
 
@@ -622,6 +638,14 @@ class ProcessTab:
                 "--scene_detect_threshold",
                 self.settings.settings["scene_change_detection_threshold"],
             ]
+            if renderOptions.sceneChangeModelFile:
+                command += [
+                    "--scene_detect_model",
+                    os.path.join(
+                        MODELS_PATH,
+                        renderOptions.sceneChangeModelFile,
+                    ),
+                ]
 
         if renderOptions.benchmarkMode:
             command += ["--benchmark"]

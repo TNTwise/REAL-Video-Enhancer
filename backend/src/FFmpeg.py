@@ -2,43 +2,14 @@ from multiprocessing import shared_memory
 import sys
 import time
 import numpy as np
-import subprocess
 
 if __name__ != "__main__":
     from .utils.Util import log, padFrame, subprocess_popen_without_terminal
-    from .constants import FFMPEG_PATH
 else:
     def log(message):
         print(message)
-    FFMPEG_PATH = "ffmpeg"  # Default to ffmpeg in PATH if not running as a module
 
-def hdr_to_sdr(hdr_frame, width, height):
-    """
-    Converts HDR frame (uint16) to SDR (uint8) using tone mapping
-    """
-    # Convert buffer to numpy array
-    hdr_frame = np.frombuffer(hdr_frame, dtype=np.uint16)
-    hdr_frame = hdr_frame.reshape((height, width, 3))
-    
-    # Normalize to 0-1 range
-    hdr_normalized = hdr_frame.astype(np.float32) / 65535.0
-    
-    # Apply tone mapping (Reinhard operator)
-    # This preserves details in highlights and shadows
-    L = 0.2126 * hdr_normalized[:,:,0] + 0.7152 * hdr_normalized[:,:,1] + 0.0722 * hdr_normalized[:,:,2]
-    L_white = np.max(L)  # Max luminance value
-    
-    L_tone_mapped = L * (1 + L / (L_white * L_white)) / (1 + L)
-    
-    # Scale each color channel
-    ratio = np.divide(L_tone_mapped, L, out=np.ones_like(L), where=L!=0)
-    ratio = ratio[:,:,np.newaxis]
-    sdr_normalized = hdr_normalized * ratio
-    
-    # Convert back to uint8 (0-255)
-    sdr_frame = (sdr_normalized * 255).clip(0, 255).astype(np.uint8)
-    
-    return sdr_frame.tobytes()
+
 
 
 def convertTime(remaining_time):
@@ -75,11 +46,6 @@ class PauseManager:
     def pause_manager(self):
         if self.paused_shared_memory_id is not None:
             return self.pausedSharedMemory.buf[0] == 1
-            
-
-
-        
-
 
 class InformationWriteOut:
     def __init__(
@@ -111,9 +77,16 @@ class InformationWriteOut:
         self.sharedMemoryChunkSize = sharedMemoryChunkSize
 
         if self.sharedMemoryID is not None:
-            self.shm = shared_memory.SharedMemory(
-                name=self.sharedMemoryID, create=True, size=sharedMemoryChunkSize
-            )
+            while True:
+                try:
+                    self.shm = shared_memory.SharedMemory(
+                        name=self.sharedMemoryID
+                    )
+                    break
+                except FileNotFoundError:
+                    log(f"Waiting for shared memory to be created: {self.sharedMemoryID}")
+                    time.sleep(0.5)
+            
         self.pausedManager = PauseManager(paused_shared_memory_id)
         self.isPaused = False
         self.stop = False
@@ -155,7 +128,7 @@ class InformationWriteOut:
         return f"{hours}:{minutes}:{seconds}"
 
     def setPreviewFrame(self, frame):
-        self.previewFrame = frame if not self.hdr_mode else hdr_to_sdr(frame, self.croppedOutputWidth, self.croppedOututHeight)
+        self.previewFrame = frame
 
     def setFramesRendered(self, framesRendered: int):
         self.framesRendered = framesRendered

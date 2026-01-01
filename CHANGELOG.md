@@ -1,4 +1,19 @@
-# RVE 2.3.8 pre-release
+# RVE 2.3.9
+### Added
+ - AnimeSR
+ - More encoding options.
+ - Auto select best backend based on model and hardware.
+ - Sudo Scene detect Models
+ - Simple installation option.
+ - Subtitle encoding options.
+### Fixed
+ - Random crash after rendering a few times.
+### Changed
+ - Backend changes.
+ - Speed up HDR processing.
+### Removed
+ - VAAPI, AMF, Vulkan encoders. Too unstable and cannot easily support.
+# RVE 2.3.8
 ### Added
  - Open output folder button
  - Cap output scale based on model scale

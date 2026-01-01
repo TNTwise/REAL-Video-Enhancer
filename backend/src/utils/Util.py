@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import contextlib
+from .Colors import Colors
 # non standard python libraries
 try:
     import numpy as np
@@ -28,9 +29,8 @@ def suppress_stdout_stderr():
             os.close(old_stderr_fd)
 
 try:
-    from ..constants import CWD, PLATFORM
+    from ..constants import PLATFORM
 except ImportError:
-    CWD = os.getcwd()
     PLATFORM = sys.platform
 
 
@@ -57,7 +57,8 @@ def errorAndLog(message: str):
 
 
 
-
+def log_error(message: str):
+    log(Colors.RED + "ERROR: "+ message + Colors.RESET, show_backend=False)
 
 def log(message: str, show_backend = True):
     """
@@ -102,6 +103,35 @@ def get_pytorch_vram() -> int:
     except Exception as e:
         log(str(e))
         return 0
+
+
+def resize_image_np(image, target_width: int, target_height: int):
+    """
+    Resizes the image to the target resolution.
+    
+    Args:
+        image (np.ndarray): The input image as a numpy array.
+        target_width (int): The target width for resizing.
+        target_height (int): The target height for resizing.
+    
+    Returns:
+        np.ndarray: The resized image as a numpy array.
+    """
+    height, width = image.shape[:2]
+    if target_width == width and target_height == height:
+        return image
+    if target_width < width or target_height < height:
+        # Best for downscaling
+        interpolation = cv2.INTER_AREA
+    else:
+        # Best for upscaling
+        interpolation = cv2.INTER_LANCZOS4
+
+    try:
+        resized_image = cv2.resize(image, (target_width, target_height), interpolation=interpolation)
+    except Exception:
+        resized_image = cv2.resize(image, (target_width, target_height))
+    return resized_image
 
 
 def resize_image_bytes(image_bytes: bytes, width: int, height: int, target_width: int, target_height: int) -> bytes:

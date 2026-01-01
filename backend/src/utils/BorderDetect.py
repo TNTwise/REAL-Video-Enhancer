@@ -1,15 +1,15 @@
-from ..constants import FFMPEG_PATH
 from ..utils.Util import log, subprocess_popen_without_terminal
 import subprocess
 
 
 class BorderDetect:
-    def __init__(self, inputFile):
+    def __init__(self, inputFile, ffmpeg_path="./bin/ffmpeg"):
         self.inputFile = inputFile
+        self.ffmpeg_path = ffmpeg_path
 
     def processBorders(self):
         command = [
-            f"{FFMPEG_PATH}",
+            f"{self.ffmpeg_path}",
             "-i",
             f"{self.inputFile}",
             "-vf",

@@ -1,19 +1,21 @@
 import numpy as np
+import os
 import cv2
 from collections import deque
 import sys
-from .Util import bytesToImg
 from .PySceneDetectUtils import ContentDetector
-
-
+from ..utils.Frame import Frame
 class BaseDetector:
     def __init__(self, threshold: int = 0):
         pass
 
-    def sceneDetect(self, frame):
+    def sceneDetect(self, frame: Frame) -> bool:
         return False
 
-
+class ModelDetector(BaseDetector):
+    def __init__(self, threshold: int = 0, model_path: str = None, model_dtype: str = "float32", model_device: str = "cpu"):
+        super().__init__(threshold)
+    
 class NPMeanSCDetect(BaseDetector):
     """
     takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
@@ -26,12 +28,12 @@ class NPMeanSCDetect(BaseDetector):
         self.sensitivity = threshold * 10
 
     # a simple scene detect based on mean
-    def sceneDetect(self, img1):
+    def sceneDetect(self, frame: Frame):
         if self.i0 is None:
-            self.i0 = img1
+            self.i0 = frame.get_frame_np()
             self.image0mean = np.mean(self.i0)
             return
-        self.i1 = img1
+        self.i1 = frame.get_frame_np()
         img1mean = np.mean(self.i1)
         if (
             self.image0mean > img1mean + self.sensitivity
@@ -84,7 +86,8 @@ class NPMeanSegmentedSCDetect(BaseDetector):
         return means
 
     # a simple scene detect based on mean
-    def sceneDetect(self, img1):
+    def sceneDetect(self, img1: Frame):
+        img1 = img1.get_frame_np()
         if self.i0 is None:
             self.i0 = img1
             self.segmentsImg1Mean = self.segmentImage(self.i0)
@@ -113,7 +116,8 @@ class NPMeanDiffSCDetect(BaseDetector):
         self.i0 = None
         self.i1 = None
 
-    def sceneDetect(self, img1):
+    def sceneDetect(self, img1: Frame):
+        img1 = img1.get_frame_np()
         if self.i0 is None:
             self.i0 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)
             return
@@ -129,80 +133,15 @@ class NPMeanDiffSCDetect(BaseDetector):
         return False
 
 
-class FFMPEGSceneDetect(BaseDetector):
-    def __init__(self, threshold=0.3, min_scene_length=1, history_size=30):
-        self.threshold = threshold / 10
-        self.min_scene_length = min_scene_length
-        self.history_size = history_size
-        self.frame_diffs = deque(maxlen=history_size)
-        self.hist_diffs = deque(maxlen=history_size)
-        self.prev_frame = None
-        self.frames_since_last_scene = 0
-
-    def compute_frame_difference(self, frame1, frame2):
-        # Convert to YUV color space
-        yuv1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2YUV)
-        yuv2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2YUV)
-
-        # Compute difference in Y (luminance) channel
-        diff_y = cv2.absdiff(yuv1[:, :, 0], yuv2[:, :, 0])
-
-        # Compute histogram difference
-        hist1 = cv2.calcHist([yuv1], [0], None, [256], [0, 256])
-        hist2 = cv2.calcHist([yuv2], [0], None, [256], [0, 256])
-        hist_diff = cv2.compareHist(hist1, hist2, cv2.HISTCMP_BHATTACHARYYA)
-
-        return np.mean(diff_y), hist_diff
-
-    def sceneDetect(self, frame):
-        if self.prev_frame is None:
-            self.prev_frame = frame
-            return False
-
-        diff_y, hist_diff = self.compute_frame_difference(self.prev_frame, frame)
-        self.frame_diffs.append(diff_y)
-        self.hist_diffs.append(hist_diff)
-
-        self.prev_frame = frame
-        self.frames_since_last_scene += 1
-
-        if len(self.frame_diffs) < self.history_size:
-            return False
-
-        # Combine frame and histogram differences
-        combined_diff = np.array(self.frame_diffs) * np.array(self.hist_diffs)
-
-        # Normalize the differences
-        normalized_diff = (combined_diff - np.min(combined_diff)) / (
-            np.max(combined_diff) - np.min(combined_diff)
-        )
-
-        # Apply moving average filter
-        window_size = 5
-        smoothed_diff = np.convolve(
-            normalized_diff, np.ones(window_size) / window_size, mode="valid"
-        )
-
-        # Check if the latest smoothed difference exceeds the threshold
-        if (
-            smoothed_diff[-1] > self.threshold
-            and self.frames_since_last_scene >= self.min_scene_length
-        ):
-            self.frames_since_last_scene = 0
-            return True
-
-        return False
-
-
 class PySceneDetect(BaseDetector):
-    def __init__(self, threshold=2, min_scene_length=30):
+    def __init__(self, threshold=2):
         self.detector = ContentDetector(
             threshold=threshold * 10, min_scene_len=1
         )  # has to be 1 to stay synced
         self.frameNum = 0
 
-    def sceneDetect(self, frame: np.ndarray):
-        frame = cv2.resize(frame, (640, 360))
+    def sceneDetect(self, frame: Frame):
+        frame = cv2.resize(frame.get_np_sdr(), (640, 360))
         frameList = self.detector.process_frame(self.frameNum, frame)
         self.frameNum += 1
         if len(frameList) > 0:
@@ -215,6 +154,48 @@ class PySceneDetect(BaseDetector):
 
         return len(frameList) > 0
 
+class PyTorchSudoSceneDetect(ModelDetector):
+    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", model_backend="pytorch", model_gpu_id=0, **kwargs):
+        from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
+        import torch
+        self.torch = torch
+        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device, model_backend=model_backend)
+        self.i0 = None
+    def sceneDetect(self, frame: Frame):
+        frame = self.torch.nn.functional.interpolate(frame.get_frame_tensor(), 
+                            size=(256, 256), 
+                            mode='bilinear', 
+                            align_corners=False, 
+                            ).squeeze(0)
+        if self.i0 is None:
+            self.i0 = frame
+            self.model.model
+            return False
+        out = self.model(self.i0, frame)
+        self.i0 = frame
+        return out
+
+class NCNNSudoSceneDetect(ModelDetector):
+    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", **kwargs):
+        from ..ncnn.NCNNEfficientNetSC import InferenceSceneChangeDetectEfficientNetNCNN
+        self.model = InferenceSceneChangeDetectEfficientNetNCNN(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device)
+        self.i0 = None
+    def sceneDetect(self, frame: Frame):
+        frame = frame.clone().resize_frame(256,256).get_frame_np()
+        if self.i0 is None:
+            self.i0 = frame
+            return False
+        out = self.model(self.i0, frame)
+        self.i0 = frame
+        return out
+
+class RVESceneDetect(BaseDetector):
+    def __init__(self, **kwargs):
+        self.pass2 = PyTorchSudoSceneDetect()
+        self.pass1 = PySceneDetect()
+    def sceneDetect(self, frame):
+        return self.pass1.sceneDetect(frame) or self.pass2.sceneDetect(frame)
+        
 
 class SceneDetect:
     """
@@ -230,6 +211,11 @@ class SceneDetect:
         sceneChangeSensitivity: float = 2.0,
         width: int = 1920,
         height: int = 1080,
+        model_path: str = None,
+        model_backend: str = "pytorch",
+        model_dtype: str = "float32",
+        model_device: str = "cpu",
+        model_gpu_id: int = 0,
     ):
         self.width = width
         self.height = height
@@ -238,18 +224,26 @@ class SceneDetect:
             "mean": NPMeanSCDetect,
             "mean_diff": NPMeanDiffSCDetect,
             "mean_segmented": NPMeanSegmentedSCDetect,
-            "ffmpeg": FFMPEGSceneDetect,
             "pyscenedetect": PySceneDetect,
             "none": BaseDetector,
         }
 
-        assert self.sceneChangeMethod in scmethoddict, "Invalid Scene Change Method"
-        self.detector = scmethoddict[self.sceneChangeMethod](
-            threshold=sceneChangeSensitivity
-        )
+        assert self.sceneChangeMethod in scmethoddict or model_path is not None, "Invalid Scene Change Method"
+        if self.sceneChangeMethod in scmethoddict:
+            self.detector: BaseDetector = scmethoddict[self.sceneChangeMethod](
+                threshold=sceneChangeSensitivity
+            )
+        else:
+            assert model_path is not None and os.path.exists(model_path),  "Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter"
+            model = PyTorchSudoSceneDetect if model_backend == "pytorch" or model_backend == "tensorrt" else NCNNSudoSceneDetect
+            self.detector: ModelDetector = model(
+                threshold=sceneChangeSensitivity,
+                model_path=model_path,
+                model_dtype=model_dtype,
+                model_device=model_device,
+                model_backend=model_backend,
+                model_gpu_id=model_gpu_id,
+            )
 
-    def detect(self, frame):
-        if self.sceneChangeMethod != "none":
-            frame = bytesToImg(frame, width=self.width, height=self.height)
-        out = self.detector.sceneDetect(frame)
-        return out
+    def detect(self, frame: Frame) -> bool:
+        return self.detector.sceneDetect(frame)

@@ -1,9 +1,6 @@
 import torch
 import torch.nn.functional as F
-from abc import ABCMeta, abstractmethod
-from queue import Queue
-
-from ..utils.SSIM import SSIM
+from typing import Generator
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
@@ -16,6 +13,7 @@ import sys
 from ..utils.Util import (
     errorAndLog, log
 )
+from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
@@ -180,7 +178,6 @@ class InterpolateRifeTorch(BaseInterpolate):
                         width=self.width,
                         height=self.height,
                         hdr_mode=self.hdr_mode,
-                        padding=self.padding if need_pad else None,
                         device_type=self.device_type,
                         )
         
@@ -415,22 +412,23 @@ class InterpolateRifeTorch(BaseInterpolate):
     @torch.inference_mode()
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
-    ):  # type: ignore
-        
-        if self.frame0 is None:
-                self.frame0 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, device=self.device, dtype=self.dtype)
-                if self.encode:
-                    self.encode0 = self.encode_Frame(self.frame0, self.prepareStream)
-                return
-        
-        frame1 = self.torchUtils.frame_to_tensor(img1, self.f2tStream, device=self.device, dtype=self.dtype)
-        
-        if self.encode:
-            encode1 = self.encode_Frame(frame1, self.f2tStream)
+    ) -> Generator[Frame, Frame, Frame]:  
         
         with self.torchUtils.run_stream(self.stream):  # type: ignore
+            with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
+                if self.frame0 is None:
+                    self.frame0 = F.pad(img1.get_frame_tensor(),self.padding)
+                    if self.encode:
+                        self.encode0 = self.encode_Frame(self.frame0, self.prepareStream)
+                    return
+            
+                frame1 = F.pad(img1.get_frame_tensor(),self.padding)
+            self.torchUtils.sync_stream(self.prepareStream)
+            
+            if self.encode:
+                encode1 = self.encode_Frame(frame1, self.f2tStream)
 
 
             if self.dynamicScaledOpticalFlow:
@@ -487,9 +485,8 @@ class InterpolateRifeTorch(BaseInterpolate):
                                 self.tenFlow_div,
                                 self.backwarp_tenGrid,
                             )
-                    output = self.torchUtils.tensor_to_frame(output[:, :, :self.height, :self.width])
                     
-                    yield output
+                    yield img1.get_dummy_frame().set_frame_tensor(output[:, :, : self.height, : self.width])
 
                 else:
                     yield img1

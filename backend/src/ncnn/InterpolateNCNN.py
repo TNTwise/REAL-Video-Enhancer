@@ -5,6 +5,7 @@ from time import sleep
 import pathlib
 import sys
 from ..utils.Util import suppress_stdout_stderr
+from ..utils.Frame import Frame
 
 # third-party imports
 import numpy as np
@@ -144,7 +145,9 @@ class InterpolateRIFENCNN:
         self.gpuid = gpuid
         self.threads = threads
         self.paused = False
+        self.backend = "ncnn"
         self.frame0 = None
+        self.hdr_mode = hdr_mode 
         self._load()
 
     def _load(self):
@@ -171,15 +174,15 @@ class InterpolateRIFENCNN:
 
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
     ):
         if self.frame0 is None:
-            self.frame0 = img1
+            self.frame0 = img1.get_frame_bytes()
             return
         if transition:
             self.render.process_bytes(
-                self.frame0, img1, self.max_timestep
+                self.frame0, img1.get_frame_bytes(), self.max_timestep
             )  # get the cache to skip to next frame
             self.frame0 = img1
             
@@ -190,6 +193,8 @@ class InterpolateRIFENCNN:
             while self.paused:
                 sleep(1)
             timestep = (n + 1) * 1.0 / (self.interpolateFactor)
-            frame = self.render.process_bytes(self.frame0, img1, timestep)
-            yield frame
+            frame = self.render.process_bytes(self.frame0, img1.get_frame_bytes(), timestep)
+            retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
+            retFrame.set_frame_bytes(frame)
+            yield retFrame
         self.frame0 = img1

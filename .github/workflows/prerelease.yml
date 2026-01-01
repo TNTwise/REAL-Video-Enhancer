@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  APP_VERSION: 2.3.8
+  APP_VERSION: 2.3.9
 
 jobs:
   
@@ -148,8 +148,8 @@ jobs:
           name: REAL-Video-Enhancer-${{ env.APP_VERSION }}-Windows-Setup_x86_64.exe
           path: REAL-Video-Enhancer-${{ env.APP_VERSION }}-Windows-Setup_x86_64.exe
 
-  build-MacOS:
-    runs-on: macos-13
+  build-MacOS_x86_64:
+    runs-on: macos-15-intel
     permissions: write-all  
     steps:
 
@@ -219,7 +219,7 @@ jobs:
           path: REAL-Video-Enhancer-${{ env.APP_VERSION }}-MacOS_arm64.zip
           
   Release:
-    needs: [build-Windows, build-Linux, build-MacOS, build-MacOS_arm64, build-Linux_arm64]
+    needs: [build-Windows, build-Linux, build-MacOS_arm64, build-Linux_arm64, build-MacOS_x86_64]
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -64,14 +64,17 @@ class Render:
         precision="float16",
         pytorch_gpu_id: int = 0,
         ncnn_gpu_id: int = 0,
+        cwd: str = os.getcwd(),
         # model settings
         upscaleModel=None,
         interpolateModel=None,
         interpolateFactor: int = 1,
         extraRestorationModels=None,
+        sceneDetectModel: str = None,
         tile_size=None,
         drba=False,
         # ffmpeg settings
+        ffmpeg_path: str = "./bin/ffmpeg",
         start_time=None,
         end_time=None,
         custom_encoder: str = "libx264",
@@ -119,6 +122,7 @@ class Render:
         self.upscaleOption = None
         self.isPaused = False
         self.drba = drba
+        self.sceneDetectModelPath = sceneDetectModel
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
         self.sharedMemoryID = sharedMemoryID
@@ -135,8 +139,12 @@ class Render:
         self.trt_dynamic_shapes = trt_dynamic_shapes
         self.extraRestorationModels = []
         
-
-        videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time)
+        if cwd:
+            log("Working Directory: " + cwd)
+        else:
+            cwd = os.getcwd()
+            log("No Working Directory specified, using current directory: " + cwd)
+        videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time, ffmpeg_path=ffmpeg_path)
         
         if not videoInfo.is_valid_video:
             log("Input video is not valid!")
@@ -167,7 +175,7 @@ class Render:
 
         if border_detect:  # border detect has to be put before everything, to overwrite the width and height
             print("Detecting borders", file=sys.stderr)
-            borderDetect = BorderDetect(inputFile=self.inputFile)
+            borderDetect = BorderDetect(inputFile=self.inputFile, ffmpeg_path=ffmpeg_path)
             self.width, self.height, self.borderX, self.borderY = (
                 borderDetect.getBorders()
             )
@@ -226,10 +234,15 @@ class Render:
             borderX=self.borderX,
             borderY=self.borderY,
             hdr_mode=hdr_mode,
+            backend=self.backend,
+            device=self.device,
+            gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
+            dtype=self.precision,
             color_space=color_space,
             color_primaries=color_primaries,
             color_transfer=color_transfer,
             input_pixel_format=input_pix_fmt,
+            ffmpeg_path=ffmpeg_path,
         )
 
         self.writeBuffer = FFmpegWrite(
@@ -259,13 +272,16 @@ class Render:
             color_space=color_space,
             color_primaries=color_primaries,
             color_transfer=color_transfer,
+            ffmpeg_path=ffmpeg_path,
+            ffmpeg_log_file=os.path.join(cwd, "ffmpeg_log.txt"),
         )
 
         shm_mul = self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes
+        hdr_mul = 6 if hdr_mode else 3
 
         self.informationHandler = InformationWriteOut(
             sharedMemoryID=sharedMemoryID,
-            sharedMemoryChunkSize=self.originalHeight*self.originalWidth*3*shm_mul*shm_mul,
+            sharedMemoryChunkSize=self.originalHeight*self.originalWidth*shm_mul*shm_mul*hdr_mul,
             paused_shared_memory_id=pause_shared_memory_id,
             outputWidth=self.originalWidth*shm_mul,
             outputHeight=self.originalHeight*shm_mul,
@@ -327,9 +343,10 @@ class Render:
                     frame = extraRestoration(frame)
 
                 if self.interpolateModel:
+                    sceneDetect = self.sceneDetect.detect(frame)
                     interpolated_frames = self.interpolateOption(
                         img1=frame,
-                        transition=self.sceneDetect.detect(frame),
+                        transition=sceneDetect,
                     )
                     if not interpolated_frames:
                         return
@@ -341,14 +358,14 @@ class Render:
                                 interpolated_frame
                             )
                         if self.override_upscale_scale:
-                            interpolated_frame = resize_image_bytes(interpolated_frame,
+                            interpolated_frame = resize_image_bytes(interpolated_frame.get_frame_bytes(),
                                                width=self.width*self.modelScale,
                                                height=self.height*self.modelScale,
                                                target_width=self.width*self.override_upscale_scale,
                                                target_height=self.height*self.override_upscale_scale,)
-                        self.informationHandler.setPreviewFrame(interpolated_frame)
+                        self.informationHandler.setPreviewFrame(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
                         self.informationHandler.setFramesRendered(frames_rendered)
-                        self.writeBuffer.writeQueue.put(interpolated_frame)
+                        self.writeBuffer.writeQueue.put(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
                 
                 
 
@@ -360,7 +377,7 @@ class Render:
                 
                 
                 if self.override_upscale_scale:
-                    frame = resize_image_bytes(frame,
+                    frame = resize_image_bytes(frame.get_frame_bytes(),
                                                width=self.width*self.modelScale,
                                                height=self.height*self.modelScale,
                                                target_width=self.width*self.override_upscale_scale,
@@ -368,9 +385,9 @@ class Render:
 
                 
                 self.informationHandler.setFramesRendered(frames_rendered)
-                self.informationHandler.setPreviewFrame(frame)
+                self.informationHandler.setPreviewFrame(frame.get_frame_bytes() if type(frame) != bytes else frame)
                 
-                self.writeBuffer.writeQueue.put(frame)
+                self.writeBuffer.writeQueue.put(frame.get_frame_bytes() if type(frame) != bytes else frame)
                 frames_rendered += int(self.ceilInterpolateFactor)
             else:
                 sleep(1)
@@ -469,6 +486,11 @@ class Render:
             sceneChangeSensitivity=self.sceneDetectSensitivty,
             width=self.width,
             height=self.height,
+            model_path=self.sceneDetectModelPath,
+            model_backend=self.backend,
+            model_dtype=self.precision,
+            model_device=self.device,
+            model_gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
         )
         if self.sceneDetectMethod != "none":
             log("Scene Detection Enabled")

@@ -18,7 +18,7 @@ print(f"CPU Arch: {CPU_ARCH}")
 print(f"OUTPUT_FOLDER: {OUTPUT_FOLDER}")
 
 
-def zero_mainwindow_size():
+def set_mainwindow_size():
     import xml.etree.ElementTree as ET
 
     def set_mainwindow_size_zero(path="testRVEInterface.ui"):
@@ -154,7 +154,7 @@ class BuildManager:
     
     def build_gui(self):
         print("Building GUI")
-        zero_mainwindow_size()
+        #set_mainwindow_size()
         if PLATFORM == "darwin" or PLATFORM == "linux":
             os.system(
                 f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"
@@ -280,29 +280,37 @@ class Nuitka(BuildManager):
 if __name__ == "__main__":
     
     args = argparse.ArgumentParser()
+    args.add_argument("--run", help="Run the application", action="store_true")
+    args.add_argument("--run_backend", help="Run the backend", action="store_true")
     args.add_argument("--build", help="Build the application with a specific builder.", default="gui", choices=["pyinstaller", "cx_freeze", "nuitka", "gui"])
     args.add_argument("--copy_backend", help="Copy the backend to the build directory", action="store_true")    
     args = args.parse_args()
     if not os.path.exists("venv") or not args.build == "gui":
         BuildManager().python_manager.setup_python()
-    BuildManager().build_resources()
     BuildManager().build_gui()
+    if args.run:
+        PythonManager.run_venv_python("REAL-Video-Enhancer.py")
+    elif args.run_backend:
+        PythonManager.run_venv_python("backend/rve-backend.py")
+    else:
+        BuildManager().build_resources()
+        
+        
+        match args.build:
+            case "pyinstaller":
+                builder = PyInstaller()
+            case "cx_freeze":
+                builder = CxFreeze()
+            case "nuitka":
+                builder = Nuitka()
+            case "gui":
+                exit()
+            case _:
+                raise ValueError("Invalid build option")
+        builder.build()
+        builder.patch_for_xcbcursor()
+        if args.copy_backend:
+            builder.copy_backend()
+        print("Build complete")
     
-    match args.build:
-        case "pyinstaller":
-            builder = PyInstaller()
-        case "cx_freeze":
-            builder = CxFreeze()
-        case "nuitka":
-            builder = Nuitka()
-        case "gui":
-            exit()
-        case _:
-            raise ValueError("Invalid build option")
-    builder.build()
-    builder.patch_for_xcbcursor()
-    if args.copy_backend:
-        builder.copy_backend()
-    print("Build complete")
-
     

@@ -62,6 +62,12 @@ pytorchInterpolateModels = {
         1,
         "gmfss",
     ),
+    "GIMM (Slow Model, Realistic/General)": (
+        "GIMMVFI_RAFT.pth",
+        "GIMMVFI_RAFT.pth",
+        1,
+        "gimm",
+    ),
     
     "IFRNet (Fast Model, Realistic only)": (
         "IFRNet_Vimeo90K.pth",
@@ -358,6 +364,12 @@ pytorchUpscaleModels = {
         2,
         "SPAN",
     ),
+    "AnimeSR (Animation) (Low-High Quality Source) (4X) (Slow)": (
+        "AnimeSR_v2.pth",
+        "AnimeSR_v2.pth",
+        4,
+        "AnimeSR",
+    ),
 }
 
 tensorrtUpscaleModels = {
@@ -507,6 +519,12 @@ tensorrtDenoiseModels = {
         "RTMoSR",
     ),"""
 ncnnDecompressModels = {
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn",
+        "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn.tar.gz",
+        1,
+        "SuperUltraCompact",
+    ),
     "DeH264 SPAN (Fast) (Medium/Low Quality Source)": (
         "1x_DeH264_SPAN.ncnn",
         "1x_DeH264_SPAN.ncnn.tar.gz",
@@ -524,14 +542,13 @@ ncnnDecompressModels = {
     
 }
 pytorchDecompressModels = {
-    "DeH264 RTMoSR Unshuffle (UltraFast) (High Quality Source)": (
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors",
+        "deH264_SuperUltraCompact.safetensors",
         1,
-        "RTMoSR",
+        "SuperUltraCompact",
     ),
-
-        "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
+    "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
         "1xDeH264_RTMoSR.pth",
         "1xDeH264_RTMoSR.pth",
         1,
@@ -551,11 +568,11 @@ pytorchDecompressModels = {
     )
 }
 tensorrtDecompressModels = {
-    "DeH264 RTMoSR Unshuffle (UltraFast) (High Quality Source)": (
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
-        "1xDeH264_RTMoSR_Unshuffle.safetensors",
+    "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
+        "deH264_SuperUltraCompact.safetensors",
+        "deH264_SuperUltraCompact.safetensors",
         1,
-        "RTMoSR",
+        "SuperUltraCompact",
     ),
 
         "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
@@ -589,7 +606,28 @@ onnxUpscaleModels = {
         "SPAN",
     ),
 }
-
+pytorchSceneChangeModels = {
+    "sudo_maxxvit": (
+        "sudo_maxxvit_scenedetect.pt2",
+        "sudo_maxxvit_scenedetect.pt",
+        1,
+        "sudo_maxxvit",
+    ),
+    "sudo_scene_detect": ( # efficientnet doesnt work too well, so im gonna use maxxvit until i figure out efficientnet issues
+        "sudo_maxxvit_scenedetect.pt2",
+        "sudo_maxxvit_scenedetect.pt2",
+        1,
+        "sudo_efficientnet",
+    )
+}
+ncnnSceneChangeModels = {
+    "sudo_scene_detect": (
+        "sudo_efficientnet_scenedetect",
+        "sudo_efficientnet_scenedetect.tar.gz",
+        1,
+        "sudo_efficientnet",
+    )
+}
 
 
 
@@ -639,18 +677,21 @@ def getModels(backend:str):
             deblurModels = ncnnDeblurModels
             denoiseModels = ncnnDenoiseModels
             decompressModels = ncnnDecompressModels
+            sceneChangeModels = ncnnSceneChangeModels
         case "pytorch":
             interpolateModels = pytorchInterpolateModels
             upscaleModels = pytorchUpscaleModels
             deblurModels = pytorchDeblurModels
             denoiseModels = pytorchDenoiseModels
             decompressModels = pytorchDecompressModels
+            sceneChangeModels = pytorchSceneChangeModels
         case "tensorrt":
             interpolateModels = tensorrtInterpolateModels
             upscaleModels = tensorrtUpscaleModels
             deblurModels = tensorrtDeblurModels
             denoiseModels = tensorrtDenoiseModels
             decompressModels = tensorrtDecompressModels
+            sceneChangeModels = pytorchSceneChangeModels
         case "directml":
             interpolateModels = onnxInterpolateModels
             upscaleModels = onnxUpscaleModels
@@ -661,7 +702,7 @@ def getModels(backend:str):
             )
             errorAndLog("Failed to import any backends!")
             return {}
-    return interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels
+    return interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, sceneChangeModels
 
 def getModelDisplayName(model: str):
     try:

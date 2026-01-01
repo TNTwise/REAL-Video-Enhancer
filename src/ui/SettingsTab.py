@@ -99,10 +99,11 @@ class SettingsTab:
             self.out_pixel_fmt,
             self.settings.settings['audio_encoder'],
             self.settings.settings['audio_bitrate'],
+            self.settings.settings['subtitle_encoder'],  
             self.hdr_mode,
             self.color_space if self.in_pix_fmt != "yuv420p" else None,
             self.color_primaries,
-            self.color_transfer,    
+            self.color_transfer,  
         ).build_command()
         self.parent.EncoderCommand.setText(" ".join(command))
         self.parent.updateVideoGUIText()
@@ -110,6 +111,11 @@ class SettingsTab:
 
     def connectWriteSettings(self):
         
+        self.parent.subtitle_encoder.currentIndexChanged.connect(
+            lambda: self.settings.writeSetting(
+                "subtitle_encoder", self.parent.subtitle_encoder.currentText()
+            )
+        )
 
         self.parent.precision.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
@@ -250,6 +256,9 @@ class SettingsTab:
         self.parent.video_encoder_speed.currentIndexChanged.connect(
             self.updateFFMpegCommand
         )
+        self.parent.subtitle_encoder.currentIndexChanged.connect(
+            self.updateFFMpegCommand
+        )
 
     def writeOutputFolder(self):
         outputlocation = self.parent.output_folder_location.text()
@@ -345,6 +354,9 @@ class SettingsTab:
         self.parent.video_encoder_speed.setCurrentText(
             self.settings.settings["video_encoder_speed"]
         )
+        self.parent.subtitle_encoder.setCurrentText(
+            self.settings.settings["subtitle_encoder"]
+        )
 
     def selectOutputFolder(self):
         outputFile = QFileDialog.getExistingDirectory(
@@ -380,9 +392,10 @@ class Settings:
             "encoder": "libx264",
             "video_encoder_speed": "medium",
             "audio_encoder": "copy_audio",
+            "subtitle_encoder": "copy_subtitle",
             "audio_bitrate": "192k",
             "preview_enabled": "True",
-            "scene_change_detection_method": "pyscenedetect",
+            "scene_change_detection_method": "sudo_scene_detect",
             "scene_change_detection_enabled": "True",
             "scene_change_detection_threshold": "3.5",
             "discord_rich_presence": "False",
@@ -395,7 +408,7 @@ class Settings:
             "auto_border_cropping": "False",
             "video_container": "mkv",
             "video_pixel_format": "yuv420p",
-            "pytorch_version": "2.9.0" if PLATFORM == "darwin" else "2.8.0",
+            "pytorch_version": "2.9.0",
             "pytorch_backend": "CUDA",
             "auto_hdr_mode": "True",
         }
@@ -410,29 +423,28 @@ class Settings:
                 "av1",
                 "prores",
                 "ffv1",
-                "x264_vulkan (experimental)",
+                "utvideo",
                 "x264_nvenc",
                 "x265_nvenc",
                 "av1_nvenc (40 series and up)",
-                "x264_vaapi",
-                "x265_vaapi",
-                "av1_vaapi",
             ),
             "video_encoder_speed": ("placebo","slow", "medium", "fast", "fastest"),
             "audio_encoder": ("aac", "libmp3lame", "opus", "copy_audio"),
             "audio_bitrate": "ANY",
+            "subtitle_encoder": ("copy_subtitle","srt","ass","webvtt"),
             "preview_enabled": ("True", "False"),
             "scene_change_detection_method": (
                 "mean",
                 "mean_segmented",
                 "pyscenedetect",
+                "sudo_scene_detect",
             ),
             "scene_change_detection_enabled": ("True", "False"),
             "scene_change_detection_threshold": [
                 str(num / 10) for num in range(1, 100)
             ],
             "discord_rich_presence": ("True", "False"),
-            "video_quality": ("Low", "Medium", "High", "Very_High"),
+            "video_quality": ("Low", "Medium", "High", "Very_High", "Ultra", "Lossless"),
             "output_folder_location": "ANY",
             "last_input_folder_location": "ANY",
             "uhd_mode": ("True", "False"),

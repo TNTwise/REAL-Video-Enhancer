@@ -27,6 +27,7 @@ class RenderOptions:
         deblurModelFile: str | None = None,
         denoiseModelFile: str | None = None,
         decompressModelFile: str | None = None,
+        sceneChangeModelFile: str | None = None,
         hdrMode: bool = False,
         startTime: float | None = None,
         endTime: float | None = None,
@@ -49,6 +50,7 @@ class RenderOptions:
         self._upscaleModelArch = upscaleModelArch
         self._denoiseModelFile = denoiseModelFile
         self._decompressModelFile = decompressModelFile
+        self._sceneChangeModelFile = sceneChangeModelFile
         self._modelScale = modelScale
         self._interpolateTimes = interpolateTimes
         self._benchmarkMode = benchmarkMode
@@ -155,6 +157,13 @@ class RenderOptions:
     def decompressModelFile(self, value: str):
         self._decompressModelFile = value
     
+    @property
+    def sceneChangeModelFile(self):
+        return self._sceneChangeModelFile
+    @sceneChangeModelFile.setter
+    def sceneChangeModelFile(self, value: str):
+        self._sceneChangeModelFile = value
+
     @property
     def upscaleModelArch(self):
         return self._upscaleModelArch

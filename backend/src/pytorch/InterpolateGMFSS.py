@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 from .TorchUtils import TorchUtils
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
@@ -10,6 +11,7 @@ from ..utils.Util import (
     log,
 )
 from ..utils.Util import CudaChecker
+from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
@@ -63,11 +65,11 @@ class InterpolateGMFSSTorch(BaseInterpolate):
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
+        self.device_type = device
         self.torchUtils = TorchUtils(
             self.width,
             self.height,
             hdr_mode=self.hdr_mode,
-            padding=self.padding,
             device_type=device
         )
         self.device = self.torchUtils.handle_device(device, gpu_id=gpu_id)
@@ -78,6 +80,7 @@ class InterpolateGMFSSTorch(BaseInterpolate):
     def _load(self):
         self.stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)  
         self.prepareStream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
+        self.copy_stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
         with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
             if self.dynamicScaledOpticalFlow:
                 from ..utils.SSIM import SSIM
@@ -143,15 +146,19 @@ class InterpolateGMFSSTorch(BaseInterpolate):
     @torch.inference_mode()
     def __call__(
         self,
-        img1,
+        img1: Frame,
         transition=False,
     ):  # type: ignore
 
         with self.torchUtils.run_stream(self.stream):  # type: ignore
-            if self.frame0 is None:
-                self.frame0 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
-                return
-            frame1 = self.torchUtils.frame_to_tensor(img1, self.prepareStream, self.device, self.dtype)
+            with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
+                if self.frame0 is None:
+                    self.frame0 = F.pad(img1.get_frame_tensor(), self.padding)
+                    return
+            
+                frame1 = F.pad(img1.get_frame_tensor(), self.padding)
+            self.torchUtils.sync_stream(self.prepareStream)
+            
             if self.dynamicScaledOpticalFlow:
                 closest_value = self.dynamicScale.dynamicScaleCalculation(
                     self.frame0, frame1
@@ -165,15 +172,20 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                     while self.flownet is None:
                         sleep(1)
                     timestep = self.timestepDict[timestep]
-                    output = self.flownet.forward(self.frame0, frame1, timestep, closest_value)
 
-                    output = self.torchUtils.tensor_to_frame(output)
-                    yield output
+                    yield (
+                        img1
+                        .get_dummy_frame()
+                        .set_frame_tensor(
+                            self.flownet.forward(self.frame0, frame1, timestep, closest_value)
+                            [:, :, : self.height, : self.width]
+                            )
+                        )
                 else:
                     self.flownet.reset_cache_after_transition()
                     yield img1
 
 
-            self.torchUtils.copy_tensor(self.frame0, frame1, self.prepareStream)
+            self.torchUtils.copy_tensor(self.frame0, frame1, self.copy_stream)
 
         self.torchUtils.sync_all_streams()

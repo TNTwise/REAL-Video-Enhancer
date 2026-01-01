@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import TypeVar, Union, Optional, Dict
 
 T = TypeVar("T")
+from ..utils.Frame import Frame
 
 
 def checked_cast(t: type[T], value: object) -> T:
@@ -4110,6 +4111,8 @@ class UpscaleNCNN:
         self.threads = num_threads
         self.tilePad = tilePad
         self.tile_pad = tilePad
+        self.hdr_mode = hdr_mode
+        self.backend = "ncnn"
         self.mean_vals = []
         self.norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
         self._load()
@@ -4153,11 +4156,13 @@ class UpscaleNCNN:
     def frame_to_tensor(self, frame: np.array) -> np.array:
         return frame
 
-    def __call__(self, imageChunk):
+    def __call__(self, imageChunk: Frame):
         while self.net is None:
             sleep(1)
             
-        img = self.net.process_bytes(imageChunk, self.width, self.height, 3)
-        return img
+        img = self.net.process_bytes(imageChunk.get_frame_bytes(), self.width, self.height, 3)
+        retFrame = Frame(self.backend, self.width, self.height, imageChunk.device, gpu_id=imageChunk.gpu_id, hdr_mode=self.hdr_mode, dtype=imageChunk.dtype)
+        retFrame.set_frame_bytes(img)
+        return retFrame
 
     

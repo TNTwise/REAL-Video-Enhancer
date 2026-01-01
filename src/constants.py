@@ -20,8 +20,9 @@ LOCKFILE = QDir.tempPath() + "/REAL-Video-Enhancer.lock"
 
 
 PLATFORM = sys.platform  # win32, darwin, linux
+IS_STEAM = "SteamAppId" in os.environ
+IS_FLATPAK = "FLATPAK_ID" in os.environ and not IS_STEAM
 
-IS_FLATPAK = "FLATPAK_ID" in os.environ
 HOME_PATH = os.path.expanduser("~")
 
 IS_COMPILED_OR_FROZEN = hasattr(sys, "frozen")
@@ -41,6 +42,7 @@ if not USE_LOCAL_BACKEND:
         )
 else:
     CWD = os.getcwd()
+    
 if IS_FLATPAK:
     CWD = (
         os.path.join(
