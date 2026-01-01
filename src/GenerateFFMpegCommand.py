@@ -101,6 +101,8 @@ class FFMpegCommand:
                 command += self._get_video_preset(self._video_encoder_speed)
                 if self._hdr_mode:
                     command += ["-x264-params", f'"{encoder_params}"']
+                if self._video_quality == "Lossless":
+                    command += ["-qp", "0"]
                 
                 
             case "libx265":
@@ -108,7 +110,11 @@ class FFMpegCommand:
                 command +=["-crf", str(self._get_video_quality(self._video_quality))]
                 command += self._get_video_preset(self._video_encoder_speed)
                 if self._hdr_mode:
+                    if self._video_quality == "Lossless":
+                        encoder_params += ":lossless=1"
                     command += ["-x265-params", f'"{encoder_params}"']
+                elif self._video_quality == "Lossless":
+                    command += ["-x265-params", "lossless=1"]
                 
             case "vp9":
                 command +=["-c:v","libvpx-vp9"]
