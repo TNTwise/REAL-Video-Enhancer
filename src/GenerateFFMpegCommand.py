@@ -181,10 +181,12 @@ class FFMpegCommand:
                 command +=["-cq:v", str(self._get_video_quality(self._video_quality))]
                 command += self._get_video_preset(self._video_encoder_speed, "p7", "p6", "p4", "p2", "p1")
                 
-            case "h264_vaapi":
+            case "x264_vaapi":
+                command +=['-init_hw_device', 'vaapi=va:/dev/dri/renderD128', '-filter_hw_device', 'vaapi', '-filter:v', f'format={self._video_pixel_format},hwupload']
                 command +=["-c:v","h264_vaapi"]
                 command +=["-crf", str(self._get_video_quality(self._video_quality))]
-            case "h265_vaapi":
+            case "x265_vaapi":
+                command +=['-init_hw_device', 'vaapi=va:/dev/dri/renderD128', '-filter_hw_device', 'vaapi', '-filter:v', f'format={self._video_pixel_format},hwupload']
                 command +=["-c:v","hevc_vaapi"]
                 command +=["-crf", str(self._get_video_quality(self._video_quality))]
             case "av1_vaapi":

@@ -2666,21 +2666,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                           </item>
                                           <item>
                                            <property name="text">
-                                            <string>x264_vaapi</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
-                                            <string>x265_vaapi</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
-                                            <string>av1_vaapi</string>
-                                           </property>
-                                          </item>
-                                          <item>
-                                           <property name="text">
                                             <string>h264_amf</string>
                                            </property>
                                           </item>
@@ -4429,8 +4414,8 @@ QTabWidget::pane { /* The tab widget frame */
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>391</width>
-                   <height>409</height>
+                   <width>1026</width>
+                   <height>652</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -4472,8 +4457,8 @@ QTabWidget::pane { /* The tab widget frame */
                              <rect>
                               <x>0</x>
                               <y>0</y>
-                              <width>499</width>
-                              <height>182</height>
+                              <width>968</width>
+                              <height>528</height>
                              </rect>
                             </property>
                             <layout class="QVBoxLayout" name="verticalLayout_25">
