@@ -1,3 +1,4 @@
+# RVE 2.4.0
 # RVE 2.3.9
 ### Added
  - AnimeSR
