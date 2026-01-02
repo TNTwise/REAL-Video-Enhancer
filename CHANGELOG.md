@@ -1,4 +1,6 @@
 # RVE 2.4.1
+### Fixed
+ - Sudo scene detect models on non-nvidia gpus.
 # RVE 2.4.0
 ### Fixed
  - Automatic backend select failing on non-nvidia systems.
