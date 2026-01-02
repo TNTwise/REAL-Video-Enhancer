@@ -72,8 +72,11 @@ class GPUDetect:
         return model
     
     def getPyTorchFeatures(self) -> str | None:
-        if int(self.getModelOfGPU()[4]) >= 2 and self.getVendor() == "Nvidia":
-            return "cuda"
+        try:
+            if int(self.getModelOfGPU()[4]) >= 2 and self.getVendor() == "Nvidia":
+                return "cuda"
+        except Exception:
+            return None
         return None
     
 if __name__ == '__main__':
