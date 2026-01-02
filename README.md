@@ -3,7 +3,7 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 ![license](https://img.shields.io/github/license/tntwise/real-video-enhancer)
-![Version](https://img.shields.io/badge/Version-2.3.8-blue)
+![Version](https://img.shields.io/badge/Version-2.3.9-blue)
 ![downloads_total](https://img.shields.io/github/downloads/tntwise/REAL-Video-Enhancer/total.svg?label=downloads%40total)
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
@@ -132,7 +132,7 @@
 git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer 
 
 # Stable
-git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer --branch 2.3.8
+git clone --recurse-submodules https://github.com/TNTwise/REAL-Video-Enhancer --branch 2.3.9
 ```
 # Building:
 

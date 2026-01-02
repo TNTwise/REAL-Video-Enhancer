@@ -1,3 +1,6 @@
+# RVE 2.4.0
+### Fixed
+ - Automatic backend select failing on non-nvidia systems.
 # RVE 2.3.9
 ### Added
  - AnimeSR
