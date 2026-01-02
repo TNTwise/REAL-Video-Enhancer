@@ -1,3 +1,4 @@
+# RVE 2.4.1
 # RVE 2.4.0
 ### Fixed
  - Automatic backend select failing on non-nvidia systems.

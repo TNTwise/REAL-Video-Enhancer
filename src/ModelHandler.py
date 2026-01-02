@@ -608,14 +608,14 @@ onnxUpscaleModels = {
 }
 pytorchSceneChangeModels = {
     "sudo_maxxvit": (
-        "sudo_maxxvit_scenedetect.pt2",
-        "sudo_maxxvit_scenedetect.pt",
+        "sudo_maxxvit_scenedetect.pth",
+        "sudo_maxxvit_scenedetect.pth",
         1,
         "sudo_maxxvit",
     ),
     "sudo_scene_detect": ( # efficientnet doesnt work too well, so im gonna use maxxvit until i figure out efficientnet issues
-        "sudo_maxxvit_scenedetect.pt2",
-        "sudo_maxxvit_scenedetect.pt2",
+        "sudo_maxxvit_scenedetect.pth",
+        "sudo_maxxvit_scenedetect.pth",
         1,
         "sudo_efficientnet",
     )
