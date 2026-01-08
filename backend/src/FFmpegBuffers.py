@@ -82,6 +82,7 @@ class FFmpegRead(Buffer):
         
         command = [
             f"{self.ffmpeg_path}",
+            "-nostdin",
             "-i",
             f"{self.inputFile}",
         ]
