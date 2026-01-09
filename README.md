@@ -3,7 +3,7 @@
 [![pypresence](https://img.shields.io/badge/using-pypresence-00bb88.svg?style=for-the-badge&logo=discord&logoWidth=20)](https://github.com/qwertyquerty/pypresence)
 
 ![license](https://img.shields.io/github/license/tntwise/real-video-enhancer)
-![Version](https://img.shields.io/badge/Version-2.4.1-blue)
+![Version](https://img.shields.io/badge/Version-2.4.2-blue)
 ![downloads_total](https://img.shields.io/github/downloads/tntwise/REAL-Video-Enhancer/total.svg?label=downloads%40total)
 <a href="https://discord.gg/hwGHXga8ck">
       <img src="https://img.shields.io/discord/1041502781808328704?label=Discord" alt="Discord Shield"/></a>
@@ -70,7 +70,7 @@
 ### Interpolate Models:
 | Model | Author | Link |
 |--|--|--|
-| RIFE 4.6,4.7,4.15,4.18,4.22,4.22-lite,4.25 | Hzwer | [Practical-RIFE](https://github.com/hzwer/Practical-RIFE) 
+| RIFE 4.6,4.7,4.15,4.18,4.22,4.22-lite,4.25,4.26 | Hzwer | [Practical-RIFE](https://github.com/hzwer/Practical-RIFE) 
 | GMFSS | 98mxr | [GMFSS_Fortuna](https://github.com/98mxr/GMFSS_Fortuna) 
 | IFRNet | ltkong218 | [IFRnet](https://github.com/ltkong218/IFRNet)
 
