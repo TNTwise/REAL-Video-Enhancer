@@ -1,7 +1,6 @@
 import numpy as np
 import os
 import cv2
-from collections import deque
 import sys
 from .PySceneDetectUtils import ContentDetector
 from ..utils.Frame import Frame
