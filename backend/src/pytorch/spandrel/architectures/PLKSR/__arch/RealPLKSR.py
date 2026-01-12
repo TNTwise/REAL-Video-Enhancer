@@ -8,6 +8,20 @@ from ....architectures.__arch_helpers.dysample import DySample
 from ....util import store_hyperparameters
 
 
+class LayerNorm(nn.Module):
+    def __init__(self, dim: int, eps: float = 1e-6) -> None:
+        super().__init__()
+        self.weight = nn.Parameter(torch.ones(dim))
+        self.bias = nn.Parameter(torch.zeros(dim))
+        self.eps = eps
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        u = x.mean(1, keepdim=True)
+        s = (x - u).pow(2).mean(1, keepdim=True)
+        x = (x - u) / torch.sqrt(s + self.eps)
+        return self.weight[:, None, None] * x + self.bias[:, None, None]
+
+
 class DCCM(nn.Sequential):
     "Doubled Convolutional Channel Mixer"
 
@@ -56,10 +70,14 @@ class PLKBlock(nn.Module):
         dim: int,
         kernel_size: int,
         split_ratio: float,
-        norm_groups: int,
         use_ea: bool = True,
+        norm_groups: int = 4,
+        use_layer_norm: bool = False,
     ):
         super().__init__()
+
+        # Layer Norm
+        self.layer_norm = LayerNorm(dim) if use_layer_norm else nn.Identity()
 
         # Local Texture
         self.channel_mixer = DCCM(dim)
@@ -80,11 +98,16 @@ class PLKBlock(nn.Module):
         self.refine = nn.Conv2d(dim, dim, 1, 1, 0)
         trunc_normal_(self.refine.weight, std=0.02)
 
-        # Group Normalization
-        self.norm = nn.GroupNorm(norm_groups, dim)
+        if not use_layer_norm:
+            self.norm = nn.GroupNorm(norm_groups, dim)
+            nn.init.constant_(self.norm.bias, 0)
+            nn.init.constant_(self.norm.weight, 1.0)
+        else:
+            self.norm = nn.Identity()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x_skip = x
+        x = self.layer_norm(x)
         x = self.channel_mixer(x)
         x = self.lk(x)
         x = self.attn(x)
@@ -114,6 +137,7 @@ class RealPLKSR(nn.Module):
         norm_groups: int = 4,
         dropout: float = 0,
         dysample: bool = False,
+        layer_norm: bool = False,
     ):
         super().__init__()
 
@@ -128,11 +152,11 @@ class RealPLKSR(nn.Module):
         self.feats = nn.Sequential(
             *[nn.Conv2d(in_ch, dim, 3, 1, 1)]
             + [
-                PLKBlock(dim, kernel_size, split_ratio, norm_groups, use_ea)
+                PLKBlock(dim, kernel_size, split_ratio, use_ea, norm_groups, layer_norm)
                 for _ in range(n_blocks)
             ]
             + [nn.Dropout2d(dropout)]
-            + [nn.Conv2d(dim, 3 * upscaling_factor**2, 3, 1, 1)]
+            + [nn.Conv2d(dim, out_ch * upscaling_factor**2, 3, 1, 1)]
         )
         trunc_normal_(self.feats[0].weight, std=0.02)
         trunc_normal_(self.feats[-1].weight, std=0.02)
