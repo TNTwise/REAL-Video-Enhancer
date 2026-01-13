@@ -1,7 +1,8 @@
 # RVE 2.4.2
 ### Fixed
  - FFMpeg reading randomly stopping, thanks @potocpav
- - Fix PLKSR LayerNorm models
+ - PLKSR LayerNorm models
+ - PySceneDetect with Restoration models enabled.
 # RVE 2.4.1
 ### Fixed
  - Sudo scene detect models on non-nvidia gpus.
