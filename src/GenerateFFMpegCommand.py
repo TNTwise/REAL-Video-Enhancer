@@ -123,7 +123,7 @@ class FFMpegCommand:
 
             case "av1":
                 command +=["-c:v","libsvtav1"]
-                command +=["-crf", str(self._get_video_quality(self._video_quality, high_crf=20, medium_crf=30, low_crf=40))]
+                command +=["-crf", str(self._get_video_quality(self._video_quality,ultra_crf=20, very_high_crf=23, high_crf=28, medium_crf=31, low_crf=40))]
                 command += self._get_video_preset(self._video_encoder_speed, 0, 4, 8, 12, 13)
                     
             case "ffv1":
@@ -178,7 +178,7 @@ class FFMpegCommand:
                 command += self._get_video_preset(self._video_encoder_speed, "p7", "p6", "p4", "p2", "p1")
             case "av1_nvenc":
                 command +=["-c:v","av1_nvenc"]
-                command +=["-cq:v", str(self._get_video_quality(self._video_quality))]
+                command +=["-cq:v", str(self._get_video_quality(self._video_quality,ultra_crf=15, very_high_crf=20, high_crf=25, medium_crf=30, low_crf=35))]
                 command += self._get_video_preset(self._video_encoder_speed, "p7", "p6", "p4", "p2", "p1")
                 
             case "x264_vaapi":
