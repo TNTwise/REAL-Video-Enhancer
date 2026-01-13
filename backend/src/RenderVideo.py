@@ -338,12 +338,15 @@ class Render:
                 if frame is None:
                     self.informationHandler.stopWriting()
                     break
+                
+                if self.interpolateModel: # detect scene changes before running any calculations, as for some reason cv2 hates the frame after its been passed through the restore models.
+                    sceneDetect = self.sceneDetect.detect(frame)
 
                 for extraRestoration in self.extraRestorationModels:
                     frame = extraRestoration(frame)
 
                 if self.interpolateModel:
-                    sceneDetect = self.sceneDetect.detect(frame)
+                    
                     interpolated_frames = self.interpolateOption(
                         img1=frame,
                         transition=sceneDetect,

@@ -63,11 +63,7 @@ class TorchUtils:
             self.use_numpy = False
         self.__run_stream_func = self.__run_stream_function()
         self.__sync_all_streams_func = self.__sync_all_streams_function()
-
-        # persistent pinned buffer for async GPU uploads
-        self._pinned_buffer = None
-        self._pinned_buffer_numel = 0
-        self._pinned_buffer_dtype = None
+        
 
     def __sync_all_streams_function(self):
         if self.device_type == "cuda":
@@ -164,6 +160,17 @@ class TorchUtils:
 
     @torch.inference_mode()
     def copy_tensor(self, tensorToCopy: torch.Tensor, tensorCopiedTo: torch.Tensor, stream: torch.Stream): # stream might be None
+        """
+        Docstring for copy_tensor
+        
+        :param self: Description
+        :param tensorToCopy: Description
+        :type tensorToCopy: torch.Tensor
+        :param tensorCopiedTo: Description
+        :type tensorCopiedTo: torch.Tensor
+        :param stream: Description
+        :type stream: torch.Stream
+        """
         with self.run_stream(stream):  # type: ignore
             tensorToCopy.copy_(tensorCopiedTo, non_blocking=True)
         
@@ -171,6 +178,20 @@ class TorchUtils:
 
     @torch.inference_mode()
     def frame_to_tensor(self, frame, stream: torch.Stream, device: torch.device, dtype: torch.dtype) -> torch.Tensor: # stream might be None
+        """
+        Docstring for frame_to_tensor
+        
+        :param frame: Frame data in bytes
+        :param stream: Torch Stream for asynchronous operations
+        :type stream: torch.Stream
+        :param device: Target device for the tensor
+        :type device: torch.device
+        :param dtype: Target data type for the tensor
+        :type dtype: torch.dtype
+        :return: Tensor representation of the frame in the shape (1, C, H, W)
+        :rtype: torch.Tensor
+        """
+        
         with self.run_stream(stream):  # type: ignore
              # ... (tensor creation and manipulation) ...
             frame = torch.frombuffer(
@@ -202,6 +223,13 @@ class TorchUtils:
     
     @torch.inference_mode()
     def tensor_to_frame(self, frame: torch.Tensor):
+        """
+        Docstring for tensor_to_frame
+        
+        :param self: Description
+        :param frame: Description
+        :type frame: torch.Tensor
+        """
         # Prepare the tensor
         tensor = (
             frame.squeeze(0)
@@ -224,13 +252,34 @@ class TorchUtils:
     @staticmethod
     @torch.inference_mode()
     def np_to_tensor(arr: np.ndarray, device, dtype):
-        import torch
+        """
+        Docstring for np_to_tensor
+
+        :param arr: Input numpy array in the shape (H, W, C)
+        :type arr: ndarray
+        :param device: Target device for the tensor
+        :type device: torch.device
+        :param dtype: Target data type for the tensor
+        :type dtype: torch.dtype
+        :return: Tensor representation of the numpy array in the shape (1, C, H
+        , W)
+        :rtype: torch.Tensor
+        """
         return torch.from_numpy(arr).to(device=device, dtype=dtype).permute(2, 0, 1).unsqueeze(0)
 
     
     @staticmethod
     @torch.inference_mode()
+    
     def tensor_to_np(tensor: torch.Tensor) -> np.ndarray:
+        """
+        Docstring for tensor_to_np
+        
+        :param tensor: Input tensor in the shape (1, C, H, W)
+        :type tensor: torch.Tensor
+        :return: Numpy array representation of the tensor in the shape (H, W, C)
+        :rtype: ndarray
+        """
         return tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()
 
     @staticmethod
@@ -241,6 +290,20 @@ class TorchUtils:
         new_height: int,
         mode: str = "bilinear",
     ) -> torch.Tensor:
+        """
+        Docstring for resize_tensor
+        
+        :param tensor: Input tensor in the shape (1, C, H, W)
+        :type tensor: torch.Tensor
+        :param new_width: new width
+        :type new_width: int
+        :param new_height: new height
+        :type new_height: int
+        :param mode: Resizing mode, e.g., 'nearest', 'bilinear', 'bicubic'
+        :type mode: str
+        :return: Resized tensor in the shape (1, C, new_height, new_width)
+        :rtype: torch.Tensor
+        """
         return F.interpolate(
             tensor,
             size=(new_height, new_width),
