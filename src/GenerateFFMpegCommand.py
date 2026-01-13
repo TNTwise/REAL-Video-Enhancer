@@ -123,7 +123,7 @@ class FFMpegCommand:
 
             case "av1":
                 command +=["-c:v","libsvtav1"]
-                command +=["-crf", str(self._get_video_quality(self._video_quality,ultra_crf=20, very_high_crf=23, high_crf=28, medium_crf=31, low_crf=40))]
+                command +=["-crf", str(self._get_video_quality(self._video_quality,ultra_crf=20, very_high_crf=23, high_crf=26, medium_crf=30, low_crf=35))]
                 command += self._get_video_preset(self._video_encoder_speed, 0, 4, 8, 12, 13)
                     
             case "ffv1":
