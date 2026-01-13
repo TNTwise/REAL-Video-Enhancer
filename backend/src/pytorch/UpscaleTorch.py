@@ -239,6 +239,9 @@ class UpscalePytorch:
                             self.trt_engine_name,
                             example_inputs=self.tensorrt_example_inputs,
                         )
+                        TorchUtils.clear_cache()
+                        torch._dynamo.reset()
+                        
 
                     except Exception as e:
                         if dynamic_shapes is not None:
