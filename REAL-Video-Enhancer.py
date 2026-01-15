@@ -182,7 +182,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             automaticInstall = reply == QMessageBox.Yes  # type: ignore
             if automaticInstall:
                 self.downloadTab = DownloadTab(parent=self, backends=self.backends, skip_info_popup=True)
-                self.downloadTab.installRecommended()
+                return_code = self.downloadTab.installRecommended()
+                if return_code != 0:
+                    exit(1)
+                    
                 self.backends, self.fullOutput = (
                     backendHandler.getAvailableBackends()
                 )

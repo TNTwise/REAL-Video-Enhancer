@@ -165,12 +165,13 @@ class DownloadTab:
     def installRecommended(self):
         pytorch_backend = GPUDetect().getPyTorchFeatures()
         if pytorch_backend and self.has_enough_space:
-            self.download("torch", install=True, pytorch_backend=pytorch_backend)
+            return_code = self.download("torch", install=True, pytorch_backend=pytorch_backend)
         elif PLATFORM == 'darwin' and CPU_ARCH == "arm64" and self.has_enough_space:
-            self.download("torch", install=True, pytorch_backend="mps")
+            return_code = self.download("torch", install=True, pytorch_backend="mps")
         else:
-            self.download("ncnn")
-
+            return_code = self.download("ncnn")
+        return return_code
+    
     def download(self, dep, install: bool = True, pytorch_backend:str = None):
         """
         Downloads the specified dependency.
@@ -179,6 +180,7 @@ class DownloadTab:
         Returns:
         - None
         """
+        return_code:int = -1
         pytorch_ver:TorchVersion|None = None
         current_pytorch_version = self.parent.pytorch_version.currentText().split()[0]
         current_pytorch_backend = self.parent.pytorch_backend.currentText().split()[0].lower() if not pytorch_backend else pytorch_backend
@@ -212,3 +214,5 @@ class DownloadTab:
                 )
             elif return_code != 0:
                 RegularQTPopup("Download Failed!\nPlease check logs for more info.")
+            
+        return return_code
