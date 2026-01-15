@@ -288,12 +288,12 @@ if __name__ == "__main__":
     if not os.path.exists("venv") or not args.build == "gui":
         BuildManager().python_manager.setup_python()
     BuildManager().build_gui()
-    BuildManager().build_resources()
     if args.run:
         PythonManager.run_venv_python("REAL-Video-Enhancer.py")
     elif args.run_backend:
         PythonManager.run_venv_python("backend/rve-backend.py")
-        
+    else:
+        BuildManager().build_resources()
         
         
         match args.build:
