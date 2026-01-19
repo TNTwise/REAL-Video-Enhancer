@@ -76,6 +76,7 @@ class InformationWriteOut:
         self.previewFrame = None
         self.last_length = 0
         self.framesRendered = 1
+        self.total_paused_time_seconds = 0
         self.hdr_mode = hdr_mode
         self.sharedMemoryChunkSize = sharedMemoryChunkSize
 
@@ -146,9 +147,10 @@ class InformationWriteOut:
             log(f"Shared memory name: {self.shm.name}")
         i = 0
         while not self.stop:
+            
             if self.previewFrame is not None and self.framesRendered > 0:
                 # print out data to stdout
-                fps = round(self.framesRendered / (time.time() - self.startTime))
+                fps = round(self.framesRendered / (time.time() - self.startTime - self.total_paused_time_seconds))
                 eta = self.calculateETA(framesRendered=self.framesRendered)
                 message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
                 if i == 0:
@@ -179,6 +181,14 @@ class InformationWriteOut:
                         except Exception:
                             pass
                 self.isPaused = self.pausedManager.pause_manager()
+                if self.isPaused:
+                    pause_start_time = time.time()
+                    while self.isPaused and not self.stop:
+                        self.isPaused = self.pausedManager.pause_manager()
+                        time.sleep(0.5)
+                    pause_end_time = time.time()
+                    paused_duration = pause_end_time - pause_start_time
+                    self.total_paused_time_seconds += paused_duration
             time.sleep(
                 0.5
             )  # setting this to a higher value will reduce the cpu usage, and increase fps
