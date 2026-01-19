@@ -3,6 +3,7 @@ import sys
 import subprocess
 import contextlib
 from .Colors import Colors
+
 # non standard python libraries
 try:
     import numpy as np
@@ -27,6 +28,7 @@ def suppress_stdout_stderr():
             os.dup2(old_stderr_fd, 2)
             os.close(old_stdout_fd)
             os.close(old_stderr_fd)
+
 
 try:
     from ..constants import PLATFORM
@@ -56,11 +58,11 @@ def errorAndLog(message: str):
     raise os.error("ERROR: " + message)
 
 
-
 def log_error(message: str):
-    log(Colors.RED + "ERROR: "+ message + Colors.RESET, show_backend=False)
+    log(Colors.RED + "ERROR: " + message + Colors.RESET, show_backend=False)
 
-def log(message: str, show_backend = True):
+
+def log(message: str, show_backend=True):
     """
     Log is now depricated, just using print now.
     """
@@ -68,16 +70,20 @@ def log(message: str, show_backend = True):
         print("BACKEND: " + message, file=sys.stderr)
     else:
         print(message, file=sys.stderr)
-    #message = message + "\n\n\n\n" + "-" * len(message)
-    #print(message, file=sys.stderr)
+    # message = message + "\n\n\n\n" + "-" * len(message)
+    # print(message, file=sys.stderr)
 
 
 def bytesToImg(
     image: bytes, width, height, outputWidth: int = None, outputHeight: int = None
 ):
-    channels = len(image) / (height * width) # 3 if RGB24/SDR, 6 if RGB48/HDR
+    channels = len(image) / (height * width)  # 3 if RGB24/SDR, 6 if RGB48/HDR
     hdr = channels == 6
-    frame = np.frombuffer(image, dtype=np.uint16 if hdr else np.uint8).reshape(height, width, 3).astype(np.uint8) # downgrade to sdr for scenedetect... its good enough.
+    frame = (
+        np.frombuffer(image, dtype=np.uint16 if hdr else np.uint8)
+        .reshape(height, width, 3)
+        .astype(np.uint8)
+    )  # downgrade to sdr for scenedetect... its good enough.
     if outputHeight and outputWidth:
         frame = cv2.resize(frame, dsize=(100, 100))
     return frame
@@ -108,12 +114,12 @@ def get_pytorch_vram() -> int:
 def resize_image_np(image, target_width: int, target_height: int):
     """
     Resizes the image to the target resolution.
-    
+
     Args:
         image (np.ndarray): The input image as a numpy array.
         target_width (int): The target width for resizing.
         target_height (int): The target height for resizing.
-    
+
     Returns:
         np.ndarray: The resized image as a numpy array.
     """
@@ -128,28 +134,34 @@ def resize_image_np(image, target_width: int, target_height: int):
         interpolation = cv2.INTER_LANCZOS4
 
     try:
-        resized_image = cv2.resize(image, (target_width, target_height), interpolation=interpolation)
+        resized_image = cv2.resize(
+            image, (target_width, target_height), interpolation=interpolation
+        )
     except Exception:
         resized_image = cv2.resize(image, (target_width, target_height))
     return resized_image
 
 
-def resize_image_bytes(image_bytes: bytes, width: int, height: int, target_width: int, target_height: int) -> bytes:
+def resize_image_bytes(
+    image_bytes: bytes, width: int, height: int, target_width: int, target_height: int
+) -> bytes:
     """
     Resizes the image to the target resolution.
-    
+
     Args:
         image_bytes (bytes): The input image in bytes.
         target_width (int): The target width for resizing.
         target_height (int): The target height for resizing.
-    
+
     Returns:
         bytes: The resized image in bytes.
     """
     if target_width == width and target_height == height:
         return image_bytes
-    channels = len(bytes(image_bytes)) / (height * width) # 3 if RGB24/SDR, 6 if RGB48/HDR
-    dtype = np.uint8 if channels == 3  else np.uint16
+    channels = len(bytes(image_bytes)) / (
+        height * width
+    )  # 3 if RGB24/SDR, 6 if RGB48/HDR
+    dtype = np.uint8 if channels == 3 else np.uint16
     # Convert bytes to numpy array
     if target_width < width or target_height < height:
         # Best for downscaling
@@ -162,11 +174,14 @@ def resize_image_bytes(image_bytes: bytes, width: int, height: int, target_width
 
     # Resize the image
     try:
-        resized_image = cv2.resize(image_array, (target_width, target_height), interpolation=interpolation)
+        resized_image = cv2.resize(
+            image_array, (target_width, target_height), interpolation=interpolation
+        )
     except Exception:
         resized_image = cv2.resize(image_array, (target_width, target_height))
     # Convert the resized image back to bytes
     return resized_image.tobytes()
+
 
 def padFrame(
     frame_bytes: bytes,
@@ -208,20 +223,24 @@ def padFrame(
     # Convert the padded frame back to bytes
     return padded_frame.tobytes()
 
+
 class subprocess_popen_without_terminal(subprocess.Popen):
     """
     A class that allows you to run a subprocess without opening a terminal window.
     """
+
     def __init__(self, *args, **kwargs):
         if PLATFORM == "win32":
-                kwargs["startupinfo"] = subprocess.STARTUPINFO()
-                kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            kwargs["startupinfo"] = subprocess.STARTUPINFO()
+            kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
         super().__init__(*args, **kwargs)
+
 
 class CudaChecker:
     def __init__(self):
         self.HAS_SYSTEM_CUDA = self.checkForCUDA()
         self.HAS_PYTORCH_CUDA = self.checkForCUDAPytorch()
+
     @staticmethod
     def checkForCUDA() -> bool:
         try:
@@ -239,6 +258,7 @@ class CudaChecker:
     def checkForCUDAPytorch() -> bool:
         try:
             import torch
+
             return torch.cuda.is_available()
         except Exception:
             return False

@@ -1,5 +1,5 @@
-
 from .Util import log_error, suppress_stdout_stderr
+
 
 class BackendDetect:
     def __init__(self):
@@ -11,6 +11,7 @@ class BackendDetect:
         try:
             import torch
             import torchvision
+
             self.__torch = torch
             self.pytorch_device = self.__get_pytorch_device()
             self.pytorch_version = self.__torch.__version__
@@ -43,20 +44,24 @@ class BackendDetect:
         except Exception as e:
             log_error("FATAL: " + str(e))
 
-
-
     def __get_pytorch_device(self):
-        if "cu" in self.__torch.__version__: return "cuda" 
-        if "rocm" in self.__torch.__version__: return "rocm"
-        if self.__torch.xpu.is_available(): return "xpu"
-        if self.__torch.backends.mps.is_available(): return "mps"
+        if "cu" in self.__torch.__version__:
+            return "cuda"
+        if "rocm" in self.__torch.__version__:
+            return "rocm"
+        if self.__torch.xpu.is_available():
+            return "xpu"
+        if self.__torch.backends.mps.is_available():
+            return "mps"
         return "CPU"
 
     def get_tensorrt(self):
-        if self.__tensorrt: return self.__tensorrt.__version__
-    
+        if self.__tensorrt:
+            return self.__tensorrt.__version__
+
     def get_ncnn(self):
-        if self.__ncnn: return self.__ncnn.__version__
+        if self.__ncnn:
+            return self.__ncnn.__version__
 
     def get_half_precision(self):
         """
@@ -64,26 +69,30 @@ class BackendDetect:
         """
 
         try:
-            x = self.__torch.tensor([1.0], dtype=self.__torch.float16).to(device="cuda" if self.pytorch_device == "rocm" else self.pytorch_device)
+            x = self.__torch.tensor([1.0], dtype=self.__torch.float16).to(
+                device="cuda" if self.pytorch_device == "rocm" else self.pytorch_device
+            )
             return True
         except Exception as e:
             log_error(str(e))
-            return False    
-    
+            return False
+
     def get_gpus_torch(self):
         """
         Function that returns a list of available GPU names using PyTorch.
         """
-        
+
         devices = []
-        
+
         if self.__torch:
-            if self.pytorch_device == "CPU": return self.pytorch_device
-            if self.pytorch_device.lower() == "mps": return [{"index": 0, "name": "Apple MPS"}]
+            if self.pytorch_device == "CPU":
+                return self.pytorch_device
+            if self.pytorch_device.lower() == "mps":
+                return [{"index": 0, "name": "Apple MPS"}]
             torch_cmd_dict = {
-            "cuda": self.__torch.cuda,
-            "xpu": self.__torch.xpu,
-            "rocm": self.__torch.cuda,  
+                "cuda": self.__torch.cuda,
+                "xpu": self.__torch.xpu,
+                "rocm": self.__torch.cuda,
             }
 
             torch_cmd = torch_cmd_dict[self.pytorch_device]
@@ -93,17 +102,19 @@ class BackendDetect:
                     devices.append(props.name)
             if not devices:
                 devices.append("CPU")
-       
+
         return devices
 
     def get_gpus_ncnn(self):
         if self.__ncnn:
             from ..constants import PLATFORM
+
             if PLATFORM == "win32":
                 # this is to prevent ncnn from creating a crashdump file on windows, despite working.
                 # Dont know the side effects of this, but if there are thats for a later me to figure out.
                 try:
                     import ctypes
+
                     SEM_NOGPFAULTERRORBOX = 0x0002
                     SEM_FAILCRITICALERRORS = 0x0001
 
@@ -115,7 +126,6 @@ class BackendDetect:
             devices = []
             try:
                 with suppress_stdout_stderr():
-
                     gpu_count = self.__ncnn.get_gpu_count()
                     if gpu_count < 1:
                         return ["CPU"]

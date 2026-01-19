@@ -1,11 +1,16 @@
 try:
-    from ..constants import PLATFORM 
+    from ..constants import PLATFORM
     from ..Util import log
 except Exception:
-    PLATFORM = 'win32'
-    def log(msg): print(msg)
+    PLATFORM = "win32"
+
+    def log(msg):
+        print(msg)
+
+
 import subprocess
 import re
+
 
 class GPUDetect:
     def __init__(self):
@@ -14,9 +19,7 @@ class GPUDetect:
     def get_gpu_info(self):
         if PLATFORM == "win32":
             try:
-                output = subprocess.check_output(
-                    "nvidia-smi", shell=True
-                ).decode()
+                output = subprocess.check_output("nvidia-smi", shell=True).decode()
                 return str(output.strip().split("\n"))
             except Exception:
                 return "Unable to retrieve GPU info on Windows"
@@ -33,7 +36,9 @@ class GPUDetect:
         elif PLATFORM == "linux":
             try:
                 # Try lspci command first
-                output = subprocess.check_output("lspci | grep -i vga", shell=True).decode()
+                output = subprocess.check_output(
+                    "lspci | grep -i vga", shell=True
+                ).decode()
                 return output.strip().split(":")[2].strip()
             except Exception:
                 try:
@@ -47,7 +52,6 @@ class GPUDetect:
         else:
             return "Unsupported operating system"
 
-
     def getVendor(self):
         """
         Gets GPU vendor of the system
@@ -59,7 +63,7 @@ class GPUDetect:
             if vendor.lower() in self.gpu_info.lower():
                 return vendor
         return None
-    
+
     def getModelOfGPU(self):
         vendor = self.getVendor()
         model = "0"
@@ -70,7 +74,7 @@ class GPUDetect:
             except Exception:
                 log("Couldnt find gpu model, " + self.gpu_info)
         return model
-    
+
     def getPyTorchFeatures(self) -> str | None:
         try:
             if int(self.getModelOfGPU()[4]) >= 2 and self.getVendor() == "Nvidia":
@@ -78,6 +82,7 @@ class GPUDetect:
         except Exception:
             return None
         return None
-    
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     print(GPUDetect().getPyTorchFeatures())

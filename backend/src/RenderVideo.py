@@ -356,7 +356,6 @@ class Render:
         while frame:
             if self.informationHandler.get_is_paused():
                 sleep(1)
-            
 
             for extraRestoration in self.extraRestorationModels:
                 frame = extraRestoration(frame)
@@ -372,34 +371,35 @@ class Render:
                     if self.upscaleModel:
                         interpolated_frame = self.upscaleOption(interpolated_frame)
                     if self.override_upscale_scale:
-                        interpolated_frame = interpolated_frame.resize_frame_optimal(new_width=self.width * self.override_upscale_scale, new_height=self.height*self.override_upscale_scale)
-                    
+                        interpolated_frame = interpolated_frame.resize_frame_optimal(
+                            new_width=self.width * self.override_upscale_scale,
+                            new_height=self.height * self.override_upscale_scale,
+                        )
+
                     self.informationHandler.update(
                         interpolated_frame.get_frame_bytes(clear_cache=True)
                     )
                     self.writeBuffer.writeQueue.put(
                         interpolated_frame.get_frame_bytes(clear_cache=True)
-                        
                     )
 
             if self.upscaleModel:
                 frame = self.upscaleOption(frame)
 
             if self.override_upscale_scale:
-                frame = frame.resize_frame_optimal(self.width * self.override_upscale_scale, self.height*self.override_upscale_scale)
+                frame = frame.resize_frame_optimal(
+                    self.width * self.override_upscale_scale,
+                    self.height * self.override_upscale_scale,
+                )
 
-            self.informationHandler.update(
-                frame.get_frame_bytes(clear_cache=True)
-            )
+            self.informationHandler.update(frame.get_frame_bytes(clear_cache=True))
 
-            self.writeBuffer.writeQueue.put(
-                frame.get_frame_bytes()
-            )
+            self.writeBuffer.writeQueue.put(frame.get_frame_bytes())
             frames_rendered += int(self.ceilInterpolateFactor)
 
             # grab new frame
             frame = self.readBuffer.get()
-        
+
         self.informationHandler.stopWriting()
         self.writeBuffer.writeQueue.put(None)
         """

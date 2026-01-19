@@ -375,9 +375,11 @@ class GatedCNNBlock(nn.Module):
         x = self.act(self.fc2(self.act(g) * torch.cat((i, c), dim=1)))
         return x + shortcut
 
+
 @store_hyperparameters()
 class RTMoSR(nn.Module):
     hyperparameters = {}
+
     def __init__(
         self,
         *,
@@ -439,5 +441,3 @@ class RTMoSR(nn.Module):
         return self.to_img(out)[
             :, :, : h * self.scale, : w * self.scale
         ] + F.interpolate(x, scale_factor=self.scale)
-
-

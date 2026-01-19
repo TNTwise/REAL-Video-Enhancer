@@ -11,34 +11,33 @@ class HandleApplication:
         if self.args.version:
             print(f"{__version__}")
             sys.exit(0)
-        
+
         if not self.args.list_backends:
             """from pyinstrument import Profiler
             profiler = Profiler()
             profiler.start()"""
             if self.args.ffmpeg_path == None:
                 from src.utils.GetFFMpeg import download_ffmpeg
+
                 self.ffmpeg_path = download_ffmpeg()
             else:
                 self.ffmpeg_path = self.args.ffmpeg_path
 
             from src.utils.VideoInfo import OpenCVInfo, print_video_info
-            
+
             if self.args.print_video_info:
-                video_info = OpenCVInfo(self.args.print_video_info, ffmpeg_path=self.ffmpeg_path)
+                video_info = OpenCVInfo(
+                    self.args.print_video_info, ffmpeg_path=self.ffmpeg_path
+                )
                 print_video_info(video_info)
-                #profiler.stop()
-                #print(profiler.output_text(unicode=True, color=True))
+                # profiler.stop()
+                # print(profiler.output_text(unicode=True, color=True))
                 sys.exit(0)
             else:
                 video_info = OpenCVInfo(self.args.input, ffmpeg_path=self.ffmpeg_path)
                 print_video_info(video_info)
-                
-            
 
             self.checkArguments()
-
-            
 
             if not self.batchProcessing():
                 buffer_str = "=" * len(str(sys.argv[0]))
@@ -74,16 +73,18 @@ class HandleApplication:
             return False
 
     def listBackends(self):
-        from src.utils.BackendDetect import (
-            BackendDetect
-        )
+        from src.utils.BackendDetect import BackendDetect
+
         half_prec_supp = False
         availableBackends = []
         printMSG = "RVE Backend Version: " + __version__ + "\n"
         backendDetect = BackendDetect()
 
         tensorrt_ver = backendDetect.get_tensorrt()
-        pytorch_device, pytorch_version = backendDetect.pytorch_device, backendDetect.pytorch_version
+        pytorch_device, pytorch_version = (
+            backendDetect.pytorch_device,
+            backendDetect.pytorch_version,
+        )
         ncnn_ver = backendDetect.get_ncnn()
 
         if tensorrt_ver:
@@ -101,7 +102,6 @@ class HandleApplication:
                 printMSG += "ERROR: Cannot use tensorrt backend, as it is not supported on your current GPU"
 
         if pytorch_device:
-
             availableBackends.append(f"pytorch ({pytorch_device})")
             printMSG += f"PyTorch Version: {pytorch_version}\n"
             half_prec_supp = backendDetect.get_half_precision()
@@ -117,16 +117,14 @@ class HandleApplication:
 
             for i, gpu in enumerate(ncnnGpus):
                 printMSG += f"NCNN GPU {i}: {gpu}\n"
-       
+
         printMSG += f"Half precision support: {half_prec_supp}\n"
-        printMSG += ("Available Backends: " + str(availableBackends))
+        printMSG += "Available Backends: " + str(availableBackends)
         self.printMSG = printMSG
         print(printMSG)
 
     def renderVideo(self):
-        
         from src.RenderVideo import Render
-        
 
         Render(
             # model settings
@@ -146,7 +144,7 @@ class HandleApplication:
             ncnn_gpu_id=self.args.ncnn_gpu_id,
             cwd=self.args.cwd,
             # ffmpeg settings
-            ffmpeg_path = self.ffmpeg_path,
+            ffmpeg_path=self.ffmpeg_path,
             start_time=self.args.start_time,
             end_time=self.args.end_time,
             overwrite=self.args.overwrite,
@@ -176,7 +174,6 @@ class HandleApplication:
             ensemble=self.args.ensemble,
             output_to_mpv=self.args.output_to_mpv,
         )
-        
 
     def handleArguments(self) -> argparse.ArgumentParser:
         """_summary_
@@ -245,7 +242,7 @@ class HandleApplication:
         parser.add_argument(
             "--extra_restoration_models",
             help="Direct path to a compression fixer model, will automatically inference if model are valid. (1x only) Can be parsed multiple times.",
-            action='append',
+            action="append",
         )
         parser.add_argument(
             "--interpolate_model",
@@ -396,7 +393,7 @@ class HandleApplication:
                 "mps",
                 "xpu",
                 "cpu",
-            ]
+            ],
         )
         parser.add_argument(
             "--pytorch_gpu_id",
@@ -526,11 +523,13 @@ class HandleApplication:
             raise ValueError(
                 "Interpolation factor must be 1 if no interpolation model is used.\nPlease use --interpolateFactor 1 for no interpolation!"
             )
-        if self.args.backend == 'ncnn' and self.args.hdr_mode:
-            print("WARNING: HDR mode is not supported with ncnn backend, falling back to SDR",file=sys.stderr)
-            self.args.hdr_mode = False            
+        if self.args.backend == "ncnn" and self.args.hdr_mode:
+            print(
+                "WARNING: HDR mode is not supported with ncnn backend, falling back to SDR",
+                file=sys.stderr,
+            )
+            self.args.hdr_mode = False
+
 
 if __name__ == "__main__":
-    
     HandleApplication()
-    

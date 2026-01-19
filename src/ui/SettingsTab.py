@@ -2,10 +2,17 @@ import os
 
 from PySide6.QtWidgets import QMainWindow, QFileDialog
 from ..constants import PLATFORM, HOME_PATH
-from ..Util import currentDirectory, checkForWritePermissions, open_folder, log, FileHandler
+from ..Util import (
+    currentDirectory,
+    checkForWritePermissions,
+    open_folder,
+    log,
+    FileHandler,
+)
 from .QTcustom import RegularQTPopup
 from ..GenerateFFMpegCommand import FFMpegCommand
 from ..VideoInfo import VideoLoader
+
 
 class SettingsTab:
     def __init__(
@@ -29,13 +36,11 @@ class SettingsTab:
             "audio_bitrate": self.parent.audio_bitrate,
             "video_pixel_format": self.parent.video_pixel_format,
             "video_quality": self.parent.video_quality,
-
         }
         self.settings = Settings()
         log("Settings: " + str(self.settings.settings))
-        self.connectSettingText() # has to be in this order, otherwise settings wont stick because they get reset.
+        self.connectSettingText()  # has to be in this order, otherwise settings wont stick because they get reset.
         self.connectWriteSettings()
-        
 
         # disable half option if its not supported
         if not halfPrecisionSupport:
@@ -44,8 +49,9 @@ class SettingsTab:
         # set max gpu id for combo boxs
         self.parent.pytorch_gpu_id.setMaximum(total_pytorch_gpus)
         self.parent.ncnn_gpu_id.setMaximum(total_ncnn_gpus)
-        self.parent.openRVEFolderBtn.clicked.connect(lambda:open_folder(currentDirectory()))
-        
+        self.parent.openRVEFolderBtn.clicked.connect(
+            lambda: open_folder(currentDirectory())
+        )
 
         self.updateFFMpegCommand()
 
@@ -55,62 +61,65 @@ class SettingsTab:
         """
         for key, value in self.ffmpeg_settings_dict.items():
             self.settings.writeSetting(key, value.currentText())
-        
-        self.out_pixel_fmt = self.settings.settings['video_pixel_format']
+
+        self.out_pixel_fmt = self.settings.settings["video_pixel_format"]
         pxfmtDict = {
-                "yuv420p": "yuv420p",
-                "yuv422p": "yuv422p",
-                "yuv444p": "yuv444p",
-                "yuv420p (10 bit)": "yuv420p10le",
-                "yuv422p (10 bit)": "yuv422p10le",
-                "yuv444p (10 bit)": "yuv444p10le",
-            }
+            "yuv420p": "yuv420p",
+            "yuv422p": "yuv422p",
+            "yuv444p": "yuv444p",
+            "yuv420p (10 bit)": "yuv420p10le",
+            "yuv422p (10 bit)": "yuv422p10le",
+            "yuv444p (10 bit)": "yuv444p10le",
+        }
         self.out_pixel_fmt = pxfmtDict[self.out_pixel_fmt]
 
         input_file = self.parent.inputFileText.text()
-        if input_file and len(input_file) > 1: # caching is nice
+        if input_file and len(input_file) > 1:  # caching is nice
             if self.input_file != input_file:
                 self.input_file = input_file
                 self.ffmpegInfoWrapper = VideoLoader(self.input_file)
                 self.ffmpegInfoWrapper.loadVideo()
                 self.ffmpegInfoWrapper.getData()
-                self.hdr_mode = (self.ffmpegInfoWrapper.is_hdr) and self.settings.settings['auto_hdr_mode'] == "True"
+                self.hdr_mode = (
+                    self.ffmpegInfoWrapper.is_hdr
+                ) and self.settings.settings["auto_hdr_mode"] == "True"
                 self.color_space = self.ffmpegInfoWrapper.color_space
                 self.color_primaries = self.ffmpegInfoWrapper.color_primaries
                 self.color_transfer = self.ffmpegInfoWrapper.color_transfer
                 self.in_pix_fmt = self.ffmpegInfoWrapper.pixel_format
 
-
-        if self.hdr_mode or ("10" in self.in_pix_fmt and self.settings.settings['auto_hdr_mode'] == "True"):
+        if self.hdr_mode or (
+            "10" in self.in_pix_fmt
+            and self.settings.settings["auto_hdr_mode"] == "True"
+        ):
             pxfmtDict = {
-                        "yuv420p": "yuv420p10le",
-                        "yuv422p": "yuv422p10le",
-                        "yuv444p": "yuv444p10le",
-                    }
+                "yuv420p": "yuv420p10le",
+                "yuv422p": "yuv422p10le",
+                "yuv444p": "yuv444p10le",
+            }
 
             if self.out_pixel_fmt in pxfmtDict:
                 self.out_pixel_fmt = pxfmtDict[self.out_pixel_fmt]
 
-
         command = FFMpegCommand(
-            self.settings.settings['encoder'].replace(' (experimental)', '').replace(' (40 series and up)', ''),
-            self.settings.settings['video_encoder_speed'],
-            self.settings.settings['video_quality'],
+            self.settings.settings["encoder"]
+            .replace(" (experimental)", "")
+            .replace(" (40 series and up)", ""),
+            self.settings.settings["video_encoder_speed"],
+            self.settings.settings["video_quality"],
             self.out_pixel_fmt,
-            self.settings.settings['audio_encoder'],
-            self.settings.settings['audio_bitrate'],
-            self.settings.settings['subtitle_encoder'],  
+            self.settings.settings["audio_encoder"],
+            self.settings.settings["audio_bitrate"],
+            self.settings.settings["subtitle_encoder"],
             self.hdr_mode,
             self.color_space if self.in_pix_fmt != "yuv420p" else None,
             self.color_primaries,
-            self.color_transfer,  
+            self.color_transfer,
         ).build_command()
         self.parent.EncoderCommand.setText(" ".join(command))
         self.parent.updateVideoGUIText()
-         
 
     def connectWriteSettings(self):
-        
         self.parent.subtitle_encoder.currentIndexChanged.connect(
             lambda: self.settings.writeSetting(
                 "subtitle_encoder", self.parent.subtitle_encoder.currentText()
@@ -214,17 +223,17 @@ class SettingsTab:
                 "pytorch_backend", self.parent.pytorch_backend.currentText()
             )
         )
-        
+
         self.parent.dynamic_tensorrt_engine.stateChanged.connect(
             lambda: self.settings.writeSetting(
                 "dynamic_tensorrt_engine",
-                "True" if self.parent.dynamic_tensorrt_engine.isChecked() else "False"
+                "True" if self.parent.dynamic_tensorrt_engine.isChecked() else "False",
             )
         )
         self.parent.auto_hdr_mode.stateChanged.connect(
             lambda: self.settings.writeSetting(
                 "auto_hdr_mode",
-                "True" if self.parent.auto_hdr_mode.isChecked() else "False"
+                "True" if self.parent.auto_hdr_mode.isChecked() else "False",
             )
         )
         self.parent.video_encoder_speed.currentIndexChanged.connect(
@@ -232,27 +241,15 @@ class SettingsTab:
                 "video_encoder_speed", self.parent.video_encoder_speed.currentText()
             )
         )
-        self.parent.inputFileText.textChanged.connect(
-            self.updateFFMpegCommand
-        )
-        self.parent.encoder.currentIndexChanged.connect(
-            self.updateFFMpegCommand
-        )
-        self.parent.audio_encoder.currentIndexChanged.connect(
-            self.updateFFMpegCommand
-        )
+        self.parent.inputFileText.textChanged.connect(self.updateFFMpegCommand)
+        self.parent.encoder.currentIndexChanged.connect(self.updateFFMpegCommand)
+        self.parent.audio_encoder.currentIndexChanged.connect(self.updateFFMpegCommand)
         self.parent.video_pixel_format.currentIndexChanged.connect(
             self.updateFFMpegCommand
         )
-        self.parent.audio_bitrate.currentIndexChanged.connect(
-            self.updateFFMpegCommand
-        )
-        self.parent.auto_hdr_mode.stateChanged.connect(
-            self.updateFFMpegCommand
-        )
-        self.parent.video_quality.currentIndexChanged.connect(
-            self.updateFFMpegCommand
-        )
+        self.parent.audio_bitrate.currentIndexChanged.connect(self.updateFFMpegCommand)
+        self.parent.auto_hdr_mode.stateChanged.connect(self.updateFFMpegCommand)
+        self.parent.video_quality.currentIndexChanged.connect(self.updateFFMpegCommand)
         self.parent.video_encoder_speed.currentIndexChanged.connect(
             self.updateFFMpegCommand
         )
@@ -279,7 +276,9 @@ class SettingsTab:
         )
 
     def resetSettings(self):
-        for i in range(10): # idk why, but settings wont fully reset until like 5 button presses.
+        for i in range(
+            10
+        ):  # idk why, but settings wont fully reset until like 5 button presses.
             self.settings.writeDefaultSettings()
             self.settings.readSettings()
             self.connectSettingText()
@@ -428,10 +427,10 @@ class Settings:
                 "x265_nvenc",
                 "av1_nvenc (40 series and up)",
             ),
-            "video_encoder_speed": ("placebo","slow", "medium", "fast", "fastest"),
+            "video_encoder_speed": ("placebo", "slow", "medium", "fast", "fastest"),
             "audio_encoder": ("aac", "libmp3lame", "opus", "copy_audio"),
             "audio_bitrate": "ANY",
-            "subtitle_encoder": ("copy_subtitle","srt","ass","webvtt"),
+            "subtitle_encoder": ("copy_subtitle", "srt", "ass", "webvtt"),
             "preview_enabled": ("True", "False"),
             "scene_change_detection_method": (
                 "mean",
@@ -444,7 +443,14 @@ class Settings:
                 str(num / 10) for num in range(1, 100)
             ],
             "discord_rich_presence": ("True", "False"),
-            "video_quality": ("Low", "Medium", "High", "Very_High", "Ultra", "Lossless"),
+            "video_quality": (
+                "Low",
+                "Medium",
+                "High",
+                "Very_High",
+                "Ultra",
+                "Lossless",
+            ),
             "output_folder_location": "ANY",
             "last_input_folder_location": "ANY",
             "uhd_mode": ("True", "False"),
@@ -464,7 +470,7 @@ class Settings:
         # check if the settings file is corrupted
         if len(self.defaultSettings) != len(self.settings):
             self.writeDefaultSettings()
-        
+
     def readSettings(self):
         """
         Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.

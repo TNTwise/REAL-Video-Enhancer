@@ -14,7 +14,7 @@ from .constants import (
     CWD,
     CPU_ARCH,
     USE_LOCAL_BACKEND,
-    IS_STEAM
+    IS_STEAM,
 )
 from .version import version, backend_dev_version
 from .Util import (
@@ -22,7 +22,7 @@ from .Util import (
     log,
     extractTarGZ,
     removeFolder,
-    subprocess_popen_without_terminal
+    subprocess_popen_without_terminal,
 )
 from .ui.QTcustom import (
     DownloadProgressPopup,
@@ -62,23 +62,25 @@ def run_executable(exe_path):
         return False
     return True
 
+
 @dataclass
 class Dependency(ABC):
     updatable: bool
-    download_path:str
-    installed_path:str
+    download_path: str
+    installed_path: str
 
     def __init__(self):
         FileHandler.createDirectory(os.path.dirname(self.download_path))
 
     @abstractmethod
     def get_download_link(self) -> str: ...
-        
+
     @abstractmethod
     def download(self) -> None: ...
 
     def get_if_update_available(self) -> bool: ...
     def update_if_updates_available(self) -> None: ...
+
 
 class Backend(Dependency):
     updatable: bool = True
@@ -86,45 +88,54 @@ class Backend(Dependency):
     download_path = os.path.join(CWD, "backend.tar.gz")
     installed_path = BACKEND_PATH
 
-
     def get_download_link(self) -> str:
         backend_url = f"https://github.com/TNTwise/REAL-Video-Enhancer/releases/download/RVE-{version}/backend-v{version}.tar.gz"
         return backend_url
-    
+
     def download(self):
         if USE_LOCAL_BACKEND:
             return
         needs_network_else_exit()
         download_link = self.get_download_link()
-        DownloadProgressPopup(link=download_link, downloadLocation=self.download_path, title="Downloading Backend")
+        DownloadProgressPopup(
+            link=download_link,
+            downloadLocation=self.download_path,
+            title="Downloading Backend",
+        )
         extractTarGZ(self.download_path)
-    
+
     def get_if_update_available(self) -> bool:
         try:
             process = subprocess_popen_without_terminal(
-                [PYTHON_EXECUTABLE_PATH, os.path.join(BACKEND_PATH, "rve-backend.py"), "--version"],
+                [
+                    PYTHON_EXECUTABLE_PATH,
+                    os.path.join(BACKEND_PATH, "rve-backend.py"),
+                    "--version",
+                ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
-                text=True
-                )
+                text=True,
+            )
             stdout, stderr = process.communicate()
             if process.returncode != 0:
-                raise subprocess.CalledProcessError(process.returncode, process.args, stdout, stderr)
-            output = stdout.strip() # this extracts the version number from the output
+                raise subprocess.CalledProcessError(
+                    process.returncode, process.args, stdout, stderr
+                )
+            output = stdout.strip()  # this extracts the version number from the output
             log(f"\nBackend Version: {output}\n")
             update_available = not output == backend_dev_version
             self.is_update_available = update_available
             return update_available
-        except subprocess.CalledProcessError as e: # if the backend is not found
+        except subprocess.CalledProcessError as e:  # if the backend is not found
             log("Backend not found, downloading..." + str(e))
             self.download()
             self.is_update_available = False
             return False
-    
+
     def update_if_updates_available(self) -> None:
         if self.is_update_available:
             needs_network_else_exit()
-            FileHandler.removeFolder(BACKEND_PATH) # remove the old backend directory
+            FileHandler.removeFolder(BACKEND_PATH)  # remove the old backend directory
             self.download()
 
 
@@ -135,14 +146,22 @@ class Python(Dependency):
 
     def get_download_link(self) -> str:
         link = f"https://github.com/TNTwise/REAL-Video-Enhancer-models/releases/download/models/cpython-{PYTHON_VERSION}+20250317-"
-       
+
         match PLATFORM:
             case "linux":
-                link += "x86_64-unknown-linux-gnu-install_only.tar.gz" if CPU_ARCH == "x86_64" else "aarch64-unknown-linux-gnu-install_only.tar.gz"
+                link += (
+                    "x86_64-unknown-linux-gnu-install_only.tar.gz"
+                    if CPU_ARCH == "x86_64"
+                    else "aarch64-unknown-linux-gnu-install_only.tar.gz"
+                )
             case "win32":
                 link += "x86_64-pc-windows-msvc-install_only.tar.gz"
             case "darwin":
-                link += "x86_64-apple-darwin-install_only.tar.gz" if CPU_ARCH == "x86_64" else "aarch64-apple-darwin-install_only.tar.gz"
+                link += (
+                    "x86_64-apple-darwin-install_only.tar.gz"
+                    if CPU_ARCH == "x86_64"
+                    else "aarch64-apple-darwin-install_only.tar.gz"
+                )
 
         return link
 
@@ -150,19 +169,32 @@ class Python(Dependency):
         needs_network_else_exit()
         download_link = self.get_download_link()
         FileHandler.createDirectory(os.path.dirname(self.download_path))
-        DownloadProgressPopup(link = download_link, downloadLocation=self.download_path, title = f"Downloading Python {PYTHON_VERSION}")
+        DownloadProgressPopup(
+            link=download_link,
+            downloadLocation=self.download_path,
+            title=f"Downloading Python {PYTHON_VERSION}",
+        )
         extractTarGZ(self.download_path)
-    
+
     def get_version(self):
-        return subprocess.run([PYTHON_EXECUTABLE_PATH, "--version"], check=True, capture_output=True, text=True).stdout.strip().split(" ")[1] # this extracts the version number from the output
-    
+        return (
+            subprocess.run(
+                [PYTHON_EXECUTABLE_PATH, "--version"],
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            .stdout.strip()
+            .split(" ")[1]
+        )  # this extracts the version number from the output
+
     def get_if_update_available(self) -> bool:
         try:
             output = self.get_version()
-        except subprocess.CalledProcessError: # if python is not found
+        except subprocess.CalledProcessError:  # if python is not found
             self.download()
             return False
-        
+
         is_update = not output == PYTHON_VERSION
 
         if is_update:
@@ -182,10 +214,10 @@ class Python(Dependency):
         return self.is_update_available
 
     def update_if_updates_available(self) -> None:
-
         if self.is_update_available:
             removeFolder(PYTHON_DIRECTORY)
             self.download()
+
 
 class FFMpeg(Dependency):
     download_path = os.path.join(CWD, "ffmpeg")
@@ -197,20 +229,28 @@ class FFMpeg(Dependency):
             case "linux":
                 link += "ffmpeg" if CPU_ARCH == "x86_64" else "ffmpeg-linux-arm64"
             case "win32":
-                link += "ffmpeg.exe" if CPU_ARCH == "x86_64" else "ffmpeg-windows-arm64.exe"
+                link += (
+                    "ffmpeg.exe" if CPU_ARCH == "x86_64" else "ffmpeg-windows-arm64.exe"
+                )
             case "darwin":
-                link += "ffmpeg-macos-bin" if CPU_ARCH == "x86_64" else "ffmpeg-macos-arm"
+                link += (
+                    "ffmpeg-macos-bin" if CPU_ARCH == "x86_64" else "ffmpeg-macos-arm"
+                )
         return link
 
     def download(self):
-        
         needs_network_else_exit()
 
         download_link = self.get_download_link()
-        DownloadProgressPopup(link=download_link, downloadLocation=self.download_path, title="Downloading FFMpeg")
+        DownloadProgressPopup(
+            link=download_link,
+            downloadLocation=self.download_path,
+            title="Downloading FFMpeg",
+        )
         FileHandler.createDirectory(os.path.dirname(self.installed_path))
         FileHandler.moveFile(self.download_path, self.installed_path)
         FileHandler.makeExecutable(self.installed_path)
+
 
 class VCRedList(Dependency):
     updatable = False
@@ -219,24 +259,29 @@ class VCRedList(Dependency):
 
     def get_download_link(self) -> str:
         return "https://aka.ms/vs/17/release/vc_redist.x64.exe"
-    
+
     def download(self):
-        if PLATFORM == 'win32':
+        if PLATFORM == "win32":
             needs_network_else_exit()
 
             download_link = self.get_download_link()
-            DownloadProgressPopup(link=download_link, downloadLocation=self.download_path, title="Downloading VCRedist")
-            
+            DownloadProgressPopup(
+                link=download_link,
+                downloadLocation=self.download_path,
+                title="Downloading VCRedist",
+            )
+
             # Use ShellExecute to properly handle admin elevation
             import ctypes
+
             try:
                 result = ctypes.windll.shell32.ShellExecuteW(
-                    None,                          # hwnd
-                    "runas",                       # operation (runas = run as admin)
-                    self.download_path,            # file
-                    "/install /norestart /quiet",         # parameters
-                    None,                          # directory
-                    1                              # show command (1 = normal window)
+                    None,  # hwnd
+                    "runas",  # operation (runas = run as admin)
+                    self.download_path,  # file
+                    "/install /norestart /quiet",  # parameters
+                    None,  # directory
+                    1,  # show command (1 = normal window)
                 )
                 if result <= 32:  # Error codes are <= 32
                     RegularQTPopup(
@@ -248,15 +293,15 @@ class VCRedList(Dependency):
                 )
 
 
-
-
 class DownloadDependencies:
     """
     Downloads platform specific dependencies python and ffmpeg to their respective locations and creates the directories
 
     """
-    def __init__(self, use_torch_nightly:bool = False):
+
+    def __init__(self, use_torch_nightly: bool = False):
         self.use_torch_nightly = use_torch_nightly
+
     def download_all_deps(self):
         for dep in Dependency.__subclasses__():
             d = dep()
@@ -271,12 +316,12 @@ class DownloadDependencies:
         if PLATFORM == "linux" and IS_STEAM:
             # Define the list of environment variables known to conflict with Steam/Linux Runtime
             conflict_vars = [
-                'LD_LIBRARY_PATH',
-                'STEAM_RUNTIME',
-                'SYSTEM_LD_LIBRARY_PATH',
-                'PRESSURE_VESSEL_RUNTIME',
-                'PRESSURE_VESSEL_RUNTIME_BASE',
-                'CUDA_PATH', # Might conflict with GPU-aware packages
+                "LD_LIBRARY_PATH",
+                "STEAM_RUNTIME",
+                "SYSTEM_LD_LIBRARY_PATH",
+                "PRESSURE_VESSEL_RUNTIME",
+                "PRESSURE_VESSEL_RUNTIME_BASE",
+                "CUDA_PATH",  # Might conflict with GPU-aware packages
             ]
 
             log("Cleaning up conflicting Steam environment variables...")
@@ -284,7 +329,9 @@ class DownloadDependencies:
             for var in conflict_vars:
                 if var in os.environ:
                     log(f"Unsetting {var}: {os.environ[var]}")
-                    del os.environ[var] # This removes the variable for the current process
+                    del os.environ[
+                        var
+                    ]  # This removes the variable for the current process
         command += [
             PYTHON_EXECUTABLE_PATH,
             "-m",
@@ -298,9 +345,9 @@ class DownloadDependencies:
                 "--no-warn-script-location",
                 "--isolated",
                 "--extra-index-url",
-                "https://download.pytorch.org/whl/test/", 
+                "https://download.pytorch.org/whl/test/",
                 "--extra-index-url",
-                "https://download.pytorch.org/whl/", # search this first, needs to be last in the list 
+                "https://download.pytorch.org/whl/",  # search this first, needs to be last in the list
                 "--trusted-host",
                 "download.pytorch.org",
             ]
@@ -352,18 +399,24 @@ class DownloadDependencies:
             "pillow==11.1.0",
         ]
         return platformIndependentdeps
-    
-    def downloadPythonDeps(self, backend, torch_version: Optional[str] = "2.7.0", torchvision_version: Optional[str] = "0.22.0", torch_backend: Optional[str] = "cu126", install: bool = True):
+
+    def downloadPythonDeps(
+        self,
+        backend,
+        torch_version: Optional[str] = "2.7.0",
+        torchvision_version: Optional[str] = "0.22.0",
+        torch_backend: Optional[str] = "cu126",
+        install: bool = True,
+    ):
         deps = []
         log("Downloading Python Deps for " + backend)
         log("Torch Version: " + torch_version)
         log("Torch Backend: " + torch_backend)
         log("Torchvision Version: " + torchvision_version)
-        
 
-        if install: # dont uninstall platform independent deps
+        if install:  # dont uninstall platform independent deps
             deps = self.getPlatformIndependentDeps()
-            
+
         return_codes = []
         match backend:
             case "ncnn":
@@ -380,12 +433,11 @@ class DownloadDependencies:
                     f"torch=={torch_version}{torch_backend}",  #
                     "safetensors==0.5.3",
                     "einops==0.8.1",
-                    
                 ]
                 deps += ["cupy-cuda12x==13.3.0"] if "cu" in backend else []
                 return_code = self.pip(deps, install)
                 return_codes.append(return_code)
-                
+
                 if install:
                     deps = [
                         "--no-deps",
@@ -402,16 +454,20 @@ class DownloadDependencies:
                         f"tensorrt_cu12=={trt_ver}",
                         f"tensorrt-cu12_libs=={trt_ver}",
                         f"tensorrt_cu12_bindings=={trt_ver}",
-                        
                     ]
                     if install:
-                        
-                        torch_version = torch_version[:-1] + "0" # remove the last character (2.7.1 -> 2.7.0), torch tensorrt doesnt release a new version for every new pytorch minor release
-                        deps += ["--no-deps","dllist",f"torch-tensorrt=={torch_version}{torch_backend}"]
+                        torch_version = (
+                            torch_version[:-1] + "0"
+                        )  # remove the last character (2.7.1 -> 2.7.0), torch tensorrt doesnt release a new version for every new pytorch minor release
+                        deps += [
+                            "--no-deps",
+                            "dllist",
+                            f"torch-tensorrt=={torch_version}{torch_backend}",
+                        ]
 
                     return_code = self.pip(deps, install)
                     return_codes.append(return_code)
-        
+
         for return_code in return_codes:
             if return_code != 0:
                 return return_code

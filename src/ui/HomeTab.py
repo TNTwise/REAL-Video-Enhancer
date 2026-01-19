@@ -15,7 +15,9 @@ class HomeTab:
             )
             releases = response.json()
             releaseTags = [release["tag_name"] for release in releases][:5]
-            releaseBodies = [release["body"].replace(r"\r\n", "") for release in releases][:5]
+            releaseBodies = [
+                release["body"].replace(r"\r\n", "") for release in releases
+            ][:5]
             for releaseTag, releaseBody in zip(releaseTags, releaseBodies):
                 changeLog += "\n# " + releaseTag
                 changeLog += "\n" + releaseBody

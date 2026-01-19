@@ -50,9 +50,8 @@ try:
     from .raftarch import RAFT, BidirCorrBlock
 except ImportError:
     from raftarch import RAFT, BidirCorrBlock
-    
-from ..util.softsplat_torch import softsplat
 
+from ..util.softsplat_torch import softsplat
 
 
 class GIMMVFI_R(nn.Module):

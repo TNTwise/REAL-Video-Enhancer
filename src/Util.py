@@ -15,7 +15,14 @@ import sys
 import time
 from functools import wraps
 
-from .constants import CWD, HAS_NETWORK_ON_STARTUP, IS_FLATPAK, PLATFORM, HOME_PATH, CPU_ARCH
+from .constants import (
+    CWD,
+    HAS_NETWORK_ON_STARTUP,
+    IS_FLATPAK,
+    PLATFORM,
+    HOME_PATH,
+    CPU_ARCH,
+)
 
 
 class FileHandler:
@@ -31,7 +38,7 @@ class FileHandler:
         except Exception as e:
             log(f"An error occurred while getting available disk space: {e}")
             return 0
-        
+
     @staticmethod
     def moveFolder(prev: str, new: str):
         """
@@ -135,13 +142,14 @@ class FileHandler:
             )
             iteration += 1
         return output_file
+
     @staticmethod
     def getDefaultOutputFolder() -> str:
         """
         Returns the default output folder based on the operating system.
         """
         videos_folder = os.path.join(f"{HOME_PATH}", "Videos")
-        
+
         if PLATFORM == "linux":
             try:
                 result = subprocess.run(
@@ -157,7 +165,7 @@ class FileHandler:
                 import ctypes
                 from ctypes import wintypes
 
-                CSIDL_MYVIDEO = 0x000e
+                CSIDL_MYVIDEO = 0x000E
                 SHGFP_TYPE_CURRENT = 0
 
                 buf = ctypes.create_unicode_buffer(wintypes.MAX_PATH)
@@ -167,15 +175,17 @@ class FileHandler:
                 if os.path.isdir(buf.value):
                     videos_folder = buf.value
             except Exception as e:
-                log(f"An error occurred while getting the Videos folder on Windows: {e}")
+                log(
+                    f"An error occurred while getting the Videos folder on Windows: {e}"
+                )
 
         if PLATFORM == "darwin":
             videos_folder = os.path.join(f"{HOME_PATH}", "Desktop")
 
         return videos_folder
 
+
 def log(message: str):
-    
     try:
         with open(os.path.join(CWD, "log.txt"), "a") as f:
             f.write(message + "\n")
@@ -185,8 +195,6 @@ def log(message: str):
 
 with open(os.path.join(CWD, "log.txt"), "w") as f:
     pass
-
-
 
 
 def getAvailableDiskSpace() -> float:
@@ -454,6 +462,7 @@ def checkForWritePermissions(dir):
             return True
         return False
 
+
 def open_folder(folder):
     if PLATFORM == "win32":
         os.startfile(folder)
@@ -467,12 +476,13 @@ class subprocess_popen_without_terminal(subprocess.Popen):
     """
     A class that allows you to run a subprocess without opening a terminal window.
     """
+
     def __init__(self, *args, **kwargs):
         if PLATFORM == "win32":
-                kwargs["startupinfo"] = subprocess.STARTUPINFO()
-                kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            kwargs["startupinfo"] = subprocess.STARTUPINFO()
+            kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
         super().__init__(*args, **kwargs)
-    
+
 
 def create_independent_process(target_func, *args, **kwargs):
     """
@@ -484,23 +494,24 @@ def create_independent_process(target_func, *args, **kwargs):
 
     # Force the 'spawn' method on all platforms for complete process isolation
     try:
-        set_start_method('spawn', force=True)
+        set_start_method("spawn", force=True)
     except RuntimeError:
         # Method already set, ignore
         pass
-    
+
     # Set environment variables to avoid Qt conflicts
     env = os.environ.copy()
-    env['QT_PLUGIN_PATH'] = ''
-    env['QT_QPA_PLATFORM_PLUGIN_PATH'] = ''
-    
+    env["QT_PLUGIN_PATH"] = ""
+    env["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
+
     # Create process with isolated environment
     process = Process(target=target_func, args=args, kwargs=kwargs)
-    
+
     # Set process to daemon so it terminates with main process
     process.daemon = True
-    
+
     return process
+
 
 def print_execution_time(func):
     @wraps(func)
@@ -510,5 +521,5 @@ def print_execution_time(func):
         end = time.time()
         print(f"{func.__name__} : {end - start:.6f} seconds")
         return result
-    return wrapper
 
+    return wrapper

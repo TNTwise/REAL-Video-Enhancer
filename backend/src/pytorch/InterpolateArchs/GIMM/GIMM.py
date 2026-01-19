@@ -39,7 +39,15 @@ class InputPadder:
         return x[..., c[0] : c[1], c[2] : c[3]]
 
 
-device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "xpu" if torch.xpu.is_available() else "cpu")
+device = torch.device(
+    "cuda"
+    if torch.cuda.is_available()
+    else "mps"
+    if torch.backends.mps.is_available()
+    else "xpu"
+    if torch.xpu.is_available()
+    else "cpu"
+)
 model = GIMMVFI_R("GIMMVFI_RAFT.pth").to(device)
 
 

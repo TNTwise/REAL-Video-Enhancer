@@ -4,6 +4,8 @@ import cv2
 import sys
 from .PySceneDetectUtils import ContentDetector
 from ..utils.Frame import Frame
+
+
 class BaseDetector:
     def __init__(self, threshold: int = 0):
         pass
@@ -11,10 +13,18 @@ class BaseDetector:
     def sceneDetect(self, frame: Frame) -> bool:
         return False
 
+
 class ModelDetector(BaseDetector):
-    def __init__(self, threshold: int = 0, model_path: str = None, model_dtype: str = "float32", model_device: str = "cpu"):
+    def __init__(
+        self,
+        threshold: int = 0,
+        model_path: str = None,
+        model_dtype: str = "float32",
+        model_device: str = "cpu",
+    ):
         super().__init__(threshold)
-    
+
+
 class NPMeanSCDetect(BaseDetector):
     """
     takes in an image as np array and calculates the mean, with ability to use it for scene detect and upscale skip
@@ -153,19 +163,40 @@ class PySceneDetect(BaseDetector):
 
         return len(frameList) > 0
 
+
 class PyTorchSudoSceneDetect(ModelDetector):
-    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", model_backend="pytorch", model_gpu_id=0, **kwargs):
-        from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import InferenceSceneChangeDetectEfficientNet
+    def __init__(
+        self,
+        threshold=0,
+        model_path="",
+        model_dtype="float32",
+        model_device="cpu",
+        model_backend="pytorch",
+        model_gpu_id=0,
+        **kwargs,
+    ):
+        from ..pytorch.scenechangedetect.PyTorchEfficientNetSC import (
+            InferenceSceneChangeDetectEfficientNet,
+        )
         import torch
+
         self.torch = torch
-        self.model = InferenceSceneChangeDetectEfficientNet(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device, model_backend=model_backend)
+        self.model = InferenceSceneChangeDetectEfficientNet(
+            threshold=threshold,
+            model_path=model_path,
+            model_dtype=model_dtype,
+            model_device=model_device,
+            model_backend=model_backend,
+        )
         self.i0 = None
+
     def sceneDetect(self, frame: Frame):
-        frame = self.torch.nn.functional.interpolate(frame.get_frame_tensor(), 
-                            size=(256, 256), 
-                            mode='bilinear', 
-                            align_corners=False, 
-                            ).squeeze(0)
+        frame = self.torch.nn.functional.interpolate(
+            frame.get_frame_tensor(),
+            size=(256, 256),
+            mode="bilinear",
+            align_corners=False,
+        ).squeeze(0)
         if self.i0 is None:
             self.i0 = frame
             self.model.model
@@ -174,13 +205,28 @@ class PyTorchSudoSceneDetect(ModelDetector):
         self.i0 = frame
         return out
 
+
 class NCNNSudoSceneDetect(ModelDetector):
-    def __init__(self, threshold=0, model_path="", model_dtype="float32", model_device="cpu", **kwargs):
+    def __init__(
+        self,
+        threshold=0,
+        model_path="",
+        model_dtype="float32",
+        model_device="cpu",
+        **kwargs,
+    ):
         from ..ncnn.NCNNEfficientNetSC import InferenceSceneChangeDetectEfficientNetNCNN
-        self.model = InferenceSceneChangeDetectEfficientNetNCNN(threshold=threshold, model_path=model_path, model_dtype=model_dtype, model_device=model_device)
+
+        self.model = InferenceSceneChangeDetectEfficientNetNCNN(
+            threshold=threshold,
+            model_path=model_path,
+            model_dtype=model_dtype,
+            model_device=model_device,
+        )
         self.i0 = None
+
     def sceneDetect(self, frame: Frame):
-        frame = frame.clone().resize_frame(256,256).get_frame_np()
+        frame = frame.clone().resize_frame(256, 256).get_frame_np()
         if self.i0 is None:
             self.i0 = frame
             return False
@@ -188,13 +234,15 @@ class NCNNSudoSceneDetect(ModelDetector):
         self.i0 = frame
         return out
 
+
 class RVESceneDetect(BaseDetector):
     def __init__(self, **kwargs):
         self.pass2 = PyTorchSudoSceneDetect()
         self.pass1 = PySceneDetect()
+
     def sceneDetect(self, frame):
         return self.pass1.sceneDetect(frame) or self.pass2.sceneDetect(frame)
-        
+
 
 class SceneDetect:
     """
@@ -227,14 +275,22 @@ class SceneDetect:
             "none": BaseDetector,
         }
 
-        assert self.sceneChangeMethod in scmethoddict or model_path is not None, "Invalid Scene Change Method"
+        assert self.sceneChangeMethod in scmethoddict or model_path is not None, (
+            "Invalid Scene Change Method"
+        )
         if self.sceneChangeMethod in scmethoddict:
             self.detector: BaseDetector = scmethoddict[self.sceneChangeMethod](
                 threshold=sceneChangeSensitivity
             )
         else:
-            assert model_path is not None and os.path.exists(model_path),  "Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter"
-            model = PyTorchSudoSceneDetect if model_backend == "pytorch" or model_backend == "tensorrt" else NCNNSudoSceneDetect
+            assert model_path is not None and os.path.exists(model_path), (
+                "Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter"
+            )
+            model = (
+                PyTorchSudoSceneDetect
+                if model_backend == "pytorch" or model_backend == "tensorrt"
+                else NCNNSudoSceneDetect
+            )
             self.detector: ModelDetector = model(
                 threshold=sceneChangeSensitivity,
                 model_path=model_path,

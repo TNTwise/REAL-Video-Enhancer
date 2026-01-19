@@ -113,9 +113,9 @@ class GMFSS:
             import gc
 
             gc.collect()
-            #torch.cuda.empty_cache()
-            #torch.cuda.reset_max_memory_allocated()
-            #torch.cuda.reset_max_memory_cached()
+            # torch.cuda.empty_cache()
+            # torch.cuda.reset_max_memory_allocated()
+            # torch.cuda.reset_max_memory_cached()
             self.ifnet = trtHandler.load_engine("IFNet.engine")
             self.feat_ext = trtHandler.load_engine("Feat.engine")
             self.flownet = trtHandler.load_engine("Flownet.engine")

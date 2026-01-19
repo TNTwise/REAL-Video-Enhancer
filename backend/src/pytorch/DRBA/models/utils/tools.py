@@ -25,17 +25,19 @@ def check_cupy_env():
 
 
 def check_scene(x1, x2, scdet_threshold=0.3):
-    x1 = F.interpolate(x1, (32, 32), mode='bilinear', align_corners=False)
-    x2 = F.interpolate(x2, (32, 32), mode='bilinear', align_corners=False)
+    x1 = F.interpolate(x1, (32, 32), mode="bilinear", align_corners=False)
+    x2 = F.interpolate(x2, (32, 32), mode="bilinear", align_corners=False)
     return ssim_matlab(x1, x2) < scdet_threshold
 
 
 def to_tensor(img, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
-    return torch.from_numpy(img.transpose(2, 0, 1)).unsqueeze(0).float().to(device) / 255.
+    return (
+        torch.from_numpy(img.transpose(2, 0, 1)).unsqueeze(0).float().to(device) / 255.0
+    )
 
 
 def to_cv2(img):
-    return (img[0].cpu().float().numpy().transpose(1, 2, 0) * 255.).astype(np.uint8)
+    return (img[0].cpu().float().numpy().transpose(1, 2, 0) * 255.0).astype(np.uint8)
 
 
 def get_valid_net_inp_size(img, scale, div=64):
@@ -51,8 +53,8 @@ def get_valid_net_inp_size(img, scale, div=64):
         w = int(w)
 
     return {
-        'src_size': (src_h, src_w),
-        'dst_size': (h, w),
+        "src_size": (src_h, src_w),
+        "dst_size": (h, w),
     }
 
 
@@ -69,28 +71,25 @@ def to_out(tenInp, src_size):
 
 
 def resize(tensor, size):
-    return F.interpolate(tensor, size=size, mode='bilinear', align_corners=False)
+    return F.interpolate(tensor, size=size, mode="bilinear", align_corners=False)
 
 
 # Flow distance calculator
 
+
 def distance_calculator(_x):
     dtype = _x.dtype
     u, v = _x[:, 0:1].float(), _x[:, 1:].float()
-    return torch.sqrt(u ** 2 + v ** 2).to(dtype)
+    return torch.sqrt(u**2 + v**2).to(dtype)
 
 
 def convert(param):
-    return {
-        k.replace("module.", ""): v
-        for k, v in param.items()
-        if "module." in k
-    }
+    return {k.replace("module.", ""): v for k, v in param.items() if "module." in k}
 
 
 def mark_tensor(tensor, text):
     """
-        Mark something to tensor for debugging
+    Mark something to tensor for debugging
     """
     n, c, h, w = tensor.shape
     to_pil = transforms.ToPILImage()
@@ -118,11 +117,13 @@ def mark_tensor(tensor, text):
 
 
 class TMapper:
-    def __init__(self, src=-1., dst=0., times=-1):
+    def __init__(self, src=-1.0, dst=0.0, times=-1):
         self.times = dst / src if times == -1 else times
         self.now_step = -1
 
-    def get_range_timestamps(self, _min: float, _max: float, lclose=True, rclose=False, normalize=True) -> list:
+    def get_range_timestamps(
+        self, _min: float, _max: float, lclose=True, rclose=False, normalize=True
+    ) -> list:
         _min_step = math.ceil(_min * self.times)
         _max_step = math.ceil(_max * self.times)
         _start = _min_step if lclose else _min_step + 1
@@ -130,7 +131,9 @@ class TMapper:
         if _start >= _end:
             return []
         if normalize:
-            return [((_i / self.times) - _min) / (_max - _min) for _i in range(_start, _end)]
+            return [
+                ((_i / self.times) - _min) / (_max - _min) for _i in range(_start, _end)
+            ]
         return [_i / self.times for _i in range(_start, _end)]
 
 
@@ -141,7 +144,9 @@ def get_ones_tensor(tensor: torch.Tensor):
     k = (str(tensor.device), str(tensor.size()))
     if k in ones_cache:
         return ones_cache[k]
-    ones_cache[k] = torch.ones(tensor.size(), requires_grad=False, dtype=tensor.dtype).to(tensor.device)
+    ones_cache[k] = torch.ones(
+        tensor.size(), requires_grad=False, dtype=tensor.dtype
+    ).to(tensor.device)
     return ones_cache[k]
 
 
@@ -163,26 +168,58 @@ class VideoFI_IO:
         self.total_frames_count = self.video_capture.get(7)
         self.width = int(self.video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.ffmpeg_writer = self.generate_frame_renderer(input_path, output_path, self.width, self.height,
-                                                          self.dst_fps, hwaccel)
+        self.ffmpeg_writer = self.generate_frame_renderer(
+            input_path, output_path, self.width, self.height, self.dst_fps, hwaccel
+        )
         self.read_buffer = Queue(maxsize=100)
         self.write_buffer = Queue(maxsize=-1)
-        _thread.start_new_thread(self.build_read_buffer, (self.read_buffer, self.video_capture))
+        _thread.start_new_thread(
+            self.build_read_buffer, (self.read_buffer, self.video_capture)
+        )
         _thread.start_new_thread(self.clear_write_buffer, (self.write_buffer,))
 
-    def generate_frame_renderer(self, input_path, output_path, width, height, dst_fps, hwaccel=False):
-        encoder = 'libx264'
-        preset = 'medium'
+    def generate_frame_renderer(
+        self, input_path, output_path, width, height, dst_fps, hwaccel=False
+    ):
+        encoder = "libx264"
+        preset = "medium"
         if hwaccel:
-            encoder = 'h264_nvenc'
-            preset = 'p7'
+            encoder = "h264_nvenc"
+            preset = "p7"
         ffmpeg_cmd = [
-            'ffmpeg', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-r', f'{dst_fps}',
-            '-s', f'{width}x{height}',
-            '-i', 'pipe:0', '-i', input_path,
-            '-map', '0:v', '-map', '1:a?',
-            '-c:v', encoder, "-movflags", "+faststart", "-pix_fmt", "yuv420p", "-qp", "16", '-preset', preset,
-            '-c:a', 'aac', '-b:a', '320k', f'{output_path}'
+            "ffmpeg",
+            "-y",
+            "-f",
+            "rawvideo",
+            "-pix_fmt",
+            "rgb24",
+            "-r",
+            f"{dst_fps}",
+            "-s",
+            f"{width}x{height}",
+            "-i",
+            "pipe:0",
+            "-i",
+            input_path,
+            "-map",
+            "0:v",
+            "-map",
+            "1:a?",
+            "-c:v",
+            encoder,
+            "-movflags",
+            "+faststart",
+            "-pix_fmt",
+            "yuv420p",
+            "-qp",
+            "16",
+            "-preset",
+            preset,
+            "-c:a",
+            "aac",
+            "-b:a",
+            "320k",
+            f"{output_path}",
         ]
 
         return subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE)

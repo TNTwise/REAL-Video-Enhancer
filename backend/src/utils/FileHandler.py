@@ -4,6 +4,7 @@ import zipfile
 import shutil
 from .Util import log
 
+
 class FileHandler:
     @staticmethod
     def getFreeSpace() -> int:
@@ -17,6 +18,7 @@ class FileHandler:
         except Exception as e:
             log(f"An error occurred while getting available disk space: {e}")
             return 0
+
     @staticmethod
     def moveFolder(prev: str, new: str):
         """

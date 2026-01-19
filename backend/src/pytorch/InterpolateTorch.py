@@ -9,7 +9,7 @@ from ..utils.SSIM import SSIM
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .InterpolateGMFSS import InterpolateGMFSSTorch
 from .InterpolateGIMM import InterpolateGIMMTorch
-from .InterpolateRIFE import InterpolateRifeTorch,  InterpolateRIFEDRBA
+from .InterpolateRIFE import InterpolateRifeTorch, InterpolateRIFEDRBA
 from .InterpolateIFRNET import InterpolateIFRNetTorch
 
 

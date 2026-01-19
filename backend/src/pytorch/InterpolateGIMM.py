@@ -1,6 +1,7 @@
 import torch
 import torch.nn.functional as F
 from .TorchUtils import TorchUtils
+
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate
 import math
@@ -16,6 +17,7 @@ from time import sleep
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 logging.basicConfig(level=logging.INFO)
+
 
 class InterpolateGIMMTorch(BaseInterpolate):
     @torch.inference_mode()
@@ -66,9 +68,9 @@ class InterpolateGIMMTorch(BaseInterpolate):
 
         self.backend = backend
         self.ceilInterpolateFactor = ceilInterpolateFactor
-        self.hdr_mode = hdr_mode # used in base interpolate class (ik inheritance is bad leave me alone)
+        self.hdr_mode = hdr_mode  # used in base interpolate class (ik inheritance is bad leave me alone)
         self.frame0 = None
-        
+
         self.doEncodingOnFrame = False
         self._load()
 
@@ -88,8 +90,6 @@ class InterpolateGIMMTorch(BaseInterpolate):
             ]
             self.flownet.load_state_dict(state_dict)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
-
-            
 
             dummyInput = torch.zeros(
                 [1, 3, self.ph, self.pw], dtype=self.dtype, device=self.device
@@ -152,7 +152,7 @@ class InterpolateGIMMTorch(BaseInterpolate):
                     return
                 frame1 = F.pad(img1.get_frame_tensor(), self.padding)
             self.torchUtils.sync_stream(self.prepareStream)
-            
+
             for n in range(self.ceilInterpolateFactor - 1):
                 if not transition:
                     timestep = (n + 1) * 1.0 / (self.ceilInterpolateFactor)
@@ -172,8 +172,10 @@ class InterpolateGIMMTorch(BaseInterpolate):
                     if torch.isnan(output).any():
                         # if there are nans in output, reload with float32 precision and process.... dumb fix but whatever
                         raise ValueError("Nans in output")
-                    
-                    yield img1.get_dummy_frame().set_frame_tensor(output[:, :, : self.height, : self.width].to(self.dtype))
+
+                    yield img1.get_dummy_frame().set_frame_tensor(
+                        output[:, :, : self.height, : self.width].to(self.dtype)
+                    )
 
                 else:
                     yield img1

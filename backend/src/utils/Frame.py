@@ -171,7 +171,7 @@ class Frame:
     def resize_frame_optimal(self, new_width: int, new_height: int):
         """
         Docstring for resize_frame_optimal
-        
+
         :param self: "Frame"
         :param new_width: new width of the frame
         :type new_width: int
@@ -188,7 +188,7 @@ class Frame:
             self._invalidate_cache("bytes")
         else:
             raise ValueError("Tried to rezise nothing!")
-        
+
         return self.resize_frame(new_width=new_width, new_height=new_height)
 
     def get_np_sdr(self):

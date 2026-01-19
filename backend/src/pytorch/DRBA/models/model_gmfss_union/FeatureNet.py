@@ -5,6 +5,7 @@ import torch.nn.functional as F
 
 class FeatureNet(nn.Module):
     """The quadratic model"""
+
     def __init__(self):
         super(FeatureNet, self).__init__()
         self.block1 = nn.Sequential(

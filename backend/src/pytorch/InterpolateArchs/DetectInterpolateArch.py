@@ -48,8 +48,8 @@ class RIFE46(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "caltime.8.bias", # thos is because for some reason, this arch is detected when loading gmfss pro's rife component.
-        "encoder.pyramid1.0.0.weight", # ifrnet 
+        "caltime.8.bias",  # thos is because for some reason, this arch is detected when loading gmfss pro's rife component.
+        "encoder.pyramid1.0.0.weight",  # ifrnet
     ]
 
     @staticmethod
@@ -83,7 +83,7 @@ class RIFE47(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -115,7 +115,7 @@ class RIFE413(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -136,7 +136,7 @@ class RIFE420(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -157,7 +157,7 @@ class RIFE421(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     def module():
@@ -177,7 +177,7 @@ class RIFE422lite(Arch):
         "module.block4.lastconv.0.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -189,8 +189,10 @@ class RIFE422lite(Arch):
 
 class RIFE425(Arch):
     base_arch: str = "rife"
-    unique_shapes: dict = {"module.block4.lastconv.0.bias": "torch.Size([52])", 
-                           "module.block0.conv0.0.0.weight": "torch.Size([96, 15, 3, 3])"}
+    unique_shapes: dict = {
+        "module.block4.lastconv.0.bias": "torch.Size([52])",
+        "module.block0.conv0.0.0.weight": "torch.Size([96, 15, 3, 3])",
+    }
     excluded_keys: list = [
         "module.encode.0.weight",
         "module.encode.0.bias",
@@ -198,7 +200,7 @@ class RIFE425(Arch):
         "module.encode.1.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -207,10 +209,13 @@ class RIFE425(Arch):
 
         return IFNet
 
+
 class RIFE425_heavy(Arch):
     base_arch: str = "rife"
-    unique_shapes: dict = {"module.block0.lastconv.0.bias": "torch.Size([52])", 
-                           "module.block0.conv0.0.0.weight": "torch.Size([96, 39, 3, 3])"}
+    unique_shapes: dict = {
+        "module.block0.lastconv.0.bias": "torch.Size([52])",
+        "module.block0.conv0.0.0.weight": "torch.Size([96, 39, 3, 3])",
+    }
     excluded_keys: list = [
         "module.encode.0.weight",
         "module.encode.0.bias",
@@ -218,7 +223,7 @@ class RIFE425_heavy(Arch):
         "module.encode.1.bias",
         "transformer.layers.4.self_attn.merge.weight",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -226,6 +231,7 @@ class RIFE425_heavy(Arch):
         from .RIFE.rife425_heavyIFNET import IFNet
 
         return IFNet
+
 
 class GMFSS(Arch):
     base_arch: str = "gmfss"
@@ -238,7 +244,7 @@ class GMFSS(Arch):
         "module.encode.1.weight",
         "module.encode.1.bias",
         "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     @staticmethod
@@ -257,13 +263,14 @@ class GIMM(Arch):
         "module.encode.1.weight",
         "module.encode.1.bias",
         "transformer.layers.4.self_attn.merge.weight",
-        "encoder.pyramid1.0.0.weight"
+        "encoder.pyramid1.0.0.weight",
     ]
 
     def module() -> torch.nn.Module:
         from .GIMM.GIMM import GIMMVFI_R
 
         return GIMMVFI_R
+
 
 class IFRNET(Arch):
     base_arch: str = "ifrnet"
@@ -277,13 +284,25 @@ class IFRNET(Arch):
         "fnet.layer1.0.conv1.weight",
         "caltime.8.bias",
     ]
+
     def module() -> torch.nn.Module:
         from .IFRNET.IFRNet import IFRNet
 
         return IFRNet
 
 
-archs = [RIFE46, RIFE47, RIFE413, RIFE420, RIFE421, RIFE422lite, RIFE425, GMFSS, GIMM, IFRNET]
+archs = [
+    RIFE46,
+    RIFE47,
+    RIFE413,
+    RIFE420,
+    RIFE421,
+    RIFE422lite,
+    RIFE425,
+    GMFSS,
+    GIMM,
+    IFRNET,
+]
 
 
 class ArchDetect:
@@ -346,12 +365,16 @@ class ArchDetect:
     def getArchModule(self):
         return IFRNET
         return self.detected_arch.module()"""
+
     def getArchName(self):
         return self.detected_arch.__name__
+
     def getArchBase(self):
         return self.detected_arch.base_arch
+
     def getArchModule(self):
         return self.detected_arch.module()
+
 
 if __name__ == "__main__":
     import os

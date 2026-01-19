@@ -16,9 +16,10 @@ torch.set_grad_enabled(False)
 
 ##########################################################
 
+
 @torch.inference_mode()
 def softsplat(
-        tenIn: torch.Tensor, tenFlow: torch.Tensor, tenMetric: torch.Tensor, strMode: str
+    tenIn: torch.Tensor, tenFlow: torch.Tensor, tenMetric: torch.Tensor, strMode: str
 ):
     mode_parts = strMode.split("-")
     mode_main = mode_parts[0]
@@ -95,14 +96,18 @@ class softsplat_func(torch.autograd.Function):
             gridY, gridX = torch.meshgrid(
                 torch.arange(H, device=device, dtype=origdtype),
                 torch.arange(W, device=device, dtype=origdtype),
-                indexing='ij'
+                indexing="ij",
             )  # [H, W]
             # Cache the grids
             grid_cache[key] = (
-            gridY.unsqueeze(0).unsqueeze(0).expand(N, 1, H, W), gridX.unsqueeze(0).unsqueeze(0).expand(N, 1, H, W))
+                gridY.unsqueeze(0).unsqueeze(0).expand(N, 1, H, W),
+                gridX.unsqueeze(0).unsqueeze(0).expand(N, 1, H, W),
+            )
 
         if key not in batch_cache:
-            batch_cache[key] = torch.arange(N, device=device).view(N, 1, 1).expand(N, H, W).reshape(-1)
+            batch_cache[key] = (
+                torch.arange(N, device=device).view(N, 1, 1).expand(N, H, W).reshape(-1)
+            )
 
         gridY, gridX = grid_cache[key]
         batch_indices = batch_cache[key]
@@ -177,6 +182,7 @@ class softsplat_func(torch.autograd.Function):
         tenOut = tenOut_flat.view(N, H, W, C).permute(0, 3, 1, 2)
 
         return tenOut
+
     # end
 
     # end

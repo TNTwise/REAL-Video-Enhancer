@@ -102,7 +102,6 @@ class Conv3XC(nn.Module):
         self.eval_conv.weight.data = self.weight_concat
         self.eval_conv.bias.data = self.bias_concat
 
-
     def forward(self, x):
         self.update_params()
         if self.training:
@@ -205,6 +204,6 @@ class SPANPlus(nn.Module):
             )
 
     def forward(self, x):
-        x = x.clamp(0., 1.)
+        x = x.clamp(0.0, 1.0)
         out = self.feats(x)
-        return self.upsampler(out).clamp(0.,1.).float()
+        return self.upsampler(out).clamp(0.0, 1.0).float()

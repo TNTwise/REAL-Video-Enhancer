@@ -1,15 +1,17 @@
 import torch
 import gc
 from ...TorchUtils import TorchUtils
+
+
 class AnimeSRInferenceHelper:
     def __init__(self, model, scale):
         self.scale = scale
         self.model: torch.nn.Module = model
         self.num_cached_frames = 3
         self.frame_cache = []
-    
+
     def state_dict(self):
-        self.frame_cache = [] # reset cache before saving state
+        self.frame_cache = []  # reset cache before saving state
         return self.model.state_dict()
 
     def __call__(self, frame: torch.Tensor):
@@ -21,13 +23,13 @@ class AnimeSRInferenceHelper:
             self.out = frame.new_zeros(1, 3, height * self.scale, width * self.scale)
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame)
-        
-        #print(x.shape, file=sys.stderr)
-        #sys.exit()
-        self.out, self.state = self.model(torch.cat(self.frame_cache, dim=1), self.out, self.state)
+
+        # print(x.shape, file=sys.stderr)
+        # sys.exit()
+        self.out, self.state = self.model(
+            torch.cat(self.frame_cache, dim=1), self.out, self.state
+        )
         # remove frame from cache
         self.frame_cache.pop(0)
         self.frame_cache.append(frame)
         return self.out
-
-            

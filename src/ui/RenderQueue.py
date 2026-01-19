@@ -135,10 +135,11 @@ class RenderOptions:
     @backend.setter
     def backend(self, value: str):
         self._backend = value
-    
+
     @property
     def modelScale(self):
         return self._modelScale
+
     @modelScale.setter
     def modelScale(self, value: int):
         self._modelScale = value
@@ -146,20 +147,23 @@ class RenderOptions:
     @property
     def denoiseModelFile(self):
         return self._denoiseModelFile
+
     @denoiseModelFile.setter
     def denoiseModelFile(self, value: str):
         self._denoiseModelFile = value
-    
+
     @property
     def decompressModelFile(self):
         return self._decompressModelFile
+
     @decompressModelFile.setter
     def decompressModelFile(self, value: str):
         self._decompressModelFile = value
-    
+
     @property
     def sceneChangeModelFile(self):
         return self._sceneChangeModelFile
+
     @sceneChangeModelFile.setter
     def sceneChangeModelFile(self, value: str):
         self._sceneChangeModelFile = value
@@ -167,6 +171,7 @@ class RenderOptions:
     @property
     def upscaleModelArch(self):
         return self._upscaleModelArch
+
     @upscaleModelArch.setter
     def upscaleModelArch(self, value: str):
         self._upscaleModelArch = value
@@ -178,11 +183,11 @@ class RenderOptions:
     @interpolateModelFile.setter
     def interpolateModelFile(self, value: str):
         self._interpolateModelFile = value
-    
+
     @property
     def deblurModelFile(self):
         return self._deblurModelFile
-    
+
     @deblurModelFile.setter
     def deblurModelFile(self, value: str):
         self._deblurModelFile = value
@@ -195,8 +200,6 @@ class RenderOptions:
     def upscaleModel(self, value: str):
         self._upscaleModel = value
 
-   
-   
     @property
     def interpolateTimes(self):
         return self._interpolateTimes
@@ -244,17 +247,19 @@ class RenderOptions:
     @upscaleModelFile.setter
     def upscaleModelFile(self, value: str):
         self._upscaleModelFile = value
-    
+
     @property
     def hdrMode(self):
         return self._hdrMode
+
     @hdrMode.setter
     def hdrMode(self, value: bool):
         self._hdrMode = value
-    
+
     @property
     def startTime(self):
         return self._startTime
+
     @startTime.setter
     def startTime(self, value: float):
         self._startTime = value
@@ -262,6 +267,7 @@ class RenderOptions:
     @property
     def endTime(self):
         return self._endTime
+
     @endTime.setter
     def endTime(self, value: float):
         self._endTime = value
@@ -269,25 +275,26 @@ class RenderOptions:
     @property
     def isPreview(self):
         return self._isPreview
+
     @isPreview.setter
     def isPreview(self, value: bool):
         self._isPreview = value
-    
+
     @property
     def overrideUpscaleScale(self):
         return self._overrideUpscaleScale
+
     @overrideUpscaleScale.setter
     def overrideUpscaleScale(self, value: int):
         self._overrideUpscaleScale = value
-    
+
     @property
     def encoderCommand(self):
         return self._encoderCommand
+
     @encoderCommand.setter
     def encoderCommand(self, value: str):
         self._encoderCommand = value
-        
-        
 
 
 class RenderQueue:
@@ -300,7 +307,7 @@ class RenderQueue:
         self.queue.append(renderable)
         self.qlistwidget.addItem(renderable.inputFile)
         self.inputNameList.append(renderable.inputFile)
-    
+
     def addToStart(self, renderable: RenderOptions):
         self.queue.insert(0, renderable)
         self.qlistwidget.insertItem(0, renderable.inputFile)

@@ -35,9 +35,9 @@ def warp(tenInput, tenFlow):
     )
 
     g = (backwarp_tenGrid[k] + tenFlow).permute(0, 2, 3, 1)
-    pd = 'border'
+    pd = "border"
     if tenInput.device.type == "mps":
-        pd = 'zeros'
+        pd = "zeros"
         g = g.clamp(-1, 1)
     return torch.nn.functional.grid_sample(
         input=tenInput,

@@ -81,5 +81,5 @@ class BaseInterpolate(metaclass=ABCMeta):
 
     @torch.inference_mode()
     def uncacheFrame(self):
-        self.f0encode = None 
+        self.f0encode = None
         self.img0 = None

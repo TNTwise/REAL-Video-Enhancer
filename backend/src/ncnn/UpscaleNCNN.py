@@ -1,4 +1,3 @@
-
 # https://github.com/chaiNNer-org/chaiNNer/blob/2aa0b46233ba8cd90d4bb405e2bc6e16a3430546/backend/src/nodes/impl/ncnn/model.py
 
 from __future__ import annotations
@@ -6,6 +5,7 @@ import pathlib
 
 try:
     from upscale_ncnn_py import upscale_ncnn_vulkan_wrapper as wrapped
+
     method = "upscale_ncnn_py"
 except Exception:
     method = "ncnn_vulkan"
@@ -3382,9 +3382,9 @@ class NcnnModel:
         layer_bytes = b""
 
         if weights_a:
-            assert len(weights_a) == len(
-                weights_b
-            ), "All corresponding nodes must have same number of weights"
+            assert len(weights_a) == len(weights_b), (
+                "All corresponding nodes must have same number of weights"
+            )
 
             layer_bytes_list = []
             for weight_name, weight_a in weights_a.items():
@@ -3393,13 +3393,13 @@ class NcnnModel:
                 except KeyError:
                     raise
 
-                assert (
-                    weight_a.shape == weight_b.shape
-                ), "Corresponding weights must have the same size and shape"
+                assert weight_a.shape == weight_b.shape, (
+                    "Corresponding weights must have the same size and shape"
+                )
 
-                assert len(weight_a.quantize_tag) == len(
-                    weight_b.quantize_tag
-                ), "Weights must either both have or both not have a quantize tag"
+                assert len(weight_a.quantize_tag) == len(weight_b.quantize_tag), (
+                    "Weights must either both have or both not have a quantize tag"
+                )
 
                 if (
                     weight_a.quantize_tag == DTYPE_FP16
@@ -3676,9 +3676,9 @@ class NcnnModel:
             (i, l) for i, l in enumerate(model_b.layers) if l.weight_data
         ]
 
-        assert len(layer_a_weights) == len(
-            layer_b_weights
-        ), "Models must have same number of layers containing weights"
+        assert len(layer_a_weights) == len(layer_b_weights), (
+            "Models must have same number of layers containing weights"
+        )
 
         weight_bytes_list = []
         for layer_a, layer_b in zip(layer_a_weights, layer_b_weights):
@@ -3778,13 +3778,12 @@ def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
     return int(scale), in_nc, out_nc, nf, fp
 
 
-
 def getNCNNScale(modelPath: str = "") -> int:
     basename = os.path.basename(modelPath)
     try:
-      modelParamPath = os.path.join(modelPath, basename + ".param")
-      model = NcnnModel.load_from_file(modelParamPath)
-      scale = get_broadcast_data(model)[0]
+        modelParamPath = os.path.join(modelPath, basename + ".param")
+        model = NcnnModel.load_from_file(modelParamPath)
+        scale = get_broadcast_data(model)[0]
     except Exception:
         print("Failed to get scale from model, getting from filename")
         for i in range(1, 20):
@@ -3793,8 +3792,18 @@ def getNCNNScale(modelPath: str = "") -> int:
                 break
     return scale
 
+
 class UPSCALE:
-    def __init__(self, gpuid: int = 0, tta_mode: bool = False, tilesize: int = 0, model: int = 0 ,num_threads: int = 1, model_str: str = "", scale: int = 0):
+    def __init__(
+        self,
+        gpuid: int = 0,
+        tta_mode: bool = False,
+        tilesize: int = 0,
+        model: int = 0,
+        num_threads: int = 1,
+        model_str: str = "",
+        scale: int = 0,
+    ):
         assert gpuid >= -1, "gpuid must >= -1"
         assert tilesize == 0 or tilesize >= 32, "tilesize must >= 32 or be 0"
         assert model >= -1, "model must > 0 or -1"
@@ -3815,80 +3824,238 @@ class UPSCALE:
 
         self.channels = None
         self.out_bytes = None
-        
-        
+
     def _set_parameters(self) -> None:
         self._upscale_object.set_parameters(self._tilesize, self._scale)
 
     def _load(
-        self, param_path: Optional[pathlib.Path] = None, model_path: Optional[pathlib.Path] = None, scale: int = 0
+        self,
+        param_path: Optional[pathlib.Path] = None,
+        model_path: Optional[pathlib.Path] = None,
+        scale: int = 0,
     ) -> None:
         model_dict: Dict[int, Dict[str, Union[str, int]]] = {
-      
-        #span
-        0: {"param": "spanx2_ch48.param", "bin": "spanx2_ch48.bin", "scale": 2, "folder": "models/SPAN"},
-        1: {"param": "spanx2_ch52.param", "bin": "spanx2_ch52.bin", "scale": 2, "folder": "models/SPAN"},
-        2: {"param": "spanx4_ch48.param", "bin": "spanx4_ch48.bin", "scale": 4, "folder": "models/SPAN"},
-        3: {"param": "spanx4_ch52.param", "bin": "spanx4_ch52.bin", "scale": 4, "folder": "models/SPAN"},
-        #custom span
-        4: {"param": "2x_ModernSpanimationV1.param", "bin": "2x_ModernSpanimationV1.bin", "scale": 2, "folder": "models/SPAN"},
-        5: {"param": "4xSPANkendata.param", "bin": "4xSPANkendata.bin", "scale": 4, "folder": "models/SPAN"},
-        6: {"param": "ClearReality4x.param", "bin": "ClearReality4x.bin", "scale": 4, "folder": "models/SPAN"},
-        
-        #esrgan
-        7: {"param": "realesr-animevideov3-x2.param", "bin": "realesr-animevideov3-x2.bin", "scale": 2, "folder": "models/ESRGAN"},
-        8: {"param": "realesr-animevideov3-x3.param", "bin": "realesr-animevideov3-x3.bin", "scale": 3, "folder": "models/ESRGAN"},
-        9: {"param": "realesr-animevideov3-x4.param", "bin": "realesr-animevideov3-x4.bin", "scale": 4, "folder": "models/ESRGAN"},
-        10: {"param": "realesrgan-x4plus-x4.param", "bin": "realesrgan-x4plus.bin", "scale": 4, "folder": "models/ESRGAN"},
-        11: {"param": "realesrgan-x4plus-anime.param", "bin": "realesrgan-x4plus-anime.bin", "scale": 4, "folder": "models/ESRGAN"},
-   
-        #cugan-se models 
-        12: {"param": "up2x-conservative.param", "bin": "up2x-conservative.bin", "scale": 2, "folder": "models/CUGAN/models-se"},
-        13: {"param": "up2x-no-denoise.param", "bin": "up2x-no-denoise.bin", "scale": 2, "folder": "models/CUGAN/models-se"},
-        14: {"param": "up2x-denoise1x.param", "bin": "up2x-denoise1x.bin", "scale": 2, "folder": "models/CUGAN/models-se"},
-        15: {"param": "up2x-denoise2x.param", "bin": "up2x-denoise2x.bin", "scale": 2, "folder": "models/CUGAN/models-se"},
-        16: {"param": "up2x-denoise3x.param", "bin": "up2x-denoise3x.bin", "scale": 2, "folder": "models/CUGAN/models-se"},
-
-        17: {"param": "up3x-conservative.param", "bin": "up3x-conservative.bin", "scale": 3, "folder": "models/CUGAN/models-se"},
-        18: {"param": "up3x-no-denoise.param", "bin": "up3x-no-denoise.bin", "scale": 3, "folder": "models/CUGAN/models-se"},
-        19: {"param": "up3x-denoise3x.param", "bin": "up3x-denoise3x.bin", "scale": 3, "folder": "models/CUGAN/models-se"},
-
-        20: {"param": "up4x-conservative.param", "bin": "up4x-conservative.bin", "scale": 4, "folder": "models/CUGAN/models-se"},
-        21: {"param": "up4x-no-denoise.param", "bin": "up4x-no-denoise.bin", "scale": 4, "folder": "models/CUGAN/models-se"},
-        22: {"param": "up4x-denoise3x.param", "bin": "up3x-denoise3x.bin", "scale": 4, "folder": "models/CUGAN/models-se"},
-        
-        #cugan-pro models
-        23: {"param": "up2x-denoise3x.param", "bin": "up2x-denoise3x.bin", "scale": 2, "folder": "models/CUGAN/models-pro"},
-        24: {"param": "up2x-conservative.param", "bin": "up2x-conservative.bin", "scale": 2, "folder": "models/CUGAN/models-pro"},
-        25: {"param": "up2x-no-denoise.param", "bin": "up2x-no-denoise.bin", "scale": 2, "folder": "models/CUGAN/models-pro"},
-        
-        26: {"param": "up3x-denoise3x", "bin": "denoise3x-up3x", "scale": 3, "folder": "models/CUGAN/models-pro"},
-        27: {"param": "up3x-conservative", "bin": "up3x-conservative.bin", "scale": 3, "folder": "models/CUGAN/models-pro"},
-        28: {"param": "up3x-no-denoise.param", "bin": "up3x-no-denoise.bin", "scale": 3, "folder": "models/CUGAN/models-pro"},
-       
-        #shufflecugan
-        29: {"param": "sudo_shuffle_cugan-x2.param", "bin": "sudo_shuffle_cugan-x2.bin", "scale": 2, "folder": "models/SHUFFLECUGAN"},
+            # span
+            0: {
+                "param": "spanx2_ch48.param",
+                "bin": "spanx2_ch48.bin",
+                "scale": 2,
+                "folder": "models/SPAN",
+            },
+            1: {
+                "param": "spanx2_ch52.param",
+                "bin": "spanx2_ch52.bin",
+                "scale": 2,
+                "folder": "models/SPAN",
+            },
+            2: {
+                "param": "spanx4_ch48.param",
+                "bin": "spanx4_ch48.bin",
+                "scale": 4,
+                "folder": "models/SPAN",
+            },
+            3: {
+                "param": "spanx4_ch52.param",
+                "bin": "spanx4_ch52.bin",
+                "scale": 4,
+                "folder": "models/SPAN",
+            },
+            # custom span
+            4: {
+                "param": "2x_ModernSpanimationV1.param",
+                "bin": "2x_ModernSpanimationV1.bin",
+                "scale": 2,
+                "folder": "models/SPAN",
+            },
+            5: {
+                "param": "4xSPANkendata.param",
+                "bin": "4xSPANkendata.bin",
+                "scale": 4,
+                "folder": "models/SPAN",
+            },
+            6: {
+                "param": "ClearReality4x.param",
+                "bin": "ClearReality4x.bin",
+                "scale": 4,
+                "folder": "models/SPAN",
+            },
+            # esrgan
+            7: {
+                "param": "realesr-animevideov3-x2.param",
+                "bin": "realesr-animevideov3-x2.bin",
+                "scale": 2,
+                "folder": "models/ESRGAN",
+            },
+            8: {
+                "param": "realesr-animevideov3-x3.param",
+                "bin": "realesr-animevideov3-x3.bin",
+                "scale": 3,
+                "folder": "models/ESRGAN",
+            },
+            9: {
+                "param": "realesr-animevideov3-x4.param",
+                "bin": "realesr-animevideov3-x4.bin",
+                "scale": 4,
+                "folder": "models/ESRGAN",
+            },
+            10: {
+                "param": "realesrgan-x4plus-x4.param",
+                "bin": "realesrgan-x4plus.bin",
+                "scale": 4,
+                "folder": "models/ESRGAN",
+            },
+            11: {
+                "param": "realesrgan-x4plus-anime.param",
+                "bin": "realesrgan-x4plus-anime.bin",
+                "scale": 4,
+                "folder": "models/ESRGAN",
+            },
+            # cugan-se models
+            12: {
+                "param": "up2x-conservative.param",
+                "bin": "up2x-conservative.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-se",
+            },
+            13: {
+                "param": "up2x-no-denoise.param",
+                "bin": "up2x-no-denoise.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-se",
+            },
+            14: {
+                "param": "up2x-denoise1x.param",
+                "bin": "up2x-denoise1x.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-se",
+            },
+            15: {
+                "param": "up2x-denoise2x.param",
+                "bin": "up2x-denoise2x.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-se",
+            },
+            16: {
+                "param": "up2x-denoise3x.param",
+                "bin": "up2x-denoise3x.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-se",
+            },
+            17: {
+                "param": "up3x-conservative.param",
+                "bin": "up3x-conservative.bin",
+                "scale": 3,
+                "folder": "models/CUGAN/models-se",
+            },
+            18: {
+                "param": "up3x-no-denoise.param",
+                "bin": "up3x-no-denoise.bin",
+                "scale": 3,
+                "folder": "models/CUGAN/models-se",
+            },
+            19: {
+                "param": "up3x-denoise3x.param",
+                "bin": "up3x-denoise3x.bin",
+                "scale": 3,
+                "folder": "models/CUGAN/models-se",
+            },
+            20: {
+                "param": "up4x-conservative.param",
+                "bin": "up4x-conservative.bin",
+                "scale": 4,
+                "folder": "models/CUGAN/models-se",
+            },
+            21: {
+                "param": "up4x-no-denoise.param",
+                "bin": "up4x-no-denoise.bin",
+                "scale": 4,
+                "folder": "models/CUGAN/models-se",
+            },
+            22: {
+                "param": "up4x-denoise3x.param",
+                "bin": "up3x-denoise3x.bin",
+                "scale": 4,
+                "folder": "models/CUGAN/models-se",
+            },
+            # cugan-pro models
+            23: {
+                "param": "up2x-denoise3x.param",
+                "bin": "up2x-denoise3x.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-pro",
+            },
+            24: {
+                "param": "up2x-conservative.param",
+                "bin": "up2x-conservative.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-pro",
+            },
+            25: {
+                "param": "up2x-no-denoise.param",
+                "bin": "up2x-no-denoise.bin",
+                "scale": 2,
+                "folder": "models/CUGAN/models-pro",
+            },
+            26: {
+                "param": "up3x-denoise3x",
+                "bin": "denoise3x-up3x",
+                "scale": 3,
+                "folder": "models/CUGAN/models-pro",
+            },
+            27: {
+                "param": "up3x-conservative",
+                "bin": "up3x-conservative.bin",
+                "scale": 3,
+                "folder": "models/CUGAN/models-pro",
+            },
+            28: {
+                "param": "up3x-no-denoise.param",
+                "bin": "up3x-no-denoise.bin",
+                "scale": 3,
+                "folder": "models/CUGAN/models-pro",
+            },
+            # shufflecugan
+            29: {
+                "param": "sudo_shuffle_cugan-x2.param",
+                "bin": "sudo_shuffle_cugan-x2.bin",
+                "scale": 2,
+                "folder": "models/SHUFFLECUGAN",
+            },
         }
 
         if self._model == -1:
             if param_path is None and model_path is None and scale == 0:
-                raise ValueError("param_path, model_path and scale must be specified when model == -1")
+                raise ValueError(
+                    "param_path, model_path and scale must be specified when model == -1"
+                )
             if param_path is None or model_path is None:
-                raise ValueError("param_path and model_path must be specified when model == -1")
+                raise ValueError(
+                    "param_path and model_path must be specified when model == -1"
+                )
             if scale == 0:
                 raise ValueError("scale must be specified when model == -1")
         else:
             if self._model_str == "":
-                model_dir = pathlib.Path(__file__).parent / model_dict[self._model].get("folder", "models")
+                model_dir = pathlib.Path(__file__).parent / model_dict[self._model].get(
+                    "folder", "models"
+                )
 
-                param_path = model_dir / pathlib.Path(str(model_dict[self._model]["param"]))
-                model_path = model_dir / pathlib.Path(str(model_dict[self._model]["bin"]))
+                param_path = model_dir / pathlib.Path(
+                    str(model_dict[self._model]["param"])
+                )
+                model_path = model_dir / pathlib.Path(
+                    str(model_dict[self._model]["bin"])
+                )
             else:
                 model_dir = pathlib.Path(self._model_str).parent
-                
-                param_path = model_dir / pathlib.Path(str(self._model_str.split("/")[-1]+".param"))
-                model_path = model_dir / pathlib.Path(str(self._model_str.split("/")[-1]+".bin"))
-                
+
+                param_path = model_dir / pathlib.Path(
+                    str(self._model_str.split("/")[-1] + ".param")
+                )
+                model_path = model_dir / pathlib.Path(
+                    str(self._model_str.split("/")[-1] + ".bin")
+                )
+
                 # print (model_dir,param_path,model_path)
         self._scale = scale if scale != 0 else int(model_dict[self._model]["scale"])
         self._set_parameters()
@@ -3902,13 +4069,14 @@ class UPSCALE:
         self._upscale_object.process(self.raw_in_image, self.raw_out_image)
 
     def process_cv2(self, _image: np.ndarray) -> np.ndarray:
-
         in_bytes = _image.tobytes()
         if self.channels == None:
             self.channels = int(len(in_bytes) / (_image.shape[1] * _image.shape[0]))
             self.out_bytes = (self._scale**2) * len(in_bytes) * b"\x00"
 
-        self.raw_in_image = wrapped.UPSCALEImage(in_bytes, _image.shape[1], _image.shape[0], self.channels)
+        self.raw_in_image = wrapped.UPSCALEImage(
+            in_bytes, _image.shape[1], _image.shape[0], self.channels
+        )
 
         self.raw_out_image = wrapped.UPSCALEImage(
             self.out_bytes,
@@ -3919,15 +4087,17 @@ class UPSCALE:
 
         self.process()
 
-        
-
         return np.frombuffer(self.raw_out_image.get_data(), dtype=np.uint8).reshape(
             self._scale * _image.shape[0], self._scale * _image.shape[1], self.channels
         )
 
-    def process_bytes(self, _image_bytes: bytes, width: int, height: int, channels: int) -> bytes:
+    def process_bytes(
+        self, _image_bytes: bytes, width: int, height: int, channels: int
+    ) -> bytes:
         if self.raw_in_image is None and self.raw_out_image is None:
-            self.raw_in_image = wrapped.UPSCALEImage(_image_bytes, width, height, channels)
+            self.raw_in_image = wrapped.UPSCALEImage(
+                _image_bytes, width, height, channels
+            )
 
             self.raw_out_image = wrapped.UPSCALEImage(
                 (self._scale**2) * len(_image_bytes) * b"\x00",
@@ -3941,33 +4111,45 @@ class UPSCALE:
         self.process()
 
         return self.raw_out_image.get_data()
-    
+
+
 class UpscaleWithNCNNMode:
-    def __init__(self, modelPath: os.PathLike, num_threads: int, scale: int, gpuid: int = 0, width: int = 1920, height: int = 1080, tilesize: int = 0, tilePad=10, hdr_mode=False):
-      self.tilewidth = width
-      self.tileheight = height
-      self.tile_size = tilesize if tilesize > 0 else 512
-      self.tile_pad = tilePad
-      self.scale = scale
-      self.hdr_mode = hdr_mode
-      
-      self.net = ncnn.Net()
-      # Use vulkan compute
-      self.net.opt.use_vulkan_compute = True
-      self.net.opt.use_fp16_packed = True
-      self.net.opt.use_fp16_storage = True 
-      self.net.opt.use_fp16_arithmetic = False
-      self.net.opt.use_int8_storage = True
-      self.net.opt.use_int8_arithmetic = False
-      self.net.set_vulkan_device(gpuid)
-      self.blob_vkallocator = ncnn.VkBlobAllocator(self.net.vulkan_device())
-      self.staging_vkallocator = ncnn.VkStagingAllocator(self.net.vulkan_device())
-      self.net.opt.blob_vkallocator = self.blob_vkallocator
-      self.net.opt.staging_vkallocator = self.staging_vkallocator
-      self.net.opt.workspace_vkallocator = self.blob_vkallocator
-      # Load model param and bin
-      self.net.load_param(modelPath + ".param")
-      self.net.load_model(modelPath + ".bin")
+    def __init__(
+        self,
+        modelPath: os.PathLike,
+        num_threads: int,
+        scale: int,
+        gpuid: int = 0,
+        width: int = 1920,
+        height: int = 1080,
+        tilesize: int = 0,
+        tilePad=10,
+        hdr_mode=False,
+    ):
+        self.tilewidth = width
+        self.tileheight = height
+        self.tile_size = tilesize if tilesize > 0 else 512
+        self.tile_pad = tilePad
+        self.scale = scale
+        self.hdr_mode = hdr_mode
+
+        self.net = ncnn.Net()
+        # Use vulkan compute
+        self.net.opt.use_vulkan_compute = True
+        self.net.opt.use_fp16_packed = True
+        self.net.opt.use_fp16_storage = True
+        self.net.opt.use_fp16_arithmetic = False
+        self.net.opt.use_int8_storage = True
+        self.net.opt.use_int8_arithmetic = False
+        self.net.set_vulkan_device(gpuid)
+        self.blob_vkallocator = ncnn.VkBlobAllocator(self.net.vulkan_device())
+        self.staging_vkallocator = ncnn.VkStagingAllocator(self.net.vulkan_device())
+        self.net.opt.blob_vkallocator = self.blob_vkallocator
+        self.net.opt.staging_vkallocator = self.staging_vkallocator
+        self.net.opt.workspace_vkallocator = self.blob_vkallocator
+        # Load model param and bin
+        self.net.load_param(modelPath + ".param")
+        self.net.load_model(modelPath + ".bin")
 
     def NCNNImageMatFromNP(self, npArray: np.array):
         return ncnn.Mat.from_pixels(
@@ -3985,26 +4167,26 @@ class UpscaleWithNCNNMode:
         nparray = np.clip(nparray, 0, 255)
         return nparray
 
-    def process_bytes(self, frame:bytes, *args, **kwargs) -> bytes:
+    def process_bytes(self, frame: bytes, *args, **kwargs) -> bytes:
         frame = np.ascontiguousarray(np.frombuffer(frame, dtype=np.uint8))
         ex = self.net.create_extractor()
-        
-        #frame = self.ClampNPArray(frame)
+
+        # frame = self.ClampNPArray(frame)
         frame = self.NCNNImageMatFromNP(frame)
         # norm
         self.NormalizeImage(mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0])
         # render frame
-        
+
         ex.input("data", frame)
-        
+
         ret, frame = ex.extract("output")
 
         # norm
         frame = np.array(frame)
         frame = frame.transpose(1, 2, 0) * 255
-        #frame = self.ClampNPArray(frame)
+        # frame = self.ClampNPArray(frame)
         return np.ascontiguousarray(frame, dtype=np.uint8).tobytes()
-    
+
     def renderTiledImage(self, img: np.ndarray):
         raise NotImplementedError(
             "Tile rendering not implemented for default ncnn fallback, please install vcredlist from https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170"
@@ -4076,7 +4258,6 @@ class UpscaleWithNCNNMode:
                     output_start_x_tile:output_end_x_tile,
                 ]
         return self.output
-
 
 
 class UpscaleNCNN:
@@ -4159,10 +4340,18 @@ class UpscaleNCNN:
     def __call__(self, imageChunk: Frame):
         while self.net is None:
             sleep(1)
-            
-        img = self.net.process_bytes(imageChunk.get_frame_bytes(), self.width, self.height, 3)
-        retFrame = Frame(self.backend, self.width, self.height, imageChunk.device, gpu_id=imageChunk.gpu_id, hdr_mode=self.hdr_mode, dtype=imageChunk.dtype)
+
+        img = self.net.process_bytes(
+            imageChunk.get_frame_bytes(), self.width, self.height, 3
+        )
+        retFrame = Frame(
+            self.backend,
+            self.width,
+            self.height,
+            imageChunk.device,
+            gpu_id=imageChunk.gpu_id,
+            hdr_mode=self.hdr_mode,
+            dtype=imageChunk.dtype,
+        )
         retFrame.set_frame_bytes(img)
         return retFrame
-
-    

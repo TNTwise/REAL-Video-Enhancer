@@ -23,7 +23,8 @@ from PySide6.QtCore import (
     QSize,
     QTime,
     QUrl,
-    Qt,QTimer
+    Qt,
+    QTimer,
 )
 from PySide6.QtGui import (
     QBrush,
@@ -40,7 +41,7 @@ from PySide6.QtGui import (
     QPalette,
     QPixmap,
     QRadialGradient,
-    QTransform
+    QTransform,
 )
 from PySide6.QtWidgets import (
     QApplication,
@@ -62,10 +63,11 @@ from .QTstyle import styleSheet, Palette
 from ..constants import HAS_NETWORK_ON_STARTUP, PLATFORM
 from ..Util import log, networkCheck, subprocess_popen_without_terminal
 
+
 def disable_combobox_item(combobox: QComboBox, index):
     """
     Disable a specific item in a QComboBox (making it visible but unselectable)
-    
+
     Parameters:
         combobox: QComboBox widget
         index: Index of the item to disable
@@ -79,10 +81,11 @@ def disable_combobox_item(combobox: QComboBox, index):
             item.setFlags(flags)
             item.setForeground(QBrush(QColor(128, 128, 128)))  # Gray color
 
+
 def disable_combobox_item_by_text(combobox: QComboBox, text):
     """
     Disable a specific item in a QComboBox by its text
-    
+
     Parameters:
         combobox: QComboBox widget
         text: Text of the item to disable
@@ -91,14 +94,18 @@ def disable_combobox_item_by_text(combobox: QComboBox, text):
     if index >= 0:
         disable_combobox_item(combobox, index)
 
-def remove_combobox_item_by_text(combobox: QComboBox, text:str,):
-    
+
+def remove_combobox_item_by_text(
+    combobox: QComboBox,
+    text: str,
+):
     """
     removes a specific item in a QComboBox by its text (not case sensitive)
     """
     for idx in range(combobox.count()):
         if text.lower() in combobox.itemText(idx).lower():
             combobox.removeItem(idx)
+
 
 def hide_layout_widgets(layout):
     # Iterate through all items in the layout and hide the widgets
@@ -136,6 +143,7 @@ _ANSI_COLORS = {
     90: "gray",
 }
 
+
 def ansi_to_html(text: str) -> str:
     """Convert a text containing ANSI SGR escape sequences to a safe HTML string.
 
@@ -159,7 +167,11 @@ def ansi_to_html(text: str) -> str:
         if i < len(parts):
             code_chunk = parts[i]
             i += 1
-            codes = [int(c) for c in code_chunk.split(";") if c != ""] if code_chunk else [0]
+            codes = (
+                [int(c) for c in code_chunk.split(";") if c != ""]
+                if code_chunk
+                else [0]
+            )
             # if reset present, close all open spans
             if 0 in codes:
                 if open_spans:
@@ -182,24 +194,25 @@ def ansi_to_html(text: str) -> str:
                         styles.append(f"color: {color}")
 
             if styles:
-                out.append(f"<span style=\"{';'.join(styles)}\">")
+                out.append(f'<span style="{";".join(styles)}">')
                 open_spans += 1
 
     if open_spans:
         out.append("</span>" * open_spans)
 
     # Replace newlines with <br> for HTML display
-    result = ''.join(out).replace('\n', '<br>')
+    result = "".join(out).replace("\n", "<br>")
     return result
+
 
 class NotificationOverlay(QWidget):
     def __init__(self, message, parent=None, timeout=3000):
         super().__init__(parent)
-        
+
         # Make this widget a child of the main window, covering its area
         self.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         self.setStyleSheet("background-color: rgba(0, 0, 0, 80);")
-        
+
         # Create layout and label to display the message
         layout = QVBoxLayout(self)
         self.label = QLabel(message, self)
@@ -214,7 +227,7 @@ class NotificationOverlay(QWidget):
         """)
         self.label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label, 0, Qt.AlignCenter)
-        
+
         # Close (hide) this overlay widget after 'timeout' milliseconds
         self._timer = QTimer(self)
         self._timer.setSingleShot(True)
@@ -246,15 +259,18 @@ class UpdateGUIThread(QThread):
         self.imagePreviewSharedMemoryID = imagePreviewSharedMemoryID
         self.outputVideoHeight = None
         self.outputVideoWidth = None
+
     def setOutputVideoRes(self, width, height):
         self.outputVideoHeight = height
         self.outputVideoWidth = width
-    
+
     def createNewSharedMemory(self, channels: int):
         self.channels = channels
         if self.outputVideoHeight and self.outputVideoWidth:
             self.shm = shared_memory.SharedMemory(
-                name=self.imagePreviewSharedMemoryID, create=True, size = self.channels * self.outputVideoHeight * self.outputVideoWidth
+                name=self.imagePreviewSharedMemoryID,
+                create=True,
+                size=self.channels * self.outputVideoHeight * self.outputVideoWidth,
             )
         else:
             raise ValueError("Output video resolution not set.")
@@ -262,9 +278,9 @@ class UpdateGUIThread(QThread):
     def deleteSharedMemory(self):
         try:
             if self.shm is not None:
-                    self.shm.close()
-                    self.shm.unlink()
-                    self.shm = None
+                self.shm.close()
+                self.shm.unlink()
+                self.shm = None
         except Exception:
             pass
 
@@ -275,42 +291,38 @@ class UpdateGUIThread(QThread):
                     self.deleteSharedMemory()
                     break
             try:
-                if self.outputVideoHeight and self.outputVideoWidth and self.shm is not None:
-                    
+                if (
+                    self.outputVideoHeight
+                    and self.outputVideoWidth
+                    and self.shm is not None
+                ):
                     image_bytes = self.shm.buf[
                         : self.outputVideoHeight * self.outputVideoWidth * self.channels
                     ].tobytes()
 
-                    expected_size = self.outputVideoHeight * self.outputVideoWidth * self.channels
+                    expected_size = (
+                        self.outputVideoHeight * self.outputVideoWidth * self.channels
+                    )
 
                     if len(image_bytes) < expected_size:
-
-
                         image_bytes += b"\x00" * (expected_size - len(image_bytes))
-
 
                     # Convert image bytes back to numpy array
 
-
-                    image_array = np.frombuffer(image_bytes, dtype=np.uint8 if self.channels == 3 else np.uint16).reshape(
-
-
-                        (self.outputVideoHeight, self.outputVideoWidth, 3)
-
-
-                    )
+                    image_array = np.frombuffer(
+                        image_bytes, dtype=np.uint8 if self.channels == 3 else np.uint16
+                    ).reshape((self.outputVideoHeight, self.outputVideoWidth, 3))
                     if self.channels == 6:
                         # Convert HDR to SDR
                         image_array = (image_array >> 8).astype(np.uint8)
-                        
-                    pixmap = self.convert_cv_qt(image_array)
 
+                    pixmap = self.convert_cv_qt(image_array)
 
                     self.latestPreviewPixmap.emit(pixmap)
 
             except Exception as e:
                 log(f"Error in UpdateGUIThread: {e}")
-                
+
             time.sleep(0.2)
 
     def convert_cv_qt(self, cv_img):
@@ -322,15 +334,13 @@ class UpdateGUIThread(QThread):
             self.outputVideoWidth,
             self.outputVideoHeight,
             bytes_per_line,
-            QtGui.QImage.Format_RGB888
+            QtGui.QImage.Format_RGB888,
         )
         return convert_to_Qt_format
 
     def stop(self):
-        
         with QMutexLocker(self._mutex):
             self._stop_flag = True
-        
 
 
 # custom threads
@@ -406,6 +416,7 @@ class SubprocessThread(QThread):
         return_code = self.process.wait()
         self.output.emit(f"Process finished with return code {return_code}")
         self.return_code.emit(return_code)
+
 
 # Custom Widgets
 class DownloadProgressPopup(QtWidgets.QProgressDialog):
@@ -534,7 +545,7 @@ class SettingUpBackendPopup(QtWidgets.QDialog):
             self.workerThread.wait
         )  # need quit and wait to allow process to exit safely
         self.workerThread.start()
-    
+
     def setReturnCode(self, return_code):
         self.return_code = return_code
 
@@ -566,11 +577,12 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.totalIters = 0
         self.progressBarLength = progressBarLength
         self.setup_ui()
-        
+
         self.setLayout(self.gridLayout)
         self.startDownload()
         self.exec()
         self.workerThread.wait()
+
     """
     Initializes all threading bs
     """
@@ -580,7 +592,7 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
         self.setWindowTitle(self.title)
         self.setStyleSheet(styleSheet())
         self.setMinimumSize(700, 100)
-        
+
         self.centralwidget = QtWidgets.QWidget(parent=self)
         self.centralwidget.setObjectName("centralwidget")
         self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
@@ -643,8 +655,8 @@ class DisplayCommandOutputPopup(QtWidgets.QDialog):
 
     def set_return_code(self, return_code):
         self.return_code = return_code
-    
-    def get_return_code(self) -> int:  
+
+    def get_return_code(self) -> int:
         try:
             return self.return_code
         except Exception:
@@ -710,7 +722,7 @@ class TextOutputPopup(QtWidgets.QDialog):
             QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn
         )
         self.gridLayout.addWidget(self.textEdit, 0, 0, 1, 1)
-        
+
 
 class RegularQTPopup(QtWidgets.QDialog):
     def __init__(self, message):
@@ -718,40 +730,43 @@ class RegularQTPopup(QtWidgets.QDialog):
         self.setWindowTitle("REAL Video Enhancer")
         self.setFixedSize(400, 100)
         self.setStyleSheet(styleSheet())
-        
+
         # Create main layout
         layout = QtWidgets.QVBoxLayout()
-        
+
         # Add message label
         label = QtWidgets.QLabel(message)
         layout.addWidget(label)
-        
+
         # Create horizontal layout for button
         button_layout = QtWidgets.QHBoxLayout()
-        
+
         # Add spacer to push button to the right
         spacer = QtWidgets.QSpacerItem(
-            40, 20, 
+            40,
+            20,
             QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Minimum
+            QtWidgets.QSizePolicy.Policy.Minimum,
         )
         button_layout.addItem(spacer)
-        
+
         # Create and add OK button
         ok_button = QtWidgets.QPushButton("OK")
         ok_button.clicked.connect(self.close)
         button_layout.addWidget(ok_button)
-        
+
         # Add button layout to main layout
         layout.addLayout(button_layout)
-        
+
         self.setLayout(layout)
         self.exec()
+
 
 class IndependentQTPopup(QtWidgets.QDialog):
     def __init__(self, message=None):
         if message is not None:
             self.start(message)
+
     def start(self, message):
         try:
             app = QApplication(sys.argv)
@@ -764,31 +779,33 @@ class IndependentQTPopup(QtWidgets.QDialog):
         self.setWindowTitle("REAL Video Enhancer")
         self.setFixedSize(400, 100)
         self.setStyleSheet(styleSheet())
-        
+
         # Create main layout
         layout = QtWidgets.QVBoxLayout()
-        
+
         # Add message label
         label = QtWidgets.QLabel(message)
         layout.addWidget(label)
-        
+
         # Create horizontal layout for button
         button_layout = QtWidgets.QHBoxLayout()
-        
+
         # Add spacer to push button to the right
         spacer = QtWidgets.QSpacerItem(
-            40, 20, 
+            40,
+            20,
             QtWidgets.QSizePolicy.Policy.Expanding,
-            QtWidgets.QSizePolicy.Policy.Minimum
+            QtWidgets.QSizePolicy.Policy.Minimum,
         )
         button_layout.addItem(spacer)
-        
+
         # Add button layout to main layout
         layout.addLayout(button_layout)
-        
+
         self.setLayout(layout)
         self.exec()
         app.exec_()
+
 
 def NetworkCheckPopup(hostname="https://raw.githubusercontent.com") -> bool:
     if not networkCheck(hostname=hostname):
@@ -797,9 +814,12 @@ def NetworkCheckPopup(hostname="https://raw.githubusercontent.com") -> bool:
     # return true if network connection
     return True
 
+
 def needs_network_else_exit():
     if not HAS_NETWORK_ON_STARTUP:
-        RegularQTPopup("Network is required for this action!\nPlease connect to a network.")
+        RegularQTPopup(
+            "Network is required for this action!\nPlease connect to a network."
+        )
         os._exit(1)
 
 

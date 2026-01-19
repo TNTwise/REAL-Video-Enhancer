@@ -1,6 +1,16 @@
-from src.constants import CUSTOM_MODELS_PATH, IS_STEAM, MODELS_PATH, CWD,  IS_INSTALLED, TEMP_DOWNLOAD_PATH, USE_LOCAL_BACKEND, PLATFORM
+from src.constants import (
+    CUSTOM_MODELS_PATH,
+    IS_STEAM,
+    MODELS_PATH,
+    CWD,
+    IS_INSTALLED,
+    TEMP_DOWNLOAD_PATH,
+    USE_LOCAL_BACKEND,
+    PLATFORM,
+)
 import os
-try: 
+
+try:
     os.makedirs(CWD) if not os.path.exists(CWD) else None
     # os.chdir(CWD) # need to actually chdir into the directory to have everything run correctly
 except:
@@ -8,17 +18,21 @@ except:
 import sys
 import os
 import time
-os.environ["PYTHONNOUSERSITE"] = "1" # Prevents python from installing packages in user site
+
+os.environ["PYTHONNOUSERSITE"] = (
+    "1"  # Prevents python from installing packages in user site
+)
 os.environ["PYTHONIOENCODING"] = "utf-8"
 os.environ["NVIDIA_TENSORRT_DISABLE_INTERNAL_PIP"] = "0"
-os.environ["PYTHON_JIT"] = "1" # enable python's experimental JIT for better performance in python 3.13
+os.environ["PYTHON_JIT"] = (
+    "1"  # enable python's experimental JIT for better performance in python 3.13
+)
 from PySide6.QtCore import QLockFile
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QFileDialog,
     QMessageBox,
-
 )
 from PySide6.QtGui import QIcon
 
@@ -35,7 +49,7 @@ from src.Util import (
     getAvailableDiskSpace,
     FileHandler,
     log,
-    createDirectory
+    createDirectory,
 )
 
 createDirectory(os.path.join(CWD, "python"))
@@ -107,10 +121,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.videoLength = 1
         self.batchVideos = []
 
-
         settings = Settings()
         self.settings = settings
-
 
         log(str(os.environ))
         # setup application
@@ -121,7 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         end_time = time.time()
         log("Setup ui time: " + str(end_time - start_time))
-        #self.VideoPreview.setVisible(False)
+        # self.VideoPreview.setVisible(False)
 
         # remove false hope
         self.directMLBackendInstallerContainer.setVisible(False)
@@ -143,29 +155,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 d.download()
         end_time = time.time()
         log("Dependency download time: " + str(end_time - start_time))
-        
-        #popupthread = create_independent_process(IndependentQTPopup, "Checking for dependency updates...")
-        #popupthread.start() 
+
+        # popupthread = create_independent_process(IndependentQTPopup, "Checking for dependency updates...")
+        # popupthread.start()
 
         start_time = time.time()
         for dep in Dependency.__subclasses__():
             d = dep()
             if d.get_if_update_available():
-        #        popupthread.terminate()
+                #        popupthread.terminate()
                 d.update_if_updates_available()
         end_time = time.time()
         log("Dependency update time: " + str(end_time - start_time))
-        #try:
+        # try:
         #    popupthread.terminate()
-        #except Exception:
+        # except Exception:
         #    pass
 
         start_time = time.time()
-        self.backends, self.fullOutput = (
-            backendHandler.getAvailableBackends()
-        )
+        self.backends, self.fullOutput = backendHandler.getAvailableBackends()
         end_time = time.time()
-        
 
         # set default home page
         self.stackedWidget.setCurrentIndex(0)
@@ -173,34 +182,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.anyBackendsInstalled = len(self.backends) > 0
         if not self.anyBackendsInstalled:
             reply = QMessageBox.question(
-            self,
-            "",
-            "Do you want to use simple installation?\n(Recommended for most users)",
-            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-            QMessageBox.StandardButton.No,  # type: ignore
+                self,
+                "",
+                "Do you want to use simple installation?\n(Recommended for most users)",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.No,  # type: ignore
             )
             automaticInstall = reply == QMessageBox.Yes  # type: ignore
             if automaticInstall:
-                self.downloadTab = DownloadTab(parent=self, backends=self.backends, skip_info_popup=True)
+                self.downloadTab = DownloadTab(
+                    parent=self, backends=self.backends, skip_info_popup=True
+                )
                 return_code = self.downloadTab.installRecommended()
                 if return_code != 0:
                     exit(1)
-                    
-                self.backends, self.fullOutput = (
-                    backendHandler.getAvailableBackends()
-                )
+
+                self.backends, self.fullOutput = backendHandler.getAvailableBackends()
                 self.anyBackendsInstalled = len(self.backends) > 0
             else:
-                self.processBtn.setEnabled(False) # disable process button if no backends are available
+                self.processBtn.setEnabled(
+                    False
+                )  # disable process button if no backends are available
                 self.stackedWidget.setCurrentIndex(4)
                 self.homeBtn.setChecked(False)
                 self.downloadBtn.setChecked(True)
-                self.processBtn.setToolTip("Please install at least one backend to enable processing.")
+                self.processBtn.setToolTip(
+                    "Please install at least one backend to enable processing."
+                )
                 self.processBtn.setToolTipDuration(0)
 
-
-
-        
         icon_path = ":/icons/icons/logo-v2.svg"
         self.setWindowIcon(QIcon(icon_path))
         QApplication.setWindowIcon(QIcon(icon_path))
@@ -275,23 +285,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.animationHandler.fadeInAnimation(self)
 
         if not self.anyBackendsInstalled:
-            RegularQTPopup("Welcome to REAL Video Enhancer!\nPlease install at least one backend to get started.")
+            RegularQTPopup(
+                "Welcome to REAL Video Enhancer!\nPlease install at least one backend to get started."
+            )
 
         # these additions are not ready for stable rve just yet.
-        #self.denoiseContainer.setVisible(False)
+        # self.denoiseContainer.setVisible(False)
         self.deblurContainer.setVisible(False)
-        #self.denoiseCheckBoxContainer.setVisible(False)
+        # self.denoiseCheckBoxContainer.setVisible(False)
         self.deblurCheckBoxContainer.setVisible(False)
 
-        #player = QMediaPlayer()
-        #player.setSource(QUrl.fromLocalFile(r"C:\Users\tntwi\Downloads\CodeGeass-OP3.webm"))
-        #player.setVideoOutput(self.VideoPreview)
-        #self.VideoPreview.show()
-        #self.playbutton.clicked.connect(lambda: player.play())
-        if (file_to_open is not None and os.path.isfile(file_to_open) and len(self.backends) > 0):
+        # player = QMediaPlayer()
+        # player.setSource(QUrl.fromLocalFile(r"C:\Users\tntwi\Downloads\CodeGeass-OP3.webm"))
+        # player.setVideoOutput(self.VideoPreview)
+        # self.VideoPreview.show()
+        # self.playbutton.clicked.connect(lambda: player.play())
+        if (
+            file_to_open is not None
+            and os.path.isfile(file_to_open)
+            and len(self.backends) > 0
+        ):
             self.loadVideo(file_to_open)
             self.switchToProcessingPage()
-            self.settings.writeSetting("last_input_folder_location", str(os.path.dirname(file_to_open)))
+            self.settings.writeSetting(
+                "last_input_folder_location", str(os.path.dirname(file_to_open))
+            )
 
     def QConnect(self):
         # connect buttons to switch menus
@@ -307,20 +325,23 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def renderPreview(self):
         self.renderQueue.clear()
         renderOptions = self.getCurrentRenderOptions()
-        renderOptions.outputPath = os.path.join(TEMP_DOWNLOAD_PATH, f"{os.path.basename(renderOptions.inputFile)}_preview.mkv")
+        renderOptions.outputPath = os.path.join(
+            TEMP_DOWNLOAD_PATH,
+            f"{os.path.basename(renderOptions.inputFile)}_preview.mkv",
+        )
         renderOptions.startTime = self.startTimeSpinBox.value()
         FileHandler().removeFile(renderOptions.outputPath)
         renderOptions.endTime = self.endTimeSpinBox.value()
         if renderOptions.endTime <= renderOptions.startTime:
-            NotificationOverlay("End time must be greater than start time!", self, timeout=1500)
+            NotificationOverlay(
+                "End time must be greater than start time!", self, timeout=1500
+            )
             return
-
 
         renderOptions.isPreview = True
         if renderOptions:
             self.renderQueue.add(renderOptions)
             self.startRender(self.renderQueue)
-
 
     def setButtonsUnchecked(self, buttonToIgnore):
         buttons = [
@@ -379,7 +400,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 + f"HDR: {self.videoHDR} -> {self.videoHDR if self.settings.settings['auto_hdr_mode'] == 'True' else 'False'}\n"
                 + f"Bit Depth: {self.videoBitDepth} bit -> {new_bitrate if self.settings.settings['auto_hdr_mode'] == 'True' else 8} bit\n"
             )
-            
+
             self.inputVideoInfoTextEdit.setFontPointSize(10)
             self.inputVideoInfoTextEdit.setText(inputText)
 
@@ -391,7 +412,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return interpolateTimes
 
     def getUpscaleModelScale(self, upscaleModelName):
-        if upscaleModelName == "None" or upscaleModelName == "" or not self.upscaleCheckBox.isChecked():
+        if (
+            upscaleModelName == "None"
+            or upscaleModelName == ""
+            or not self.upscaleCheckBox.isChecked()
+        ):
             scale = 1
         else:
             scale = int(self.upscaleScaleSpinBox.value())
@@ -415,18 +440,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             decompressModelName = self.decompressModelComboBox.currentText()
             denoiseModelName = self.denoiseModelComboBox.currentText()
             interpolateModelName = self.interpolateModelComboBox.currentText()
-            
-            interpolateTimes = self.getInterpolationMultiplier(interpolateModelName) if not self.sloMoModeCheckBox.isChecked() else 1
+
+            interpolateTimes = (
+                self.getInterpolationMultiplier(interpolateModelName)
+                if not self.sloMoModeCheckBox.isChecked()
+                else 1
+            )
             scale = self.getUpscaleModelScale(upscaleModelName)
             container = self.settings.settings["video_container"]
 
             file_name = os.path.splitext(os.path.basename(inputFile))[0]
             base_file_name = (
                 f"{file_name}"
-                + ("" if not self.interpolateCheckBox.isChecked() else f"_{getModelDisplayName(interpolateModelName)}")
-                + ("" if not self.decompressCheckBox.isChecked() else f"_{getModelDisplayName(decompressModelName)}")
-                + ("" if  not self.denoiseCheckBox.isChecked() else f"_{getModelDisplayName(denoiseModelName)}")
-                + ("" if  not self.upscaleCheckBox.isChecked() else f"_{getModelDisplayName(upscaleModelName)}")
+                + (
+                    ""
+                    if not self.interpolateCheckBox.isChecked()
+                    else f"_{getModelDisplayName(interpolateModelName)}"
+                )
+                + (
+                    ""
+                    if not self.decompressCheckBox.isChecked()
+                    else f"_{getModelDisplayName(decompressModelName)}"
+                )
+                + (
+                    ""
+                    if not self.denoiseCheckBox.isChecked()
+                    else f"_{getModelDisplayName(denoiseModelName)}"
+                )
+                + (
+                    ""
+                    if not self.upscaleCheckBox.isChecked()
+                    else f"_{getModelDisplayName(upscaleModelName)}"
+                )
                 + f"_{round(interpolateTimes * self.videoFps, 0)}fps"
                 + f"_{scale * self.videoWidth}x{scale * self.videoHeight}"
             )
@@ -450,31 +495,38 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         isDeblur = self.deblurCheckBox.isChecked()
         isDenoise = self.denoiseCheckBox.isChecked()
         isDecompress = self.decompressCheckBox.isChecked()
-        
+
         self.interpolationContainer.setVisible(isInterpolate)
         self.interpolateContainer_2.setVisible(isInterpolate)
         self.deblurContainer.setVisible(isDeblur)
         self.denoiseContainer.setVisible(isDenoise)
         self.decompressContainer.setVisible(isDecompress)
-        
+
         # disable decompress for now
-        #self.decompressCheckBoxContainer.setVisible(False)
-        #self.decompressContainer.setVisible(False)
-        
+        # self.decompressCheckBoxContainer.setVisible(False)
+        # self.decompressContainer.setVisible(False)
+
         # set interpolation container visible if interpolate model is not none
-        self.upscaleContainer.setVisible(isUpscale or isDeblur or isDenoise or isDecompress)
+        self.upscaleContainer.setVisible(
+            isUpscale or isDeblur or isDenoise or isDecompress
+        )
         self.generalUpscaleContainer.setVisible(isUpscale)
         self.settings.readSettings()
-        self.setDefaultOutputFile(self.inputFileText.text(), self.settings.settings["output_folder_location"])
+        self.setDefaultOutputFile(
+            self.inputFileText.text(), self.settings.settings["output_folder_location"]
+        )
         self.updateVideoGUIText()
         self.startTimeSpinBox.setMaximum(self.videoLength)
         self.endTimeSpinBox.setMaximum(self.videoLength)
         self.timeInVideoScrollBar.setMaximum(self.videoLength)
-        if isUpscale and (self.upscaleModelComboBox.currentText() != "" or self.upscaleModelComboBox.currentText() != "None"):
+        if isUpscale and (
+            self.upscaleModelComboBox.currentText() != ""
+            or self.upscaleModelComboBox.currentText() != "None"
+        ):
             try:
                 max_scale = totalModels[self.upscaleModelComboBox.currentText()][2]
                 self.upscaleScaleSpinBox.setMaximum(max_scale if max_scale > 0 else 4)
-            except KeyError: # idk why it does this, gui is shit tbh.
+            except KeyError:  # idk why it does this, gui is shit tbh.
                 self.upscaleScaleSpinBox.setMaximum(4)
 
     def getCurrentRenderOptions(self, input_file=None, output_path=None):
@@ -506,13 +558,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             NotificationOverlay("Video is not loaded!", self, timeout=1500)
             return 1
 
-        if not interpolate and not upscale and not deblur and not denoise and not decompress:
+        if (
+            not interpolate
+            and not upscale
+            and not deblur
+            and not denoise
+            and not decompress
+        ):
             NotificationOverlay("Please select at least one model!", self, timeout=1500)
             return 1
 
         backend = self.backendComboBox.currentText()
         upscaleModelArch = "custom"
-        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, sceneChangeModels = getModels(backend)
+        (
+            interpolateModels,
+            upscaleModels,
+            deblurModels,
+            denoiseModels,
+            decompressModels,
+            sceneChangeModels,
+        ) = getModels(backend)
 
         if interpolate:
             interpolateDownloadFile = interpolateModels[interpolate][1]
@@ -577,7 +642,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     timeout=2500,
                 )
                 return 1
-        
+
         if denoise:
             denoiseModelFile = denoiseModels[denoise][0]
             denoiseDownloadFile = denoiseModels[denoise][1]
@@ -610,7 +675,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         """if "gmfss" in interpolateDownloadFile.lower():
             log("GMFSS model detected, enabling rgb48 proc to have correct colors.")
             hdrmode = True"""
-        if self.settings.settings["auto_hdr_mode"] == "True" and (self.videoHDR or self.videoBitDepth > 8):
+        if self.settings.settings["auto_hdr_mode"] == "True" and (
+            self.videoHDR or self.videoBitDepth > 8
+        ):
             hdrmode = True
         return RenderOptions(
             inputFile=input_file,
@@ -665,16 +732,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.pixelFMT = videoHandler.pixel_format
                 self.videoHDR = videoHandler.is_hdr
                 self.videoBitDepth = videoHandler.bit_depth
-                
 
                 # set output_path for checking
-                default_output_path = self.setDefaultOutputFile(
-                    video, output_path
-                )
+                default_output_path = self.setDefaultOutputFile(video, output_path)
 
                 # check if file already exists in renderQueue
-                if any(item.outputPath == default_output_path for item in self.renderQueue.getQueue()):
-                    NotificationOverlay(f"Skipped (Already in queue): {default_output_path}", self, timeout=1500)
+                if any(
+                    item.outputPath == default_output_path
+                    for item in self.renderQueue.getQueue()
+                ):
+                    NotificationOverlay(
+                        f"Skipped (Already in queue): {default_output_path}",
+                        self,
+                        timeout=1500,
+                    )
                     continue
 
                 renderOptions = self.getCurrentRenderOptions(
@@ -685,12 +756,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
                 # alert user that item has been added to queue
                 self.renderQueue.add(renderOptions)
-                
 
             # clear batch file list
             self.batchVideos = []
             return
-
 
         for renderOptions in self.renderQueue.getQueue():
             if output_path == renderOptions.outputPath:
@@ -717,7 +786,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.previewLabel.setVisible(True)
 
         self.disableProcessPage()
-        
+
         self.processTab.run(renderQueue)
 
     def disableProcessPage(self):
@@ -762,11 +831,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 videoHandler = VideoLoader(video)
                 videoHandler.loadVideo()
                 if videoHandler.isValidVideo():
-                   self.batchVideos.append(video)
+                    self.batchVideos.append(video)
             if self.batchVideos == 0:
-                NotificationOverlay("No valid videos found in the selected folder!", self, timeout=1500)
+                NotificationOverlay(
+                    "No valid videos found in the selected folder!", self, timeout=1500
+                )
                 return
-            NotificationOverlay("Loaded " + str(len(self.batchVideos)) + " videos.", self, timeout=1500)
+            NotificationOverlay(
+                "Loaded " + str(len(self.batchVideos)) + " videos.", self, timeout=1500
+            )
             self.inputFileText.setText(" { MULTIPLE_FILES } ")
             self.inputFileText.setEnabled(False)
             self.videoWidth = 0
@@ -782,7 +855,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.videoHDR = "Multi File"
             self.videoBitDepth = "Multi File"
         else:
-                    
             videoHandler = VideoLoader(inputFile)
             videoHandler.loadVideo()
             if (
@@ -808,7 +880,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.outputFileText.setEnabled(True)
 
         self.outputFileSelectButton.setEnabled(True)
-        self.openOutputFolderButton.setEnabled(True)    
+        self.openOutputFolderButton.setEnabled(True)
         self.isVideoLoaded = True
         self.updateVideoGUIDetails()
 
@@ -831,12 +903,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         inputFile, _ = QFileDialog.getOpenFileName(
             parent=self,
             caption="Select File",
-            dir=self.settings.settings["last_input_folder_location"] if os.path.exists(self.settings.settings["last_input_folder_location"]) else self.homeDir,
+            dir=self.settings.settings["last_input_folder_location"]
+            if os.path.exists(self.settings.settings["last_input_folder_location"])
+            else self.homeDir,
             filter=fileFilter,
         )
         self.loadVideo(inputFile)
-        self.settings.writeSetting("last_input_folder_location", str(os.path.dirname(inputFile)))
-    
+        self.settings.writeSetting(
+            "last_input_folder_location", str(os.path.dirname(inputFile))
+        )
+
     def openBatchFiles(self):
         inputFolder = QFileDialog.getExistingDirectory(
             self,
@@ -861,11 +937,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 dir=self.homeDir,
                 filter=fileFilter,
             )
-               
+
             if modelFile == "":
                 RegularQTPopup("Please select a model file!")
                 return
-            
+
             outputModelPath = os.path.join(
                 CUSTOM_MODELS_PATH, os.path.basename(modelFile)
             )
@@ -928,7 +1004,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     "Failed to import model!\nPlease try again.", self, timeout=1500
                 )
 
-       
     # output file button
     def openOutputFolder(self):
         """
@@ -941,14 +1016,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         outputFolder = QFileDialog.getExistingDirectory(
             self,
             caption="Select Output Directory",
-            dir=str(os.path.dirname(self.inputFileText.text())) if (self.isVideoLoaded and len(self.batchVideos) == 0 and os.path.exists(os.path.dirname(self.inputFileText.text()))) else self.homeDir,
+            dir=str(os.path.dirname(self.inputFileText.text()))
+            if (
+                self.isVideoLoaded
+                and len(self.batchVideos) == 0
+                and os.path.exists(os.path.dirname(self.inputFileText.text()))
+            )
+            else self.homeDir,
         )
         self.outputFileText.setText(
-            os.path.join(outputFolder, self.setDefaultOutputFile(self.inputFileText.text(), outputFolder))
+            os.path.join(
+                outputFolder,
+                self.setDefaultOutputFile(self.inputFileText.text(), outputFolder),
+            )
         )
 
     def closeEvent(self, event):
-
         reply = QMessageBox.question(
             self,
             "",
@@ -963,7 +1046,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             event.accept()
         else:
             event.ignore()
-
 
 
 def main(file_to_open=None):
@@ -995,6 +1077,7 @@ custom command args
 
 if __name__ == "__main__":
     from multiprocessing import freeze_support
+
     freeze_support()
     if "--debug" in sys.argv:
         import trace
@@ -1004,5 +1087,7 @@ if __name__ == "__main__":
         )
         tracer.run("main()")
     else:
-        file_to_open = sys.argv[1] if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]) else None
+        file_to_open = (
+            sys.argv[1] if len(sys.argv) > 1 and os.path.isfile(sys.argv[1]) else None
+        )
         main(file_to_open)

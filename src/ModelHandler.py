@@ -68,7 +68,6 @@ pytorchInterpolateModels = {
         1,
         "gimm",
     ),
-    
     "IFRNet (Fast Model, Realistic only)": (
         "IFRNet_Vimeo90K.pth",
         "IFRNet_Vimeo90K.pth",
@@ -164,8 +163,6 @@ tensorrtInterpolateModels = {
     ),
 }
 ncnnUpscaleModels = {
-    
-    
     "Nomos8k (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak",
         "4xNomos8k_span_otf_weak.tar.gz",
@@ -208,7 +205,6 @@ ncnnUpscaleModels = {
         4,
         "Compact",
     ),
-    
     "JaNai V2 (Animation) (2X) (Fast)": (
         "2x_AnimeJaNai_V2_Compact_36k",
         "2x_AnimeJaNai_V2_Compact_36k.tar.gz",
@@ -278,7 +274,6 @@ ncnnUpscaleModels = {
 }
 
 pytorchUpscaleModels = {
-    
     "Nomos8k (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak_no_update_params.pth",
         "4xNomos8k_span_otf_weak_no_update_params.pth",
@@ -309,7 +304,6 @@ pytorchUpscaleModels = {
         4,
         "Compact",
     ),
-    
     "JaNai V2 (Animation) (2X) (Fast)": (
         "2x_AnimeJaNai_V2_Compact_36k.pth",
         "2x_AnimeJaNai_V2_Compact_36k.pth",
@@ -373,9 +367,6 @@ pytorchUpscaleModels = {
 }
 
 tensorrtUpscaleModels = {
-
-    
-
     "Nomos8k (Realistic) (High Quality Source) (4X) (Fast)": (
         "4xNomos8k_span_otf_weak_no_update_params.pth",
         "4xNomos8k_span_otf_weak_no_update_params.pth",
@@ -394,14 +385,12 @@ tensorrtUpscaleModels = {
         4,
         "SPAN",
     ),
-
     "OpenProteus (Realistic) (HD Input) (2X) (Fast)": (
         "2x_OpenProteus_Compact_i2_70K.pth",
         "2x_OpenProteus_Compact_i2_70K.pth",
         2,
         "Compact",
     ),
-    
     "RealisticVideo (4X) (Fast)": (
         "realesr-general-x4v3.pth",
         "realesr-general-x4v3.pth",
@@ -444,7 +433,6 @@ tensorrtUpscaleModels = {
         2,
         "SPAN",
     ),
-
 }
 
 ncnnDeblurModels = {
@@ -483,34 +471,23 @@ ncnnDenoiseModels = {
 }
 
 pytorchDenoiseModels = {
-    "DRUNET (Slow)": (
-        "drunet_color.pth",
-        "drunet_color.pth",
-        "1",
-        "drunet"
-    ),
+    "DRUNET (Slow)": ("drunet_color.pth", "drunet_color.pth", "1", "drunet"),
     "DNcnn (Fast)": (
         "dncnn_color_blind.pth",
         "dncnn_color_blind.pth",
         1,
         "scunet",
-    ), 
+    ),
     "SCUNet Color (Slow)": (
         "scunet_color_real_psnr.pth",
         "scunet_color_real_psnr.pth",
         1,
         "scunet",
-    )
+    ),
 }
 
 tensorrtDenoiseModels = {
-
-    "DRUNET (Slow)": (
-        "drunet_color.pth",
-        "drunet_color.pth",
-        "1",
-        "drunet"
-    ),
+    "DRUNET (Slow)": ("drunet_color.pth", "drunet_color.pth", "1", "drunet"),
 }
 """"DeH264 RTMoSR Unshuffle (UltraFast)": (
         "1xDeH264_RTMoSR_Unshuffle.ncnn",
@@ -531,15 +508,12 @@ ncnnDecompressModels = {
         1,
         "SPAN",
     ),
-
     "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
         "1xDeH264_RTMoSR.ncnn",
         "1xDeH264_RTMoSR.ncnn.tar.gz",
         1,
         "RTMoSR",
     ),
-
-    
 }
 pytorchDecompressModels = {
     "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
@@ -565,7 +539,7 @@ pytorchDecompressModels = {
         "1xDeH264_realplksr.pth",
         1,
         "PLKSR",
-    )
+    ),
 }
 tensorrtDecompressModels = {
     "DeH264 SuperUltraCompact (UltraFast) (High/Medium Quality Source)": (
@@ -574,8 +548,7 @@ tensorrtDecompressModels = {
         1,
         "SuperUltraCompact",
     ),
-
-        "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
+    "DeH264 RTMoSR (Fast) (High/Medium Quality Source)": (
         "1xDeH264_RTMoSR.pth",
         "1xDeH264_RTMoSR.pth",
         1,
@@ -587,7 +560,6 @@ tensorrtDecompressModels = {
         1,
         "SPAN",
     ),
-    
 }
 
 onnxInterpolateModels = {
@@ -613,12 +585,12 @@ pytorchSceneChangeModels = {
         1,
         "sudo_maxxvit",
     ),
-    "sudo_scene_detect": ( # efficientnet doesnt work too well, so im gonna use maxxvit until i figure out efficientnet issues
+    "sudo_scene_detect": (  # efficientnet doesnt work too well, so im gonna use maxxvit until i figure out efficientnet issues
         "sudo_maxxvit_scenedetect.pt",
         "sudo_maxxvit_scenedetect.pt",
         1,
         "sudo_efficientnet",
-    )
+    ),
 }
 ncnnSceneChangeModels = {
     "sudo_scene_detect": (
@@ -630,15 +602,11 @@ ncnnSceneChangeModels = {
 }
 
 
-
-
-
 # detect custom models
 createDirectory(CUSTOM_MODELS_PATH)
 customPytorchUpscaleModels = {}
 customNCNNUpscaleModels = {}
 for model in os.listdir(CUSTOM_MODELS_PATH):
-    
     model_path = os.path.join(CUSTOM_MODELS_PATH, model)
     if os.path.exists(model_path):
         if not os.path.isfile(model_path):
@@ -666,7 +634,7 @@ totalModels = (
 )  # this doesnt include all models due to overwriting, but includes every case of every unique model name
 
 
-def getModels(backend:str):
+def getModels(backend: str):
     """
     returns models based on backend, used for populating the model comboboxes [interpolate, upscale]
     """
@@ -702,12 +670,20 @@ def getModels(backend:str):
             )
             errorAndLog("Failed to import any backends!")
             return {}
-    return interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, sceneChangeModels
+    return (
+        interpolateModels,
+        upscaleModels,
+        deblurModels,
+        denoiseModels,
+        decompressModels,
+        sceneChangeModels,
+    )
+
 
 def getModelDisplayName(model: str):
     try:
         cutPosition = model.index(" (") if " (" in model else len(model)
         onlyName = model[:cutPosition]
-        return onlyName.lower().replace(' ', '-')
+        return onlyName.lower().replace(" ", "-")
     except:
         return (model[0] + model[1]) if len(model) >= 2 else ""

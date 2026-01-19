@@ -78,7 +78,7 @@ def calc_drm_rife(t, flow10, flow12, linear=False):
         drm_t0_unaligned = get_drm_t(drm10, t)
         drm_t1_unaligned = get_drm_t(drm12, t)
 
-    warp_method = 'avg'
+    warp_method = "avg"
     # When using RIFE to generate intermediate frames between I0 and I1,
     # if the input image order is I0, I1, you need to use drm_t_I0_t01.
     # Conversely, if the order is reversed, you should use drm_t_I1_t01.
@@ -101,10 +101,7 @@ def calc_drm_rife(t, flow10, flow12, linear=False):
     drm_t1_t01[gap_t1_t01] = drm_t1_unaligned[gap_t1_t01]
     drm_t1_t12[gap_t1_t12] = drm_t0_unaligned[gap_t1_t12]
 
-    return {
-        "drm_t1_t01": drm_t1_t01,
-        "drm_t1_t12": drm_t1_t12
-    }
+    return {"drm_t1_t01": drm_t1_t01, "drm_t1_t12": drm_t1_t12}
 
 
 def calc_drm_gmfss(t, flow10, flow12, metric10, metric12, linear=False):
@@ -116,7 +113,7 @@ def calc_drm_gmfss(t, flow10, flow12, metric10, metric12, linear=False):
     drm10 = d10 / (d10 + d12)
     drm12 = d12 / (d10 + d12)
 
-    warp_method = 'soft' if (metric10 is not None and metric12 is not None) else 'avg'
+    warp_method = "soft" if (metric10 is not None and metric12 is not None) else "avg"
 
     if linear:
         drm1t_t01 = drm12 * t * 2
@@ -151,7 +148,7 @@ def calc_drm_gmfss(t, flow10, flow12, metric10, metric12, linear=False):
         "drm0t_t01": drm0t_t01,
         "drm1t_t01": drm1t_t01,
         "drm1t_t12": drm1t_t12,
-        "drm2t_t12": drm2t_t12
+        "drm2t_t12": drm2t_t12,
     }
 
 
@@ -171,11 +168,15 @@ def calc_drm_rife_auxiliary(t, flow10, flow12, metric10, metric12, linear=False)
         drm_t0_unaligned = get_drm_t(drm10, t)
         drm_t1_unaligned = get_drm_t(drm12, t)
 
-    warp_method = 'soft' if (metric10 is not None and metric12 is not None) else 'avg'
+    warp_method = "soft" if (metric10 is not None and metric12 is not None) else "avg"
 
     # For RIFE, drm should be aligned with the time corresponding to the intermediate frame.
-    drm_t1_t01 = warp(drm_t1_unaligned, flow10 * drm_t1_unaligned, metric10, warp_method)
-    drm_t1_t12 = warp(drm_t0_unaligned, flow12 * drm_t0_unaligned, metric12, warp_method)
+    drm_t1_t01 = warp(
+        drm_t1_unaligned, flow10 * drm_t1_unaligned, metric10, warp_method
+    )
+    drm_t1_t12 = warp(
+        drm_t0_unaligned, flow12 * drm_t0_unaligned, metric12, warp_method
+    )
 
     ones_mask = drm10.clone() * 0 + 1
 
@@ -189,7 +190,4 @@ def calc_drm_rife_auxiliary(t, flow10, flow12, metric10, metric12, linear=False)
     drm_t1_t12[gap_t1_t12] = drm_t0_unaligned[gap_t1_t12]
 
     # why use drm0t1 not drm1t0, because rife use backward warp not forward warp.
-    return {
-        "drm_t1_t01": drm_t1_t01,
-        "drm_t1_t12": drm_t1_t12
-    }
+    return {"drm_t1_t01": drm_t1_t01, "drm_t1_t12": drm_t1_t12}

@@ -9,21 +9,21 @@ from torch.nn.modules.utils import _pair
 
 class MultiScaleTridentConv(nn.Module):
     def __init__(
-            self,
-            in_channels,
-            out_channels,
-            kernel_size,
-            stride=1,
-            strides=1,
-            paddings=0,
-            dilations=1,
-            dilation=1,
-            groups=1,
-            num_branch=1,
-            test_branch_idx=-1,
-            bias=False,
-            norm=None,
-            activation=None,
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride=1,
+        strides=1,
+        paddings=0,
+        dilations=1,
+        dilation=1,
+        groups=1,
+        num_branch=1,
+        test_branch_idx=-1,
+        bias=False,
+        norm=None,
+        activation=None,
     ):
         super(MultiScaleTridentConv, self).__init__()
         self.in_channels = in_channels
@@ -62,12 +62,22 @@ class MultiScaleTridentConv(nn.Module):
             nn.init.constant_(self.bias, 0)
 
     def forward(self, inputs):
-        num_branch = self.num_branch if self.training or self.test_branch_idx == -1 else 1
+        num_branch = (
+            self.num_branch if self.training or self.test_branch_idx == -1 else 1
+        )
         assert len(inputs) == num_branch
 
         if self.training or self.test_branch_idx == -1:
             outputs = [
-                F.conv2d(input, self.weight, self.bias, stride, padding, self.dilation, self.groups)
+                F.conv2d(
+                    input,
+                    self.weight,
+                    self.bias,
+                    stride,
+                    padding,
+                    self.dilation,
+                    self.groups,
+                )
                 for input, stride, padding in zip(inputs, self.strides, self.paddings)
             ]
         else:
@@ -76,8 +86,12 @@ class MultiScaleTridentConv(nn.Module):
                     inputs[0],
                     self.weight,
                     self.bias,
-                    self.strides[self.test_branch_idx] if self.test_branch_idx == -1 else self.strides[-1],
-                    self.paddings[self.test_branch_idx] if self.test_branch_idx == -1 else self.paddings[-1],
+                    self.strides[self.test_branch_idx]
+                    if self.test_branch_idx == -1
+                    else self.strides[-1],
+                    self.paddings[self.test_branch_idx]
+                    if self.test_branch_idx == -1
+                    else self.paddings[-1],
                     self.dilation,
                     self.groups,
                 )

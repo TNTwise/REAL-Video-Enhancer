@@ -81,20 +81,28 @@ class ProcessTab:
         returns
         the current models available given a method (interpolate, upscale) and a backend (ncnn, tensorrt, pytorch)
         """
-        interpolateModels, upscaleModels, deblurModels, denoiseModels, decompressModels, _ = getModels(backend)
+        (
+            interpolateModels,
+            upscaleModels,
+            deblurModels,
+            denoiseModels,
+            decompressModels,
+            _,
+        ) = getModels(backend)
         self.parent.interpolateModelComboBox.clear()
         self.parent.upscaleModelComboBox.clear()
         self.parent.deblurModelComboBox.clear()
         self.parent.denoiseModelComboBox.clear()
         self.parent.decompressModelComboBox.clear()
-        self.parent.interpolateModelComboBox.addItems(
-            list(interpolateModels.keys())
+        self.parent.interpolateModelComboBox.addItems(list(interpolateModels.keys()))
+        self.parent.interpolateModelComboBox.setCurrentIndex(
+            len(list(interpolateModels.keys())) - 1
         )
-        self.parent.interpolateModelComboBox.setCurrentIndex(len(list(interpolateModels.keys()))-1)
         self.parent.upscaleModelComboBox.addItems(list(upscaleModels.keys()))
         self.parent.deblurModelComboBox.addItems(list(deblurModels.keys()))
         self.parent.denoiseModelComboBox.addItems(list(denoiseModels.keys()))
         self.parent.decompressModelComboBox.addItems(list(decompressModels.keys()))
+
     def onTilingSwitch(self):
         if self.parent.tilingCheckBox.isChecked():
             self.parent.tileSizeContainer.setVisible(True)
@@ -131,13 +139,15 @@ class ProcessTab:
         self.parent.batchSelectButton.clicked.connect(self.parent.openBatchFiles)
         self.parent.inputFileText.textChanged.connect(self.parent.loadVideo)
         self.parent.outputFileSelectButton.clicked.connect(self.parent.openOutputFolder)
-        self.parent.openOutputFolderButton.clicked.connect(self.openOutputFolderInExplorer)
+        self.parent.openOutputFolderButton.clicked.connect(
+            self.openOutputFolderInExplorer
+        )
         # connect render button
         self.parent.startRenderButton.clicked.connect(self.parent.startRender)
         # set tile size visible to false by default
         self.parent.tileSizeContainer.setVisible(False)
         # set slo mo container visable to false by default
-        
+
         self.parent.interpolateContainer_2.setVisible(False)
         # connect up tilesize container visiable
         self.parent.tilingCheckBox.stateChanged.connect(self.onTilingSwitch)
@@ -158,16 +168,30 @@ class ProcessTab:
         self.parent.decompressModelComboBox.currentIndexChanged.connect(
             self.parent.updateVideoGUIDetails
         )
-        self.parent.interpolateCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
+        self.parent.interpolateCheckBox.clicked.connect(
+            self.parent.updateVideoGUIDetails
+        )
         self.parent.upscaleCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.deblurCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.denoiseCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
-        self.parent.decompressCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)   
-        self.parent.sloMoModeCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)  
+        self.parent.decompressCheckBox.clicked.connect(
+            self.parent.updateVideoGUIDetails
+        )
+        self.parent.sloMoModeCheckBox.clicked.connect(self.parent.updateVideoGUIDetails)
         self.parent.backendComboBox.currentIndexChanged.connect(
             lambda: self.populateModels(self.parent.backendComboBox.currentText())
         )
-        self.parent.EncoderCommand.textChanged.connect(lambda: self.parent.EncoderCommand.setFixedWidth(max(50, QFontMetrics(self.parent.EncoderCommand.font()).horizontalAdvance(self.parent.EncoderCommand.text()) + 10)))
+        self.parent.EncoderCommand.textChanged.connect(
+            lambda: self.parent.EncoderCommand.setFixedWidth(
+                max(
+                    50,
+                    QFontMetrics(self.parent.EncoderCommand.font()).horizontalAdvance(
+                        self.parent.EncoderCommand.text()
+                    )
+                    + 10,
+                )
+            )
+        )
         # connect up pausing
         hide_layout_widgets(self.parent.onRenderButtonsContiainer)
         self.parent.pauseRenderButton.clicked.connect(self.pauseRender)
@@ -195,7 +219,6 @@ class ProcessTab:
         self.parent.startRenderButton.setVisible(False)
 
     def startGUIUpdate(self):
-        
         self.workerThread = UpdateGUIThread(
             parent=self,
             imagePreviewSharedMemoryID=IMAGE_SHARED_MEMORY_ID,
@@ -243,8 +266,8 @@ class ProcessTab:
         self,
         renderQueue: RenderQueue,
     ):
-        self.return_codes = [] # reset return codes
-        self.userKilled = False # reset userkilled
+        self.return_codes = []  # reset return codes
+        self.userKilled = False  # reset userkilled
         # gui changes
         show_layout_widgets(self.parent.onRenderButtonsContiainer)
         self.parent.startRenderButton.setVisible(False)
@@ -287,7 +310,6 @@ class ProcessTab:
         self.createPausedSharedMemory()
 
         for renderOptions in renderQueue.getQueue():
-            
             self.isPreview = renderOptions.isPreview
             self.currentRenderOptions = renderOptions
 
@@ -295,8 +317,12 @@ class ProcessTab:
                 renderOptions.videoWidth * renderOptions.overrideUpscaleScale,
                 renderOptions.videoHeight * renderOptions.overrideUpscaleScale,
             )
-            self.workerThread.createNewSharedMemory(channels=6 if renderOptions.hdrMode else 3)
-            self.max_value = renderOptions.videoFrameCount * renderOptions.interpolateTimes
+            self.workerThread.createNewSharedMemory(
+                channels=6 if renderOptions.hdrMode else 3
+            )
+            self.max_value = (
+                renderOptions.videoFrameCount * renderOptions.interpolateTimes
+            )
             command = self.build_command(renderOptions)
             log(str(command))
 
@@ -304,15 +330,14 @@ class ProcessTab:
                 "stdout": subprocess.PIPE,
                 "stderr": subprocess.STDOUT,
                 "universal_newlines": True,
-                "text": True,                 # return str instead of bytes
-                "encoding": "utf-8",          # decode using utf-8
+                "text": True,  # return str instead of bytes
+                "encoding": "utf-8",  # decode using utf-8
                 "errors": "replace",
             }
 
             if PLATFORM == "win32":
                 kwargs["startupinfo"] = subprocess.STARTUPINFO()
                 kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
 
             self.renderProcess = subprocess.Popen(
                 command,
@@ -341,7 +366,6 @@ class ProcessTab:
                     if "this may take a while" in line.lower():
                         self.status = "Building Engine, this may take a while."
 
-
                     if any(char.isalpha() for char in line):
                         textOutput.append(line)
                     # self.setRenderOutputContent(textOutput)
@@ -363,14 +387,20 @@ class ProcessTab:
         try:
             self.pausedSharedMemory.close()
             self.pausedSharedMemory.unlink()
-        except Exception: # too lazy to patch why this errors maybe on exit
+        except Exception:  # too lazy to patch why this errors maybe on exit
             pass
 
         renderQueue.clear()
         self.onRenderCompletion()
 
     def guiChangesOnRenderCompletion(self):
-        if all(return_code == 0 or return_code == 3221225477 for return_code in self.return_codes) or self.userKilled: # 3221225477 comes up when using ncnn on windows for some reason, but no error in output itself.
+        if (
+            all(
+                return_code == 0 or return_code == 3221225477
+                for return_code in self.return_codes
+            )
+            or self.userKilled
+        ):  # 3221225477 comes up when using ncnn on windows for some reason, but no error in output itself.
             log("All render processes completed successfully")
         else:
             log("Some render processes failed: Error code: " + str(self.return_codes))
@@ -391,14 +421,16 @@ class ProcessTab:
         self.parent.renderQueue.clear()
         if self.currentRenderOptions.isPreview:
             from PySide6.QtMultimedia import QMediaPlayer
+
             try:
-                def onScroll(preview:QMediaPlayer, value):
+
+                def onScroll(preview: QMediaPlayer, value):
                     preview.setPosition(value)
 
-                
-
                 player = QMediaPlayer()
-                player.setSource(QUrl.fromLocalFile(self.currentRenderOptions.outputPath))
+                player.setSource(
+                    QUrl.fromLocalFile(self.currentRenderOptions.outputPath)
+                )
                 player.setVideoOutput(self.parent.VideoPreview)
                 player.play()
                 player.pause()
@@ -406,12 +438,25 @@ class ProcessTab:
                 self.parent.VideoPreview.show()
                 self.parent.VideoPreview.setVisible(True)
                 self.parent.previewLabel.setVisible(False)
-                self.parent.timeInVideoScrollBar.setRange(0, (((self.currentRenderOptions.endTime-self.currentRenderOptions.startTime))*10)-1) # convert to ms
-                self.parent.timeInVideoScrollBar.valueChanged.connect(lambda: onScroll(player, int(self.parent.timeInVideoScrollBar.value()*100)))
+                self.parent.timeInVideoScrollBar.setRange(
+                    0,
+                    (
+                        (
+                            self.currentRenderOptions.endTime
+                            - self.currentRenderOptions.startTime
+                        )
+                        * 10
+                    )
+                    - 1,
+                )  # convert to ms
+                self.parent.timeInVideoScrollBar.valueChanged.connect(
+                    lambda: onScroll(
+                        player, int(self.parent.timeInVideoScrollBar.value() * 100)
+                    )
+                )
 
             except Exception as e:
                 log(f"Error: {e}")
-
 
     def onRenderCompletion(self):
         self.eta = 0
@@ -473,7 +518,7 @@ class ProcessTab:
             self.parent.progressBar.setRange(
                 0,
                 # only set the range to multiply the frame count if the method is interpolate
-                self.max_value
+                self.max_value,
             )
             # print(self.renderTextOutputList)
             self.parent.renderOutput.setPlainText(
@@ -543,7 +588,6 @@ class ProcessTab:
             f"{CWD}",
             "--ffmpeg_path",
             f"{FFMPEG_PATH}",
-
         ]
 
         if renderOptions.upscaleModelFile:
@@ -556,14 +600,16 @@ class ProcessTab:
                 "--upscale_model",
                 modelPath,
             ]
-            command += ["--override_upscale_scale", f"{renderOptions.overrideUpscaleScale}"]
-            
+            command += [
+                "--override_upscale_scale",
+                f"{renderOptions.overrideUpscaleScale}",
+            ]
+
         if renderOptions.tilingEnabled:
             command += [
                 "--tilesize",
                 f"{renderOptions.tilesize}",
             ]
-            
 
         if renderOptions.interpolateModelFile:
             command += [
@@ -587,7 +633,7 @@ class ProcessTab:
                 command += [
                     "--ensemble",
                 ]
-        
+
         if renderOptions.deblurModelFile:
             command += [
                 "--extra_restoration_models",
@@ -660,7 +706,5 @@ class ProcessTab:
 
         if renderOptions.hdrMode:
             command += ["--hdr_mode"]
-
-
 
         return command

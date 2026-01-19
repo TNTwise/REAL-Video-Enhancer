@@ -3,6 +3,8 @@ import sys
 import requests
 import platform
 from PySide6.QtCore import QDir
+
+
 def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
     """
     checks network availability against a url, default url: raw.githubusercontent.com
@@ -13,10 +15,11 @@ def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
     except Exception as e:
         pass
     return False
+
+
 HAS_NETWORK_ON_STARTUP = networkCheck()
 
 LOCKFILE = QDir.tempPath() + "/REAL-Video-Enhancer.lock"
-
 
 
 PLATFORM = sys.platform  # win32, darwin, linux
@@ -26,28 +29,21 @@ IS_FLATPAK = "FLATPAK_ID" in os.environ and not IS_STEAM
 HOME_PATH = os.path.expanduser("~")
 
 IS_COMPILED_OR_FROZEN = hasattr(sys, "frozen")
-USE_LOCAL_BACKEND =  os.path.exists(
-    os.path.join(os.getcwd(), "backend")
-) 
+USE_LOCAL_BACKEND = os.path.exists(os.path.join(os.getcwd(), "backend"))
 
 if not USE_LOCAL_BACKEND:
-    
     if PLATFORM == "win32":
         CWD = os.path.join(HOME_PATH, "AppData", "Local", "REAL-Video-Enhancer")
     if PLATFORM == "darwin":
         CWD = os.path.join(HOME_PATH, "Library", "REAL-Video-Enhancer")
     if PLATFORM == "linux":
-        CWD = os.path.join(
-            HOME_PATH, ".local", "share", "REAL-Video-Enhancer"
-        )
+        CWD = os.path.join(HOME_PATH, ".local", "share", "REAL-Video-Enhancer")
 else:
     CWD = os.getcwd()
-    
+
 if IS_FLATPAK:
-    CWD = (
-        os.path.join(
-            HOME_PATH, ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
-        )
+    CWD = os.path.join(
+        HOME_PATH, ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
     )
 
 CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
@@ -78,7 +74,7 @@ PYTHON_EXECUTABLE_PATH = (
     if PLATFORM == "win32"
     else os.path.join(CWD, "python", "python", "bin", "python3")
 )
-#PYTHON_VERSION = "3.13.2" if PLATFORM != "darwin" else "3.12.9" # sets python version of backend
+# PYTHON_VERSION = "3.13.2" if PLATFORM != "darwin" else "3.12.9" # sets python version of backend
 PYTHON_VERSION = "3.12.9"
 
 EXE_PATH = os.path.join(

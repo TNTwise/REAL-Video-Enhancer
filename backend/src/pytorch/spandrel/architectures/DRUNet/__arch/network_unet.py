@@ -115,15 +115,15 @@ class DRUNet(nn.Module):
         _, _, H, W = x0.shape  # noqa: N806
 
         noise_level = 15 / 255  # default from repo
-        
+
         padding = 32
         pw = math.ceil(W / padding) * padding
         ph = math.ceil(H / padding) * padding
         padding = (0, pw - W, 0, ph - H)
         x0 = F.pad(x0, padding)
         noise_map = torch.zeros(1, 1, ph, pw).to(x0) + noise_level
-        
-        x0 = (torch.cat([x0, noise_map], dim=1))
+
+        x0 = torch.cat([x0, noise_map], dim=1)
         x1 = self.m_head(x0)
         x2 = self.m_down1(x1)
         x3 = self.m_down2(x2)

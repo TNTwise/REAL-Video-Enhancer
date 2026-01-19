@@ -6,10 +6,9 @@ import numpy as np
 if __name__ != "__main__":
     from .utils.Util import log, padFrame, subprocess_popen_without_terminal
 else:
+
     def log(message):
         print(message)
-
-
 
 
 def convertTime(remaining_time):
@@ -41,11 +40,15 @@ class PauseManager:
                     )
                     break
                 except FileNotFoundError:
-                    log(f"Waiting for shared memory to be created: {self.paused_shared_memory_id}")
+                    log(
+                        f"Waiting for shared memory to be created: {self.paused_shared_memory_id}"
+                    )
                     time.sleep(0.5)
+
     def pause_manager(self):
         if self.paused_shared_memory_id is not None:
             return self.pausedSharedMemory.buf[0] == 1
+
 
 class InformationWriteOut:
     def __init__(
@@ -79,14 +82,14 @@ class InformationWriteOut:
         if self.sharedMemoryID is not None:
             while True:
                 try:
-                    self.shm = shared_memory.SharedMemory(
-                        name=self.sharedMemoryID
-                    )
+                    self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID)
                     break
                 except FileNotFoundError:
-                    log(f"Waiting for shared memory to be created: {self.sharedMemoryID}")
+                    log(
+                        f"Waiting for shared memory to be created: {self.sharedMemoryID}"
+                    )
                     time.sleep(0.5)
-            
+
         self.pausedManager = PauseManager(paused_shared_memory_id)
         self.isPaused = False
         self.stop = False
@@ -143,7 +146,6 @@ class InformationWriteOut:
             log(f"Shared memory name: {self.shm.name}")
         i = 0
         while not self.stop:
-            
             if self.previewFrame is not None and self.framesRendered > 0:
                 # print out data to stdout
                 fps = round(self.framesRendered / (time.time() - self.startTime))
@@ -164,13 +166,19 @@ class InformationWriteOut:
                             self.croppedOututHeight,
                         )
                         try:
-                            self.shm.buf[:self.sharedMemoryChunkSize] = bytes(padded_frame)
+                            self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
+                                padded_frame
+                            )
                         except Exception:
                             pass
                     else:
                         try:
-                            self.shm.buf[:self.sharedMemoryChunkSize] = bytes(self.previewFrame)
+                            self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
+                                self.previewFrame
+                            )
                         except Exception:
                             pass
                 self.isPaused = self.pausedManager.pause_manager()
-            time.sleep(0.5) # setting this to a higher value will reduce the cpu usage, and increase fps
+            time.sleep(
+                0.5
+            )  # setting this to a higher value will reduce the cpu usage, and increase fps

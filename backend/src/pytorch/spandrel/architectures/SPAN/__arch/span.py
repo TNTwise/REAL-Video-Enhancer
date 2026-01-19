@@ -256,13 +256,13 @@ class SPAN(nn.Module):
         self.in_channels = num_in_ch
         self.out_channels = num_out_ch
         self.img_range = img_range
-        #device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
-        #self.mean_half = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).half()
-        #self.mean_float = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).float()
+        # device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
+        # self.mean_half = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).half()
+        # self.mean_float = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).float()
         mean_tensor = torch.tensor(rgb_mean, dtype=torch.float32).view(1, 3, 1, 1)
-        #self.register_buffer('mean', mean_tensor)
+        # self.register_buffer('mean', mean_tensor)
         self.mean_tensor = mean_tensor
-        
+
         self.no_norm: torch.Tensor | None
         if not norm:
             self.register_buffer("no_norm", torch.zeros(1))
@@ -291,7 +291,7 @@ class SPAN(nn.Module):
         return self.no_norm is None
 
     def forward(self, x):
-        x = x.clamp(0., 1.)
+        x = x.clamp(0.0, 1.0)
         if self.is_norm:
             x = (x - self.mean_tensor.type_as(x)) * self.img_range
 

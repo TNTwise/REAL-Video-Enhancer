@@ -13,6 +13,7 @@ from .__arch.RealPLKSR import RealPLKSR
 
 _PLKSR = Union[PLKSR, RealPLKSR]
 
+
 class PLKSRArch(Architecture[_PLKSR]):
     def __init__(self) -> None:
         super().__init__(

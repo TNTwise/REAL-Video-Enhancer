@@ -8,7 +8,6 @@ import torch.nn.functional as F
 from ....util import store_hyperparameters
 
 
-
 class DepthToSpace(nn.Module):
     def __init__(self, filters: int, out_ch: int, kernel_size: int, scale: int) -> None:
         super().__init__()
@@ -50,6 +49,7 @@ class ResBlock(nn.Module):
 @store_hyperparameters()
 class ArtCNN(nn.Module):
     hyperparameters = {}
+
     def __init__(
         self,
         *,

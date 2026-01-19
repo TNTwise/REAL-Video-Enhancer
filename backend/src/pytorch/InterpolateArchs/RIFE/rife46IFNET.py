@@ -30,7 +30,6 @@ import torch.nn.functional as F
 from torch.nn.functional import interpolate
 
 
-
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
@@ -140,8 +139,8 @@ class IFNet(nn.Module):
         self.warp = warp
 
     def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid, scale=None):
-        img0 = img0.clamp(0.,1.)
-        img1 = img1.clamp(0.,1.)
+        img0 = img0.clamp(0.0, 1.0)
+        img1 = img1.clamp(0.0, 1.0)
         if scale is not None:
             self.scale_list = [8 / scale, 4 / scale, 2 / scale, 1 / scale]
         warped_img0 = img0

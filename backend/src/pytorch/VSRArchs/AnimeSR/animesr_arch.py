@@ -7,6 +7,8 @@ from torch.nn.modules.batchnorm import _BatchNorm
 """
 Originally from Tencent ARC, Modified by HolyWu
 """
+
+
 def default_init_weights(module_list, scale=1, bias_fill=0, **kwargs):
     """Initialize network weights.
 
@@ -74,7 +76,9 @@ class MyPixelShuffle(nn.Module):
         out_channel = c // (self.upscale_factor**2)
         h = hh * self.upscale_factor
         w = hw * self.upscale_factor
-        x_view = x.view(b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw)
+        x_view = x.view(
+            b, out_channel, self.upscale_factor, self.upscale_factor, hh, hw
+        )
         return x_view.permute(0, 1, 4, 2, 5, 3).reshape(b, out_channel, h, w)
 
 
@@ -95,7 +99,9 @@ class MyPixelUnshuffle(nn.Module):
 class RightAlignMSConvResidualBlocks(nn.Module):
     """right align multi-scale ConvResidualBlocks, currently only support 3 scales (1, 2, 4)"""
 
-    def __init__(self, num_in_ch=3, num_state_ch=64, num_out_ch=64, num_block=(5, 3, 2)):
+    def __init__(
+        self, num_in_ch=3, num_state_ch=64, num_out_ch=64, num_block=(5, 3, 2)
+    ):
         super().__init__()
 
         assert len(num_block) == 3
@@ -103,9 +109,13 @@ class RightAlignMSConvResidualBlocks(nn.Module):
         self.num_block = num_block
 
         self.conv_s1_first = nn.Sequential(
-            nn.Conv2d(num_in_ch, num_state_ch, 3, 1, 1, bias=True), nn.LeakyReLU(negative_slope=0.1, inplace=True))
+            nn.Conv2d(num_in_ch, num_state_ch, 3, 1, 1, bias=True),
+            nn.LeakyReLU(negative_slope=0.1, inplace=True),
+        )
         self.conv_s2_first = nn.Sequential(
-            nn.Conv2d(num_state_ch, num_state_ch, 3, 2, 1, bias=True), nn.LeakyReLU(negative_slope=0.1, inplace=True))
+            nn.Conv2d(num_state_ch, num_state_ch, 3, 2, 1, bias=True),
+            nn.LeakyReLU(negative_slope=0.1, inplace=True),
+        )
         self.conv_s4_first = nn.Sequential(
             nn.Conv2d(num_state_ch, num_state_ch, 3, 2, 1, bias=True),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
@@ -128,7 +138,7 @@ class RightAlignMSConvResidualBlocks(nn.Module):
         )
 
     def up(self, x, scale=2):
-        return interpolate(x, scale_factor=scale, mode='bilinear')
+        return interpolate(x, scale_factor=scale, mode="bilinear")
 
     def forward(self, x):
         x_s1 = self.conv_s1_first(x)
@@ -139,16 +149,24 @@ class RightAlignMSConvResidualBlocks(nn.Module):
         flag_s4 = False
         for i in range(0, self.num_block[0]):
             x_s1 = self.body_s1_first[i](
-                x_s1 + (self.up(x_s2, 2) if flag_s2 else 0) + (self.up(x_s4, 4) if flag_s4 else 0))
+                x_s1
+                + (self.up(x_s2, 2) if flag_s2 else 0)
+                + (self.up(x_s4, 4) if flag_s4 else 0)
+            )
             if i >= self.num_block[0] - self.num_block[1]:
                 x_s2 = self.body_s2_first[i - self.num_block[0] + self.num_block[1]](
-                    x_s2 + (self.up(x_s4, 2) if flag_s4 else 0))
+                    x_s2 + (self.up(x_s4, 2) if flag_s4 else 0)
+                )
                 flag_s2 = True
             if i >= self.num_block[0] - self.num_block[2]:
-                x_s4 = self.body_s4_first[i - self.num_block[0] + self.num_block[2]](x_s4)
+                x_s4 = self.body_s4_first[i - self.num_block[0] + self.num_block[2]](
+                    x_s4
+                )
                 flag_s4 = True
 
-        x_fusion = self.fusion(torch.cat((x_s1, self.up(x_s2, 2), self.up(x_s4, 4)), dim=1))
+        x_fusion = self.fusion(
+            torch.cat((x_s1, self.up(x_s2, 2), self.up(x_s4, 4)), dim=1)
+        )
 
         return x_fusion
 
@@ -164,8 +182,12 @@ class AnimeSR(nn.Module):
         self.num_feat = num_feat
 
         # 3(img channel) * 3(prev cur nxt 3 imgs) + 3(hr img channel) * netscale * netscale + num_feat
-        self.recurrent_cell = RightAlignMSConvResidualBlocks(3 * 3 + 3 * netscale * netscale + num_feat, num_feat,
-                                                             num_feat + 3 * netscale * netscale, num_block)
+        self.recurrent_cell = RightAlignMSConvResidualBlocks(
+            3 * 3 + 3 * netscale * netscale + num_feat,
+            num_feat,
+            num_feat + 3 * netscale * netscale,
+            num_block,
+        )
         self.lrelu = nn.LeakyReLU(negative_slope=0.1)
         self.pixel_shuffle = MyPixelShuffle(netscale)
         self.pixel_unshuffle = MyPixelUnshuffle(netscale)
@@ -177,8 +199,9 @@ class AnimeSR(nn.Module):
         inp = torch.cat((x, self.pixel_unshuffle(fb), state), dim=1)
         # the out contains both state and sr frame
         out = self.recurrent_cell(inp)
-        out_img = self.pixel_shuffle(out[:, :3 * self.netscale * self.netscale]) + interpolate(
-            res, scale_factor=self.netscale, mode='bilinear')
-        out_state = self.lrelu(out[:, 3 * self.netscale * self.netscale:])
+        out_img = self.pixel_shuffle(
+            out[:, : 3 * self.netscale * self.netscale]
+        ) + interpolate(res, scale_factor=self.netscale, mode="bilinear")
+        out_state = self.lrelu(out[:, 3 * self.netscale * self.netscale :])
 
         return out_img, out_state

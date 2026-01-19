@@ -57,5 +57,4 @@ class ArtCNNArch(Architecture[ArtCNN]):
         )
 
 
-
 __all__ = ["ArtCNNArch", "ArtCNN"]

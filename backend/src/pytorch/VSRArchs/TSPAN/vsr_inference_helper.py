@@ -2,15 +2,17 @@ import torch
 import gc
 import sys
 from ...TorchUtils import TorchUtils
+
+
 class TemporalSPANInferenceHelper:
     def __init__(self, model, scale):
         self.scale = scale
         self.model: torch.nn.Module = model
         self.num_cached_frames = 5
         self.frame_cache = []
-    
+
     def state_dict(self):
-        self.frame_cache = [] # reset cache before saving state
+        self.frame_cache = []  # reset cache before saving state
         return self.model.state_dict()
 
     def __call__(self, frame: torch.Tensor):
@@ -22,5 +24,3 @@ class TemporalSPANInferenceHelper:
         self.frame_cache.pop(0)
         self.frame_cache.append(frame.unsqueeze(1))
         return out
-
-            

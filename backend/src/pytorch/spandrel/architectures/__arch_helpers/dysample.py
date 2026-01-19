@@ -3,7 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-
 class DySample(nn.Module):
     """Adapted from 'Learning to Upsample by Learning to Sample':
     https://arxiv.org/abs/2308.15085
@@ -51,7 +50,6 @@ class DySample(nn.Module):
         )
 
     def forward(self, x):
-        
         offset = self.offset(x) * self.scope(x).sigmoid() * 0.5 + self.init_pos
         B, _, H, W = offset.shape
         offset = offset.view(B, 2, -1, H, W)
@@ -81,13 +79,17 @@ class DySample(nn.Module):
             .flatten(0, 1)
             .float()
         )
-        pd = 'border'
+        pd = "border"
         if x.device.type == "mps":
-            pd = 'zeros'
+            pd = "zeros"
             coords = coords.clamp(-1, 1)
         output = (
             F.grid_sample(
-                x.reshape(B * self.groups, -1, H, W).float(), coords.float(), mode="bilinear", padding_mode=pd, align_corners=False
+                x.reshape(B * self.groups, -1, H, W).float(),
+                coords.float(),
+                mode="bilinear",
+                padding_mode=pd,
+                align_corners=False,
             )
             .to(x.dtype)
             .view(B, -1, self.scale * H, self.scale * W)

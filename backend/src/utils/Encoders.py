@@ -2,6 +2,7 @@ from abc import ABC
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class Encoder(ABC):
     preset_tag: str
@@ -97,10 +98,12 @@ class av1(VideoEncoder):
     preInputsettings = None
     postInputSettings = "-c:v libsvtav1"
 
+
 class ffv1(VideoEncoder):
     preset_tag = "ffv1"
     preInputsettings = None
     postInputSettings = "-c:v ffv1"
+
 
 class prores(VideoEncoder):
     preset_tag = "prores"

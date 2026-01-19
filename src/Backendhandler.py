@@ -1,9 +1,16 @@
 import os
 
-from .constants import BACKEND_PATH, PYTHON_EXECUTABLE_PATH, PYTHON_DIRECTORY, PLATFORM, IS_INSTALLED, IS_FLATPAK, HAS_NETWORK_ON_STARTUP, CWD
-from .Util import (
-    FileHandler
+from .constants import (
+    BACKEND_PATH,
+    PYTHON_EXECUTABLE_PATH,
+    PYTHON_DIRECTORY,
+    PLATFORM,
+    IS_INSTALLED,
+    IS_FLATPAK,
+    HAS_NETWORK_ON_STARTUP,
+    CWD,
 )
+from .Util import FileHandler
 from PySide6.QtWidgets import QMessageBox
 from .version import version
 
@@ -28,9 +35,11 @@ class BackendHandler:
         return_code = str(output.getReturnCode()).strip()
         output: str = output.getOutput()
         if "ERROR" in output or "TRACEBACK" in output or return_code == "1":
-            TextOutputPopup(f"ERROR DETECTED IN BACKEND SETUP!\n{output}", title="FATAL ERROR")
+            TextOutputPopup(
+                f"ERROR DETECTED IN BACKEND SETUP!\n{output}", title="FATAL ERROR"
+            )
             exit(1)
-        
+
         output = output.split(" ")
         # hack to filter out bad find
         new_out = ""

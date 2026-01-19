@@ -147,7 +147,7 @@ class InterpolateRIFENCNN:
         self.paused = False
         self.backend = "ncnn"
         self.frame0 = None
-        self.hdr_mode = hdr_mode 
+        self.hdr_mode = hdr_mode
         self._load()
 
     def _load(self):
@@ -185,7 +185,7 @@ class InterpolateRIFENCNN:
                 self.frame0, img1.get_frame_bytes(), self.max_timestep
             )  # get the cache to skip to next frame
             self.frame0 = img1
-            
+
             for n in range(self.interpolateFactor - 1):
                 yield img1
             return
@@ -193,8 +193,18 @@ class InterpolateRIFENCNN:
             while self.paused:
                 sleep(1)
             timestep = (n + 1) * 1.0 / (self.interpolateFactor)
-            frame = self.render.process_bytes(self.frame0, img1.get_frame_bytes(), timestep)
-            retFrame = Frame(self.backend, self.width, self.height, img1.device, gpu_id=img1.gpu_id, hdr_mode=self.hdr_mode, dtype=img1.dtype)
+            frame = self.render.process_bytes(
+                self.frame0, img1.get_frame_bytes(), timestep
+            )
+            retFrame = Frame(
+                self.backend,
+                self.width,
+                self.height,
+                img1.device,
+                gpu_id=img1.gpu_id,
+                hdr_mode=self.hdr_mode,
+                dtype=img1.dtype,
+            )
             retFrame.set_frame_bytes(frame)
             yield retFrame
         self.frame0 = img1

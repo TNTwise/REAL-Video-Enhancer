@@ -3,7 +3,17 @@ from PySide6.QtWidgets import QMainWindow, QMessageBox
 from .QTcustom import RegularQTPopup, NetworkCheckPopup, remove_combobox_item_by_text
 from ..DownloadDeps import DownloadDependencies
 from .Updater import ApplicationUpdater
-from ..constants import IS_FLATPAK, PLATFORM, CWD, USE_LOCAL_BACKEND, HOME_PATH, PLATFORM, IS_FLATPAK, CWD, CPU_ARCH
+from ..constants import (
+    IS_FLATPAK,
+    PLATFORM,
+    CWD,
+    USE_LOCAL_BACKEND,
+    HOME_PATH,
+    PLATFORM,
+    IS_FLATPAK,
+    CWD,
+    CPU_ARCH,
+)
 from ..BuiltInTorchVersions import TorchVersion
 from .GPUDetect import GPUDetect
 from ..Util import FileHandler
@@ -17,7 +27,9 @@ class DownloadTab:
         skip_info_popup: bool = False,
     ):
         self.parent = parent
-        self.torch_versions:list[TorchVersion] = [version for version in TorchVersion.__subclasses__()]
+        self.torch_versions: list[TorchVersion] = [
+            version for version in TorchVersion.__subclasses__()
+        ]
         self.downloadDeps = DownloadDependencies()
         self.backends = backends
         self.skip_info_popup = skip_info_popup
@@ -42,7 +54,6 @@ class DownloadTab:
         except Exception as e:
             print(e)
 
-
         # set this all to not visible, as scrapping the idea for now.
         if PLATFORM != "linux":
             remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
@@ -56,15 +67,13 @@ class DownloadTab:
         if PLATFORM == "darwin":
             if CPU_ARCH == "arm64":
                 self.parent.pytorch_backend.clear()
-                self.parent.pytorch_backend.addItems(
-                    ["MPS (Apple Silicon)"]
-                )
+                self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
                 # force 2.9.0 as it should include support for uint16
                 self.parent.pytorch_version.setEnabled(False)
 
                 self.parent.pytorch_backend.setCurrentText("MPS (Apple Silicon)")
                 self.parent.pytorch_backend.setEnabled(False)
-                
+
                 self.parent.downloadTorchBtn.setEnabled(True)
             self.parent.downloadTensorRTBtn.setEnabled(False)
         if IS_FLATPAK or USE_LOCAL_BACKEND:
@@ -74,8 +83,7 @@ class DownloadTab:
 
         self.parent.ApplicationUpdateContainer.setVisible(False)
         self.QButtonConnect()
-    
-    
+
     def QButtonConnect(self):
         self.parent.downloadNCNNBtn.clicked.connect(lambda: self.download("ncnn", True))
         self.parent.downloadTorchBtn.clicked.connect(
@@ -87,10 +95,8 @@ class DownloadTab:
         self.parent.downloadDirectMLBtn.clicked.connect(
             lambda: self.download("directml", True)
         )
-        self.parent.downloadRecommendedBtn.clicked.connect(
-            self.installRecommended
-        )
-        
+        self.parent.downloadRecommendedBtn.clicked.connect(self.installRecommended)
+
         self.parent.uninstallNCNNBtn.clicked.connect(
             lambda: self.download("ncnn", False)
         )
@@ -122,12 +128,12 @@ class DownloadTab:
             QMessageBox.StandardButton.No,  # type: ignore
         )
         if reply == QMessageBox.Yes:  # type: ignore
-            os.chdir(HOME_PATH) # fix for windows, as you cant delete a directory in use.
+            os.chdir(
+                HOME_PATH
+            )  # fix for windows, as you cant delete a directory in use.
             FileHandler().removeFolder(CWD)
             os._exit(0)
-        
 
-        
     def hideUninstallButtons(self):
         self.parent.uninstallTorchBtn.setVisible(False)
         self.parent.uninstallNCNNBtn.setVisible(False)
@@ -165,14 +171,16 @@ class DownloadTab:
     def installRecommended(self):
         pytorch_backend = GPUDetect().getPyTorchFeatures()
         if pytorch_backend and self.has_enough_space:
-            return_code = self.download("torch", install=True, pytorch_backend=pytorch_backend)
-        elif PLATFORM == 'darwin' and CPU_ARCH == "arm64" and self.has_enough_space:
+            return_code = self.download(
+                "torch", install=True, pytorch_backend=pytorch_backend
+            )
+        elif PLATFORM == "darwin" and CPU_ARCH == "arm64" and self.has_enough_space:
             return_code = self.download("torch", install=True, pytorch_backend="mps")
         else:
             return_code = self.download("ncnn")
         return return_code
-    
-    def download(self, dep, install: bool = True, pytorch_backend:str = None):
+
+    def download(self, dep, install: bool = True, pytorch_backend: str = None):
         """
         Downloads the specified dependency.
         Parameters:
@@ -180,19 +188,21 @@ class DownloadTab:
         Returns:
         - None
         """
-        return_code:int = -1
-        pytorch_ver:TorchVersion|None = None
+        return_code: int = -1
+        pytorch_ver: TorchVersion | None = None
         current_pytorch_version = self.parent.pytorch_version.currentText().split()[0]
-        current_pytorch_backend = self.parent.pytorch_backend.currentText().split()[0].lower() if not pytorch_backend else pytorch_backend
+        current_pytorch_backend = (
+            self.parent.pytorch_backend.currentText().split()[0].lower()
+            if not pytorch_backend
+            else pytorch_backend
+        )
         for version in self.torch_versions:
             if version.torch_version == current_pytorch_version:
                 pytorch_ver = version
                 torchvision_ver = version.torchvision_version
 
         if not pytorch_ver:
-            RegularQTPopup(
-                "Please select a valid PyTorch version from the dropdown."
-            )
+            RegularQTPopup("Please select a valid PyTorch version from the dropdown.")
             return
         if current_pytorch_backend == "cuda" or dep.lower() == "tensorrt":
             pytorch_backend = pytorch_ver.cuda_version
@@ -202,17 +212,22 @@ class DownloadTab:
             pytorch_backend = pytorch_ver.xpu_version
         elif current_pytorch_backend == "mps":
             pytorch_backend = pytorch_ver.mps_version
-        
-        
+
         if NetworkCheckPopup(
             "https://pypi.org/"
         ):  # check for network before installing
-            return_code = self.downloadDeps.downloadPythonDeps(dep, pytorch_ver.torch_version, torchvision_ver, pytorch_backend.lower(), install)
+            return_code = self.downloadDeps.downloadPythonDeps(
+                dep,
+                pytorch_ver.torch_version,
+                torchvision_ver,
+                pytorch_backend.lower(),
+                install,
+            )
             if return_code == 0 and not self.skip_info_popup:
                 RegularQTPopup(
                     "Download Complete\nPlease restart the application to apply changes."
                 )
             elif return_code != 0:
                 RegularQTPopup("Download Failed!\nPlease check logs for more info.")
-            
+
         return return_code
