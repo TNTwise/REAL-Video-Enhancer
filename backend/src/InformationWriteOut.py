@@ -1,10 +1,10 @@
 from multiprocessing import shared_memory
-import sys
 import time
-import numpy as np
 
 if __name__ != "__main__":
-    from .utils.Util import log, padFrame, subprocess_popen_without_terminal
+    from .utils.Util import log, padFrame
+    from .utils.RealTimePrint import RealTimePrint
+    from .utils.PauseManager import PauseManager
 else:
 
     def log(message):
@@ -25,29 +25,6 @@ def convertTime(remaining_time):
     if seconds < 10:
         seconds = str(f"0{seconds}")
     return hours, minutes, seconds
-
-
-class PauseManager:
-    def __init__(self, paused_shared_memory_id):
-        self.isPaused = False
-        self.prevState = None
-        self.paused_shared_memory_id = paused_shared_memory_id
-        if self.paused_shared_memory_id is not None:
-            while True:
-                try:
-                    self.pausedSharedMemory = shared_memory.SharedMemory(
-                        name=self.paused_shared_memory_id
-                    )
-                    break
-                except FileNotFoundError:
-                    log(
-                        f"Waiting for shared memory to be created: {self.paused_shared_memory_id}"
-                    )
-                    time.sleep(0.5)
-
-    def pause_manager(self):
-        if self.paused_shared_memory_id is not None:
-            return self.pausedSharedMemory.buf[0] == 1
 
 
 class InformationWriteOut:
@@ -92,21 +69,10 @@ class InformationWriteOut:
                     time.sleep(0.5)
 
         self.pausedManager = PauseManager(paused_shared_memory_id)
+        self.realTimePrint = RealTimePrint()
         self.isPaused = False
         self.stop = False
 
-    def realTimePrint(self, data):
-        data = str(data)
-        # Clear the last line
-        sys.stdout.write("\r" + " " * self.last_length)
-        sys.stdout.flush()
-
-        # Write the new line
-        sys.stdout.write("\r" + data)
-        sys.stdout.flush()
-
-        # Update the length of the last printed line
-        self.last_length = len(data)
 
     def get_is_paused(self):
         return self.isPaused
@@ -147,16 +113,27 @@ class InformationWriteOut:
             log(f"Shared memory name: {self.shm.name}")
         i = 0
         while not self.stop:
-            
+            time.sleep(
+                0.5
+            )  # setting this to a higher value will reduce the cpu usage, and increase fps
+            self.isPaused = self.pausedManager.pause_manager()
+
+            if self.isPaused:
+                pause_start_time = time.time()
+                while self.isPaused and not self.stop:
+                    self.isPaused = self.pausedManager.pause_manager()
+                    time.sleep(0.5)
+                pause_end_time = time.time()
+                paused_duration = pause_end_time - pause_start_time
+                self.total_paused_time_seconds += paused_duration
+
             if self.previewFrame is not None and self.framesRendered > 0:
                 # print out data to stdout
                 fps = round(self.framesRendered / (time.time() - self.startTime - self.total_paused_time_seconds))
                 eta = self.calculateETA(framesRendered=self.framesRendered)
                 message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
-                if i == 0:
-                    print("\n", file=sys.stderr)
-                    i = 1
-                self.realTimePrint(message)
+                self.realTimePrint.realTimePrint(message)
+                
                 if self.sharedMemoryID is not None and self.previewFrame is not None:
                     # Update the shared array
                     if self.border_detect:
@@ -180,15 +157,6 @@ class InformationWriteOut:
                             )
                         except Exception:
                             pass
-                self.isPaused = self.pausedManager.pause_manager()
-                if self.isPaused:
-                    pause_start_time = time.time()
-                    while self.isPaused and not self.stop:
-                        self.isPaused = self.pausedManager.pause_manager()
-                        time.sleep(0.5)
-                    pause_end_time = time.time()
-                    paused_duration = pause_end_time - pause_start_time
-                    self.total_paused_time_seconds += paused_duration
-            time.sleep(
-                0.5
-            )  # setting this to a higher value will reduce the cpu usage, and increase fps
+                
+                
+            
