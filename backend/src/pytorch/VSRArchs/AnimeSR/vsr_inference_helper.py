@@ -21,15 +21,13 @@ class AnimeSRInferenceHelper:
             self.out = frame.new_zeros(1, 3, height * self.scale, width * self.scale)
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame)
-        x = torch.cat(self.frame_cache, dim=1)
         
         #print(x.shape, file=sys.stderr)
         #sys.exit()
-        self.out, self.state = self.model(x, self.out, self.state)
+        self.out, self.state = self.model(torch.cat(self.frame_cache, dim=1), self.out, self.state)
         # remove frame from cache
         self.frame_cache.pop(0)
         self.frame_cache.append(frame)
-        #gc.collect()
         return self.out
 
             
