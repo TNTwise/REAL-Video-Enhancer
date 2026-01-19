@@ -190,6 +190,8 @@ def padFrame(
     from_width: int,
     from_height: int,
 ) -> bytes:
+    if to_width == from_width and to_height == from_height:
+        return frame_bytes
     R = 52
     G = 59
     B = 71

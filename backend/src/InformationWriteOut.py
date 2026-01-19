@@ -61,6 +61,7 @@ class InformationWriteOut:
             while True:
                 try:
                     self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID)
+                    log(f"Connected to shared memory: {self.sharedMemoryID}")
                     break
                 except FileNotFoundError:
                     log(
@@ -108,11 +109,8 @@ class InformationWriteOut:
         """
         fcs = framechunksize
         """
-        # Create a shared memory block
-        if self.sharedMemoryID is not None:
-            log(f"Shared memory name: {self.shm.name}")
-        i = 0
-        while not self.stop:
+        
+        while (not self.stop) and self.framesRendered > 0:
             time.sleep(
                 0.5
             )  # setting this to a higher value will reduce the cpu usage, and increase fps
@@ -127,36 +125,27 @@ class InformationWriteOut:
                 paused_duration = pause_end_time - pause_start_time
                 self.total_paused_time_seconds += paused_duration
 
-            if self.previewFrame is not None and self.framesRendered > 0:
-                # print out data to stdout
-                fps = round(self.framesRendered / (time.time() - self.startTime - self.total_paused_time_seconds))
-                eta = self.calculateETA(framesRendered=self.framesRendered)
-                message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
-                self.realTimePrint.realTimePrint(message)
+            # print out data to stdout
+            fps = round(self.framesRendered / (time.time() - self.startTime - self.total_paused_time_seconds))
+            eta = self.calculateETA(framesRendered=self.framesRendered)
+            message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
+            self.realTimePrint.realTimePrint(message)
                 
-                if self.sharedMemoryID is not None and self.previewFrame is not None:
-                    # Update the shared array
-                    if self.border_detect:
-                        padded_frame = padFrame(
-                            self.previewFrame,
-                            self.width,
-                            self.height,
-                            self.croppedOutputWidth,
-                            self.croppedOututHeight,
-                        )
-                        try:
-                            self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
-                                padded_frame
-                            )
-                        except Exception:
-                            pass
-                    else:
-                        try:
-                            self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
-                                self.previewFrame
-                            )
-                        except Exception:
-                            pass
+            if self.sharedMemoryID is not None and self.previewFrame is not None:
+                # Update the shared array
+                padded_frame = padFrame( # pad frame in case of border detect
+                    self.previewFrame,
+                    self.width,
+                    self.height,
+                    self.croppedOutputWidth,
+                    self.croppedOututHeight,
+                )
+                self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
+                        padded_frame
+                )
+                    
+                
+                    
                 
                 
             
