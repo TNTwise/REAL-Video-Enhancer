@@ -127,11 +127,9 @@ class InformationWriteOut:
         hours, minutes, seconds = convertTime(remaining_time)
         return f"{hours}:{minutes}:{seconds}"
 
-    def setPreviewFrame(self, frame):
-        self.previewFrame = frame
-
-    def setFramesRendered(self, framesRendered: int):
-        self.framesRendered = framesRendered
+    def update(self, preview_frame):
+        self.previewFrame = preview_frame
+        self.framesRendered += 1
 
     def stopWriting(self):
         self.stop = True
