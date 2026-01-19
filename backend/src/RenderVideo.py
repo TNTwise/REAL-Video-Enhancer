@@ -115,7 +115,7 @@ class Render:
         # also used to help with performace and caching
         self.maxTimestep = (interpolateFactor - 1) / interpolateFactor
         self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
-        
+
         # self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.setupFrame0 = None
         self.interpolateOption = None
@@ -138,17 +138,22 @@ class Render:
         self.override_upscale_scale = override_upscale_scale
         self.trt_dynamic_shapes = trt_dynamic_shapes
         self.extraRestorationModels = []
-        
+
         if cwd:
             log("Working Directory: " + cwd)
         else:
             cwd = os.getcwd()
             log("No Working Directory specified, using current directory: " + cwd)
-        videoInfo = OpenCVInfo(input_file=inputFile, start_time=start_time, end_time=end_time, ffmpeg_path=ffmpeg_path)
-        
+        videoInfo = OpenCVInfo(
+            input_file=inputFile,
+            start_time=start_time,
+            end_time=end_time,
+            ffmpeg_path=ffmpeg_path,
+        )
+
         if not videoInfo.is_valid_video:
             log("Input video is not valid!")
-        
+
         if start_time is None:
             start_time = 0
         if end_time is None:
@@ -161,9 +166,7 @@ class Render:
         self.borderX = 0
         self.borderY = 0  # set borders for cropping automatically to 0, will be overwritten if borders are detected
         self.totalInputFrames = videoInfo.get_total_frames()
-        self.totalOutputFrames = int(
-            self.totalInputFrames * self.ceilInterpolateFactor
-        )
+        self.totalOutputFrames = int(self.totalInputFrames * self.ceilInterpolateFactor)
         self.fps = videoInfo.get_fps()
         color_space = videoInfo.get_color_space()
         color_primaries = videoInfo.get_color_primaries()
@@ -175,7 +178,9 @@ class Render:
 
         if border_detect:  # border detect has to be put before everything, to overwrite the width and height
             print("Detecting borders", file=sys.stderr)
-            borderDetect = BorderDetect(inputFile=self.inputFile, ffmpeg_path=ffmpeg_path)
+            borderDetect = BorderDetect(
+                inputFile=self.inputFile, ffmpeg_path=ffmpeg_path
+            )
             self.width, self.height, self.borderX, self.borderY = (
                 borderDetect.getBorders()
             )
@@ -192,9 +197,7 @@ class Render:
         else:
             self.upscaleTimes = 1  # if no upscaling, it will default to 1
             self.modelScale = 1
-            
 
-        
         if extraRestorationModels:
             for model in extraRestorationModels:
                 extraRestoration = self.setupExtraRestoration(model)
@@ -202,24 +205,27 @@ class Render:
                     log("Using Extra Restoration Model: " + model)
                     self.extraRestorationModels.append(extraRestoration)
                     extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
-        
 
         if interpolateModel:
             self.setupInterpolate()
             log("Using Interpolation Model: " + self.interpolateModel)
 
-        if upscaleModel: # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
+        if upscaleModel:  # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
             self.upscaleOption.hotReload()
 
         for extraRestoration in self.extraRestorationModels:
             extraRestoration.hotReload()
-        
+
         if self.modelScale and self.override_upscale_scale:
             if int(self.modelScale) == int(self.override_upscale_scale):
-                log("Override upscale scale is set to the same value as the model scale, this will not change the output resolution.")
+                log(
+                    "Override upscale scale is set to the same value as the model scale, this will not change the output resolution."
+                )
                 self.override_upscale_scale = False
-        
-        log(f"Upscale Times: {self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes}")
+
+        log(
+            f"Upscale Times: {self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes}"
+        )
         log(f"Interpolate Factor: {self.interpolateFactor}")
         log(f"Total Output Frames: {self.totalOutputFrames}")
         log("Model Scale: " + str(self.modelScale))
@@ -236,7 +242,9 @@ class Render:
             hdr_mode=hdr_mode,
             backend=self.backend,
             device=self.device,
-            gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
+            gpu_id=self.pytorch_gpu_id
+            if self.backend in ["pytorch", "tensorrt"]
+            else self.ncnn_gpu_id,
             dtype=self.precision,
             color_space=color_space,
             color_primaries=color_primaries,
@@ -260,7 +268,9 @@ class Render:
             custom_encoder=custom_encoder,
             benchmark=benchmark,
             slowmo_mode=slomo_mode,
-            upscaleTimes=self.upscaleTimes if not self.override_upscale_scale else self.override_upscale_scale,
+            upscaleTimes=self.upscaleTimes
+            if not self.override_upscale_scale
+            else self.override_upscale_scale,
             interpolateFactor=self.interpolateFactor,
             ceilInterpolateFactor=self.ceilInterpolateFactor,
             video_encoder=video_encoder,
@@ -276,23 +286,29 @@ class Render:
             ffmpeg_log_file=os.path.join(cwd, "ffmpeg_log.txt"),
         )
 
-        shm_mul = self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes
+        shm_mul = (
+            self.override_upscale_scale
+            if self.override_upscale_scale
+            else self.upscaleTimes
+        )
         hdr_mul = 6 if hdr_mode else 3
 
         self.informationHandler = InformationWriteOut(
             sharedMemoryID=sharedMemoryID,
-            sharedMemoryChunkSize=self.originalHeight*self.originalWidth*shm_mul*shm_mul*hdr_mul,
+            sharedMemoryChunkSize=self.originalHeight
+            * self.originalWidth
+            * shm_mul
+            * shm_mul
+            * hdr_mul,
             paused_shared_memory_id=pause_shared_memory_id,
-            outputWidth=self.originalWidth*shm_mul,
-            outputHeight=self.originalHeight*shm_mul,
-            croppedOutputWidth=self.width*shm_mul,
-            croppedOutputHeight=self.height*shm_mul,
+            outputWidth=self.originalWidth * shm_mul,
+            outputHeight=self.originalHeight * shm_mul,
+            croppedOutputWidth=self.width * shm_mul,
+            croppedOutputHeight=self.height * shm_mul,
             totalOutputFrames=self.totalOutputFrames,
             border_detect=border_detect,
             hdr_mode=hdr_mode,
-            
         )
-        
 
         self.renderThread = Thread(target=self.render)
         self.ffmpegReadThread = Thread(target=self.readBuffer.read_frames_into_queue)
@@ -307,7 +323,13 @@ class Render:
         self.renderThread.start()
 
         if output_to_mpv:
-            MPVOut = MPVOutput(self.writeBuffer, width=self.width*self.upscaleTimes, height=self.height*self.upscaleTimes,fps=self.fps*self.interpolateFactor, outputFrameChunkSize=self.outputFrameChunkSize)
+            MPVOut = MPVOutput(
+                self.writeBuffer,
+                width=self.width * self.upscaleTimes,
+                height=self.height * self.upscaleTimes,
+                fps=self.fps * self.interpolateFactor,
+                outputFrameChunkSize=self.outputFrameChunkSize,
+            )
             MPVoutThread = Thread(target=MPVOut.write_out_frames)
             MPVoutThread.start()
 
@@ -330,70 +352,55 @@ class Render:
         profiler = Profiler()
         profiler.start()
         """
-
-        while True:
-            if not self.informationHandler.get_is_paused():
-                frame = self.readBuffer.get()
-                #self.write_bytes_to_cv2_frame_debug(frame)
-                if frame is None:
-                    self.informationHandler.stopWriting()
-                    break
-                
-                if self.interpolateModel: # detect scene changes before running any calculations, as for some reason cv2 hates the frame after its been passed through the restore models.
-                    sceneDetect = self.sceneDetect.detect(frame)
-
-                for extraRestoration in self.extraRestorationModels:
-                    frame = extraRestoration(frame)
-
-                if self.interpolateModel:
-                    
-                    interpolated_frames = self.interpolateOption(
-                        img1=frame,
-                        transition=sceneDetect,
-                    )
-                    if not interpolated_frames:
-                        return
-                    
-                    for interpolated_frame in interpolated_frames:
-
-                        if self.upscaleModel:
-                            interpolated_frame = self.upscaleOption(
-                                interpolated_frame
-                            )
-                        if self.override_upscale_scale:
-                            interpolated_frame = resize_image_bytes(interpolated_frame.get_frame_bytes(),
-                                               width=self.width*self.modelScale,
-                                               height=self.height*self.modelScale,
-                                               target_width=self.width*self.override_upscale_scale,
-                                               target_height=self.height*self.override_upscale_scale,)
-                        self.informationHandler.setPreviewFrame(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
-                        self.informationHandler.setFramesRendered(frames_rendered)
-                        self.writeBuffer.writeQueue.put(interpolated_frame.get_frame_bytes() if type(interpolated_frame) != bytes else interpolated_frame)
-                
-                
-
-                if self.upscaleModel:
-                    frame = self.upscaleOption(
-                        frame
-                    )
-                
-                
-                
-                if self.override_upscale_scale:
-                    frame = resize_image_bytes(frame.get_frame_bytes(),
-                                               width=self.width*self.modelScale,
-                                               height=self.height*self.modelScale,
-                                               target_width=self.width*self.override_upscale_scale,
-                                               target_height=self.height*self.override_upscale_scale,)
-
-                
-                self.informationHandler.setFramesRendered(frames_rendered)
-                self.informationHandler.setPreviewFrame(frame.get_frame_bytes() if type(frame) != bytes else frame)
-                
-                self.writeBuffer.writeQueue.put(frame.get_frame_bytes() if type(frame) != bytes else frame)
-                frames_rendered += int(self.ceilInterpolateFactor)
-            else:
+        frame = self.readBuffer.get()
+        while frame:
+            if self.informationHandler.get_is_paused():
                 sleep(1)
+            
+
+            for extraRestoration in self.extraRestorationModels:
+                frame = extraRestoration(frame)
+
+            if self.interpolateModel:
+                sceneDetect = self.sceneDetect.detect(frame)
+                interpolated_frames = self.interpolateOption(
+                    img1=frame,
+                    transition=sceneDetect,
+                )
+
+                for interpolated_frame in interpolated_frames:
+                    if self.upscaleModel:
+                        interpolated_frame = self.upscaleOption(interpolated_frame)
+                    if self.override_upscale_scale:
+                        interpolated_frame = interpolated_frame.resize_frame_optimal(new_width=self.width * self.override_upscale_scale, new_height=self.height*self.override_upscale_scale)
+                    
+                    self.informationHandler.update(
+                        interpolated_frame.get_frame_bytes(clear_cache=True)
+                    )
+                    self.writeBuffer.writeQueue.put(
+                        interpolated_frame.get_frame_bytes(clear_cache=True)
+                        
+                    )
+
+            if self.upscaleModel:
+                frame = self.upscaleOption(frame)
+
+            if self.override_upscale_scale:
+                frame = frame.resize_frame_optimal(self.width * self.override_upscale_scale, self.height*self.override_upscale_scale)
+
+            self.informationHandler.update(
+                frame.get_frame_bytes(clear_cache=True)
+            )
+
+            self.writeBuffer.writeQueue.put(
+                frame.get_frame_bytes()
+            )
+            frames_rendered += int(self.ceilInterpolateFactor)
+
+            # grab new frame
+            frame = self.readBuffer.get()
+        
+        self.informationHandler.stopWriting()
         self.writeBuffer.writeQueue.put(None)
         """
         tracer.stop()
@@ -401,9 +408,10 @@ class Render:
         profiler.stop()
         print(profiler.output_text(unicode=True, color=True))
         """
-    
+
     def upscalePytorchObject(self, modelPath=None):
         from .pytorch.UpscaleTorch import UpscalePytorch
+
         return UpscalePytorch(
             modelPath,
             device=self.device,
@@ -415,11 +423,12 @@ class Render:
             gpu_id=self.pytorch_gpu_id,
             trt_optimization_level=self.trt_optimization_level,
             hdr_mode=self.hdr_mode,
-            trt_static_shape= not self.trt_dynamic_shapes,
+            trt_static_shape=not self.trt_dynamic_shapes,
         )
-    
+
     def upscaleNCNNObject(self, scale=None, modelPath=None):
         from .ncnn.UpscaleNCNN import UpscaleNCNN
+
         path, last_folder = os.path.split(modelPath)
         modelPath = os.path.join(path, last_folder, last_folder)
         return UpscaleNCNN(
@@ -431,8 +440,10 @@ class Render:
             height=self.height,
             tilesize=self.tilesize,
         )
+
     def upscaleONNXObject(self, scale=None, modelPath=None):
         from .onnx.UpscaleONNX import UpscaleONNX
+
         return UpscaleONNX(
             modelPath=modelPath,
             deviceID=self.pytorch_gpu_id,
@@ -443,44 +454,46 @@ class Render:
             hdr_mode=self.hdr_mode,
         )
 
-
     def setupExtraRestoration(self, modelPath):
         log("Setting up Extra Restoration")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             return self.upscalePytorchObject(modelPath)
-        
+
         if self.backend == "ncnn":
             return self.upscaleNCNNObject(scale=1, modelPath=modelPath)
 
     def setupUpscale(self):
         log("Setting up Upscale")
         if self.backend == "pytorch" or self.backend == "tensorrt":
-
             self.upscaleOption = self.upscalePytorchObject(self.upscaleModel)
-            self.modelScale = self.upscaleOption.getScale() 
-            
+            self.modelScale = self.upscaleOption.getScale()
 
         if self.backend == "ncnn":
             from .ncnn.UpscaleNCNN import getNCNNScale
 
             self.modelScale = getNCNNScale(modelPath=self.upscaleModel)
-            
-            self.upscaleOption = self.upscaleNCNNObject(scale=self.modelScale, modelPath=self.upscaleModel)
+
+            self.upscaleOption = self.upscaleNCNNObject(
+                scale=self.modelScale, modelPath=self.upscaleModel
+            )
 
         if self.backend == "directml":  # i dont want to work with this shit
             from .onnx.UpscaleONNX import UpscaleONNX
+
             self.modelScale = UpscaleONNX.getModelScale(self.upscaleModel)
-            
+
             self.upscaleOption = UpscaleONNX(
                 modelPath=self.upscaleModel,
                 precision=self.precision,
                 width=self.width,
                 height=self.height,
-                scale=self.modelScale
+                scale=self.modelScale,
             )
-        self.upscaleTimes = self.modelScale if not self.override_upscale_scale else self.override_upscale_scale
-        
-
+        self.upscaleTimes = (
+            self.modelScale
+            if not self.override_upscale_scale
+            else self.override_upscale_scale
+        )
 
     def setupInterpolate(self):
         log("Setting up Interpolation")
@@ -493,7 +506,9 @@ class Render:
             model_backend=self.backend,
             model_dtype=self.precision,
             model_device=self.device,
-            model_gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch","tensorrt"] else self.ncnn_gpu_id,
+            model_gpu_id=self.pytorch_gpu_id
+            if self.backend in ["pytorch", "tensorrt"]
+            else self.ncnn_gpu_id,
         )
         if self.sceneDetectMethod != "none":
             log("Scene Detection Enabled")
@@ -537,5 +552,5 @@ class Render:
                 dynamicScaledOpticalFlow=self.dynamic_scaled_optical_flow,
                 max_timestep=self.maxTimestep,
                 hdr_mode=self.hdr_mode,
-                trt_static_shape= not self.trt_dynamic_shapes,  # if dynamic shapes are enabled, we have to set the static shape to false (default is true in the model
+                trt_static_shape=not self.trt_dynamic_shapes,  # if dynamic shapes are enabled, we have to set the static shape to false (default is true in the model
             )
