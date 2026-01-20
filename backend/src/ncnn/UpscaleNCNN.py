@@ -3789,7 +3789,7 @@ def getNCNNScale(modelPath: str = "") -> int:
         model = NcnnModel.load_from_file(modelParamPath)
         scale = get_broadcast_data(model)[0]
     except Exception:
-    logger.exception("Failed to get scale from model; falling back to filename")
+        logger.exception("Failed to get scale from model; falling back to filename")
         for i in range(1, 20):
             if f"x{i}" in basename or f"{i}x" in basename.lower():
                 scale = i

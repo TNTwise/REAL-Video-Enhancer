@@ -1,10 +1,8 @@
 import os
 import argparse
 import sys
-import logging
 from src.version import __version__
 from src.utils.LogConfig import get_logger, configure_logging
-
 
 configure_logging()
 logger = get_logger(__name__)
@@ -538,3 +536,5 @@ class HandleApplication:
 
 if __name__ == "__main__":
     HandleApplication()
+    
+    

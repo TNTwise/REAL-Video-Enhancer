@@ -15,7 +15,20 @@ from .utils.LogConfig import get_logger
 from .utils.BorderDetect import BorderDetect
 from .utils.VideoInfo import OpenCVInfo
 import numpy as np
+import threading
+import traceback
 
+def global_thread_handler(args):
+    # args.exc_value contains the error
+    # args.exc_traceback contains the stack trace
+    tb_string = "".join(traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback))
+    
+    print(f"Thread '{args.thread.name}' crashed. Full Traceback:\n{tb_string}")
+    print("Exiting application due to thread crash.")
+    sleep(1) # Give time for the print to flush
+    os._exit(1)
+
+threading.excepthook = global_thread_handler
 
 logger = get_logger(__name__)
 
