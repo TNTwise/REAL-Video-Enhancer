@@ -5,15 +5,40 @@ on:
     branches:
       - main
   workflow_dispatch:
-    branches:
-      - dev
 
 env:
-  APP_VERSION: 2.4.1
+  APP_VERSION: 2.4.2
 
 jobs:
-  
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce allowed triggers/branches
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          event="${{ github.event_name }}"
+          ref="${{ github.ref }}"
+
+          if [[ "$event" == "pull_request" ]]; then
+            echo "OK: pull_request event"
+            exit 0
+          fi
+
+          if [[ "$event" == "workflow_dispatch" && "$ref" == "refs/heads/dev" ]]; then
+            echo "OK: manual dispatch on dev"
+            exit 0
+          fi
+
+          echo "ERROR: This workflow is only allowed on:"
+          echo "  - pull_request"
+          echo "  - workflow_dispatch on refs/heads/dev"
+          echo "Got: event=$event ref=$ref"
+          exit 1
+
   build-Linux:
+    needs: [validate]
     runs-on: ubuntu-latest
     permissions: write-all  
     steps:
@@ -67,6 +92,7 @@ jobs:
           path: backend-v${{ env.APP_VERSION }}.tar.gz 
 
   build-Linux_arm64:
+    needs: [validate]
     runs-on: ubuntu-22.04-arm
     permissions: write-all  
     steps:
@@ -111,6 +137,7 @@ jobs:
 
           
   build-Windows:
+    needs: [validate]
     runs-on: windows-2022
     permissions: write-all  
     steps:
@@ -154,6 +181,7 @@ jobs:
           path: REAL-Video-Enhancer-${{ env.APP_VERSION }}-Windows-Setup_x86_64.exe
 
   build-MacOS_x86_64:
+    needs: [validate]
     runs-on: macos-15-intel
     permissions: write-all  
     steps:
@@ -188,7 +216,7 @@ jobs:
           path: REAL-Video-Enhancer-${{ env.APP_VERSION }}-MacOS_x86_64.zip
 
   build-MacOS_arm64:
-
+    needs: [validate]
     runs-on: macos-14
 
     permissions: write-all  
