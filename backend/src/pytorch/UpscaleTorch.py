@@ -280,11 +280,10 @@ class UpscalePytorch:
                         TorchUtils.clear_cache()
                         torch._dynamo.reset()
 
-                    except Exception as e:
+                    except Exception:
                         if dynamic_shapes is not None:
-                            print(
-                                f"ERROR: building TensorRT engine with dynamic shapes, trying without.\n",
-                                file=sys.stderr,
+                            logger.exception(
+                                "Error building TensorRT engine with dynamic shapes; trying without"
                             )
 
                             if trtHandler.check_engine_exists(

@@ -9,6 +9,10 @@ import math
 from queue import Queue
 import _thread
 import subprocess
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 def check_cupy_env():
@@ -18,7 +22,10 @@ def check_cupy_env():
 
         if cupy.cuda.get_cuda_path() == None:
             SUPPORT_CUPY = False
+    except ImportError:
+        SUPPORT_CUPY = False
     except Exception:
+        logger.exception("Error while checking CuPy environment")
         SUPPORT_CUPY = False
 
     return SUPPORT_CUPY

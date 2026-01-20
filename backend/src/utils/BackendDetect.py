@@ -1,4 +1,8 @@
 from .Util import log_error, suppress_stdout_stderr
+from .LogConfig import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class BackendDetect:
@@ -22,12 +26,14 @@ class BackendDetect:
                 self.__tensorrt = tensorrt
             except ImportError as e:
                 pass
-            except Exception as e:
-                log_error("FATAL: " + str(e))
+            except Exception:
+                logger.exception("FATAL error while importing TensorRT")
+                log_error("FATAL: failed to import TensorRT")
         except ImportError as e:
             pass
-        except Exception as e:
-            log_error("FATAL: " + str(e))
+        except Exception:
+            logger.exception("FATAL error while importing PyTorch/Torchvision")
+            log_error("FATAL: failed to import PyTorch/Torchvision")
         try:
             from rife_ncnn_vulkan_python import Rife
             import ncnn
@@ -41,8 +47,9 @@ class BackendDetect:
             self.__ncnn = ncnn
         except ImportError as e:
             pass
-        except Exception as e:
-            log_error("FATAL: " + str(e))
+        except Exception:
+            logger.exception("FATAL error while importing NCNN")
+            log_error("FATAL: failed to import NCNN")
 
     def __get_pytorch_device(self):
         if "cu" in self.__torch.__version__:
@@ -73,8 +80,9 @@ class BackendDetect:
                 device="cuda" if self.pytorch_device == "rocm" else self.pytorch_device
             )
             return True
-        except Exception as e:
-            log_error(str(e))
+        except Exception:
+            logger.exception("Failed to validate half precision support")
+            log_error("Failed to validate half precision support")
             return False
 
     def get_gpus_torch(self):
@@ -121,8 +129,9 @@ class BackendDetect:
                     ctypes.windll.kernel32.SetErrorMode(
                         SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX
                     )
-                except Exception as e:
-                    log_error(str(e))
+                except Exception:
+                    logger.exception("Failed to set Windows error mode for NCNN")
+                    log_error("Failed to set Windows error mode for NCNN")
             devices = []
             try:
                 with suppress_stdout_stderr():
@@ -135,7 +144,6 @@ class BackendDetect:
                         devices.append(gpu_info.device_name())
                 return devices
             except Exception:
+                logger.exception("Failed to query NCNN GPU list")
+                log_error("Unable to get NCNN GPU")
                 return ["CPU"]
-            except Exception as e:
-                log_error(str(e))
-                return "Unable to get NCNN GPU"

@@ -120,7 +120,9 @@ class TorchTensorRTHandler:
                         cleared_models = True
                         logger.info("Removed %s", model_path)
                     except Exception as e:
-                        logger.warning("Failed to remove %s: %s", model_path, e)
+                        logger.warning(
+                            "Failed to remove %s: %s", model_path, e, exc_info=True
+                        )
             if cleared_models:
                 print("Cleared old TensorRT models...", file=sys.stderr)
 

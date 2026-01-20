@@ -347,7 +347,7 @@ class ArchDetect:
                     try:  # the key might not be in the state_dict
                         if not str(self.state_dict[key1].shape) == str(uniqueshape1):
                             arch_dict[arch] = False
-                    except Exception:
+                    except KeyError:
                         arch_dict[arch] = False
 
         for key, value in arch_dict.items():

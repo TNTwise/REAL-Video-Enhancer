@@ -11,6 +11,10 @@ from .main_registry import MAIN_REGISTRY
 from .model_descriptor import ModelDescriptor, StateDict
 from .registry import ArchRegistry
 from .unpickler import RestrictedUnpickle
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class ModelLoader:
@@ -64,6 +68,7 @@ class ModelLoader:
                 try:
                     pth_state_dict = self._load_pth(path)
                 except Exception:
+                    logger.exception("Failed to load %s as a .pth state dict", path)
                     pth_state_dict = None
 
                 if pth_state_dict is None:

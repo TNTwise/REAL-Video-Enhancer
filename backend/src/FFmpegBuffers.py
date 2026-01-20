@@ -242,6 +242,7 @@ class FFmpegWrite(Buffer):
                 universal_newlines=True,
             )
         except Exception as e:
+            logger.exception("Exception while starting FFmpeg write process")
             self.onErroredExit()
 
     def command(self):
@@ -501,8 +502,7 @@ class FFmpegWrite(Buffer):
                     "Make sure you have the latest drivers installed and your GPU supports vulkan encoding."
                 )
         except Exception as e:
-            print("Failed to read FFmpeg log file.")
-            print(str(e))
+            logger.exception("Failed to read FFmpeg log file")
 
         time.sleep(1)
         os._exit(1)

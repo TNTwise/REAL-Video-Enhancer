@@ -6,7 +6,15 @@ from time import sleep
 from multiprocessing import shared_memory
 
 from PySide6 import QtGui
-from PySide6.QtGui import QPixmap, QPainter, QPainterPath, QColor, QFontMetrics
+from PySide6.QtGui import (
+    QPixmap,
+    QPainter,
+    QPainterPath,
+    QColor,
+    QFontMetrics,
+    QSyntaxHighlighter,
+    QTextCharFormat,
+)
 from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtWidgets import QMessageBox
 
@@ -39,6 +47,28 @@ from .SettingsTab import Settings
 from ..DiscordRPC import DiscordRPC
 from ..ModelHandler import getModels
 from .RenderQueue import RenderOptions
+
+
+class RenderOutputHighlighter(QSyntaxHighlighter):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._error_format = QTextCharFormat()
+        self._error_format.setForeground(QColor(Qt.red))
+
+        # Keep this intentionally simple: if the current output line contains a
+        # strong error signal, color the whole line red.
+        self._error_needles = (
+            "error",
+            "traceback",
+            "exception",
+            "fatal",
+            "failed",
+        )
+
+    def highlightBlock(self, text: str) -> None:
+        lowered = text.lower()
+        if any(needle in lowered for needle in self._error_needles) and "loglevel" not in lowered:
+            self.setFormat(0, len(text), self._error_format)
 
 
 class ProcessTab:
@@ -74,7 +104,18 @@ class ProcessTab:
 
         # get default backend
         self.QConnect()
+        self._setupRenderOutputHighlighter()
         self.populateModels(self.parent.backendComboBox.currentText())
+
+    def _setupRenderOutputHighlighter(self):
+        # `renderOutput` is expected to be a QTextEdit/QPlainTextEdit.
+        # Keep a reference on self to prevent garbage collection.
+        try:
+            self.renderOutputHighlighter = RenderOutputHighlighter(
+                self.parent.renderOutput.document()
+            )
+        except Exception:
+            self.renderOutputHighlighter = None
 
     def populateModels(self, backend) -> dict:
         """

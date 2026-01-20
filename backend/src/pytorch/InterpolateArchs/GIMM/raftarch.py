@@ -534,7 +534,7 @@ def upflow8(flow, mode="bilinear"):
 
 try:
     autocast = torch.cuda.amp.autocast
-except:
+except AttributeError:
     # dummy autocast for PyTorch < 1.6
     class autocast:
         def __init__(self, enabled):

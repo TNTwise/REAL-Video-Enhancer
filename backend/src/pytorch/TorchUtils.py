@@ -73,9 +73,10 @@ class TorchUtils:
             test_tensor = torch.tensor([1.0]).cpu().numpy()
             del test_tensor
             self.use_numpy = True
-        except Exception as e:
+        except Exception:
             logger.warning(
-                "Failed to create a Numpy tensor; this will heavily reduce performance."
+                "Failed to create a Numpy tensor; this will heavily reduce performance.",
+                exc_info=True,
             )
             self.use_numpy = False
         self.__run_stream_func = self.__run_stream_function()

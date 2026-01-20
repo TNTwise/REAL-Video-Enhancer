@@ -1,6 +1,10 @@
 from ..constants import CPU_ARCH, PLATFORM
 import os
 import sys
+from .LogConfig import get_logger
+
+
+logger = get_logger(__name__)
 
 
 def download_ffmpeg(cwd: str = os.getcwd()) -> str | None:
@@ -28,6 +32,6 @@ def download_ffmpeg(cwd: str = os.getcwd()) -> str | None:
         print("Download completed.")
 
         return download_path
-    except Exception as e:
-        print(f"Error downloading FFMpeg: {e}", file=sys.stderr)
+    except Exception:
+        logger.exception("Error downloading FFMpeg")
         return None

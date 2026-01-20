@@ -59,6 +59,7 @@ class UpscaleModelWrapper:
                     "Model precision %s not supported; falling back to float32: %s",
                     self.__precision,
                     e,
+                    exc_info=True,
                 )
                 self.set_precision(torch.float32)
                 self.__test_inference(test_input)
@@ -108,6 +109,7 @@ class UpscaleModelWrapper:
                     self.__dummy_input_pre_channels = [3]
                     self.__inference_mode = "animesr"
                 except Exception as e:
+                    logger.exception("Failed to load model as AnimeSR; trying TSPAN")
                     try:
                         self.__scale = 2
                         self.__dummy_input_pre_channels = [
@@ -127,8 +129,8 @@ class UpscaleModelWrapper:
                         )
                         self.__inference_mode = "tspan"
                     except Exception as e:
-                        logger.error(
-                            "Model at %s is not supported: %s", self.__model_path, e
+                        logger.exception(
+                            "Model at %s is not supported", self.__model_path
                         )
                         raise e
         else:

@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 import pathlib
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 try:
     from upscale_ncnn_py import upscale_ncnn_vulkan_wrapper as wrapped
 
     method = "upscale_ncnn_py"
-except Exception:
+except (ImportError, OSError):
     method = "ncnn_vulkan"
 import numpy as np
 import cv2
@@ -3785,7 +3789,7 @@ def getNCNNScale(modelPath: str = "") -> int:
         model = NcnnModel.load_from_file(modelParamPath)
         scale = get_broadcast_data(model)[0]
     except Exception:
-        print("Failed to get scale from model, getting from filename")
+    logger.exception("Failed to get scale from model; falling back to filename")
         for i in range(1, 20):
             if f"x{i}" in basename or f"{i}x" in basename.lower():
                 scale = i

@@ -1,4 +1,8 @@
 import torch
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class DetectionHelper:
@@ -13,16 +17,16 @@ class DetectionHelper:
             self.model = animesr_arch.AnimeSR()
             self.model.load_state_dict(self.model)
             return self.model
-        except Exception as e:
-            pass
+        except Exception:
+            logger.exception("Failed to load AnimeSR VSR architecture")
         try:
             from TSPAN import tspan, vsr_inference_helper
 
             self.model = tspan.TemporalSPAN(upscale=1)
             self.model.load_state_dict(self.model)
             return self.model
-        except Exception as e:
-            pass
+        except Exception:
+            logger.exception("Failed to load TSPAN VSR architecture")
 
     @torch.inference_mode()
     def inference(self, frame: torch.Tensor):

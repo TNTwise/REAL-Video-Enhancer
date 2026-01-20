@@ -222,6 +222,7 @@ class FFMpegInfoWrapper(VideoInfo):
                     return color_opt_detected
 
             except Exception:
+                logger.exception("Failed to parse color option '%s'", color_opt)
                 return None
         return None
 
@@ -240,7 +241,7 @@ class FFMpegInfoWrapper(VideoInfo):
                 pixel_format = self.stream_line.split(",")[1].split("(")[0].strip()
                 return pixel_format
             except Exception:
-                logger.error("Can't detect pixel format.")
+                logger.exception("Can't detect pixel format.")
         return None
 
     def is_hdr(self) -> bool:

@@ -141,6 +141,10 @@ def resize_image_np(image, target_width: int, target_height: int):
             image, (target_width, target_height), interpolation=interpolation
         )
     except Exception:
+        _logger.exception(
+            "cv2.resize failed with interpolation=%s; retrying with defaults",
+            interpolation,
+        )
         resized_image = cv2.resize(image, (target_width, target_height))
     return resized_image
 
@@ -181,6 +185,10 @@ def resize_image_bytes(
             image_array, (target_width, target_height), interpolation=interpolation
         )
     except Exception:
+        _logger.exception(
+            "cv2.resize failed with interpolation=%s; retrying with defaults",
+            interpolation,
+        )
         resized_image = cv2.resize(image_array, (target_width, target_height))
     # Convert the resized image back to bytes
     return resized_image.tobytes()
@@ -256,6 +264,7 @@ class CudaChecker:
             if cupy.cuda.get_cuda_path() == None:
                 return False
         except Exception as e:
+            _logger.exception("CUDA environment check failed")
             return False
         return True
 
@@ -266,4 +275,5 @@ class CudaChecker:
 
             return torch.cuda.is_available()
         except Exception:
+            _logger.exception("PyTorch CUDA availability check failed")
             return False

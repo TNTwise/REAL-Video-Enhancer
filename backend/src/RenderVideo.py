@@ -25,11 +25,11 @@ def remove_shared_memory_block(name):
         existing_shm = shared_memory.SharedMemory(name=name)
         existing_shm.close()
         existing_shm.unlink()
-        print(f"Shared memory block '{name}' removed.")
+        logger.info("Shared memory block '%s' removed.", name)
     except FileNotFoundError:
-        print(f"Shared memory block '{name}' does not exist.")
-    except Exception as e:
-        print(f"Error removing shared memory block '{name}': {e}")
+        logger.info("Shared memory block '%s' does not exist.", name)
+    except Exception:
+        logger.exception("Error removing shared memory block '%s'", name)
 
 
 class Render:
