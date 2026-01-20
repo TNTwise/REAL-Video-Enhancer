@@ -1,7 +1,12 @@
 name: build-prerelease
 
 on:
-  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
+    branches:
+      - dev
 
 env:
   APP_VERSION: 2.4.1
