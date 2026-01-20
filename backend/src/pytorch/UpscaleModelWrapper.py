@@ -1,10 +1,13 @@
 import torch
-from ..utils.Util import log
+from ..utils.LogConfig import get_logger
 from .TorchUtils import TorchUtils
 from .VSRArchs.AnimeSR.vsr_inference_helper import AnimeSRInferenceHelper
 from .VSRArchs.AnimeSR.animesr_arch import AnimeSR
 from .VSRArchs.TSPAN.vsr_inference_helper import TemporalSPANInferenceHelper
 from .VSRArchs.TSPAN.tspan import TemporalSPAN
+
+
+logger = get_logger(__name__)
 
 
 class UpscaleModelWrapper:
@@ -52,8 +55,10 @@ class UpscaleModelWrapper:
             try:
                 self.__test_inference(test_input)
             except Exception as e:
-                log(
-                    f"Model precision {self.__precision} not supported, falling back to float32: {e}"
+                logger.warning(
+                    "Model precision %s not supported; falling back to float32: %s",
+                    self.__precision,
+                    e,
                 )
                 self.set_precision(torch.float32)
                 self.__test_inference(test_input)
@@ -122,7 +127,9 @@ class UpscaleModelWrapper:
                         )
                         self.__inference_mode = "tspan"
                     except Exception as e:
-                        log(f"Model at {self.__model_path} is not supported: {e}")
+                        logger.error(
+                            "Model at %s is not supported: %s", self.__model_path, e
+                        )
                         raise e
         else:
             if self.__inference_mode == "spandrel":

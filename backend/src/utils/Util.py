@@ -2,7 +2,9 @@ import os
 import sys
 import subprocess
 import contextlib
+import logging
 from .Colors import Colors
+from .LogConfig import configure_logging
 
 # non standard python libraries
 try:
@@ -36,22 +38,26 @@ except ImportError:
     PLATFORM = sys.platform
 
 
+configure_logging()
+_logger = logging.getLogger(__name__)
+
+
 def removeFile(file):
     try:
         os.remove(file)
     except Exception:
-        log("Failed to remove file! " + file)
+        _logger.exception("Failed to remove file: %s", file)
 
 
 def removeFolder(folder):
     try:
         shutil.rmtree(folder)
     except Exception:
-        print("Failed to remove file!")
+        _logger.exception("Failed to remove folder: %s", folder)
 
 
 def warnAndLog(message: str):
-    print("WARNING: " + message, file=sys.stderr)
+    _logger.warning(message)
 
 
 def errorAndLog(message: str):
@@ -59,17 +65,14 @@ def errorAndLog(message: str):
 
 
 def log_error(message: str):
-    log(Colors.RED + "ERROR: " + message + Colors.RESET, show_backend=False)
+    _logger.error(Colors.RED + "ERROR: " + message + Colors.RESET)
 
 
 def log(message: str, show_backend=True):
     """
     Log is now depricated, just using print now.
     """
-    if show_backend:
-        print("BACKEND: " + message, file=sys.stderr)
-    else:
-        print(message, file=sys.stderr)
+    _logger.info("%s", message)
     # message = message + "\n\n\n\n" + "-" * len(message)
     # print(message, file=sys.stderr)
 
@@ -104,10 +107,10 @@ def get_pytorch_vram() -> int:
         else:
             return 0
     except ImportError as e:
-        log(str(e))
+        _logger.exception("%s", e)
         return 0
     except Exception as e:
-        log(str(e))
+        _logger.exception("%s", e)
         return 0
 
 

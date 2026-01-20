@@ -1,5 +1,9 @@
-from ..utils.Util import log, subprocess_popen_without_terminal
+from ..utils.Util import subprocess_popen_without_terminal
+from ..utils.LogConfig import get_logger
 import subprocess
+
+
+logger = get_logger(__name__)
 
 
 class BorderDetect:
@@ -29,7 +33,7 @@ class BorderDetect:
             output = process.communicate()
             return output
         except subprocess.SubprocessError as e:
-            log(f"Error during subprocess execution: {e}")
+            logger.exception("Error during subprocess execution")
             return None, None
 
     def processOutput(self, output):
@@ -49,11 +53,11 @@ class BorderDetect:
                 try:
                     width, height, x, y = map(int, crop_str.split(":"))
                     if width <= 0 or height <= 0:
-                        log(f"Invalid crop dimensions: {crop_str}")
+                        logger.warning("Invalid crop dimensions: %s", crop_str)
                         return None
                     return width, height, x, y
                 except ValueError:
-                    log(f"Invalid crop format: {crop_str}")
+                    logger.warning("Invalid crop format: %s", crop_str)
                     return None
 
             # Parse all crop values and filter out any invalid entries
@@ -61,7 +65,7 @@ class BorderDetect:
             parsed_crops = [crop for crop in parsed_crops if crop is not None]
 
             if not parsed_crops:
-                log("No valid crop values found.")
+                logger.warning("No valid crop values found.")
                 return None
 
             # Determine the least cropped crop (i.e., largest area)
@@ -76,7 +80,7 @@ class BorderDetect:
         output = self.processBorders()
         output = self.processOutput(output)
         if output is None:
-            log("No valid borders detected.")
+            logger.warning("No valid borders detected.")
             return None, None, None, None
         width, height, borderX, borderY = map(int, output.split(":"))
         return width, height, borderX, borderY

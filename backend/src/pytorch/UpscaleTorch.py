@@ -9,8 +9,12 @@ import torch.nn.functional as F
 import sys
 from time import sleep
 
-from ..utils.Util import log, CudaChecker
+from ..utils.Util import CudaChecker
+from ..utils.LogConfig import get_logger
 from ..utils.Frame import Frame
+
+
+logger = get_logger(__name__)
 
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 import numpy as np
@@ -134,8 +138,8 @@ class UpscalePytorch:
             or self.videoHeight > 1920
             and not self.trt_static_shape
         ):
-            log(
-                "The video resolution is very large for TensorRT dynamic shape and will use a lot of VRAM, falling back to static shape"
+            logger.warning(
+                "The video resolution is very large for TensorRT dynamic shape and will use a lot of VRAM; falling back to static shape"
             )
             self.trt_static_shape = True
 
@@ -144,8 +148,8 @@ class UpscalePytorch:
             or self.videoHeight < 128
             and not self.trt_static_shape
         ):
-            log(
-                "The video resolution is too small for TensorRT dynamic shape, falling back to static shape"
+            logger.warning(
+                "The video resolution is too small for TensorRT dynamic shape; falling back to static shape"
             )
             self.trt_static_shape = True
 

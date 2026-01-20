@@ -4,17 +4,17 @@ from .TorchUtils import TorchUtils
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate
 import math
-import logging
 from ..utils.Util import (
     warnAndLog,
-    log,
 )
+from ..utils.LogConfig import get_logger
 from ..utils.Frame import Frame
 from typing import Generator
 
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
-logging.basicConfig(level=logging.INFO)
+
+logger = get_logger(__name__)
 
 
 class InterpolateIFRNetTorch(BaseInterpolate):
@@ -117,8 +117,8 @@ class InterpolateIFRNetTorch(BaseInterpolate):
                 strict=True,
             )
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
-            log("IFRNet loaded")
-            log("Scale: " + str(self.scale))
+            logger.info("IFRNet loaded")
+            logger.info("Scale: %s", self.scale)
 
             if self.backend == "tensorrt":
                 warnAndLog(

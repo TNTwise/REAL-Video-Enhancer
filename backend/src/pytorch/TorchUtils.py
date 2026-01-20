@@ -1,11 +1,15 @@
 import torch
 import torch.nn.functional as F
 import sys
+import logging
 from ..utils.BackendDetect import BackendDetect
+from ..utils.LogConfig import get_logger
 
 backendDetect = BackendDetect()
 
-from ..utils.Util import log, CudaChecker
+from ..utils.Util import CudaChecker
+
+logger = get_logger(__name__)
 
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 import numpy as np
@@ -40,7 +44,7 @@ class DummyContextManager:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
-            print(f"An exception occurred: {exc_type}")
+            logger.exception("An exception occurred")
         return False  # re-raise exceptions if any
 
 
@@ -70,8 +74,8 @@ class TorchUtils:
             del test_tensor
             self.use_numpy = True
         except Exception as e:
-            log(
-                f"Failed to create a Numpy tensor, This will heavily reduce performance."
+            logger.warning(
+                "Failed to create a Numpy tensor; this will heavily reduce performance."
             )
             self.use_numpy = False
         self.__run_stream_func = self.__run_stream_function()
@@ -86,15 +90,17 @@ class TorchUtils:
             return dummy_function  # CPU does not require explicit synchronization
         if self.device_type == "xpu":
             return torch.xpu.synchronize
-        return lambda: log(
-            f"Unknown device type {self.device_type}, skipping stream synchronization."
+        return lambda: logger.warning(
+            "Unknown device type %s, skipping stream synchronization.", self.device_type
         )
 
     def init_stream(self, gpu_id=0) -> torch.Stream:
         """
         Initializes the stream based on the device type.
         """
-        log(f"Initializing stream for device {self.device_type} (GPU ID: {gpu_id})")
+        logger.info(
+            "Initializing stream for device %s (GPU ID: %s)", self.device_type, gpu_id
+        )
         device = self.handle_device(self.device_type, gpu_id)
         if self.device_type == "cuda":
             return torch.cuda.Stream(device=device)
@@ -126,8 +132,9 @@ class TorchUtils:
             case "cpu":
                 pass  # CPU does not require explicit synchronization
             case _:
-                log(
-                    f"Unknown device type {self.device_type}, skipping stream synchronization."
+                logger.warning(
+                    "Unknown device type %s, skipping stream synchronization.",
+                    self.device_type,
                 )
                 # For other devices, we assume no synchronization is needed.
 
@@ -142,7 +149,7 @@ class TorchUtils:
         """
         returns device based on gpu id and device parameter
         """
-        log(f"Handling device: {device}, GPU ID: {gpu_id}")
+        logger.info("Handling device: %s, GPU ID: %s", device, gpu_id)
         if device == "auto":
             if torch.cuda.is_available():
                 torchdevice = torch.device("cuda", gpu_id)
@@ -168,7 +175,7 @@ class TorchUtils:
 
     @staticmethod
     def handle_precision(precision) -> torch.dtype:
-        log(f"Handling precision: {precision}")
+        logger.info("Handling precision: %s", precision)
         if precision == "auto":
             return (
                 torch.float16 if backendDetect.get_half_precision() else torch.float32

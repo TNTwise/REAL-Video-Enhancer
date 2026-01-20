@@ -7,13 +7,16 @@ import queue
 import time
 import cv2
 import numpy as np
+from .utils.LogConfig import get_logger
 
 from .utils.Util import (
-    log,
     subprocess_popen_without_terminal,
 )
 from .utils.Encoders import EncoderSettings
 from .utils.Frame import Frame
+
+
+logger = get_logger(__name__)
 
 
 class Buffer(ABC):
@@ -70,7 +73,7 @@ class FFmpegRead(Buffer):
             else:
                 self.inputFrameChunkSize = width * height * 3
         command = self.command()
-        log("FFMPEG READ COMMAND: " + str(command))
+        logger.info("FFMPEG READ COMMAND: %s", command)
         self.readProcess = subprocess_popen_without_terminal(
             self.command(),
             stdout=subprocess.PIPE,
@@ -107,7 +110,7 @@ class FFmpegRead(Buffer):
             "-",
         ]
 
-        log("FFMPEG READ COMMAND: " + str(command))
+        logger.info("FFMPEG READ COMMAND: %s", command)
         return command
 
     def read_frame(self):
@@ -229,7 +232,7 @@ class FFmpegWrite(Buffer):
         self.ffmpeg_log = open(self.ffmpeg_log_file, "w", encoding="utf-8")
         try:
             command = self.command()
-            log("\nFFMPEG WRITE COMMAND: " + str(command) + "\n")
+            logger.info("FFMPEG WRITE COMMAND: %s", command)
             self.writeProcess = subprocess_popen_without_terminal(
                 command,
                 stdin=subprocess.PIPE,
@@ -416,7 +419,7 @@ class FFmpegWrite(Buffer):
                 command.append("-y")
 
             if self.slowmo_mode:
-                log("Slowmo mode enabled, will not merge audio or subtitles.")
+                logger.info("Slowmo mode enabled, will not merge audio or subtitles.")
 
         else:  # Benchmark mode
             command = [
@@ -452,7 +455,7 @@ class FFmpegWrite(Buffer):
         self.writeQueue.put(frame)
 
     def write_out_frames(self):
-        log("Rendering")
+        logger.info("Rendering")
         self.startTime = time.time()
 
         exit_code: int = 0
@@ -469,10 +472,10 @@ class FFmpegWrite(Buffer):
             exit_code = self.writeProcess.returncode
 
             renderTime = time.time() - self.startTime
-            log(f"\nTime to complete render: {round(renderTime, 2)}")
+            logger.info("Time to complete render: %s", round(renderTime, 2))
 
         except Exception as e:
-            log(str(e))
+            logger.exception("Exception while writing frames")
             self.onErroredExit()
 
         if exit_code != 0:
@@ -480,21 +483,21 @@ class FFmpegWrite(Buffer):
             return
 
     def onErroredExit(self):
-        log("FFmpeg failed to render the video.")
+        logger.error("FFmpeg failed to render the video.")
         try:
             with open(self.ffmpeg_log_file, "r") as f:
-                log("FULL FFMPEG LOG:")
+                logger.error("FULL FFMPEG LOG:")
                 for line in f.readlines():
-                    log(line)
+                    logger.error("%s", line.rstrip("\n"))
 
             with open(self.ffmpeg_log_file, "r") as f:
                 for line in f.readlines():
                     if f"[{self.outputFileExtension}" in line:
-                        log(line)
+                        logger.error("%s", line.rstrip("\n"))
 
             if self.video_encoder.getPresetTag() == "x264_vulkan":
-                log("Vulkan encode failed, try restarting the render.")
-                log(
+                logger.error("Vulkan encode failed, try restarting the render.")
+                logger.error(
                     "Make sure you have the latest drivers installed and your GPU supports vulkan encoding."
                 )
         except Exception as e:

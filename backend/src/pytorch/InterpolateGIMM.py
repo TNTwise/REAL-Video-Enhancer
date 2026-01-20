@@ -5,18 +5,18 @@ from .TorchUtils import TorchUtils
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate
 import math
-import logging
 import sys
 from ..utils.Util import (
     warnAndLog,
-    log,
 )
+from ..utils.LogConfig import get_logger
 from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
-logging.basicConfig(level=logging.INFO)
+
+logger = get_logger(__name__)
 
 
 class InterpolateGIMMTorch(BaseInterpolate):
@@ -131,8 +131,8 @@ class InterpolateGIMMTorch(BaseInterpolate):
                 )
                 self.coordDict[timestep] = coord
 
-            log("GIMM loaded")
-            log("Scale: " + str(self.scale))
+            logger.info("GIMM loaded")
+            logger.info("Scale: %s", self.scale)
             if self.backend == "tensorrt":
                 warnAndLog(
                     "TensorRT is not implemented for GIMM yet, falling back to PyTorch"

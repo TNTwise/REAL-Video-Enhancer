@@ -5,6 +5,7 @@ import re
 import cv2
 from typing import Optional
 import sys
+import logging
 
 
 FFMPEG_COLORSPACES = [
@@ -64,10 +65,16 @@ FFMPEG_COLOR_TRC = [
 ]
 
 if not __name__ == "__main__":
-    from .Util import log, subprocess_popen_without_terminal
+    from .Util import subprocess_popen_without_terminal
+    from .LogConfig import get_logger
+
+    logger = get_logger(__name__)
 
 else:
-    from Util import log, subprocess_popen_without_terminal
+    from Util import subprocess_popen_without_terminal
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
 
 class VideoInfo(ABC):
@@ -135,9 +142,9 @@ class FFMpegInfoWrapper(VideoInfo):
                     self.ffmpeg_output_raw = self.ffmpeg_output_raw.replace(line, "")
                     break
             if self.stream_line is None:
-                log("No video stream found in the input file.")
+                logger.warning("No video stream found in the input file.")
         except Exception:
-            log(f"ERROR: Input file seems to have no video stream!", file=sys.stderr)
+            logger.exception("Input file seems to have no video stream")
             exit(1)
 
     def get_duration_seconds(self) -> float:
@@ -233,7 +240,7 @@ class FFMpegInfoWrapper(VideoInfo):
                 pixel_format = self.stream_line.split(",")[1].split("(")[0].strip()
                 return pixel_format
             except Exception:
-                log("ERROR: Cant detect pixel format.")
+                logger.error("Can't detect pixel format.")
         return None
 
     def is_hdr(self) -> bool:
@@ -267,7 +274,7 @@ class OpenCVInfo(VideoInfo):
         end_time: Optional[float] = None,
         ffmpeg_path: str = "./bin/ffmpeg",
     ):
-        log("Getting Input Video Properties")
+        logger.info("Getting Input Video Properties")
         self.input_file = input_file
         self.start_time = start_time
         self.end_time = end_time

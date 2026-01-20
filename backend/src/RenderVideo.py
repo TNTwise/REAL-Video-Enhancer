@@ -11,10 +11,13 @@ from .FFmpegBuffers import FFmpegRead, FFmpegWrite, MPVOutput
 from .InformationWriteOut import InformationWriteOut
 from .utils.Encoders import EncoderSettings
 from .utils.SceneDetect import SceneDetect
-from .utils.Util import log
+from .utils.LogConfig import get_logger
 from .utils.BorderDetect import BorderDetect
 from .utils.VideoInfo import OpenCVInfo
 import numpy as np
+
+
+logger = get_logger(__name__)
 
 
 def remove_shared_memory_block(name):
@@ -140,10 +143,10 @@ class Render:
         self.extraRestorationModels = []
 
         if cwd:
-            log("Working Directory: " + cwd)
+            logger.info("Working Directory: %s", cwd)
         else:
             cwd = os.getcwd()
-            log("No Working Directory specified, using current directory: " + cwd)
+            logger.info("No Working Directory specified, using current directory: %s", cwd)
         videoInfo = OpenCVInfo(
             input_file=inputFile,
             start_time=start_time,
@@ -152,7 +155,7 @@ class Render:
         )
 
         if not videoInfo.is_valid_video:
-            log("Input video is not valid!")
+            logger.error("Input video is not valid!")
 
         if start_time is None:
             start_time = 0
@@ -184,16 +187,20 @@ class Render:
             self.width, self.height, self.borderX, self.borderY = (
                 borderDetect.getBorders()
             )
-            log(
-                f"Detected borders: Width,Height:{self.width}x{self.height}, X,Y: {self.borderX}x{self.borderY}"
+            logger.info(
+                "Detected borders: Width,Height:%sx%s, X,Y: %sx%s",
+                self.width,
+                self.height,
+                self.borderX,
+                self.borderY,
             )
 
-        log("Using backend: " + self.backend)
+        logger.info("Using backend: %s", self.backend)
         # upscale has to be called first to get the scale of the upscale model
         if upscaleModel:
             self.setupUpscale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
-            log("Using Upscaling Model: " + self.upscaleModel)
+            logger.info("Using Upscaling Model: %s", self.upscaleModel)
         else:
             self.upscaleTimes = 1  # if no upscaling, it will default to 1
             self.modelScale = 1
@@ -202,13 +209,13 @@ class Render:
             for model in extraRestorationModels:
                 extraRestoration = self.setupExtraRestoration(model)
                 if extraRestoration:
-                    log("Using Extra Restoration Model: " + model)
+                    logger.info("Using Extra Restoration Model: %s", model)
                     self.extraRestorationModels.append(extraRestoration)
                     extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
 
         if interpolateModel:
             self.setupInterpolate()
-            log("Using Interpolation Model: " + self.interpolateModel)
+            logger.info("Using Interpolation Model: %s", self.interpolateModel)
 
         if upscaleModel:  # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
             self.upscaleOption.hotReload()
@@ -218,18 +225,19 @@ class Render:
 
         if self.modelScale and self.override_upscale_scale:
             if int(self.modelScale) == int(self.override_upscale_scale):
-                log(
-                    "Override upscale scale is set to the same value as the model scale, this will not change the output resolution."
+                logger.warning(
+                    "Override upscale scale is set to the same value as the model scale; output resolution will not change."
                 )
                 self.override_upscale_scale = False
 
-        log(
-            f"Upscale Times: {self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes}"
+        logger.info(
+            "Upscale Times: %s",
+            self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes,
         )
-        log(f"Interpolate Factor: {self.interpolateFactor}")
-        log(f"Total Output Frames: {self.totalOutputFrames}")
-        log("Model Scale: " + str(self.modelScale))
-        log("HDR Mode: " + str(hdr_mode))
+        logger.info("Interpolate Factor: %s", self.interpolateFactor)
+        logger.info("Total Output Frames: %s", self.totalOutputFrames)
+        logger.info("Model Scale: %s", self.modelScale)
+        logger.info("HDR Mode: %s", hdr_mode)
 
         self.readBuffer = FFmpegRead(  # input width
             inputFile=inputFile,
@@ -455,7 +463,7 @@ class Render:
         )
 
     def setupExtraRestoration(self, modelPath):
-        log("Setting up Extra Restoration")
+        logger.info("Setting up Extra Restoration")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             return self.upscalePytorchObject(modelPath)
 
@@ -463,7 +471,7 @@ class Render:
             return self.upscaleNCNNObject(scale=1, modelPath=modelPath)
 
     def setupUpscale(self):
-        log("Setting up Upscale")
+        logger.info("Setting up Upscale")
         if self.backend == "pytorch" or self.backend == "tensorrt":
             self.upscaleOption = self.upscalePytorchObject(self.upscaleModel)
             self.modelScale = self.upscaleOption.getScale()
@@ -496,7 +504,7 @@ class Render:
         )
 
     def setupInterpolate(self):
-        log("Setting up Interpolation")
+        logger.info("Setting up Interpolation")
         self.sceneDetect = SceneDetect(
             sceneChangeMethod=self.sceneDetectMethod,
             sceneChangeSensitivity=self.sceneDetectSensitivty,
@@ -511,10 +519,10 @@ class Render:
             else self.ncnn_gpu_id,
         )
         if self.sceneDetectMethod != "none":
-            log("Scene Detection Enabled")
+            logger.info("Scene Detection Enabled")
 
         else:
-            log("Scene Detection Disabled")
+            logger.info("Scene Detection Disabled")
 
         if self.backend == "ncnn":
             from .ncnn.InterpolateNCNN import InterpolateRIFENCNN

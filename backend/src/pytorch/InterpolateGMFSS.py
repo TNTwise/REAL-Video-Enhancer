@@ -5,19 +5,19 @@ from .TorchUtils import TorchUtils
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
 import math
-import logging
 import sys
 from ..utils.Util import (
     warnAndLog,
-    log,
 )
 from ..utils.Util import CudaChecker
+from ..utils.LogConfig import get_logger
 from ..utils.Frame import Frame
 from time import sleep
 
 torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
-logging.basicConfig(level=logging.INFO)
+
+logger = get_logger(__name__)
 
 
 class InterpolateGMFSSTorch(BaseInterpolate):
@@ -126,10 +126,10 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                 max_timestep=self.max_timestep,
             )
 
-            log("GMFSS loaded")
-            log("Scale: " + str(self.scale))
+            logger.info("GMFSS loaded")
+            logger.info("Scale: %s", self.scale)
             HAS_SYSTEM_CUDA = CudaChecker().HAS_SYSTEM_CUDA
-            log("Using System CUDA: " + str(HAS_SYSTEM_CUDA))
+            logger.info("Using System CUDA: %s", HAS_SYSTEM_CUDA)
             if not HAS_SYSTEM_CUDA:
                 print(
                     "WARNING: System CUDA not found, falling back to PyTorch softsplat. This will be a bit slower.",

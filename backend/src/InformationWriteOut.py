@@ -2,13 +2,17 @@ from multiprocessing import shared_memory
 import time
 
 if __name__ != "__main__":
-    from .utils.Util import log, padFrame
+    from .utils.Util import padFrame
+    from .utils.LogConfig import get_logger
     from .utils.RealTimePrint import RealTimePrint
     from .utils.PauseManager import PauseManager
-else:
 
-    def log(message):
-        print(message)
+    logger = get_logger(__name__)
+else:
+    import logging
+
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
 
 def convertTime(remaining_time):
@@ -61,11 +65,11 @@ class InformationWriteOut:
             while True:
                 try:
                     self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID)
-                    log(f"Connected to shared memory: {self.sharedMemoryID}")
+                    logger.info("Connected to shared memory: %s", self.sharedMemoryID)
                     break
                 except FileNotFoundError:
-                    log(
-                        f"Waiting for shared memory to be created: {self.sharedMemoryID}"
+                    logger.info(
+                        "Waiting for shared memory to be created: %s", self.sharedMemoryID
                     )
                     time.sleep(0.5)
 

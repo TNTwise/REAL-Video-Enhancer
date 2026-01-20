@@ -24,9 +24,13 @@ SOFTWARE.
 
 import sys
 import os
-from ..utils.Util import suppress_stdout_stderr, warnAndLog, log
+from ..utils.Util import suppress_stdout_stderr, warnAndLog
+from ..utils.LogConfig import get_logger
 from ..version import __version__
 import time
+
+
+logger = get_logger(__name__)
 
 with suppress_stdout_stderr():
     import torch
@@ -114,9 +118,9 @@ class TorchTensorRTHandler:
                     try:
                         os.remove(model_path)
                         cleared_models = True
-                        log(f"Removed {model_path}")
+                        logger.info("Removed %s", model_path)
                     except Exception as e:
-                        log(f"Failed to remove {model_path}: {e}")
+                        logger.warning("Failed to remove %s: %s", model_path, e)
             if cleared_models:
                 print("Cleared old TensorRT models...", file=sys.stderr)
 

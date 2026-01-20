@@ -1,10 +1,15 @@
 from typing import Any, Optional
+import logging
 
 try:
     import numpy as np
 except ImportError:
     pass
-from .Util import resize_image_np, log
+from .Util import resize_image_np
+from .LogConfig import get_logger
+
+
+logger = get_logger(__name__)
 
 _pytorch_device = None
 _pytorch_dtype = None
@@ -30,7 +35,7 @@ def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
         _pytorch_stream = _torch_utils.init_stream(gpu_id=gpu_id)
         _pytorch_device = _torch_utils.handle_device(device, gpu_id)
         _pytorch_dtype = _torch_utils.handle_precision(dtype)
-        print("Initialized Frame PyTorch utils")
+        logger.info("Initialized Frame PyTorch utils")
 
 
 class Frame:

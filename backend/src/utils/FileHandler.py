@@ -2,7 +2,10 @@ import os
 import stat
 import zipfile
 import shutil
-from .Util import log
+from .LogConfig import get_logger
+
+
+logger = get_logger(__name__)
 
 
 class FileHandler:
@@ -16,7 +19,7 @@ class FileHandler:
             available_space = free / (1024**3)
             return available_space
         except Exception as e:
-            log(f"An error occurred while getting available disk space: {e}")
+            logger.exception("An error occurred while getting available disk space")
             return 0
 
     @staticmethod
@@ -40,7 +43,7 @@ class FileHandler:
         origCWD = os.getcwd()
         dir_path = os.path.dirname(os.path.realpath(file))
         os.chdir(dir_path)
-        log("Extracting: " + file)
+        logger.info("Extracting: %s", file)
         with zipfile.ZipFile(file, "r") as f:
             f.extractall(outputDirectory)
         FileHandler.removeFile(file)

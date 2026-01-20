@@ -1,8 +1,13 @@
 import os
 import argparse
 import sys
+import logging
 from src.version import __version__
-from src.utils.Util import log
+from src.utils.LogConfig import get_logger, configure_logging
+
+
+configure_logging()
+logger = get_logger(__name__)
 
 
 class HandleApplication:
@@ -41,12 +46,12 @@ class HandleApplication:
 
             if not self.batchProcessing():
                 buffer_str = "=" * len(str(sys.argv[0]))
-                log(buffer_str, False)
-                log("RVE Backend Version: " + __version__, False)
-                log(buffer_str, False)
-                log("CLI Arguments: ", False)
-                log(str(sys.argv), False)
-                log(buffer_str, False)
+                logger.info("%s", buffer_str)
+                logger.info("RVE Backend Version: %s", __version__)
+                logger.info("%s", buffer_str)
+                logger.info("CLI Arguments:")
+                logger.info("%s", sys.argv)
+                logger.info("%s", buffer_str)
                 self.renderVideo()
 
         else:
