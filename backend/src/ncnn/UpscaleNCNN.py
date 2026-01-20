@@ -4345,8 +4345,11 @@ class UpscaleNCNN:
         while self.net is None:
             sleep(1)
 
+
         img = self.net.process_bytes(
             imageChunk.get_frame_bytes(), self.width, self.height, 3
         )
-        return imageChunk.get_dummy_frame().resize_frame(
+        dummyFrame = imageChunk.get_dummy_frame()
+        del imageChunk
+        return dummyFrame.resize_frame(
             self.scale * self.width, self.scale * self.height).set_frame_bytes(img)
