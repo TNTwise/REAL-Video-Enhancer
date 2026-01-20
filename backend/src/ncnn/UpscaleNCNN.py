@@ -4348,14 +4348,5 @@ class UpscaleNCNN:
         img = self.net.process_bytes(
             imageChunk.get_frame_bytes(), self.width, self.height, 3
         )
-        retFrame = Frame(
-            self.backend,
-            self.width,
-            self.height,
-            imageChunk.device,
-            gpu_id=imageChunk.gpu_id,
-            hdr_mode=self.hdr_mode,
-            dtype=imageChunk.dtype,
-        )
-        retFrame.set_frame_bytes(img)
-        return retFrame
+        return imageChunk.get_dummy_frame().resize_frame(
+            self.scale * self.width, self.scale * self.height).set_frame_bytes(img)
