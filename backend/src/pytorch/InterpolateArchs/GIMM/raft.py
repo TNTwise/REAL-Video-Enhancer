@@ -8,20 +8,21 @@
 # ginr-ipc: https://github.com/kakaobrain/ginr-ipc
 # --------------------------------------------------------
 
-import torch
-import torch.nn as nn
 import math
+
 import einops
+import torch
 import torch.nn.functional as F
+from torch import nn
 
 device = torch.device(
-    "cuda"
+    'cuda'
     if torch.cuda.is_available()
-    else "mps"
+    else 'mps'
     if torch.backends.mps.is_available()
-    else "xpu"
+    else 'xpu'
     if torch.xpu.is_available()
-    else "cpu"
+    else 'cpu'
 )
 backwarp_tenGrid = {}
 
@@ -33,12 +34,14 @@ def warp(tenInput, tenFlow):
     k = (str(tenFlow.device), str(tenFlow.size()))
     if k not in backwarp_tenGrid:
         tenHorizontal = (
-            torch.linspace(-1.0, 1.0, tenFlow.shape[3], device=device)
+            torch
+            .linspace(-1.0, 1.0, tenFlow.shape[3], device=device)
             .view(1, 1, 1, tenFlow.shape[3])
             .expand(tenFlow.shape[0], -1, tenFlow.shape[2], -1)
         ).float()
         tenVertical = (
-            torch.linspace(-1.0, 1.0, tenFlow.shape[2], device=device)
+            torch
+            .linspace(-1.0, 1.0, tenFlow.shape[2], device=device)
             .view(1, 1, tenFlow.shape[2], 1)
             .expand(tenFlow.shape[0], -1, -1, tenFlow.shape[3])
         ).float()
@@ -55,14 +58,14 @@ def warp(tenInput, tenFlow):
     ).float()
 
     g = (backwarp_tenGrid[k] + tenFlow).permute(0, 2, 3, 1).float()
-    pd = "border"
-    if tenInput.device.type == "mps":
-        pd = "zeros"
+    pd = 'border'
+    if tenInput.device.type == 'mps':
+        pd = 'zeros'
         g = g.clamp(-1, 1)
     return torch.nn.functional.grid_sample(
         input=tenInput,
         grid=g,
-        mode="bilinear",
+        mode='bilinear',
         padding_mode=pd,
         align_corners=True,
     ).to(dtype=origdtype)
@@ -85,7 +88,7 @@ def unnormalize_flow(flows, flow_scaler):
 
 def resize(x, scale_factor):
     return F.interpolate(
-        x, scale_factor=scale_factor, mode="bilinear", align_corners=False
+        x, scale_factor=scale_factor, mode='bilinear', align_corners=False
     )
 
 
@@ -103,19 +106,19 @@ def build_coord(img):
 
 def initialize_params(params, init_type, **kwargs):
     fan_in, fan_out = params.shape[0], params.shape[1]
-    if init_type is None or init_type == "normal":
+    if init_type is None or init_type == 'normal':
         nn.init.normal_(params)
-    elif init_type == "kaiming_uniform":
+    elif init_type == 'kaiming_uniform':
         nn.init.kaiming_uniform_(params, a=math.sqrt(5))
-    elif init_type == "uniform_fan_in":
+    elif init_type == 'uniform_fan_in':
         bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
         nn.init.uniform_(params, -bound, bound)
-    elif init_type == "zero":
+    elif init_type == 'zero':
         nn.init.zeros_(params)
-    elif "siren" == init_type:
-        assert "siren_w0" in kwargs.keys() and "is_first" in kwargs.keys()
-        w0 = kwargs["siren_w0"]
-        if kwargs["is_first"]:
+    elif init_type == 'siren':
+        assert 'siren_w0' in kwargs and 'is_first' in kwargs
+        w0 = kwargs['siren_w0']
+        if kwargs['is_first']:
             w_std = 1 / fan_in
         else:
             w_std = math.sqrt(6.0 / fan_in) / w0
@@ -125,19 +128,22 @@ def initialize_params(params, init_type, **kwargs):
 
 
 def create_params_with_init(
-    shape, init_type="normal", include_bias=False, bias_init_type="zero", **kwargs
+    shape,
+    init_type='normal',
+    include_bias=False,
+    bias_init_type='zero',
+    **kwargs,
 ):
     if not include_bias:
         params = torch.empty([shape[0], shape[1]])
         initialize_params(params, init_type, **kwargs)
         return params
-    else:
-        params = torch.empty([shape[0] - 1, shape[1]])
-        bias = torch.empty([1, shape[1]])
+    params = torch.empty([shape[0] - 1, shape[1]])
+    bias = torch.empty([1, shape[1]])
 
-        initialize_params(params, init_type, **kwargs)
-        initialize_params(bias, bias_init_type, **kwargs)
-        return torch.cat([params, bias], dim=0)
+    initialize_params(params, init_type, **kwargs)
+    initialize_params(bias, bias_init_type, **kwargs)
+    return torch.cat([params, bias], dim=0)
 
 
 class CoordSampler3D(nn.Module):
@@ -162,9 +168,11 @@ class CoordSampler3D(nn.Module):
         for num_s in spatial_shape:
             num_s = int(num_s * upsample_ratio)
             _coords = (0.5 + torch.arange(num_s, device=device)) / num_s
-            _coords = coord_range[0] + (coord_range[1] - coord_range[0]) * _coords
+            _coords = (
+                coord_range[0] + (coord_range[1] - coord_range[0]) * _coords
+            )
             coords.append(_coords)
-        coords = torch.meshgrid(*coords, indexing="ij")
+        coords = torch.meshgrid(*coords, indexing='ij')
         coords = torch.stack(coords, dim=-1)
         ones_like_shape = (1,) * coords.ndim
         coords = coords.unsqueeze(0).repeat(batch_size, *ones_like_shape)
@@ -185,9 +193,11 @@ class CoordSampler3D(nn.Module):
         for num_s in spatial_shape:
             num_s = int(num_s * upsample_ratio)
             _coords = (0.5 + torch.arange(num_s, device=device)) / num_s
-            _coords = coord_range[0] + (coord_range[1] - coord_range[0]) * _coords
+            _coords = (
+                coord_range[0] + (coord_range[1] - coord_range[0]) * _coords
+            )
             coords.append(_coords)
-        coords = torch.meshgrid(*coords, indexing="ij")
+        coords = torch.meshgrid(*coords, indexing='ij')
         coords = torch.stack(coords, dim=-1)
         ones_like_shape = (1,) * coords.ndim
         # Now coords b,1,h,w,3, coords[...,0]=1.
@@ -263,7 +273,7 @@ class HypoNet(nn.Module):
 
         self.normalize_weight = True
 
-        self.ignore_base_param_dict = {name: False for name in self.params_dict}
+        self.ignore_base_param_dict = dict.fromkeys(self.params_dict, False)
 
     @staticmethod
     def subsample_coords(coords, subcoord_idx=None):
@@ -297,7 +307,7 @@ class HypoNet(nn.Module):
         pixel_latent = F.interpolate(
             pixel_latent.permute(0, 3, 1, 2),
             size=(coord_shape[1], coord_shape[2]),
-            mode="bilinear",
+            mode='bilinear',
         ).permute(0, 2, 3, 1)
         pixel_latent_dim = pixel_latent.shape[-1]
         pixel_latent = pixel_latent.view(batch_size, -1, pixel_latent_dim)
@@ -308,9 +318,9 @@ class HypoNet(nn.Module):
         hidden = self.subsample_coords(hidden, sub_idx)
 
         for idx in range(5):
-            param_key = f"linear_wb{idx}"
+            param_key = f'linear_wb{idx}'
             base_param = einops.repeat(
-                self.params_dict[param_key], "n m -> b n m", b=batch_size
+                self.params_dict[param_key], 'n m -> b n m', b=batch_size
             )
 
             if (modulation_params_dict is not None) and (
@@ -362,10 +372,10 @@ class HypoNet(nn.Module):
 
         for i in range(4):
             fan_out = self.hidden_dims[i]
-            param_shape_dict[f"linear_wb{i}"] = (fan_in, fan_out)
+            param_shape_dict[f'linear_wb{i}'] = (fan_in, fan_out)
             fan_in = fan_out + 1 if use_bias else fan_out
 
-        param_shape_dict[f"linear_wb{4}"] = (fan_in, 2)
+        param_shape_dict[f'linear_wb{4}'] = (fan_in, 2)
         return param_shape_dict
 
     def build_base_params_dict(self):
@@ -375,9 +385,9 @@ class HypoNet(nn.Module):
             is_first = idx == 0
             params = create_params_with_init(
                 shape,
-                init_type="siren",
+                init_type='siren',
                 include_bias=self.use_bias,
-                bias_init_type="siren",
+                bias_init_type='siren',
                 is_first=is_first,
                 siren_w0=1.0,  # valid only for siren
             )
@@ -390,8 +400,7 @@ class HypoNet(nn.Module):
         for param_key in params_dict.keys():
             if param_key in predefined_params_keys:
                 continue
-            else:
-                raise KeyError
+            raise KeyError
 
     def set_params_dict(self, params_dict):
         self.check_valid_param_keys(params_dict)
@@ -400,7 +409,7 @@ class HypoNet(nn.Module):
 
 class LateralBlock(nn.Module):
     def __init__(self, dim):
-        super(LateralBlock, self).__init__()
+        super().__init__()
         self.layers = nn.Sequential(
             nn.Conv2d(dim, dim, 3, 1, 1, bias=True),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
@@ -480,11 +489,16 @@ def multi_flow_combine(
 
 class ResBlock(nn.Module):
     def __init__(self, in_channels, side_channels, bias=True):
-        super(ResBlock, self).__init__()
+        super().__init__()
         self.side_channels = side_channels
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+                in_channels,
+                in_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=bias,
             ),
             nn.PReLU(in_channels),
         )
@@ -501,7 +515,12 @@ class ResBlock(nn.Module):
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(
-                in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+                in_channels,
+                in_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=bias,
             ),
             nn.PReLU(in_channels),
         )
@@ -517,7 +536,12 @@ class ResBlock(nn.Module):
             nn.PReLU(side_channels),
         )
         self.conv5 = nn.Conv2d(
-            in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+            in_channels,
+            in_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=bias,
         )
         self.prelu = nn.PReLU(in_channels)
 
@@ -552,7 +576,7 @@ class BasicUpdateBlock(nn.Module):
         scale_factor=None,
         out_num=1,
     ):
-        super(BasicUpdateBlock, self).__init__()
+        super().__init__()
         cor_planes = corr_levels * (2 * radius + 1) ** 2
 
         self.scale_factor = scale_factor
@@ -584,7 +608,9 @@ class BasicUpdateBlock(nn.Module):
 
     def forward(self, net, flow, corr):
         net = (
-            resize(net, 1 / self.scale_factor) if self.scale_factor is not None else net
+            resize(net, 1 / self.scale_factor)
+            if self.scale_factor is not None
+            else net
         )
         cor = self.lrelu(self.convc1(corr))
         cor = self.lrelu(self.convc2(cor))
@@ -662,7 +688,7 @@ class NewInitDecoder(nn.Module):
 
 class NewMultiFlowDecoder(nn.Module):
     def __init__(self, in_ch, skip_ch, num_flows=3):
-        super(NewMultiFlowDecoder, self).__init__()
+        super().__init__()
         norm_layer = get_bn()
 
         self.upsample = nn.Sequential(
@@ -685,10 +711,14 @@ class NewMultiFlowDecoder(nn.Module):
             ResBlock(in_ch * ch_factor, skip_ch),
             ResBlock(in_ch * ch_factor, skip_ch),
             ResBlock(in_ch * ch_factor, skip_ch),
-            nn.Conv2d(in_ch * ch_factor, 8 * num_flows, kernel_size=3, padding=1),
+            nn.Conv2d(
+                in_ch * ch_factor, 8 * num_flows, kernel_size=3, padding=1
+            ),
         )
 
-    def forward(self, ft_, f0, f1, flow0, flow1, mask=None, img0=None, img1=None):
+    def forward(
+        self, ft_, f0, f1, flow0, flow1, mask=None, img0=None, img1=None
+    ):
         f0 = self.upsample(f0)
         # print([f1.shape,f0.shape])
         f1 = self.upsample(f1)

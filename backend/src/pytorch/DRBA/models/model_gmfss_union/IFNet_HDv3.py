@@ -1,8 +1,7 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-
 from models.model_gmfss_union.warplayer import warp
+from torch import nn
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -22,7 +21,7 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
 
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
-        super(ResConv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1)
         self.beta = nn.Parameter(torch.ones((1, c, 1, 1)), requires_grad=True)
         self.relu = nn.LeakyReLU(0.2, True)
@@ -33,7 +32,7 @@ class ResConv(nn.Module):
 
 class IFBlock(nn.Module):
     def __init__(self, in_planes, c=64):
-        super(IFBlock, self).__init__()
+        super().__init__()
         self.conv0 = nn.Sequential(
             conv(in_planes, c // 2, 3, 2, 1),
             conv(c // 2, c, 3, 2, 1),
@@ -54,12 +53,15 @@ class IFBlock(nn.Module):
 
     def forward(self, x, flow=None, scale=1):
         x = F.interpolate(
-            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+            x, scale_factor=1.0 / scale, mode='bilinear', align_corners=False
         )
         if flow is not None:
             flow = (
                 F.interpolate(
-                    flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+                    flow,
+                    scale_factor=1.0 / scale,
+                    mode='bilinear',
+                    align_corners=False,
                 )
                 * 1.0
                 / scale
@@ -69,7 +71,7 @@ class IFBlock(nn.Module):
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
         tmp = F.interpolate(
-            tmp, scale_factor=scale, mode="bilinear", align_corners=False
+            tmp, scale_factor=scale, mode='bilinear', align_corners=False
         )
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
@@ -78,7 +80,7 @@ class IFBlock(nn.Module):
 
 class IFNet(nn.Module):
     def __init__(self):
-        super(IFNet, self).__init__()
+        super().__init__()
         self.block0 = IFBlock(7, c=192)
         self.block1 = IFBlock(8 + 4, c=128)
         self.block2 = IFBlock(8 + 4, c=96)
@@ -121,7 +123,13 @@ class IFNet(nn.Module):
             else:
                 f0, m0 = block[i](
                     torch.cat(
-                        (warped_img0[:, :3], warped_img1[:, :3], timestep, mask), 1
+                        (
+                            warped_img0[:, :3],
+                            warped_img1[:, :3],
+                            timestep,
+                            mask,
+                        ),
+                        1,
                     ),
                     flow,
                     scale=scale_list[i],

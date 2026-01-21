@@ -1,1 +1,1 @@
-__all__ = ["BorderDetect", "Util", "SSIM", "SceneDetect"]
+__all__ = ['SSIM', 'BorderDetect', 'SceneDetect', 'Util']

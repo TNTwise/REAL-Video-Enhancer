@@ -1,19 +1,21 @@
-import torch
-import torch.nn.functional as F
-from .TorchUtils import TorchUtils
-
-# from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
-from .BaseInterpolate import BaseInterpolate
 import math
 import sys
+from time import sleep
+
+import torch
+import torch.nn.functional as F
+
+from ..utils.Frame import Frame
+from ..utils.LogConfig import get_logger
 from ..utils.Util import (
     warnAndLog,
 )
-from ..utils.LogConfig import get_logger
-from ..utils.Frame import Frame
-from time import sleep
 
-torch.set_float32_matmul_precision("medium")
+# from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
+from .BaseInterpolate import BaseInterpolate
+from .TorchUtils import TorchUtils
+
+torch.set_float32_matmul_precision('medium')
 torch.set_grad_enabled(False)
 
 logger = get_logger(__name__)
@@ -27,9 +29,9 @@ class InterpolateGIMMTorch(BaseInterpolate):
         ceilInterpolateFactor: int = 2,
         width: int = 1920,
         height: int = 1080,
-        device: str = "default",
-        dtype: str = "auto",
-        backend: str = "pytorch",
+        device: str = 'default',
+        dtype: str = 'auto',
+        backend: str = 'pytorch',
         UHDMode: bool = False,
         ensemble: bool = False,
         dynamicScaledOpticalFlow: bool = False,
@@ -59,10 +61,13 @@ class InterpolateGIMMTorch(BaseInterpolate):
         self.device = self.torchUtils.handle_device(device, gpu_id=gpu_id)
         self.dtype = self.torchUtils.handle_precision(dtype)
         if ensemble:
-            print("Ensemble is not implemented for GIMM, disabling", file=sys.stderr)
+            print(
+                'Ensemble is not implemented for GIMM, disabling',
+                file=sys.stderr,
+            )
         if dynamicScaledOpticalFlow:
             print(
-                "Dynamic Scaled Optical Flow is not implemented for GIMM, disabling",
+                'Dynamic Scaled Optical Flow is not implemented for GIMM, disabling',
                 file=sys.stderr,
             )
 
@@ -83,11 +88,13 @@ class InterpolateGIMMTorch(BaseInterpolate):
             from .InterpolateArchs.GIMM.gimmvfi_r import GIMMVFI_R
 
             self.flownet = GIMMVFI_R(
-                model_path=self.interpolateModel, width=self.width, height=self.height
+                model_path=self.interpolateModel,
+                width=self.width,
+                height=self.height,
             )
-            state_dict = torch.load(self.interpolateModel, map_location=self.device)[
-                "gimmvfi_r"
-            ]
+            state_dict = torch.load(
+                self.interpolateModel, map_location=self.device
+            )['gimmvfi_r']
             self.flownet.load_state_dict(state_dict)
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
 
@@ -113,7 +120,8 @@ class InterpolateGIMMTorch(BaseInterpolate):
                     n
                     * 1
                     / self.ceilInterpolateFactor
-                    * torch.ones(xs.shape[0])
+                    * torch
+                    .ones(xs.shape[0])
                     .to(xs.device)
                     .to(self.dtype)
                     .reshape(-1, 1, 1, 1)
@@ -126,16 +134,18 @@ class InterpolateGIMMTorch(BaseInterpolate):
                         [1 / self.ceilInterpolateFactor * n],
                         device=self.device,
                         upsample_ratio=self.scale,
-                    ).to(non_blocking=True, dtype=self.dtype, device=self.device),
+                    ).to(
+                        non_blocking=True, dtype=self.dtype, device=self.device
+                    ),
                     None,
                 )
                 self.coordDict[timestep] = coord
 
-            logger.info("GIMM loaded")
-            logger.info("Scale: %s", self.scale)
-            if self.backend == "tensorrt":
+            logger.info('GIMM loaded')
+            logger.info('Scale: %s', self.scale)
+            if self.backend == 'tensorrt':
                 warnAndLog(
-                    "TensorRT is not implemented for GIMM yet, falling back to PyTorch"
+                    'TensorRT is not implemented for GIMM yet, falling back to PyTorch'
                 )
         self.torchUtils.sync_stream(self.prepareStream)  # type: ignore
 
@@ -164,14 +174,16 @@ class InterpolateGIMMTorch(BaseInterpolate):
 
                     while self.flownet is None:
                         sleep(1)
-                    with torch.autocast(enabled=True, device_type=self.device.type):
+                    with torch.autocast(
+                        enabled=True, device_type=self.device.type
+                    ):
                         output = self.flownet(
                             xs, coord, timestep_tens, ds_factor=self.scale
                         )
 
                     if torch.isnan(output).any():
                         # if there are nans in output, reload with float32 precision and process.... dumb fix but whatever
-                        raise ValueError("Nans in output")
+                        raise ValueError('Nans in output')
 
                     yield img1.get_dummy_frame().set_frame_tensor(
                         output[:, :, : self.height, : self.width].to(self.dtype)

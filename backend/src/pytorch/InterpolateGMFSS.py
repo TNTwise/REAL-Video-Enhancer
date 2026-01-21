@@ -1,20 +1,22 @@
+import math
+import sys
+from time import sleep
+
 import torch
 import torch.nn.functional as F
-from .TorchUtils import TorchUtils
+
+from ..utils.Frame import Frame
+from ..utils.LogConfig import get_logger
+from ..utils.Util import (
+    CudaChecker,
+    warnAndLog,
+)
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
-import math
-import sys
-from ..utils.Util import (
-    warnAndLog,
-)
-from ..utils.Util import CudaChecker
-from ..utils.LogConfig import get_logger
-from ..utils.Frame import Frame
-from time import sleep
+from .TorchUtils import TorchUtils
 
-torch.set_float32_matmul_precision("medium")
+torch.set_float32_matmul_precision('medium')
 torch.set_grad_enabled(False)
 
 logger = get_logger(__name__)
@@ -28,9 +30,9 @@ class InterpolateGMFSSTorch(BaseInterpolate):
         ceilInterpolateFactor: int = 2,
         width: int = 1920,
         height: int = 1080,
-        device: str = "default",
-        dtype: str = "auto",
-        backend: str = "pytorch",
+        device: str = 'default',
+        dtype: str = 'auto',
+        backend: str = 'pytorch',
         UHDMode: bool = False,
         ensemble: bool = False,
         dynamicScaledOpticalFlow: bool = False,
@@ -85,7 +87,9 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                 from ..utils.SSIM import SSIM
 
                 compareNet = SSIM()
-                self.CompareNet = compareNet.to(device=self.device, dtype=self.dtype)
+                self.CompareNet = compareNet.to(
+                    device=self.device, dtype=self.dtype
+                )
                 possible_values = {
                     0.25: 0.25,
                     0.5: 0.5,
@@ -94,15 +98,15 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                 self.dynamicScale = DynamicScale(
                     possible_values=possible_values, CompareNet=compareNet
                 )
-                print("Dynamic Scaled Optical Flow Enabled")
-                if self.backend == "tensorrt":
+                print('Dynamic Scaled Optical Flow Enabled')
+                if self.backend == 'tensorrt':
                     print(
-                        "Dynamic Scaled Optical Flow does not work with TensorRT, disabling",
+                        'Dynamic Scaled Optical Flow does not work with TensorRT, disabling',
                         file=sys.stderr,
                     )
                 if self.UHDMode:
                     print(
-                        "Dynamic Scaled Optical Flow does not work with UHD Mode, disabling",
+                        'Dynamic Scaled Optical Flow does not work with UHD Mode, disabling',
                         file=sys.stderr,
                     )
             from .InterpolateArchs.GMFSS.GMFSS import GMFSS
@@ -126,18 +130,18 @@ class InterpolateGMFSSTorch(BaseInterpolate):
                 max_timestep=self.max_timestep,
             )
 
-            logger.info("GMFSS loaded")
-            logger.info("Scale: %s", self.scale)
+            logger.info('GMFSS loaded')
+            logger.info('Scale: %s', self.scale)
             HAS_SYSTEM_CUDA = CudaChecker().HAS_SYSTEM_CUDA
-            logger.info("Using System CUDA: %s", HAS_SYSTEM_CUDA)
+            logger.info('Using System CUDA: %s', HAS_SYSTEM_CUDA)
             if not HAS_SYSTEM_CUDA:
                 print(
-                    "WARNING: System CUDA not found, falling back to PyTorch softsplat. This will be a bit slower.",
+                    'WARNING: System CUDA not found, falling back to PyTorch softsplat. This will be a bit slower.',
                     file=sys.stderr,
                 )
-            if self.backend == "tensorrt":
+            if self.backend == 'tensorrt':
                 warnAndLog(
-                    "TensorRT is not implemented for GMFSS yet, falling back to PyTorch"
+                    'TensorRT is not implemented for GMFSS yet, falling back to PyTorch'
                 )
         self.torchUtils.sync_stream(self.prepareStream)  # type: ignore
 

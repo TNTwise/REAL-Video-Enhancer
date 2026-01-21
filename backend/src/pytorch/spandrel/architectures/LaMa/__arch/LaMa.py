@@ -7,16 +7,19 @@ Model adapted from advimman's lama project: https://github.com/advimman/lama
 # original implementation https://github.com/pkumivision/FFC/blob/main/model_zoo/ffc.py
 # paper https://proceedings.neurips.cc/paper/2020/file/2fd5d41ec6cfab47e32164d5624269b1-Paper.pdf
 
+
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 from torchvision.transforms.functional import InterpolationMode, rotate
 
 from ....util import store_hyperparameters
 
 
 class LearnableSpatialTransformWrapper(nn.Module):
-    def __init__(self, impl, pad_coef=0.5, angle_init_range=80, train_angle=True):
+    def __init__(
+        self, impl, pad_coef=0.5, angle_init_range=80, train_angle=True
+    ):
         super().__init__()
         self.impl = impl
         self.angle = torch.rand(1) * angle_init_range
@@ -27,21 +30,23 @@ class LearnableSpatialTransformWrapper(nn.Module):
     def forward(self, x):
         if torch.is_tensor(x):
             return self.inverse_transform(self.impl(self.transform(x)), x)
-        elif isinstance(x, tuple):
+        if isinstance(x, tuple):
             x_trans = tuple(self.transform(elem) for elem in x)
             y_trans = self.impl(x_trans)
             return tuple(
-                self.inverse_transform(elem, orig_x) for elem, orig_x in zip(y_trans, x)
+                map(self.inverse_transform, y_trans, x)
             )
-        else:
-            raise ValueError(f"Unexpected input type {type(x)}")
+        raise ValueError(f'Unexpected input type {type(x)}')
 
     def transform(self, x):
         height, width = x.shape[2:]
         pad_h, pad_w = int(height * self.pad_coef), int(width * self.pad_coef)
-        x_padded = F.pad(x, [pad_w, pad_w, pad_h, pad_h], mode="reflect")
+        x_padded = F.pad(x, [pad_w, pad_w, pad_h, pad_h], mode='reflect')
         x_padded_rotated = rotate(
-            x_padded, self.angle.to(x_padded), InterpolationMode.BILINEAR, fill=0
+            x_padded,
+            self.angle.to(x_padded),
+            InterpolationMode.BILINEAR,
+            fill=0,
         )
 
         return x_padded_rotated
@@ -87,12 +92,12 @@ class FourierUnit(nn.Module):
         out_channels,
         groups=1,
         spatial_scale_factor=None,
-        spatial_scale_mode="bilinear",
+        spatial_scale_mode='bilinear',
         spectral_pos_encoding=False,
         use_se=False,
         se_kwargs=None,
         ffc3d=False,
-        fft_norm="ortho",
+        fft_norm='ortho',
     ):
         # bn_layer not used
         super().__init__()
@@ -125,7 +130,7 @@ class FourierUnit(nn.Module):
 
     def forward(self, x):
         half_check = False
-        if x.type() == "torch.cuda.HalfTensor":
+        if x.type() == 'torch.cuda.HalfTensor':
             # half only works on gpu anyway
             half_check = True
 
@@ -150,7 +155,9 @@ class FourierUnit(nn.Module):
             ffted = torch.fft.rfftn(x, dim=fft_dim, norm=self.fft_norm)
 
         ffted = torch.stack((ffted.real, ffted.imag), dim=-1)
-        ffted = ffted.permute(0, 1, 4, 2, 3).contiguous()  # (batch, c, 2, h, w/2+1)
+        ffted = ffted.permute(
+            0, 1, 4, 2, 3
+        ).contiguous()  # (batch, c, 2, h, w/2+1)
         ffted = ffted.view(
             (
                 batch,
@@ -162,12 +169,14 @@ class FourierUnit(nn.Module):
         if self.spectral_pos_encoding:
             height, width = ffted.shape[-2:]
             coords_vert = (
-                torch.linspace(0, 1, height)[None, None, :, None]
+                torch
+                .linspace(0, 1, height)[None, None, :, None]
                 .expand(batch, 1, height, width)
                 .to(ffted)
             )
             coords_hor = (
-                torch.linspace(0, 1, width)[None, None, None, :]
+                torch
+                .linspace(0, 1, width)[None, None, None, :]
                 .expand(batch, 1, height, width)
                 .to(ffted)
             )
@@ -188,7 +197,8 @@ class FourierUnit(nn.Module):
         ffted = ffted.float()
 
         ffted = (
-            ffted.view(
+            ffted
+            .view(
                 (
                     batch,
                     -1,
@@ -243,17 +253,27 @@ class SpectralTransform(nn.Module):
         self.stride = stride
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels, out_channels // 2, kernel_size=1, groups=groups, bias=False
+                in_channels,
+                out_channels // 2,
+                kernel_size=1,
+                groups=groups,
+                bias=False,
             ),
             nn.BatchNorm2d(out_channels // 2),
             nn.ReLU(inplace=True),
         )
         fu_class = FourierUnit
-        self.fu = fu_class(out_channels // 2, out_channels // 2, groups, **fu_kwargs)
+        self.fu = fu_class(
+            out_channels // 2, out_channels // 2, groups, **fu_kwargs
+        )
         if self.enable_lfu:
             self.lfu = fu_class(out_channels // 2, out_channels // 2, groups)
         self.conv2 = torch.nn.Conv2d(
-            out_channels // 2, out_channels, kernel_size=1, groups=groups, bias=False
+            out_channels // 2,
+            out_channels,
+            kernel_size=1,
+            groups=groups,
+            bias=False,
         )
 
     def forward(self, x):
@@ -293,13 +313,13 @@ class FFC(nn.Module):
         groups=1,
         bias=False,
         enable_lfu=True,
-        padding_type="reflect",
+        padding_type='reflect',
         gated=False,
         **spectral_kwargs,
     ):
         super().__init__()
 
-        assert stride == 1 or stride == 2, "Stride should be 1 or 2."
+        assert stride == 1 or stride == 2, 'Stride should be 1 or 2.'
         self.stride = stride
 
         in_cg = int(in_channels * ratio_gin)
@@ -361,7 +381,9 @@ class FFC(nn.Module):
 
         self.gated = gated
         module = (
-            nn.Identity if in_cg == 0 or out_cl == 0 or not self.gated else nn.Conv2d
+            nn.Identity
+            if in_cg == 0 or out_cl == 0 or not self.gated
+            else nn.Conv2d
         )
         self.gate = module(in_channels, 2, 1)
 
@@ -403,7 +425,7 @@ class FFC_BN_ACT(nn.Module):
         bias=False,
         norm_layer=nn.BatchNorm2d,
         activation_layer=nn.Identity,
-        padding_type="reflect",
+        padding_type='reflect',
         enable_lfu=True,
         **kwargs,
     ):
@@ -525,7 +547,7 @@ class FFCResNetGenerator(nn.Module):
         n_downsampling=3,
         n_blocks=18,
         norm_layer=nn.BatchNorm2d,
-        padding_type="reflect",
+        padding_type='reflect',
         activation_layer=nn.ReLU,
         up_norm_layer=nn.BatchNorm2d,
         up_activation=nn.ReLU(True),
@@ -560,12 +582,20 @@ class FFCResNetGenerator(nn.Module):
         ReLU(inplace=True)
         None sigmoid 1024 False
         """
-        init_conv_kwargs = {"ratio_gin": 0, "ratio_gout": 0, "enable_lfu": False}
-        downsample_conv_kwargs = {"ratio_gin": 0, "ratio_gout": 0, "enable_lfu": False}
+        init_conv_kwargs = {
+            'ratio_gin': 0,
+            'ratio_gout': 0,
+            'enable_lfu': False,
+        }
+        downsample_conv_kwargs = {
+            'ratio_gin': 0,
+            'ratio_gout': 0,
+            'enable_lfu': False,
+        }
         resnet_conv_kwargs = {
-            "ratio_gin": 0.75,
-            "ratio_gout": 0.75,
-            "enable_lfu": False,
+            'ratio_gin': 0.75,
+            'ratio_gout': 0.75,
+            'enable_lfu': False,
         }
         spatial_transform_kwargs = {}
         out_ffc_kwargs = {}
@@ -583,12 +613,14 @@ class FFCResNetGenerator(nn.Module):
             ),
         ]
 
-        ### downsample
+        # downsample
         for i in range(n_downsampling):
             mult = 2**i
             if i == n_downsampling - 1:
                 cur_conv_kwargs = dict(downsample_conv_kwargs)
-                cur_conv_kwargs["ratio_gout"] = resnet_conv_kwargs.get("ratio_gin", 0)
+                cur_conv_kwargs['ratio_gout'] = resnet_conv_kwargs.get(
+                    'ratio_gin', 0
+                )
             else:
                 cur_conv_kwargs = downsample_conv_kwargs
             model += [
@@ -607,7 +639,7 @@ class FFCResNetGenerator(nn.Module):
         mult = 2**n_downsampling
         feats_num_bottleneck = min(max_features, ngf * mult)
 
-        ### resnet blocks
+        # resnet blocks
         for i in range(n_blocks):
             cur_resblock = FFCResnetBlock(
                 feats_num_bottleneck,
@@ -616,7 +648,10 @@ class FFCResNetGenerator(nn.Module):
                 norm_layer=norm_layer,
                 **resnet_conv_kwargs,
             )
-            if spatial_transform_layers is not None and i in spatial_transform_layers:
+            if (
+                spatial_transform_layers is not None
+                and i in spatial_transform_layers
+            ):
                 cur_resblock = LearnableSpatialTransformWrapper(
                     cur_resblock, **spatial_transform_kwargs
                 )
@@ -624,7 +659,7 @@ class FFCResNetGenerator(nn.Module):
 
         model += [ConcatTupleLayer()]
 
-        ### upsample
+        # upsample
         for i in range(n_downsampling):
             mult = 2 ** (n_downsampling - i)
             model += [

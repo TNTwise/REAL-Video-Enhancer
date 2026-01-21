@@ -1,6 +1,5 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
 
 
 # Residual Block
@@ -41,7 +40,12 @@ def DownsampleBlock(in_channels, out_channels, stride=2):
         ),
         nn.PReLU(),
         nn.Conv2d(
-            out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=True,
         ),
     )
 
@@ -60,14 +64,19 @@ def UpsampleBlock(in_channels, out_channels, stride=2):
         ),
         nn.PReLU(),
         nn.Conv2d(
-            out_channels, out_channels, kernel_size=3, stride=1, padding=1, bias=True
+            out_channels,
+            out_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=True,
         ),
     )
 
 
 class PixelShuffleBlcok(nn.Module):
     def __init__(self, in_feat, num_feat, num_out_ch):
-        super(PixelShuffleBlcok, self).__init__()
+        super().__init__()
         self.conv_before_upsample = nn.Sequential(
             nn.Conv2d(in_feat, num_feat, 3, 1, 1), nn.PReLU()
         )
@@ -85,9 +94,14 @@ class PixelShuffleBlcok(nn.Module):
 # grid network
 class GridNet(nn.Module):
     def __init__(
-        self, in_channels, in_channels1, in_channels2, in_channels3, out_channels
+        self,
+        in_channels,
+        in_channels1,
+        in_channels2,
+        in_channels3,
+        out_channels,
     ):
-        super(GridNet, self).__init__()
+        super().__init__()
 
         self.residual_model_head = ResidualBlock(in_channels, 64)
         self.residual_model_head1 = ResidualBlock(in_channels1, 64)
@@ -113,8 +127,6 @@ class GridNet(nn.Module):
         self.residual_model_24 = ResidualBlock(192, 192)
         self.residual_model_25 = ResidualBlock(192, 192)
 
-        #
-
         self.downsample_model_10 = DownsampleBlock(64, 128)
         self.downsample_model_20 = DownsampleBlock(128, 192)
 
@@ -123,8 +135,6 @@ class GridNet(nn.Module):
 
         # self.downsample_model_12=DownsampleBlock(64, 128)
         # self.downsample_model_22=DownsampleBlock(128, 192)
-
-        #
 
         # self.upsample_model_03=UpsampleBlock(128, 64)
         # self.upsample_model_13=UpsampleBlock(192, 128)
@@ -141,7 +151,9 @@ class GridNet(nn.Module):
         )  # ---   182 ~ 185
         # X10 = self.residual_model_head1(x1)
 
-        X01 = self.residual_model_01(X00) + X00  # ---   208 ~ 211 ,AddBackward1213
+        X01 = (
+            self.residual_model_01(X00) + X00
+        )  # ---   208 ~ 211 ,AddBackward1213
 
         X10 = self.downsample_model_10(X00) + self.residual_model_head2(
             x2
@@ -162,23 +174,35 @@ class GridNet(nn.Module):
         downsample_21 = self.downsample_model_21(X11)  # 219 ~ 222
         X21 = residual_21 + downsample_21  # AddBackward1223
 
-        X24 = self.residual_model_24(X21) + X21  # ---   224 ~ 227 , AddBackward1229
-        X25 = self.residual_model_25(X24) + X24  # ---   230 ~ 233 , AddBackward1235
+        X24 = (
+            self.residual_model_24(X21) + X21
+        )  # ---   224 ~ 227 , AddBackward1229
+        X25 = (
+            self.residual_model_25(X24) + X24
+        )  # ---   230 ~ 233 , AddBackward1235
 
         upsample_14 = self.upsample_model_14(X24)  # 242 ~ 246
-        residual_14 = self.residual_model_14(X11) + X11  # 248 ~ 251, AddBackward1253
+        residual_14 = (
+            self.residual_model_14(X11) + X11
+        )  # 248 ~ 251, AddBackward1253
         X14 = upsample_14 + residual_14  # ---   AddBackward1254
 
         upsample_04 = self.upsample_model_04(X14)  # 268 ~ 272
-        residual_04 = self.residual_model_04(X01) + X01  # 274 ~ 277, AddBackward1279
+        residual_04 = (
+            self.residual_model_04(X01) + X01
+        )  # 274 ~ 277, AddBackward1279
         X04 = upsample_04 + residual_04  # ---  AddBackward1280
 
         upsample_15 = self.upsample_model_15(X25)  # 236 ~ 240
-        residual_15 = self.residual_model_15(X14) + X14  # 255 ~ 258, AddBackward1260
+        residual_15 = (
+            self.residual_model_15(X14) + X14
+        )  # 255 ~ 258, AddBackward1260
         X15 = upsample_15 + residual_15  # AddBackward1261
 
         upsample_05 = self.upsample_model_05(X15)  # 262 ~ 266
-        residual_05 = self.residual_model_05(X04) + X04  # 281 ~ 284,AddBackward1286
+        residual_05 = (
+            self.residual_model_05(X04) + X04
+        )  # 281 ~ 284,AddBackward1286
         X05 = upsample_05 + residual_05  # AddBackward1287
 
         X_tail = self.residual_model_tail(X05)  # 288 ~ 291

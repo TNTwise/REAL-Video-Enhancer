@@ -22,11 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+
 import torch
-import torch.nn as nn
-import math
-
-
+from torch import nn
 from torch.nn.functional import interpolate
 
 from ..util.warplayer import warp
@@ -47,7 +45,9 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
+def conv_bn(
+    in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1
+):
     return nn.Sequential(
         nn.Conv2d(
             in_planes,
@@ -65,7 +65,7 @@ def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=
 
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
-        super(MyPixelShuffle, self).__init__()
+        super().__init__()
         self.upscale_factor = upscale_factor
 
     def forward(self, x):
@@ -81,7 +81,7 @@ class MyPixelShuffle(nn.Module):
 
 class Head(nn.Module):
     def __init__(self):
-        super(Head, self).__init__()
+        super().__init__()
         self.cnn0 = nn.Conv2d(3, 32, 3, 2, 1)
         self.cnn1 = nn.Conv2d(32, 32, 3, 1, 1)
         self.cnn2 = nn.Conv2d(32, 32, 3, 1, 1)
@@ -104,7 +104,7 @@ class Head(nn.Module):
 
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
-        super(ResConv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1)
         self.beta = nn.Parameter(torch.ones((1, c, 1, 1)), requires_grad=True)
         self.relu = nn.LeakyReLU(0.2, True)
@@ -115,7 +115,7 @@ class ResConv(nn.Module):
 
 class IFBlock(nn.Module):
     def __init__(self, in_planes, c=64):
-        super(IFBlock, self).__init__()
+        super().__init__()
         self.conv0 = nn.Sequential(
             conv(in_planes, c // 2, 3, 2, 1),
             conv(c // 2, c, 3, 2, 1),
@@ -136,12 +136,15 @@ class IFBlock(nn.Module):
 
     def forward(self, x, flow=None, scale=1):
         x = interpolate(
-            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+            x, scale_factor=1.0 / scale, mode='bilinear', align_corners=False
         )
         if flow is not None:
             flow = (
                 interpolate(
-                    flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+                    flow,
+                    scale_factor=1.0 / scale,
+                    mode='bilinear',
+                    align_corners=False,
                 )
                 / scale
             )
@@ -149,7 +152,9 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
+        tmp = interpolate(
+            tmp, scale_factor=scale, mode='bilinear', align_corners=False
+        )
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask
@@ -161,7 +166,7 @@ class IFNet(nn.Module):
         scale=1.0,
         ensemble=False,
     ):
-        super(IFNet, self).__init__()
+        super().__init__()
         self.block0 = IFBlock(7 + 16, c=192)
         self.block1 = IFBlock(8 + 4 + 16, c=128)
         self.block2 = IFBlock(8 + 4 + 16, c=96)
@@ -172,7 +177,15 @@ class IFNet(nn.Module):
         self.blocks = [self.block0, self.block1, self.block2, self.block3]
 
     def forward(
-        self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid, f0, f1, scale=None
+        self,
+        img0,
+        img1,
+        timestep,
+        tenFlow_div,
+        backwarp_tenGrid,
+        f0,
+        f1,
+        scale=None,
     ):
         img0 = img0.clamp(0.0, 1.0)
         img1 = img1.clamp(0.0, 1.0)
@@ -237,6 +250,8 @@ class IFNet(nn.Module):
                     mask = m0
                 flow = flow + fd
             warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
-            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
+            warped_img1 = warp(
+                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
+            )
         mask = torch.sigmoid(mask)
         return warped_img0 * mask + warped_img1 * (1 - mask)

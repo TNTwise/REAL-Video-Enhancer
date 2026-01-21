@@ -1,8 +1,11 @@
 from typing_extensions import override
 
+from ...__helpers.model_descriptor import (
+    Architecture,
+    ImageModelDescriptor,
+    StateDict,
+)
 from ...util import KeyCondition, get_scale_and_output_channels, get_seq_len
-
-from ...__helpers.model_descriptor import Architecture, ImageModelDescriptor, StateDict
 from .__arch.Sebica import RTSRSebica as Sebica
 
 
@@ -11,13 +14,13 @@ class SebicaArch(Architecture[Sebica]):
         self,
     ) -> None:
         super().__init__(
-            id="Sebica",
-            name="Sebica",
+            id='Sebica',
+            name='Sebica',
             detect=KeyCondition.has_all(
-                "head.1.weight",
-                "body.0.pre_mixer.conv.0.weight",
-                "body.0.pre_mixer.conv.1.weight",
-                "body.0.post_mixer.ffn.0.weight",
+                'head.1.weight',
+                'body.0.pre_mixer.conv.0.weight',
+                'body.0.pre_mixer.conv.1.weight',
+                'body.0.post_mixer.ffn.0.weight',
             ),
         )
 
@@ -30,13 +33,15 @@ class SebicaArch(Architecture[Sebica]):
         attn_blocks = 6
         state = state_dict
 
-        attn_blocks = get_seq_len(state, "body")
-        num_in_ch = state["head.0.weight"].shape[1]
+        attn_blocks = get_seq_len(state, 'body')
+        num_in_ch = state['head.0.weight'].shape[1]
 
-        num_feat = state["head.1.weight"].shape[0]
-        pixelshuffle_shape = state_dict["tail.0.weight"].shape[0]
+        num_feat = state['head.1.weight'].shape[0]
+        pixelshuffle_shape = state_dict['tail.0.weight'].shape[0]
 
-        scale, num_out_ch = get_scale_and_output_channels(pixelshuffle_shape, num_in_ch)
+        scale, num_out_ch = get_scale_and_output_channels(
+            pixelshuffle_shape, num_in_ch
+        )
         model = Sebica(
             sr_rate=scale,
             num_feat=num_feat,
@@ -49,8 +54,8 @@ class SebicaArch(Architecture[Sebica]):
             model,
             state,
             architecture=self,
-            purpose="Restoration" if scale == 1 else "SR",
-            tags=[f"{num_feat}nf"],
+            purpose='Restoration' if scale == 1 else 'SR',
+            tags=[f'{num_feat}nf'],
             supports_half=True,
             supports_bfloat16=True,
             scale=scale,
@@ -59,4 +64,4 @@ class SebicaArch(Architecture[Sebica]):
         )
 
 
-__all__ = ["SebicaArch", "Sebica"]
+__all__ = ['Sebica', 'SebicaArch']

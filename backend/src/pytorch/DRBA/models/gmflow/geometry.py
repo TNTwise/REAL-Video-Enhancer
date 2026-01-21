@@ -44,7 +44,9 @@ def generate_window_grid(
             torch.linspace(h_min, h_max, len_h, device=device),
         ],
     )
-    grid = torch.stack((x, y), -1).transpose(0, 1).to(device, dtype=dtype)  # [H, W, 2]
+    grid = (
+        torch.stack((x, y), -1).transpose(0, 1).to(device, dtype=dtype)
+    )  # [H, W, 2]
     window_grid_cache[k] = grid
     return grid
 
@@ -59,14 +61,16 @@ def normalize_coords(coords, h, w):
         c = normalize_coords_cache[k]
     else:
         c = torch.tensor(
-            [(w - 1) / 2.0, (h - 1) / 2.0], dtype=coords.dtype, device=coords.device
+            [(w - 1) / 2.0, (h - 1) / 2.0],
+            dtype=coords.dtype,
+            device=coords.device,
         )
         normalize_coords_cache[k] = c
     return (coords - c) / c  # [-1, 1]
 
 
 def bilinear_sample(
-    img, sample_coords, mode="bilinear", padding_mode="zeros", return_mask=False
+    img, sample_coords, mode='bilinear', padding_mode='zeros', return_mask=False
 ):
     # img: [B, C, H, W]
     # sample_coords: [B, 2, H, W] in image scale
@@ -95,7 +99,7 @@ def bilinear_sample(
     return img
 
 
-def flow_warp(feature, flow, mask=False, padding_mode="zeros"):
+def flow_warp(feature, flow, mask=False, padding_mode='zeros'):
     b, c, h, w = feature.size()
     assert flow.size(1) == 2
 
@@ -103,15 +107,21 @@ def flow_warp(feature, flow, mask=False, padding_mode="zeros"):
         coords_grid(b, h, w, device=flow.device, dtype=flow.dtype) + flow
     )  # [B, 2, H, W]
 
-    return bilinear_sample(feature, grid, padding_mode=padding_mode, return_mask=mask)
+    return bilinear_sample(
+        feature, grid, padding_mode=padding_mode, return_mask=mask
+    )
 
 
-def forward_backward_consistency_check(fwd_flow, bwd_flow, alpha=0.01, beta=0.5):
+def forward_backward_consistency_check(
+    fwd_flow, bwd_flow, alpha=0.01, beta=0.5
+):
     # fwd_flow, bwd_flow: [B, 2, H, W]
     # alpha and beta values are following UnFlow (https://arxiv.org/abs/1711.07837)
     assert fwd_flow.dim() == 4 and bwd_flow.dim() == 4
     assert fwd_flow.size(1) == 2 and bwd_flow.size(1) == 2
-    flow_mag = torch.norm(fwd_flow, dim=1) + torch.norm(bwd_flow, dim=1)  # [B, H, W]
+    flow_mag = torch.norm(fwd_flow, dim=1) + torch.norm(
+        bwd_flow, dim=1
+    )  # [B, H, W]
 
     warped_bwd_flow = flow_warp(bwd_flow, fwd_flow)  # [B, 2, H, W]
     warped_fwd_flow = flow_warp(fwd_flow, bwd_flow)  # [B, 2, H, W]

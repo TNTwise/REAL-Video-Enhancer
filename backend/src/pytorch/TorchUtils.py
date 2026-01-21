@@ -1,7 +1,8 @@
+import sys
+
 import torch
 import torch.nn.functional as F
-import sys
-import logging
+
 from ..utils.BackendDetect import BackendDetect
 from ..utils.LogConfig import get_logger
 
@@ -20,7 +21,6 @@ def dummy_function(*args, **kwargs):
     A dummy function that does nothing.
     This is used as a placeholder for device-specific functions that may not be available.
     """
-    pass
 
 
 def dummy_context_manager(*args, **kwargs):
@@ -44,28 +44,34 @@ class DummyContextManager:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_type:
-            logger.exception("An exception occurred")
+            logger.exception('An exception occurred')
         return False  # re-raise exceptions if any
 
 
 class TorchUtils:
     # device and precision are in string formats, loaded straight from the command line arguments
     def __init__(
-        self, width, height, device_type: str, hdr_mode=False, padding=None, gpu_id=0
+        self,
+        width,
+        height,
+        device_type: str,
+        hdr_mode=False,
+        padding=None,
+        gpu_id=0,
     ):
         self.width = width
         self.height = height
         self.hdr_mode = hdr_mode
         self.gpu_id = gpu_id
-        if device_type == "auto":
+        if device_type == 'auto':
             self.device_type = (
-                "cuda"
+                'cuda'
                 if torch.cuda.is_available()
-                else "mps"
+                else 'mps'
                 if torch.backends.mps.is_available()
-                else "xpu"
+                else 'xpu'
                 if torch.xpu.is_available()
-                else "cpu"
+                else 'cpu'
             )
         else:
             self.device_type = device_type
@@ -75,7 +81,7 @@ class TorchUtils:
             self.use_numpy = True
         except Exception:
             logger.warning(
-                "Failed to create a Numpy tensor; this will heavily reduce performance.",
+                'Failed to create a Numpy tensor; this will heavily reduce performance.',
                 exc_info=True,
             )
             self.use_numpy = False
@@ -83,16 +89,19 @@ class TorchUtils:
         self.__sync_all_streams_func = self.__sync_all_streams_function()
 
     def __sync_all_streams_function(self):
-        if self.device_type == "cuda":
+        if self.device_type == 'cuda':
             return torch.cuda.synchronize
-        if self.device_type == "mps":
+        if self.device_type == 'mps':
             return torch.mps.synchronize
-        if self.device_type == "cpu":
-            return dummy_function  # CPU does not require explicit synchronization
-        if self.device_type == "xpu":
+        if self.device_type == 'cpu':
+            return (
+                dummy_function  # CPU does not require explicit synchronization
+            )
+        if self.device_type == 'xpu':
             return torch.xpu.synchronize
         return lambda: logger.warning(
-            "Unknown device type %s, skipping stream synchronization.", self.device_type
+            'Unknown device type %s, skipping stream synchronization.',
+            self.device_type,
         )
 
     def init_stream(self, gpu_id=0) -> torch.Stream:
@@ -100,41 +109,43 @@ class TorchUtils:
         Initializes the stream based on the device type.
         """
         logger.info(
-            "Initializing stream for device %s (GPU ID: %s)", self.device_type, gpu_id
+            'Initializing stream for device %s (GPU ID: %s)',
+            self.device_type,
+            gpu_id,
         )
         device = self.handle_device(self.device_type, gpu_id)
-        if self.device_type == "cuda":
+        if self.device_type == 'cuda':
             return torch.cuda.Stream(device=device)
-        elif self.device_type == "xpu":
+        if self.device_type == 'xpu':
             return torch.xpu.Stream(device=device)
-        else:
-            return DummyContextManager()  # For CPU and MPS, we can use a dummy stream
+        return (
+            DummyContextManager()
+        )  # For CPU and MPS, we can use a dummy stream
 
     def __run_stream_function(self) -> callable:
         """
         Runs the stream based on the device type.
         """
-        if self.device_type == "cuda":
+        if self.device_type == 'cuda':
             return torch.cuda.stream
-        elif self.device_type == "xpu":
+        if self.device_type == 'xpu':
             return torch.xpu.stream
-        else:
-            return dummy_context_manager  # For CPU and MPS, we can use a dummy context manager
+        return dummy_context_manager  # For CPU and MPS, we can use a dummy context manager
 
     def run_stream(self, stream):
         return self.__run_stream_func(stream)
 
     def sync_stream(self, stream: torch.Stream):
         match self.device_type:
-            case "cuda" | "xpu":
+            case 'cuda' | 'xpu':
                 stream.synchronize()
-            case "mps":
+            case 'mps':
                 torch.mps.synchronize()
-            case "cpu":
+            case 'cpu':
                 pass  # CPU does not require explicit synchronization
             case _:
                 logger.warning(
-                    "Unknown device type %s, skipping stream synchronization.",
+                    'Unknown device type %s, skipping stream synchronization.',
                     self.device_type,
                 )
                 # For other devices, we assume no synchronization is needed.
@@ -148,22 +159,22 @@ class TorchUtils:
     @staticmethod
     def handle_device(device, gpu_id: int = 0) -> torch.device:
         """
-        returns device based on gpu id and device parameter
+        Returns device based on gpu id and device parameter
         """
-        logger.info("Handling device: %s, GPU ID: %s", device, gpu_id)
-        if device == "auto":
+        logger.info('Handling device: %s, GPU ID: %s', device, gpu_id)
+        if device == 'auto':
             if torch.cuda.is_available():
-                torchdevice = torch.device("cuda", gpu_id)
+                torchdevice = torch.device('cuda', gpu_id)
             else:
                 torchdevice = torch.device(
-                    "mps"
+                    'mps'
                     if torch.backends.mps.is_available()
-                    else "xpu"
+                    else 'xpu'
                     if torch.xpu.is_available()
-                    else "cpu"
+                    else 'cpu'
                 )
 
-        elif device == "cuda":
+        elif device == 'cuda':
             torchdevice = torch.device(
                 device, gpu_id
             )  # 0 is the device index, may have to change later
@@ -171,21 +182,23 @@ class TorchUtils:
             torchdevice = torch.device(device)
 
         device = backendDetect.get_gpus_torch()[gpu_id]
-        print("Using Device: " + str(device), file=sys.stderr)
+        print('Using Device: ' + str(device), file=sys.stderr)
         return torchdevice
 
     @staticmethod
     def handle_precision(precision) -> torch.dtype:
-        logger.info("Handling precision: %s", precision)
-        if precision == "auto":
+        logger.info('Handling precision: %s', precision)
+        if precision == 'auto':
             return (
-                torch.float16 if backendDetect.get_half_precision() else torch.float32
+                torch.float16
+                if backendDetect.get_half_precision()
+                else torch.float32
             )
-        if precision == "float32":
+        if precision == 'float32':
             return torch.float32
-        if precision == "float16":
+        if precision == 'float16':
             return torch.float16
-        if precision == "bfloat16":
+        if precision == 'bfloat16':
             return torch.bfloat16
         return torch.float32
 
@@ -214,7 +227,11 @@ class TorchUtils:
 
     @torch.inference_mode()
     def frame_to_tensor(
-        self, frame, stream: torch.Stream, device: torch.device, dtype: torch.dtype
+        self,
+        frame,
+        stream: torch.Stream,
+        device: torch.device,
+        dtype: torch.dtype,
     ) -> torch.Tensor:  # stream might be None
         """
         Docstring for frame_to_tensor
@@ -229,7 +246,6 @@ class TorchUtils:
         :return: Tensor representation of the frame in the shape (1, C, H, W)
         :rtype: torch.Tensor
         """
-
         with self.run_stream(stream):  # type: ignore
             # ... (tensor creation and manipulation) ...
             frame = torch.frombuffer(
@@ -238,7 +254,8 @@ class TorchUtils:
             ).to(device=device, non_blocking=True)
 
             frame = (
-                frame.div(65535.0 if self.hdr_mode else 255.0)
+                frame
+                .div(65535.0 if self.hdr_mode else 255.0)
                 .clamp(0.0, 1.0)
                 .reshape(self.height, self.width, 3)
                 .permute(2, 0, 1)
@@ -269,7 +286,8 @@ class TorchUtils:
         """
         # Prepare the tensor
         tensor = (
-            frame.squeeze(0)
+            frame
+            .squeeze(0)
             .permute(1, 2, 0)
             .clamp(0.0, 1.0)
             .mul(65535.0 if self.hdr_mode else 255.0)
@@ -282,9 +300,8 @@ class TorchUtils:
         if self.use_numpy:
             # Convert to numpy array if possible
             return tensor.numpy()
-        else:
-            np_dtype = np.uint16 if self.hdr_mode else np.uint8
-            return np.array(tensor.tolist(), dtype=np_dtype)
+        np_dtype = np.uint16 if self.hdr_mode else np.uint8
+        return np.array(tensor.tolist(), dtype=np_dtype)
 
     @staticmethod
     @torch.inference_mode()
@@ -303,7 +320,8 @@ class TorchUtils:
         :rtype: torch.Tensor
         """
         return (
-            torch.from_numpy(arr)
+            torch
+            .from_numpy(arr)
             .to(device=device, dtype=dtype)
             .permute(2, 0, 1)
             .unsqueeze(0)
@@ -328,7 +346,7 @@ class TorchUtils:
         tensor: torch.Tensor,
         new_width: int,
         new_height: int,
-        mode: str = "bilinear",
+        mode: str = 'bilinear',
     ) -> torch.Tensor:
         """
         Docstring for resize_tensor
@@ -349,6 +367,6 @@ class TorchUtils:
             size=(new_height, new_width),
             mode=mode,
             align_corners=False
-            if mode in ["linear", "bilinear", "bicubic", "trilinear"]
+            if mode in ['linear', 'bilinear', 'bicubic', 'trilinear']
             else None,
         )

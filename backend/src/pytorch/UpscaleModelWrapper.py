@@ -1,18 +1,21 @@
 import torch
+
 from ..utils.LogConfig import get_logger
 from .TorchUtils import TorchUtils
-from .VSRArchs.AnimeSR.vsr_inference_helper import AnimeSRInferenceHelper
 from .VSRArchs.AnimeSR.animesr_arch import AnimeSR
-from .VSRArchs.TSPAN.vsr_inference_helper import TemporalSPANInferenceHelper
+from .VSRArchs.AnimeSR.vsr_inference_helper import AnimeSRInferenceHelper
 from .VSRArchs.TSPAN.tspan import TemporalSPAN
-
+from .VSRArchs.TSPAN.vsr_inference_helper import TemporalSPANInferenceHelper
 
 logger = get_logger(__name__)
 
 
 class UpscaleModelWrapper:
     def __init__(
-        self, model_path: torch.nn.Module, device: torch.device, precision: torch.dtype
+        self,
+        model_path: torch.nn.Module,
+        device: torch.device,
+        precision: torch.dtype,
     ):
         self.__model_path = model_path
         self.__device = device
@@ -50,13 +53,15 @@ class UpscaleModelWrapper:
             del model
 
     def __test_model_precision(self):
-        test_input = torch.randn(1, 3, 64, 64).to(self.__device, dtype=self.__precision)
+        test_input = torch.randn(1, 3, 64, 64).to(
+            self.__device, dtype=self.__precision
+        )
         with torch.inference_mode():
             try:
                 self.__test_inference(test_input)
             except Exception as e:
                 logger.warning(
-                    "Model precision %s not supported; falling back to float32: %s",
+                    'Model precision %s not supported; falling back to float32: %s',
                     self.__precision,
                     e,
                     exc_info=True,
@@ -66,20 +71,22 @@ class UpscaleModelWrapper:
 
     def get_dummy_input(self, width: int, height: int) -> torch.Tensor:
         assert self.__dummy_input_pre_channels is not None, (
-            "Dummy input pre channels not set."
+            'Dummy input pre channels not set.'
         )
         dummy_input = self.__dummy_input_pre_channels.copy()
         dummy_input.append(self.__channels)
         dummy_input.append(height)
         dummy_input.append(width)
-        return torch.zeros(dummy_input, dtype=self.__precision, device=self.__device)
+        return torch.zeros(
+            dummy_input, dtype=self.__precision, device=self.__device
+        )
 
     @torch.inference_mode()
     def load_model(self, model=None) -> torch.nn.Module:
         if not model:
             from .spandrel import (
-                ModelLoader,
                 ImageModelDescriptor,
+                ModelLoader,
                 UnsupportedModelError,
             )
 
@@ -91,9 +98,9 @@ class UpscaleModelWrapper:
                 self.__model = model
                 self.inference_helper = self.__model
                 self.__dummy_input_pre_channels = [1]
-                self.__inference_mode = "spandrel"
+                self.__inference_mode = 'spandrel'
 
-            except UnsupportedModelError as e:
+            except UnsupportedModelError:
                 try:
                     model = AnimeSR()
                     # dummy attributes
@@ -102,14 +109,18 @@ class UpscaleModelWrapper:
                         self.__model_path, map_location=self.__device
                     )
                     model.load_state_dict(state_dict=state_dict)
-                    self.__model = model.to(self.__device, dtype=self.__precision)
+                    self.__model = model.to(
+                        self.__device, dtype=self.__precision
+                    )
                     self.inference_helper = AnimeSRInferenceHelper(
                         model=self.__model, scale=self.__scale
                     )
                     self.__dummy_input_pre_channels = [3]
-                    self.__inference_mode = "animesr"
-                except Exception as e:
-                    logger.exception("Failed to load model as AnimeSR; trying TSPAN")
+                    self.__inference_mode = 'animesr'
+                except Exception:
+                    logger.exception(
+                        'Failed to load model as AnimeSR; trying TSPAN'
+                    )
                     try:
                         self.__scale = 2
                         self.__dummy_input_pre_channels = [
@@ -121,30 +132,33 @@ class UpscaleModelWrapper:
                             self.__model_path, map_location=self.__device
                         )
                         model.load_state_dict(
-                            state_dict=state_dict["params_ema"], strict=False
+                            state_dict=state_dict['params_ema'], strict=False
                         )
-                        self.__model = model.to(self.__device, dtype=self.__precision)
+                        self.__model = model.to(
+                            self.__device, dtype=self.__precision
+                        )
                         self.inference_helper = TemporalSPANInferenceHelper(
                             model=self.__model, scale=self.__scale
                         )
-                        self.__inference_mode = "tspan"
+                        self.__inference_mode = 'tspan'
                     except Exception as e:
                         logger.exception(
-                            "Model at %s is not supported", self.__model_path
+                            'Model at %s is not supported', self.__model_path
                         )
                         raise e
-        else:
-            if self.__inference_mode == "spandrel":
-                self.inference_helper = model
-            elif self.__inference_mode == "animesr":
-                self.inference_helper = AnimeSRInferenceHelper(
-                    model=model, scale=self.__scale
-                )
-            elif self.__inference_mode == "tspan":
-                self.inference_helper = TemporalSPANInferenceHelper(
-                    model=model, scale=self.__scale
-                )
+        elif self.__inference_mode == 'spandrel':
+            self.inference_helper = model
+        elif self.__inference_mode == 'animesr':
+            self.inference_helper = AnimeSRInferenceHelper(
+                model=model, scale=self.__scale
+            )
+        elif self.__inference_mode == 'tspan':
+            self.inference_helper = TemporalSPANInferenceHelper(
+                model=model, scale=self.__scale
+            )
 
     def __call__(self, *args, **kwargs):
-        assert self.inference_helper is not None, "Inference helper is not initialized."
+        assert self.inference_helper is not None, (
+            'Inference helper is not initialized.'
+        )
         return self.inference_helper(*args, **kwargs).clone()

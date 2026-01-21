@@ -17,8 +17,8 @@ Hacked together by / Copyright 2020 Ross Wightman
 """
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F  # noqa: N812
+from torch import nn
 
 
 def drop_block_2d(
@@ -52,8 +52,12 @@ def drop_block_2d(
         torch.arange(W).to(x.device), torch.arange(H).to(x.device)
     )
     valid_block = (
-        (w_i >= clipped_block_size // 2) & (w_i < W - (clipped_block_size - 1) // 2)
-    ) & ((h_i >= clipped_block_size // 2) & (h_i < H - (clipped_block_size - 1) // 2))
+        (w_i >= clipped_block_size // 2)
+        & (w_i < W - (clipped_block_size - 1) // 2)
+    ) & (
+        (h_i >= clipped_block_size // 2)
+        & (h_i < H - (clipped_block_size - 1) // 2)
+    )
     valid_block = torch.reshape(valid_block, (1, 1, H, W)).to(dtype=x.dtype)
 
     if batchwise:
@@ -61,7 +65,9 @@ def drop_block_2d(
         uniform_noise = torch.rand((1, C, H, W), dtype=x.dtype, device=x.device)
     else:
         uniform_noise = torch.rand_like(x)
-    block_mask = ((2 - gamma - valid_block + uniform_noise) >= 1).to(dtype=x.dtype)
+    block_mask = ((2 - gamma - valid_block + uniform_noise) >= 1).to(
+        dtype=x.dtype
+    )
     block_mask = -F.max_pool2d(
         -block_mask,
         kernel_size=clipped_block_size,  # block_size,
@@ -81,7 +87,8 @@ def drop_block_2d(
             x = x * block_mask + normal_noise * (1 - block_mask)
     else:
         normalize_scale = (
-            block_mask.numel() / block_mask.to(dtype=torch.float32).sum().add(1e-7)
+            block_mask.numel()
+            / block_mask.to(dtype=torch.float32).sum().add(1e-7)
         ).to(x.dtype)
         if inplace:
             x.mul_(block_mask * normalize_scale)
@@ -131,7 +138,8 @@ def drop_block_fast_2d(
     else:
         block_mask = 1 - block_mask
         normalize_scale = (
-            block_mask.numel() / block_mask.to(dtype=torch.float32).sum().add(1e-6)
+            block_mask.numel()
+            / block_mask.to(dtype=torch.float32).sum().add(1e-6)
         ).to(dtype=x.dtype)
         if inplace:
             x.mul_(block_mask * normalize_scale)
@@ -174,16 +182,15 @@ class DropBlock2d(nn.Module):
                 self.with_noise,
                 self.inplace,
             )
-        else:
-            return drop_block_2d(
-                x,
-                self.drop_prob,
-                self.block_size,
-                self.gamma_scale,
-                self.with_noise,
-                self.inplace,
-                self.batchwise,
-            )
+        return drop_block_2d(
+            x,
+            self.drop_prob,
+            self.block_size,
+            self.gamma_scale,
+            self.with_noise,
+            self.inplace,
+            self.batchwise,
+        )
 
 
 def drop_path(
@@ -225,4 +232,4 @@ class DropPath(nn.Module):
         return drop_path(x, self.drop_prob, self.training, self.scale_by_keep)
 
     def extra_repr(self):
-        return f"drop_prob={round(self.drop_prob, 3):0.3f}"
+        return f'drop_prob={round(self.drop_prob, 3):0.3f}'

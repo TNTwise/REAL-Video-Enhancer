@@ -1,13 +1,11 @@
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
 
 
 class FeatureNet(nn.Module):
     """The quadratic model"""
 
     def __init__(self):
-        super(FeatureNet, self).__init__()
+        super().__init__()
         self.block1 = nn.Sequential(
             nn.PReLU(),
             nn.Conv2d(3, 64, 3, 2, 1),

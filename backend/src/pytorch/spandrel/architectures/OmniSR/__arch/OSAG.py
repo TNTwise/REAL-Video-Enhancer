@@ -10,7 +10,7 @@
 #############################################################
 
 
-import torch.nn as nn
+from torch import nn
 
 from .esa import ESA
 from .OSA import OSA_Block
@@ -45,7 +45,9 @@ class OSAG(nn.Module):
                 with_pe=pe,
             )
             group_list.append(temp_res)
-        group_list.append(nn.Conv2d(channel_num, channel_num, 1, 1, 0, bias=bias))
+        group_list.append(
+            nn.Conv2d(channel_num, channel_num, 1, 1, 0, bias=bias)
+        )
         self.residual_layer = nn.Sequential(*group_list)
         esa_channel = max(channel_num // 4, 16)
         self.esa = ESA(esa_channel, channel_num)

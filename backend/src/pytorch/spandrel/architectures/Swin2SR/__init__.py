@@ -2,27 +2,26 @@ import math
 
 from typing_extensions import override
 
-from ...util import KeyCondition, get_pixelshuffle_params, get_seq_len
-
 from ...__helpers.model_descriptor import (
     Architecture,
     ImageModelDescriptor,
     SizeRequirements,
     StateDict,
 )
+from ...util import KeyCondition, get_pixelshuffle_params, get_seq_len
 from .__arch.Swin2SR import Swin2SR
 
 
 class Swin2SRArch(Architecture[Swin2SR]):
     def __init__(self) -> None:
         super().__init__(
-            id="Swin2SR",
+            id='Swin2SR',
             detect=KeyCondition.has_all(
-                "layers.0.residual_group.blocks.0.norm1.weight",
-                "patch_embed.proj.weight",
-                "conv_first.weight",
-                "layers.0.residual_group.blocks.0.mlp.fc1.bias",
-                "layers.0.residual_group.blocks.0.attn.relative_position_index",
+                'layers.0.residual_group.blocks.0.norm1.weight',
+                'patch_embed.proj.weight',
+                'conv_first.weight',
+                'layers.0.residual_group.blocks.0.mlp.fc1.bias',
+                'layers.0.residual_group.blocks.0.attn.relative_position_index',
             ),
         )
 
@@ -46,68 +45,72 @@ class Swin2SRArch(Architecture[Swin2SR]):
         use_checkpoint = False  # cannot be deduced from state_dict
         upscale = 2
         img_range = 1.0
-        upsampler = ""
-        resi_connection = "1conv"
+        upsampler = ''
+        resi_connection = '1conv'
 
-        in_chans = state_dict["conv_first.weight"].shape[1]
-        embed_dim = state_dict["conv_first.weight"].shape[0]
-        patch_size = state_dict["patch_embed.proj.weight"].shape[2]
+        in_chans = state_dict['conv_first.weight'].shape[1]
+        embed_dim = state_dict['conv_first.weight'].shape[0]
+        patch_size = state_dict['patch_embed.proj.weight'].shape[2]
 
-        ape = "absolute_pos_embed" in state_dict
-        patch_norm = "patch_embed.norm.weight" in state_dict
-        qkv_bias = "layers.0.residual_group.blocks.0.attn.q_bias" in state_dict
+        ape = 'absolute_pos_embed' in state_dict
+        patch_norm = 'patch_embed.norm.weight' in state_dict
+        qkv_bias = 'layers.0.residual_group.blocks.0.attn.q_bias' in state_dict
 
         # depths & num_heads
-        num_layers = get_seq_len(state_dict, "layers")
+        num_layers = get_seq_len(state_dict, 'layers')
         depths = [6] * num_layers
         num_heads = [6] * num_layers
         for i in range(num_layers):
-            depths[i] = get_seq_len(state_dict, f"layers.{i}.residual_group.blocks")
+            depths[i] = get_seq_len(
+                state_dict, f'layers.{i}.residual_group.blocks'
+            )
             num_heads[i] = state_dict[
-                f"layers.{i}.residual_group.blocks.0.attn.logit_scale"
+                f'layers.{i}.residual_group.blocks.0.attn.logit_scale'
             ].shape[0]
 
         mlp_ratio = float(
-            state_dict["layers.0.residual_group.blocks.0.mlp.fc1.weight"].shape[0]
+            state_dict['layers.0.residual_group.blocks.0.mlp.fc1.weight'].shape[
+                0
+            ]
             / embed_dim
         )
 
-        if "conv_after_body.0.weight" in state_dict:
-            resi_connection = "3conv"
-        elif "conv_after_body.weight" in state_dict:
-            resi_connection = "1conv"
+        if 'conv_after_body.0.weight' in state_dict:
+            resi_connection = '3conv'
+        elif 'conv_after_body.weight' in state_dict:
+            resi_connection = '1conv'
         else:
-            raise ValueError("Unknown residual connection type")
+            raise ValueError('Unknown residual connection type')
 
         # upsampler
-        if "conv_bicubic.weight" in state_dict:
-            upsampler = "pixelshuffle_aux"
-        elif "conv_hr.weight" in state_dict:
-            upsampler = "nearest+conv"
-        elif "conv_after_body_hf.weight" in state_dict:
-            upsampler = "pixelshuffle_hf"
-        elif "conv_before_upsample.0.weight" in state_dict:
-            upsampler = "pixelshuffle"
-        elif "upsample.0.weight" in state_dict:
-            upsampler = "pixelshuffledirect"
+        if 'conv_bicubic.weight' in state_dict:
+            upsampler = 'pixelshuffle_aux'
+        elif 'conv_hr.weight' in state_dict:
+            upsampler = 'nearest+conv'
+        elif 'conv_after_body_hf.weight' in state_dict:
+            upsampler = 'pixelshuffle_hf'
+        elif 'conv_before_upsample.0.weight' in state_dict:
+            upsampler = 'pixelshuffle'
+        elif 'upsample.0.weight' in state_dict:
+            upsampler = 'pixelshuffledirect'
         else:
-            upsampler = ""
+            upsampler = ''
 
-        if upsampler == "":
+        if upsampler == '':
             upscale = 1
-        elif upsampler == "nearest+conv":
+        elif upsampler == 'nearest+conv':
             upscale = 4  # only supports 4x
-        elif upsampler == "pixelshuffledirect":
+        elif upsampler == 'pixelshuffledirect':
             upscale = int(
-                math.sqrt(state_dict["upsample.0.weight"].shape[0] // in_chans)
+                math.sqrt(state_dict['upsample.0.weight'].shape[0] // in_chans)
             )
         else:
-            upscale, _ = get_pixelshuffle_params(state_dict, "upsample")
+            upscale, _ = get_pixelshuffle_params(state_dict, 'upsample')
 
         window_size = int(
             math.sqrt(
                 state_dict[
-                    "layers.0.residual_group.blocks.0.attn.relative_position_index"
+                    'layers.0.residual_group.blocks.0.attn.relative_position_index'
                 ].shape[0]
             )
         )
@@ -116,11 +119,13 @@ class Swin2SRArch(Architecture[Swin2SR]):
         #   patches_resolution = img_size // patch_size
         #   if window_size > patches_resolution:
         #     attn_mask[0] = patches_resolution**2 // window_size**2
-        if "layers.0.residual_group.blocks.1.attn_mask" in state_dict:
+        if 'layers.0.residual_group.blocks.1.attn_mask' in state_dict:
             attn_mask_0 = state_dict[
-                "layers.0.residual_group.blocks.1.attn_mask"
+                'layers.0.residual_group.blocks.1.attn_mask'
             ].shape[0]
-            patches_resolution = int(math.sqrt(attn_mask_0 * window_size * window_size))
+            patches_resolution = int(
+                math.sqrt(attn_mask_0 * window_size * window_size)
+            )
             img_size = patches_resolution * patch_size
         else:
             # we only know that window_size <= patches_resolution
@@ -129,7 +134,9 @@ class Swin2SRArch(Architecture[Swin2SR]):
 
             # if APE is enabled, we know that absolute_pos_embed[1] == patches_resolution**2
             if ape:
-                patches_resolution = int(math.sqrt(state_dict["absolute_pos_embed"][1]))
+                patches_resolution = int(
+                    math.sqrt(state_dict['absolute_pos_embed'][1])
+                )
                 img_size = patches_resolution * patch_size
 
         # The JPEG models are the only ones with window-size 7, and they also use this range
@@ -159,23 +166,23 @@ class Swin2SRArch(Architecture[Swin2SR]):
 
         head_length = len(depths)  # type: ignore
         if head_length <= 4:
-            size_tag = "small"
+            size_tag = 'small'
         elif head_length < 9:
-            size_tag = "medium"
+            size_tag = 'medium'
         else:
-            size_tag = "large"
+            size_tag = 'large'
         tags = [
             size_tag,
-            f"s{img_size}w{window_size}",
-            f"{embed_dim}dim",
-            f"{resi_connection}",
+            f's{img_size}w{window_size}',
+            f'{embed_dim}dim',
+            f'{resi_connection}',
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration" if upscale == 1 else "SR",
+            purpose='Restoration' if upscale == 1 else 'SR',
             tags=tags,
             supports_half=False,  # Too much weirdness to support this at the moment
             supports_bfloat16=True,
@@ -186,4 +193,4 @@ class Swin2SRArch(Architecture[Swin2SR]):
         )
 
 
-__all__ = ["Swin2SRArch", "Swin2SR"]
+__all__ = ['Swin2SR', 'Swin2SRArch']

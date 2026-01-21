@@ -1,16 +1,19 @@
-import onnx
-import onnxruntime as ort
-from onnxruntime import InferenceSession
-from onnxconverter_common import float16
 import os
+
 import numpy as np
+import onnxruntime as ort
+from onnxconverter_common import float16
+from onnxruntime import InferenceSession
+
+import onnx
+
 from ..utils.Util import checkForDirectMLHalfPrecisionSupport
 
 
-def getONNXScale(modelPath: str = "") -> int:
+def getONNXScale(modelPath: str = '') -> int:
     paramName = os.path.basename(modelPath).lower()
     for i in range(100):
-        if f"{i}x" in paramName or f"x{i}" in paramName:
+        if f'{i}x' in paramName or f'x{i}' in paramName:
             return i
 
 
@@ -19,7 +22,7 @@ class UpscaleONNX:
         self,
         modelPath,
         deviceID: int = 0,
-        precision: str = "float32",
+        precision: str = 'float32',
         width: int = 1920,
         height: int = 1080,
     ):
@@ -37,11 +40,15 @@ class UpscaleONNX:
         return self.scale
 
     def handlePrecision(self, precision):
-        if precision == "auto":
-            return np.float16 if checkForDirectMLHalfPrecisionSupport() else np.float32
-        if precision == "float16":
+        if precision == 'auto':
+            return (
+                np.float16
+                if checkForDirectMLHalfPrecisionSupport()
+                else np.float32
+            )
+        if precision == 'float16':
             return np.float16
-        if precision == "float32":
+        if precision == 'float32':
             return np.float32
 
     def bytesToFrame(self, image: bytes) -> tuple:
@@ -53,7 +60,10 @@ class UpscaleONNX:
         return np.ascontiguousarray(image)
 
     def render(
-        self, image0_as_np_array: np.ndarray, image1_as_np_array: np.ndarray, timestep
+        self,
+        image0_as_np_array: np.ndarray,
+        image1_as_np_array: np.ndarray,
+        timestep,
     ) -> np.ndarray:
         timestep_tens = np.full(
             (1, 1, self.ph, self.pw),
@@ -64,13 +74,14 @@ class UpscaleONNX:
         input = np.concatenate(
             (image0_as_np_array, image1_as_np_array, timestep_tens), axis=1
         )
-        onnx_input = {"x": input}
+        onnx_input = {'x': input}
         onnx_output = self.inferenceSession.run(None, onnx_input)[0]
         return self.frameToBytes(onnx_output)
 
     def frameToBytes(self, image: np.ndarray) -> bytes:
         image = (
-            image.clip(0, 1)
+            image
+            .clip(0, 1)
             .squeeze()
             .transpose(1, 2, 0)
             .__mul__(255.0)
@@ -85,14 +96,18 @@ class UpscaleONNX:
         return model
 
     def loadInferenceSession(self) -> InferenceSession:
-        directml_backend = [("DmlExecutionProvider", {"device_id": f"{self.deviceID}"})]
+        directml_backend = [
+            ('DmlExecutionProvider', {'device_id': f'{self.deviceID}'})
+        ]
 
         session_options = ort.SessionOptions()
         session_options.graph_optimization_level = (
             ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         )
         inference_session = InferenceSession(
-            self.model.SerializeToString(), session_options, providers=directml_backend
+            self.model.SerializeToString(),
+            session_options,
+            providers=directml_backend,
         )
 
         return inference_session

@@ -6,11 +6,11 @@
 import torch
 
 ##########################################################
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 grid_cache = {}
 batch_cache = {}
-torch.set_float32_matmul_precision("medium")
+torch.set_float32_matmul_precision('medium')
 torch.set_grad_enabled(False)
 
 
@@ -19,28 +19,38 @@ torch.set_grad_enabled(False)
 
 @torch.inference_mode()
 def softsplat(
-    tenIn: torch.Tensor, tenFlow: torch.Tensor, tenMetric: torch.Tensor, strMode: str
+    tenIn: torch.Tensor,
+    tenFlow: torch.Tensor,
+    tenMetric: torch.Tensor,
+    strMode: str,
 ):
-    mode_parts = strMode.split("-")
+    mode_parts = strMode.split('-')
     mode_main = mode_parts[0]
     mode_sub = mode_parts[1] if len(mode_parts) > 1 else None
 
-    assert mode_main in ["sum", "avg", "linear", "soft"]
-    if mode_main in ["sum", "avg"]:
+    assert mode_main in ['sum', 'avg', 'linear', 'soft']
+    if mode_main in ['sum', 'avg']:
         assert tenMetric is None
-    if mode_main in ["linear", "soft"]:
+    if mode_main in ['linear', 'soft']:
         assert tenMetric is not None
 
     mode_to_operation = {
-        "avg": lambda: torch.cat(
+        'avg': lambda: torch.cat(
             [
                 tenIn,
-                tenIn.new_ones([tenIn.shape[0], 1, tenIn.shape[2], tenIn.shape[3]]),
+                tenIn.new_ones([
+                    tenIn.shape[0],
+                    1,
+                    tenIn.shape[2],
+                    tenIn.shape[3],
+                ]),
             ],
             1,
         ),
-        "linear": lambda: torch.cat([tenIn * tenMetric, tenMetric], 1),
-        "soft": lambda: torch.cat([tenIn * tenMetric.exp(), tenMetric.exp()], 1),
+        'linear': lambda: torch.cat([tenIn * tenMetric, tenMetric], 1),
+        'soft': lambda: torch.cat(
+            [tenIn * tenMetric.exp(), tenMetric.exp()], 1
+        ),
     }
 
     if mode_main in mode_to_operation:
@@ -48,16 +58,16 @@ def softsplat(
 
     tenOut = softsplat_func.apply(tenIn, tenFlow)
 
-    if mode_main in ["avg", "linear", "soft"]:
+    if mode_main in ['avg', 'linear', 'soft']:
         tenNormalize = tenOut[:, -1:, :, :]
 
         normalize_modes = {
             None: lambda x: x + 0.0000001,
-            "addeps": lambda x: x + 0.0000001,
-            "zeroeps": lambda x: torch.where(
+            'addeps': lambda x: x + 0.0000001,
+            'zeroeps': lambda x: torch.where(
                 x == 0.0, torch.tensor(1.0, device=x.device), x
             ),
-            "clipeps": lambda x: x.clip(0.0000001, None),
+            'clipeps': lambda x: x.clip(0.0000001, None),
         }
 
         if mode_sub in normalize_modes:
@@ -96,7 +106,7 @@ class softsplat_func(torch.autograd.Function):
             gridY, gridX = torch.meshgrid(
                 torch.arange(H, device=device, dtype=origdtype),
                 torch.arange(W, device=device, dtype=origdtype),
-                indexing="ij",
+                indexing='ij',
             )  # [H, W]
             # Cache the grids
             grid_cache[key] = (
@@ -106,7 +116,11 @@ class softsplat_func(torch.autograd.Function):
 
         if key not in batch_cache:
             batch_cache[key] = (
-                torch.arange(N, device=device).view(N, 1, 1).expand(N, H, W).reshape(-1)
+                torch
+                .arange(N, device=device)
+                .view(N, 1, 1)
+                .expand(N, H, W)
+                .reshape(-1)
             )
 
         gridY, gridX = grid_cache[key]

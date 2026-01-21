@@ -1,6 +1,6 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 
 def warp(img, flow):
@@ -16,19 +16,23 @@ def warp(img, flow):
         1,
     )
     grid_ = (grid + flow_).permute(0, 2, 3, 1)
-    pd = "border"
-    if img.device.type == "mps":
-        pd = "zeros"
+    pd = 'border'
+    if img.device.type == 'mps':
+        pd = 'zeros'
         grid_ = grid_.clamp(-1, 1)
     output = F.grid_sample(
-        input=img, grid=grid_, mode="bilinear", padding_mode=pd, align_corners=True
+        input=img,
+        grid=grid_,
+        mode='bilinear',
+        padding_mode=pd,
+        align_corners=True,
     )
     return output
 
 
 def resize(x, scale_factor):
     return F.interpolate(
-        x, scale_factor=scale_factor, mode="bilinear", align_corners=False
+        x, scale_factor=scale_factor, mode='bilinear', align_corners=False
     )
 
 
@@ -59,11 +63,16 @@ def convrelu(
 
 class ResBlock(nn.Module):
     def __init__(self, in_channels, side_channels, bias=True):
-        super(ResBlock, self).__init__()
+        super().__init__()
         self.side_channels = side_channels
         self.conv1 = nn.Sequential(
             nn.Conv2d(
-                in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+                in_channels,
+                in_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=bias,
             ),
             nn.PReLU(in_channels),
         )
@@ -80,7 +89,12 @@ class ResBlock(nn.Module):
         )
         self.conv3 = nn.Sequential(
             nn.Conv2d(
-                in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+                in_channels,
+                in_channels,
+                kernel_size=3,
+                stride=1,
+                padding=1,
+                bias=bias,
             ),
             nn.PReLU(in_channels),
         )
@@ -96,7 +110,12 @@ class ResBlock(nn.Module):
             nn.PReLU(side_channels),
         )
         self.conv5 = nn.Conv2d(
-            in_channels, in_channels, kernel_size=3, stride=1, padding=1, bias=bias
+            in_channels,
+            in_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            bias=bias,
         )
         self.prelu = nn.PReLU(in_channels)
 
@@ -115,7 +134,7 @@ class ResBlock(nn.Module):
 
 class Encoder(nn.Module):
     def __init__(self):
-        super(Encoder, self).__init__()
+        super().__init__()
         self.pyramid1 = nn.Sequential(
             convrelu(3, 32, 3, 2, 1), convrelu(32, 32, 3, 1, 1)
         )
@@ -139,7 +158,7 @@ class Encoder(nn.Module):
 
 class Decoder4(nn.Module):
     def __init__(self):
-        super(Decoder4, self).__init__()
+        super().__init__()
         self.convblock = nn.Sequential(
             convrelu(192 + 1, 192),
             ResBlock(192, 32),
@@ -156,7 +175,7 @@ class Decoder4(nn.Module):
 
 class Decoder3(nn.Module):
     def __init__(self):
-        super(Decoder3, self).__init__()
+        super().__init__()
         self.convblock = nn.Sequential(
             convrelu(220, 216),
             ResBlock(216, 32),
@@ -173,7 +192,7 @@ class Decoder3(nn.Module):
 
 class Decoder2(nn.Module):
     def __init__(self):
-        super(Decoder2, self).__init__()
+        super().__init__()
         self.convblock = nn.Sequential(
             convrelu(148, 144),
             ResBlock(144, 32),
@@ -190,7 +209,7 @@ class Decoder2(nn.Module):
 
 class Decoder1(nn.Module):
     def __init__(self):
-        super(Decoder1, self).__init__()
+        super().__init__()
         self.convblock = nn.Sequential(
             convrelu(100, 96),
             ResBlock(96, 32),
@@ -207,7 +226,7 @@ class Decoder1(nn.Module):
 
 class IFRNet(nn.Module):
     def __init__(self, scale_factor=1.0):
-        super(IFRNet, self).__init__()
+        super().__init__()
         self.encoder = Encoder()
         self.decoder4 = Decoder4()
         self.decoder3 = Decoder3()
@@ -217,7 +236,8 @@ class IFRNet(nn.Module):
 
     def forward(self, img0, img1, embt):
         mean_ = (
-            torch.cat([img0, img1], 2)
+            torch
+            .cat([img0, img1], 2)
             .mean(1, keepdim=True)
             .mean(2, keepdim=True)
             .mean(3, keepdim=True)
@@ -252,12 +272,12 @@ class IFRNet(nn.Module):
         up_mask_1 = torch.sigmoid(out1[:, 4:5])
         up_res_1 = out1[:, 5:]
 
-        up_flow0_1 = resize(up_flow0_1, scale_factor=(1.0 / self.scale_factor)) * (
-            1.0 / self.scale_factor
-        )
-        up_flow1_1 = resize(up_flow1_1, scale_factor=(1.0 / self.scale_factor)) * (
-            1.0 / self.scale_factor
-        )
+        up_flow0_1 = resize(
+            up_flow0_1, scale_factor=(1.0 / self.scale_factor)
+        ) * (1.0 / self.scale_factor)
+        up_flow1_1 = resize(
+            up_flow1_1, scale_factor=(1.0 / self.scale_factor)
+        ) * (1.0 / self.scale_factor)
         up_mask_1 = resize(up_mask_1, scale_factor=(1.0 / self.scale_factor))
         up_res_1 = resize(up_res_1, scale_factor=(1.0 / self.scale_factor))
 

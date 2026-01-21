@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from typing import Literal
-import sys
 
 import torch
 import torch.nn.functional as F
@@ -23,7 +22,9 @@ def conv_layer(in_channels, out_channels, kernel_size, bias=True):
     """
     kernel_size = _make_pair(kernel_size)
     padding = (int((kernel_size[0] - 1) / 2), int((kernel_size[1] - 1) / 2))
-    return nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding, bias=bias)
+    return nn.Conv2d(
+        in_channels, out_channels, kernel_size, padding=padding, bias=bias
+    )
 
 
 def activation(act_type, inplace=True, neg_slope=0.05, n_prelu=1):
@@ -42,14 +43,16 @@ def activation(act_type, inplace=True, neg_slope=0.05, n_prelu=1):
     ----------
     """
     act_type = act_type.lower()
-    if act_type == "relu":
+    if act_type == 'relu':
         layer = nn.ReLU(inplace)
-    elif act_type == "lrelu":
+    elif act_type == 'lrelu':
         layer = nn.LeakyReLU(neg_slope, inplace)
-    elif act_type == "prelu":
+    elif act_type == 'prelu':
         layer = nn.PReLU(num_parameters=n_prelu, init=neg_slope)
     else:
-        raise NotImplementedError(f"activation layer [{act_type:s}] is not found")
+        raise NotImplementedError(
+            f'activation layer [{act_type:s}] is not found'
+        )
     return layer
 
 
@@ -65,7 +68,9 @@ def sequential(*args):
     """
     if len(args) == 1:
         if isinstance(args[0], OrderedDict):
-            raise NotImplementedError("sequential does not support OrderedDict input.")
+            raise NotImplementedError(
+                'sequential does not support OrderedDict input.'
+            )
         return args[0]
     modules = []
     for module in args:
@@ -77,11 +82,15 @@ def sequential(*args):
     return nn.Sequential(*modules)
 
 
-def pixelshuffle_block(in_channels, out_channels, upscale_factor=2, kernel_size=3):
+def pixelshuffle_block(
+    in_channels, out_channels, upscale_factor=2, kernel_size=3
+):
     """
     Upsample features according to `upscale_factor`.
     """
-    conv = conv_layer(in_channels, out_channels * (upscale_factor**2), kernel_size)
+    conv = conv_layer(
+        in_channels, out_channels * (upscale_factor**2), kernel_size
+    )
     pixel_shuffle = nn.PixelShuffle(upscale_factor)
     return sequential(conv, pixel_shuffle)
 
@@ -161,14 +170,16 @@ class Conv3XC(nn.Module):
         b3 = self.conv[2].bias.data.clone().detach()
 
         w = (
-            F.conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
+            F
+            .conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
         b = (w2 * b1.reshape(1, -1, 1, 1)).sum((1, 2, 3)) + b2
 
         self.weight_concat = (
-            F.conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
+            F
+            .conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
@@ -181,7 +192,13 @@ class Conv3XC(nn.Module):
         H_pixels_to_pad = (target_kernel_size - 1) // 2
         W_pixels_to_pad = (target_kernel_size - 1) // 2
         sk_w = F.pad(
-            sk_w, [H_pixels_to_pad, H_pixels_to_pad, W_pixels_to_pad, W_pixels_to_pad]
+            sk_w,
+            [
+                H_pixels_to_pad,
+                H_pixels_to_pad,
+                W_pixels_to_pad,
+                W_pixels_to_pad,
+            ],
         )
 
         self.weight_concat = self.weight_concat + sk_w
@@ -202,7 +219,9 @@ class Conv3XC(nn.Module):
 
 
 class SPAB(nn.Module):
-    def __init__(self, in_channels, mid_channels=None, out_channels=None, bias=False):
+    def __init__(
+        self, in_channels, mid_channels=None, out_channels=None, bias=False
+    ):
         super().__init__()
         if mid_channels is None:
             mid_channels = in_channels
@@ -214,7 +233,7 @@ class SPAB(nn.Module):
         self.c2_r = Conv3XC(mid_channels, mid_channels, gain1=2, s=1)
         self.c3_r = Conv3XC(mid_channels, out_channels, gain1=2, s=1)
         self.act1 = torch.nn.SiLU(inplace=True)
-        self.act2 = activation("lrelu", neg_slope=0.1, inplace=True)
+        self.act2 = activation('lrelu', neg_slope=0.1, inplace=True)
 
     def forward(self, x):
         out1 = self.c1_r(x)
@@ -259,13 +278,15 @@ class SPAN(nn.Module):
         # device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
         # self.mean_half = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).half()
         # self.mean_float = torch.Tensor(rgb_mean).view(1, 3, 1, 1).to(device=device).float()
-        mean_tensor = torch.tensor(rgb_mean, dtype=torch.float32).view(1, 3, 1, 1)
+        mean_tensor = torch.tensor(rgb_mean, dtype=torch.float32).view(
+            1, 3, 1, 1
+        )
         # self.register_buffer('mean', mean_tensor)
         self.mean_tensor = mean_tensor
 
         self.no_norm: torch.Tensor | None
         if not norm:
-            self.register_buffer("no_norm", torch.zeros(1))
+            self.register_buffer('no_norm', torch.zeros(1))
         else:
             self.no_norm = None
 
@@ -306,7 +327,9 @@ class SPAN(nn.Module):
         out_b6, out_b5_2, _att6 = self.block_6(out_b5)
 
         out_b6 = self.conv_2(out_b6)
-        out = self.conv_cat(torch.cat([out_feature, out_b6, out_b1, out_b5_2], 1))
+        out = self.conv_cat(
+            torch.cat([out_feature, out_b6, out_b1, out_b5_2], 1)
+        )
         output = self.upsampler(out)
 
         return output

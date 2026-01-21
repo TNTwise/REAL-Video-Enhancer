@@ -16,8 +16,8 @@ def _no_grad_trunc_normal_(
 
     if (mean < a - 2 * std) or (mean > b + 2 * std):
         warnings.warn(
-            "mean is more than 2 std from [a, b] in nn.init.trunc_normal_. "
-            "The distribution of values may be incorrect.",
+            'mean is more than 2 std from [a, b] in nn.init.trunc_normal_. '
+            'The distribution of values may be incorrect.',
             stacklevel=2,
         )
 
@@ -114,31 +114,31 @@ def trunc_normal_tf_(
 def variance_scaling_(
     tensor: torch.Tensor,
     scale: float = 1.0,
-    mode: str = "fan_in",
-    distribution: str = "normal",
+    mode: str = 'fan_in',
+    distribution: str = 'normal',
 ):
     fan_in, fan_out = _calculate_fan_in_and_fan_out(tensor)
-    if mode == "fan_in":
+    if mode == 'fan_in':
         denom = fan_in
-    elif mode == "fan_out":
+    elif mode == 'fan_out':
         denom = fan_out
-    elif mode == "fan_avg":
+    elif mode == 'fan_avg':
         denom = (fan_in + fan_out) / 2
 
     variance = scale / denom  # type: ignore
 
-    if distribution == "truncated_normal":
+    if distribution == 'truncated_normal':
         # constant is stddev of standard normal truncated to (-2, 2)
         trunc_normal_tf_(tensor, std=math.sqrt(variance) / 0.87962566103423978)
-    elif distribution == "normal":
+    elif distribution == 'normal':
         tensor.normal_(std=math.sqrt(variance))
-    elif distribution == "uniform":
+    elif distribution == 'uniform':
         bound = math.sqrt(3 * variance)
         # pylint: disable=invalid-unary-operand-type
         tensor.uniform_(-bound, bound)
     else:
-        raise ValueError(f"invalid distribution {distribution}")
+        raise ValueError(f'invalid distribution {distribution}')
 
 
 def lecun_normal_(tensor: torch.Tensor):
-    variance_scaling_(tensor, mode="fan_in", distribution="truncated_normal")
+    variance_scaling_(tensor, mode='fan_in', distribution='truncated_normal')

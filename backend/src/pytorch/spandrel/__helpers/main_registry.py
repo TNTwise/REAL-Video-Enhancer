@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-
 from ..architectures import (
-    ArtCNN,
     ATD,
     CRAFT,
     DAT,
@@ -16,12 +14,12 @@ from ..architectures import (
     HAT,
     IPT,
     PLKSR,
+    RCAN,
     RGT,
     SAFMN,
     SAFMNBCIE,
     SPAN,
-    SPANPlus,
-    sudo_SPANPlus,
+    ArtCNN,
     Compact,
     DnCNN,
     DRUNet,
@@ -37,15 +35,16 @@ from ..architectures import (
     RealCUGAN,
     RestoreFormer,
     RetinexFormer,
+    RTMoSR,
     SCUNet,
+    Sebica,
     SeemoRe,
+    SPANPlus,
     SwiftSRGAN,
     Swin2SR,
     SwinIR,
     Uformer,
-    Sebica,
-    RTMoSR,
-    RCAN,
+    sudo_SPANPlus,
 )
 from .registry import ArchRegistry, ArchSupport
 

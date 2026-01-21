@@ -60,11 +60,19 @@ class ConvBlock(nn.Module):
         self.out_channel = out_channel
         self.block = nn.Sequential(
             nn.Conv2d(
-                in_channel, out_channel, kernel_size=3, stride=strides, padding=1
+                in_channel,
+                out_channel,
+                kernel_size=3,
+                stride=strides,
+                padding=1,
             ),
             nn.Mish(),
             nn.Conv2d(
-                out_channel, out_channel, kernel_size=3, stride=strides, padding=1
+                out_channel,
+                out_channel,
+                kernel_size=3,
+                stride=strides,
+                padding=1,
             ),
             nn.Mish(),
         )
@@ -149,14 +157,14 @@ class MoSR(nn.Module):
         upscale: int = 4,
         n_block: int = 24,
         dim: int = 64,
-        upsampler: str = "ps",  # "ps" "dys" "gps"
+        upsampler: str = 'ps',  # "ps" "dys" "gps"
         drop_path: float = 0.0,
         kernel_size: int = 7,
         expansion_ratio: float = 1.5,
         conv_ratio: float = 1.0,
     ):
         super().__init__()
-        if upsampler in ["ps", "gps"]:
+        if upsampler in ['ps', 'gps']:
             out_ch = in_ch
         dp_rates = [x.item() for x in torch.linspace(0, drop_path, n_block)]
         self.gblocks = nn.Sequential(
@@ -182,13 +190,14 @@ class MoSR(nn.Module):
 
         self.shortcut = ConvBlock(in_ch, dim)
 
-        if upsampler == "ps":
+        if upsampler == 'ps':
             self.upsampler = nn.Sequential(
-                nn.Conv2d(dim, out_ch * (upscale**2), 3, 1, 1), nn.PixelShuffle(upscale)
+                nn.Conv2d(dim, out_ch * (upscale**2), 3, 1, 1),
+                nn.PixelShuffle(upscale),
             )
-        elif upsampler == "gps":
+        elif upsampler == 'gps':
             self.upsampler = GPS(dim, upscale, out_ch)
-        elif upsampler == "dys":
+        elif upsampler == 'dys':
             self.upsampler = DySample(dim, out_ch, upscale)
         else:
             raise ValueError(

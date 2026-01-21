@@ -11,7 +11,13 @@ from ....util import store_hyperparameters
 
 class SeperableConv2d(nn.Module):
     def __init__(
-        self, in_channels, out_channels, kernel_size, stride=1, padding=1, bias=True
+        self,
+        in_channels,
+        out_channels,
+        kernel_size,
+        stride=1,
+        padding=1,
+        bias=True,
     ):
         super().__init__()
         self.depthwise = nn.Conv2d(
@@ -23,7 +29,9 @@ class SeperableConv2d(nn.Module):
             bias=bias,
             padding=padding,
         )
-        self.pointwise = nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=bias)
+        self.pointwise = nn.Conv2d(
+            in_channels, out_channels, kernel_size=1, bias=bias
+        )
 
     def forward(self, x):
         return self.pointwise(self.depthwise(x))
@@ -42,7 +50,9 @@ class ConvBlock(nn.Module):
         super().__init__()
 
         self.use_act = use_act
-        self.cnn = SeperableConv2d(in_channels, out_channels, **kwargs, bias=not use_bn)
+        self.cnn = SeperableConv2d(
+            in_channels, out_channels, **kwargs, bias=not use_bn
+        )
         self.bn = nn.BatchNorm2d(out_channels) if use_bn else nn.Identity()
         self.act = (
             nn.LeakyReLU(0.2, inplace=True)
@@ -51,7 +61,11 @@ class ConvBlock(nn.Module):
         )
 
     def forward(self, x):
-        return self.act(self.bn(self.cnn(x))) if self.use_act else self.bn(self.cnn(x))
+        return (
+            self.act(self.bn(self.cnn(x)))
+            if self.use_act
+            else self.bn(self.cnn(x))
+        )
 
 
 class UpsampleBlock(nn.Module):
@@ -82,7 +96,12 @@ class ResidualBlock(nn.Module):
             in_channels, in_channels, kernel_size=3, stride=1, padding=1
         )
         self.block2 = ConvBlock(
-            in_channels, in_channels, kernel_size=3, stride=1, padding=1, use_act=False
+            in_channels,
+            in_channels,
+            kernel_size=3,
+            stride=1,
+            padding=1,
+            use_act=False,
         )
 
     def forward(self, x):
@@ -99,6 +118,7 @@ class Generator(nn.Module):
         num_channels (int): number of hidden channels.
         num_blocks (int): number of residual blocks.
         upscale_factor (int): factor to upscale the image [2x, 4x, 8x].
+
     Returns:
         torch.Tensor: super resolution image
     """
@@ -116,11 +136,16 @@ class Generator(nn.Module):
         super().__init__()
 
         self.initial = ConvBlock(
-            in_channels, num_channels, kernel_size=9, stride=1, padding=4, use_bn=False
+            in_channels,
+            num_channels,
+            kernel_size=9,
+            stride=1,
+            padding=4,
+            use_bn=False,
         )
-        self.residual = nn.Sequential(
-            *[ResidualBlock(num_channels) for _ in range(num_blocks)]
-        )
+        self.residual = nn.Sequential(*[
+            ResidualBlock(num_channels) for _ in range(num_blocks)
+        ])
         self.convblock = ConvBlock(
             num_channels,
             num_channels,
@@ -129,12 +154,10 @@ class Generator(nn.Module):
             padding=1,
             use_act=False,
         )
-        self.upsampler = nn.Sequential(
-            *[
-                UpsampleBlock(num_channels, scale_factor=2)
-                for _ in range(int(math.log2(upscale_factor)))
-            ]
-        )
+        self.upsampler = nn.Sequential(*[
+            UpsampleBlock(num_channels, scale_factor=2)
+            for _ in range(int(math.log2(upscale_factor)))
+        ])
         self.final_conv = SeperableConv2d(
             num_channels, in_channels, kernel_size=9, stride=1, padding=4
         )

@@ -1,11 +1,12 @@
-import torch
-from dataclasses import dataclass
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from collections import OrderedDict
+from dataclasses import dataclass
+
+import torch
 
 
 @dataclass
-class Arch(metaclass=ABCMeta):
+class Arch(ABC):
     base_arch: str
     unique_shapes: dict
     excluded_keys: list
@@ -17,39 +18,39 @@ class Arch(metaclass=ABCMeta):
 
 
 class RIFE46(Arch):
-    base_arch: str = "rife"
+    base_arch: str = 'rife'
     unique_shapes: dict = {}
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.encode.cnn0.bias",
-        "module.encode.cnn1.weight",
-        "module.encode.cnn1.bias",
-        "module.encode.cnn2.weight",
-        "module.encode.cnn2.bias",
-        "module.encode.cnn3.weight",
-        "module.encode.cnn3.bias",
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.caltime.0.weight",
-        "module.caltime.0.bias",
-        "module.caltime.2.weight",
-        "module.caltime.2.bias",
-        "module.caltime.4.weight",
-        "module.caltime.4.bias",
-        "module.caltime.6.weight",
-        "module.caltime.6.bias",
-        "module.caltime.8.weight",
-        "module.caltime.8.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "caltime.8.bias",  # thos is because for some reason, this arch is detected when loading gmfss pro's rife component.
-        "encoder.pyramid1.0.0.weight",  # ifrnet
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.encode.cnn0.bias',
+        'module.encode.cnn1.weight',
+        'module.encode.cnn1.bias',
+        'module.encode.cnn2.weight',
+        'module.encode.cnn2.bias',
+        'module.encode.cnn3.weight',
+        'module.encode.cnn3.bias',
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.caltime.0.weight',
+        'module.caltime.0.bias',
+        'module.caltime.2.weight',
+        'module.caltime.2.bias',
+        'module.caltime.4.weight',
+        'module.caltime.4.bias',
+        'module.caltime.6.weight',
+        'module.caltime.6.bias',
+        'module.caltime.8.weight',
+        'module.caltime.8.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'caltime.8.bias',  # thos is because for some reason, this arch is detected when loading gmfss pro's rife component.
+        'encoder.pyramid1.0.0.weight',  # ifrnet
     ]
 
     @staticmethod
@@ -60,30 +61,30 @@ class RIFE46(Arch):
 
 
 class RIFE47(Arch):
-    base_arch: str = "rife"
+    base_arch: str = 'rife'
     unique_shapes: dict = {}
     excluded_keys: list = [
-        "module.encode.cnn0.bias",
-        "module.encode.cnn1.weight",
-        "module.encode.cnn1.bias",
-        "module.encode.cnn2.weight",
-        "module.encode.cnn2.bias",
-        "module.encode.cnn3.weight",
-        "module.encode.cnn3.bias",
-        "module.caltime.0.weight",
-        "module.caltime.0.bias",
-        "module.caltime.2.weight",
-        "module.caltime.2.bias",
-        "module.caltime.4.weight",
-        "module.caltime.4.bias",
-        "module.caltime.6.weight",
-        "module.caltime.6.bias",
-        "module.caltime.8.weight",
-        "module.caltime.8.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.cnn0.bias',
+        'module.encode.cnn1.weight',
+        'module.encode.cnn1.bias',
+        'module.encode.cnn2.weight',
+        'module.encode.cnn2.bias',
+        'module.encode.cnn3.weight',
+        'module.encode.cnn3.bias',
+        'module.caltime.0.weight',
+        'module.caltime.0.bias',
+        'module.caltime.2.weight',
+        'module.caltime.2.bias',
+        'module.caltime.4.weight',
+        'module.caltime.4.bias',
+        'module.caltime.6.weight',
+        'module.caltime.6.bias',
+        'module.caltime.8.weight',
+        'module.caltime.8.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -94,28 +95,28 @@ class RIFE47(Arch):
 
 
 class RIFE413(Arch):
-    base_arch: str = "rife"
+    base_arch: str = 'rife'
     unique_shapes: dict = {}
 
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.caltime.0.weight",
-        "module.caltime.0.bias",
-        "module.caltime.2.weight",
-        "module.caltime.2.bias",
-        "module.caltime.4.weight",
-        "module.caltime.4.bias",
-        "module.caltime.6.weight",
-        "module.caltime.6.bias",
-        "module.caltime.8.weight",
-        "module.caltime.8.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.caltime.0.weight',
+        'module.caltime.0.bias',
+        'module.caltime.2.weight',
+        'module.caltime.2.bias',
+        'module.caltime.4.weight',
+        'module.caltime.4.bias',
+        'module.caltime.6.weight',
+        'module.caltime.6.bias',
+        'module.caltime.8.weight',
+        'module.caltime.8.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -126,17 +127,17 @@ class RIFE413(Arch):
 
 
 class RIFE420(Arch):
-    base_arch: str = "rife"
-    unique_shapes: dict = {"module.block0.conv0.1.0.bias": "torch.Size([384])"}
+    base_arch: str = 'rife'
+    unique_shapes: dict = {'module.block0.conv0.1.0.bias': 'torch.Size([384])'}
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -147,17 +148,17 @@ class RIFE420(Arch):
 
 
 class RIFE421(Arch):
-    base_arch: str = "rife"
-    unique_shapes: dict = {"module.block0.conv0.1.0.bias": "torch.Size([256])"}
+    base_arch: str = 'rife'
+    unique_shapes: dict = {'module.block0.conv0.1.0.bias': 'torch.Size([256])'}
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     def module():
@@ -167,17 +168,17 @@ class RIFE421(Arch):
 
 
 class RIFE422lite(Arch):
-    base_arch: str = "rife"
-    unique_shapes: dict = {"module.block0.conv0.1.0.bias": "torch.Size([192])"}
+    base_arch: str = 'rife'
+    unique_shapes: dict = {'module.block0.conv0.1.0.bias': 'torch.Size([192])'}
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -188,19 +189,19 @@ class RIFE422lite(Arch):
 
 
 class RIFE425(Arch):
-    base_arch: str = "rife"
+    base_arch: str = 'rife'
     unique_shapes: dict = {
-        "module.block4.lastconv.0.bias": "torch.Size([52])",
-        "module.block0.conv0.0.0.weight": "torch.Size([96, 15, 3, 3])",
+        'module.block4.lastconv.0.bias': 'torch.Size([52])',
+        'module.block0.conv0.0.0.weight': 'torch.Size([96, 15, 3, 3])',
     }
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -211,19 +212,19 @@ class RIFE425(Arch):
 
 
 class RIFE425_heavy(Arch):
-    base_arch: str = "rife"
+    base_arch: str = 'rife'
     unique_shapes: dict = {
-        "module.block0.lastconv.0.bias": "torch.Size([52])",
-        "module.block0.conv0.0.0.weight": "torch.Size([96, 39, 3, 3])",
+        'module.block0.lastconv.0.bias': 'torch.Size([52])',
+        'module.block0.conv0.0.0.weight': 'torch.Size([96, 39, 3, 3])',
     }
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -234,17 +235,17 @@ class RIFE425_heavy(Arch):
 
 
 class GMFSS(Arch):
-    base_arch: str = "gmfss"
+    base_arch: str = 'gmfss'
     unique_shapes: dict = {
-        "transformer.layers.4.self_attn.merge.weight": "torch.Size([128, 128])"
+        'transformer.layers.4.self_attn.merge.weight': 'torch.Size([128, 128])'
     }
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "fnet.layer1.0.conv1.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'fnet.layer1.0.conv1.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     @staticmethod
@@ -255,15 +256,17 @@ class GMFSS(Arch):
 
 
 class GIMM(Arch):
-    base_arch: str = "gimm"
-    unique_shapes: dict = {"fnet.layer1.0.conv1.weight": "torch.Size([64, 64, 3, 3])"}
+    base_arch: str = 'gimm'
+    unique_shapes: dict = {
+        'fnet.layer1.0.conv1.weight': 'torch.Size([64, 64, 3, 3])'
+    }
     excluded_keys: list = [
-        "module.encode.0.weight",
-        "module.encode.0.bias",
-        "module.encode.1.weight",
-        "module.encode.1.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "encoder.pyramid1.0.0.weight",
+        'module.encode.0.weight',
+        'module.encode.0.bias',
+        'module.encode.1.weight',
+        'module.encode.1.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'encoder.pyramid1.0.0.weight',
     ]
 
     def module() -> torch.nn.Module:
@@ -273,16 +276,16 @@ class GIMM(Arch):
 
 
 class IFRNET(Arch):
-    base_arch: str = "ifrnet"
+    base_arch: str = 'ifrnet'
     unique_shapes: dict = {
-        "encoder.pyramid1.0.0.weight": "torch.Size([32, 3, 3, 3])",
+        'encoder.pyramid1.0.0.weight': 'torch.Size([32, 3, 3, 3])',
     }
     excluded_keys: list = [
-        "module.caltime.8.bias",
-        "module.block4.lastconv.0.bias",
-        "transformer.layers.4.self_attn.merge.weight",
-        "fnet.layer1.0.conv1.weight",
-        "caltime.8.bias",
+        'module.caltime.8.bias',
+        'module.block4.lastconv.0.bias',
+        'transformer.layers.4.self_attn.merge.weight',
+        'fnet.layer1.0.conv1.weight',
+        'caltime.8.bias',
     ]
 
     def module() -> torch.nn.Module:
@@ -312,13 +315,15 @@ class ArchDetect:
             self.state_dict = pkl_path
         else:
             self.state_dict = torch.load(
-                pkl_path, weights_only=True, map_location=torch.device("cpu")
+                pkl_path, weights_only=True, map_location=torch.device('cpu')
             )
         # this is specific to loading gmfss, as its loaded in as one big pkl
-        if "flownet" in self.state_dict:
-            self.state_dict = self.state_dict["flownet"]  # load in GMFSS FLOWNET
-        if "raft" in self.state_dict:  # load in GIMM RAFT
-            self.state_dict = self.state_dict["raft"]
+        if 'flownet' in self.state_dict:
+            self.state_dict = self.state_dict[
+                'flownet'
+            ]  # load in GMFSS FLOWNET
+        if 'raft' in self.state_dict:  # load in GIMM RAFT
+            self.state_dict = self.state_dict['raft']
         self.keys = self.state_dict.keys()
         self.key_shape_pair = self.detect_weights()
         self.detected_arch = self.compare_arch()
@@ -345,7 +350,9 @@ class ArchDetect:
             if type(arch.unique_shapes) is dict:
                 for key1, uniqueshape1 in arch.unique_shapes.items():
                     try:  # the key might not be in the state_dict
-                        if not str(self.state_dict[key1].shape) == str(uniqueshape1):
+                        if not str(self.state_dict[key1].shape) == str(
+                            uniqueshape1
+                        ):
                             arch_dict[arch] = False
                     except KeyError:
                         arch_dict[arch] = False
@@ -376,10 +383,10 @@ class ArchDetect:
         return self.detected_arch.module()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import os
 
-    for file in os.listdir("."):
-        if ".pkl" in file:
+    for file in os.listdir('.'):
+        if '.pkl' in file:
             ra = ArchDetect(file)
             print(ra.getArchName())

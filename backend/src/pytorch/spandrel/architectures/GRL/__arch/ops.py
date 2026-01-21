@@ -24,7 +24,9 @@ def blc_to_bchw(x: torch.Tensor, x_size: tuple[int, int]) -> torch.Tensor:
     return x.transpose(1, 2).view(B, C, *x_size)
 
 
-def blc_to_bhwc(x: torch.Tensor, x_size: tuple[int, int] | list[int]) -> torch.Tensor:
+def blc_to_bhwc(
+    x: torch.Tensor, x_size: tuple[int, int] | list[int]
+) -> torch.Tensor:
     """Rearrange a tensor from the shape (B, L, C) to (B, H, W, C)."""
     B, _L, C = x.shape
     return x.view(B, *x_size, C)
@@ -41,10 +43,16 @@ def window_partition(x, window_size: tuple[int, int] | list[int]):
     """
     B, H, W, C = x.shape
     x = x.view(
-        B, H // window_size[0], window_size[0], W // window_size[1], window_size[1], C
+        B,
+        H // window_size[0],
+        window_size[0],
+        W // window_size[1],
+        window_size[1],
+        C,
     )
     windows = (
-        x.permute(0, 1, 3, 2, 4, 5)
+        x
+        .permute(0, 1, 3, 2, 4, 5)
         .contiguous()
         .view(-1, window_size[0], window_size[1], C)
     )
@@ -66,7 +74,12 @@ def window_reverse(
     H, W = img_size
     B = int(windows.shape[0] / (H * W / window_size[0] / window_size[1]))
     x = windows.view(
-        B, H // window_size[0], W // window_size[1], window_size[0], window_size[1], -1
+        B,
+        H // window_size[0],
+        W // window_size[1],
+        window_size[0],
+        window_size[1],
+        -1,
     )
     x = x.permute(0, 1, 3, 2, 4, 5).contiguous().view(B, H, W, -1)
     return x
@@ -138,7 +151,9 @@ def calculate_mask_all(
     Use case: 3)
     """
     # calculate attention mask for SW-MSA
-    anchor_resolution = [s // anchor_window_down_factor for s in input_resolution]
+    anchor_resolution = [
+        s // anchor_window_down_factor for s in input_resolution
+    ]
     aws = [s // anchor_window_down_factor for s in window_size]
     anchor_shift = [s // anchor_window_down_factor for s in shift_size]
 
@@ -164,7 +179,9 @@ def _get_meshgrid_coords(
 ):
     coord_h = torch.arange(start_coords[0], end_coords[0])
     coord_w = torch.arange(start_coords[1], end_coords[1])
-    coords = torch.stack(torch.meshgrid([coord_h, coord_w], indexing="ij"))  # 2, Wh, Ww
+    coords = torch.stack(
+        torch.meshgrid([coord_h, coord_w], indexing='ij')
+    )  # 2, Wh, Ww
     coords = torch.flatten(coords, 1)  # 2, Wh*Ww
     return coords
 
@@ -178,6 +195,7 @@ def get_relative_coords_table_all(
     Use case: 3)
 
     Support all window shapes.
+
     Args:
         window_size:
         pretrained_window_size:
@@ -204,9 +222,9 @@ def get_relative_coords_table_all(
 
     coord_h = torch.arange(ts_n[0], ts_p[0] + 1, dtype=torch.float32)
     coord_w = torch.arange(ts_n[1], ts_p[1] + 1, dtype=torch.float32)
-    table = torch.stack(torch.meshgrid([coord_h, coord_w], indexing="ij")).permute(
-        1, 2, 0
-    )
+    table = torch.stack(
+        torch.meshgrid([coord_h, coord_w], indexing='ij')
+    ).permute(1, 2, 0)
     table = table.contiguous().unsqueeze(0)  # 1, Wh+AWh-1, Ww+AWw-1, 2
     if pts[0] > 0:
         table[:, :, :, 0] /= pts[0]
@@ -252,8 +270,12 @@ def get_relative_position_index_simple(
     max_horizontal_diff = aws[1] + ws[1] - 1
     if window_to_anchor:
         offset = [w2 - 1 for w2 in aws]
-        idx = coords_diff_odd(coords, coords_anchor, offset, max_horizontal_diff)
+        idx = coords_diff_odd(
+            coords, coords_anchor, offset, max_horizontal_diff
+        )
     else:
         offset = [w1 - 1 for w1 in ws]
-        idx = coords_diff_odd(coords_anchor, coords, offset, max_horizontal_diff)
+        idx = coords_diff_odd(
+            coords_anchor, coords, offset, max_horizontal_diff
+        )
     return idx  # Wh*Ww, AWh*AWw or AWh*AWw, Wh*Ww

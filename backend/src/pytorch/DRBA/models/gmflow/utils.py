@@ -16,7 +16,10 @@ def split_feature(
         w_new = w // num_splits
 
         feature = (
-            feature.view(b, num_splits, h // num_splits, num_splits, w // num_splits, c)
+            feature
+            .view(
+                b, num_splits, h // num_splits, num_splits, w // num_splits, c
+            )
             .permute(0, 1, 3, 2, 4, 5)
             .reshape(b_new, h_new, w_new, c)
         )  # [B*K*K, H/K, W/K, C]
@@ -29,7 +32,10 @@ def split_feature(
         w_new = w // num_splits
 
         feature = (
-            feature.view(b, c, num_splits, h // num_splits, num_splits, w // num_splits)
+            feature
+            .view(
+                b, c, num_splits, h // num_splits, num_splits, w // num_splits
+            )
             .permute(0, 2, 4, 1, 3, 5)
             .reshape(b_new, c, h_new, w_new)
         )  # [B*K*K, C, H/K, W/K]
@@ -48,7 +54,8 @@ def merge_splits(
 
         splits = splits.view(new_b, num_splits, num_splits, h, w, c)
         merge = (
-            splits.permute(0, 1, 3, 2, 4, 5)
+            splits
+            .permute(0, 1, 3, 2, 4, 5)
             .contiguous()
             .view(new_b, num_splits * h, num_splits * w, c)
         )  # [B, H, W, C]
@@ -58,7 +65,8 @@ def merge_splits(
 
         splits = splits.view(new_b, num_splits, num_splits, c, h, w)
         merge = (
-            splits.permute(0, 3, 1, 4, 2, 5)
+            splits
+            .permute(0, 3, 1, 4, 2, 5)
             .contiguous()
             .view(new_b, c, num_splits * h, num_splits * w)
         )  # [B, C, H, W]

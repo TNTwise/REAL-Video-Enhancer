@@ -5,12 +5,12 @@
 import torch
 
 ##########################################################
-device = "cuda" if torch.cuda.is_available() else "cpu"
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 grid_cache = {}
 out_cache = {}
 linear_cache = {}
-torch.set_float32_matmul_precision("medium")
+torch.set_float32_matmul_precision('medium')
 torch.set_grad_enabled(False)
 
 ##########################################################
@@ -18,38 +18,46 @@ torch.set_grad_enabled(False)
 
 @torch.inference_mode()
 def softsplat(
-    tenIn: torch.Tensor, tenFlow: torch.Tensor, tenMetric: torch.Tensor, strMode: str
+    tenIn: torch.Tensor,
+    tenFlow: torch.Tensor,
+    tenMetric: torch.Tensor,
+    strMode: str,
 ):
-    mode_parts = strMode.split("-")
+    mode_parts = strMode.split('-')
     mode_main = mode_parts[0]
     mode_sub = mode_parts[1] if len(mode_parts) > 1 else None
 
-    assert mode_main in ["sum", "avg", "linear", "soft"]
-    if mode_main in ["sum", "avg"]:
+    assert mode_main in ['sum', 'avg', 'linear', 'soft']
+    if mode_main in ['sum', 'avg']:
         assert tenMetric is None
-    if mode_main in ["linear", "soft"]:
+    if mode_main in ['linear', 'soft']:
         assert tenMetric is not None
 
     # Sanity: for 'linear'/'soft' we require matching spatial shapes
-    if mode_main in ["linear", "soft"]:
+    if mode_main in ['linear', 'soft']:
         if tenIn.shape[2:] != tenMetric.shape[2:]:
             raise ValueError(
-                f"softsplat: mismatched spatial sizes between input {tenIn.shape} and metric {tenMetric.shape}"
+                f'softsplat: mismatched spatial sizes between input {tenIn.shape} and metric {tenMetric.shape}'
             )
 
     # Precompute exp once (bitwise identical vs computing twice)
-    metric_exp = tenMetric.exp() if mode_main == "soft" else None
+    metric_exp = tenMetric.exp() if mode_main == 'soft' else None
 
     mode_to_operation = {
-        "avg": lambda: torch.cat(
+        'avg': lambda: torch.cat(
             [
                 tenIn,
-                tenIn.new_ones([tenIn.shape[0], 1, tenIn.shape[2], tenIn.shape[3]]),
+                tenIn.new_ones([
+                    tenIn.shape[0],
+                    1,
+                    tenIn.shape[2],
+                    tenIn.shape[3],
+                ]),
             ],
             1,
         ),
-        "linear": lambda: torch.cat([tenIn * tenMetric, tenMetric], 1),
-        "soft": lambda: torch.cat([tenIn * metric_exp, metric_exp], 1),
+        'linear': lambda: torch.cat([tenIn * tenMetric, tenMetric], 1),
+        'soft': lambda: torch.cat([tenIn * metric_exp, metric_exp], 1),
     }
 
     if mode_main in mode_to_operation:
@@ -57,16 +65,16 @@ def softsplat(
 
     tenOut = softsplat_func.apply(tenIn, tenFlow)
 
-    if mode_main in ["avg", "linear", "soft"]:
+    if mode_main in ['avg', 'linear', 'soft']:
         tenNormalize = tenOut[:, -1:, :, :]
 
         normalize_modes = {
             None: lambda x: x + 0.0000001,
-            "addeps": lambda x: x + 0.0000001,
-            "zeroeps": lambda x: torch.where(
+            'addeps': lambda x: x + 0.0000001,
+            'zeroeps': lambda x: torch.where(
                 x == 0.0, torch.tensor(1.0, device=x.device), x
             ),
-            "clipeps": lambda x: x.clip(0.0000001, None),
+            'clipeps': lambda x: x.clip(0.0000001, None),
         }
 
         if mode_sub in normalize_modes:
@@ -91,7 +99,7 @@ class softsplat_func(torch.autograd.Function):
     @staticmethod
     @torch.inference_mode()
     @torch.amp.custom_fwd(device_type=device)
-    def forward(ctx, tenIn: torch.Tensor, tenFlow: torch.Tensor):  # noqa: D401
+    def forward(ctx, tenIn: torch.Tensor, tenFlow: torch.Tensor):
         # Shapes / device
         N, C, H, W = tenIn.shape
         dev = tenIn.device
@@ -103,7 +111,7 @@ class softsplat_func(torch.autograd.Function):
             gy, gx = torch.meshgrid(
                 torch.arange(H, device=dev, dtype=origdtype),
                 torch.arange(W, device=dev, dtype=origdtype),
-                indexing="ij",
+                indexing='ij',
             )
             grid_cache[key] = (gy[None, None], gx[None, None])  # (1,1,H,W)
         gy, gx = grid_cache[key]

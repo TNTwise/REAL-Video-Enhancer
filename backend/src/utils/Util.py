@@ -1,16 +1,19 @@
-import os
-import sys
-import subprocess
 import contextlib
 import logging
+import os
+import pathlib
+import subprocess
+import sys
+
 from .Colors import Colors
 from .LogConfig import configure_logging
 
 # non standard python libraries
 try:
-    import numpy as np
-    import cv2
     import shutil
+
+    import cv2
+    import numpy as np
 except ImportError:
     pass
 
@@ -18,7 +21,7 @@ except ImportError:
 @contextlib.contextmanager
 def suppress_stdout_stderr():
     """Suppress stdout and stderr by redirecting them to /dev/null."""
-    with open(os.devnull, "w") as devnull:
+    with pathlib.Path(os.devnull).open('w') as devnull:
         old_stdout_fd = os.dup(1)
         old_stderr_fd = os.dup(2)
         try:
@@ -44,16 +47,16 @@ _logger = logging.getLogger(__name__)
 
 def removeFile(file):
     try:
-        os.remove(file)
+        pathlib.Path(file).unlink()
     except Exception:
-        _logger.exception("Failed to remove file: %s", file)
+        _logger.exception('Failed to remove file: %s', file)
 
 
 def removeFolder(folder):
     try:
         shutil.rmtree(folder)
     except Exception:
-        _logger.exception("Failed to remove folder: %s", folder)
+        _logger.exception('Failed to remove folder: %s', folder)
 
 
 def warnAndLog(message: str):
@@ -61,29 +64,34 @@ def warnAndLog(message: str):
 
 
 def errorAndLog(message: str):
-    raise os.error("ERROR: " + message)
+    raise OSError('ERROR: ' + message)
 
 
 def log_error(message: str):
-    _logger.error(Colors.RED + "ERROR: " + message + Colors.RESET)
+    _logger.error(Colors.RED + 'ERROR: ' + message + Colors.RESET)
 
 
 def log(message: str, show_backend=True):
     """
     Log is now depricated, just using print now.
     """
-    _logger.info("%s", message)
+    _logger.info('%s', message)
     # message = message + "\n\n\n\n" + "-" * len(message)
     # print(message, file=sys.stderr)
 
 
 def bytesToImg(
-    image: bytes, width, height, outputWidth: int = None, outputHeight: int = None
+    image: bytes,
+    width,
+    height,
+    outputWidth: int = None,
+    outputHeight: int = None,
 ):
     channels = len(image) / (height * width)  # 3 if RGB24/SDR, 6 if RGB48/HDR
     hdr = channels == 6
     frame = (
-        np.frombuffer(image, dtype=np.uint16 if hdr else np.uint8)
+        np
+        .frombuffer(image, dtype=np.uint16 if hdr else np.uint8)
         .reshape(height, width, 3)
         .astype(np.uint8)
     )  # downgrade to sdr for scenedetect... its good enough.
@@ -100,17 +108,16 @@ def get_pytorch_vram() -> int:
         import torch
 
         if torch.cuda.is_available():
-            device = torch.device("cuda")
+            device = torch.device('cuda')
             props = torch.cuda.get_device_properties(device)
             vram_in_mb = props.total_memory // (1024**2)  # Convert bytes to MB
             return vram_in_mb
-        else:
-            return 0
+        return 0
     except ImportError as e:
-        _logger.exception("%s", e)
+        _logger.exception('%s', e)
         return 0
     except Exception as e:
-        _logger.exception("%s", e)
+        _logger.exception('%s', e)
         return 0
 
 
@@ -142,7 +149,7 @@ def resize_image_np(image, target_width: int, target_height: int):
         )
     except Exception:
         _logger.exception(
-            "cv2.resize failed with interpolation=%s; retrying with defaults",
+            'cv2.resize failed with interpolation=%s; retrying with defaults',
             interpolation,
         )
         resized_image = cv2.resize(image, (target_width, target_height))
@@ -150,7 +157,11 @@ def resize_image_np(image, target_width: int, target_height: int):
 
 
 def resize_image_bytes(
-    image_bytes: bytes, width: int, height: int, target_width: int, target_height: int
+    image_bytes: bytes,
+    width: int,
+    height: int,
+    target_width: int,
+    target_height: int,
 ) -> bytes:
     """
     Resizes the image to the target resolution.
@@ -182,11 +193,13 @@ def resize_image_bytes(
     # Resize the image
     try:
         resized_image = cv2.resize(
-            image_array, (target_width, target_height), interpolation=interpolation
+            image_array,
+            (target_width, target_height),
+            interpolation=interpolation,
         )
     except Exception:
         _logger.exception(
-            "cv2.resize failed with interpolation=%s; retrying with defaults",
+            'cv2.resize failed with interpolation=%s; retrying with defaults',
             interpolation,
         )
         resized_image = cv2.resize(image_array, (target_width, target_height))
@@ -243,9 +256,9 @@ class subprocess_popen_without_terminal(subprocess.Popen):
     """
 
     def __init__(self, *args, **kwargs):
-        if PLATFORM == "win32":
-            kwargs["startupinfo"] = subprocess.STARTUPINFO()
-            kwargs["startupinfo"].dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        if PLATFORM == 'win32':
+            kwargs['startupinfo'] = subprocess.STARTUPINFO()
+            kwargs['startupinfo'].dwFlags |= subprocess.STARTF_USESHOWWINDOW
         super().__init__(*args, **kwargs)
 
 
@@ -257,14 +270,12 @@ class CudaChecker:
     @staticmethod
     def checkForCUDA() -> bool:
         try:
-            import torch
-            import torchvision
             import cupy
 
             if cupy.cuda.get_cuda_path() == None:
                 return False
-        except Exception as e:
-            _logger.exception("CUDA environment check failed")
+        except Exception:
+            _logger.exception('CUDA environment check failed')
             return False
         return True
 
@@ -275,5 +286,5 @@ class CudaChecker:
 
             return torch.cuda.is_available()
         except Exception:
-            _logger.exception("PyTorch CUDA availability check failed")
+            _logger.exception('PyTorch CUDA availability check failed')
             return False

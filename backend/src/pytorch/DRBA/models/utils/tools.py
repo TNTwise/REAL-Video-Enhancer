@@ -1,16 +1,17 @@
-from ...models.pytorch_msssim import ssim_matlab
-from torch.nn import functional as F
-from PIL import ImageDraw, ImageFont
-from torchvision import transforms
+import _thread
+import logging
+import math
+import subprocess
+from queue import Queue
+
 import cv2
 import numpy as np
 import torch
-import math
-from queue import Queue
-import _thread
-import subprocess
-import logging
+from PIL import ImageDraw, ImageFont
+from torch.nn import functional as F
+from torchvision import transforms
 
+from ...models.pytorch_msssim import ssim_matlab
 
 logger = logging.getLogger(__name__)
 
@@ -25,26 +26,31 @@ def check_cupy_env():
     except ImportError:
         SUPPORT_CUPY = False
     except Exception:
-        logger.exception("Error while checking CuPy environment")
+        logger.exception('Error while checking CuPy environment')
         SUPPORT_CUPY = False
 
     return SUPPORT_CUPY
 
 
 def check_scene(x1, x2, scdet_threshold=0.3):
-    x1 = F.interpolate(x1, (32, 32), mode="bilinear", align_corners=False)
-    x2 = F.interpolate(x2, (32, 32), mode="bilinear", align_corners=False)
+    x1 = F.interpolate(x1, (32, 32), mode='bilinear', align_corners=False)
+    x2 = F.interpolate(x2, (32, 32), mode='bilinear', align_corners=False)
     return ssim_matlab(x1, x2) < scdet_threshold
 
 
-def to_tensor(img, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")):
+def to_tensor(
+    img, device=torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+):
     return (
-        torch.from_numpy(img.transpose(2, 0, 1)).unsqueeze(0).float().to(device) / 255.0
+        torch.from_numpy(img.transpose(2, 0, 1)).unsqueeze(0).float().to(device)
+        / 255.0
     )
 
 
 def to_cv2(img):
-    return (img[0].cpu().float().numpy().transpose(1, 2, 0) * 255.0).astype(np.uint8)
+    return (img[0].cpu().float().numpy().transpose(1, 2, 0) * 255.0).astype(
+        np.uint8
+    )
 
 
 def get_valid_net_inp_size(img, scale, div=64):
@@ -60,8 +66,8 @@ def get_valid_net_inp_size(img, scale, div=64):
         w = int(w)
 
     return {
-        "src_size": (src_h, src_w),
-        "dst_size": (h, w),
+        'src_size': (src_h, src_w),
+        'dst_size': (h, w),
     }
 
 
@@ -78,7 +84,9 @@ def to_out(tenInp, src_size):
 
 
 def resize(tensor, size):
-    return F.interpolate(tensor, size=size, mode="bilinear", align_corners=False)
+    return F.interpolate(
+        tensor, size=size, mode='bilinear', align_corners=False
+    )
 
 
 # Flow distance calculator
@@ -91,7 +99,9 @@ def distance_calculator(_x):
 
 
 def convert(param):
-    return {k.replace("module.", ""): v for k, v in param.items() if "module." in k}
+    return {
+        k.replace('module.', ''): v for k, v in param.items() if 'module.' in k
+    }
 
 
 def mark_tensor(tensor, text):
@@ -105,8 +115,8 @@ def mark_tensor(tensor, text):
     draw = ImageDraw.Draw(image_pil)
 
     try:
-        font = ImageFont.truetype("arial.ttf", 24)
-    except IOError:
+        font = ImageFont.truetype('arial.ttf', 24)
+    except OSError:
         font = ImageFont.load_default()
 
     text_width, text_height = draw.textsize(text, font=font)
@@ -129,7 +139,12 @@ class TMapper:
         self.now_step = -1
 
     def get_range_timestamps(
-        self, _min: float, _max: float, lclose=True, rclose=False, normalize=True
+        self,
+        _min: float,
+        _max: float,
+        lclose=True,
+        rclose=False,
+        normalize=True,
     ) -> list:
         _min_step = math.ceil(_min * self.times)
         _max_step = math.ceil(_max * self.times)
@@ -139,7 +154,8 @@ class TMapper:
             return []
         if normalize:
             return [
-                ((_i / self.times) - _min) / (_max - _min) for _i in range(_start, _end)
+                ((_i / self.times) - _min) / (_max - _min)
+                for _i in range(_start, _end)
             ]
         return [_i / self.times for _i in range(_start, _end)]
 
@@ -161,12 +177,16 @@ def get_ones_tensor_size(size: tuple, device, dtype: torch.dtype):
     k = (str(device), str(size))
     if k in ones_cache:
         return ones_cache[k]
-    ones_cache[k] = torch.ones(size, requires_grad=False, dtype=dtype).to(device)
+    ones_cache[k] = torch.ones(size, requires_grad=False, dtype=dtype).to(
+        device
+    )
     return ones_cache[k]
 
 
 class VideoFI_IO:
-    def __init__(self, input_path, output_path, dst_fps=60, times=-1, hwaccel=False):
+    def __init__(
+        self, input_path, output_path, dst_fps=60, times=-1, hwaccel=False
+    ):
         self.video_capture = cv2.VideoCapture(input_path)
         self.src_fps = self.video_capture.get(cv2.CAP_PROP_FPS)
         self.dst_fps = dst_fps
@@ -176,7 +196,12 @@ class VideoFI_IO:
         self.width = int(self.video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.ffmpeg_writer = self.generate_frame_renderer(
-            input_path, output_path, self.width, self.height, self.dst_fps, hwaccel
+            input_path,
+            output_path,
+            self.width,
+            self.height,
+            self.dst_fps,
+            hwaccel,
         )
         self.read_buffer = Queue(maxsize=100)
         self.write_buffer = Queue(maxsize=-1)
@@ -188,45 +213,45 @@ class VideoFI_IO:
     def generate_frame_renderer(
         self, input_path, output_path, width, height, dst_fps, hwaccel=False
     ):
-        encoder = "libx264"
-        preset = "medium"
+        encoder = 'libx264'
+        preset = 'medium'
         if hwaccel:
-            encoder = "h264_nvenc"
-            preset = "p7"
+            encoder = 'h264_nvenc'
+            preset = 'p7'
         ffmpeg_cmd = [
-            "ffmpeg",
-            "-y",
-            "-f",
-            "rawvideo",
-            "-pix_fmt",
-            "rgb24",
-            "-r",
-            f"{dst_fps}",
-            "-s",
-            f"{width}x{height}",
-            "-i",
-            "pipe:0",
-            "-i",
+            'ffmpeg',
+            '-y',
+            '-f',
+            'rawvideo',
+            '-pix_fmt',
+            'rgb24',
+            '-r',
+            f'{dst_fps}',
+            '-s',
+            f'{width}x{height}',
+            '-i',
+            'pipe:0',
+            '-i',
             input_path,
-            "-map",
-            "0:v",
-            "-map",
-            "1:a?",
-            "-c:v",
+            '-map',
+            '0:v',
+            '-map',
+            '1:a?',
+            '-c:v',
             encoder,
-            "-movflags",
-            "+faststart",
-            "-pix_fmt",
-            "yuv420p",
-            "-qp",
-            "16",
-            "-preset",
+            '-movflags',
+            '+faststart',
+            '-pix_fmt',
+            'yuv420p',
+            '-qp',
+            '16',
+            '-preset',
             preset,
-            "-c:a",
-            "aac",
-            "-b:a",
-            "320k",
-            f"{output_path}",
+            '-c:a',
+            'aac',
+            '-b:a',
+            '320k',
+            f'{output_path}',
         ]
 
         return subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE)
@@ -243,7 +268,9 @@ class VideoFI_IO:
             item = w_buffer.get()
             if item is None:
                 break
-            self.ffmpeg_writer.stdin.write(np.ascontiguousarray(item[:, :, ::-1]))
+            self.ffmpeg_writer.stdin.write(
+                np.ascontiguousarray(item[:, :, ::-1])
+            )
         self.ffmpeg_writer.stdin.close()
         self.ffmpeg_writer.wait()
 

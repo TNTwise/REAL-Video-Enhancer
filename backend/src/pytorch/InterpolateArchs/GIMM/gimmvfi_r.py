@@ -11,40 +11,39 @@
 # --------------------------------------------------------
 
 
-from tabnanny import check
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 try:
     from .raft import (
-        normalize_flow,
-        unnormalize_flow,
-        warp,
-        resize,
-        build_coord,
-        multi_flow_combine,
+        BasicUpdateBlock,
+        CoordSampler3D,
+        HypoNet,
+        LateralBlock,
         NewInitDecoder,
         NewMultiFlowDecoder,
-        BasicUpdateBlock,
-        LateralBlock,
-        HypoNet,
-        CoordSampler3D,
+        build_coord,
+        multi_flow_combine,
+        normalize_flow,
+        resize,
+        unnormalize_flow,
+        warp,
     )
 except ImportError:
     from raft import (
-        normalize_flow,
-        unnormalize_flow,
-        warp,
-        resize,
-        build_coord,
-        multi_flow_combine,
+        BasicUpdateBlock,
+        CoordSampler3D,
+        HypoNet,
+        LateralBlock,
         NewInitDecoder,
         NewMultiFlowDecoder,
-        BasicUpdateBlock,
-        LateralBlock,
-        HypoNet,
-        CoordSampler3D,
+        build_coord,
+        multi_flow_combine,
+        normalize_flow,
+        resize,
+        unnormalize_flow,
+        warp,
     )
 try:
     from .raftarch import RAFT, BidirCorrBlock
@@ -61,10 +60,10 @@ class GIMMVFI_R(nn.Module):
         self.width = width
         self.height = height
 
-        ######### Encoder and Decoder Settings #########
+        # Encoder and Decoder Settings #########
         model = RAFT()
         ckpt = torch.load(model_path)
-        model.load_state_dict(ckpt["raft"], strict=True)
+        model.load_state_dict(ckpt['raft'], strict=True)
         self.flow_estimator = model
 
         cur_f_dims = [128, 96]
@@ -88,23 +87,23 @@ class GIMMVFI_R(nn.Module):
             nn.Conv2d(6 * self.num_flows, 3, 7, 1, 3),
         )
 
-        ################ GIMM settings #################
+        # GIMM settings #################
         self.coord_sampler = CoordSampler3D([-1.0, 1.0])
 
         self.g_filter = torch.nn.Parameter(
-            torch.Tensor(
-                [
-                    [1.0 / 16.0, 1.0 / 8.0, 1.0 / 16.0],
-                    [1.0 / 8.0, 1.0 / 4.0, 1.0 / 8.0],
-                    [1.0 / 16.0, 1.0 / 8.0, 1.0 / 16.0],
-                ]
-            ).reshape(1, 1, 1, 3, 3),
+            torch.Tensor([
+                [1.0 / 16.0, 1.0 / 8.0, 1.0 / 16.0],
+                [1.0 / 8.0, 1.0 / 4.0, 1.0 / 8.0],
+                [1.0 / 16.0, 1.0 / 8.0, 1.0 / 16.0],
+            ]).reshape(1, 1, 1, 3, 3),
             requires_grad=False,
         )
-        self.fwarp_type = "linear"
+        self.fwarp_type = 'linear'
 
         self.alpha_v = torch.nn.Parameter(torch.Tensor([1]), requires_grad=True)
-        self.alpha_fe = torch.nn.Parameter(torch.Tensor([1]), requires_grad=True)
+        self.alpha_fe = torch.nn.Parameter(
+            torch.Tensor([1]), requires_grad=True
+        )
 
         channel = 32
         in_dim = 2
@@ -117,7 +116,13 @@ class GIMMVFI_R(nn.Module):
             LateralBlock(channel),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
             nn.Conv2d(
-                channel, channel // 2, 3, 1, 1, padding_mode="reflect", bias=True
+                channel,
+                channel // 2,
+                3,
+                1,
+                1,
+                padding_mode='reflect',
+                bias=True,
             ),
         )
         channel = 64
@@ -129,7 +134,13 @@ class GIMMVFI_R(nn.Module):
             LateralBlock(channel),
             nn.LeakyReLU(negative_slope=0.1, inplace=True),
             nn.Conv2d(
-                channel, channel // 2, 3, 1, 1, padding_mode="reflect", bias=True
+                channel,
+                channel // 2,
+                3,
+                1,
+                1,
+                padding_mode='reflect',
+                bias=True,
             ),
         )
 
@@ -155,7 +166,9 @@ class GIMMVFI_R(nn.Module):
         f10, features1, fnet1 = self.flow_estimator(
             im1, im0, return_feat=True, iters=20
         )
-        corr_fn = BidirCorrBlock(self.amt_fproj(fnet0), self.amt_fproj(fnet1), radius=4)
+        corr_fn = BidirCorrBlock(
+            self.amt_fproj(fnet0), self.amt_fproj(fnet1), radius=4
+        )
         features0 = [
             self.amt_second_last_cproj(features0[0]),
             self.amt_last_cproj(features0[1]),
@@ -185,10 +198,9 @@ class GIMMVFI_R(nn.Module):
             if type(tensor) == list:
                 for t in tensor:
                     if torch.isnan(t).any():
-                        print(f"NaNs found in {name}")
-            else:
-                if torch.isnan(tensor).any():
-                    print(f"NaNs found in {name}")
+                        print(f'NaNs found in {name}')
+            elif torch.isnan(tensor).any():
+                print(f'NaNs found in {name}')
 
         raft_flow01 = flows[:, :, 0].detach()
         raft_flow10 = flows[:, :, 1].detach()
@@ -196,10 +208,12 @@ class GIMMVFI_R(nn.Module):
         # check_for_nans(raft_flow10, "raft_flow10")
 
         # calculate splatting metrics
-        weights1, weights2 = self.cal_splatting_weights(raft_flow01, raft_flow10)
+        weights1, weights2 = self.cal_splatting_weights(
+            raft_flow01, raft_flow10
+        )
         # check_for_nans(weights1, "weights1")
         # check_for_nans(weights2, "weights2")
-        strtype = self.fwarp_type + "-zeroeps"
+        strtype = self.fwarp_type + '-zeroeps'
         # check_for_nans(f, "f")
 
         # b,c,h,w
@@ -221,7 +235,9 @@ class GIMMVFI_R(nn.Module):
             strMode=strtype,
         )
 
-        tmp_pixel_latent = torch.cat([tmp_pixel_latent_0, tmp_pixel_latent_1], dim=1)
+        tmp_pixel_latent = torch.cat(
+            [tmp_pixel_latent_0, tmp_pixel_latent_1], dim=1
+        )
         # check_for_nans(tmp_pixel_latent, "tmp_pixel_latent")
         tmp_pixel_latent = tmp_pixel_latent + self.res_conv(
             torch.cat([pixel_latent_0, pixel_latent_1, tmp_pixel_latent], dim=1)
@@ -254,7 +270,14 @@ class GIMMVFI_R(nn.Module):
         return img_warp
 
     def frame_synthesize(
-        self, img_xs, flow_t, features0, features1, corr_fn, cur_t, full_img=None
+        self,
+        img_xs,
+        flow_t,
+        features0,
+        features1,
+        corr_fn,
+        cur_t,
+        full_img=None,
     ):
         """
         flow_t: b,2,h,w
@@ -264,8 +287,8 @@ class GIMMVFI_R(nn.Module):
         img0 = 2 * img_xs[:, :, 0] - 1.0
         img1 = 2 * img_xs[:, :, 1] - 1.0
 
-        ##################### update the predicted flow #####################
-        ##initialize coordinates for looking up
+        # update the predicted flow #####################
+        # initialize coordinates for looking up
         lookup_coord = build_coord(img_xs[:, :, 0]).to(
             img_xs[:, :, 0].device
         )  # H//8,W//8
@@ -277,7 +300,7 @@ class GIMMVFI_R(nn.Module):
         flow_t0_inr4 = inv * resize(flow_t0_fullsize, inv)
         flow_t1_inr4 = inv * resize(flow_t1_fullsize, inv)
 
-        ############################# scale 1/4 #############################
+        # scale 1/4 #############################
         # i. Initialize feature t at scale 1/4
         flowt0_4, flowt1_4, ft_4_ = self.amt_init_decoder(
             features0[-1],
@@ -290,7 +313,9 @@ class GIMMVFI_R(nn.Module):
         features0, features1 = features0[:-1], features1[:-1]
 
         mask_4_, ft_4_ = ft_4_[:, :1], ft_4_[:, 1:]
-        img_warp_4 = self.warp_w_mask(img0, img1, flowt0_4, flowt1_4, mask_4_, scale=4)
+        img_warp_4 = self.warp_w_mask(
+            img0, img1, flowt0_4, flowt1_4, mask_4_, scale=4
+        )
         img_warp_4 = (img_warp_4 + 1.0) / 2
         img_warp_4 = torch.clamp(img_warp_4, 0, 1)
 
@@ -298,7 +323,9 @@ class GIMMVFI_R(nn.Module):
             corr_fn, lookup_coord, flowt0_4, flowt1_4, cur_t, downsample=2
         )
 
-        delta_ft_4_, delta_flow_4 = self.amt_update4_low(ft_4_, flow_4_lr, corr_4)
+        delta_ft_4_, delta_flow_4 = self.amt_update4_low(
+            ft_4_, flow_4_lr, corr_4
+        )
         delta_flow0_4, delta_flow1_4 = torch.chunk(delta_flow_4, 2, 1)
         flowt0_4 = flowt0_4 + delta_flow0_4
         flowt1_4 = flowt1_4 + delta_flow1_4
@@ -313,7 +340,7 @@ class GIMMVFI_R(nn.Module):
         flowt1_4 = flowt1_4 + delta_flow_4[:, 2:4]
         ft_4_ = ft_4_ + delta_ft_4_
 
-        ############################# scale 1/1 #############################
+        # scale 1/1 #############################
         flowt0_1, flowt1_1, mask, img_res = self.amt_final_decoder(
             ft_4_,
             features0[0],
@@ -337,7 +364,14 @@ class GIMMVFI_R(nn.Module):
             img_res = resize(img_res, scale_factor=inv)
 
         imgt_pred = multi_flow_combine(
-            self.amt_comb_block, img0, img1, flowt0_1, flowt1_1, mask, img_res, None
+            self.amt_comb_block,
+            img0,
+            img1,
+            flowt0_1,
+            flowt1_1,
+            mask,
+            img_res,
+            None,
         )
         imgt_pred = torch.clamp(imgt_pred, 0, 1)
 
@@ -355,7 +389,9 @@ class GIMMVFI_R(nn.Module):
         other_pred = [img_warp_4]
         return imgt_pred, flowt0_pred, flowt1_pred, other_pred
 
-    def forward(self, img_xs, coord=None, timestep=None, iters=None, ds_factor=None):
+    def forward(
+        self, img_xs, coord=None, timestep=None, iters=None, ds_factor=None
+    ):
         indtype = img_xs.dtype
         indevice = img_xs.device
 
@@ -364,8 +400,12 @@ class GIMMVFI_R(nn.Module):
             full_size_img = img_xs.clone()
             img_xs = torch.cat(
                 [
-                    resize(img_xs[:, :, 0], scale_factor=ds_factor).unsqueeze(2),
-                    resize(img_xs[:, :, 1], scale_factor=ds_factor).unsqueeze(2),
+                    resize(img_xs[:, :, 0], scale_factor=ds_factor).unsqueeze(
+                        2
+                    ),
+                    resize(img_xs[:, :, 1], scale_factor=ds_factor).unsqueeze(
+                        2
+                    ),
                 ],
                 dim=2,
             ).to(dtype=indtype, device=indevice)
@@ -383,7 +423,9 @@ class GIMMVFI_R(nn.Module):
         )
 
         # List of flows
-        normal_inr_flows = self.predict_flow(normal_flows, coord, timestep, flows)
+        normal_inr_flows = self.predict_flow(
+            normal_flows, coord, timestep, flows
+        )
         cur_flow_t = unnormalize_flow(normal_inr_flows, flow_scalers).squeeze()
 
         if cur_flow_t.ndim != 4:
@@ -405,16 +447,16 @@ class GIMMVFI_R(nn.Module):
     def warp_frame(self, frame, flow):
         return warp(frame, flow)
 
-    def compute_psnr(self, preds, targets, reduction="mean"):
-        assert reduction in ["mean", "sum", "none"]
+    def compute_psnr(self, preds, targets, reduction='mean'):
+        assert reduction in ['mean', 'sum', 'none']
         batch_size = preds.shape[0]
-        sample_mses = torch.reshape((preds - targets) ** 2, (batch_size, -1)).mean(
-            dim=-1
-        )
+        sample_mses = torch.reshape(
+            (preds - targets) ** 2, (batch_size, -1)
+        ).mean(dim=-1)
 
-        if reduction == "mean":
+        if reduction == 'mean':
             psnr = (-10 * torch.log10(sample_mses)).mean()
-        elif reduction == "sum":
+        elif reduction == 'sum':
             psnr = (-10 * torch.log10(sample_mses)).sum()
         else:
             psnr = -10 * torch.log10(sample_mses)
@@ -442,21 +484,20 @@ class GIMMVFI_R(nn.Module):
             if type(tensor) == list:
                 for t in tensor:
                     if torch.isnan(t).any():
-                        print(f"NaNs found in {name}")
-            else:
-                if torch.isnan(tensor).any():
-                    print(f"NaNs found in {name}")
+                        print(f'NaNs found in {name}')
+            elif torch.isnan(tensor).any():
+                print(f'NaNs found in {name}')
 
         batch_size = raft_flow01.shape[0]
         raft_flows = torch.cat([raft_flow01, raft_flow10], dim=0)
 
-        ## flow variance metric
+        # flow variance metric
         sqaure_mean, mean_square = torch.split(
             F.conv3d(
                 F.pad(
                     torch.cat([raft_flows**2, raft_flows], 1),
                     (1, 1, 1, 1),
-                    mode="reflect",
+                    mode='reflect',
                 ).unsqueeze(1),
                 self.g_filter,
             ).squeeze(1),
@@ -476,36 +517,40 @@ class GIMMVFI_R(nn.Module):
         var01 = var[:batch_size]
         var10 = var[batch_size:]
 
-        ## flow warp metirc
+        # flow warp metirc
         f01_warp = -warp(raft_flow10, raft_flow01)
         f10_warp = -warp(raft_flow01, raft_flow10)
         # check_for_nan(f01_warp, "f01_warp")
         # check_for_nan(f10_warp, "f10_warp")
         err01 = (
-            torch.nn.functional.l1_loss(
-                input=f01_warp, target=raft_flow01, reduction="none"
-            )
+            torch.nn.functional
+            .l1_loss(input=f01_warp, target=raft_flow01, reduction='none')
             .mean(1)
             .unsqueeze(1)
         )
         err02 = (
-            torch.nn.functional.l1_loss(
-                input=f10_warp, target=raft_flow10, reduction="none"
-            )
+            torch.nn.functional
+            .l1_loss(input=f10_warp, target=raft_flow10, reduction='none')
             .mean(1)
             .unsqueeze(1)
         )
         # check_for_nan(err01, "err01")
         # check_for_nan(err02, "err02")
 
-        weights1 = 1 / (1 + err01 * self.alpha_fe) + 1 / (1 + var01 * self.alpha_v)
-        weights2 = 1 / (1 + err02 * self.alpha_fe) + 1 / (1 + var10 * self.alpha_v)
+        weights1 = 1 / (1 + err01 * self.alpha_fe) + 1 / (
+            1 + var01 * self.alpha_v
+        )
+        weights2 = 1 / (1 + err02 * self.alpha_fe) + 1 / (
+            1 + var10 * self.alpha_v
+        )
         # check_for_nan(weights1, "weights1")
         # check_for_nan(weights2, "weights2")
 
         return weights1, weights2
 
-    def _amt_corr_scale_lookup(self, corr_fn, coord, flow0, flow1, embt, downsample=1):
+    def _amt_corr_scale_lookup(
+        self, corr_fn, coord, flow0, flow1, embt, downsample=1
+    ):
         # convert t -> 0 to 0 -> 1 | convert t -> 1 to 1 -> 0
         # based on linear assumption
         t0_scale = 1.0 / embt
@@ -515,7 +560,9 @@ class GIMMVFI_R(nn.Module):
             flow0 = inv * resize(flow0, scale_factor=inv)
             flow1 = inv * resize(flow1, scale_factor=inv)
 
-        corr0, corr1 = corr_fn(coord + flow1 * t1_scale, coord + flow0 * t0_scale)
+        corr0, corr1 = corr_fn(
+            coord + flow1 * t1_scale, coord + flow0 * t0_scale
+        )
         corr = torch.cat([corr0, corr1], dim=1)
         flow = torch.cat([flow0, flow1], dim=1)
         return corr, flow

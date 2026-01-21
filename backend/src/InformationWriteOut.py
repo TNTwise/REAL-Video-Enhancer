@@ -1,11 +1,11 @@
-from multiprocessing import shared_memory
 import time
+from multiprocessing import shared_memory
 
-if __name__ != "__main__":
-    from .utils.Util import padFrame
+if __name__ != '__main__':
     from .utils.LogConfig import get_logger
-    from .utils.RealTimePrint import RealTimePrint
     from .utils.PauseManager import PauseManager
+    from .utils.RealTimePrint import RealTimePrint
+    from .utils.Util import padFrame
 
     logger = get_logger(__name__)
 else:
@@ -25,9 +25,9 @@ def convertTime(remaining_time):
     remaining_time -= minutes * 60
     seconds = remaining_time
     if minutes < 10:
-        minutes = str(f"0{minutes}")
+        minutes = str(f'0{minutes}')
     if seconds < 10:
-        seconds = str(f"0{seconds}")
+        seconds = str(f'0{seconds}')
     return hours, minutes, seconds
 
 
@@ -64,12 +64,17 @@ class InformationWriteOut:
         if self.sharedMemoryID is not None:
             while True:
                 try:
-                    self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID)
-                    logger.info("Connected to shared memory: %s", self.sharedMemoryID)
+                    self.shm = shared_memory.SharedMemory(
+                        name=self.sharedMemoryID
+                    )
+                    logger.info(
+                        'Connected to shared memory: %s', self.sharedMemoryID
+                    )
                     break
                 except FileNotFoundError:
                     logger.info(
-                        "Waiting for shared memory to be created: %s", self.sharedMemoryID
+                        'Waiting for shared memory to be created: %s',
+                        self.sharedMemoryID,
                     )
                     time.sleep(0.5)
 
@@ -77,7 +82,6 @@ class InformationWriteOut:
         self.realTimePrint = RealTimePrint()
         self.isPaused = False
         self.stop = False
-
 
     def get_is_paused(self):
         return self.isPaused
@@ -91,7 +95,6 @@ class InformationWriteOut:
         remaining time = remaining iterations (files) * time per iteration
 
         """
-
         # Estimate the remaining time
         elapsed_time = time.time() - self.startTime
         time_per_iteration = elapsed_time / framesRendered
@@ -100,7 +103,7 @@ class InformationWriteOut:
         remaining_time = int(remaining_time)
         # convert to hours, minutes, and seconds
         hours, minutes, seconds = convertTime(remaining_time)
-        return f"{hours}:{minutes}:{seconds}"
+        return f'{hours}:{minutes}:{seconds}'
 
     def update(self, preview_frame):
         self.previewFrame = preview_frame
@@ -111,9 +114,8 @@ class InformationWriteOut:
 
     def writeOutInformation(self):
         """
-        fcs = framechunksize
+        Fcs = framechunksize
         """
-        
         while (not self.stop) and self.framesRendered > 0:
             time.sleep(
                 0.5
@@ -130,26 +132,30 @@ class InformationWriteOut:
                 self.total_paused_time_seconds += paused_duration
 
             # print out data to stdout
-            fps = round(self.framesRendered / (time.time() - self.startTime - self.total_paused_time_seconds))
+            fps = round(
+                self.framesRendered
+                / (
+                    time.time()
+                    - self.startTime
+                    - self.total_paused_time_seconds
+                )
+            )
             eta = self.calculateETA(framesRendered=self.framesRendered)
-            message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
+            message = (
+                f'FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}'
+            )
             self.realTimePrint.realTimePrint(message)
-                
-            if self.sharedMemoryID is not None and self.previewFrame is not None:
+
+            if (
+                self.sharedMemoryID is not None
+                and self.previewFrame is not None
+            ):
                 # Update the shared array
-                padded_frame = padFrame( # pad frame in case of border detect
+                padded_frame = padFrame(  # pad frame in case of border detect
                     self.previewFrame,
                     self.width,
                     self.height,
                     self.croppedOutputWidth,
                     self.croppedOututHeight,
                 )
-                self.shm.buf[: self.sharedMemoryChunkSize] = bytes(
-                        padded_frame
-                )
-                    
-                
-                    
-                
-                
-            
+                self.shm.buf[: self.sharedMemoryChunkSize] = bytes(padded_frame)

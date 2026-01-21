@@ -22,22 +22,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
-import sys
 import os
-from ..utils.Util import suppress_stdout_stderr, warnAndLog
-from ..utils.LogConfig import get_logger
-from ..version import __version__
+import pathlib
+import sys
 import time
 
+from ..utils.LogConfig import get_logger
+from ..utils.Util import suppress_stdout_stderr
+from ..version import __version__
 
 logger = get_logger(__name__)
 
 with suppress_stdout_stderr():
+    import tensorrt as trt
     import torch
     import torch_tensorrt
-    import tensorrt as trt
     from torch._export.converter import TS2EPConverter
     from torch.export.exported_program import ExportedProgram
+
     from .TorchUtils import TorchUtils
 
 
@@ -51,15 +53,21 @@ def _normalize_example_inputs(example_inputs):
     return tuple(example_inputs)
 
 
-def torchscript_to_dynamo(model: torch.ScriptModule, example_inputs) -> ExportedProgram:
+def torchscript_to_dynamo(
+    model: torch.ScriptModule, example_inputs
+) -> ExportedProgram:
     """Converts a TorchScript module to a Dynamo program."""
     sample_args = _normalize_example_inputs(example_inputs)
     traced = torch.jit.trace(model, sample_args)
-    return TS2EPConverter(traced, sample_args=sample_args, sample_kwargs=None).convert()
+    return TS2EPConverter(
+        traced, sample_args=sample_args, sample_kwargs=None
+    ).convert()
 
 
 def nnmodule_to_dynamo(
-    model: torch.nn.Module, example_inputs: list[torch.Tensor], dynamic_shapes=None
+    model: torch.nn.Module,
+    example_inputs: list[torch.Tensor],
+    dynamic_shapes=None,
 ) -> ExportedProgram:
     """Converts a nn.Module to a Dynamo program."""
     return torch.export.export(
@@ -88,7 +96,7 @@ class TorchTensorRTHandler:
         either way, forcing one precision helps with speed in some cases.
     """
 
-    trt_path_appendix = f"_{__version__}.engine"  # this is used to identify the models that were exported with this version of RVE
+    trt_path_appendix = f'_{__version__}.engine'  # this is used to identify the models that were exported with this version of RVE
 
     def __init__(
         self,
@@ -108,43 +116,44 @@ class TorchTensorRTHandler:
         self.model_parent_path = model_parent_path
         # clear previous tensorrt models
         cleared_models = False
-        if os.path.exists(self.model_parent_path):
+        if pathlib.Path(self.model_parent_path).exists():
             for model in os.listdir(self.model_parent_path):
                 if (
-                    not self.trt_path_appendix.lower() in model.lower()
-                    and "tensorrt" in model.lower()
+                    self.trt_path_appendix.lower() not in model.lower()
+                    and 'tensorrt' in model.lower()
                 ):
                     model_path = os.path.join(self.model_parent_path, model)
                     try:
-                        os.remove(model_path)
+                        pathlib.Path(model_path).unlink()
                         cleared_models = True
-                        logger.info("Removed %s", model_path)
+                        logger.info('Removed %s', model_path)
                     except Exception as e:
                         logger.warning(
-                            "Failed to remove %s: %s", model_path, e, exc_info=True
+                            'Failed to remove %s: %s',
+                            model_path,
+                            e,
+                            exc_info=True,
                         )
             if cleared_models:
-                print("Cleared old TensorRT models...", file=sys.stderr)
+                print('Cleared old TensorRT models...', file=sys.stderr)
 
     def grid_sample_decomp(self, exported_program):
         from torch_tensorrt.dynamo.conversion.impl.grid import (
             GridSamplerInterpolationMode,
         )
 
-        GridSamplerInterpolationMode.update(
-            {
-                0: trt.InterpolationMode.LINEAR,
-                1: trt.InterpolationMode.NEAREST,
-                2: trt.InterpolationMode.CUBIC,
-            }
-        )
+        GridSamplerInterpolationMode.update({
+            0: trt.InterpolationMode.LINEAR,
+            1: trt.InterpolationMode.NEAREST,
+            2: trt.InterpolationMode.CUBIC,
+        })
         return exported_program
 
     def check_engine_exists(self, trt_engine_name: str) -> bool:
         """Checks if a TensorRT engine exists at the specified path."""
         trt_engine_name += self.trt_path_appendix
         trt_engine_path = os.path.join(self.model_parent_path, trt_engine_name)
-        return os.path.exists(trt_engine_path)
+        return pathlib.Path(trt_engine_path).exists()
 
     def build_engine(
         self,
@@ -164,7 +173,7 @@ class TorchTensorRTHandler:
         TorchUtils.clear_cache()
         """Builds a TensorRT engine from the provided model."""
         print(
-            f"Building TensorRT engine {os.path.basename(trt_engine_name)}. This may take a while...",
+            f'Building TensorRT engine {os.path.basename(trt_engine_name)}. This may take a while...',
             file=sys.stderr,
         )
 
@@ -194,7 +203,7 @@ class TorchTensorRTHandler:
             )
 
         print(
-            f"TensorRT engine built in {time.time() - start_time:.2f} seconds.",
+            f'TensorRT engine built in {time.time() - start_time:.2f} seconds.',
             file=sys.stderr,
         )
         TorchUtils.clear_cache()
@@ -213,15 +222,16 @@ class TorchTensorRTHandler:
         torch_tensorrt.save(
             trt_engine,
             trt_engine_path,
-            output_format="torchscript",
+            output_format='torchscript',
             inputs=tuple(example_inputs),
         )
         TorchUtils.clear_cache()
 
     def load_engine(self, trt_engine_name: str) -> torch.jit.ScriptModule:
         """Loads a TensorRT engine from the specified path."""
-
         trt_engine_name += self.trt_path_appendix
         trt_engine_path = os.path.join(self.model_parent_path, trt_engine_name)
-        print(f"Loading TensorRT engine from {trt_engine_path}.", file=sys.stderr)
+        print(
+            f'Loading TensorRT engine from {trt_engine_path}.', file=sys.stderr
+        )
         return torch.jit.load(trt_engine_path).eval()

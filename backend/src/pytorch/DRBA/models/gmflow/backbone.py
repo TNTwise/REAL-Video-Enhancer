@@ -1,6 +1,5 @@
-import torch.nn as nn
-
 from models.gmflow.trident_conv import MultiScaleTridentConv
+from torch import nn
 
 
 class ResidualBlock(nn.Module):
@@ -12,7 +11,7 @@ class ResidualBlock(nn.Module):
         stride=1,
         dilation=1,
     ):
-        super(ResidualBlock, self).__init__()
+        super().__init__()
 
         self.conv1 = nn.Conv2d(
             in_planes,
@@ -42,7 +41,8 @@ class ResidualBlock(nn.Module):
             self.downsample = None
         else:
             self.downsample = nn.Sequential(
-                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride), self.norm3
+                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride),
+                self.norm3,
             )
 
     def forward(self, x):
@@ -64,7 +64,7 @@ class CNNEncoder(nn.Module):
         num_output_scales=1,
         **kwargs,
     ):
-        super(CNNEncoder, self).__init__()
+        super().__init__()
         self.num_branch = num_output_scales
 
         feature_dims = [64, 96, 128]
@@ -114,16 +114,26 @@ class CNNEncoder(nn.Module):
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
-            elif isinstance(m, (nn.BatchNorm2d, nn.InstanceNorm2d, nn.GroupNorm)):
+                nn.init.kaiming_normal_(
+                    m.weight, mode='fan_out', nonlinearity='relu'
+                )
+            elif isinstance(
+                m, (nn.BatchNorm2d, nn.InstanceNorm2d, nn.GroupNorm)
+            ):
                 if m.weight is not None:
                     nn.init.constant_(m.weight, 1)
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
 
-    def _make_layer(self, dim, stride=1, dilation=1, norm_layer=nn.InstanceNorm2d):
+    def _make_layer(
+        self, dim, stride=1, dilation=1, norm_layer=nn.InstanceNorm2d
+    ):
         layer1 = ResidualBlock(
-            self.in_planes, dim, norm_layer=norm_layer, stride=stride, dilation=dilation
+            self.in_planes,
+            dim,
+            norm_layer=norm_layer,
+            stride=stride,
+            dilation=dilation,
         )
         layer2 = ResidualBlock(
             dim, dim, norm_layer=norm_layer, stride=1, dilation=dilation

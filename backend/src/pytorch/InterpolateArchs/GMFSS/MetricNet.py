@@ -1,10 +1,9 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 from .gmflow.geometry import forward_backward_consistency_check
 from .util import MyPReLU
-
 
 backwarp_tenGrid = {}
 
@@ -12,7 +11,8 @@ backwarp_tenGrid = {}
 def backwarp(tenIn, tenflow):
     if str(tenflow.shape) not in backwarp_tenGrid:
         tenHor = (
-            torch.linspace(
+            torch
+            .linspace(
                 start=-1.0,
                 end=1.0,
                 steps=tenflow.shape[3],
@@ -23,7 +23,8 @@ def backwarp(tenIn, tenflow):
             .repeat(1, 1, tenflow.shape[2], 1)
         )
         tenVer = (
-            torch.linspace(
+            torch
+            .linspace(
                 start=-1.0,
                 end=1.0,
                 steps=tenflow.shape[2],
@@ -47,16 +48,18 @@ def backwarp(tenIn, tenflow):
 
     return torch.nn.functional.grid_sample(
         input=tenIn,
-        grid=(backwarp_tenGrid[str(tenflow.shape)] + tenflow).permute(0, 2, 3, 1),
-        mode="bilinear",
-        padding_mode="zeros",
+        grid=(backwarp_tenGrid[str(tenflow.shape)] + tenflow).permute(
+            0, 2, 3, 1
+        ),
+        mode='bilinear',
+        padding_mode='zeros',
         align_corners=True,
     )
 
 
 class MetricNet(nn.Module):
     def __init__(self):
-        super(MetricNet, self).__init__()
+        super().__init__()
         self.metric_in = nn.Conv2d(14, 64, 3, 1, 1)
         self.metric_net1 = nn.Sequential(MyPReLU(), nn.Conv2d(64, 64, 3, 1, 1))
         self.metric_net2 = nn.Sequential(MyPReLU(), nn.Conv2d(64, 64, 3, 1, 1))
@@ -64,12 +67,12 @@ class MetricNet(nn.Module):
         self.metric_out = nn.Sequential(MyPReLU(), nn.Conv2d(64, 2, 3, 1, 1))
 
     def forward(self, img0, img1, flow01, flow10):
-        metric0 = F.l1_loss(img0, backwarp(img1, flow01), reduction="none").mean(
-            [1], True
-        )
-        metric1 = F.l1_loss(img1, backwarp(img0, flow10), reduction="none").mean(
-            [1], True
-        )
+        metric0 = F.l1_loss(
+            img0, backwarp(img1, flow01), reduction='none'
+        ).mean([1], True)
+        metric1 = F.l1_loss(
+            img1, backwarp(img0, flow10), reduction='none'
+        ).mean([1], True)
 
         fwd_occ, bwd_occ = forward_backward_consistency_check(flow01, flow10)
 

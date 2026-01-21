@@ -1,20 +1,23 @@
 from typing_extensions import override
 
+from ...__helpers.model_descriptor import (
+    Architecture,
+    ImageModelDescriptor,
+    StateDict,
+)
 from ...util import KeyCondition, get_seq_len
-
-from ...__helpers.model_descriptor import Architecture, ImageModelDescriptor, StateDict
 from .__arch.spanplus import SPANPlus
 
 
 class SPANPlusArch(Architecture[SPANPlus]):
     def __init__(self) -> None:
         super().__init__(
-            id="SPANPlus",
+            id='SPANPlus',
             detect=KeyCondition.has_all(
-                "feats.0.eval_conv.weight",
-                "feats.1.block_1.c1_r.sk.weight",
-                "feats.1.block_1.c1_r.conv.0.weight",
-                "feats.1.block_1.c1_r.eval_conv.weight",
+                'feats.0.eval_conv.weight',
+                'feats.1.block_1.c1_r.sk.weight',
+                'feats.1.block_1.c1_r.conv.0.weight',
+                'feats.1.block_1.c1_r.eval_conv.weight',
             ),
         )
 
@@ -24,23 +27,25 @@ class SPANPlusArch(Architecture[SPANPlus]):
         num_out_ch: int = 3
         feature_channels: int = 48
         upscale: int = 4
-        n_feats = get_seq_len(state_dict, "feats") - 1
+        n_feats = get_seq_len(state_dict, 'feats') - 1
         blocks = [
-            get_seq_len(state_dict, f"feats.{n_feat + 1}.block_n")
+            get_seq_len(state_dict, f'feats.{n_feat + 1}.block_n')
             for n_feat in range(n_feats)
         ]
-        num_in_ch = state_dict["feats.0.eval_conv.weight"].shape[1]
-        feature_channels = state_dict["feats.0.eval_conv.weight"].shape[0]
-        if "upsampler.0.weight" in state_dict:
-            upsampler = "ps"
+        num_in_ch = state_dict['feats.0.eval_conv.weight'].shape[1]
+        feature_channels = state_dict['feats.0.eval_conv.weight'].shape[0]
+        if 'upsampler.0.weight' in state_dict:
+            upsampler = 'ps'
             num_out_ch = num_in_ch
             upscale = int(
-                (state_dict["upsampler.0.weight"].shape[0] / num_in_ch) ** 0.5
+                (state_dict['upsampler.0.weight'].shape[0] / num_in_ch) ** 0.5
             )
         else:
-            upsampler = "dys"
-            num_out_ch = state_dict["upsampler.end_conv.weight"].shape[0]
-            upscale = int((state_dict["upsampler.offset.weight"].shape[0] // 8) ** 0.5)
+            upsampler = 'dys'
+            num_out_ch = state_dict['upsampler.end_conv.weight'].shape[0]
+            upscale = int(
+                (state_dict['upsampler.offset.weight'].shape[0] // 8) ** 0.5
+            )
 
         model = SPANPlus(
             num_in_ch=num_in_ch,
@@ -55,8 +60,8 @@ class SPANPlusArch(Architecture[SPANPlus]):
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration" if upscale == 1 else "SR",
-            tags=[f"{feature_channels}nf"],
+            purpose='Restoration' if upscale == 1 else 'SR',
+            tags=[f'{feature_channels}nf'],
             supports_half=True,
             supports_bfloat16=True,
             scale=upscale,
@@ -65,4 +70,4 @@ class SPANPlusArch(Architecture[SPANPlus]):
         )
 
 
-__all__ = ["SPANPlusArch", "SPANPlus"]
+__all__ = ['SPANPlus', 'SPANPlusArch']

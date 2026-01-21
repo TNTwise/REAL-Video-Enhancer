@@ -25,7 +25,7 @@ class MultiScaleTridentConv(nn.Module):
         norm=None,
         activation=None,
     ):
-        super(MultiScaleTridentConv, self).__init__()
+        super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = _pair(kernel_size)
@@ -47,7 +47,9 @@ class MultiScaleTridentConv(nn.Module):
         self.norm = norm
         self.activation = activation
 
-        assert len({self.num_branch, len(self.paddings), len(self.strides)}) == 1
+        assert (
+            len({self.num_branch, len(self.paddings), len(self.strides)}) == 1
+        )
 
         self.weight = nn.Parameter(
             torch.Tensor(out_channels, in_channels // groups, *self.kernel_size)
@@ -57,13 +59,15 @@ class MultiScaleTridentConv(nn.Module):
         else:
             self.bias = None
 
-        nn.init.kaiming_uniform_(self.weight, nonlinearity="relu")
+        nn.init.kaiming_uniform_(self.weight, nonlinearity='relu')
         if self.bias is not None:
             nn.init.constant_(self.bias, 0)
 
     def forward(self, inputs):
         num_branch = (
-            self.num_branch if self.training or self.test_branch_idx == -1 else 1
+            self.num_branch
+            if self.training or self.test_branch_idx == -1
+            else 1
         )
         assert len(inputs) == num_branch
 
@@ -78,7 +82,9 @@ class MultiScaleTridentConv(nn.Module):
                     self.dilation,
                     self.groups,
                 )
-                for input, stride, padding in zip(inputs, self.strides, self.paddings)
+                for input, stride, padding in zip(
+                    inputs, self.strides, self.paddings
+                )
             ]
         else:
             outputs = [

@@ -1,18 +1,18 @@
-from .models.utils.tools import (
-    get_valid_net_inp_size,
-    to_inp,
-    to_out,
-    check_scene,
-    TMapper,
-)
-import torch
-import numpy as np
-
 import warnings
 
-warnings.filterwarnings("ignore")
+import numpy as np
+import torch
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+from .models.utils.tools import (
+    TMapper,
+    check_scene,
+    get_valid_net_inp_size,
+    to_inp,
+)
+
+warnings.filterwarnings('ignore')
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 if torch.cuda.is_available():
     torch.backends.cudnn.enabled = True
@@ -41,22 +41,26 @@ class DRBA_RVE:
         self.model = self.load_model(model_type)
 
     def load_model(self, model_type):
-        if model_type == "rife":
+        if model_type == 'rife':
             from .models.rife import RIFE
 
-            model = RIFE(weights=self.model_path, scale=self.scale, device=device)
-        elif model_type == "gmfss":
+            model = RIFE(
+                weights=self.model_path, scale=self.scale, device=device
+            )
+        elif model_type == 'gmfss':
             from .models.gmfss import GMFSS
 
-            model = GMFSS(weights=self.model_path, scale=self.scale, device=device)
-        elif model_type == "gmfss_union":
+            model = GMFSS(
+                weights=self.model_path, scale=self.scale, device=device
+            )
+        elif model_type == 'gmfss_union':
             from .models.gmfss_union import GMFSS_UNION
 
             model = GMFSS_UNION(
                 weights=self.model_path, scale=self.scale, device=device
             )
         else:
-            raise ValueError(f"model_type must in {model_type}")
+            raise ValueError(f'model_type must in {model_type}')
 
         return model
 
@@ -73,18 +77,21 @@ class DRBA_RVE:
                     + [t + 1 for t in vfi_timestamp]
                 )
                 return np.array(vfi_timestamp)
-            else:
-                vfi_timestamp = [
-                    (_i + 0.5) / cls.times for _i in range(cls.times // 2)
-                ]  # 0 ~ 0.5
-                vfi_timestamp = list(reversed([1 - t for t in vfi_timestamp])) + [
-                    t + 1 for t in vfi_timestamp
-                ]
-                return np.array(vfi_timestamp)
+            vfi_timestamp = [
+                (_i + 0.5) / cls.times for _i in range(cls.times // 2)
+            ]  # 0 ~ 0.5
+            vfi_timestamp = list(
+                reversed([1 - t for t in vfi_timestamp])
+            ) + [t + 1 for t in vfi_timestamp]
+            return np.array(vfi_timestamp)
 
         timestamp = np.array(
             cls.t_mapper.get_range_timestamps(
-                _idx - 0.5, _idx + 0.5, lclose=True, rclose=False, normalize=False
+                _idx - 0.5,
+                _idx + 0.5,
+                lclose=True,
+                rclose=False,
+                normalize=False,
             )
         )
         vfi_timestamp = np.round(timestamp - _idx, 4) + 1  # [0.5, 1.5)
@@ -98,7 +105,7 @@ class DRBA_RVE:
     ):
         # start inference
         size = get_valid_net_inp_size(i0, self.scale, div=self.pad_size)
-        self.src_size, self.dst_size = size["src_size"], size["dst_size"]
+        self.src_size, self.dst_size = size['src_size'], size['dst_size']
 
         I0 = to_inp(i0, self.dst_size)
         I1 = to_inp(i1, self.dst_size)
@@ -109,7 +116,9 @@ class DRBA_RVE:
         # head
         ts = self.calc_t(idx)
         left_scene = (
-            check_scene(I0, I1, self.scdet_threshold) if self.enable_scdet else False
+            check_scene(I0, I1, self.scdet_threshold)
+            if self.enable_scdet
+            else False
         )
         right_scene = left_scene
         self.reuse = None

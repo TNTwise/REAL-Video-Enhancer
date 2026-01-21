@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 from enum import Enum
 from typing import (
     Any,
-    Callable,
-    Dict,
     Final,
     Generic,
     Literal,
@@ -21,16 +20,16 @@ from typing_extensions import Self, override
 
 from .size_req import SizeRequirements, pad_tensor
 
-T = TypeVar("T", bound=torch.nn.Module, covariant=True)
+T = TypeVar('T', bound=torch.nn.Module, covariant=True)
 
-StateDict = Dict[str, Any]
+StateDict = dict[str, Any]
 """
 Spandrel's type alias for PyTorch state dicts.
 
 See https://pytorch.org/tutorials/recipes/recipes/what_is_state_dict.html
 """
 
-ArchId = NewType("ArchId", str)
+ArchId = NewType('ArchId', str)
 """
 A unique identifier for an `Architecture`.
 """
@@ -95,7 +94,7 @@ class Architecture(ABC, Generic[T]):
         """
 
 
-Purpose = Literal["SR", "FaceSR", "Inpainting", "Restoration"]
+Purpose = Literal['SR', 'FaceSR', 'Inpainting', 'Restoration']
 """
 A short string describing the purpose of the model.
 
@@ -288,41 +287,45 @@ class ModelBase(ABC, Generic[T]):
         # turn positional arguments into keyword arguments
         def set_kw(name: str, value: object):
             if name in kwargs:
-                raise TypeError(f"to() got multiple values for keyword argument {name}")
+                raise TypeError(
+                    f'to() got multiple values for keyword argument {name}'
+                )
             kwargs[name] = value
 
         if len(args) == 1:
             arg: object = args[0]
             if isinstance(arg, torch.dtype):
-                set_kw("dtype", arg)
+                set_kw('dtype', arg)
             elif isinstance(arg, (torch.device, str)) or arg is None:
-                set_kw("device", arg)
+                set_kw('device', arg)
             else:
                 raise TypeError(
-                    f"to() expected a torch.device or torch.dtype, but got {type(arg)}"
+                    f'to() expected a torch.device or torch.dtype, but got {type(arg)}'
                 )
         elif len(args) == 2:
-            set_kw("device", args[0])
-            set_kw("dtype", args[1])
+            set_kw('device', args[0])
+            set_kw('dtype', args[1])
         elif len(args) > 2:
             raise TypeError(
-                f"to() expected at most 2 positional arguments, got {len(args)}"
+                f'to() expected at most 2 positional arguments, got {len(args)}'
             )
 
-        device: torch.device | str | None = kwargs.pop("device", None)
-        dtype: torch.dtype | None = kwargs.pop("dtype", None)
+        device: torch.device | str | None = kwargs.pop('device', None)
+        dtype: torch.dtype | None = kwargs.pop('dtype', None)
 
         if len(kwargs) > 0:
-            raise TypeError(f"to() got unexpected keyword arguments {list(kwargs)}")
+            raise TypeError(
+                f'to() got unexpected keyword arguments {list(kwargs)}'
+            )
 
         if dtype is not None:
             if dtype == torch.float16 and not self.supports_half:
                 raise UnsupportedDtypeError(
-                    f"{self.architecture} does not support half precision (fp16)"
+                    f'{self.architecture} does not support half precision (fp16)'
                 )
             if dtype == torch.bfloat16 and not self.supports_bfloat16:
                 raise UnsupportedDtypeError(
-                    f"{self.architecture} does not support bfloat16 precision"
+                    f'{self.architecture} does not support bfloat16 precision'
                 )
 
         if isinstance(device, str):
@@ -405,7 +408,7 @@ class ImageModelDescriptor(ModelBase[T], Generic[T]):
         model: T,
         state_dict: StateDict,
         architecture: Architecture[T],
-        purpose: Literal["SR", "FaceSR", "Restoration"],
+        purpose: Literal['SR', 'FaceSR', 'Restoration'],
         tags: list[str],
         supports_half: bool,
         supports_bfloat16: bool,
@@ -416,8 +419,8 @@ class ImageModelDescriptor(ModelBase[T], Generic[T]):
         tiling: ModelTiling = ModelTiling.SUPPORTED,
         call_fn: Callable[[T, Tensor], Tensor] | None = None,
     ):
-        assert purpose != "Restoration" or scale == 1, (
-            "Restoration models must have a scale of 1"
+        assert purpose != 'Restoration' or scale == 1, (
+            'Restoration models must have a scale of 1'
         )
 
         super().__init__(
@@ -434,13 +437,13 @@ class ImageModelDescriptor(ModelBase[T], Generic[T]):
             tiling=tiling,
         )
 
-        self._purpose: Literal["SR", "FaceSR", "Restoration"] = purpose
+        self._purpose: Literal['SR', 'FaceSR', 'Restoration'] = purpose
 
         self._call_fn = call_fn or (lambda model, image: model(image))
 
     @property
     @override
-    def purpose(self) -> Literal["SR", "FaceSR", "Restoration"]:
+    def purpose(self) -> Literal['SR', 'FaceSR', 'Restoration']:
         return self._purpose
 
     @torch.inference_mode()
@@ -456,7 +459,7 @@ class ImageModelDescriptor(ModelBase[T], Generic[T]):
         """
         if len(image.shape) != 4:
             raise ValueError(
-                f"Expected image tensor to have 4 dimensions, but got {image.shape}"
+                f'Expected image tensor to have 4 dimensions, but got {image.shape}'
             )
 
         _, _, h, w = image.shape
@@ -471,7 +474,7 @@ class ImageModelDescriptor(ModelBase[T], Generic[T]):
         # call model
         output = self._call_fn(self.model, image)
         assert isinstance(output, Tensor), (
-            f"Expected {type(self.model).__name__} model to return a tensor, but got {type(output)}"
+            f'Expected {type(self.model).__name__} model to return a tensor, but got {type(output)}'
         )
 
         # guarantee range
@@ -494,7 +497,7 @@ class MaskedImageModelDescriptor(ModelBase[T], Generic[T]):
         model: T,
         state_dict: StateDict,
         architecture: Architecture[T],
-        purpose: Literal["Inpainting"],
+        purpose: Literal['Inpainting'],
         tags: list[str],
         supports_half: bool,
         supports_bfloat16: bool,
@@ -518,13 +521,15 @@ class MaskedImageModelDescriptor(ModelBase[T], Generic[T]):
             tiling=tiling,
         )
 
-        self._purpose: Literal["Inpainting"] = purpose
+        self._purpose: Literal['Inpainting'] = purpose
 
-        self._call_fn = call_fn or (lambda model, image, mask: model(image, mask))
+        self._call_fn = call_fn or (
+            lambda model, image, mask: model(image, mask)
+        )
 
     @property
     @override
-    def purpose(self) -> Literal["Inpainting"]:
+    def purpose(self) -> Literal['Inpainting']:
         return self._purpose
 
     def __call__(self, image: Tensor, mask: Tensor) -> Tensor:
@@ -543,11 +548,11 @@ class MaskedImageModelDescriptor(ModelBase[T], Generic[T]):
         """
         if len(image.shape) != 4:
             raise ValueError(
-                f"Expected image tensor to have 4 dimensions, but got {image.shape}"
+                f'Expected image tensor to have 4 dimensions, but got {image.shape}'
             )
         if len(mask.shape) != 4:
             raise ValueError(
-                f"Expected mask tensor to have 4 dimensions, but got {mask.shape}"
+                f'Expected mask tensor to have 4 dimensions, but got {mask.shape}'
             )
 
         _, _, h, w = image.shape
@@ -556,7 +561,7 @@ class MaskedImageModelDescriptor(ModelBase[T], Generic[T]):
         mask_shape = torch.Size([1, 1, h, w])
         if mask.shape != mask_shape:
             raise ValueError(
-                f"Expected mask shape to be {mask_shape}, but got {mask.shape}"
+                f'Expected mask shape to be {mask_shape}, but got {mask.shape}'
             )
 
         # satisfy size requirements
@@ -566,7 +571,7 @@ class MaskedImageModelDescriptor(ModelBase[T], Generic[T]):
         # call model
         output = self._call_fn(self.model, image, mask)
         assert isinstance(output, Tensor), (
-            f"Expected {type(self.model).__name__} model to returns a tensor, but got {type(output)}"
+            f'Expected {type(self.model).__name__} model to returns a tensor, but got {type(output)}'
         )
 
         # guarantee range

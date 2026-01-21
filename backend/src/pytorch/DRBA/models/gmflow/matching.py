@@ -1,7 +1,10 @@
 import torch
 import torch.nn.functional as F
-
-from models.gmflow.geometry import coords_grid, generate_window_grid, normalize_coords
+from models.gmflow.geometry import (
+    coords_grid,
+    generate_window_grid,
+    normalize_coords,
+)
 
 
 def global_correlation_softmax(
@@ -52,7 +55,7 @@ def local_correlation_softmax(
     feature0,
     feature1,
     local_radius,
-    padding_mode="zeros",
+    padding_mode='zeros',
 ):
     b, c, h, w = feature0.size()
     coords_init = coords_grid(
@@ -73,7 +76,9 @@ def local_correlation_softmax(
         device=feature0.device,
         dtype=feature0.dtype,
     )  # [2R+1, 2R+1, 2]
-    window_grid = window_grid.reshape(-1, 2).repeat(b, 1, 1, 1)  # [B, 1, (2R+1)^2, 2]
+    window_grid = window_grid.reshape(-1, 2).repeat(
+        b, 1, 1, 1
+    )  # [B, 1, (2R+1)^2, 2]
     sample_coords = coords.unsqueeze(-2) + window_grid  # [B, H*W, (2R+1)^2, 2]
 
     sample_coords_softmax = sample_coords
@@ -98,7 +103,9 @@ def local_correlation_softmax(
         padding_mode=padding_mode,
         align_corners=True,
     ).permute(0, 2, 1, 3)  # [B, H*W, C, (2R+1)^2]
-    feature0_view = feature0.permute(0, 2, 3, 1).view(b, h * w, 1, c)  # [B, H*W, 1, C]
+    feature0_view = feature0.permute(0, 2, 3, 1).view(
+        b, h * w, 1, c
+    )  # [B, H*W, 1, C]
 
     corr = torch.matmul(feature0_view, window_feature).view(b, h * w, -1) / (
         c**0.5
@@ -114,7 +121,8 @@ def local_correlation_softmax(
     prob = F.softmax(corr, -1)  # [B, H*W, (2R+1)^2]
 
     correspondence = (
-        torch.matmul(prob.unsqueeze(-2), sample_coords_softmax)
+        torch
+        .matmul(prob.unsqueeze(-2), sample_coords_softmax)
         .squeeze(-2)
         .view(b, h, w, 2)
         .permute(0, 3, 1, 2)

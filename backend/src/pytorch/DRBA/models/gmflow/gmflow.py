@@ -1,12 +1,14 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-
 from models.gmflow.backbone import CNNEncoder
-from models.gmflow.transformer import FeatureTransformer, FeatureFlowAttention
-from models.gmflow.matching import global_correlation_softmax, local_correlation_softmax
-from models.gmflow.geometry import flow_warp, coords_grid
-from models.gmflow.utils import normalize_img, feature_add_position
+from models.gmflow.geometry import flow_warp
+from models.gmflow.matching import (
+    global_correlation_softmax,
+    local_correlation_softmax,
+)
+from models.gmflow.transformer import FeatureFlowAttention, FeatureTransformer
+from models.gmflow.utils import feature_add_position, normalize_img
+from torch import nn
 
 
 class GMFlow(nn.Module):
@@ -15,13 +17,13 @@ class GMFlow(nn.Module):
         num_scales=2,
         upsample_factor=4,
         feature_channels=128,
-        attention_type="swin",
+        attention_type='swin',
         num_transformer_layers=6,
         ffn_dim_expansion=4,
         num_head=1,
         **kwargs,
     ):
-        super(GMFlow, self).__init__()
+        super().__init__()
 
         self.num_scales = num_scales
         self.feature_channels = feature_channels
@@ -44,7 +46,9 @@ class GMFlow(nn.Module):
         )
 
         # flow propagation with self-attn
-        self.feature_flow_attn = FeatureFlowAttention(in_channels=feature_channels)
+        self.feature_flow_attn = FeatureFlowAttention(
+            in_channels=feature_channels
+        )
 
         # convex upsampling: concat feature0 and flow as input
         self.upsampler = nn.Sequential(
@@ -84,7 +88,7 @@ class GMFlow(nn.Module):
                 F.interpolate(
                     flow,
                     scale_factor=upsample_factor,
-                    mode="bilinear",
+                    mode='bilinear',
                     align_corners=True,
                 )
                 * upsample_factor
@@ -109,7 +113,10 @@ class GMFlow(nn.Module):
             up_flow = torch.sum(mask * up_flow, dim=2)  # [B, 2, K, K, H, W]
             up_flow = up_flow.permute(0, 1, 4, 2, 5, 3)  # [B, 2, K, H, K, W]
             up_flow = up_flow.reshape(
-                b, flow_channel, self.upsample_factor * h, self.upsample_factor * w
+                b,
+                flow_channel,
+                self.upsample_factor * h,
+                self.upsample_factor * w,
             )  # [B, 2, K*H, K*W]
 
         return up_flow
@@ -141,7 +148,10 @@ class GMFlow(nn.Module):
         )
 
         for scale_idx in range(self.num_scales):
-            feature0, feature1 = feature0_list[scale_idx], feature1_list[scale_idx]
+            feature0, feature1 = (
+                feature0_list[scale_idx],
+                feature1_list[scale_idx],
+            )
 
             if pred_bidir_flow and scale_idx > 0:
                 # predicting bidirectional flow with refinement
@@ -157,7 +167,10 @@ class GMFlow(nn.Module):
             if scale_idx > 0:
                 flow = (
                     F.interpolate(
-                        flow, scale_factor=2, mode="bilinear", align_corners=True
+                        flow,
+                        scale_factor=2,
+                        mode='bilinear',
+                        align_corners=True,
                     )
                     * 2
                 )
@@ -196,9 +209,7 @@ class GMFlow(nn.Module):
             flow = flow + flow_pred if flow is not None else flow_pred
 
             # upsample to the original resolution for supervison
-            if (
-                self.training
-            ):  # only need to upsample intermediate flow predictions at training time
+            if self.training:  # only need to upsample intermediate flow predictions at training time
                 flow_bilinear = self.upsample_flow(
                     flow, None, bilinear=True, upsample_factor=upsample_factor
                 )
@@ -218,7 +229,10 @@ class GMFlow(nn.Module):
             # bilinear upsampling at training time except the last one
             if self.training and scale_idx < self.num_scales - 1:
                 flow_up = self.upsample_flow(
-                    flow, feature0, bilinear=True, upsample_factor=upsample_factor
+                    flow,
+                    feature0,
+                    bilinear=True,
+                    upsample_factor=upsample_factor,
                 )
 
             if scale_idx == self.num_scales - 1:

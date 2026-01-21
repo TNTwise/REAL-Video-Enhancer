@@ -1,17 +1,19 @@
-import torch
-from .TorchUtils import TorchUtils
-
-# from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
-from .BaseInterpolate import BaseInterpolate
 import math
+from collections.abc import Generator
+
+import torch
+
+from ..utils.Frame import Frame
+from ..utils.LogConfig import get_logger
 from ..utils.Util import (
     warnAndLog,
 )
-from ..utils.LogConfig import get_logger
-from ..utils.Frame import Frame
-from typing import Generator
 
-torch.set_float32_matmul_precision("medium")
+# from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
+from .BaseInterpolate import BaseInterpolate
+from .TorchUtils import TorchUtils
+
+torch.set_float32_matmul_precision('medium')
 torch.set_grad_enabled(False)
 
 logger = get_logger(__name__)
@@ -25,9 +27,9 @@ class InterpolateIFRNetTorch(BaseInterpolate):
         ceilInterpolateFactor: int = 2,
         width: int = 1920,
         height: int = 1080,
-        device: str = "default",
-        dtype: str = "auto",
-        backend: str = "pytorch",
+        device: str = 'default',
+        dtype: str = 'auto',
+        backend: str = 'pytorch',
         UHDMode: bool = False,
         ensemble: bool = False,
         gpu_id: int = 0,
@@ -69,12 +71,18 @@ class InterpolateIFRNetTorch(BaseInterpolate):
             device=self.device,
         )
         tenHorizontal = (
-            torch.linspace(-1.0, 1.0, self.pw, dtype=torch.float32, device=self.device)
+            torch
+            .linspace(
+                -1.0, 1.0, self.pw, dtype=torch.float32, device=self.device
+            )
             .view(1, 1, 1, self.pw)
             .expand(-1, -1, self.ph, -1)
         ).to(dtype=torch.float32, device=self.device)
         tenVertical = (
-            torch.linspace(-1.0, 1.0, self.ph, dtype=torch.float32, device=self.device)
+            torch
+            .linspace(
+                -1.0, 1.0, self.ph, dtype=torch.float32, device=self.device
+            )
             .view(1, 1, self.ph, 1)
             .expand(-1, -1, -1, self.pw)
         ).to(dtype=torch.float32, device=self.device)
@@ -92,7 +100,8 @@ class InterpolateIFRNetTorch(BaseInterpolate):
             timesteplist = []
             for n in range(self.ceilInterpolateFactor - 1):
                 timestep_tens = (
-                    torch.tensor(
+                    torch
+                    .tensor(
                         (n + 1) / (self.ceilInterpolateFactor),
                         dtype=self.dtype,
                         device=self.device,
@@ -109,7 +118,7 @@ class InterpolateIFRNetTorch(BaseInterpolate):
 
             state_dict = torch.load(
                 self.interpolateModel,
-                map_location="cpu",
+                map_location='cpu',
                 weights_only=True,
             )
             self.flownet.load_state_dict(
@@ -117,12 +126,12 @@ class InterpolateIFRNetTorch(BaseInterpolate):
                 strict=True,
             )
             self.flownet.eval().to(device=self.device, dtype=self.dtype)
-            logger.info("IFRNet loaded")
-            logger.info("Scale: %s", self.scale)
+            logger.info('IFRNet loaded')
+            logger.info('Scale: %s', self.scale)
 
-            if self.backend == "tensorrt":
+            if self.backend == 'tensorrt':
                 warnAndLog(
-                    "TensorRT is not implemented for IFRNet yet, falling back to PyTorch"
+                    'TensorRT is not implemented for IFRNet yet, falling back to PyTorch'
                 )
         self.torchUtils.sync_stream(self.prepareStream)  # type: ignore
 
@@ -139,13 +148,19 @@ class InterpolateIFRNetTorch(BaseInterpolate):
                         img1.get_frame_tensor(), self.padding
                     )
                     self.frame0 = torch.cat(
-                        [self.frame0 for _ in range(self.ceilInterpolateFactor - 1)],
+                        [
+                            self.frame0
+                            for _ in range(self.ceilInterpolateFactor - 1)
+                        ],
                         dim=0,
                     )
                     return
-                frame1 = torch.nn.functional.pad(img1.get_frame_tensor(), self.padding)
+                frame1 = torch.nn.functional.pad(
+                    img1.get_frame_tensor(), self.padding
+                )
                 frame1 = torch.cat(
-                    [frame1 for _ in range(self.ceilInterpolateFactor - 1)], dim=0
+                    [frame1 for _ in range(self.ceilInterpolateFactor - 1)],
+                    dim=0,
                 )
             self.torchUtils.sync_stream(self.prepareStream)  # type: ignore
 

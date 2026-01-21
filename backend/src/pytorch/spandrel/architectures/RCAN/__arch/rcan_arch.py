@@ -10,27 +10,28 @@ from ....architectures.__arch_helpers.padding import pad_to_multiple
 from ....util import store_hyperparameters
 
 
-def get_activation(activation: str = "relu") -> nn.Module:
+def get_activation(activation: str = 'relu') -> nn.Module:
     """Get the specified activation layer.
+
     Args:
         activation (str): one of ``'relu'``, ``'leaky_relu'``, ``'elu'``, ``'gelu'``,
             ``'swish'``, 'efficient_swish'`` and ``'none'``. Default: ``'relu'``
     """
     assert activation in [
-        "relu",
-        "leaky_relu",
-        "elu",
-        "silu",
-        "gelu",
-        "none",
-    ], f"Get unknown activation key {activation}"
+        'relu',
+        'leaky_relu',
+        'elu',
+        'silu',
+        'gelu',
+        'none',
+    ], f'Get unknown activation key {activation}'
     activation_dict = {
-        "relu": nn.ReLU(inplace=True),
-        "leaky_relu": nn.LeakyReLU(negative_slope=0.2, inplace=True),
-        "elu": nn.ELU(alpha=1.0, inplace=True),
-        "silu": nn.SiLU(inplace=True),
-        "gelu": nn.GELU(),
-        "none": nn.Identity(),
+        'relu': nn.ReLU(inplace=True),
+        'leaky_relu': nn.LeakyReLU(negative_slope=0.2, inplace=True),
+        'elu': nn.ELU(alpha=1.0, inplace=True),
+        'silu': nn.SiLU(inplace=True),
+        'gelu': nn.GELU(),
+        'none': nn.Identity(),
     }
     return activation_dict[activation]
 
@@ -39,7 +40,11 @@ def default_conv(
     in_channels: int, out_channels: int, kernel_size: int, bias: bool = True
 ) -> nn.Conv2d:
     return nn.Conv2d(
-        in_channels, out_channels, kernel_size, padding=(kernel_size // 2), bias=bias
+        in_channels,
+        out_channels,
+        kernel_size,
+        padding=(kernel_size // 2),
+        bias=bias,
     )
 
 
@@ -70,7 +75,7 @@ class BasicBlock(nn.Sequential):
         stride: int = 1,
         bias: bool = False,
         bn: bool = True,
-        act_mode: str | None = "relu",
+        act_mode: str | None = 'relu',
     ) -> None:
         m: list[nn.Module] = [
             nn.Conv2d(
@@ -97,7 +102,7 @@ class ResBlock(nn.Module):
         kernel_size: int,
         bias: bool = True,
         bn: bool = False,
-        act_mode: str = "relu",
+        act_mode: str = 'relu',
         res_scale: float = 1,
     ) -> None:
         super().__init__()
@@ -150,7 +155,7 @@ class Upsampler(nn.Sequential):
         super().__init__(*m)
 
 
-## Channel Attention (CA) Layer
+# Channel Attention (CA) Layer
 class CALayer(nn.Module):
     def __init__(self, channel: int, reduction: int = 16) -> None:
         super().__init__()
@@ -170,7 +175,7 @@ class CALayer(nn.Module):
         return x * y
 
 
-## Residual Channel Attention Block (RCAB)
+# Residual Channel Attention Block (RCAB)
 class RCAB(nn.Module):
     def __init__(
         self,
@@ -180,7 +185,7 @@ class RCAB(nn.Module):
         reduction: int,
         bias: bool = True,
         bn: bool = False,
-        act_mode: str = "relu",
+        act_mode: str = 'relu',
         res_scale: float = 1,
     ) -> None:
         super().__init__()
@@ -202,7 +207,7 @@ class RCAB(nn.Module):
         return res
 
 
-## Residual Group (RG)
+# Residual Group (RG)
 class ResidualGroup(nn.Module):
     def __init__(
         self,
@@ -239,7 +244,7 @@ class ResidualGroup(nn.Module):
 
 
 @store_hyperparameters()
-## Residual Channel Attention Network (RCAN)
+# Residual Channel Attention Network (RCAN)
 class RCAN(nn.Module):
     hyperparameters = {}
 
@@ -256,7 +261,7 @@ class RCAN(nn.Module):
         kernel_size: int = 3,
         reduction: int = 16,
         res_scale: float = 1,
-        act_mode: str = "relu",
+        act_mode: str = 'relu',
         unshuffle_mod: bool = False,
         conv: Callable[..., nn.Conv2d] = default_conv,
     ) -> None:
@@ -320,7 +325,7 @@ class RCAN(nn.Module):
         self.tail = nn.Sequential(*modules_tail)
 
     def check_img_size(self, x: Tensor) -> Tensor:
-        return pad_to_multiple(x, self.downscale_factor, mode="reflect")
+        return pad_to_multiple(x, self.downscale_factor, mode='reflect')
 
     def forward(self, x: Tensor) -> Tensor:
         _b, _c, h, w = x.shape

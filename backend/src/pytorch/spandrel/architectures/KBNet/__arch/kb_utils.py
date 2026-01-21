@@ -1,7 +1,7 @@
 # type: ignore
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 
 class LayerNormFunction(torch.autograd.Function):
@@ -47,10 +47,12 @@ class LayerNorm2d(nn.Module):
     def __init__(self, channels, eps=1e-6, requires_grad=True):
         super().__init__()
         self.register_parameter(
-            "weight", nn.Parameter(torch.ones(channels), requires_grad=requires_grad)
+            'weight',
+            nn.Parameter(torch.ones(channels), requires_grad=requires_grad),
         )
         self.register_parameter(
-            "bias", nn.Parameter(torch.zeros(channels), requires_grad=requires_grad)
+            'bias',
+            nn.Parameter(torch.zeros(channels), requires_grad=requires_grad),
         )
         self.eps = eps
 
@@ -85,13 +87,19 @@ class KBAFunction(torch.autograd.Function):
         bias = att @ selfb
         attk = att @ selfw
 
-        uf = torch.nn.functional.unfold(x, kernel_size=selfk, padding=selfk // 2)
+        uf = torch.nn.functional.unfold(
+            x, kernel_size=selfk, padding=selfk // 2
+        )
 
         # for unfold att / less memory cost
-        uf = uf.reshape(B, selfg, selfc // selfg * KK, H * W).permute(0, 3, 1, 2)
-        attk = attk.reshape(B, H * W, selfg, selfc // selfg, selfc // selfg * KK)
+        uf = uf.reshape(B, selfg, selfc // selfg * KK, H * W).permute(
+            0, 3, 1, 2
+        )
+        attk = attk.reshape(
+            B, H * W, selfg, selfc // selfg, selfc // selfg * KK
+        )
 
-        x = attk @ uf.unsqueeze(-1)  #
+        x = attk @ uf.unsqueeze(-1)
         del attk, uf
         x = x.squeeze(-1).reshape(B, H * W, selfc) + bias
         x = x.transpose(-1, -2).reshape(B, selfc, H, W)
@@ -118,8 +126,12 @@ class KBAFunction(torch.autograd.Function):
         attk = att @ selfw
         uf = F.unfold(x, kernel_size=selfk, padding=selfk // 2)
         # for unfold att / less memory cost
-        uf = uf.reshape(B, selfg, selfc // selfg * KK, H * W).permute(0, 3, 1, 2)
-        attk = attk.reshape(B, H * W, selfg, selfc // selfg, selfc // selfg * KK)
+        uf = uf.reshape(B, selfg, selfc // selfg * KK, H * W).permute(
+            0, 3, 1, 2
+        )
+        attk = attk.reshape(
+            B, H * W, selfg, selfc // selfg, selfc // selfg * KK
+        )
 
         dx = dbias.view(B, H * W, selfg, selfc // selfg, 1)
 
@@ -132,7 +144,9 @@ class KBAFunction(torch.autograd.Function):
         dselfw = att.transpose(-2, -1) @ dattk
 
         duf = duf.permute(0, 2, 3, 4, 1).view(B, -1, H * W)
-        dx = F.fold(duf, output_size=(H, W), kernel_size=selfk, padding=selfk // 2)
+        dx = F.fold(
+            duf, output_size=(H, W), kernel_size=selfk, padding=selfk // 2
+        )
 
         datt = datt.transpose(-1, -2).view(B, nset, H, W)
 

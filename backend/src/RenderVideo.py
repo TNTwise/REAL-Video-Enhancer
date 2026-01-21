@@ -1,32 +1,38 @@
-from threading import Thread
-import os
 import math
-from time import sleep, time
-from typing import Optional
+import os
 import sys
+import threading
+import traceback
 from multiprocessing import shared_memory
+from threading import Thread
+from time import sleep
+
 import cv2
+import numpy as np
 
 from .FFmpegBuffers import FFmpegRead, FFmpegWrite, MPVOutput
 from .InformationWriteOut import InformationWriteOut
-from .utils.Encoders import EncoderSettings
-from .utils.SceneDetect import SceneDetect
-from .utils.LogConfig import get_logger
 from .utils.BorderDetect import BorderDetect
+from .utils.Encoders import EncoderSettings
+from .utils.LogConfig import get_logger
+from .utils.SceneDetect import SceneDetect
 from .utils.VideoInfo import OpenCVInfo
-import numpy as np
-import threading
-import traceback
+
 
 def global_thread_handler(args):
     # args.exc_value contains the error
     # args.exc_traceback contains the stack trace
-    tb_string = "".join(traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback))
-    
+    tb_string = ''.join(
+        traceback.format_exception(
+            args.exc_type, args.exc_value, args.exc_traceback
+        )
+    )
+
     print(f"Thread '{args.thread.name}' crashed. Full Traceback:\n{tb_string}")
-    print("Exiting application due to thread crash.")
-    sleep(1) # Give time for the print to flush
+    print('Exiting application due to thread crash.')
+    sleep(1)  # Give time for the print to flush
     os._exit(1)
+
 
 threading.excepthook = global_thread_handler
 
@@ -75,9 +81,9 @@ class Render:
         inputFile: str,
         outputFile: str,
         # backend settings
-        backend="pytorch",
-        device="default",
-        precision="float16",
+        backend='pytorch',
+        device='default',
+        precision='float16',
         pytorch_gpu_id: int = 0,
         ncnn_gpu_id: int = 0,
         cwd: str = os.getcwd(),
@@ -90,26 +96,26 @@ class Render:
         tile_size=None,
         drba=False,
         # ffmpeg settings
-        ffmpeg_path: str = "./bin/ffmpeg",
+        ffmpeg_path: str = './bin/ffmpeg',
         start_time=None,
         end_time=None,
-        custom_encoder: str = "libx264",
-        pixelFormat: str = "yuv420p",
+        custom_encoder: str = 'libx264',
+        pixelFormat: str = 'yuv420p',
         benchmark: bool = False,
         overwrite: bool = False,
-        crf: str = "18",
-        video_encoder_preset: str = "libx264",
-        audio_encoder_preset: str = "aac",
-        subtitle_encoder_preset: str = "srt",
-        audio_bitrate: str = "192k",
+        crf: str = '18',
+        video_encoder_preset: str = 'libx264',
+        audio_encoder_preset: str = 'aac',
+        subtitle_encoder_preset: str = 'srt',
+        audio_bitrate: str = '192k',
         border_detect: bool = False,
         hdr_mode: bool = False,
         merge_subtitles: bool = True,
         # misc
         pause_shared_memory_id=None,
-        sceneDetectMethod: str = "pyscenedetect",
+        sceneDetectMethod: str = 'pyscenedetect',
         sceneDetectSensitivity: float = 3.0,
-        sharedMemoryID: Optional[str] = None,
+        sharedMemoryID: str | None = None,
         trt_optimization_level: int = 3,
         trt_dynamic_shapes: bool = False,
         override_upscale_scale: int | None = None,
@@ -156,10 +162,13 @@ class Render:
         self.extraRestorationModels = []
 
         if cwd:
-            logger.info("Working Directory: %s", cwd)
+            logger.info('Working Directory: %s', cwd)
         else:
             cwd = os.getcwd()
-            logger.info("No Working Directory specified, using current directory: %s", cwd)
+            logger.info(
+                'No Working Directory specified, using current directory: %s',
+                cwd,
+            )
         videoInfo = OpenCVInfo(
             input_file=inputFile,
             start_time=start_time,
@@ -168,7 +177,7 @@ class Render:
         )
 
         if not videoInfo.is_valid_video:
-            logger.error("Input video is not valid!")
+            logger.error('Input video is not valid!')
 
         if start_time is None:
             start_time = 0
@@ -182,18 +191,22 @@ class Render:
         self.borderX = 0
         self.borderY = 0  # set borders for cropping automatically to 0, will be overwritten if borders are detected
         self.totalInputFrames = videoInfo.get_total_frames()
-        self.totalOutputFrames = int(self.totalInputFrames * self.ceilInterpolateFactor)
+        self.totalOutputFrames = int(
+            self.totalInputFrames * self.ceilInterpolateFactor
+        )
         self.fps = videoInfo.get_fps()
         color_space = videoInfo.get_color_space()
         color_primaries = videoInfo.get_color_primaries()
         color_transfer = videoInfo.get_color_transfer()
 
         video_encoder = EncoderSettings(video_encoder_preset)
-        audio_encoder = EncoderSettings(audio_encoder_preset, type="audio")
-        subtitle_encoder = EncoderSettings(subtitle_encoder_preset, type="subtitle")
+        audio_encoder = EncoderSettings(audio_encoder_preset, type='audio')
+        subtitle_encoder = EncoderSettings(
+            subtitle_encoder_preset, type='subtitle'
+        )
 
         if border_detect:  # border detect has to be put before everything, to overwrite the width and height
-            print("Detecting borders", file=sys.stderr)
+            print('Detecting borders', file=sys.stderr)
             borderDetect = BorderDetect(
                 inputFile=self.inputFile, ffmpeg_path=ffmpeg_path
             )
@@ -201,19 +214,19 @@ class Render:
                 borderDetect.getBorders()
             )
             logger.info(
-                "Detected borders: Width,Height:%sx%s, X,Y: %sx%s",
+                'Detected borders: Width,Height:%sx%s, X,Y: %sx%s',
                 self.width,
                 self.height,
                 self.borderX,
                 self.borderY,
             )
 
-        logger.info("Using backend: %s", self.backend)
+        logger.info('Using backend: %s', self.backend)
         # upscale has to be called first to get the scale of the upscale model
         if upscaleModel:
             self.setupUpscale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
-            logger.info("Using Upscaling Model: %s", self.upscaleModel)
+            logger.info('Using Upscaling Model: %s', self.upscaleModel)
         else:
             self.upscaleTimes = 1  # if no upscaling, it will default to 1
             self.modelScale = 1
@@ -222,13 +235,13 @@ class Render:
             for model in extraRestorationModels:
                 extraRestoration = self.setupExtraRestoration(model)
                 if extraRestoration:
-                    logger.info("Using Extra Restoration Model: %s", model)
+                    logger.info('Using Extra Restoration Model: %s', model)
                     self.extraRestorationModels.append(extraRestoration)
                     extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
 
         if interpolateModel:
             self.setupInterpolate()
-            logger.info("Using Interpolation Model: %s", self.interpolateModel)
+            logger.info('Using Interpolation Model: %s', self.interpolateModel)
 
         if upscaleModel:  # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
             self.upscaleOption.hotReload()
@@ -239,18 +252,18 @@ class Render:
         if self.modelScale and self.override_upscale_scale:
             if int(self.modelScale) == int(self.override_upscale_scale):
                 logger.warning(
-                    "Override upscale scale is set to the same value as the model scale; output resolution will not change."
+                    'Override upscale scale is set to the same value as the model scale; output resolution will not change.'
                 )
                 self.override_upscale_scale = False
 
         logger.info(
-            "Upscale Times: %s",
-            self.override_upscale_scale if self.override_upscale_scale else self.upscaleTimes,
+            'Upscale Times: %s',
+            self.override_upscale_scale or self.upscaleTimes,
         )
-        logger.info("Interpolate Factor: %s", self.interpolateFactor)
-        logger.info("Total Output Frames: %s", self.totalOutputFrames)
-        logger.info("Model Scale: %s", self.modelScale)
-        logger.info("HDR Mode: %s", hdr_mode)
+        logger.info('Interpolate Factor: %s', self.interpolateFactor)
+        logger.info('Total Output Frames: %s', self.totalOutputFrames)
+        logger.info('Model Scale: %s', self.modelScale)
+        logger.info('HDR Mode: %s', hdr_mode)
 
         self.readBuffer = FFmpegRead(  # input width
             inputFile=inputFile,
@@ -264,7 +277,7 @@ class Render:
             backend=self.backend,
             device=self.device,
             gpu_id=self.pytorch_gpu_id
-            if self.backend in ["pytorch", "tensorrt"]
+            if self.backend in ['pytorch', 'tensorrt']
             else self.ncnn_gpu_id,
             dtype=self.precision,
             color_space=color_space,
@@ -304,13 +317,11 @@ class Render:
             color_primaries=color_primaries,
             color_transfer=color_transfer,
             ffmpeg_path=ffmpeg_path,
-            ffmpeg_log_file=os.path.join(cwd, "ffmpeg_log.txt"),
+            ffmpeg_log_file=os.path.join(cwd, 'ffmpeg_log.txt'),
         )
 
         shm_mul = (
-            self.override_upscale_scale
-            if self.override_upscale_scale
-            else self.upscaleTimes
+            self.override_upscale_scale or self.upscaleTimes
         )
         hdr_mul = 6 if hdr_mode else 3
 
@@ -332,8 +343,12 @@ class Render:
         )
 
         self.renderThread = Thread(target=self.render)
-        self.ffmpegReadThread = Thread(target=self.readBuffer.read_frames_into_queue)
-        self.ffmpegWriteThread = Thread(target=self.writeBuffer.write_out_frames)
+        self.ffmpegReadThread = Thread(
+            target=self.readBuffer.read_frames_into_queue
+        )
+        self.ffmpegWriteThread = Thread(
+            target=self.writeBuffer.write_out_frames
+        )
         self.sharedMemoryThread = Thread(
             target=self.informationHandler.writeOutInformation
         )
@@ -361,7 +376,7 @@ class Render:
         frame_array = frame_array.reshape((self.height, self.width, 3))
         # Convert the BGR image to RGB
         frame_array = cv2.cvtColor(frame_array, cv2.COLOR_BGR2RGB)
-        cv2.imwrite("frame.jpg", frame_array)
+        cv2.imwrite('frame.jpg', frame_array)
 
     def render(self):
         frames_rendered = 0
@@ -390,11 +405,17 @@ class Render:
 
                 for interpolated_frame in interpolated_frames:
                     if self.upscaleModel:
-                        interpolated_frame = self.upscaleOption(interpolated_frame)
+                        interpolated_frame = self.upscaleOption(
+                            interpolated_frame
+                        )
                     if self.override_upscale_scale:
-                        interpolated_frame = interpolated_frame.resize_frame_optimal(
-                            new_width=self.width * self.override_upscale_scale,
-                            new_height=self.height * self.override_upscale_scale,
+                        interpolated_frame = (
+                            interpolated_frame.resize_frame_optimal(
+                                new_width=self.width
+                                * self.override_upscale_scale,
+                                new_height=self.height
+                                * self.override_upscale_scale,
+                            )
                         )
 
                     self.informationHandler.update(
@@ -413,7 +434,9 @@ class Render:
                     self.height * self.override_upscale_scale,
                 )
 
-            self.informationHandler.update(frame.get_frame_bytes(clear_cache=True))
+            self.informationHandler.update(
+                frame.get_frame_bytes(clear_cache=True)
+            )
 
             self.writeBuffer.writeQueue.put(frame.get_frame_bytes())
             frames_rendered += int(self.ceilInterpolateFactor)
@@ -476,20 +499,20 @@ class Render:
         )
 
     def setupExtraRestoration(self, modelPath):
-        logger.info("Setting up Extra Restoration")
-        if self.backend == "pytorch" or self.backend == "tensorrt":
+        logger.info('Setting up Extra Restoration')
+        if self.backend == 'pytorch' or self.backend == 'tensorrt':
             return self.upscalePytorchObject(modelPath)
 
-        if self.backend == "ncnn":
+        if self.backend == 'ncnn':
             return self.upscaleNCNNObject(scale=1, modelPath=modelPath)
 
     def setupUpscale(self):
-        logger.info("Setting up Upscale")
-        if self.backend == "pytorch" or self.backend == "tensorrt":
+        logger.info('Setting up Upscale')
+        if self.backend == 'pytorch' or self.backend == 'tensorrt':
             self.upscaleOption = self.upscalePytorchObject(self.upscaleModel)
             self.modelScale = self.upscaleOption.getScale()
 
-        if self.backend == "ncnn":
+        if self.backend == 'ncnn':
             from .ncnn.UpscaleNCNN import getNCNNScale
 
             self.modelScale = getNCNNScale(modelPath=self.upscaleModel)
@@ -498,7 +521,7 @@ class Render:
                 scale=self.modelScale, modelPath=self.upscaleModel
             )
 
-        if self.backend == "directml":  # i dont want to work with this shit
+        if self.backend == 'directml':  # i dont want to work with this shit
             from .onnx.UpscaleONNX import UpscaleONNX
 
             self.modelScale = UpscaleONNX.getModelScale(self.upscaleModel)
@@ -517,7 +540,7 @@ class Render:
         )
 
     def setupInterpolate(self):
-        logger.info("Setting up Interpolation")
+        logger.info('Setting up Interpolation')
         self.sceneDetect = SceneDetect(
             sceneChangeMethod=self.sceneDetectMethod,
             sceneChangeSensitivity=self.sceneDetectSensitivty,
@@ -528,16 +551,16 @@ class Render:
             model_dtype=self.precision,
             model_device=self.device,
             model_gpu_id=self.pytorch_gpu_id
-            if self.backend in ["pytorch", "tensorrt"]
+            if self.backend in ['pytorch', 'tensorrt']
             else self.ncnn_gpu_id,
         )
-        if self.sceneDetectMethod != "none":
-            logger.info("Scene Detection Enabled")
+        if self.sceneDetectMethod != 'none':
+            logger.info('Scene Detection Enabled')
 
         else:
-            logger.info("Scene Detection Disabled")
+            logger.info('Scene Detection Disabled')
 
-        if self.backend == "ncnn":
+        if self.backend == 'ncnn':
             from .ncnn.InterpolateNCNN import InterpolateRIFENCNN
 
             self.interpolateOption = InterpolateRIFENCNN(
@@ -550,7 +573,7 @@ class Render:
                 hdr_mode=self.hdr_mode,
             )
 
-        if self.backend == "pytorch" or self.backend == "tensorrt":
+        if self.backend == 'pytorch' or self.backend == 'tensorrt':
             from .pytorch.InterpolateTorch import InterpolateFactory
 
             self.interpolateOption = InterpolateFactory.build_interpolation_method(

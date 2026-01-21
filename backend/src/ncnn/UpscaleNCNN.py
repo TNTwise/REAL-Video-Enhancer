@@ -1,37 +1,37 @@
 # https://github.com/chaiNNer-org/chaiNNer/blob/2aa0b46233ba8cd90d4bb405e2bc6e16a3430546/backend/src/nodes/impl/ncnn/model.py
 
 from __future__ import annotations
-import pathlib
-import logging
 
+import logging
+import pathlib
 
 logger = logging.getLogger(__name__)
 
 try:
     from upscale_ncnn_py import upscale_ncnn_vulkan_wrapper as wrapped
 
-    method = "upscale_ncnn_py"
+    method = 'upscale_ncnn_py'
 except (ImportError, OSError):
-    method = "ncnn_vulkan"
-import numpy as np
-import cv2
-import os
-from time import sleep
+    method = 'ncnn_vulkan'
 import math
-import ncnn
+import os
 from copy import deepcopy
 from io import BufferedReader, StringIO
 from json import loads as jload
 from pathlib import Path
+from time import sleep
+from typing import TypeVar
 
-from typing import TypeVar, Union, Optional, Dict
+import numpy as np
 
-T = TypeVar("T")
+import ncnn
+
+T = TypeVar('T')
 from ..utils.Frame import Frame
 
 
 def checked_cast(t: type[T], value: object) -> T:
-    assert isinstance(value, t), f"Value is {type(value)}, must be type {t}"
+    assert isinstance(value, t), f'Value is {type(value)}, must be type {t}'
     return value
 
 
@@ -3006,9 +3006,9 @@ schemaf = """
 
 param_schema = jload(schemaf)
 
-DTYPE_FP32 = b"\x00\x00\x00\x00"
-DTYPE_FP16 = b"\x47\x6b\x30\x01"
-DTYPE_DICT = {b"\x00\x00\x00\x00": np.float32, b"\x47\x6b\x30\x01": np.float16}
+DTYPE_FP32 = b'\x00\x00\x00\x00'
+DTYPE_FP16 = b'\x47\x6b\x30\x01'
+DTYPE_DICT = {b'\x00\x00\x00\x00': np.float32, b'\x47\x6b\x30\x01': np.float16}
 
 
 class UnaryOpTypes:
@@ -3147,7 +3147,7 @@ class LrnRegionTypes:
 
 
 class NcnnWeight:
-    def __init__(self, weight: np.ndarray, quantize_tag: bytes = b""):
+    def __init__(self, weight: np.ndarray, quantize_tag: bytes = b''):
         self.quantize_tag = quantize_tag
         self.weight = weight
 
@@ -3177,9 +3177,11 @@ class NcnnParamCollection:
         param_dict: dict[int, NcnnParam] | None = None,
     ) -> None:
         self.op: str = op
-        self.param_dict: dict[int, NcnnParam] = {} if param_dict is None else param_dict
+        self.param_dict: dict[int, NcnnParam] = (
+            {} if param_dict is None else param_dict
+        )
         self.weight_order: dict[str, list[int]] = (
-            param_schema[self.op]["weightOrder"] if self.op else {}
+            param_schema[self.op]['weightOrder'] if self.op else {}
         )
 
     def __getitem__(self, pid: int) -> NcnnParam:
@@ -3193,33 +3195,35 @@ class NcnnParamCollection:
             except KeyError:
                 raise
 
-            default_value = param["defaultValue"]
-            value = param["defaultValue"]
+            default_value = param['defaultValue']
+            value = param['defaultValue']
             if isinstance(value, str):
                 for key, val in list(param_dict.items())[:-1]:
-                    if value == val["paramPhase"]:
+                    if value == val['paramPhase']:
                         try:
                             value = self.param_dict[int(key)].value
                         except KeyError:
-                            value = val["defaultValue"]
-                        default_value = val["defaultValue"]
+                            value = val['defaultValue']
+                        default_value = val['defaultValue']
 
                         break
                 else:
-                    msg = f"Op {self.op} does not have param {value}, please report"
+                    msg = f'Op {self.op} does not have param {value}, please report'
                     raise KeyError(msg) from exc
 
-            return NcnnParam(idstr, param["paramPhase"], value, default_value)
+            return NcnnParam(idstr, param['paramPhase'], value, default_value)
 
-    def __setitem__(self, pid: int, value: float | int | list[float | int]) -> None:
+    def __setitem__(
+        self, pid: int, value: float | int | list[float | int]
+    ) -> None:
         idstr = str(pid)
         param_dict = param_schema[self.op]
         try:
             param = param_dict[idstr]
         except KeyError:
             raise
-        name = param["paramPhase"]
-        def_val = param["defaultValue"]
+        name = param['paramPhase']
+        def_val = param['defaultValue']
 
         self.param_dict[pid] = NcnnParam(idstr, name, value, def_val)
 
@@ -3235,20 +3239,20 @@ class NcnnParamCollection:
         return False
 
     def __str__(self) -> str:
-        output = ""
+        output = ''
         param_dict = param_schema[self.op]
         self.param_dict = dict(sorted(self.param_dict.items()))
         for v in self.param_dict.values():
             if v.value == v.default:
                 continue
-            if isinstance(v.default, str) and "FLT_MAX" not in v.default:
+            if isinstance(v.default, str) and 'FLT_MAX' not in v.default:
                 pid = None
                 for key, val in list(param_dict.items())[:-1]:
-                    if v.default == val["paramPhase"]:
+                    if v.default == val['paramPhase']:
                         pid = int(key)
                         break
                 else:
-                    msg = f"Op {self.op} does not have param {v.default}, please report"
+                    msg = f'Op {self.op} does not have param {v.default}, please report'
                     raise KeyError(msg)
 
                 # If a param that defaults to the value of another param, if it's value
@@ -3260,21 +3264,21 @@ class NcnnParamCollection:
                     continue
 
             if isinstance(v.value, list):
-                output += " -233" + v.id.zfill(2) + "="
+                output += ' -233' + v.id.zfill(2) + '='
             else:
-                output += " " + v.id + "="
+                output += ' ' + v.id + '='
 
             if isinstance(v.value, float):
-                v_str = np.format_float_scientific(v.value, 6, False, exp_digits=2)
-            elif isinstance(v.value, list):
-                v_str = ",".join(
-                    [
-                        np.format_float_scientific(n, 6, False, exp_digits=2)
-                        if isinstance(n, float)
-                        else str(n)
-                        for n in v.value
-                    ]
+                v_str = np.format_float_scientific(
+                    v.value, 6, False, exp_digits=2
                 )
+            elif isinstance(v.value, list):
+                v_str = ','.join([
+                    np.format_float_scientific(n, 6, False, exp_digits=2)
+                    if isinstance(n, float)
+                    else str(n)
+                    for n in v.value
+                ])
             else:
                 v_str = str(v.value)
 
@@ -3284,14 +3288,14 @@ class NcnnParamCollection:
 
     def set_op(self, op: str) -> None:
         self.op = op
-        self.weight_order = param_schema[op]["weightOrder"]
+        self.weight_order = param_schema[op]['weightOrder']
 
 
 class NcnnLayer:
     def __init__(
         self,
-        op_type: str = "",
-        name: str = "",
+        op_type: str = '',
+        name: str = '',
         num_inputs: int = 0,
         num_outputs: int = 0,
         inputs: list[str] | None = None,
@@ -3312,14 +3316,16 @@ class NcnnLayer:
             {} if weight_data is None else weight_data
         )
 
-    def add_param(self, pid: int, value: float | int | list[float | int]) -> None:
+    def add_param(
+        self, pid: int, value: float | int | list[float | int]
+    ) -> None:
         self.params[pid] = value
 
     def add_weight(
         self,
         weight_name: str,
         data: float | int | np.ndarray,
-        quantize_tag: bytes = b"",
+        quantize_tag: bytes = b'',
     ) -> int:
         if isinstance(data, float):
             data_array = np.array(data, np.float32)
@@ -3352,19 +3358,19 @@ class NcnnModel:
 
     @property
     def magic(self):
-        return "7767517"
+        return '7767517'
 
-    def load_from_file(param_path: str = "", bin_path: str = "") -> NcnnModel:
-        if bin_path == "":
-            bin_path = param_path.replace(".param", ".bin")
-        elif param_path == "":
-            param_path = bin_path.replace(".bin", ".param")
+    def load_from_file(param_path: str = '', bin_path: str = '') -> NcnnModel:
+        if bin_path == '':
+            bin_path = param_path.replace('.param', '.bin')
+        elif param_path == '':
+            param_path = bin_path.replace('.bin', '.param')
 
         model = NcnnModel()
-        with open(param_path, encoding="utf-8") as paramf:
-            with open(bin_path, "rb") as binf:
+        with Path(param_path).open(encoding='utf-8') as paramf:
+            with Path(bin_path).open('rb') as binf:
                 paramf.readline()
-                counts = paramf.readline().strip().split(" ")
+                counts = paramf.readline().strip().split(' ')
                 model.node_count = int(counts[0])
                 model.blob_count = int(counts[1])
 
@@ -3383,11 +3389,11 @@ class NcnnModel:
         weights_a = a.weight_data
         weights_b = b.weight_data
         weights_interp: dict[str, NcnnWeight] = {}
-        layer_bytes = b""
+        layer_bytes = b''
 
         if weights_a:
             assert len(weights_a) == len(weights_b), (
-                "All corresponding nodes must have same number of weights"
+                'All corresponding nodes must have same number of weights'
             )
 
             layer_bytes_list = []
@@ -3398,11 +3404,13 @@ class NcnnModel:
                     raise
 
                 assert weight_a.shape == weight_b.shape, (
-                    "Corresponding weights must have the same size and shape"
+                    'Corresponding weights must have the same size and shape'
                 )
 
-                assert len(weight_a.quantize_tag) == len(weight_b.quantize_tag), (
-                    "Weights must either both have or both not have a quantize tag"
+                assert len(weight_a.quantize_tag) == len(
+                    weight_b.quantize_tag
+                ), (
+                    'Weights must either both have or both not have a quantize tag'
                 )
 
                 if (
@@ -3419,7 +3427,10 @@ class NcnnModel:
                     weight_a.weight = weight_a.weight.astype(np.float16)
 
                 weight_c = NcnnWeight(
-                    (weight_a.weight * alpha_a + weight_b.weight * (1 - alpha_a)),
+                    (
+                        weight_a.weight * alpha_a
+                        + weight_b.weight * (1 - alpha_a)
+                    ),
                     weight_a.quantize_tag,
                 )
                 layer_bytes_list.append(
@@ -3428,7 +3439,7 @@ class NcnnModel:
 
                 weights_interp[weight_name] = weight_c
 
-            layer_bytes = b"".join(layer_bytes_list)
+            layer_bytes = b''.join(layer_bytes_list)
 
         return (
             NcnnLayer(
@@ -3461,25 +3472,25 @@ class NcnnModel:
         params = param_list[output_end:]
         param_dict = {}
         for param_str in params:
-            ks, vs = param_str.split("=")
+            ks, vs = param_str.split('=')
             k = int(ks)
             if k < 0:
                 v = []
-                for vi in vs.split(","):
-                    vi = float(vi) if "." in vi or "e" in vi else int(vi)  # noqa: PLW2901
+                for vi in vs.split(','):
+                    vi = float(vi) if '.' in vi or 'e' in vi else int(vi)  # noqa: PLW2901
                     v.append(vi)
                 k = abs(k + 23300)
                 ks = str(k)
-            elif "." in vs or "e" in vs:
+            elif '.' in vs or 'e' in vs:
                 v = float(vs)
             else:
                 v = int(vs)
 
             param = NcnnParam(
                 ks,
-                param_schema[op_type][ks]["paramPhase"],
+                param_schema[op_type][ks]['paramPhase'],
                 v,
-                param_schema[op_type][ks]["defaultValue"],
+                param_schema[op_type][ks]['defaultValue'],
             )
             param_dict[k] = param
 
@@ -3497,17 +3508,17 @@ class NcnnModel:
         self, binf: BufferedReader, op_type: str, layer: NcnnLayer
     ) -> dict[str, NcnnWeight]:
         weight_dict = {}
-        if op_type == "BatchNorm":
+        if op_type == 'BatchNorm':
             channels_data = checked_cast(int, layer.params[0].value) * 4
             slope = np.frombuffer(binf.read(channels_data), np.float32)
-            weight_dict["slope"] = NcnnWeight(slope)
+            weight_dict['slope'] = NcnnWeight(slope)
             mean = np.frombuffer(binf.read(channels_data), np.float32)
-            weight_dict["mean"] = NcnnWeight(mean)
+            weight_dict['mean'] = NcnnWeight(mean)
             variance = np.frombuffer(binf.read(channels_data), np.float32)
-            weight_dict["variance"] = NcnnWeight(variance)
+            weight_dict['variance'] = NcnnWeight(variance)
             bias = np.frombuffer(binf.read(channels_data), np.float32)
-            weight_dict["bias"] = NcnnWeight(bias)
-        elif op_type in ("Convolution", "ConvolutionDepthWise"):
+            weight_dict['bias'] = NcnnWeight(bias)
+        elif op_type in ('Convolution', 'ConvolutionDepthWise'):
             quantize_tag = binf.read(4)
             dtype = DTYPE_DICT[quantize_tag]
             weight_data_length = checked_cast(int, layer.params[6].value)
@@ -3522,10 +3533,13 @@ class NcnnModel:
             num_filters = checked_cast(int, layer.params[0].value)
             kernel_w = checked_cast(int, layer.params[1].value)
             kernel_h = checked_cast(int, layer.params[11].value)
-            if op_type == "ConvolutionDepthWise":
+            if op_type == 'ConvolutionDepthWise':
                 group = checked_cast(int, layer.params[7].value)
                 num_input = (
-                    weight_data_length // (num_filters // group) // kernel_w // kernel_h
+                    weight_data_length
+                    // (num_filters // group)
+                    // kernel_w
+                    // kernel_h
                 )
                 shape = (
                     group,
@@ -3535,18 +3549,20 @@ class NcnnModel:
                     kernel_w,
                 )
             else:
-                num_input = weight_data_length // num_filters // kernel_w // kernel_h
+                num_input = (
+                    weight_data_length // num_filters // kernel_w // kernel_h
+                )
                 shape = (num_filters, num_input, kernel_h, kernel_w)
 
             weight_data = np.frombuffer(binf.read(weight_data_size), dtype)
             weight_data = weight_data.reshape(shape)
-            weight_dict["weight"] = NcnnWeight(weight_data, quantize_tag)
+            weight_dict['weight'] = NcnnWeight(weight_data, quantize_tag)
 
             if has_bias:
                 bias_data_size = num_filters * 4
                 bias_data = np.frombuffer(binf.read(bias_data_size), np.float32)
-                weight_dict["bias"] = NcnnWeight(bias_data)
-        elif op_type == "Deconvolution":
+                weight_dict['bias'] = NcnnWeight(bias_data)
+        elif op_type == 'Deconvolution':
             quantize_tag = binf.read(4)
             dtype = DTYPE_DICT[quantize_tag]
             weight_data_length = checked_cast(int, layer.params[6].value)
@@ -3561,22 +3577,26 @@ class NcnnModel:
             num_filters = checked_cast(int, layer.params[0].value)
             kernel_w = checked_cast(int, layer.params[1].value)
             kernel_h = checked_cast(int, layer.params[11].value)
-            num_input = weight_data_length // num_filters // kernel_w // kernel_h
+            num_input = (
+                weight_data_length // num_filters // kernel_w // kernel_h
+            )
             shape = (num_filters, num_input, kernel_h, kernel_w)
 
             weight_data = np.frombuffer(binf.read(weight_data_size), dtype)
             weight_data = weight_data.reshape(shape)
-            weight_dict["weight"] = NcnnWeight(weight_data, quantize_tag)
+            weight_dict['weight'] = NcnnWeight(weight_data, quantize_tag)
 
             if has_bias:
                 bias_data_size = num_filters * 4
                 bias_data = np.frombuffer(binf.read(bias_data_size), np.float32)
-                weight_dict["bias"] = NcnnWeight(bias_data)
-        elif op_type == "InnerProduct":
+                weight_dict['bias'] = NcnnWeight(bias_data)
+        elif op_type == 'InnerProduct':
             quantize_tag = binf.read(4)
             dtype = DTYPE_DICT[quantize_tag]
             weight_data_length = layer.params[2].value
-            assert isinstance(weight_data_length, int), "Weight data size must be int"
+            assert isinstance(weight_data_length, int), (
+                'Weight data size must be int'
+            )
             weight_data_size = (
                 weight_data_length * 2
                 if quantize_tag == DTYPE_FP16
@@ -3584,25 +3604,27 @@ class NcnnModel:
             )
             weight_data = np.frombuffer(binf.read(weight_data_size), dtype)
             num_output = layer.params[0].value
-            assert isinstance(num_output, int), "Num output must be int"
+            assert isinstance(num_output, int), 'Num output must be int'
             num_input = weight_data_length // num_output
             weight_data = weight_data.reshape((num_input, num_output))
-            weight_dict["weight"] = NcnnWeight(weight_data, quantize_tag)
+            weight_dict['weight'] = NcnnWeight(weight_data, quantize_tag)
 
             has_bias = layer.params[1].value
             if has_bias == 1:
                 bias_data_size = num_output * 4
                 bias_data = np.frombuffer(binf.read(bias_data_size), np.float32)
-                weight_dict["bias"] = NcnnWeight(bias_data)
-        elif op_type == "PReLU":
+                weight_dict['bias'] = NcnnWeight(bias_data)
+        elif op_type == 'PReLU':
             num_slope = layer.params[0].value
-            assert isinstance(num_slope, int), "Num slopes must be int"
+            assert isinstance(num_slope, int), 'Num slopes must be int'
             slope_data_size = num_slope * 4
             slope_data = np.frombuffer(binf.read(slope_data_size), np.float32)
-            weight_dict["slope"] = NcnnWeight(slope_data)
-        elif op_type == "Scale":
+            weight_dict['slope'] = NcnnWeight(slope_data)
+        elif op_type == 'Scale':
             scale_data_length = layer.params[0].value
-            assert isinstance(scale_data_length, int), "Scale data size must be int"
+            assert isinstance(scale_data_length, int), (
+                'Scale data size must be int'
+            )
             if scale_data_length != -233:
                 quantize_tag = binf.read(4)
                 dtype = DTYPE_DICT[quantize_tag]
@@ -3612,76 +3634,77 @@ class NcnnModel:
                     else scale_data_length * 4
                 )
                 scale_data = np.frombuffer(binf.read(scale_data_size), dtype)
-                weight_dict["weight"] = NcnnWeight(scale_data, quantize_tag)
+                weight_dict['weight'] = NcnnWeight(scale_data, quantize_tag)
 
                 has_bias = layer.params[1].value
                 if has_bias == 1:
                     bias_data = np.frombuffer(
                         binf.read(scale_data_length * 4), np.float32
                     )
-                    weight_dict["bias"] = NcnnWeight(bias_data)
+                    weight_dict['bias'] = NcnnWeight(bias_data)
 
         elif len(layer.params.weight_order) != 0:
-            error_msg = f"Load weights not added for {op_type} yet, please report"
+            error_msg = (
+                f'Load weights not added for {op_type} yet, please report'
+            )
             raise ValueError(error_msg)
 
         return weight_dict
 
-    def write_param(self, filename: Path | str = "") -> str:
+    def write_param(self, filename: Path | str = '') -> str:
         with StringIO() as p:
-            p.write(f"{self.magic}\n{self.node_count} {self.blob_count}\n")
+            p.write(f'{self.magic}\n{self.node_count} {self.blob_count}\n')
 
             for layer in self.layers:
-                if layer.op_type == "ncnnfused":
+                if layer.op_type == 'ncnnfused':
                     continue
 
                 p.write(
-                    f"{layer.op_type:<16}"
-                    f" {layer.name:<24}"
-                    f" {layer.num_inputs}"
-                    f" {layer.num_outputs}"
+                    f'{layer.op_type:<16}'
+                    f' {layer.name:<24}'
+                    f' {layer.num_inputs}'
+                    f' {layer.num_outputs}'
                 )
                 if layer.inputs:
-                    p.write(f" {' '.join(layer.inputs)}")
+                    p.write(f' {" ".join(layer.inputs)}')
                 if layer.outputs:
-                    p.write(f" {' '.join(layer.outputs)}")
+                    p.write(f' {" ".join(layer.outputs)}')
                 if layer.params.param_dict:
                     param_str = str(layer.params)
                     if param_str:
-                        p.write(f"{param_str}")
-                p.write("\n")
+                        p.write(f'{param_str}')
+                p.write('\n')
 
             if filename:
-                with open(filename, "w", encoding="utf-8") as f:
-                    f.write(p.getvalue())
-                return ""
-            else:
-                return p.getvalue()
+                Path(filename).write_text(p.getvalue(), encoding='utf-8')
+                return ''
+            return p.getvalue()
 
     def serialize_weights(self) -> bytes:
         layer_weights = [
-            b"".join((w.quantize_tag, np.ndarray.tobytes(w.weight)))
+            b''.join((w.quantize_tag, np.ndarray.tobytes(w.weight)))
             for l in self.layers
             for w in l.weight_data.values()
-            if l.weight_data and l.op_type != "ncnnfused"
+            if l.weight_data and l.op_type != 'ncnnfused'
         ]
 
-        return b"".join(layer_weights)
+        return b''.join(layer_weights)
 
     def write_bin(self, filename: Path | str) -> None:
-        with open(filename, "wb") as f:
-            f.write(self.serialize_weights())
+        Path(filename).write_bytes(self.serialize_weights())
 
     def interpolate(self, model_b: NcnnModel, alpha: float) -> NcnnModel:
         interp_model = deepcopy(self)
 
-        layer_a_weights = [(i, l) for i, l in enumerate(self.layers) if l.weight_data]
+        layer_a_weights = [
+            (i, l) for i, l in enumerate(self.layers) if l.weight_data
+        ]
         layer_b_weights = [
             (i, l) for i, l in enumerate(model_b.layers) if l.weight_data
         ]
 
         assert len(layer_a_weights) == len(layer_b_weights), (
-            "Models must have same number of layers containing weights"
+            'Models must have same number of layers containing weights'
         )
 
         weight_bytes_list = []
@@ -3702,7 +3725,9 @@ class NcnnModel:
 class NcnnModelWrapper:
     def __init__(self, model: NcnnModel) -> None:
         self.model: NcnnModel = model
-        scale, in_nc, out_nc, nf, fp = NcnnModelWrapper.get_broadcast_data(model)
+        scale, in_nc, out_nc, nf, fp = NcnnModelWrapper.get_broadcast_data(
+            model
+        )
         self.scale: int = scale
         self.nf: int = nf
         self.in_nc: int = in_nc
@@ -3723,7 +3748,9 @@ class NcnnModelWrapper:
             and isinstance(kernel_w, int)
             and isinstance(kernel_h, int)
             and isinstance(weight_data_size, int)
-        ), "Out nc, kernel width and height, and weight data size must all be ints"
+        ), (
+            'Out nc, kernel width and height, and weight data size must all be ints'
+        )
         in_nc = weight_data_size // nf // kernel_w // kernel_h
 
         return nf, in_nc
@@ -3734,28 +3761,28 @@ def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
     in_nc = 0
     out_nc = 0
     nf = 0
-    fp = "fp32"
+    fp = 'fp32'
     pixel_shuffle = 1
     found_first_conv = False
     current_conv = None
 
     for i, layer in enumerate(model.layers):
-        if layer.op_type == "Interp":
+        if layer.op_type == 'Interp':
             try:
                 if (
-                    model.layers[i + 1].op_type != "BinaryOp"
+                    model.layers[i + 1].op_type != 'BinaryOp'
                     and model.layers[i + 1].params[0].value != 0
                 ):
                     scale *= checked_cast(float, layer.params[1].value)
             except IndexError:
                 scale *= checked_cast(float, layer.params[1].value)
-        elif layer.op_type == "PixelShuffle":
+        elif layer.op_type == 'PixelShuffle':
             scale *= checked_cast(int, layer.params[0].value)
             pixel_shuffle *= checked_cast(int, layer.params[0].value)
         elif layer.op_type in (
-            "Convolution",
-            "Convolution1D",
-            "ConvolutionDepthWise",
+            'Convolution',
+            'Convolution1D',
+            'ConvolutionDepthWise',
         ):
             if found_first_conv is not True:
                 nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
@@ -3764,7 +3791,7 @@ def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
 
             scale /= checked_cast(int, layer.params[3].value)
             current_conv = layer
-        elif layer.op_type in ("Deconvolution", "DeconvolutionDepthWise"):
+        elif layer.op_type in ('Deconvolution', 'DeconvolutionDepthWise'):
             if found_first_conv is not True:
                 nf, in_nc = NcnnModelWrapper.get_nf_and_in_nc(layer)
                 found_first_conv = True
@@ -3772,26 +3799,32 @@ def get_broadcast_data(model: NcnnModel) -> tuple[int, int, int, int, str]:
             scale *= checked_cast(int, layer.params[3].value)
             current_conv = layer
 
-    assert current_conv is not None, "Cannot broadcast; model has no Convolution layers"
+    assert current_conv is not None, (
+        'Cannot broadcast; model has no Convolution layers'
+    )
 
     out_nc = checked_cast(int, current_conv.params[0].value) // pixel_shuffle**2
 
-    assert scale >= 1, "Models with scale less than 1x not supported"
-    assert scale % 1 == 0, f"Model not supported, scale {scale} is not an integer"
+    assert scale >= 1, 'Models with scale less than 1x not supported'
+    assert scale % 1 == 0, (
+        f'Model not supported, scale {scale} is not an integer'
+    )
 
     return int(scale), in_nc, out_nc, nf, fp
 
 
-def getNCNNScale(modelPath: str = "") -> int:
+def getNCNNScale(modelPath: str = '') -> int:
     basename = os.path.basename(modelPath)
     try:
-        modelParamPath = os.path.join(modelPath, basename + ".param")
+        modelParamPath = os.path.join(modelPath, basename + '.param')
         model = NcnnModel.load_from_file(modelParamPath)
         scale = get_broadcast_data(model)[0]
     except Exception:
-        logger.exception("Failed to get scale from model; falling back to filename")
+        logger.exception(
+            'Failed to get scale from model; falling back to filename'
+        )
         for i in range(1, 20):
-            if f"x{i}" in basename or f"{i}x" in basename.lower():
+            if f'x{i}' in basename or f'{i}x' in basename.lower():
                 scale = i
                 break
     return scale
@@ -3805,16 +3838,18 @@ class UPSCALE:
         tilesize: int = 0,
         model: int = 0,
         num_threads: int = 1,
-        model_str: str = "",
+        model_str: str = '',
         scale: int = 0,
     ):
-        assert gpuid >= -1, "gpuid must >= -1"
-        assert tilesize == 0 or tilesize >= 32, "tilesize must >= 32 or be 0"
-        assert model >= -1, "model must > 0 or -1"
-        assert num_threads >= 1, "num_threads must be a positive integer"
+        assert gpuid >= -1, 'gpuid must >= -1'
+        assert tilesize == 0 or tilesize >= 32, 'tilesize must >= 32 or be 0'
+        assert model >= -1, 'model must > 0 or -1'
+        assert num_threads >= 1, 'num_threads must be a positive integer'
         self._gpuid = gpuid
         self._model_str = model_str
-        self._upscale_object = wrapped.UPSCALEWrapped(gpuid, tta_mode, num_threads)
+        self._upscale_object = wrapped.UPSCALEWrapped(
+            gpuid, tta_mode, num_threads
+        )
 
         self._tilesize = tilesize
         self._model = model
@@ -3834,238 +3869,239 @@ class UPSCALE:
 
     def _load(
         self,
-        param_path: Optional[pathlib.Path] = None,
-        model_path: Optional[pathlib.Path] = None,
+        param_path: pathlib.Path | None = None,
+        model_path: pathlib.Path | None = None,
         scale: int = 0,
     ) -> None:
-        model_dict: Dict[int, Dict[str, Union[str, int]]] = {
+        model_dict: dict[int, dict[str, str | int]] = {
             # span
             0: {
-                "param": "spanx2_ch48.param",
-                "bin": "spanx2_ch48.bin",
-                "scale": 2,
-                "folder": "models/SPAN",
+                'param': 'spanx2_ch48.param',
+                'bin': 'spanx2_ch48.bin',
+                'scale': 2,
+                'folder': 'models/SPAN',
             },
             1: {
-                "param": "spanx2_ch52.param",
-                "bin": "spanx2_ch52.bin",
-                "scale": 2,
-                "folder": "models/SPAN",
+                'param': 'spanx2_ch52.param',
+                'bin': 'spanx2_ch52.bin',
+                'scale': 2,
+                'folder': 'models/SPAN',
             },
             2: {
-                "param": "spanx4_ch48.param",
-                "bin": "spanx4_ch48.bin",
-                "scale": 4,
-                "folder": "models/SPAN",
+                'param': 'spanx4_ch48.param',
+                'bin': 'spanx4_ch48.bin',
+                'scale': 4,
+                'folder': 'models/SPAN',
             },
             3: {
-                "param": "spanx4_ch52.param",
-                "bin": "spanx4_ch52.bin",
-                "scale": 4,
-                "folder": "models/SPAN",
+                'param': 'spanx4_ch52.param',
+                'bin': 'spanx4_ch52.bin',
+                'scale': 4,
+                'folder': 'models/SPAN',
             },
             # custom span
             4: {
-                "param": "2x_ModernSpanimationV1.param",
-                "bin": "2x_ModernSpanimationV1.bin",
-                "scale": 2,
-                "folder": "models/SPAN",
+                'param': '2x_ModernSpanimationV1.param',
+                'bin': '2x_ModernSpanimationV1.bin',
+                'scale': 2,
+                'folder': 'models/SPAN',
             },
             5: {
-                "param": "4xSPANkendata.param",
-                "bin": "4xSPANkendata.bin",
-                "scale": 4,
-                "folder": "models/SPAN",
+                'param': '4xSPANkendata.param',
+                'bin': '4xSPANkendata.bin',
+                'scale': 4,
+                'folder': 'models/SPAN',
             },
             6: {
-                "param": "ClearReality4x.param",
-                "bin": "ClearReality4x.bin",
-                "scale": 4,
-                "folder": "models/SPAN",
+                'param': 'ClearReality4x.param',
+                'bin': 'ClearReality4x.bin',
+                'scale': 4,
+                'folder': 'models/SPAN',
             },
             # esrgan
             7: {
-                "param": "realesr-animevideov3-x2.param",
-                "bin": "realesr-animevideov3-x2.bin",
-                "scale": 2,
-                "folder": "models/ESRGAN",
+                'param': 'realesr-animevideov3-x2.param',
+                'bin': 'realesr-animevideov3-x2.bin',
+                'scale': 2,
+                'folder': 'models/ESRGAN',
             },
             8: {
-                "param": "realesr-animevideov3-x3.param",
-                "bin": "realesr-animevideov3-x3.bin",
-                "scale": 3,
-                "folder": "models/ESRGAN",
+                'param': 'realesr-animevideov3-x3.param',
+                'bin': 'realesr-animevideov3-x3.bin',
+                'scale': 3,
+                'folder': 'models/ESRGAN',
             },
             9: {
-                "param": "realesr-animevideov3-x4.param",
-                "bin": "realesr-animevideov3-x4.bin",
-                "scale": 4,
-                "folder": "models/ESRGAN",
+                'param': 'realesr-animevideov3-x4.param',
+                'bin': 'realesr-animevideov3-x4.bin',
+                'scale': 4,
+                'folder': 'models/ESRGAN',
             },
             10: {
-                "param": "realesrgan-x4plus-x4.param",
-                "bin": "realesrgan-x4plus.bin",
-                "scale": 4,
-                "folder": "models/ESRGAN",
+                'param': 'realesrgan-x4plus-x4.param',
+                'bin': 'realesrgan-x4plus.bin',
+                'scale': 4,
+                'folder': 'models/ESRGAN',
             },
             11: {
-                "param": "realesrgan-x4plus-anime.param",
-                "bin": "realesrgan-x4plus-anime.bin",
-                "scale": 4,
-                "folder": "models/ESRGAN",
+                'param': 'realesrgan-x4plus-anime.param',
+                'bin': 'realesrgan-x4plus-anime.bin',
+                'scale': 4,
+                'folder': 'models/ESRGAN',
             },
             # cugan-se models
             12: {
-                "param": "up2x-conservative.param",
-                "bin": "up2x-conservative.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up2x-conservative.param',
+                'bin': 'up2x-conservative.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-se',
             },
             13: {
-                "param": "up2x-no-denoise.param",
-                "bin": "up2x-no-denoise.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up2x-no-denoise.param',
+                'bin': 'up2x-no-denoise.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-se',
             },
             14: {
-                "param": "up2x-denoise1x.param",
-                "bin": "up2x-denoise1x.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up2x-denoise1x.param',
+                'bin': 'up2x-denoise1x.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-se',
             },
             15: {
-                "param": "up2x-denoise2x.param",
-                "bin": "up2x-denoise2x.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up2x-denoise2x.param',
+                'bin': 'up2x-denoise2x.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-se',
             },
             16: {
-                "param": "up2x-denoise3x.param",
-                "bin": "up2x-denoise3x.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up2x-denoise3x.param',
+                'bin': 'up2x-denoise3x.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-se',
             },
             17: {
-                "param": "up3x-conservative.param",
-                "bin": "up3x-conservative.bin",
-                "scale": 3,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up3x-conservative.param',
+                'bin': 'up3x-conservative.bin',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-se',
             },
             18: {
-                "param": "up3x-no-denoise.param",
-                "bin": "up3x-no-denoise.bin",
-                "scale": 3,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up3x-no-denoise.param',
+                'bin': 'up3x-no-denoise.bin',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-se',
             },
             19: {
-                "param": "up3x-denoise3x.param",
-                "bin": "up3x-denoise3x.bin",
-                "scale": 3,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up3x-denoise3x.param',
+                'bin': 'up3x-denoise3x.bin',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-se',
             },
             20: {
-                "param": "up4x-conservative.param",
-                "bin": "up4x-conservative.bin",
-                "scale": 4,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up4x-conservative.param',
+                'bin': 'up4x-conservative.bin',
+                'scale': 4,
+                'folder': 'models/CUGAN/models-se',
             },
             21: {
-                "param": "up4x-no-denoise.param",
-                "bin": "up4x-no-denoise.bin",
-                "scale": 4,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up4x-no-denoise.param',
+                'bin': 'up4x-no-denoise.bin',
+                'scale': 4,
+                'folder': 'models/CUGAN/models-se',
             },
             22: {
-                "param": "up4x-denoise3x.param",
-                "bin": "up3x-denoise3x.bin",
-                "scale": 4,
-                "folder": "models/CUGAN/models-se",
+                'param': 'up4x-denoise3x.param',
+                'bin': 'up3x-denoise3x.bin',
+                'scale': 4,
+                'folder': 'models/CUGAN/models-se',
             },
             # cugan-pro models
             23: {
-                "param": "up2x-denoise3x.param",
-                "bin": "up2x-denoise3x.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up2x-denoise3x.param',
+                'bin': 'up2x-denoise3x.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-pro',
             },
             24: {
-                "param": "up2x-conservative.param",
-                "bin": "up2x-conservative.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up2x-conservative.param',
+                'bin': 'up2x-conservative.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-pro',
             },
             25: {
-                "param": "up2x-no-denoise.param",
-                "bin": "up2x-no-denoise.bin",
-                "scale": 2,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up2x-no-denoise.param',
+                'bin': 'up2x-no-denoise.bin',
+                'scale': 2,
+                'folder': 'models/CUGAN/models-pro',
             },
             26: {
-                "param": "up3x-denoise3x",
-                "bin": "denoise3x-up3x",
-                "scale": 3,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up3x-denoise3x',
+                'bin': 'denoise3x-up3x',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-pro',
             },
             27: {
-                "param": "up3x-conservative",
-                "bin": "up3x-conservative.bin",
-                "scale": 3,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up3x-conservative',
+                'bin': 'up3x-conservative.bin',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-pro',
             },
             28: {
-                "param": "up3x-no-denoise.param",
-                "bin": "up3x-no-denoise.bin",
-                "scale": 3,
-                "folder": "models/CUGAN/models-pro",
+                'param': 'up3x-no-denoise.param',
+                'bin': 'up3x-no-denoise.bin',
+                'scale': 3,
+                'folder': 'models/CUGAN/models-pro',
             },
             # shufflecugan
             29: {
-                "param": "sudo_shuffle_cugan-x2.param",
-                "bin": "sudo_shuffle_cugan-x2.bin",
-                "scale": 2,
-                "folder": "models/SHUFFLECUGAN",
+                'param': 'sudo_shuffle_cugan-x2.param',
+                'bin': 'sudo_shuffle_cugan-x2.bin',
+                'scale': 2,
+                'folder': 'models/SHUFFLECUGAN',
             },
         }
 
         if self._model == -1:
             if param_path is None and model_path is None and scale == 0:
                 raise ValueError(
-                    "param_path, model_path and scale must be specified when model == -1"
+                    'param_path, model_path and scale must be specified when model == -1'
                 )
             if param_path is None or model_path is None:
                 raise ValueError(
-                    "param_path and model_path must be specified when model == -1"
+                    'param_path and model_path must be specified when model == -1'
                 )
             if scale == 0:
-                raise ValueError("scale must be specified when model == -1")
+                raise ValueError('scale must be specified when model == -1')
+        elif self._model_str == '':
+            model_dir = pathlib.Path(__file__).parent / model_dict[
+                self._model
+            ].get('folder', 'models')
+
+            param_path = model_dir / pathlib.Path(
+                str(model_dict[self._model]['param'])
+            )
+            model_path = model_dir / pathlib.Path(
+                str(model_dict[self._model]['bin'])
+            )
         else:
-            if self._model_str == "":
-                model_dir = pathlib.Path(__file__).parent / model_dict[self._model].get(
-                    "folder", "models"
-                )
+            model_dir = pathlib.Path(self._model_str).parent
 
-                param_path = model_dir / pathlib.Path(
-                    str(model_dict[self._model]["param"])
-                )
-                model_path = model_dir / pathlib.Path(
-                    str(model_dict[self._model]["bin"])
-                )
-            else:
-                model_dir = pathlib.Path(self._model_str).parent
-
-                param_path = model_dir / pathlib.Path(
-                    str(self._model_str.split("/")[-1] + ".param")
-                )
-                model_path = model_dir / pathlib.Path(
-                    str(self._model_str.split("/")[-1] + ".bin")
-                )
+            param_path = model_dir / pathlib.Path(
+                str(self._model_str.split('/')[-1] + '.param')
+            )
+            model_path = model_dir / pathlib.Path(
+                str(self._model_str.split('/')[-1] + '.bin')
+            )
 
                 # print (model_dir,param_path,model_path)
-        self._scale = scale if scale != 0 else int(model_dict[self._model]["scale"])
+        self._scale = (
+            scale if scale != 0 else int(model_dict[self._model]['scale'])
+        )
         self._set_parameters()
 
         if param_path is None or model_path is None:
-            raise ValueError("param_path and model_path is None")
+            raise ValueError('param_path and model_path is None')
 
         self._upscale_object.load(str(param_path), str(model_path))
 
@@ -4075,8 +4111,10 @@ class UPSCALE:
     def process_cv2(self, _image: np.ndarray) -> np.ndarray:
         in_bytes = _image.tobytes()
         if self.channels == None:
-            self.channels = int(len(in_bytes) / (_image.shape[1] * _image.shape[0]))
-            self.out_bytes = (self._scale**2) * len(in_bytes) * b"\x00"
+            self.channels = int(
+                len(in_bytes) / (_image.shape[1] * _image.shape[0])
+            )
+            self.out_bytes = (self._scale**2) * len(in_bytes) * b'\x00'
 
         self.raw_in_image = wrapped.UPSCALEImage(
             in_bytes, _image.shape[1], _image.shape[0], self.channels
@@ -4091,8 +4129,12 @@ class UPSCALE:
 
         self.process()
 
-        return np.frombuffer(self.raw_out_image.get_data(), dtype=np.uint8).reshape(
-            self._scale * _image.shape[0], self._scale * _image.shape[1], self.channels
+        return np.frombuffer(
+            self.raw_out_image.get_data(), dtype=np.uint8
+        ).reshape(
+            self._scale * _image.shape[0],
+            self._scale * _image.shape[1],
+            self.channels,
         )
 
     def process_bytes(
@@ -4104,7 +4146,7 @@ class UPSCALE:
             )
 
             self.raw_out_image = wrapped.UPSCALEImage(
-                (self._scale**2) * len(_image_bytes) * b"\x00",
+                (self._scale**2) * len(_image_bytes) * b'\x00',
                 self._scale * width,
                 self._scale * height,
                 channels,
@@ -4147,13 +4189,15 @@ class UpscaleWithNCNNMode:
         self.net.opt.use_int8_arithmetic = False
         self.net.set_vulkan_device(gpuid)
         self.blob_vkallocator = ncnn.VkBlobAllocator(self.net.vulkan_device())
-        self.staging_vkallocator = ncnn.VkStagingAllocator(self.net.vulkan_device())
+        self.staging_vkallocator = ncnn.VkStagingAllocator(
+            self.net.vulkan_device()
+        )
         self.net.opt.blob_vkallocator = self.blob_vkallocator
         self.net.opt.staging_vkallocator = self.staging_vkallocator
         self.net.opt.workspace_vkallocator = self.blob_vkallocator
         # Load model param and bin
-        self.net.load_param(modelPath + ".param")
-        self.net.load_model(modelPath + ".bin")
+        self.net.load_param(modelPath + '.param')
+        self.net.load_model(modelPath + '.bin')
 
     def NCNNImageMatFromNP(self, npArray: np.array):
         return ncnn.Mat.from_pixels(
@@ -4178,12 +4222,14 @@ class UpscaleWithNCNNMode:
         # frame = self.ClampNPArray(frame)
         frame = self.NCNNImageMatFromNP(frame)
         # norm
-        self.NormalizeImage(mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0])
+        self.NormalizeImage(
+            mat=frame, norm_vals=[1 / 255.0, 1 / 255.0, 1 / 255.0]
+        )
         # render frame
 
-        ex.input("data", frame)
+        ex.input('data', frame)
 
-        ret, frame = ex.extract("output")
+        ret, frame = ex.extract('output')
 
         # norm
         frame = np.array(frame)
@@ -4193,7 +4239,7 @@ class UpscaleWithNCNNMode:
 
     def renderTiledImage(self, img: np.ndarray):
         raise NotImplementedError(
-            "Tile rendering not implemented for default ncnn fallback, please install vcredlist from https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170"
+            'Tile rendering not implemented for default ncnn fallback, please install vcredlist from https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170'
         )
         """It will first crop input images to tiles, and then process each tile.
         Finally, all the processed tiles are merged into one images.
@@ -4248,10 +4294,18 @@ class UpscaleWithNCNNMode:
                 output_end_y = input_end_y * self.scale
 
                 # output tile area without padding
-                output_start_x_tile = (input_start_x - input_start_x_pad) * self.scale
-                output_end_x_tile = output_start_x_tile + input_tile_width * self.scale
-                output_start_y_tile = (input_start_y - input_start_y_pad) * self.scale
-                output_end_y_tile = output_start_y_tile + input_tile_height * self.scale
+                output_start_x_tile = (
+                    input_start_x - input_start_x_pad
+                ) * self.scale
+                output_end_x_tile = (
+                    output_start_x_tile + input_tile_width * self.scale
+                )
+                output_start_y_tile = (
+                    input_start_y - input_start_y_pad
+                ) * self.scale
+                output_end_y_tile = (
+                    output_start_y_tile + input_tile_height * self.scale
+                )
 
                 # put tile into output image
                 self.output[
@@ -4297,7 +4351,7 @@ class UpscaleNCNN:
         self.tilePad = tilePad
         self.tile_pad = tilePad
         self.hdr_mode = hdr_mode
-        self.backend = "ncnn"
+        self.backend = 'ncnn'
         self.mean_vals = []
         self.norm_vals = [1 / 255.0, 1 / 255.0, 1 / 255.0]
         self._load()
@@ -4306,7 +4360,7 @@ class UpscaleNCNN:
         from ..utils.Util import suppress_stdout_stderr
 
         with suppress_stdout_stderr():
-            if method == "ncnn_vulkan":
+            if method == 'ncnn_vulkan':
                 self.net = UpscaleWithNCNNMode(
                     modelPath=self.modelPath,
                     num_threads=self.threads,
@@ -4317,7 +4371,7 @@ class UpscaleNCNN:
                     tilesize=self.tilesize,
                     tilePad=self.tilePad,
                 )
-            elif method == "upscale_ncnn_py":
+            elif method == 'upscale_ncnn_py':
                 self.net = UPSCALE(
                     gpuid=self.gpuid,
                     model_str=self.modelPath,
@@ -4326,7 +4380,7 @@ class UpscaleNCNN:
                     tilesize=self.tilesize,
                 )
             device = ncnn.get_gpu_device(self.gpuid).info().device_name()
-        print("Using GPU:", device)
+        print('Using GPU:', device)
 
     def hotUnload(self):
         self.model = None
@@ -4345,11 +4399,11 @@ class UpscaleNCNN:
         while self.net is None:
             sleep(1)
 
-
         img = self.net.process_bytes(
             imageChunk.get_frame_bytes(), self.width, self.height, 3
         )
         dummyFrame = imageChunk.get_dummy_frame()
         del imageChunk
         return dummyFrame.resize_frame(
-            self.scale * self.width, self.scale * self.height).set_frame_bytes(img)
+            self.scale * self.width, self.scale * self.height
+        ).set_frame_bytes(img)

@@ -5,10 +5,11 @@ Hacked together by / Copyright 2020 Ross Wightman
 from __future__ import annotations
 
 import collections.abc
+from collections.abc import Iterable
 from itertools import repeat
-from typing import Iterable, TypeVar
+from typing import TypeVar
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 def _to_n(x: T | Iterable[T], n: int):

@@ -2,46 +2,45 @@ import math
 
 from typing_extensions import override
 
-from ...util import KeyCondition, get_pixelshuffle_params, get_seq_len
-
 from ...__helpers.model_descriptor import (
     Architecture,
     ImageModelDescriptor,
     SizeRequirements,
     StateDict,
 )
+from ...util import KeyCondition, get_pixelshuffle_params, get_seq_len
 from .__arch.drct_arch import DRCT
 
 
 class DRCTArch(Architecture[DRCT]):
     def __init__(self) -> None:
         super().__init__(
-            id="DRCT",
+            id='DRCT',
             detect=KeyCondition.has_all(
-                "conv_first.weight",
-                "conv_first.bias",
-                "layers.0.swin1.norm1.weight",
-                "layers.0.swin1.norm1.bias",
-                "layers.0.swin1.attn.relative_position_bias_table",
-                "layers.0.swin1.attn.relative_position_index",
-                "layers.0.swin1.attn.qkv.weight",
-                "layers.0.swin1.attn.proj.weight",
-                "layers.0.swin1.attn.proj.bias",
-                "layers.0.swin1.norm2.weight",
-                "layers.0.swin1.mlp.fc1.weight",
-                "layers.0.swin1.mlp.fc1.bias",
-                "layers.0.swin1.mlp.fc2.weight",
-                "layers.0.adjust1.weight",
-                "layers.0.swin2.norm1.weight",
-                "layers.0.adjust2.weight",
-                "layers.0.swin3.norm1.weight",
-                "layers.0.adjust3.weight",
-                "layers.0.swin4.norm1.weight",
-                "layers.0.adjust4.weight",
-                "layers.0.swin5.norm1.weight",
-                "layers.0.adjust5.weight",
-                "norm.weight",
-                "norm.bias",
+                'conv_first.weight',
+                'conv_first.bias',
+                'layers.0.swin1.norm1.weight',
+                'layers.0.swin1.norm1.bias',
+                'layers.0.swin1.attn.relative_position_bias_table',
+                'layers.0.swin1.attn.relative_position_index',
+                'layers.0.swin1.attn.qkv.weight',
+                'layers.0.swin1.attn.proj.weight',
+                'layers.0.swin1.attn.proj.bias',
+                'layers.0.swin1.norm2.weight',
+                'layers.0.swin1.mlp.fc1.weight',
+                'layers.0.swin1.mlp.fc1.bias',
+                'layers.0.swin1.mlp.fc2.weight',
+                'layers.0.adjust1.weight',
+                'layers.0.swin2.norm1.weight',
+                'layers.0.adjust2.weight',
+                'layers.0.swin3.norm1.weight',
+                'layers.0.adjust3.weight',
+                'layers.0.swin4.norm1.weight',
+                'layers.0.adjust4.weight',
+                'layers.0.swin5.norm1.weight',
+                'layers.0.adjust5.weight',
+                'norm.weight',
+                'norm.bias',
             ),
         )
 
@@ -61,52 +60,54 @@ class DRCTArch(Architecture[DRCT]):
         patch_norm = True
         upscale = 2
         img_range = 1.0  # cannot be deduced from state_dict
-        upsampler = ""
-        resi_connection = "1conv"
+        upsampler = ''
+        resi_connection = '1conv'
         gc = 32
 
         # detect
-        in_chans = state_dict["conv_first.weight"].shape[1]
-        embed_dim = state_dict["conv_first.weight"].shape[0]
+        in_chans = state_dict['conv_first.weight'].shape[1]
+        embed_dim = state_dict['conv_first.weight'].shape[0]
 
-        num_layers = get_seq_len(state_dict, "layers")
+        num_layers = get_seq_len(state_dict, 'layers')
         depths = (6,) * num_layers
         num_heads = []
         for i in range(num_layers):
             num_heads.append(
-                state_dict[f"layers.{i}.swin1.attn.relative_position_bias_table"].shape[
-                    1
-                ]
+                state_dict[
+                    f'layers.{i}.swin1.attn.relative_position_bias_table'
+                ].shape[1]
             )
 
-        mlp_ratio = state_dict["layers.0.swin1.mlp.fc1.weight"].shape[0] / embed_dim
+        mlp_ratio = (
+            state_dict['layers.0.swin1.mlp.fc1.weight'].shape[0] / embed_dim
+        )
 
         window_square = state_dict[
-            "layers.0.swin1.attn.relative_position_bias_table"
+            'layers.0.swin1.attn.relative_position_bias_table'
         ].shape[0]
         window_size = (math.isqrt(window_square) + 1) // 2
 
-        if "conv_last.weight" in state_dict:
-            upsampler = "pixelshuffle"
-            upscale, _ = get_pixelshuffle_params(state_dict, "upsample")
+        if 'conv_last.weight' in state_dict:
+            upsampler = 'pixelshuffle'
+            upscale, _ = get_pixelshuffle_params(state_dict, 'upsample')
         else:
-            upsampler = ""
+            upsampler = ''
             upscale = 1
 
-        if "conv_after_body.weight" in state_dict:
-            resi_connection = "1conv"
+        if 'conv_after_body.weight' in state_dict:
+            resi_connection = '1conv'
         else:
-            resi_connection = "identity"
+            resi_connection = 'identity'
 
-        qkv_bias = "layers.0.swin1.attn.qkv.bias" in state_dict
-        gc = state_dict["layers.0.adjust1.weight"].shape[0]
+        qkv_bias = 'layers.0.swin1.attn.qkv.bias' in state_dict
+        gc = state_dict['layers.0.adjust1.weight'].shape[0]
 
-        patch_norm = "patch_embed.norm.weight" in state_dict
-        ape = "absolute_pos_embed" in state_dict
+        patch_norm = 'patch_embed.norm.weight' in state_dict
+        ape = 'absolute_pos_embed' in state_dict
 
-        if "layers.0.swin2.attn_mask" in state_dict:
+        if 'layers.0.swin2.attn_mask' in state_dict:
             img_size = (
-                math.isqrt(state_dict["layers.0.swin2.attn_mask"].shape[0])
+                math.isqrt(state_dict['layers.0.swin2.attn_mask'].shape[0])
                 * window_size
                 * patch_size
             )
@@ -134,19 +135,19 @@ class DRCTArch(Architecture[DRCT]):
             gc=gc,
         )
 
-        size_tag = ["large"] if len(depths) >= 10 else []
+        size_tag = ['large'] if len(depths) >= 10 else []
         tags = [
             *size_tag,
-            f"s{img_size}w{window_size}",
-            f"{embed_dim}dim",
-            f"{resi_connection}",
+            f's{img_size}w{window_size}',
+            f'{embed_dim}dim',
+            f'{resi_connection}',
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration" if upscale == 1 else "SR",
+            purpose='Restoration' if upscale == 1 else 'SR',
             tags=tags,
             supports_half=False,  # Too much weirdness to support this at the moment
             supports_bfloat16=True,
@@ -157,4 +158,4 @@ class DRCTArch(Architecture[DRCT]):
         )
 
 
-__all__ = ["DRCTArch", "DRCT"]
+__all__ = ['DRCT', 'DRCTArch']

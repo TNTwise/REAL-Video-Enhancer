@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 from ....util import store_hyperparameters
 from ....util.timm import to_2tuple
@@ -21,7 +21,9 @@ class LSAB(nn.Module):
         return out_fused
 
 
-def conv_layer(in_channels, out_channels, kernel_size, stride=1, dilation=1, groups=1):
+def conv_layer(
+    in_channels, out_channels, kernel_size, stride=1, dilation=1, groups=1
+):
     padding = int((kernel_size - 1) / 2) * dilation
     return nn.Conv2d(
         in_channels,
@@ -38,7 +40,9 @@ def conv_layer(in_channels, out_channels, kernel_size, stride=1, dilation=1, gro
 def sequential(*args):
     if len(args) == 1:
         if isinstance(args[0], OrderedDict):
-            raise NotImplementedError("sequential does not support OrderedDict input.")
+            raise NotImplementedError(
+                'sequential does not support OrderedDict input.'
+            )
         return args[0]
     modules = []
     for module in args:
@@ -72,36 +76,42 @@ def pad(pad_type, padding):
     pad_type = pad_type.lower()
     if padding == 0:
         return None
-    if pad_type == "reflect":
+    if pad_type == 'reflect':
         layer = nn.ReflectionPad2d(padding)
-    elif pad_type == "replicate":
+    elif pad_type == 'replicate':
         layer = nn.ReplicationPad2d(padding)
     else:
-        raise NotImplementedError(f"padding layer [{pad_type:s}] is not implemented")
+        raise NotImplementedError(
+            f'padding layer [{pad_type:s}] is not implemented'
+        )
     return layer
 
 
 def activation(act_type, inplace=True, neg_slope=0.05, n_prelu=1):
     act_type = act_type.lower()
-    if act_type == "relu":
+    if act_type == 'relu':
         layer = nn.ReLU(inplace)
-    elif act_type == "lrelu":
+    elif act_type == 'lrelu':
         layer = nn.LeakyReLU(neg_slope, inplace)
-    elif act_type == "prelu":
+    elif act_type == 'prelu':
         layer = nn.PReLU(num_parameters=n_prelu, init=neg_slope)
     else:
-        raise NotImplementedError(f"activation layer [{act_type:s}] is not found")
+        raise NotImplementedError(
+            f'activation layer [{act_type:s}] is not found'
+        )
     return layer
 
 
 def norm(norm_type, nc):
     norm_type = norm_type.lower()
-    if norm_type == "batch":
+    if norm_type == 'batch':
         layer = nn.BatchNorm2d(nc, affine=True)
-    elif norm_type == "instance":
+    elif norm_type == 'instance':
         layer = nn.InstanceNorm2d(nc, affine=False)
     else:
-        raise NotImplementedError(f"normalization layer [{norm_type:s}] is not found")
+        raise NotImplementedError(
+            f'normalization layer [{norm_type:s}] is not found'
+        )
     return layer
 
 
@@ -113,13 +123,13 @@ def conv_block(
     dilation=1,
     groups=1,
     bias=True,
-    pad_type="zero",
+    pad_type='zero',
     norm_type=None,
-    act_type="relu",
+    act_type='relu',
 ):
     padding = get_valid_padding(kernel_size, dilation)
-    p = pad(pad_type, padding) if pad_type and pad_type != "zero" else None
-    padding = padding if pad_type == "zero" else 0
+    p = pad(pad_type, padding) if pad_type and pad_type != 'zero' else None
+    padding = padding if pad_type == 'zero' else 0
 
     c = nn.Conv2d(
         in_nc,
@@ -185,21 +195,19 @@ class BasicLayer(nn.Module):
         self.depth = depth
         self.window_size = window_size
         # build blocks
-        self.blocks = nn.ModuleList(
-            [
-                SwinTransformerBlock(
-                    dim=dim,
-                    resolution=resolution,
-                    num_heads=num_heads,
-                    window_size=window_size,
-                    shift_size=0 if (i % 2 == 0) else window_size // 2,
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    qk_scale=qk_scale,
-                )
-                for i in range(depth)
-            ]
-        )
+        self.blocks = nn.ModuleList([
+            SwinTransformerBlock(
+                dim=dim,
+                resolution=resolution,
+                num_heads=num_heads,
+                window_size=window_size,
+                shift_size=0 if (i % 2 == 0) else window_size // 2,
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                qk_scale=qk_scale,
+            )
+            for i in range(depth)
+        ])
         self.patch_embed = PatchEmbed(embed_dim=dim, norm_layer=norm_layer)
         self.patch_unembed = PatchUnEmbed(embed_dim=dim)
 
@@ -208,7 +216,7 @@ class BasicLayer(nn.Module):
         mod_pad_h = (self.window_size - h % self.window_size) % self.window_size
         mod_pad_w = (self.window_size - w % self.window_size) % self.window_size
         if mod_pad_h != 0 or mod_pad_w != 0:
-            x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
+            x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h), 'reflect')
         return x, h, w
 
     def forward(self, x):
@@ -245,7 +253,7 @@ class SwinTransformerBlock(nn.Module):
         self.shift_size = shift_size
         self.mlp_ratio = mlp_ratio
         assert 0 <= self.shift_size < self.window_size, (
-            "shift_size must in 0-window_size"
+            'shift_size must in 0-window_size'
         )
 
         self.attn = WindowAttention(
@@ -279,7 +287,9 @@ class SwinTransformerBlock(nn.Module):
         # reverse cyclic shift
         if self.shift_size > 0:
             x = torch.roll(
-                shifted_x, shifts=(self.shift_size, self.shift_size), dims=(1, 2)
+                shifted_x,
+                shifts=(self.shift_size, self.shift_size),
+                dims=(1, 2),
             )
         else:
             x = shifted_x
@@ -293,12 +303,13 @@ class SwinTransformerBlock(nn.Module):
 class LocalModule(nn.Sequential):
     def __init__(self, channels):
         super().__init__()
-        self.add_module("pointwise_prenorm_0", nn.BatchNorm2d(channels))
+        self.add_module('pointwise_prenorm_0', nn.BatchNorm2d(channels))
         self.add_module(
-            "pointwise_conv_0", nn.Conv2d(channels, channels, kernel_size=1, bias=False)
+            'pointwise_conv_0',
+            nn.Conv2d(channels, channels, kernel_size=1, bias=False),
         )
         self.add_module(
-            "depthwise_conv",
+            'depthwise_conv',
             nn.Conv2d(
                 channels,
                 channels,
@@ -308,9 +319,10 @@ class LocalModule(nn.Sequential):
                 bias=False,
             ),
         )
-        self.add_module("pointwise_prenorm_1", nn.BatchNorm2d(channels))
+        self.add_module('pointwise_prenorm_1', nn.BatchNorm2d(channels))
         self.add_module(
-            "pointwise_conv_1", nn.Conv2d(channels, channels, kernel_size=1, bias=False)
+            'pointwise_conv_1',
+            nn.Conv2d(channels, channels, kernel_size=1, bias=False),
         )
 
 
@@ -359,9 +371,9 @@ class WindowAttention(nn.Module):
         N = self.window_size[0] * self.window_size[1]
         C = C // 3
 
-        qkv = qkv.reshape(B_, N, 3, self.num_heads, C // self.num_heads).permute(
-            2, 0, 3, 1, 4
-        )
+        qkv = qkv.reshape(
+            B_, N, 3, self.num_heads, C // self.num_heads
+        ).permute(2, 0, 3, 1, 4)
         q, k, v = (
             qkv[0],
             qkv[1],
@@ -392,7 +404,11 @@ def window_reverse(windows, window_size, H, W):
 
 class Mlp(nn.Module):
     def __init__(
-        self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
     ):
         super().__init__()
         out_features = out_features or in_features
@@ -410,9 +426,14 @@ class Mlp(nn.Module):
 
 def window_partition(x, window_size):
     B, H, W, C = x.shape
-    x = x.view(B, H // window_size, window_size, W // window_size, window_size, C)
+    x = x.view(
+        B, H // window_size, window_size, W // window_size, window_size, C
+    )
     windows = (
-        x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size, window_size, C)
+        x
+        .permute(0, 1, 3, 2, 4, 5)
+        .contiguous()
+        .view(-1, window_size, window_size, C)
     )
     return windows
 
@@ -447,7 +468,9 @@ class PatchUnEmbed(nn.Module):
 
     def forward(self, x, x_size):
         B, _HW, _C = x.shape
-        x = x.transpose(1, 2).view(B, self.embed_dim, x_size[0], x_size[1])  # B Ph*Pw C
+        x = x.transpose(1, 2).view(
+            B, self.embed_dim, x_size[0], x_size[1]
+        )  # B Ph*Pw C
         return x
 
     def flops(self):
@@ -479,12 +502,14 @@ class DCTLSA(nn.Module):
         self.B4 = LSAB(in_channels=nf, num_head=num_head)
         self.B5 = LSAB(in_channels=nf, num_head=num_head)
         self.B6 = LSAB(in_channels=nf, num_head=num_head)
-        self.c = conv_block(nf * num_modules, nf, kernel_size=1, act_type="lrelu")
-        self.c1 = conv_block(nf * 2, nf, kernel_size=1, act_type="lrelu")
-        self.c2 = conv_block(nf * 3, nf, kernel_size=1, act_type="lrelu")
-        self.c3 = conv_block(nf * 4, nf, kernel_size=1, act_type="lrelu")
-        self.c4 = conv_block(nf * 5, nf, kernel_size=1, act_type="lrelu")
-        self.c5 = conv_block(nf * 6, nf, kernel_size=1, act_type="lrelu")
+        self.c = conv_block(
+            nf * num_modules, nf, kernel_size=1, act_type='lrelu'
+        )
+        self.c1 = conv_block(nf * 2, nf, kernel_size=1, act_type='lrelu')
+        self.c2 = conv_block(nf * 3, nf, kernel_size=1, act_type='lrelu')
+        self.c3 = conv_block(nf * 4, nf, kernel_size=1, act_type='lrelu')
+        self.c4 = conv_block(nf * 5, nf, kernel_size=1, act_type='lrelu')
+        self.c5 = conv_block(nf * 6, nf, kernel_size=1, act_type='lrelu')
         # //The DCTB code End
         self.LR_conv = conv_layer(nf, nf, kernel_size=3)
 

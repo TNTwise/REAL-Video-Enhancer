@@ -1,9 +1,8 @@
 from typing import Literal
 
-import torch.nn as nn
+from torch import nn
 
 from ....util import store_hyperparameters
-
 from ...__arch_helpers.dpir_basic_block import conv, sequential
 
 """
@@ -50,8 +49,8 @@ class DnCNN(nn.Module):
         out_nc=1,
         nc=64,
         nb=17,
-        act_mode="BR",
-        mode: Literal["DnCNN", "FDnCNN"] = "DnCNN",
+        act_mode='BR',
+        mode: Literal['DnCNN', 'FDnCNN'] = 'DnCNN',
     ):
         """
         # ------------------------------------
@@ -71,24 +70,25 @@ class DnCNN(nn.Module):
         # ------------------------------------
         """
         super().__init__()
-        assert "R" in act_mode or "L" in act_mode, (
-            "Examples of activation function: R, L, BR, BL, IR, IL"
+        assert 'R' in act_mode or 'L' in act_mode, (
+            'Examples of activation function: R, L, BR, BL, IR, IL'
         )
         bias = True
 
         self.mode = mode
-        if mode == "DnCNN":
-            assert in_nc == out_nc, "DnCNN only supports in_nc == out_nc"
+        if mode == 'DnCNN':
+            assert in_nc == out_nc, 'DnCNN only supports in_nc == out_nc'
 
-        m_head = conv(in_nc, nc, mode="C" + act_mode[-1], bias=bias)
-        m_body = [conv(nc, nc, mode="C" + act_mode, bias=bias) for _ in range(nb - 2)]
-        m_tail = conv(nc, out_nc, mode="C", bias=bias)
+        m_head = conv(in_nc, nc, mode='C' + act_mode[-1], bias=bias)
+        m_body = [
+            conv(nc, nc, mode='C' + act_mode, bias=bias) for _ in range(nb - 2)
+        ]
+        m_tail = conv(nc, out_nc, mode='C', bias=bias)
 
         self.model = sequential(m_head, *m_body, m_tail)
 
     def forward(self, x):
-        if self.mode == "DnCNN":
+        if self.mode == 'DnCNN':
             n = self.model(x)
             return x - n
-        else:
-            return self.model(x)
+        return self.model(x)

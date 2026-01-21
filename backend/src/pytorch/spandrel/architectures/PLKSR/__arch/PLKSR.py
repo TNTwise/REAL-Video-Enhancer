@@ -1,9 +1,10 @@
+from collections.abc import Sequence
 from functools import partial
-from typing import Literal, Sequence
+from typing import Literal
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 from torch.nn.init import trunc_normal_
 
 from ....util import store_hyperparameters
@@ -18,7 +19,7 @@ def repeat_interleave(x, n):
 
 
 class CCM(nn.Sequential):
-    "Convolutional Channel Mixer"
+    """Convolutional Channel Mixer"""
 
     def __init__(self, dim: int):
         super().__init__(
@@ -30,7 +31,7 @@ class CCM(nn.Sequential):
 
 
 class ICCM(nn.Sequential):
-    "Inverted Convolutional Channel Mixer"
+    """Inverted Convolutional Channel Mixer"""
 
     def __init__(self, dim: int):
         super().__init__(
@@ -42,7 +43,7 @@ class ICCM(nn.Sequential):
 
 
 class DCCM(nn.Sequential):
-    "Doubled Convolutional Channel Mixer"
+    """Doubled Convolutional Channel Mixer"""
 
     def __init__(self, dim: int):
         super().__init__(
@@ -54,7 +55,7 @@ class DCCM(nn.Sequential):
 
 
 class PLKConv2d(nn.Module):
-    "Partial Large Kernel Convolutional Layer"
+    """Partial Large Kernel Convolutional Layer"""
 
     def __init__(self, dim, kernel_size, with_idt):
         super().__init__()
@@ -71,16 +72,17 @@ class PLKConv2d(nn.Module):
             else:
                 x1 = self.conv(x1)
             return torch.cat([x1, x2], dim=1)
+        if self.with_idt:
+            x[:, : self.idx] = x[:, : self.idx] + self.conv(
+                x[:, : self.idx]
+            )
         else:
-            if self.with_idt:
-                x[:, : self.idx] = x[:, : self.idx] + self.conv(x[:, : self.idx])
-            else:
-                x[:, : self.idx] = self.conv(x[:, : self.idx])
-            return x
+            x[:, : self.idx] = self.conv(x[:, : self.idx])
+        return x
 
 
 class RectSparsePLKConv2d(nn.Module):
-    "Rectangular Sparse Partial Large Kernel Convolutional Layer (SLaK style)"
+    """Rectangular Sparse Partial Large Kernel Convolutional Layer (SLaK style)"""
 
     def __init__(self, dim, kernel_size):
         super().__init__()
@@ -97,23 +99,24 @@ class RectSparsePLKConv2d(nn.Module):
 
     def forward(
         self, x: torch.Tensor
-    ) -> torch.Tensor:  # No reparametrization since this is for a ablative study
+    ) -> (
+        torch.Tensor
+    ):  # No reparametrization since this is for a ablative study
         if self.training:
             x1, x2 = x[:, : self.idx], x[:, self.idx :]
             x1 = self.mn_conv(x1) + self.nm_conv(x1) + self.nn_conv(x1)
             return torch.cat([x1, x2], dim=1)
 
-        else:
-            x[:, : self.idx] = (
-                self.mn_conv(x[:, : self.idx])
-                + self.nm_conv(x[:, : self.idx])
-                + self.nn_conv(x[:, : self.idx])
-            )
-            return x
+        x[:, : self.idx] = (
+            self.mn_conv(x[:, : self.idx])
+            + self.nm_conv(x[:, : self.idx])
+            + self.nn_conv(x[:, : self.idx])
+        )
+        return x
 
 
 class SparsePLKConv2d(nn.Module):
-    "Sparse Partial Large Kernel Convolutional Layer (RepLKNet and UniRepLKNet style)"
+    """Sparse Partial Large Kernel Convolutional Layer (RepLKNet and UniRepLKNet style)"""
 
     def __init__(
         self,
@@ -129,19 +132,25 @@ class SparsePLKConv2d(nn.Module):
         self.max_kernel_size = max_kernel_size
         for k, d in zip(sub_kernel_sizes, dilations):
             m_k = self._calc_rep_kernel_size(k, d)
-            if m_k > self.max_kernel_size:
-                self.max_kernel_size = m_k
+            self.max_kernel_size = max(self.max_kernel_size, m_k)
         self.with_idt = with_idt
 
         convs = [
             nn.Conv2d(
-                dim, dim, sub_kernel_size, 1, (sub_kernel_size // 2) * d, dilation=d
+                dim,
+                dim,
+                sub_kernel_size,
+                1,
+                (sub_kernel_size // 2) * d,
+                dilation=d,
             )
             for sub_kernel_size, d in zip(sub_kernel_sizes, dilations)
         ]
         if use_max_kernel:
             convs.append(
-                nn.Conv2d(dim, dim, self.max_kernel_size, 1, self.max_kernel_size // 2)
+                nn.Conv2d(
+                    dim, dim, self.max_kernel_size, 1, self.max_kernel_size // 2
+                )
             )
         self.convs = nn.ModuleList(convs)
         for m in self.convs:
@@ -153,15 +162,14 @@ class SparsePLKConv2d(nn.Module):
         if self.is_convert:
             x[:, : self.idx, :, :] = self.conv(x[:, : self.idx, :, :])
             return x
+        x1, x2 = torch.split(x, [self.idx, x.size(1) - self.idx], dim=1)
+        if self.with_idt:
+            out = x1
         else:
-            x1, x2 = torch.split(x, [self.idx, x.size(1) - self.idx], dim=1)
-            if self.with_idt:
-                out = x1
-            else:
-                out = 0.0
-            for conv in self.convs:
-                out = out + conv(x1)
-            return torch.cat([out, x2], dim=1)  # type: ignore
+            out = 0.0
+        for conv in self.convs:
+            out = out + conv(x1)
+        return torch.cat([out, x2], dim=1)  # type: ignore
 
     @staticmethod
     def _calc_rep_kernel_size(ks, dilation):
@@ -207,7 +215,7 @@ class SparsePLKConv2d(nn.Module):
 
 
 class EA(nn.Module):
-    "Element-wise Attention"
+    """Element-wise Attention"""
 
     def __init__(self, dim: int):
         super().__init__()
@@ -223,11 +231,11 @@ class PLKBlock(nn.Module):
         self,
         dim: int,
         # CCM Rep options
-        ccm_type: Literal["CCM", "ICCM", "DCCM"],
+        ccm_type: Literal['CCM', 'ICCM', 'DCCM'],
         # LK Options
         max_kernel_size: int,
         split_ratio: float,
-        lk_type: Literal["PLK", "SparsePLK", "RectSparsePLK"] = "PLK",
+        lk_type: Literal['PLK', 'SparsePLK', 'RectSparsePLK'] = 'PLK',
         # Sparse Rep options
         use_max_kernel: bool = False,
         sparse_kernels: Sequence[int] = [5, 5, 5],
@@ -239,20 +247,20 @@ class PLKBlock(nn.Module):
         super().__init__()
 
         # Local Texture
-        if ccm_type == "CCM":
+        if ccm_type == 'CCM':
             self.channe_mixer = CCM(dim)
-        elif ccm_type == "ICCM":
+        elif ccm_type == 'ICCM':
             self.channe_mixer = ICCM(dim)
-        elif ccm_type == "DCCM":
+        elif ccm_type == 'DCCM':
             self.channe_mixer = DCCM(dim)
         else:
-            raise ValueError(f"Unknown CCM type: {ccm_type}")
+            raise ValueError(f'Unknown CCM type: {ccm_type}')
 
         # Long-range Dependency
         pdim = int(dim * split_ratio)
-        if lk_type == "PLK":
+        if lk_type == 'PLK':
             self.lk = PLKConv2d(pdim, max_kernel_size, with_idt)
-        elif lk_type == "SparsePLK":
+        elif lk_type == 'SparsePLK':
             self.lk = SparsePLKConv2d(
                 pdim,
                 max_kernel_size,
@@ -261,10 +269,10 @@ class PLKBlock(nn.Module):
                 use_max_kernel,
                 with_idt,
             )
-        elif lk_type == "RectSparsePLK":
+        elif lk_type == 'RectSparsePLK':
             self.lk = RectSparsePLKConv2d(pdim, max_kernel_size)
         else:
-            raise ValueError(f"Unknown LK type: {lk_type}")
+            raise ValueError(f'Unknown LK type: {lk_type}')
 
         # Instance-dependent modulation
         if use_ea:
@@ -296,11 +304,11 @@ class PLKSR(nn.Module):
         n_blocks: int = 28,
         upscaling_factor: int = 4,
         # CCM options
-        ccm_type: Literal["CCM", "ICCM", "DCCM"] = "CCM",
+        ccm_type: Literal['CCM', 'ICCM', 'DCCM'] = 'CCM',
         # LK Options
         kernel_size: int = 17,
         split_ratio: float = 0.25,
-        lk_type: Literal["PLK", "SparsePLK", "RectSparsePLK"] = "PLK",
+        lk_type: Literal['PLK', 'SparsePLK', 'RectSparsePLK'] = 'PLK',
         # LK Rep options
         use_max_kernel: bool = False,
         sparse_kernels: Sequence[int] = [5, 5, 5, 5],

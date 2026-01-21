@@ -4,7 +4,7 @@ from typing import Literal
 
 @dataclass
 class GRLConfig:
-    out_proj_type: Literal["linear", "conv2d"] = "linear"
+    out_proj_type: Literal['linear', 'conv2d'] = 'linear'
     """
     Type of the output projection in the self-attention modules.
     """

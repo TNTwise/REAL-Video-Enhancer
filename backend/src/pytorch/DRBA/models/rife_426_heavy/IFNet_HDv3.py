@@ -1,11 +1,12 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
+
 from .warplayer import warp
 
 # from train_log.refine import *
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -23,7 +24,9 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
+def conv_bn(
+    in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1
+):
     return nn.Sequential(
         nn.Conv2d(
             in_planes,
@@ -41,7 +44,7 @@ def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=
 
 class Head(nn.Module):
     def __init__(self):
-        super(Head, self).__init__()
+        super().__init__()
         self.cnn0 = nn.Conv2d(3, 16, 3, 2, 1)
         self.cnn1 = nn.Conv2d(16, 16, 3, 1, 1)
         self.cnn2 = nn.Conv2d(16, 16, 3, 1, 1)
@@ -63,7 +66,7 @@ class Head(nn.Module):
 
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
-        super(ResConv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1)
         self.beta = nn.Parameter(torch.ones((1, c, 1, 1)), requires_grad=True)
         self.relu = nn.LeakyReLU(0.2, True)
@@ -74,7 +77,7 @@ class ResConv(nn.Module):
 
 class IFBlock(nn.Module):
     def __init__(self, in_planes, c=64):
-        super(IFBlock, self).__init__()
+        super().__init__()
         self.conv0 = nn.Sequential(
             conv(in_planes, c // 2, 3, 2, 1),
             conv(c // 2, c, 3, 2, 1),
@@ -95,12 +98,15 @@ class IFBlock(nn.Module):
 
     def forward(self, x, flow=None, scale=1):
         x = F.interpolate(
-            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+            x, scale_factor=1.0 / scale, mode='bilinear', align_corners=False
         )
         if flow is not None:
             flow = (
                 F.interpolate(
-                    flow, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
+                    flow,
+                    scale_factor=1.0 / scale,
+                    mode='bilinear',
+                    align_corners=False,
                 )
                 * 1.0
                 / scale
@@ -110,7 +116,7 @@ class IFBlock(nn.Module):
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
         tmp = F.interpolate(
-            tmp, scale_factor=scale, mode="bilinear", align_corners=False
+            tmp, scale_factor=scale, mode='bilinear', align_corners=False
         )
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
@@ -120,7 +126,7 @@ class IFBlock(nn.Module):
 
 class IFNet(nn.Module):
     def __init__(self):
-        super(IFNet, self).__init__()
+        super().__init__()
         self.block0 = IFBlock(7 + 32, c=192)
         self.block1 = IFBlock(8 + 4 + 8 + 32, c=128)
         self.block2 = IFBlock(8 + 4 + 8 + 32, c=96)
@@ -172,7 +178,13 @@ class IFNet(nn.Module):
         flow = None
         mask = None
         loss_cons = 0
-        block = [self.block0, self.block1, self.block2, self.block3, self.block4]
+        block = [
+            self.block0,
+            self.block1,
+            self.block2,
+            self.block3,
+            self.block4,
+        ]
         for i in range(5):
             if flow is None:
                 flow, mask, feat = block[i](
@@ -181,7 +193,7 @@ class IFNet(nn.Module):
                     scale=scale_list[i],
                 )
                 if ensemble:
-                    print("warning: ensemble is not supported since RIFEv4.21")
+                    print('warning: ensemble is not supported since RIFEv4.21')
             else:
                 wf0 = warp(f0, flow[:, :2])
                 wf1 = warp(f1, flow[:, 2:4])
@@ -202,7 +214,7 @@ class IFNet(nn.Module):
                     scale=scale_list[i],
                 )
                 if ensemble:
-                    print("warning: ensemble is not supported since RIFEv4.21")
+                    print('warning: ensemble is not supported since RIFEv4.21')
                 else:
                     mask = m0
                 flow = flow + fd
@@ -214,7 +226,7 @@ class IFNet(nn.Module):
         mask = torch.sigmoid(mask)
         merged[4] = warped_img0 * mask + warped_img1 * (1 - mask)
         if not fastmode:
-            print("contextnet is removed")
+            print('contextnet is removed')
             """
             c0 = self.contextnet(img0, flow[:, :2])
             c1 = self.contextnet(img1, flow[:, 2:4])

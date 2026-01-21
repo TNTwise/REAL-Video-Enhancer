@@ -1,4 +1,4 @@
-import torch.nn as nn
+from torch import nn
 
 
 def conv3x3(inplanes, outplanes, stride=1):
@@ -68,7 +68,9 @@ class IRBlock(nn.Module):
 
     expansion = 1  # output channel expansion ratio
 
-    def __init__(self, inplanes, planes, stride=1, downsample=None, use_se=True):
+    def __init__(
+        self, inplanes, planes, stride=1, downsample=None, use_se=True
+    ):
         super().__init__()
         self.bn0 = nn.BatchNorm2d(inplanes)
         self.conv1 = conv3x3(inplanes, inplanes)
@@ -193,7 +195,7 @@ class ResNetArcFace(nn.Module):
     """
 
     def __init__(self, block, layers, use_se=True):
-        if block == "IRBlock":
+        if block == 'IRBlock':
             block = IRBlock
         self.inplanes = 64
         self.use_se = use_se

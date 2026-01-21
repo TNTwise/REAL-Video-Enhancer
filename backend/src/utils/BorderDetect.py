@@ -1,26 +1,26 @@
-from ..utils.Util import subprocess_popen_without_terminal
-from ..utils.LogConfig import get_logger
 import subprocess
 
+from ..utils.LogConfig import get_logger
+from ..utils.Util import subprocess_popen_without_terminal
 
 logger = get_logger(__name__)
 
 
 class BorderDetect:
-    def __init__(self, inputFile, ffmpeg_path="./bin/ffmpeg"):
+    def __init__(self, inputFile, ffmpeg_path='./bin/ffmpeg'):
         self.inputFile = inputFile
         self.ffmpeg_path = ffmpeg_path
 
     def processBorders(self):
         command = [
-            f"{self.ffmpeg_path}",
-            "-i",
-            f"{self.inputFile}",
-            "-vf",
-            "cropdetect",
-            "-f",
-            "null",
-            "-",
+            f'{self.ffmpeg_path}',
+            '-i',
+            f'{self.inputFile}',
+            '-vf',
+            'cropdetect',
+            '-f',
+            'null',
+            '-',
         ]
         try:
             process = subprocess_popen_without_terminal(
@@ -32,8 +32,8 @@ class BorderDetect:
             )
             output = process.communicate()
             return output
-        except subprocess.SubprocessError as e:
-            logger.exception("Error during subprocess execution")
+        except subprocess.SubprocessError:
+            logger.exception('Error during subprocess execution')
             return None, None
 
     def processOutput(self, output):
@@ -41,9 +41,9 @@ class BorderDetect:
             return None
 
         borders = []
-        for line in output[1].split("\n"):
-            if "crop=" in line:
-                crop_value = line.split("crop=")[1].split(" ")[0]
+        for line in output[1].split('\n'):
+            if 'crop=' in line:
+                crop_value = line.split('crop=')[1].split(' ')[0]
                 borders.append(crop_value)
 
         if borders:
@@ -51,13 +51,13 @@ class BorderDetect:
             def parse_crop(crop_str):
                 # Expected format: "width:height:x:y"
                 try:
-                    width, height, x, y = map(int, crop_str.split(":"))
+                    width, height, x, y = map(int, crop_str.split(':'))
                     if width <= 0 or height <= 0:
-                        logger.warning("Invalid crop dimensions: %s", crop_str)
+                        logger.warning('Invalid crop dimensions: %s', crop_str)
                         return None
                     return width, height, x, y
                 except ValueError:
-                    logger.warning("Invalid crop format: %s", crop_str)
+                    logger.warning('Invalid crop format: %s', crop_str)
                     return None
 
             # Parse all crop values and filter out any invalid entries
@@ -65,12 +65,14 @@ class BorderDetect:
             parsed_crops = [crop for crop in parsed_crops if crop is not None]
 
             if not parsed_crops:
-                logger.warning("No valid crop values found.")
+                logger.warning('No valid crop values found.')
                 return None
 
             # Determine the least cropped crop (i.e., largest area)
-            least_cropped = max(parsed_crops, key=lambda dims: dims[0] * dims[1])
-            least_cropped_str = f"{least_cropped[0]}:{least_cropped[1]}:{least_cropped[2]}:{least_cropped[3]}"
+            least_cropped = max(
+                parsed_crops, key=lambda dims: dims[0] * dims[1]
+            )
+            least_cropped_str = f'{least_cropped[0]}:{least_cropped[1]}:{least_cropped[2]}:{least_cropped[3]}'
 
             return least_cropped_str
 
@@ -80,7 +82,7 @@ class BorderDetect:
         output = self.processBorders()
         output = self.processOutput(output)
         if output is None:
-            logger.warning("No valid borders detected.")
+            logger.warning('No valid borders detected.')
             return None, None, None, None
-        width, height, borderX, borderY = map(int, output.split(":"))
+        width, height, borderX, borderY = map(int, output.split(':'))
         return width, height, borderX, borderY

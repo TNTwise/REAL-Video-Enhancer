@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from pathlib import Path
 
@@ -11,8 +12,6 @@ from .main_registry import MAIN_REGISTRY
 from .model_descriptor import ModelDescriptor, StateDict
 from .registry import ArchRegistry
 from .unpickler import RestrictedUnpickle
-import logging
-
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +26,7 @@ class ModelLoader:
     ):
         if isinstance(device, str):
             device = torch.device(device)
-        self.device: torch.device = device or torch.device("cpu")
+        self.device: torch.device = device or torch.device('cpu')
         self.registry: ArchRegistry = registry
         """
         The architecture registry to use for loading models.
@@ -43,7 +42,6 @@ class ModelLoader:
         Throws a `ValueError` if the file extension is not supported.
         Throws an `UnsupportedModelError` if the model architecture is not supported.
         """
-
         state_dict = self.load_state_dict_from_file(path)
         return self.load_from_state_dict(state_dict)
 
@@ -56,11 +54,10 @@ class ModelLoader:
 
         Throws a `ValueError` if the file extension is not supported.
         """
-
         extension = os.path.splitext(path)[1].lower()
 
         state_dict: StateDict
-        if extension == ".pt":
+        if extension == '.pt':
             try:
                 state_dict = self._load_torchscript(path)
             except RuntimeError:
@@ -68,7 +65,9 @@ class ModelLoader:
                 try:
                     pth_state_dict = self._load_pth(path)
                 except Exception:
-                    logger.exception("Failed to load %s as a .pth state dict", path)
+                    logger.exception(
+                        'Failed to load %s as a .pth state dict', path
+                    )
                     pth_state_dict = None
 
                 if pth_state_dict is None:
@@ -78,13 +77,13 @@ class ModelLoader:
 
                 state_dict = pth_state_dict
 
-        elif extension == ".pth" or extension == ".ckpt":
+        elif extension == '.pth' or extension == '.ckpt':
             state_dict = self._load_pth(path)
-        elif extension == ".safetensors":
+        elif extension == '.safetensors':
             state_dict = self._load_safetensors(path)
         else:
             raise ValueError(
-                f"Unsupported model file extension {extension}. Please try a supported model type."
+                f'Unsupported model file extension {extension}. Please try a supported model type.'
             )
 
         return canonicalize_state_dict(state_dict)
@@ -95,7 +94,6 @@ class ModelLoader:
 
         Throws an `UnsupportedModelError` if the model architecture is not supported.
         """
-
         return self.registry.load(state_dict).to(self.device)
 
     def _load_pth(self, path: str | Path) -> StateDict:

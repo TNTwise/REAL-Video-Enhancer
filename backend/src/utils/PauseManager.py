@@ -1,7 +1,7 @@
 import time
 from multiprocessing import shared_memory
-from .LogConfig import get_logger
 
+from .LogConfig import get_logger
 
 logger = get_logger(__name__)
 
@@ -20,7 +20,7 @@ class PauseManager:
                     break
                 except FileNotFoundError:
                     logger.info(
-                        "Waiting for shared memory to be created: %s",
+                        'Waiting for shared memory to be created: %s',
                         self.paused_shared_memory_id,
                     )
                     time.sleep(0.5)

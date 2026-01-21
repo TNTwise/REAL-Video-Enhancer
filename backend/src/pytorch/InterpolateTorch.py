@@ -1,16 +1,11 @@
-import torch
-import torch.nn.functional as F
-from abc import ABCMeta, abstractmethod
-from queue import Queue
 
-from ..utils.SSIM import SSIM
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
-from .InterpolateGMFSS import InterpolateGMFSSTorch
 from .InterpolateGIMM import InterpolateGIMMTorch
-from .InterpolateRIFE import InterpolateRifeTorch, InterpolateRIFEDRBA
+from .InterpolateGMFSS import InterpolateGMFSSTorch
 from .InterpolateIFRNET import InterpolateIFRNetTorch
+from .InterpolateRIFE import InterpolateRIFEDRBA, InterpolateRifeTorch
 
 
 class InterpolateFactory:
@@ -19,13 +14,13 @@ class InterpolateFactory:
         ad = ArchDetect(interpolate_model_path)
         base_arch = ad.getArchBase()
         match base_arch:
-            case "rife":
+            case 'rife':
                 if drba:
                     return InterpolateRIFEDRBA
                 return InterpolateRifeTorch
-            case "gimm":
+            case 'gimm':
                 return InterpolateGIMMTorch
-            case "gmfss":
+            case 'gmfss':
                 return InterpolateGMFSSTorch
-            case "ifrnet":
+            case 'ifrnet':
                 return InterpolateIFRNetTorch  # IFRNet is a RIFE based architecture

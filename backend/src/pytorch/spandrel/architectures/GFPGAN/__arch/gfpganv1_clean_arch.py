@@ -7,13 +7,13 @@ from torch import nn
 from torch.nn import functional as F
 
 from ....util import store_hyperparameters
-
 from .stylegan2_clean_arch import StyleGAN2GeneratorClean
 
 
 class StyleGAN2GeneratorCSFT(StyleGAN2GeneratorClean):
     """StyleGAN2 Generator with SFT modulation (Spatial Feature Transform).
     It is the clean version without custom compiled CUDA extensions used in StyleGAN2.
+
     Args:
         out_size (int): The spatial size of outputs.
         num_style_feat (int): Channel number of style features. Default: 512.
@@ -54,6 +54,7 @@ class StyleGAN2GeneratorCSFT(StyleGAN2GeneratorClean):
         return_latents=False,
     ):
         """Forward function for StyleGAN2GeneratorCSFT.
+
         Args:
             styles (list[Tensor]): Sample codes of styles.
             conditions (list[Tensor]): SFT conditions to generators.
@@ -74,7 +75,8 @@ class StyleGAN2GeneratorCSFT(StyleGAN2GeneratorClean):
                 noise = [None] * self.num_layers  # for each style conv layer
             else:  # use the stored noise
                 noise = [
-                    getattr(self.noises, f"noise{i}") for i in range(self.num_layers)
+                    getattr(self.noises, f'noise{i}')
+                    for i in range(self.num_layers)
                 ]
         # style truncation
         if truncation < 1:
@@ -98,7 +100,9 @@ class StyleGAN2GeneratorCSFT(StyleGAN2GeneratorClean):
                 inject_index = random.randint(1, self.num_latent - 1)
             latent1 = styles[0].unsqueeze(1).repeat(1, inject_index, 1)
             latent2 = (
-                styles[1].unsqueeze(1).repeat(1, self.num_latent - inject_index, 1)
+                styles[1]
+                .unsqueeze(1)
+                .repeat(1, self.num_latent - inject_index, 1)
             )
             latent = torch.cat([latent1, latent2], 1)
 
@@ -121,53 +125,63 @@ class StyleGAN2GeneratorCSFT(StyleGAN2GeneratorClean):
             if i < len(conditions):
                 # SFT part to combine the conditions
                 if self.sft_half:  # only apply SFT to half of the channels
-                    out_same, out_sft = torch.split(out, int(out.size(1) // 2), dim=1)
+                    out_same, out_sft = torch.split(
+                        out, int(out.size(1) // 2), dim=1
+                    )
                     out_sft = out_sft * conditions[i - 1] + conditions[i]
                     out = torch.cat([out_same, out_sft], dim=1)
                 else:  # apply SFT to all the channels
                     out = out * conditions[i - 1] + conditions[i]
 
             out = conv2(out, latent[:, i + 1], noise=noise2)
-            skip = to_rgb(out, latent[:, i + 2], skip)  # feature back to the rgb space
+            skip = to_rgb(
+                out, latent[:, i + 2], skip
+            )  # feature back to the rgb space
             i += 2
 
         image = skip
 
         if return_latents:
             return image, latent
-        else:
-            return image, None
+        return image, None
 
 
 class ResBlock(nn.Module):
     """Residual block with bilinear upsampling/downsampling.
+
     Args:
         in_channels (int): Channel number of the input.
         out_channels (int): Channel number of the output.
         mode (str): Upsampling/downsampling mode. Options: down | up. Default: down.
     """
 
-    def __init__(self, in_channels, out_channels, mode="down"):
+    def __init__(self, in_channels, out_channels, mode='down'):
         super().__init__()
 
         self.conv1 = nn.Conv2d(in_channels, in_channels, 3, 1, 1)
         self.conv2 = nn.Conv2d(in_channels, out_channels, 3, 1, 1)
         self.skip = nn.Conv2d(in_channels, out_channels, 1, bias=False)
-        if mode == "down":
+        if mode == 'down':
             self.scale_factor = 0.5
-        elif mode == "up":
+        elif mode == 'up':
             self.scale_factor = 2
 
     def forward(self, x):
         out = F.leaky_relu_(self.conv1(x), negative_slope=0.2)
         # upsample/downsample
         out = F.interpolate(
-            out, scale_factor=self.scale_factor, mode="bilinear", align_corners=False
+            out,
+            scale_factor=self.scale_factor,
+            mode='bilinear',
+            align_corners=False,
         )
         out = F.leaky_relu_(self.conv2(out), negative_slope=0.2)
         # skip
         x = F.interpolate(
-            x, scale_factor=self.scale_factor, mode="bilinear", align_corners=False
+            x,
+            scale_factor=self.scale_factor,
+            mode='bilinear',
+            align_corners=False,
         )
         skip = self.skip(x)
         out = out + skip
@@ -179,6 +193,7 @@ class GFPGANv1Clean(nn.Module):
     """The GFPGAN architecture: Unet + StyleGAN2 decoder with SFT.
     It is the clean version without custom compiled CUDA extensions used in StyleGAN2.
     Ref: GFP-GAN: Towards Real-World Blind Face Restoration with Generative Facial Prior.
+
     Args:
         out_size (int): The spatial size of outputs.
         num_style_feat (int): Channel number of style features. Default: 512.
@@ -215,51 +230,57 @@ class GFPGANv1Clean(nn.Module):
 
         unet_narrow = narrow * 0.5  # by default, use a half of input channels
         channels = {
-            "4": int(512 * unet_narrow),
-            "8": int(512 * unet_narrow),
-            "16": int(512 * unet_narrow),
-            "32": int(512 * unet_narrow),
-            "64": int(256 * channel_multiplier * unet_narrow),
-            "128": int(128 * channel_multiplier * unet_narrow),
-            "256": int(64 * channel_multiplier * unet_narrow),
-            "512": int(32 * channel_multiplier * unet_narrow),
-            "1024": int(16 * channel_multiplier * unet_narrow),
+            '4': int(512 * unet_narrow),
+            '8': int(512 * unet_narrow),
+            '16': int(512 * unet_narrow),
+            '32': int(512 * unet_narrow),
+            '64': int(256 * channel_multiplier * unet_narrow),
+            '128': int(128 * channel_multiplier * unet_narrow),
+            '256': int(64 * channel_multiplier * unet_narrow),
+            '512': int(32 * channel_multiplier * unet_narrow),
+            '1024': int(16 * channel_multiplier * unet_narrow),
         }
 
         self.log_size = int(math.log(out_size, 2))
         first_out_size = 2 ** (int(math.log(out_size, 2)))
 
-        self.conv_body_first = nn.Conv2d(3, channels[f"{first_out_size}"], 1)
+        self.conv_body_first = nn.Conv2d(3, channels[f'{first_out_size}'], 1)
 
         # downsample
-        in_channels = channels[f"{first_out_size}"]
+        in_channels = channels[f'{first_out_size}']
         self.conv_body_down = nn.ModuleList()
         for i in range(self.log_size, 2, -1):
-            out_channels = channels[f"{2 ** (i - 1)}"]
-            self.conv_body_down.append(ResBlock(in_channels, out_channels, mode="down"))
+            out_channels = channels[f'{2 ** (i - 1)}']
+            self.conv_body_down.append(
+                ResBlock(in_channels, out_channels, mode='down')
+            )
             in_channels = out_channels
 
-        self.final_conv = nn.Conv2d(in_channels, channels["4"], 3, 1, 1)
+        self.final_conv = nn.Conv2d(in_channels, channels['4'], 3, 1, 1)
 
         # upsample
-        in_channels = channels["4"]
+        in_channels = channels['4']
         self.conv_body_up = nn.ModuleList()
         for i in range(3, self.log_size + 1):
-            out_channels = channels[f"{2**i}"]
-            self.conv_body_up.append(ResBlock(in_channels, out_channels, mode="up"))
+            out_channels = channels[f'{2**i}']
+            self.conv_body_up.append(
+                ResBlock(in_channels, out_channels, mode='up')
+            )
             in_channels = out_channels
 
         # to RGB
         self.toRGB = nn.ModuleList()
         for i in range(3, self.log_size + 1):
-            self.toRGB.append(nn.Conv2d(channels[f"{2**i}"], 3, 1))
+            self.toRGB.append(nn.Conv2d(channels[f'{2**i}'], 3, 1))
 
         if different_w:
-            linear_out_channel = (int(math.log(out_size, 2)) * 2 - 2) * num_style_feat
+            linear_out_channel = (
+                int(math.log(out_size, 2)) * 2 - 2
+            ) * num_style_feat
         else:
             linear_out_channel = num_style_feat
 
-        self.final_linear = nn.Linear(channels["4"] * 4 * 4, linear_out_channel)
+        self.final_linear = nn.Linear(channels['4'] * 4 * 4, linear_out_channel)
 
         # the decoder: stylegan2 generator with SFT modulations
         self.stylegan_decoder = StyleGAN2GeneratorCSFT(
@@ -273,7 +294,7 @@ class GFPGANv1Clean(nn.Module):
 
         if decoder_load_path:
             # Refuse to attempt to load a decoder here
-            raise NotImplementedError(f"Got a non-empty {decoder_load_path=}")
+            raise NotImplementedError(f'Got a non-empty {decoder_load_path=}')
 
         # fix decoder without updating params
         if fix_decoder:
@@ -284,7 +305,7 @@ class GFPGANv1Clean(nn.Module):
         self.condition_scale = nn.ModuleList()
         self.condition_shift = nn.ModuleList()
         for i in range(3, self.log_size + 1):
-            out_channels = channels[f"{2**i}"]
+            out_channels = channels[f'{2**i}']
             if sft_half:
                 sft_out_channels = out_channels
             else:
@@ -305,9 +326,15 @@ class GFPGANv1Clean(nn.Module):
             )
 
     def forward(
-        self, x, return_latents=False, return_rgb=True, randomize_noise=True, **kwargs
+        self,
+        x,
+        return_latents=False,
+        return_rgb=True,
+        randomize_noise=True,
+        **kwargs,
     ):
         """Forward function for GFPGANv1Clean.
+
         Args:
             x (Tensor): Input images.
             return_latents (bool): Whether to return style latents. Default: False.
@@ -328,7 +355,9 @@ class GFPGANv1Clean(nn.Module):
         # style code
         style_code = self.final_linear(feat.view(feat.size(0), -1))
         if self.different_w:
-            style_code = style_code.view(style_code.size(0), -1, self.num_style_feat)
+            style_code = style_code.view(
+                style_code.size(0), -1, self.num_style_feat
+            )
 
         # decode
         for i in range(self.log_size - 2):

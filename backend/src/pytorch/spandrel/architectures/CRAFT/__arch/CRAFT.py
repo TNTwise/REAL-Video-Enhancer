@@ -3,9 +3,9 @@
 import numbers
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from einops import rearrange
+from torch import nn
 from torch.nn.init import trunc_normal_
 
 from ....util import store_hyperparameters
@@ -19,7 +19,10 @@ def img2windows(img, H_sp, W_sp):
     B, C, H, W = img.shape
     img_reshape = img.view(B, C, H // H_sp, H_sp, W // W_sp, W_sp)
     img_perm = (
-        img_reshape.permute(0, 2, 4, 3, 5, 1).contiguous().reshape(-1, H_sp * W_sp, C)
+        img_reshape
+        .permute(0, 2, 4, 3, 5, 1)
+        .contiguous()
+        .reshape(-1, H_sp * W_sp, C)
     )
 
     return img_perm
@@ -39,7 +42,11 @@ def windows2img(img_splits_hw, H_sp, W_sp, H, W):
 
 class Mlp(nn.Module):
     def __init__(
-        self, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU
+        self,
+        in_features,
+        hidden_features=None,
+        out_features=None,
+        act_layer=nn.GELU,
     ):
         super().__init__()
         out_features = out_features or in_features
@@ -62,6 +69,7 @@ class Mlp(nn.Module):
 class DynamicPosBias(nn.Module):
     # The implementation builds on Crossformer code https://github.com/cheerss/CrossFormer/blob/main/models/crossformer.py
     """Dynamic Relative Position Bias.
+
     Args:
         dim (int): Number of input channels.
         num_heads (int): Number of attention heads.
@@ -143,7 +151,7 @@ class Attention_regular(nn.Module):
         elif idx == 1:
             W_sp, H_sp = self.split_size[0], self.split_size[1]
         else:
-            raise ValueError(f"ERROR MODE: {idx}")
+            raise ValueError(f'ERROR MODE: {idx}')
         self.H_sp = H_sp
         self.W_sp = W_sp
 
@@ -155,7 +163,10 @@ class Attention_regular(nn.Module):
         x = x.transpose(-2, -1).contiguous().view(B, C, H, W)
         x = img2windows(x, self.H_sp, self.W_sp)
         x = (
-            x.reshape(-1, self.H_sp * self.W_sp, self.num_heads, C // self.num_heads)
+            x
+            .reshape(
+                -1, self.H_sp * self.W_sp, self.num_heads, C // self.num_heads
+            )
             .permute(0, 2, 1, 3)
             .contiguous()
         )
@@ -169,7 +180,7 @@ class Attention_regular(nn.Module):
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         B, L, C = q.shape
-        assert L == H * W, "flatten img_tokens has wrong size"
+        assert L == H * W, 'flatten img_tokens has wrong size'
 
         self.N = L // (self.H_sp * self.W_sp)
         # partition the q,k,v, image to window
@@ -186,7 +197,9 @@ class Attention_regular(nn.Module):
         relative_position_bias = pos[rpi.view(-1)].view(
             self.H_sp * self.W_sp, self.H_sp * self.W_sp, -1
         )
-        relative_position_bias = relative_position_bias.permute(2, 0, 1).contiguous()
+        relative_position_bias = relative_position_bias.permute(
+            2, 0, 1
+        ).contiguous()
         attn = attn + relative_position_bias.unsqueeze(0)
 
         N = attn.shape[3]
@@ -194,9 +207,9 @@ class Attention_regular(nn.Module):
         # use mask for shift window
         if mask is not None:
             nW = mask.shape[0]
-            attn = attn.view(B, nW, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(
-                0
-            )
+            attn = attn.view(B, nW, self.num_heads, N, N) + mask.unsqueeze(
+                1
+            ).unsqueeze(0)
             attn = attn.view(-1, self.num_heads, N, N)
         attn = self.softmax(attn)
 
@@ -250,20 +263,18 @@ class SRWAB(nn.Module):
             dim, dim, kernel_size=3, stride=1, padding=1, groups=dim
         )  # DW Conv
 
-        self.attns = nn.ModuleList(
-            [
-                Attention_regular(
-                    dim // 2,
-                    idx=i,
-                    split_size=split_size,
-                    num_heads=num_heads // 2,
-                    dim_out=dim // 2,
-                    qk_scale=qk_scale,
-                    position_bias=True,
-                )
-                for i in range(self.branch_num)
-            ]
-        )
+        self.attns = nn.ModuleList([
+            Attention_regular(
+                dim // 2,
+                idx=i,
+                split_size=split_size,
+                num_heads=num_heads // 2,
+                dim_out=dim // 2,
+                qk_scale=qk_scale,
+                position_bias=True,
+            )
+            for i in range(self.branch_num)
+        ])
 
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
@@ -278,7 +289,9 @@ class SRWAB(nn.Module):
         b, _, c = x.shape
         shortcut = x
         x = self.norm1(x)
-        qkv = self.qkv(x).reshape(b, -1, 3, c).permute(2, 0, 1, 3)  # 3, B, HW, C
+        qkv = (
+            self.qkv(x).reshape(b, -1, 3, c).permute(2, 0, 1, 3)
+        )  # 3, B, HW, C
         v = qkv[2].transpose(-2, -1).contiguous().view(b, c, h, w)
 
         # cyclic shift
@@ -305,8 +318,8 @@ class SRWAB(nn.Module):
                 h,
                 w,
                 mask=attn_mask[0],
-                rpi=params["rpi_sa_h"],
-                rpe_biases=params["biases_h"],
+                rpi=params['rpi_sa_h'],
+                rpe_biases=params['biases_h'],
             )
             # V-Rwin
             x2_shift = self.attns[1](
@@ -314,15 +327,19 @@ class SRWAB(nn.Module):
                 h,
                 w,
                 mask=attn_mask[1],
-                rpi=params["rpi_sa_v"],
-                rpe_biases=params["biases_v"],
+                rpi=params['rpi_sa_v'],
+                rpe_biases=params['biases_v'],
             )
 
             x1 = torch.roll(
-                x1_shift, shifts=(self.shift_size[0], self.shift_size[1]), dims=(1, 2)
+                x1_shift,
+                shifts=(self.shift_size[0], self.shift_size[1]),
+                dims=(1, 2),
             )
             x2 = torch.roll(
-                x2_shift, shifts=(self.shift_size[1], self.shift_size[0]), dims=(1, 2)
+                x2_shift,
+                shifts=(self.shift_size[1], self.shift_size[0]),
+                dims=(1, 2),
             )
             # Concat
             attened_x = torch.cat([x1, x2], dim=-1)
@@ -332,16 +349,16 @@ class SRWAB(nn.Module):
                 qkv[:, :, :, : c // 2],
                 h,
                 w,
-                rpi=params["rpi_sa_h"],
-                rpe_biases=params["biases_h"],
+                rpi=params['rpi_sa_h'],
+                rpe_biases=params['biases_h'],
             )
             # V-Rwin
             x2 = self.attns[1](
                 qkv[:, :, :, c // 2 :],
                 h,
                 w,
-                rpi=params["rpi_sa_v"],
-                rpe_biases=params["biases_v"],
+                rpi=params['rpi_sa_v'],
+                rpe_biases=params['biases_v'],
             )
             # Concat
             attened_x = torch.cat([x1, x2], dim=-1)
@@ -393,7 +410,7 @@ class HFERB(nn.Module):
 
 
 ##########################################################################
-## High-frequency prior query inter attention layer
+# High-frequency prior query inter attention layer
 class Attention(nn.Module):
     def __init__(
         self,
@@ -429,9 +446,15 @@ class Attention(nn.Module):
 
     def _forward(self, q, kv):
         k, v = kv.chunk(2, dim=1)
-        q = rearrange(q, "b (head c) h w -> b head c (h w)", head=self.num_heads)
-        k = rearrange(k, "b (head c) h w -> b head c (h w)", head=self.num_heads)
-        v = rearrange(v, "b (head c) h w -> b head c (h w)", head=self.num_heads)
+        q = rearrange(
+            q, 'b (head c) h w -> b head c (h w)', head=self.num_heads
+        )
+        k = rearrange(
+            k, 'b (head c) h w -> b head c (h w)', head=self.num_heads
+        )
+        v = rearrange(
+            v, 'b (head c) h w -> b head c (h w)', head=self.num_heads
+        )
 
         q = torch.nn.functional.normalize(q, dim=-1)
         k = torch.nn.functional.normalize(k, dim=-1)
@@ -449,7 +472,7 @@ class Attention(nn.Module):
         out = self._forward(q, kv)
         out = rearrange(
             out,
-            "b head c (h w) -> b (head c) h w",
+            'b head c (h w) -> b (head c) h w',
             head=self.num_heads,
             h=kv.shape[-2],
             w=kv.shape[-1],
@@ -459,11 +482,11 @@ class Attention(nn.Module):
 
 
 def to_3d(x):
-    return rearrange(x, "b c h w -> b (h w) c")
+    return rearrange(x, 'b c h w -> b (h w) c')
 
 
 def to_4d(x, h, w):
-    return rearrange(x, "b (h w) c -> b c h w", h=h, w=w)
+    return rearrange(x, 'b (h w) c -> b c h w', h=h, w=w)
 
 
 class BiasFree_LayerNorm(nn.Module):
@@ -505,7 +528,7 @@ class WithBias_LayerNorm(nn.Module):
 class LayerNorm(nn.Module):
     def __init__(self, dim, LayerNorm_type):
         super().__init__()
-        if LayerNorm_type == "BiasFree":
+        if LayerNorm_type == 'BiasFree':
             self.body = BiasFree_LayerNorm(dim)
         else:
             self.body = WithBias_LayerNorm(dim)
@@ -516,7 +539,7 @@ class LayerNorm(nn.Module):
 
 
 ##########################################################################
-## Improved feed-forward network
+# Improved feed-forward network
 class FeedForward(nn.Module):
     def __init__(self, dim, ffn_expansion_factor, bias):
         super().__init__()
@@ -525,7 +548,9 @@ class FeedForward(nn.Module):
         self.hid_fea = hidden_features
         self.dim = dim
 
-        self.project_in = nn.Conv2d(dim, hidden_features * 2, kernel_size=1, bias=bias)
+        self.project_in = nn.Conv2d(
+            dim, hidden_features * 2, kernel_size=1, bias=bias
+        )
 
         self.dwconv = nn.Conv2d(
             hidden_features * 2,
@@ -537,7 +562,9 @@ class FeedForward(nn.Module):
             bias=bias,
         )
 
-        self.project_out = nn.Conv2d(hidden_features, dim, kernel_size=1, bias=bias)
+        self.project_out = nn.Conv2d(
+            hidden_features, dim, kernel_size=1, bias=bias
+        )
 
     def forward(self, x):
         self.h, self.w = x.shape[2:]
@@ -560,7 +587,9 @@ class HFB(nn.Module):
         LayerNorm_type (float): Ratio of mlp hidden dim to embedding dim.
     """
 
-    def __init__(self, dim, num_heads, ffn_expansion_factor, bias, LayerNorm_type):
+    def __init__(
+        self, dim, num_heads, ffn_expansion_factor, bias, LayerNorm_type
+    ):
         super().__init__()
 
         self.norm1 = LayerNorm(dim, LayerNorm_type)
@@ -606,40 +635,36 @@ class CRFB(nn.Module):
         self.depth = depth
 
         # Shift Rectangle window attention blocks
-        self.srwa_blocks = nn.ModuleList(
-            [
-                SRWAB(
-                    dim=dim,
-                    num_heads=num_heads,
-                    split_size=[split_size_0, split_size_1],
-                    shift_size=[0, 0]
-                    if (i % 2 == 0)
-                    else [split_size_0 // 2, split_size_1 // 2],
-                    mlp_ratio=mlp_ratio,
-                    qkv_bias=qkv_bias,
-                    qk_scale=qk_scale,
-                    norm_layer=norm_layer,
-                )
-                for i in range(2 * depth)
-            ]
-        )
+        self.srwa_blocks = nn.ModuleList([
+            SRWAB(
+                dim=dim,
+                num_heads=num_heads,
+                split_size=[split_size_0, split_size_1],
+                shift_size=[0, 0]
+                if (i % 2 == 0)
+                else [split_size_0 // 2, split_size_1 // 2],
+                mlp_ratio=mlp_ratio,
+                qkv_bias=qkv_bias,
+                qk_scale=qk_scale,
+                norm_layer=norm_layer,
+            )
+            for i in range(2 * depth)
+        ])
 
         # High frequency enhancement residual blocks
         self.hfer_blocks = nn.ModuleList([HFERB(dim) for _ in range(depth)])
 
         # Hybrid fusion blocks
-        self.hf_blocks = nn.ModuleList(
-            [
-                HFB(
-                    dim=dim,
-                    num_heads=num_heads,
-                    ffn_expansion_factor=2.66,
-                    bias=False,
-                    LayerNorm_type="WithBias",
-                )
-                for i in range(depth)
-            ]
-        )
+        self.hf_blocks = nn.ModuleList([
+            HFB(
+                dim=dim,
+                num_heads=num_heads,
+                ffn_expansion_factor=2.66,
+                bias=False,
+                LayerNorm_type='WithBias',
+            )
+            for i in range(depth)
+        ])
 
     def forward(self, x, x_size, params):
         b, c, h, w = x.shape
@@ -647,10 +672,12 @@ class CRFB(nn.Module):
             low = x.permute(0, 2, 3, 1)
             low = low.reshape(b, h * w, c)
             low = self.srwa_blocks[2 * i + 1](
-                self.srwa_blocks[2 * i](low, x_size, params, params["attn_mask"]),
+                self.srwa_blocks[2 * i](
+                    low, x_size, params, params['attn_mask']
+                ),
                 x_size,
                 params,
-                params["attn_mask"],
+                params['attn_mask'],
             )
             low = low.reshape(b, h, w, c)
             low = low.permute(0, 3, 1, 2)
@@ -732,6 +759,7 @@ class UpsampleOneStep(nn.Sequential):
 class CRAFT(nn.Module):
     r"""Cross-Refinement Adaptive Fusion Transformer
         Some codes are based on SwinIR.
+
     Args:
         in_chans (int): Number of input image channels. Default: 3
         embed_dim (int): Patch embedding dimension. Default: 96
@@ -765,7 +793,7 @@ class CRAFT(nn.Module):
         norm_layer=nn.LayerNorm,
         upscale=4,
         img_range=1.0,
-        resi_connection="1conv",
+        resi_connection='1conv',
     ):
         super().__init__()
 
@@ -813,12 +841,12 @@ class CRAFT(nn.Module):
             )
             self.layers.append(layer)
 
-        self.norm = LayerNorm(self.num_features, "with_bias")
+        self.norm = LayerNorm(self.num_features, 'with_bias')
 
         # build the last conv layer in deep feature extraction
-        if resi_connection == "1conv":
+        if resi_connection == '1conv':
             self.conv_after_body = nn.Conv2d(embed_dim, embed_dim, 3, 1, 1)
-        elif resi_connection == "identity":
+        elif resi_connection == 'identity':
             self.conv_after_body = nn.Identity()
 
         # ------------------------- 3, high quality image reconstruction ------------------------- #
@@ -840,7 +868,9 @@ class CRAFT(nn.Module):
         H_sp, W_sp = self.split_size[0], self.split_size[1]
         position_bias_h = torch.arange(1 - H_sp, H_sp)
         position_bias_w = torch.arange(1 - W_sp, W_sp)
-        biases_h = torch.stack(torch.meshgrid([position_bias_h, position_bias_w]))
+        biases_h = torch.stack(
+            torch.meshgrid([position_bias_h, position_bias_w])
+        )
         biases_h = biases_h.flatten(1).transpose(0, 1).contiguous().float()
 
         # get pair-wise relative position index for each token inside the window
@@ -848,7 +878,9 @@ class CRAFT(nn.Module):
         coords_w = torch.arange(W_sp)
         coords = torch.stack(torch.meshgrid([coords_h, coords_w]))
         coords_flatten = torch.flatten(coords, 1)
-        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        relative_coords = (
+            coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        )
         relative_coords = relative_coords.permute(1, 2, 0).contiguous()
         relative_coords[:, :, 0] += H_sp - 1
         relative_coords[:, :, 1] += W_sp - 1
@@ -858,7 +890,9 @@ class CRAFT(nn.Module):
         H_sp, W_sp = self.split_size[1], self.split_size[0]
         position_bias_h = torch.arange(1 - H_sp, H_sp)
         position_bias_w = torch.arange(1 - W_sp, W_sp)
-        biases_v = torch.stack(torch.meshgrid([position_bias_h, position_bias_w]))
+        biases_v = torch.stack(
+            torch.meshgrid([position_bias_h, position_bias_w])
+        )
         biases_v = biases_v.flatten(1).transpose(0, 1).contiguous().float()
 
         # get pair-wise relative position index for each token inside the window
@@ -866,35 +900,41 @@ class CRAFT(nn.Module):
         coords_w = torch.arange(W_sp)
         coords = torch.stack(torch.meshgrid([coords_h, coords_w]))
         coords_flatten = torch.flatten(coords, 1)
-        relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        relative_coords = (
+            coords_flatten[:, :, None] - coords_flatten[:, None, :]
+        )
         relative_coords = relative_coords.permute(1, 2, 0).contiguous()
         relative_coords[:, :, 0] += H_sp - 1
         relative_coords[:, :, 1] += W_sp - 1
         relative_coords[:, :, 0] *= 2 * W_sp - 1
         relative_position_index_v = relative_coords.sum(-1)
-        self.register_buffer("relative_position_index_h", relative_position_index_h)
-        self.register_buffer("relative_position_index_v", relative_position_index_v)
-        self.register_buffer("biases_v", biases_v)
-        self.register_buffer("biases_h", biases_h)
+        self.register_buffer(
+            'relative_position_index_h', relative_position_index_h
+        )
+        self.register_buffer(
+            'relative_position_index_v', relative_position_index_v
+        )
+        self.register_buffer('biases_v', biases_v)
+        self.register_buffer('biases_h', biases_h)
 
         return biases_v, biases_h
 
     @torch.jit.ignore
     def no_weight_decay(self):
-        return {"absolute_pos_embed"}
+        return {'absolute_pos_embed'}
 
     @torch.jit.ignore
     def no_weight_decay_keywords(self):
-        return {"relative_position_bias_table"}
+        return {'relative_position_bias_table'}
 
     def forward_features(self, x):
         x_size = (x.shape[2], x.shape[3])
         params = {
-            "attn_mask": (None, None),
-            "rpi_sa_h": self.relative_position_index_h,
-            "rpi_sa_v": self.relative_position_index_v,
-            "biases_v": self.biases_v,
-            "biases_h": self.biases_h,
+            'attn_mask': (None, None),
+            'rpi_sa_h': self.relative_position_index_h,
+            'rpi_sa_v': self.relative_position_index_v,
+            'biases_v': self.biases_v,
+            'biases_h': self.biases_h,
         }
 
         for layer in self.layers:

@@ -1,13 +1,11 @@
-from typing import Any, Optional
-import logging
+from typing import Any
 
 try:
     import numpy as np
 except ImportError:
     pass
-from .Util import resize_image_np
 from .LogConfig import get_logger
-
+from .Util import resize_image_np
 
 logger = get_logger(__name__)
 
@@ -19,9 +17,15 @@ _torch = None
 
 
 def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
-    global _pytorch_device, _pytorch_dtype, _torch_utils, _torch, _pytorch_stream
+    global \
+        _pytorch_device, \
+        _pytorch_dtype, \
+        _torch_utils, \
+        _torch, \
+        _pytorch_stream
     if _torch_utils is None:
         import torch
+
         from ..pytorch.TorchUtils import TorchUtils
 
         _torch = torch
@@ -35,12 +39,19 @@ def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
         _pytorch_stream = _torch_utils.init_stream(gpu_id=gpu_id)
         _pytorch_device = _torch_utils.handle_device(device, gpu_id)
         _pytorch_dtype = _torch_utils.handle_precision(dtype)
-        logger.info("Initialized Frame PyTorch utils")
+        logger.info('Initialized Frame PyTorch utils')
 
 
 class Frame:
     def __init__(
-        self, backend: str, width: int, height: int, device, gpu_id, hdr_mode, dtype
+        self,
+        backend: str,
+        width: int,
+        height: int,
+        device,
+        gpu_id,
+        hdr_mode,
+        dtype,
     ):
         self.backend = backend
         self.width = width
@@ -51,45 +62,47 @@ class Frame:
         self.dtype = dtype
 
         self.tensor_conversions = 0
-        self._tensor: Optional[Any] = None
-        self._np: Optional[np.ndarray] = None
-        self._bytes: Optional[bytes] = None
+        self._tensor: Any | None = None
+        self._np: np.ndarray | None = None
+        self._bytes: bytes | None = None
 
-        if backend in ("pytorch", "tensorrt"):
+        if backend in ('pytorch', 'tensorrt'):
             _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode)
 
     def _invalidate_cache(self, keep: str):
         """Clear cached representations except the one being set."""
-        if keep != "tensor":
+        if keep != 'tensor':
             del self._tensor
             self._tensor = None
-        if keep != "np":
+        if keep != 'np':
             del self._np
             self._np = None
-        if keep != "bytes":
+        if keep != 'bytes':
             del self._bytes
             self._bytes = None
 
-    def set_frame_bytes(self, frame: bytes) -> "Frame":
+    def set_frame_bytes(self, frame: bytes) -> 'Frame':
         if not isinstance(frame, bytes):
-            raise TypeError(f"Expected bytes, got {type(frame).__name__}")
-        self._invalidate_cache("bytes")
+            raise TypeError(f'Expected bytes, got {type(frame).__name__}')
+        self._invalidate_cache('bytes')
         self._bytes = frame
         return self
 
-    def set_frame_tensor(self, frame: Any) -> "Frame":
+    def set_frame_tensor(self, frame: Any) -> 'Frame':
         # might need to sync streams here
         if _torch is not None and not isinstance(frame, _torch.Tensor):
-            raise TypeError(f"Expected torch.Tensor, got {type(frame).__name__}")
-        self._invalidate_cache("tensor")
+            raise TypeError(
+                f'Expected torch.Tensor, got {type(frame).__name__}'
+            )
+        self._invalidate_cache('tensor')
         self._tensor = frame.clone()
         _torch_utils.sync_all_streams()
         return self
 
-    def set_frame_np(self, frame: Any) -> "Frame":
+    def set_frame_np(self, frame: Any) -> 'Frame':
         if not isinstance(frame, np.ndarray):
-            raise TypeError(f"Expected np.ndarray, got {type(frame).__name__}")
-        self._invalidate_cache("np")
+            raise TypeError(f'Expected np.ndarray, got {type(frame).__name__}')
+        self._invalidate_cache('np')
         self._np = frame
         return self
 
@@ -99,7 +112,6 @@ class Frame:
         """
         Get the frame as a torch tensor in format (1, C, H, W).
         """
-
         if self._tensor is None:
             if self._bytes is not None:
                 self._tensor = _torch_utils.frame_to_tensor(
@@ -113,7 +125,7 @@ class Frame:
                     self._np, _pytorch_device, _pytorch_dtype
                 )
         if clear_cache:
-            self._invalidate_cache("tensor")
+            self._invalidate_cache('tensor')
 
         return (
             self._tensor.clone()
@@ -127,7 +139,7 @@ class Frame:
                 self._bytes = self._np_to_bytes(self._np)
 
         if clear_cache:
-            self._invalidate_cache("bytes")
+            self._invalidate_cache('bytes')
 
         return self._bytes
 
@@ -143,7 +155,7 @@ class Frame:
                 self._np = self._bytes_to_np(self._bytes)
 
         if clear_cache:
-            self._invalidate_cache("np")
+            self._invalidate_cache('np')
         return self._np
 
     # --- Conversion helpers ---
@@ -158,7 +170,7 @@ class Frame:
     def _np_to_bytes(self, arr: Any) -> bytes:
         return arr.tobytes()
 
-    def resize_frame(self, new_width: int, new_height: int) -> "Frame":
+    def resize_frame(self, new_width: int, new_height: int) -> 'Frame':
         if self._tensor is not None:
             self._tensor = _torch_utils.resize_tensor(
                 self._tensor, new_width, new_height
@@ -186,13 +198,13 @@ class Frame:
         Clears all cache but the optimal frame to resize, then resizes the frame.
         """
         if self._tensor is not None:
-            self._invalidate_cache("tensor")
+            self._invalidate_cache('tensor')
         elif self._np is not None:
-            self._invalidate_cache("np")
+            self._invalidate_cache('np')
         elif self._bytes is not None:
-            self._invalidate_cache("bytes")
+            self._invalidate_cache('bytes')
         else:
-            raise ValueError("Tried to rezise nothing!")
+            raise ValueError('Tried to rezise nothing!')
 
         return self.resize_frame(new_width=new_width, new_height=new_height)
 
@@ -208,7 +220,7 @@ class Frame:
             ).astype(np.uint8)
         return np_frame
 
-    def clone(self) -> "Frame":
+    def clone(self) -> 'Frame':
         new_frame = Frame(
             backend=self.backend,
             width=self.width,
@@ -226,7 +238,7 @@ class Frame:
             new_frame.set_frame_bytes(self._bytes)
         return new_frame
 
-    def get_dummy_frame(self) -> "Frame":
+    def get_dummy_frame(self) -> 'Frame':
         return Frame(
             backend=self.backend,
             width=self.width,

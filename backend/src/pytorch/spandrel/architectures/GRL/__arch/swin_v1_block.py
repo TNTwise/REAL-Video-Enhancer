@@ -1,7 +1,6 @@
-import torch.nn as nn
+from torch import nn
 
 from ....util.timm import to_2tuple
-
 from .ops import bchw_to_blc, blc_to_bchw
 
 
@@ -49,9 +48,9 @@ class Linear(nn.Linear):
 
 
 def build_last_conv(conv_type: str, dim: int):
-    if conv_type == "1conv":
+    if conv_type == '1conv':
         block = nn.Conv2d(dim, dim, 3, 1, 1)
-    elif conv_type == "3conv":
+    elif conv_type == '3conv':
         # to save parameters and memory
         block = nn.Sequential(
             nn.Conv2d(dim, dim // 4, 3, 1, 1),
@@ -60,10 +59,10 @@ def build_last_conv(conv_type: str, dim: int):
             nn.LeakyReLU(negative_slope=0.2, inplace=True),
             nn.Conv2d(dim // 4, dim, 3, 1, 1),
         )
-    elif conv_type == "1conv1x1":
+    elif conv_type == '1conv1x1':
         block = nn.Conv2d(dim, dim, 1, 1, 0)
-    elif conv_type == "linear":
+    elif conv_type == 'linear':
         block = Linear(dim, dim)
     else:
-        raise ValueError(f"Unsupported conv_type {conv_type}")
+        raise ValueError(f'Unsupported conv_type {conv_type}')
     return block

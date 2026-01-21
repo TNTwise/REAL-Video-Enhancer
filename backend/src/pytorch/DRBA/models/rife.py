@@ -1,34 +1,41 @@
 # for real-time playback(+TensorRT)
-from ..models.rife_426_heavy.IFNet_HDv3 import IFNet
-from ..models.drm import calc_drm_rife
-from ..models.utils.tools import *
+
 import torch
-import os
+
+from ..models.drm import calc_drm_rife
+from ..models.rife_426_heavy.IFNet_HDv3 import IFNet
+from ..models.utils.tools import *
 
 if check_cupy_env():
     from ..models.softsplat.softsplat import softsplat as warp
 else:
-    print("System does not have CUDA installed, falling back to PyTorch")
+    print('System does not have CUDA installed, falling back to PyTorch')
     from ..models.softsplat.softsplat_torch import softsplat as warp
 
 
 class RIFE:
     def __init__(
         self,
-        weights="weights/train_log_rife_426_heavy",
+        weights='weights/train_log_rife_426_heavy',
         scale=1.0,
-        device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+        device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
     ):
         self.ifnet = IFNet().to(device).eval()
         self.ifnet.load_state_dict(
-            convert(torch.load(weights, map_location="cpu")), strict=False
+            convert(torch.load(weights, map_location='cpu')), strict=False
         )
         self.scale = scale
-        self.scale_list = [16 / scale, 8 / scale, 4 / scale, 2 / scale, 1 / scale]
+        self.scale_list = [
+            16 / scale,
+            8 / scale,
+            4 / scale,
+            2 / scale,
+            1 / scale,
+        ]
         self.pad_size = 64
 
     @torch.inference_mode()
-    @torch.autocast(device_type="cuda" if torch.cuda.is_available() else "cpu")
+    @torch.autocast(device_type='cuda' if torch.cuda.is_available() else 'cpu')
     def inference_ts(self, I0, I1, ts):
         output = []
         for t in ts:
@@ -39,7 +46,9 @@ class RIFE:
             else:
                 output.append(
                     self.ifnet(
-                        torch.cat((I0, I1), 1), timestep=t, scale_list=self.scale_list
+                        torch.cat((I0, I1), 1),
+                        timestep=t,
+                        scale_list=self.scale_list,
                     )[0]
                 )
 
@@ -59,7 +68,7 @@ class RIFE:
         # get flow flow0.5 -> 0/1
         flow50, flow51 = flow[:, :2], flow[:, 2:]
 
-        warp_method = "avg"
+        warp_method = 'avg'
 
         # qvi
         # flow05, norm2 = fwarp(flow50, flow50)
@@ -76,8 +85,12 @@ class RIFE:
         gap05 = mask05 < 0.999
         gap15 = mask15 < 0.999
 
-        flow05[gap05] = (ones_mask * max(flow05.shape[2], flow05.shape[3]))[gap05]
-        flow15[gap15] = (ones_mask * max(flow15.shape[2], flow15.shape[3]))[gap15]
+        flow05[gap05] = (ones_mask * max(flow05.shape[2], flow05.shape[3]))[
+            gap05
+        ]
+        flow15[gap15] = (ones_mask * max(flow15.shape[2], flow15.shape[3]))[
+            gap15
+        ]
 
         flow01 = flow05 * 2
         flow10 = flow15 * 2
@@ -85,7 +98,7 @@ class RIFE:
         return flow01, flow10, f0, f1
 
     @torch.inference_mode()
-    @torch.autocast(device_type="cuda" if torch.cuda.is_available() else "cpu")
+    @torch.autocast(device_type='cuda' if torch.cuda.is_available() else 'cpu')
     def inference_ts_drba(self, I0, I1, I2, ts, reuse=None, linear=False):
         flow10, flow01, f1, f0 = self.calc_flow(I1, I0) if not reuse else reuse
         if reuse is None:
@@ -107,7 +120,7 @@ class RIFE:
                 inp = torch.cat((I1, I0), 1)
                 out = self.ifnet(
                     inp,
-                    timestep=drm["drm_t1_t01"],
+                    timestep=drm['drm_t1_t01'],
                     scale_list=self.scale_list,
                     f0=f1,
                     f1=f0,
@@ -119,7 +132,7 @@ class RIFE:
                 inp = torch.cat((I1, I2), 1)
                 out = self.ifnet(
                     inp,
-                    timestep=drm["drm_t1_t12"],
+                    timestep=drm['drm_t1_t12'],
                     scale_list=self.scale_list,
                     f0=f1,
                     f1=f2,

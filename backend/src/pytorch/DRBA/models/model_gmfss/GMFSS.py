@@ -1,18 +1,15 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
-from models.utils.tools import check_cupy_env
-
 from models.gmflow.gmflow import GMFlow
-from models.model_gmfss.MetricNet import MetricNet
 from models.model_gmfss.FeatureNet import FeatureNet
 from models.model_gmfss.FusionNet import GridNet
+from models.model_gmfss.MetricNet import MetricNet
+from models.utils.tools import check_cupy_env
 
 if check_cupy_env():
     from models.softsplat.softsplat import softsplat as warp
 else:
-    print("System does not have CUDA installed, falling back to PyTorch")
+    print('System does not have CUDA installed, falling back to PyTorch')
     from models.softsplat.softsplat_torch import softsplat as warp
 
 
@@ -31,7 +28,8 @@ class Model:
         self.fusionnet.eval()
 
     def device(
-        self, device=torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self,
+        device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'),
     ):
         self.flownet.to(device)
         self.metricnet.to(device)
@@ -47,20 +45,22 @@ class Model:
     def load_model(self, path, rank):
         def convert(param):
             return {
-                k.replace("module.", ""): v for k, v in param.items() if "module." in k
+                k.replace('module.', ''): v
+                for k, v in param.items()
+                if 'module.' in k
             }
 
         self.flownet.load_state_dict(
-            torch.load("{}/flownet.pkl".format(path), map_location="cpu")
+            torch.load(f'{path}/flownet.pkl', map_location='cpu')
         )
         self.metricnet.load_state_dict(
-            torch.load("{}/metric.pkl".format(path), map_location="cpu")
+            torch.load(f'{path}/metric.pkl', map_location='cpu')
         )
         self.feat_ext.load_state_dict(
-            torch.load("{}/feat.pkl".format(path), map_location="cpu")
+            torch.load(f'{path}/feat.pkl', map_location='cpu')
         )
         self.fusionnet.load_state_dict(
-            torch.load("{}/fusionnet.pkl".format(path), map_location="cpu")
+            torch.load(f'{path}/fusionnet.pkl', map_location='cpu')
         )
 
     def reuse(self, img0, img1, scale):
@@ -70,18 +70,18 @@ class Model:
         feat_ext1 = [feat21, feat22, feat23]
 
         img0 = F.interpolate(
-            img0, scale_factor=0.5, mode="bilinear", align_corners=False
+            img0, scale_factor=0.5, mode='bilinear', align_corners=False
         )
         img1 = F.interpolate(
-            img1, scale_factor=0.5, mode="bilinear", align_corners=False
+            img1, scale_factor=0.5, mode='bilinear', align_corners=False
         )
 
         if scale != 1.0:
             imgf0 = F.interpolate(
-                img0, scale_factor=scale, mode="bilinear", align_corners=False
+                img0, scale_factor=scale, mode='bilinear', align_corners=False
             )
             imgf1 = F.interpolate(
-                img1, scale_factor=scale, mode="bilinear", align_corners=False
+                img1, scale_factor=scale, mode='bilinear', align_corners=False
             )
         else:
             imgf0 = img0
@@ -93,7 +93,7 @@ class Model:
                 F.interpolate(
                     flow01,
                     scale_factor=1.0 / scale,
-                    mode="bilinear",
+                    mode='bilinear',
                     align_corners=False,
                 )
                 / scale
@@ -102,7 +102,7 @@ class Model:
                 F.interpolate(
                     flow10,
                     scale_factor=1.0 / scale,
-                    mode="bilinear",
+                    mode='bilinear',
                     align_corners=False,
                 )
                 / scale
@@ -112,7 +112,9 @@ class Model:
 
         return flow01, flow10, metric0, metric1, feat_ext0, feat_ext1
 
-    def inference(self, img0, img1, reuse_things, timestep0, timestep1, swap_thresh=1):
+    def inference(
+        self, img0, img1, reuse_things, timestep0, timestep1, swap_thresh=1
+    ):
         flow01, metric0, feat11, feat12, feat13 = (
             reuse_things[0],
             reuse_things[2],
@@ -135,46 +137,58 @@ class Model:
         Z2t = timestep1 * metric1
 
         img0 = F.interpolate(
-            img0, scale_factor=0.5, mode="bilinear", align_corners=False
+            img0, scale_factor=0.5, mode='bilinear', align_corners=False
         )
-        I1t = warp(img0, F1t, Z1t, strMode="soft")
+        I1t = warp(img0, F1t, Z1t, strMode='soft')
         img1 = F.interpolate(
-            img1, scale_factor=0.5, mode="bilinear", align_corners=False
+            img1, scale_factor=0.5, mode='bilinear', align_corners=False
         )
-        I2t = warp(img1, F2t, Z2t, strMode="soft")
+        I2t = warp(img1, F2t, Z2t, strMode='soft')
 
-        feat1t1 = warp(feat11, F1t, Z1t, strMode="soft")
-        feat2t1 = warp(feat21, F2t, Z2t, strMode="soft")
+        feat1t1 = warp(feat11, F1t, Z1t, strMode='soft')
+        feat2t1 = warp(feat21, F2t, Z2t, strMode='soft')
 
         F1td = (
-            F.interpolate(F1t, scale_factor=0.5, mode="bilinear", align_corners=False)
+            F.interpolate(
+                F1t, scale_factor=0.5, mode='bilinear', align_corners=False
+            )
             * 0.5
         )
-        Z1d = F.interpolate(Z1t, scale_factor=0.5, mode="bilinear", align_corners=False)
-        feat1t2 = warp(feat12, F1td, Z1d, strMode="soft")
+        Z1d = F.interpolate(
+            Z1t, scale_factor=0.5, mode='bilinear', align_corners=False
+        )
+        feat1t2 = warp(feat12, F1td, Z1d, strMode='soft')
         F2td = (
-            F.interpolate(F2t, scale_factor=0.5, mode="bilinear", align_corners=False)
+            F.interpolate(
+                F2t, scale_factor=0.5, mode='bilinear', align_corners=False
+            )
             * 0.5
         )
-        Z2d = F.interpolate(Z2t, scale_factor=0.5, mode="bilinear", align_corners=False)
-        feat2t2 = warp(feat22, F2td, Z2d, strMode="soft")
+        Z2d = F.interpolate(
+            Z2t, scale_factor=0.5, mode='bilinear', align_corners=False
+        )
+        feat2t2 = warp(feat22, F2td, Z2d, strMode='soft')
 
         F1tdd = (
-            F.interpolate(F1t, scale_factor=0.25, mode="bilinear", align_corners=False)
+            F.interpolate(
+                F1t, scale_factor=0.25, mode='bilinear', align_corners=False
+            )
             * 0.25
         )
         Z1dd = F.interpolate(
-            Z1t, scale_factor=0.25, mode="bilinear", align_corners=False
+            Z1t, scale_factor=0.25, mode='bilinear', align_corners=False
         )
-        feat1t3 = warp(feat13, F1tdd, Z1dd, strMode="soft")
+        feat1t3 = warp(feat13, F1tdd, Z1dd, strMode='soft')
         F2tdd = (
-            F.interpolate(F2t, scale_factor=0.25, mode="bilinear", align_corners=False)
+            F.interpolate(
+                F2t, scale_factor=0.25, mode='bilinear', align_corners=False
+            )
             * 0.25
         )
         Z2dd = F.interpolate(
-            Z2t, scale_factor=0.25, mode="bilinear", align_corners=False
+            Z2t, scale_factor=0.25, mode='bilinear', align_corners=False
         )
-        feat2t3 = warp(feat23, F2tdd, Z2dd, strMode="soft")
+        feat2t3 = warp(feat23, F2tdd, Z2dd, strMode='soft')
 
         # swap_thresh means Threshold for applying the swap mask.
         # 0 means fully apply the swap mask.

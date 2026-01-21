@@ -1,15 +1,16 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-
-from models.gmflow.utils import split_feature, merge_splits
+from models.gmflow.utils import merge_splits, split_feature
+from torch import nn
 
 
 def single_head_full_attention(q, k, v):
     # q, k, v: [B, L, C]
     assert q.dim() == k.dim() == v.dim() == 3
 
-    scores = torch.matmul(q, k.permute(0, 2, 1)) / (q.size(2) ** 0.5)  # [B, L, L]
+    scores = torch.matmul(q, k.permute(0, 2, 1)) / (
+        q.size(2) ** 0.5
+    )  # [B, L, L]
     attn = torch.softmax(scores, dim=2)  # [B, L, L]
     out = torch.matmul(attn, v)  # [B, L, C]
 
@@ -22,7 +23,7 @@ def generate_shift_window_attn_mask(
     window_size_w,
     shift_size_h,
     shift_size_w,
-    device=torch.device("cuda"),
+    device=torch.device('cuda'),
 ):
     # Ref: https://github.com/microsoft/Swin-Transformer/blob/main/models/swin_transformer.py
     # calculate attention mask for SW-MSA
@@ -45,14 +46,16 @@ def generate_shift_window_attn_mask(
             cnt += 1
 
     mask_windows = split_feature(
-        img_mask, num_splits=input_resolution[-1] // window_size_w, channel_last=True
+        img_mask,
+        num_splits=input_resolution[-1] // window_size_w,
+        channel_last=True,
     )
 
     mask_windows = mask_windows.view(-1, window_size_h * window_size_w)
     attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
-    attn_mask = attn_mask.masked_fill(attn_mask != 0, float(-100.0)).masked_fill(
-        attn_mask == 0, float(0.0)
-    )
+    attn_mask = attn_mask.masked_fill(
+        attn_mask != 0, (-100.0)
+    ).masked_fill(attn_mask == 0, 0.0)
 
     return attn_mask
 
@@ -103,7 +106,9 @@ def single_head_split_window_attention(
     v = split_feature(v, num_splits=num_splits, channel_last=True)
 
     scores = (
-        torch.matmul(q.view(b_new, -1, c), k.view(b_new, -1, c).permute(0, 2, 1))
+        torch.matmul(
+            q.view(b_new, -1, c), k.view(b_new, -1, c).permute(0, 2, 1)
+        )
         / scale_factor
     )  # [B*K*K, H/K*W/K, H/K*W/K]
 
@@ -134,13 +139,13 @@ class TransformerLayer(nn.Module):
         self,
         d_model=256,
         nhead=1,
-        attention_type="swin",
+        attention_type='swin',
         no_ffn=False,
         ffn_dim_expansion=4,
         with_shift=False,
         **kwargs,
     ):
-        super(TransformerLayer, self).__init__()
+        super().__init__()
 
         self.dim = d_model
         self.nhead = nhead
@@ -162,7 +167,9 @@ class TransformerLayer(nn.Module):
         if not self.no_ffn:
             in_channels = d_model * 2
             self.mlp = nn.Sequential(
-                nn.Linear(in_channels, in_channels * ffn_dim_expansion, bias=False),
+                nn.Linear(
+                    in_channels, in_channels * ffn_dim_expansion, bias=False
+                ),
                 nn.GELU(),
                 nn.Linear(in_channels * ffn_dim_expansion, d_model, bias=False),
             )
@@ -187,22 +194,21 @@ class TransformerLayer(nn.Module):
         key = self.k_proj(key)  # [B, L, C]
         value = self.v_proj(value)  # [B, L, C]
 
-        if self.attention_type == "swin" and attn_num_splits > 1:
+        if self.attention_type == 'swin' and attn_num_splits > 1:
             if self.nhead > 1:
                 # we observe that multihead attention slows down the speed and increases the memory consumption
                 # without bringing obvious performance gains and thus the implementation is removed
                 raise NotImplementedError
-            else:
-                message = single_head_split_window_attention(
-                    query,
-                    key,
-                    value,
-                    num_splits=attn_num_splits,
-                    with_shift=self.with_shift,
-                    h=height,
-                    w=width,
-                    attn_mask=shifted_window_attn_mask,
-                )
+            message = single_head_split_window_attention(
+                query,
+                key,
+                value,
+                num_splits=attn_num_splits,
+                with_shift=self.with_shift,
+                h=height,
+                w=width,
+                attn_mask=shifted_window_attn_mask,
+            )
         else:
             message = single_head_full_attention(query, key, value)  # [B, L, C]
 
@@ -223,12 +229,12 @@ class TransformerBlock(nn.Module):
         self,
         d_model=256,
         nhead=1,
-        attention_type="swin",
+        attention_type='swin',
         ffn_dim_expansion=4,
         with_shift=False,
         **kwargs,
     ):
-        super(TransformerBlock, self).__init__()
+        super().__init__()
 
         self.self_attn = TransformerLayer(
             d_model=d_model,
@@ -288,31 +294,29 @@ class FeatureTransformer(nn.Module):
         num_layers=6,
         d_model=128,
         nhead=1,
-        attention_type="swin",
+        attention_type='swin',
         ffn_dim_expansion=4,
         **kwargs,
     ):
-        super(FeatureTransformer, self).__init__()
+        super().__init__()
 
         self.attention_type = attention_type
 
         self.d_model = d_model
         self.nhead = nhead
 
-        self.layers = nn.ModuleList(
-            [
-                TransformerBlock(
-                    d_model=d_model,
-                    nhead=nhead,
-                    attention_type=attention_type,
-                    ffn_dim_expansion=ffn_dim_expansion,
-                    with_shift=True
-                    if attention_type == "swin" and i % 2 == 1
-                    else False,
-                )
-                for i in range(num_layers)
-            ]
-        )
+        self.layers = nn.ModuleList([
+            TransformerBlock(
+                d_model=d_model,
+                nhead=nhead,
+                attention_type=attention_type,
+                ffn_dim_expansion=ffn_dim_expansion,
+                with_shift=True
+                if attention_type == 'swin' and i % 2 == 1
+                else False,
+            )
+            for i in range(num_layers)
+        ])
 
         for p in self.parameters():
             if p.dim() > 1:
@@ -331,7 +335,7 @@ class FeatureTransformer(nn.Module):
         feature0 = feature0.flatten(-2).permute(0, 2, 1)  # [B, H*W, C]
         feature1 = feature1.flatten(-2).permute(0, 2, 1)  # [B, H*W, C]
 
-        if self.attention_type == "swin" and attn_num_splits > 1:
+        if self.attention_type == 'swin' and attn_num_splits > 1:
             # global and refine use different number of splits
             window_size_h = h // attn_num_splits
             window_size_w = w // attn_num_splits
@@ -389,7 +393,7 @@ class FeatureFlowAttention(nn.Module):
         in_channels,
         **kwargs,
     ):
-        super(FeatureFlowAttention, self).__init__()
+        super().__init__()
 
         self.q_proj = nn.Linear(in_channels, in_channels)
         self.k_proj = nn.Linear(in_channels, in_channels)
@@ -425,13 +429,19 @@ class FeatureFlowAttention(nn.Module):
         query = self.q_proj(query)  # [B, H*W, C]
         key = self.k_proj(query)  # [B, H*W, C]
 
-        value = flow.view(b, flow.size(1), h * w).permute(0, 2, 1)  # [B, H*W, 2]
+        value = flow.view(b, flow.size(1), h * w).permute(
+            0, 2, 1
+        )  # [B, H*W, 2]
 
-        scores = torch.matmul(query, key.permute(0, 2, 1)) / (c**0.5)  # [B, H*W, H*W]
+        scores = torch.matmul(query, key.permute(0, 2, 1)) / (
+            c**0.5
+        )  # [B, H*W, H*W]
         prob = torch.softmax(scores, dim=-1)
 
         out = torch.matmul(prob, value)  # [B, H*W, 2]
-        out = out.view(b, h, w, value.size(-1)).permute(0, 3, 1, 2)  # [B, 2, H, W]
+        out = out.view(b, h, w, value.size(-1)).permute(
+            0, 3, 1, 2
+        )  # [B, 2, H, W]
 
         return out
 
@@ -453,7 +463,8 @@ class FeatureFlowAttention(nn.Module):
         kernel_size = 2 * local_window_radius + 1
 
         feature0_proj = (
-            self.k_proj(feature0.view(b, c, -1).permute(0, 2, 1))
+            self
+            .k_proj(feature0.view(b, c, -1).permute(0, 2, 1))
             .permute(0, 2, 1)
             .reshape(b, c, h, w)
         )
@@ -463,7 +474,8 @@ class FeatureFlowAttention(nn.Module):
         )  # [B, C*(2R+1)^2), H*W]
 
         feature0_window = (
-            feature0_window.view(b, c, kernel_size**2, h, w)
+            feature0_window
+            .view(b, c, kernel_size**2, h, w)
             .permute(0, 3, 4, 1, 2)
             .reshape(b * h * w, c, kernel_size**2)
         )  # [B*H*W, C, (2R+1)^2]
@@ -473,7 +485,8 @@ class FeatureFlowAttention(nn.Module):
         )  # [B, 2*(2R+1)^2), H*W]
 
         flow_window = (
-            flow_window.view(b, 2, kernel_size**2, h, w)
+            flow_window
+            .view(b, 2, kernel_size**2, h, w)
             .permute(0, 3, 4, 2, 1)
             .reshape(b * h * w, kernel_size**2, 2)
         )  # [B*H*W, (2R+1)^2, 2]
@@ -485,7 +498,8 @@ class FeatureFlowAttention(nn.Module):
         prob = torch.softmax(scores, dim=-1)
 
         out = (
-            torch.matmul(prob, flow_window)
+            torch
+            .matmul(prob, flow_window)
             .view(b, h, w, 2)
             .permute(0, 3, 1, 2)
             .contiguous()

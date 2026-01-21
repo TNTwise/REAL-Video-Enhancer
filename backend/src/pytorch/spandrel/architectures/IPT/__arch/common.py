@@ -5,12 +5,18 @@ from __future__ import annotations
 import math
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 
-def default_conv(in_channels: int, out_channels: int, kernel_size: int, bias=True):
+def default_conv(
+    in_channels: int, out_channels: int, kernel_size: int, bias=True
+):
     return nn.Conv2d(
-        in_channels, out_channels, kernel_size, padding=(kernel_size // 2), bias=bias
+        in_channels,
+        out_channels,
+        kernel_size,
+        padding=(kernel_size // 2),
+        bias=bias,
     )
 
 
@@ -77,9 +83,9 @@ class Upsampler(nn.Sequential):
                 m.append(nn.PixelShuffle(2))
                 if bn:
                     m.append(nn.BatchNorm2d(n_feats))
-                if act == "relu":
+                if act == 'relu':
                     m.append(nn.ReLU(True))
-                elif act == "prelu":
+                elif act == 'prelu':
                     m.append(nn.PReLU(n_feats))
 
         elif scale == 3:
@@ -87,9 +93,9 @@ class Upsampler(nn.Sequential):
             m.append(nn.PixelShuffle(3))
             if bn:
                 m.append(nn.BatchNorm2d(n_feats))
-            if act == "relu":
+            if act == 'relu':
                 m.append(nn.ReLU(True))
-            elif act == "prelu":
+            elif act == 'prelu':
                 m.append(nn.PReLU(n_feats))
         else:
             raise NotImplementedError

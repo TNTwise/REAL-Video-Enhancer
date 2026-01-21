@@ -1,10 +1,11 @@
 import math
 
-import torch.nn as nn
+from torch import nn
 
 
 class Upsample(nn.Module):
     """Upsample module.
+
     Args:
         scale (int): Scale factor. Supported scales: 2^n and 3.
         num_feat (int): Channel number of intermediate features.
@@ -22,7 +23,7 @@ class Upsample(nn.Module):
             m.append(nn.PixelShuffle(3))
         else:
             raise ValueError(
-                f"scale {scale} is not supported. Supported scales: 2^n and 3."
+                f'scale {scale} is not supported. Supported scales: 2^n and 3.'
             )
         self.up = nn.Sequential(*m)
 
@@ -33,6 +34,7 @@ class Upsample(nn.Module):
 class UpsampleOneStep(nn.Module):
     """UpsampleOneStep module (the difference with Upsample is that it always only has 1conv + 1pixelshuffle)
        Used in lightweight SR to save parameters.
+
     Args:
         scale (int): Scale factor. Supported scales: 2^n and 3.
         num_feat (int): Channel number of intermediate features.

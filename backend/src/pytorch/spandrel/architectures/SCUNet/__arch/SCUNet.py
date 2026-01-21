@@ -6,13 +6,12 @@
 
 import numpy as np
 import torch
-import torch.nn as nn
 from einops import rearrange
 from einops.layers.torch import Rearrange
+from torch import nn
 
 from ....util import store_hyperparameters
 from ....util.timm import DropPath, trunc_normal_
-
 from ...__arch_helpers.padding import pad_to_multiple
 
 
@@ -29,33 +28,39 @@ class WMSA(nn.Module):
         self.n_heads = input_dim // head_dim
         self.window_size = window_size
         self.type = type
-        self.embedding_layer = nn.Linear(self.input_dim, 3 * self.input_dim, bias=True)
+        self.embedding_layer = nn.Linear(
+            self.input_dim, 3 * self.input_dim, bias=True
+        )
 
         self.relative_position_params = nn.Parameter(
-            torch.zeros((2 * window_size - 1) * (2 * window_size - 1), self.n_heads)
+            torch.zeros(
+                (2 * window_size - 1) * (2 * window_size - 1), self.n_heads
+            )
         )
         # TODO recover
         # self.relative_position_params = nn.Parameter(torch.zeros(self.n_heads, 2 * window_size - 1, 2 * window_size -1))
         self.relative_position_params = nn.Parameter(
-            torch.zeros((2 * window_size - 1) * (2 * window_size - 1), self.n_heads)
+            torch.zeros(
+                (2 * window_size - 1) * (2 * window_size - 1), self.n_heads
+            )
         )
 
         self.linear = nn.Linear(self.input_dim, self.output_dim)
 
         trunc_normal_(self.relative_position_params, std=0.02)
         self.relative_position_params = torch.nn.Parameter(
-            self.relative_position_params.view(
-                2 * window_size - 1, 2 * window_size - 1, self.n_heads
-            )
+            self.relative_position_params
+            .view(2 * window_size - 1, 2 * window_size - 1, self.n_heads)
             .transpose(1, 2)
             .transpose(0, 1)
             .contiguous()
         )
 
     def generate_mask(self, h, w, p, shift):
-        """generating the mask of SW-MSA
+        """Generating the mask of SW-MSA
         Args:
             shift: shift parameters in CyclicShift.
+
         Returns:
             attn_mask: should be (1 1 w p p),
         """
@@ -70,7 +75,7 @@ class WMSA(nn.Module):
             dtype=torch.bool,
             device=self.relative_position_params.device,
         )
-        if self.type == "W":
+        if self.type == 'W':
             return attn_mask
 
         s = p - shift
@@ -79,19 +84,21 @@ class WMSA(nn.Module):
         attn_mask[:, -1, :, :s, :, s:] = True
         attn_mask[:, -1, :, s:, :, :s] = True
         attn_mask = rearrange(
-            attn_mask, "w1 w2 p1 p2 p3 p4 -> 1 1 (w1 w2) (p1 p2) (p3 p4)"
+            attn_mask, 'w1 w2 p1 p2 p3 p4 -> 1 1 (w1 w2) (p1 p2) (p3 p4)'
         )
         return attn_mask
 
     def forward(self, x):
         """Forward pass of Window Multi-head Self-attention module.
+
         Args:
             x: input tensor with shape of [b h w c];
             attn_mask: attention mask, fill -inf where the value is True;
+
         Returns:
             output: tensor shape [b h w c]
         """
-        if self.type != "W":
+        if self.type != 'W':
             x = torch.roll(
                 x,
                 shifts=(-(self.window_size // 2), -(self.window_size // 2)),
@@ -100,7 +107,7 @@ class WMSA(nn.Module):
 
         x = rearrange(
             x,
-            "b (w1 p1) (w2 p2) c -> b w1 w2 p1 p2 c",
+            'b (w1 p1) (w2 p2) c -> b w1 w2 p1 p2 c',
             p1=self.window_size,
             p2=self.window_size,
         )
@@ -111,36 +118,39 @@ class WMSA(nn.Module):
 
         x = rearrange(
             x,
-            "b w1 w2 p1 p2 c -> b (w1 w2) (p1 p2) c",
+            'b w1 w2 p1 p2 c -> b (w1 w2) (p1 p2) c',
             p1=self.window_size,
             p2=self.window_size,
         )
         qkv = self.embedding_layer(x)
         q, k, v = rearrange(
-            qkv, "b nw np (threeh c) -> threeh b nw np c", c=self.head_dim
+            qkv, 'b nw np (threeh c) -> threeh b nw np c', c=self.head_dim
         ).chunk(3, dim=0)
-        sim = torch.einsum("hbwpc,hbwqc->hbwpq", q, k) * self.scale
+        sim = torch.einsum('hbwpc,hbwqc->hbwpq', q, k) * self.scale
         # Adding learnable relative embedding
-        sim = sim + rearrange(self.relative_embedding(), "h p q -> h 1 1 p q")
+        sim = sim + rearrange(self.relative_embedding(), 'h p q -> h 1 1 p q')
         # Using Attn Mask to distinguish different subwindows.
-        if self.type != "W":
+        if self.type != 'W':
             attn_mask = self.generate_mask(
-                h_windows, w_windows, self.window_size, shift=self.window_size // 2
+                h_windows,
+                w_windows,
+                self.window_size,
+                shift=self.window_size // 2,
             )
-            sim = sim.masked_fill_(attn_mask, float("-inf"))
+            sim = sim.masked_fill_(attn_mask, float('-inf'))
 
         probs = nn.functional.softmax(sim, dim=-1)
-        output = torch.einsum("hbwij,hbwjc->hbwic", probs, v)
-        output = rearrange(output, "h b w p c -> b w p (h c)")
+        output = torch.einsum('hbwij,hbwjc->hbwic', probs, v)
+        output = rearrange(output, 'h b w p c -> b w p (h c)')
         output = self.linear(output)
         output = rearrange(
             output,
-            "b (w1 w2) (p1 p2) c -> b (w1 p1) (w2 p2) c",
+            'b (w1 w2) (p1 p2) c -> b (w1 p1) (w2 p2) c',
             w1=h_windows,
             p1=self.window_size,
         )
 
-        if self.type != "W":
+        if self.type != 'W':
             output = torch.roll(
                 output,
                 shifts=(self.window_size // 2, self.window_size // 2),
@@ -151,13 +161,11 @@ class WMSA(nn.Module):
 
     def relative_embedding(self):
         cord = torch.tensor(
-            np.array(
-                [
-                    [i, j]
-                    for i in range(self.window_size)
-                    for j in range(self.window_size)
-                ]
-            )
+            np.array([
+                [i, j]
+                for i in range(self.window_size)
+                for j in range(self.window_size)
+            ])
         )
         relation = cord[:, None, :] - cord[None, :, :] + self.window_size - 1
         # negative is allowed
@@ -174,21 +182,23 @@ class Block(nn.Module):
         head_dim,
         window_size,
         drop_path,
-        type="W",
+        type='W',
         input_resolution=None,
     ):
         """SwinTransformer Block"""
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
-        assert type in ["W", "SW"]
+        assert type in ['W', 'SW']
         self.type = type
         if input_resolution <= window_size:
-            self.type = "W"
+            self.type = 'W'
 
         self.ln1 = nn.LayerNorm(input_dim)
         self.msa = WMSA(input_dim, input_dim, head_dim, window_size, self.type)
-        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
+        self.drop_path = (
+            DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
+        )
         self.ln2 = nn.LayerNorm(input_dim)
         self.mlp = nn.Sequential(
             nn.Linear(input_dim, 4 * input_dim),
@@ -210,7 +220,7 @@ class ConvTransBlock(nn.Module):
         head_dim,
         window_size,
         drop_path,
-        type="W",
+        type='W',
         input_resolution=None,
     ):
         """SwinTransformer and Conv Block"""
@@ -223,9 +233,9 @@ class ConvTransBlock(nn.Module):
         self.type = type
         self.input_resolution = input_resolution
 
-        assert self.type in ["W", "SW"]
+        assert self.type in ['W', 'SW']
         if self.input_resolution <= self.window_size:
-            self.type = "W"
+            self.type = 'W'
 
         self.trans_block = Block(
             self.trans_dim,
@@ -264,9 +274,9 @@ class ConvTransBlock(nn.Module):
             self.conv1_1(x), (self.conv_dim, self.trans_dim), dim=1
         )
         conv_x = self.conv_block(conv_x) + conv_x
-        trans_x = Rearrange("b c h w -> b h w c")(trans_x)
+        trans_x = Rearrange('b c h w -> b h w c')(trans_x)
         trans_x = self.trans_block(trans_x)
-        trans_x = Rearrange("b h w c -> b c h w")(trans_x)
+        trans_x = Rearrange('b h w c -> b c h w')(trans_x)
         res = self.conv1_2(torch.cat((conv_x, trans_x), dim=1))
         x = x + res
 
@@ -305,7 +315,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution,
             )
             for i in range(config[0])
@@ -319,7 +329,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution // 2,
             )
             for i in range(config[1])
@@ -333,7 +343,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution // 4,
             )
             for i in range(config[2])
@@ -347,7 +357,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution // 8,
             )
             for i in range(config[3])
@@ -363,7 +373,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution // 4,
             )
             for i in range(config[4])
@@ -379,7 +389,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution // 2,
             )
             for i in range(config[5])
@@ -395,7 +405,7 @@ class SCUNet(nn.Module):
                 self.head_dim,
                 self.window_size,
                 dpr[i + begin],
-                "W" if not i % 2 else "SW",
+                'W' if not i % 2 else 'SW',
                 input_resolution,
             )
             for i in range(config[6])
@@ -415,7 +425,7 @@ class SCUNet(nn.Module):
         # self.apply(self._init_weights)
 
     def check_image_size(self, x):
-        return pad_to_multiple(x, 64, mode="reflect")
+        return pad_to_multiple(x, 64, mode='reflect')
 
     def forward(self, x0):
         h, w = x0.size()[-2:]

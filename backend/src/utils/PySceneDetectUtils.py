@@ -29,18 +29,23 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-import numpy
+import csv
 import math
 import typing as ty
-from enum import Enum
-import cv2
-import numpy as np
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import NamedTuple, List, Optional, Any, Dict, Iterable, Set, TextIO, Union
-
-import csv
-import os.path
+from enum import Enum
 from pathlib import Path
+from typing import (
+    Any,
+    NamedTuple,
+    TextIO,
+    Union,
+)
+
+import cv2
+import numpy
+import numpy as np
 
 MAX_FPS_DELTA: float = 1.0 / 100000
 """Maximum amount two framerates can differ by for equality testing."""
@@ -62,14 +67,15 @@ class FrameTimecode:
 
     def __init__(
         self,
-        timecode: Union[int, float, str, "FrameTimecode"] = None,
-        fps: Union[int, float, str, "FrameTimecode"] = None,
+        timecode: Union[int, float, str, 'FrameTimecode'] = None,
+        fps: Union[int, float, str, 'FrameTimecode'] = None,
     ):
         """
         Arguments:
             timecode: A frame number (int), number of seconds (float), or timecode (str in
                 the form `'HH:MM:SS'` or `'HH:MM:SS.nnn'`).
             fps: The framerate or FrameTimecode to use as a time base for all arithmetic.
+
         Raises:
             TypeError: Thrown if either `timecode` or `fps` are unsupported types.
             ValueError: Thrown when specifying a negative timecode or framerate.
@@ -87,22 +93,24 @@ class FrameTimecode:
             self.frame_num = timecode.frame_num
             if fps is not None:
                 raise TypeError(
-                    "Framerate cannot be overwritten when copying a FrameTimecode."
+                    'Framerate cannot be overwritten when copying a FrameTimecode.'
                 )
         else:
             # Ensure other arguments are consistent with API.
             if fps is None:
-                raise TypeError("Framerate (fps) is a required argument.")
+                raise TypeError('Framerate (fps) is a required argument.')
             if isinstance(fps, FrameTimecode):
                 fps = fps.framerate
 
             # Process the given framerate, if it was not already set.
             if not isinstance(fps, (int, float)):
-                raise TypeError("Framerate must be of type int/float.")
+                raise TypeError('Framerate must be of type int/float.')
             if (isinstance(fps, int) and not fps > 0) or (
                 isinstance(fps, float) and not fps >= MAX_FPS_DELTA
             ):
-                raise ValueError("Framerate must be positive and greater than zero.")
+                raise ValueError(
+                    'Framerate must be positive and greater than zero.'
+                )
             self.framerate = float(fps)
 
         # Process the timecode value, storing it as an exact number of frames.
@@ -141,6 +149,7 @@ class FrameTimecode:
         Arguments:
             fps: Framerate to compare against within the precision constant defined in this module
                 (see :data:`MAX_FPS_DELTA`).
+
         Returns:
             bool: True if passed fps matches the FrameTimecode object's framerate, False otherwise.
 
@@ -160,7 +169,9 @@ class FrameTimecode:
         return float(self.frame_num) / self.framerate
 
     # TODO(v1.0): Add a `timecode` property to replace this and deprecate the existing one.
-    def get_timecode(self, precision: int = 3, use_rounding: bool = True) -> str:
+    def get_timecode(
+        self, precision: int = 3, use_rounding: bool = True
+    ) -> str:
         """Get a formatted timecode string of the form HH:MM:SS[.nnn].
 
         Args:
@@ -188,15 +199,15 @@ class FrameTimecode:
                 mins = 0
                 hrs += 1
         # We have to extend the precision by 1 here, since `format` will round up.
-        msec = format(secs, ".%df" % (precision + 1)) if precision else ""
+        msec = format(secs, '.%df' % (precision + 1)) if precision else ''
         # Need to include decimal place in `msec_str`.
         msec_str = msec[-(2 + precision) : -1]
-        secs_str = f"{int(secs):02d}{msec_str}"
+        secs_str = f'{int(secs):02d}{msec_str}'
         # Return hours, minutes, and seconds as a formatted timecode string.
-        return "%02d:%02d:%s" % (hrs, mins, secs_str)
+        return '%02d:%02d:%s' % (hrs, mins, secs_str)
 
     # TODO(v1.0): Add a `previous` property to replace the existing one and deprecate this getter.
-    def previous_frame(self) -> "FrameTimecode":
+    def previous_frame(self) -> 'FrameTimecode':
         """Return a new FrameTimecode for the previous frame (or 0 if on frame 0)."""
         new_timecode = FrameTimecode(self)
         new_timecode.frame_num = max(0, new_timecode.frame_num - 1)
@@ -212,7 +223,7 @@ class FrameTimecode:
         """
         return round(seconds * self.framerate)
 
-    def _parse_timecode_number(self, timecode: Union[int, float]) -> int:
+    def _parse_timecode_number(self, timecode: int | float) -> int:
         """Parse a timecode number, storing it as the exact number of frames.
         Can be passed as frame number (int), seconds (float)
 
@@ -224,23 +235,22 @@ class FrameTimecode:
         if isinstance(timecode, int):
             if timecode < 0:
                 raise ValueError(
-                    "Timecode frame number must be positive and greater than zero."
+                    'Timecode frame number must be positive and greater than zero.'
                 )
             return timecode
         # Number of seconds S
-        elif isinstance(timecode, float):
+        if isinstance(timecode, float):
             if timecode < 0.0:
                 raise ValueError(
-                    "Timecode value must be positive and greater than zero."
+                    'Timecode value must be positive and greater than zero.'
                 )
             return self._seconds_to_frames(timecode)
         # FrameTimecode
-        elif isinstance(timecode, FrameTimecode):
+        if isinstance(timecode, FrameTimecode):
             return timecode.frame_num
-        elif timecode is None:
-            raise TypeError("Timecode/frame number must be specified!")
-        else:
-            raise TypeError("Timecode format/type unrecognized.")
+        if timecode is None:
+            raise TypeError('Timecode/frame number must be specified!')
+        raise TypeError('Timecode format/type unrecognized.')
 
     def _parse_timecode_string(self, input: str) -> int:
         """Parses a string based on the three possible forms (in timecode format,
@@ -260,41 +270,42 @@ class FrameTimecode:
         if input.isdigit():
             timecode = int(input)
             if timecode < 0:
-                raise ValueError("Timecode frame number must be positive.")
+                raise ValueError('Timecode frame number must be positive.')
             return timecode
         # Timecode in string format 'HH:MM:SS[.nnn]' or 'MM:SS[.nnn]'
-        elif input.find(":") >= 0:
-            values = input.split(":")
+        if input.find(':') >= 0:
+            values = input.split(':')
             # Case of 'HH:MM:SS[.nnn]'
             if len(values) == 3:
                 hrs, mins = int(values[0]), int(values[1])
-                secs = float(values[2]) if "." in values[2] else int(values[2])
+                secs = float(values[2]) if '.' in values[2] else int(values[2])
             # Case of 'MM:SS[.nnn]'
             elif len(values) == 2:
                 hrs = 0
                 mins = int(values[0])
-                secs = float(values[1]) if "." in values[1] else int(values[1])
-            if not (hrs >= 0 and mins >= 0 and secs >= 0 and mins < 60 and secs < 60):
+                secs = float(values[1]) if '.' in values[1] else int(values[1])
+            if not (
+                hrs >= 0 and mins >= 0 and secs >= 0 and mins < 60 and secs < 60
+            ):
                 raise ValueError(
-                    "Invalid timecode range (values outside allowed range)."
+                    'Invalid timecode range (values outside allowed range).'
                 )
             secs += (hrs * 60 * 60) + (mins * 60)
             return self._seconds_to_frames(secs)
         # Try to parse the number as seconds in the format 1234.5 or 1234s
-        if input.endswith("s"):
-            input = input[:-1]
-        if not input.replace(".", "").isdigit():
+        input = input.removesuffix('s')
+        if not input.replace('.', '').isdigit():
             raise ValueError(
-                "All characters in timecode seconds string must be digits."
+                'All characters in timecode seconds string must be digits.'
             )
         as_float = float(input)
         if as_float < 0.0:
-            raise ValueError("Timecode seconds value must be positive.")
+            raise ValueError('Timecode seconds value must be positive.')
         return self._seconds_to_frames(as_float)
 
     def __iadd__(
-        self, other: Union[int, float, str, "FrameTimecode"]
-    ) -> "FrameTimecode":
+        self, other: Union[int, float, str, 'FrameTimecode']
+    ) -> 'FrameTimecode':
         if isinstance(other, int):
             self.frame_num += other
         elif isinstance(other, FrameTimecode):
@@ -302,7 +313,7 @@ class FrameTimecode:
                 self.frame_num += other.frame_num
             else:
                 raise ValueError(
-                    "FrameTimecode instances require equal framerate for addition."
+                    'FrameTimecode instances require equal framerate for addition.'
                 )
         # Check if value to add is in number of seconds.
         elif isinstance(other, float):
@@ -311,22 +322,24 @@ class FrameTimecode:
             self.frame_num += self._parse_timecode_string(other)
         else:
             raise TypeError(
-                "Unsupported type for performing addition with FrameTimecode."
+                'Unsupported type for performing addition with FrameTimecode.'
             )
-        if self.frame_num < 0:  # Required to allow adding negative seconds/frames.
+        if (
+            self.frame_num < 0
+        ):  # Required to allow adding negative seconds/frames.
             self.frame_num = 0
         return self
 
     def __add__(
-        self, other: Union[int, float, str, "FrameTimecode"]
-    ) -> "FrameTimecode":
+        self, other: Union[int, float, str, 'FrameTimecode']
+    ) -> 'FrameTimecode':
         to_return = FrameTimecode(timecode=self)
         to_return += other
         return to_return
 
     def __isub__(
-        self, other: Union[int, float, str, "FrameTimecode"]
-    ) -> "FrameTimecode":
+        self, other: Union[int, float, str, 'FrameTimecode']
+    ) -> 'FrameTimecode':
         if isinstance(other, int):
             self.frame_num -= other
         elif isinstance(other, FrameTimecode):
@@ -334,7 +347,7 @@ class FrameTimecode:
                 self.frame_num -= other.frame_num
             else:
                 raise ValueError(
-                    "FrameTimecode instances require equal framerate for subtraction."
+                    'FrameTimecode instances require equal framerate for subtraction.'
                 )
         # Check if value to add is in number of seconds.
         elif isinstance(other, float):
@@ -343,122 +356,115 @@ class FrameTimecode:
             self.frame_num -= self._parse_timecode_string(other)
         else:
             raise TypeError(
-                "Unsupported type for performing subtraction with FrameTimecode: %s"
+                'Unsupported type for performing subtraction with FrameTimecode: %s'
                 % type(other)
             )
-        if self.frame_num < 0:
-            self.frame_num = 0
+        self.frame_num = max(self.frame_num, 0)
         return self
 
     def __sub__(
-        self, other: Union[int, float, str, "FrameTimecode"]
-    ) -> "FrameTimecode":
+        self, other: Union[int, float, str, 'FrameTimecode']
+    ) -> 'FrameTimecode':
         to_return = FrameTimecode(timecode=self)
         to_return -= other
         return to_return
 
-    def __eq__(self, other: Union[int, float, str, "FrameTimecode"]) -> "FrameTimecode":
+    def __eq__(
+        self, other: Union[int, float, str, 'FrameTimecode']
+    ) -> 'FrameTimecode':
         if isinstance(other, int):
             return self.frame_num == other
-        elif isinstance(other, float):
+        if isinstance(other, float):
             return self.get_seconds() == other
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.frame_num == self._parse_timecode_string(other)
-        elif isinstance(other, FrameTimecode):
+        if isinstance(other, FrameTimecode):
             if self.equal_framerate(other.framerate):
                 return self.frame_num == other.frame_num
-            else:
-                raise TypeError(
-                    "FrameTimecode objects must have the same framerate to be compared."
-                )
-        elif other is None:
-            return False
-        else:
             raise TypeError(
-                "Unsupported type for performing == with FrameTimecode: %s"
-                % type(other)
+                'FrameTimecode objects must have the same framerate to be compared.'
             )
+        if other is None:
+            return False
+        raise TypeError(
+            'Unsupported type for performing == with FrameTimecode: %s'
+            % type(other)
+        )
 
-    def __ne__(self, other: Union[int, float, str, "FrameTimecode"]) -> bool:
+    def __ne__(self, other: Union[int, float, str, 'FrameTimecode']) -> bool:
         return not self == other
 
-    def __lt__(self, other: Union[int, float, str, "FrameTimecode"]) -> bool:
+    def __lt__(self, other: Union[int, float, str, 'FrameTimecode']) -> bool:
         if isinstance(other, int):
             return self.frame_num < other
-        elif isinstance(other, float):
+        if isinstance(other, float):
             return self.get_seconds() < other
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.frame_num < self._parse_timecode_string(other)
-        elif isinstance(other, FrameTimecode):
+        if isinstance(other, FrameTimecode):
             if self.equal_framerate(other.framerate):
                 return self.frame_num < other.frame_num
-            else:
-                raise TypeError(
-                    "FrameTimecode objects must have the same framerate to be compared."
-                )
-        else:
             raise TypeError(
-                "Unsupported type for performing < with FrameTimecode: %s" % type(other)
+                'FrameTimecode objects must have the same framerate to be compared.'
             )
+        raise TypeError(
+            'Unsupported type for performing < with FrameTimecode: %s'
+            % type(other)
+        )
 
-    def __le__(self, other: Union[int, float, str, "FrameTimecode"]) -> bool:
+    def __le__(self, other: Union[int, float, str, 'FrameTimecode']) -> bool:
         if isinstance(other, int):
             return self.frame_num <= other
-        elif isinstance(other, float):
+        if isinstance(other, float):
             return self.get_seconds() <= other
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.frame_num <= self._parse_timecode_string(other)
-        elif isinstance(other, FrameTimecode):
+        if isinstance(other, FrameTimecode):
             if self.equal_framerate(other.framerate):
                 return self.frame_num <= other.frame_num
-            else:
-                raise TypeError(
-                    "FrameTimecode objects must have the same framerate to be compared."
-                )
-        else:
             raise TypeError(
-                "Unsupported type for performing <= with FrameTimecode: %s"
-                % type(other)
+                'FrameTimecode objects must have the same framerate to be compared.'
             )
+        raise TypeError(
+            'Unsupported type for performing <= with FrameTimecode: %s'
+            % type(other)
+        )
 
-    def __gt__(self, other: Union[int, float, str, "FrameTimecode"]) -> bool:
+    def __gt__(self, other: Union[int, float, str, 'FrameTimecode']) -> bool:
         if isinstance(other, int):
             return self.frame_num > other
-        elif isinstance(other, float):
+        if isinstance(other, float):
             return self.get_seconds() > other
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.frame_num > self._parse_timecode_string(other)
-        elif isinstance(other, FrameTimecode):
+        if isinstance(other, FrameTimecode):
             if self.equal_framerate(other.framerate):
                 return self.frame_num > other.frame_num
-            else:
-                raise TypeError(
-                    "FrameTimecode objects must have the same framerate to be compared."
-                )
-        else:
             raise TypeError(
-                "Unsupported type for performing > with FrameTimecode: %s" % type(other)
+                'FrameTimecode objects must have the same framerate to be compared.'
             )
+        raise TypeError(
+            'Unsupported type for performing > with FrameTimecode: %s'
+            % type(other)
+        )
 
-    def __ge__(self, other: Union[int, float, str, "FrameTimecode"]) -> bool:
+    def __ge__(self, other: Union[int, float, str, 'FrameTimecode']) -> bool:
         if isinstance(other, int):
             return self.frame_num >= other
-        elif isinstance(other, float):
+        if isinstance(other, float):
             return self.get_seconds() >= other
-        elif isinstance(other, str):
+        if isinstance(other, str):
             return self.frame_num >= self._parse_timecode_string(other)
-        elif isinstance(other, FrameTimecode):
+        if isinstance(other, FrameTimecode):
             if self.equal_framerate(other.framerate):
                 return self.frame_num >= other.frame_num
-            else:
-                raise TypeError(
-                    "FrameTimecode objects must have the same framerate to be compared."
-                )
-        else:
             raise TypeError(
-                "Unsupported type for performing >= with FrameTimecode: %s"
-                % type(other)
+                'FrameTimecode objects must have the same framerate to be compared.'
             )
+        raise TypeError(
+            'Unsupported type for performing >= with FrameTimecode: %s'
+            % type(other)
+        )
 
     # TODO(v1.0): __int__ and __float__ should be removed. Mark as deprecated, and indicate
     # need to use relevant property instead.
@@ -473,7 +479,7 @@ class FrameTimecode:
         return self.get_timecode()
 
     def __repr__(self) -> str:
-        return "%s [frame=%d, fps=%.3f]" % (
+        return '%s [frame=%d, fps=%.3f]' % (
             self.get_timecode(),
             self.frame_num,
             self.framerate,
@@ -483,14 +489,14 @@ class FrameTimecode:
         return self.frame_num
 
 
-COLUMN_NAME_FRAME_NUMBER = "Frame Number"
+COLUMN_NAME_FRAME_NUMBER = 'Frame Number'
 """Name of column containing frame numbers in the statsfile CSV."""
 
-COLUMN_NAME_TIMECODE = "Timecode"
+COLUMN_NAME_TIMECODE = 'Timecode'
 """Name of column containing timecodes in the statsfile CSV."""
 
 ##
-## StatsManager Exceptions
+# StatsManager Exceptions
 ##
 
 
@@ -500,8 +506,6 @@ class FrameMetricRegistered(Exception):
     :meta private:
     """
 
-    pass
-
 
 class FrameMetricNotRegistered(Exception):
     """[DEPRECATED - DO NOT USE] No longer used.
@@ -509,15 +513,13 @@ class FrameMetricNotRegistered(Exception):
     :meta private:
     """
 
-    pass
-
 
 class StatsFileCorrupt(Exception):
     """Raised when frame metrics/stats could not be loaded from a provided CSV file."""
 
     def __init__(
         self,
-        message: str = "Could not load frame metric data data from passed CSV file.",
+        message: str = 'Could not load frame metric data data from passed CSV file.',
     ):
         super().__init__(message)
 
@@ -545,12 +547,12 @@ class StatsManager:
         """
         # Frame metrics is a dict of frame (int): metric_dict (Dict[str, float])
         # of each frame metric key and the value it represents (usually float).
-        self._frame_metrics: Dict[FrameTimecode, Dict[str, float]] = dict()
-        self._metric_keys: Set[str] = set()
+        self._frame_metrics: dict[FrameTimecode, dict[str, float]] = dict()
+        self._metric_keys: set[str] = set()
         self._metrics_updated: bool = (
             False  # Flag indicating if metrics require saving.
         )
-        self._base_timecode: Optional[FrameTimecode] = (
+        self._base_timecode: FrameTimecode | None = (
             base_timecode  # Used for timing calculations.
         )
 
@@ -565,7 +567,9 @@ class StatsManager:
     # TODO(v1.0): Change frame_number to a FrameTimecode now that it is just a hash and will
     # be required for VFR support. This API is also really difficult to use, this type should just
     # function like a dictionary.
-    def get_metrics(self, frame_number: int, metric_keys: Iterable[str]) -> List[Any]:
+    def get_metrics(
+        self, frame_number: int, metric_keys: Iterable[str]
+    ) -> list[Any]:
         """Return the requested statistics/metrics for a given frame.
 
         Arguments:
@@ -578,10 +582,13 @@ class StatsManager:
             not be found, None is returned for that particular metric.
         """
         return [
-            self._get_metric(frame_number, metric_key) for metric_key in metric_keys
+            self._get_metric(frame_number, metric_key)
+            for metric_key in metric_keys
         ]
 
-    def set_metrics(self, frame_number: int, metric_kv_dict: Dict[str, Any]) -> None:
+    def set_metrics(
+        self, frame_number: int, metric_kv_dict: dict[str, Any]
+    ) -> None:
         """Set Metrics: Sets the provided statistics/metrics for a given frame.
 
         Arguments:
@@ -590,20 +597,22 @@ class StatsManager:
                 respective integer/floating-point metric values to set.
         """
         for metric_key in metric_kv_dict:
-            self._set_metric(frame_number, metric_key, metric_kv_dict[metric_key])
+            self._set_metric(
+                frame_number, metric_key, metric_kv_dict[metric_key]
+            )
 
-    def metrics_exist(self, frame_number: int, metric_keys: Iterable[str]) -> bool:
+    def metrics_exist(
+        self, frame_number: int, metric_keys: Iterable[str]
+    ) -> bool:
         """Metrics Exist: Checks if the given metrics/stats exist for the given frame.
 
         Returns:
             bool: True if the given metric keys exist for the frame, False otherwise.
         """
-        return all(
-            [
-                self._metric_exists(frame_number, metric_key)
-                for metric_key in metric_keys
-            ]
-        )
+        return all([
+            self._metric_exists(frame_number, metric_key)
+            for metric_key in metric_keys
+        ])
 
     def is_save_required(self) -> bool:
         """Is Save Required: Checks if the stats have been updated since loading.
@@ -616,8 +625,8 @@ class StatsManager:
 
     def save_to_csv(
         self,
-        csv_file: Union[str, bytes, Path, TextIO],
-        base_timecode: Optional[FrameTimecode] = None,
+        csv_file: str | bytes | Path | TextIO,
+        base_timecode: FrameTimecode | None = None,
         force_save=True,
     ) -> None:
         """Save To CSV: Saves all frame metrics stored in the StatsManager to a CSV file.
@@ -632,35 +641,38 @@ class StatsManager:
         """
         # TODO(v0.7): Replace with DeprecationWarning that `base_timecode` will be removed in v0.8.
         if base_timecode is not None:
-            print("base_timecode is deprecated and has no effect.")
+            print('base_timecode is deprecated and has no effect.')
 
         if not (force_save or self.is_save_required()):
-            print("No metrics to write.")
+            print('No metrics to write.')
             return
 
         # If we get a path instead of an open file handle, recursively call ourselves
         # again but with file handle instead of path.
         if isinstance(csv_file, (str, bytes, Path)):
-            with open(csv_file, "w") as file:
+            with Path(csv_file).open('w') as file:
                 self.save_to_csv(csv_file=file, force_save=force_save)
                 return
 
-        csv_writer = csv.writer(csv_file, lineterminator="\n")
+        csv_writer = csv.writer(csv_file, lineterminator='\n')
         metric_keys = sorted(list(self._metric_keys))
         csv_writer.writerow(
             [COLUMN_NAME_FRAME_NUMBER, COLUMN_NAME_TIMECODE] + metric_keys
         )
         frame_keys = sorted(self._frame_metrics.keys())
-        print("Writing %d frames to CSV...", len(frame_keys))
+        print('Writing %d frames to CSV...', len(frame_keys))
         for frame_key in frame_keys:
             frame_timecode = self._base_timecode + frame_key
             csv_writer.writerow(
                 [frame_timecode.get_frames() + 1, frame_timecode.get_timecode()]
-                + [str(metric) for metric in self.get_metrics(frame_key, metric_keys)]
+                + [
+                    str(metric)
+                    for metric in self.get_metrics(frame_key, metric_keys)
+                ]
             )
 
     @staticmethod
-    def valid_header(row: List[str]) -> bool:
+    def valid_header(row: list[str]) -> bool:
         """Check that the given CSV row is a valid header for a statsfile.
 
         Arguments:
@@ -677,7 +689,9 @@ class StatsManager:
 
     # TODO(v1.0): Create a replacement for a calculation cache that functions like load_from_csv
     # did, but is better integrated with detectors for cached calculations instead of statistics.
-    def load_from_csv(self, csv_file: Union[str, bytes, TextIO]) -> Optional[int]:
+    def load_from_csv(
+        self, csv_file: str | bytes | TextIO
+    ) -> int | None:
         """[DEPRECATED] DO NOT USE
 
         Load all metrics stored in a CSV file into the StatsManager instance. Will be removed in a
@@ -697,19 +711,21 @@ class StatsManager:
         :meta private:
         """
         # TODO: Make this an error, then make load_from_csv() a no-op, and finally, remove it.
-        print("load_from_csv() is deprecated and will be removed in a future release.")
+        print(
+            'load_from_csv() is deprecated and will be removed in a future release.'
+        )
 
         # If we get a path instead of an open file handle, check that it exists, and if so,
         # recursively call ourselves again but with file set instead of path.
         if isinstance(csv_file, (str, bytes, Path)):
-            if os.path.exists(csv_file):
-                with open(csv_file) as file:
+            if Path(csv_file).exists():
+                with Path(csv_file).open() as file:
                     return self.load_from_csv(csv_file=file)
             # Path doesn't exist.
             return None
 
         # If we get here, file is a valid file handle in read-only text mode.
-        csv_reader = csv.reader(csv_file, lineterminator="\n")
+        csv_reader = csv.reader(csv_file, lineterminator='\n')
         num_cols = None
         num_metrics = None
         num_frames = None
@@ -724,18 +740,18 @@ class StatsManager:
             # If the file is blank or we couldn't decode anything, assume the file was empty.
             return None
         if not self.valid_header(row):
-            raise StatsFileCorrupt()
+            raise StatsFileCorrupt
         num_cols = len(row)
         num_metrics = num_cols - 2
         if not num_metrics > 0:
-            raise StatsFileCorrupt("No metrics defined in CSV file.")
+            raise StatsFileCorrupt('No metrics defined in CSV file.')
         loaded_metrics = list(row[2:])
         num_frames = 0
         for row in csv_reader:
             metric_dict = {}
             if not len(row) == num_cols:
                 raise StatsFileCorrupt(
-                    "Wrong number of columns detected in stats file row."
+                    'Wrong number of columns detected in stats file row.'
                 )
             frame_number = int(row[0])
             # Switch from 1-based to 0-based frame numbers.
@@ -743,22 +759,24 @@ class StatsManager:
                 frame_number -= 1
             self.set_metrics(frame_number, metric_dict)
             for i, metric in enumerate(row[2:]):
-                if metric and metric != "None":
+                if metric and metric != 'None':
                     try:
-                        self._set_metric(frame_number, loaded_metrics[i], float(metric))
+                        self._set_metric(
+                            frame_number, loaded_metrics[i], float(metric)
+                        )
                     except ValueError:
                         raise StatsFileCorrupt(
-                            "Corrupted value in stats file: %s" % metric
+                            'Corrupted value in stats file: %s' % metric
                         ) from ValueError
             num_frames += 1
         self._metric_keys = self._metric_keys.union(set(loaded_metrics))
-        print("Loaded %d metrics for %d frames.", num_metrics, num_frames)
+        print('Loaded %d metrics for %d frames.', num_metrics, num_frames)
         self._metrics_updated = False
         return num_frames
 
     # TODO: Get rid of these functions and simplify the implementation of this class.
 
-    def _get_metric(self, frame_number: int, metric_key: str) -> Optional[Any]:
+    def _get_metric(self, frame_number: int, metric_key: str) -> Any | None:
         if self._metric_exists(frame_number, metric_key):
             return self._frame_metrics[frame_number][metric_key]
         return None
@@ -792,7 +810,7 @@ class SceneDetector:
 
     # TODO(v0.7): Make this a proper abstract base class.
 
-    stats_manager: ty.Optional[StatsManager] = None
+    stats_manager: StatsManager | None = None
     """Optional :class:`StatsManager <scenedetect.stats_manager.StatsManager>` to
     use for caching frame metrics to and from."""
 
@@ -825,7 +843,7 @@ class SceneDetector:
         """
         return False
 
-    def get_metrics(self) -> ty.List[str]:
+    def get_metrics(self) -> list[str]:
         """Get Metrics:  Get a list of all metric names/keys used by the detector.
 
         Returns:
@@ -834,7 +852,9 @@ class SceneDetector:
         """
         return []
 
-    def process_frame(self, frame_num: int, frame_img: numpy.ndarray) -> ty.List[int]:
+    def process_frame(
+        self, frame_num: int, frame_img: numpy.ndarray
+    ) -> list[int]:
         """Process the next frame. `frame_num` is assumed to be sequential.
 
         Args:
@@ -851,7 +871,7 @@ class SceneDetector:
         """
         return []
 
-    def post_process(self, frame_num: int) -> ty.List[int]:
+    def post_process(self, frame_num: int) -> list[int]:
         """Post Process: Performs any processing after the last frame has been read.
 
         Prototype method, no actual detection.
@@ -882,7 +902,7 @@ class SparseSceneDetector(SceneDetector):
 
     def process_frame(
         self, frame_num: int, frame_img: numpy.ndarray
-    ) -> ty.List[ty.Tuple[int, int]]:
+    ) -> list[tuple[int, int]]:
         """Process Frame: Computes/stores metrics and detects any scene changes.
 
         Prototype method, no actual detection.
@@ -893,7 +913,7 @@ class SparseSceneDetector(SceneDetector):
         """
         return []
 
-    def post_process(self, frame_num: int) -> ty.List[ty.Tuple[int, int]]:
+    def post_process(self, frame_num: int) -> list[tuple[int, int]]:
         """Post Process: Performs any processing after the last frame has been read.
 
         Prototype method, no actual detection.
@@ -922,14 +942,20 @@ class FlashFilter:
             False  # Used to disable merging until at least one cut was found.
         )
         self._merge_triggered = False  # True when the merge filter is active.
-        self._merge_start = None  # Frame number where we started the merge filter.
+        self._merge_start = (
+            None  # Frame number where we started the merge filter.
+        )
 
     @property
     def max_behind(self) -> int:
         """Maximum number of frames a filtered cut can be behind the current frame."""
-        return 0 if self._mode == FlashFilter.Mode.SUPPRESS else self._filter_length
+        return (
+            0
+            if self._mode == FlashFilter.Mode.SUPPRESS
+            else self._filter_length
+        )
 
-    def filter(self, frame_num: int, above_threshold: bool) -> ty.List[int]:
+    def filter(self, frame_num: int, above_threshold: bool) -> list[int]:
         if not self._filter_length > 0:
             return [frame_num] if above_threshold else []
         if self._last_above is None:
@@ -938,14 +964,18 @@ class FlashFilter:
             return self._filter_merge(
                 frame_num=frame_num, above_threshold=above_threshold
             )
-        elif self._mode == FlashFilter.Mode.SUPPRESS:
+        if self._mode == FlashFilter.Mode.SUPPRESS:
             return self._filter_suppress(
                 frame_num=frame_num, above_threshold=above_threshold
             )
-        raise RuntimeError("Unhandled FlashFilter mode.")
+        raise RuntimeError('Unhandled FlashFilter mode.')
 
-    def _filter_suppress(self, frame_num: int, above_threshold: bool) -> ty.List[int]:
-        min_length_met: bool = (frame_num - self._last_above) >= self._filter_length
+    def _filter_suppress(
+        self, frame_num: int, above_threshold: bool
+    ) -> list[int]:
+        min_length_met: bool = (
+            frame_num - self._last_above
+        ) >= self._filter_length
         if not (above_threshold and min_length_met):
             return []
         # Both length and threshold requirements were satisfied. Emit the cut, and wait until both
@@ -953,8 +983,12 @@ class FlashFilter:
         self._last_above = frame_num
         return [frame_num]
 
-    def _filter_merge(self, frame_num: int, above_threshold: bool) -> ty.List[int]:
-        min_length_met: bool = (frame_num - self._last_above) >= self._filter_length
+    def _filter_merge(
+        self, frame_num: int, above_threshold: bool
+    ) -> list[int]:
+        min_length_met: bool = (
+            frame_num - self._last_above
+        ) >= self._filter_length
         # Ensure last frame is always advanced to the most recent one that was above the threshold.
         if above_threshold:
             self._last_above = frame_num
@@ -993,7 +1027,9 @@ def _mean_pixel_distance(left: numpy.ndarray, right: numpy.ndarray) -> float:
     assert left.shape == right.shape
     num_pixels: float = float(left.shape[0] * left.shape[1])
     return (
-        numpy.sum(numpy.abs(left.astype(numpy.int32) - right.astype(numpy.int32)))
+        numpy.sum(
+            numpy.abs(left.astype(numpy.int32) - right.astype(numpy.int32))
+        )
         / num_pixels
     )
 
@@ -1044,7 +1080,7 @@ class ContentDetector(SceneDetector):
     )
     """Component weights to use if `luma_only` is set."""
 
-    FRAME_SCORE_KEY = "content_val"
+    FRAME_SCORE_KEY = 'content_val'
     """Key in statsfile representing the final frame score after weighed by specified components."""
 
     METRIC_KEYS = [FRAME_SCORE_KEY, *Components._fields]
@@ -1060,16 +1096,16 @@ class ContentDetector(SceneDetector):
         """Frame saturation map [2D 8-bit]."""
         lum: numpy.ndarray
         """Frame luma/brightness map [2D 8-bit]."""
-        edges: Optional[numpy.ndarray]
+        edges: numpy.ndarray | None
         """Frame edge map [2D 8-bit, edges are 255, non edges 0]. Affected by `kernel_size`."""
 
     def __init__(
         self,
         threshold: float = 27.0,
         min_scene_len: int = 15,
-        weights: "ContentDetector.Components" = DEFAULT_COMPONENT_WEIGHTS,
+        weights: 'ContentDetector.Components' = DEFAULT_COMPONENT_WEIGHTS,
         luma_only: bool = False,
-        kernel_size: Optional[int] = None,
+        kernel_size: int | None = None,
         filter_mode: FlashFilter.Mode = FlashFilter.Mode.MERGE,
     ):
         """
@@ -1089,18 +1125,18 @@ class ContentDetector(SceneDetector):
         super().__init__()
         self._threshold: float = threshold
         self._min_scene_len: int = min_scene_len
-        self._last_above_threshold: Optional[int] = None
-        self._last_frame: Optional[ContentDetector._FrameData] = None
+        self._last_above_threshold: int | None = None
+        self._last_frame: ContentDetector._FrameData | None = None
         self._weights: ContentDetector.Components = weights
         if luma_only:
             self._weights = ContentDetector.LUMA_ONLY_WEIGHTS
-        self._kernel: Optional[numpy.ndarray] = None
+        self._kernel: numpy.ndarray | None = None
         if kernel_size is not None:
             print(kernel_size)
             if kernel_size < 3 or kernel_size % 2 == 0:
-                raise ValueError("kernel_size must be odd integer >= 3")
+                raise ValueError('kernel_size must be odd integer >= 3')
             self._kernel = numpy.ones((kernel_size, kernel_size), numpy.uint8)
-        self._frame_score: Optional[float] = None
+        self._frame_score: float | None = None
         self._flash_filter = FlashFilter(mode=filter_mode, length=min_scene_len)
 
     def get_metrics(self):
@@ -1109,9 +1145,12 @@ class ContentDetector(SceneDetector):
     def is_processing_required(self, frame_num):
         return True
 
-    def _calculate_frame_score(self, frame_num: int, frame_img: numpy.ndarray) -> float:
+    def _calculate_frame_score(
+        self, frame_num: int, frame_img: numpy.ndarray
+    ) -> float:
         """Calculate score representing relative amount of motion in `frame_img` compared to
-        the last time the function was called (returns 0.0 on the first call)."""
+        the last time the function was called (returns 0.0 on the first call).
+        """
         # TODO: Add option to enable motion estimation before calculating score components.
         # TODO: Investigate methods of performing cheaper alternatives, e.g. shifting or resizing
         # the frame to simulate camera movement, using optical flow, etc...
@@ -1156,7 +1195,9 @@ class ContentDetector(SceneDetector):
         self._last_frame = ContentDetector._FrameData(hue, sat, lum, edges)
         return frame_score
 
-    def process_frame(self, frame_num: int, frame_img: numpy.ndarray) -> List[int]:
+    def process_frame(
+        self, frame_num: int, frame_img: numpy.ndarray
+    ) -> list[int]:
         """Process the next frame. `frame_num` is assumed to be sequential.
 
         Args:
@@ -1216,7 +1257,7 @@ class AdaptiveDetector(ContentDetector):
     in situations such as camera movement.
     """
 
-    ADAPTIVE_RATIO_KEY_TEMPLATE = "adaptive_ratio{luma_only} (w={window_width})"
+    ADAPTIVE_RATIO_KEY_TEMPLATE = 'adaptive_ratio{luma_only} (w={window_width})'
 
     def __init__(
         self,
@@ -1226,9 +1267,9 @@ class AdaptiveDetector(ContentDetector):
         min_content_val: float = 15.0,
         weights: ContentDetector.Components = ContentDetector.DEFAULT_COMPONENT_WEIGHTS,
         luma_only: bool = False,
-        kernel_size: Optional[int] = None,
+        kernel_size: int | None = None,
         video_manager=None,
-        min_delta_hsv: Optional[float] = None,
+        min_delta_hsv: float | None = None,
     ):
         """
         Arguments:
@@ -1255,12 +1296,12 @@ class AdaptiveDetector(ContentDetector):
         # TODO(v0.7): Replace with DeprecationWarning that `video_manager` and `min_delta_hsv` will
         # be removed in v0.8.
         if video_manager is not None:
-            print("video_manager is deprecated, use video instead.")
+            print('video_manager is deprecated, use video instead.')
         if min_delta_hsv is not None:
-            print("min_delta_hsv is deprecated, use min_content_val instead.")
+            print('min_delta_hsv is deprecated, use min_content_val instead.')
             min_content_val = min_delta_hsv
         if window_width < 1:
-            raise ValueError("window_width must be at least 1.")
+            raise ValueError('window_width must be at least 1.')
 
         super().__init__(
             threshold=255.0,
@@ -1276,13 +1317,16 @@ class AdaptiveDetector(ContentDetector):
         self.min_content_val = min_content_val
         self.window_width = window_width
 
-        self._adaptive_ratio_key = AdaptiveDetector.ADAPTIVE_RATIO_KEY_TEMPLATE.format(
-            window_width=window_width, luma_only="" if not luma_only else "_lum"
+        self._adaptive_ratio_key = (
+            AdaptiveDetector.ADAPTIVE_RATIO_KEY_TEMPLATE.format(
+                window_width=window_width,
+                luma_only='' if not luma_only else '_lum',
+            )
         )
         self._first_frame_num = None
 
         # NOTE: This must be different than `self._last_scene_cut` which is used by the base class.
-        self._last_cut: Optional[int] = None
+        self._last_cut: int | None = None
 
         self._buffer = []
 
@@ -1291,7 +1335,7 @@ class AdaptiveDetector(ContentDetector):
         """Number of frames any detected cuts will be behind the current frame due to buffering."""
         return self.window_width
 
-    def get_metrics(self) -> List[str]:
+    def get_metrics(self) -> list[str]:
         """Combines base ContentDetector metric keys with the AdaptiveDetector one."""
         return super().get_metrics() + [self._adaptive_ratio_key]
 
@@ -1300,8 +1344,8 @@ class AdaptiveDetector(ContentDetector):
         return False
 
     def process_frame(
-        self, frame_num: int, frame_img: Optional[np.ndarray]
-    ) -> List[int]:
+        self, frame_num: int, frame_img: np.ndarray | None
+    ) -> list[int]:
         """Process the next frame. `frame_num` is assumed to be sequential.
 
         Args:
@@ -1313,7 +1357,6 @@ class AdaptiveDetector(ContentDetector):
             List[int]: List of frames where scene cuts have been detected. There may be 0
             or more frames in the list, and not necessarily the same as frame_num.
         """
-
         # TODO(#283): Merge this with ContentDetector and turn it on by default.
 
         super().process_frame(frame_num=frame_num, frame_img=frame_img)
@@ -1353,18 +1396,20 @@ class AdaptiveDetector(ContentDetector):
             adaptive_ratio >= self.adaptive_threshold
             and target_score >= self.min_content_val
         )
-        min_length_met: bool = (frame_num - self._last_cut) >= self.min_scene_len
+        min_length_met: bool = (
+            frame_num - self._last_cut
+        ) >= self.min_scene_len
         if threshold_met and min_length_met:
             self._last_cut = target_frame
             return [target_frame]
         return []
 
-    def get_content_val(self, frame_num: int) -> Optional[float]:
+    def get_content_val(self, frame_num: int) -> float | None:
         """Returns the average content change for a frame."""
         # TODO(v0.7): Add DeprecationWarning that `get_content_val` will be removed in v0.7.
         print(
-            "get_content_val is deprecated and will be removed. Lookup the value"
-            " using a StatsManager with ContentDetector.FRAME_SCORE_KEY."
+            'get_content_val is deprecated and will be removed. Lookup the value'
+            ' using a StatsManager with ContentDetector.FRAME_SCORE_KEY.'
         )
         if self.stats_manager is not None:
             return self.stats_manager.get_metrics(

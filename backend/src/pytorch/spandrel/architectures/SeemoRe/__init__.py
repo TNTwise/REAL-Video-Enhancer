@@ -2,14 +2,13 @@ import math
 
 from typing_extensions import override
 
-from ...util import KeyCondition, get_seq_len
-
 from ...__helpers.model_descriptor import (
     Architecture,
     ImageModelDescriptor,
     SizeRequirements,
     StateDict,
 )
+from ...util import KeyCondition, get_seq_len
 from .__arch.seemore_arch import LRSpace, SeemoRe
 
 
@@ -23,66 +22,64 @@ def _get_lr_space(state_dict: StateDict) -> LRSpace:
     # - exp: 2, 4, 8, 16, ...
 
     # check the 3rd expert first
-    low_dim_2_key = "body.0.local_block.block.moe_layer.experts.2.conv_1.weight"
+    low_dim_2_key = 'body.0.local_block.block.moe_layer.experts.2.conv_1.weight'
     if low_dim_2_key in state_dict:
         low_dim_2 = state_dict[low_dim_2_key].shape[0]
         if low_dim_2 == 4:
-            return "linear"
-        elif low_dim_2 == 6:
-            return "double"
-        elif low_dim_2 == 8:
-            return "exp"
-        else:
-            raise ValueError(f"Unknown low_dim_2: {low_dim_2}")
+            return 'linear'
+        if low_dim_2 == 6:
+            return 'double'
+        if low_dim_2 == 8:
+            return 'exp'
+        raise ValueError(f'Unknown low_dim_2: {low_dim_2}')
 
     # if there is no 3rd expert, check the 2nd expert
-    low_dim_1_key = "body.0.local_block.block.moe_layer.experts.1.conv_1.weight"
+    low_dim_1_key = 'body.0.local_block.block.moe_layer.experts.1.conv_1.weight'
     if low_dim_1_key in state_dict:
         low_dim_1 = state_dict[low_dim_1_key].shape[0]
         if low_dim_1 == 3:
-            return "linear"
-        elif low_dim_1 == 4:
-            return "double"  # or "exp"
-        else:
-            raise ValueError(f"Unknown low_dim_1: {low_dim_1}")
+            return 'linear'
+        if low_dim_1 == 4:
+            return 'double'  # or "exp"
+        raise ValueError(f'Unknown low_dim_1: {low_dim_1}')
 
     # there's only one expert, so the growth rate doesn't matter
-    return "linear"
+    return 'linear'
 
 
 class SeemoReArch(Architecture[SeemoRe]):
     def __init__(self) -> None:
         super().__init__(
-            id="SeemoRe",
+            id='SeemoRe',
             detect=KeyCondition.has_all(
-                "conv_1.weight",
-                "conv_1.bias",
-                "norm.weight",
-                "norm.bias",
-                "conv_2.weight",
-                "conv_2.bias",
-                "upsampler.0.weight",
-                "upsampler.0.bias",
-                "body.0.local_block.norm_1.weight",
-                "body.0.local_block.norm_1.bias",
-                "body.0.local_block.block.conv_1.0.weight",
-                "body.0.local_block.block.conv_1.2.weight",
-                "body.0.local_block.block.agg_conv.0.weight",
-                "body.0.local_block.block.conv.0.weight",
-                "body.0.local_block.block.conv.1.weight",
-                "body.0.local_block.block.conv_2.0.conv.0.weight",
-                "body.0.local_block.block.conv_2.0.conv.1.weight",
-                "body.0.local_block.block.moe_layer.experts.0.conv_1.weight",
-                "body.0.local_block.block.moe_layer.experts.0.conv_2.weight",
-                "body.0.local_block.block.moe_layer.experts.0.conv_3.weight",
-                "body.0.local_block.block.proj.weight",
-                "body.0.local_block.norm_2.weight",
-                "body.0.local_block.ffn.gate.weight",
-                "body.0.global_block.norm_1.weight",
-                "body.0.global_block.block.proj.weight",
-                "body.0.global_block.block.attn.conv.0.weight",
-                "body.0.global_block.ffn.fn_2.0.weight",
-                "body.0.global_block.ffn.gate.weight",
+                'conv_1.weight',
+                'conv_1.bias',
+                'norm.weight',
+                'norm.bias',
+                'conv_2.weight',
+                'conv_2.bias',
+                'upsampler.0.weight',
+                'upsampler.0.bias',
+                'body.0.local_block.norm_1.weight',
+                'body.0.local_block.norm_1.bias',
+                'body.0.local_block.block.conv_1.0.weight',
+                'body.0.local_block.block.conv_1.2.weight',
+                'body.0.local_block.block.agg_conv.0.weight',
+                'body.0.local_block.block.conv.0.weight',
+                'body.0.local_block.block.conv.1.weight',
+                'body.0.local_block.block.conv_2.0.conv.0.weight',
+                'body.0.local_block.block.conv_2.0.conv.1.weight',
+                'body.0.local_block.block.moe_layer.experts.0.conv_1.weight',
+                'body.0.local_block.block.moe_layer.experts.0.conv_2.weight',
+                'body.0.local_block.block.moe_layer.experts.0.conv_3.weight',
+                'body.0.local_block.block.proj.weight',
+                'body.0.local_block.norm_2.weight',
+                'body.0.local_block.ffn.gate.weight',
+                'body.0.global_block.norm_1.weight',
+                'body.0.global_block.block.proj.weight',
+                'body.0.global_block.block.attn.conv.0.weight',
+                'body.0.global_block.ffn.fn_2.0.weight',
+                'body.0.global_block.ffn.gate.weight',
             ),
         )
 
@@ -98,38 +95,40 @@ class SeemoReArch(Architecture[SeemoRe]):
         use_shuffle: bool = True  # undetectable
         # global_kernel_size: int = 11
         recursive: int = 2  # undetectable
-        lr_space: LRSpace = "linear"
+        lr_space: LRSpace = 'linear'
         topk: int = 1  # undetectable
 
         # detect
-        in_chans = state_dict["conv_1.weight"].shape[1]
-        embedding_dim = state_dict["conv_1.weight"].shape[0]
-        num_layers = get_seq_len(state_dict, "body")
+        in_chans = state_dict['conv_1.weight'].shape[1]
+        embedding_dim = state_dict['conv_1.weight'].shape[0]
+        num_layers = get_seq_len(state_dict, 'body')
 
         num_experts = get_seq_len(
-            state_dict, "body.0.local_block.block.moe_layer.experts"
+            state_dict, 'body.0.local_block.block.moe_layer.experts'
         )
         lr_space = _get_lr_space(state_dict)
 
-        scale = math.isqrt(state_dict["upsampler.0.weight"].shape[0] // in_chans)
+        scale = math.isqrt(
+            state_dict['upsampler.0.weight'].shape[0] // in_chans
+        )
 
         global_kernel_size = state_dict[
-            "body.0.global_block.block.attn.conv.0.weight"
+            'body.0.global_block.block.attn.conv.0.weight'
         ].shape[3]
 
         extra_tags = []
         if num_layers == 6 and embedding_dim == 36:
-            extra_tags = ["Tiny"]
+            extra_tags = ['Tiny']
             use_shuffle = True
             topk = 1
             recursive = 2
         elif num_layers == 8 and embedding_dim == 48:
-            extra_tags = ["Big"]
+            extra_tags = ['Big']
             use_shuffle = True
             topk = 1
             recursive = 2
         elif num_layers == 16 and embedding_dim == 48:
-            extra_tags = ["Large"]
+            extra_tags = ['Large']
             use_shuffle = False
             topk = 1
             recursive = 1
@@ -152,12 +151,12 @@ class SeemoReArch(Architecture[SeemoRe]):
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration" if scale == 1 else "SR",
+            purpose='Restoration' if scale == 1 else 'SR',
             tags=[
                 *extra_tags,
-                f"{embedding_dim}dim",
-                f"{num_experts}ne",
-                f"{num_layers}nl",
+                f'{embedding_dim}dim',
+                f'{num_experts}ne',
+                f'{num_layers}nl',
             ],
             supports_half=False,  # TODO: verify
             supports_bfloat16=True,
@@ -168,4 +167,4 @@ class SeemoReArch(Architecture[SeemoRe]):
         )
 
 
-__all__ = ["SeemoReArch", "SeemoRe"]
+__all__ = ['SeemoRe', 'SeemoReArch']

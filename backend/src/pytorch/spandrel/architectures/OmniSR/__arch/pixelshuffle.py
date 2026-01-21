@@ -9,7 +9,7 @@
 # Copyright (c) 2022 Shanghai Jiao Tong University
 #############################################################
 
-import torch.nn as nn
+from torch import nn
 
 
 def pixelshuffle_block(

@@ -1,7 +1,7 @@
 import torch
 from torch import nn
-from torch.nn.functional import interpolate
 from torch.nn import init
+from torch.nn.functional import interpolate
 from torch.nn.modules.batchnorm import _BatchNorm
 
 """
@@ -23,12 +23,7 @@ def default_init_weights(module_list, scale=1, bias_fill=0, **kwargs):
         module_list = [module_list]
     for module in module_list:
         for m in module.modules():
-            if isinstance(m, nn.Conv2d):
-                init.kaiming_normal_(m.weight, **kwargs)
-                m.weight.data *= scale
-                if m.bias is not None:
-                    m.bias.data.fill_(bias_fill)
-            elif isinstance(m, nn.Linear):
+            if isinstance(m, nn.Conv2d) or isinstance(m, nn.Linear):
                 init.kaiming_normal_(m.weight, **kwargs)
                 m.weight.data *= scale
                 if m.bias is not None:
@@ -51,7 +46,7 @@ class ResidualBlockNoBN(nn.Module):
     """
 
     def __init__(self, num_feat=64, res_scale=1, pytorch_init=False):
-        super(ResidualBlockNoBN, self).__init__()
+        super().__init__()
         self.res_scale = res_scale
         self.conv1 = nn.Conv2d(num_feat, num_feat, 3, 1, 1, bias=True)
         self.conv2 = nn.Conv2d(num_feat, num_feat, 3, 1, 1, bias=True)
@@ -92,7 +87,9 @@ class MyPixelUnshuffle(nn.Module):
         out_channel = c * (self.downscale_factor**2)
         h = hh // self.downscale_factor
         w = hw // self.downscale_factor
-        x_view = x.view(b, c, h, self.downscale_factor, w, self.downscale_factor)
+        x_view = x.view(
+            b, c, h, self.downscale_factor, w, self.downscale_factor
+        )
         return x_view.permute(0, 1, 3, 5, 2, 4).reshape(b, out_channel, h, w)
 
 
@@ -138,7 +135,7 @@ class RightAlignMSConvResidualBlocks(nn.Module):
         )
 
     def up(self, x, scale=2):
-        return interpolate(x, scale_factor=scale, mode="bilinear")
+        return interpolate(x, scale_factor=scale, mode='bilinear')
 
     def forward(self, x):
         x_s1 = self.conv_s1_first(x)
@@ -147,21 +144,21 @@ class RightAlignMSConvResidualBlocks(nn.Module):
 
         flag_s2 = False
         flag_s4 = False
-        for i in range(0, self.num_block[0]):
+        for i in range(self.num_block[0]):
             x_s1 = self.body_s1_first[i](
                 x_s1
                 + (self.up(x_s2, 2) if flag_s2 else 0)
                 + (self.up(x_s4, 4) if flag_s4 else 0)
             )
             if i >= self.num_block[0] - self.num_block[1]:
-                x_s2 = self.body_s2_first[i - self.num_block[0] + self.num_block[1]](
-                    x_s2 + (self.up(x_s4, 2) if flag_s4 else 0)
-                )
+                x_s2 = self.body_s2_first[
+                    i - self.num_block[0] + self.num_block[1]
+                ](x_s2 + (self.up(x_s4, 2) if flag_s4 else 0))
                 flag_s2 = True
             if i >= self.num_block[0] - self.num_block[2]:
-                x_s4 = self.body_s4_first[i - self.num_block[0] + self.num_block[2]](
-                    x_s4
-                )
+                x_s4 = self.body_s4_first[
+                    i - self.num_block[0] + self.num_block[2]
+                ](x_s4)
                 flag_s4 = True
 
         x_fusion = self.fusion(
@@ -178,7 +175,7 @@ class AnimeSR(nn.Module):
     """
 
     def __init__(self, num_feat=64, num_block=(5, 3, 2), netscale=4):
-        super(AnimeSR, self).__init__()
+        super().__init__()
         self.num_feat = num_feat
 
         # 3(img channel) * 3(prev cur nxt 3 imgs) + 3(hr img channel) * netscale * netscale + num_feat
@@ -201,7 +198,7 @@ class AnimeSR(nn.Module):
         out = self.recurrent_cell(inp)
         out_img = self.pixel_shuffle(
             out[:, : 3 * self.netscale * self.netscale]
-        ) + interpolate(res, scale_factor=self.netscale, mode="bilinear")
+        ) + interpolate(res, scale_factor=self.netscale, mode='bilinear')
         out_state = self.lrelu(out[:, 3 * self.netscale * self.netscale :])
 
         return out_img, out_state

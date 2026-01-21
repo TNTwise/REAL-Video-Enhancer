@@ -6,7 +6,7 @@ from collections import OrderedDict
 from typing import Literal
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 ####################
 # Basic blocks
@@ -18,26 +18,30 @@ def act(act_type: str, inplace=True, neg_slope=0.2, n_prelu=1):
     # neg_slope: for leakyrelu and init of prelu
     # n_prelu: for p_relu num_parameters
     act_type = act_type.lower()
-    if act_type == "relu":
+    if act_type == 'relu':
         layer = nn.ReLU(inplace)
-    elif act_type == "leakyrelu":
+    elif act_type == 'leakyrelu':
         layer = nn.LeakyReLU(neg_slope, inplace)
-    elif act_type == "prelu":
+    elif act_type == 'prelu':
         layer = nn.PReLU(num_parameters=n_prelu, init=neg_slope)
     else:
-        raise NotImplementedError(f"activation layer [{act_type:s}] is not found")
+        raise NotImplementedError(
+            f'activation layer [{act_type:s}] is not found'
+        )
     return layer
 
 
 def norm(norm_type: str, nc: int):
     # helper selecting normalization layer
     norm_type = norm_type.lower()
-    if norm_type == "batch":
+    if norm_type == 'batch':
         layer = nn.BatchNorm2d(nc, affine=True)
-    elif norm_type == "instance":
+    elif norm_type == 'instance':
         layer = nn.InstanceNorm2d(nc, affine=False)
     else:
-        raise NotImplementedError(f"normalization layer [{norm_type:s}] is not found")
+        raise NotImplementedError(
+            f'normalization layer [{norm_type:s}] is not found'
+        )
     return layer
 
 
@@ -47,12 +51,14 @@ def pad(pad_type: str, padding):
     pad_type = pad_type.lower()
     if padding == 0:
         return None
-    if pad_type == "reflect":
+    if pad_type == 'reflect':
         layer = nn.ReflectionPad2d(padding)
-    elif pad_type == "replicate":
+    elif pad_type == 'replicate':
         layer = nn.ReplicationPad2d(padding)
     else:
-        raise NotImplementedError(f"padding layer [{pad_type:s}] is not implemented")
+        raise NotImplementedError(
+            f'padding layer [{pad_type:s}] is not implemented'
+        )
     return layer
 
 
@@ -73,8 +79,8 @@ class ConcatBlock(nn.Module):
         return output
 
     def __repr__(self):
-        tmpstr = "Identity .. \n|"
-        modstr = self.sub.__repr__().replace("\n", "\n|")
+        tmpstr = 'Identity .. \n|'
+        modstr = self.sub.__repr__().replace('\n', '\n|')
         tmpstr = tmpstr + modstr
         return tmpstr
 
@@ -90,8 +96,8 @@ class ShortcutBlock(nn.Module):
         return output
 
     def __repr__(self):
-        tmpstr = "Identity + \n|"
-        modstr = self.sub.__repr__().replace("\n", "\n|")
+        tmpstr = 'Identity + \n|'
+        modstr = self.sub.__repr__().replace('\n', '\n|')
         tmpstr = tmpstr + modstr
         return tmpstr
 
@@ -106,8 +112,8 @@ class ShortcutBlockSPSR(nn.Module):
         return x, self.sub
 
     def __repr__(self):
-        tmpstr = "Identity + \n|"
-        modstr = self.sub.__repr__().replace("\n", "\n|")
+        tmpstr = 'Identity + \n|'
+        modstr = self.sub.__repr__().replace('\n', '\n|')
         tmpstr = tmpstr + modstr
         return tmpstr
 
@@ -116,7 +122,9 @@ def sequential(*args):
     # Flatten Sequential. It unwraps nn.Sequential.
     if len(args) == 1:
         if isinstance(args[0], OrderedDict):
-            raise NotImplementedError("sequential does not support OrderedDict input.")
+            raise NotImplementedError(
+                'sequential does not support OrderedDict input.'
+            )
         return args[0]  # No sequential is needed.
     modules = []
     for module in args:
@@ -128,14 +136,14 @@ def sequential(*args):
     return nn.Sequential(*modules)
 
 
-ConvMode = Literal["CNA", "NAC", "CNAC"]
+ConvMode = Literal['CNA', 'NAC', 'CNAC']
 
 
 # 2x2x2 Conv Block
 def conv_block_2c2(
     in_nc,
     out_nc,
-    act_type="relu",
+    act_type='relu',
 ):
     return sequential(
         nn.Conv2d(in_nc, out_nc, kernel_size=2, padding=1),
@@ -152,10 +160,10 @@ def conv_block(
     dilation=1,
     groups=1,
     bias=True,
-    pad_type="zero",
+    pad_type='zero',
     norm_type: str | None = None,
-    act_type: str | None = "relu",
-    mode: ConvMode = "CNA",
+    act_type: str | None = 'relu',
+    mode: ConvMode = 'CNA',
 ):
     """
     Conv layer with padding, normalization, activation
@@ -163,11 +171,10 @@ def conv_block(
     - ``CNA`` --> Conv -> Norm -> Act
     - ``NAC`` --> Norm -> Act --> Conv (Identity Mappings in Deep Residual Networks, ECCV16)
     """
-
-    assert mode in ("CNA", "NAC", "CNAC"), f"Wrong conv mode [{mode:s}]"
+    assert mode in ('CNA', 'NAC', 'CNAC'), f'Wrong conv mode [{mode:s}]'
     padding = get_valid_padding(kernel_size, dilation)
-    p = pad(pad_type, padding) if pad_type and pad_type != "zero" else None
-    padding = padding if pad_type == "zero" else 0
+    p = pad(pad_type, padding) if pad_type and pad_type != 'zero' else None
+    padding = padding if pad_type == 'zero' else 0
 
     c = nn.Conv2d(
         in_nc,
@@ -180,10 +187,10 @@ def conv_block(
         groups=groups,
     )
     a = act(act_type) if act_type else None
-    if mode in ("CNA", "CNAC"):
+    if mode in ('CNA', 'CNAC'):
         n = norm(norm_type, out_nc) if norm_type else None
         return sequential(p, c, n, a)
-    elif mode == "NAC":
+    if mode == 'NAC':
         if norm_type is None and act_type is not None:
             a = act(act_type, inplace=False)
             # Important!
@@ -192,8 +199,7 @@ def conv_block(
             # inplace ReLU will modify the input, therefore wrong output
         n = norm(norm_type, in_nc) if norm_type else None
         return sequential(n, a, p, c)
-    else:
-        raise ValueError(f"Invalid conv mode {mode}")
+    raise ValueError(f'Invalid conv mode {mode}')
 
 
 ####################
@@ -218,10 +224,10 @@ class ResNetBlock(nn.Module):
         dilation=1,
         groups=1,
         bias=True,
-        pad_type="zero",
+        pad_type='zero',
         norm_type=None,
-        act_type="relu",
-        mode: ConvMode = "CNA",
+        act_type='relu',
+        mode: ConvMode = 'CNA',
         res_scale=1,
     ):
         super().__init__()
@@ -238,9 +244,9 @@ class ResNetBlock(nn.Module):
             act_type,
             mode,
         )
-        if mode == "CNA":
+        if mode == 'CNA':
             act_type = None
-        if mode == "CNAC":  # Residual path: |-CNAC-|
+        if mode == 'CNAC':  # Residual path: |-CNAC-|
             act_type = None
             norm_type = None
         conv1 = conv_block(
@@ -283,11 +289,11 @@ class RRDB(nn.Module):
         gc=32,
         stride=1,
         bias: bool = True,
-        pad_type="zero",
+        pad_type='zero',
         norm_type=None,
-        act_type="leakyrelu",
-        mode: ConvMode = "CNA",
-        _convtype="Conv2D",
+        act_type='leakyrelu',
+        mode: ConvMode = 'CNA',
+        _convtype='Conv2D',
         _spectral_norm=False,
         plus=False,
     ):
@@ -362,17 +368,17 @@ class ResidualDenseBlock_5C(nn.Module):
         gc=32,
         stride=1,
         bias: bool = True,
-        pad_type="zero",
+        pad_type='zero',
         norm_type=None,
-        act_type="leakyrelu",
-        mode: ConvMode = "CNA",
+        act_type='leakyrelu',
+        mode: ConvMode = 'CNA',
         plus=False,
     ):
         super().__init__()
 
-        ## +
+        # +
         self.conv1x1 = conv1x1(nf, gc) if plus else None
-        ## +
+        # +
 
         self.conv1 = conv_block(
             nf,
@@ -418,7 +424,7 @@ class ResidualDenseBlock_5C(nn.Module):
             act_type=act_type,
             mode=mode,
         )
-        if mode == "CNA":
+        if mode == 'CNA':
             last_act = None
         else:
             last_act = act_type
@@ -449,7 +455,9 @@ class ResidualDenseBlock_5C(nn.Module):
 
 
 def conv1x1(in_planes, out_planes, stride=1):
-    return nn.Conv2d(in_planes, out_planes, kernel_size=1, stride=stride, bias=False)
+    return nn.Conv2d(
+        in_planes, out_planes, kernel_size=1, stride=stride, bias=False
+    )
 
 
 ####################
@@ -464,9 +472,9 @@ def pixelshuffle_block(
     kernel_size=3,
     stride=1,
     bias=True,
-    pad_type="zero",
+    pad_type='zero',
     norm_type: str | None = None,
-    act_type="relu",
+    act_type='relu',
 ):
     """
     Pixel shuffle layer
@@ -497,10 +505,10 @@ def upconv_block(
     kernel_size=3,
     stride=1,
     bias=True,
-    pad_type="zero",
+    pad_type='zero',
     norm_type: str | None = None,
-    act_type="relu",
-    mode="nearest",
+    act_type='relu',
+    mode='nearest',
 ):
     # Up conv
     # described in https://distill.pub/2016/deconv-checkerboard/

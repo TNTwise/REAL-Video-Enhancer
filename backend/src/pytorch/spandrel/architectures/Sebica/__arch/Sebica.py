@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 from ....util import store_hyperparameters
 
@@ -14,7 +14,7 @@ class CSA(nn.Module):
         kernel_size=3,
         reduction=16,
     ):
-        super(CSA, self).__init__()
+        super().__init__()
         self.spatial_attention = nn.Sequential(
             nn.Conv2d(2, 1, kernel_size=7, padding=3, bias=False), nn.Sigmoid()
         )
@@ -56,20 +56,22 @@ class CSA(nn.Module):
         )  # （B，16,1,1）全局平均池化后的通道向量
 
         y_forward = (
-            self.channel_attention_forward(y.squeeze(-1).transpose(-1, -2))
+            self
+            .channel_attention_forward(y.squeeze(-1).transpose(-1, -2))
             .transpose(-1, -2)
             .unsqueeze(-1)
-        )  ## （B，1,1,1）
+        )  # （B，1,1,1）
         y_backward = (
-            self.channel_attention_backward(
+            self
+            .channel_attention_backward(
                 y.squeeze(-1).transpose(-1, -2).flip(dims=[1])
             )
             .transpose(-1, -2)
             .unsqueeze(-1)
-        )  ##（B，1,1,1）
+        )  # （B，1,1,1）
 
         channel_weight = (y_forward + y_backward.flip(dims=[1])) / 2
-        channel_weight = channel_weight.expand_as(x)  ## （B，16,H，W）
+        channel_weight = channel_weight.expand_as(x)  # （B，16,H，W）
 
         out = x * spatial_weight * channel_weight
         return out
@@ -77,7 +79,7 @@ class CSA(nn.Module):
 
 class Conv(nn.Module):
     def __init__(self, N):
-        super(Conv, self).__init__()
+        super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(N, N * 2, 1),
             nn.BatchNorm2d(N * 2),
@@ -130,9 +132,15 @@ class RTSRSebica(nn.Module):
     hyperparameters = {}
 
     def __init__(
-        self, *, num_in_ch=3, num_out_ch=3, sr_rate=4, num_feat=16, attn_blocks=6
+        self,
+        *,
+        num_in_ch=3,
+        num_out_ch=3,
+        sr_rate=4,
+        num_feat=16,
+        attn_blocks=6,
     ):
-        super(RTSRSebica, self).__init__()
+        super().__init__()
         self.scale = sr_rate
 
         self.head = nn.Sequential(
@@ -158,7 +166,7 @@ class RTSRSebica(nn.Module):
         h = self.tail(body_out)
 
         base = F.interpolate(
-            x, scale_factor=self.scale, mode="bilinear", align_corners=False
+            x, scale_factor=self.scale, mode='bilinear', align_corners=False
         )
 
         out = h + base

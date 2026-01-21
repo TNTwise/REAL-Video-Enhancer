@@ -4,14 +4,13 @@ from typing import Union
 
 from typing_extensions import override
 
-from ...util import KeyCondition, get_seq_len
-
 from ...__helpers.model_descriptor import (
     Architecture,
     ImageModelDescriptor,
     SizeRequirements,
     StateDict,
 )
+from ...util import KeyCondition, get_seq_len
 from .__arch.kbnet_l import KBNet_l
 from .__arch.kbnet_s import KBNet_s
 
@@ -22,22 +21,22 @@ _KBNet = Union[KBNet_l, KBNet_s]
 class KBNetArch(Architecture[_KBNet]):
     def __init__(self) -> None:
         super().__init__(
-            id="KBNet",
+            id='KBNet',
             detect=KeyCondition.has_any(
                 KeyCondition.has_all(
                     # KBNet_s
-                    "intro.weight",
-                    "encoders.0.0.attgamma",
-                    "middle_blks.0.w",
-                    "decoders.0.0.attgamma",
-                    "ending.weight",
+                    'intro.weight',
+                    'encoders.0.0.attgamma',
+                    'middle_blks.0.w',
+                    'decoders.0.0.attgamma',
+                    'ending.weight',
                 ),
                 KeyCondition.has_all(
                     # KBNet_l
-                    "patch_embed.proj.weight",
-                    "encoder_level3.0.ffn.project_out.weight",
-                    "latent.0.ffn.qkv.weight",
-                    "refinement.0.attn.dwconv.0.weight",
+                    'patch_embed.proj.weight',
+                    'encoder_level3.0.ffn.project_out.weight',
+                    'latent.0.ffn.qkv.weight',
+                    'refinement.0.attn.dwconv.0.weight',
                 ),
             ),
         )
@@ -52,27 +51,27 @@ class KBNetArch(Architecture[_KBNet]):
         ffn_expansion_factor = 1.5
         bias = False
 
-        in_nc = state_dict["patch_embed.proj.weight"].shape[1]
-        out_nc = state_dict["output.weight"].shape[0]
+        in_nc = state_dict['patch_embed.proj.weight'].shape[1]
+        out_nc = state_dict['output.weight'].shape[0]
 
-        dim = state_dict["patch_embed.proj.weight"].shape[0]
+        dim = state_dict['patch_embed.proj.weight'].shape[0]
 
-        num_blocks[0] = get_seq_len(state_dict, "encoder_level1")
-        num_blocks[1] = get_seq_len(state_dict, "encoder_level2")
-        num_blocks[2] = get_seq_len(state_dict, "encoder_level3")
-        num_blocks[3] = get_seq_len(state_dict, "latent")
+        num_blocks[0] = get_seq_len(state_dict, 'encoder_level1')
+        num_blocks[1] = get_seq_len(state_dict, 'encoder_level2')
+        num_blocks[2] = get_seq_len(state_dict, 'encoder_level3')
+        num_blocks[3] = get_seq_len(state_dict, 'latent')
 
-        num_refinement_blocks = get_seq_len(state_dict, "refinement")
+        num_refinement_blocks = get_seq_len(state_dict, 'refinement')
 
-        heads[0] = state_dict["encoder_level1.0.ffn.temperature"].shape[0]
-        heads[1] = state_dict["encoder_level2.0.ffn.temperature"].shape[0]
-        heads[2] = state_dict["encoder_level3.0.ffn.temperature"].shape[0]
-        heads[3] = state_dict["latent.0.ffn.temperature"].shape[0]
+        heads[0] = state_dict['encoder_level1.0.ffn.temperature'].shape[0]
+        heads[1] = state_dict['encoder_level2.0.ffn.temperature'].shape[0]
+        heads[2] = state_dict['encoder_level3.0.ffn.temperature'].shape[0]
+        heads[3] = state_dict['latent.0.ffn.temperature'].shape[0]
 
-        bias = "encoder_level1.0.ffn.qkv.bias" in state_dict
+        bias = 'encoder_level1.0.ffn.qkv.bias' in state_dict
 
         # in code: hidden_features = int(dim * ffn_expansion_factor)
-        hidden_features = state_dict["encoder_level1.0.attn.ga1"].shape[1]
+        hidden_features = state_dict['encoder_level1.0.attn.ga1'].shape[1]
         ffn_expansion_factor = hidden_features / dim
 
         model = KBNet_l(
@@ -90,8 +89,8 @@ class KBNetArch(Architecture[_KBNet]):
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration",
-            tags=["L", f"{dim}dim"],
+            purpose='Restoration',
+            tags=['L', f'{dim}dim'],
             supports_half=False,
             supports_bfloat16=True,
             scale=1,
@@ -109,28 +108,28 @@ class KBNetArch(Architecture[_KBNet]):
         lightweight = False
         ffn_scale = 2
 
-        img_channel = state_dict["intro.weight"].shape[1]
-        width = state_dict["intro.weight"].shape[0]
+        img_channel = state_dict['intro.weight'].shape[1]
+        width = state_dict['intro.weight'].shape[0]
 
-        middle_blk_num = get_seq_len(state_dict, "middle_blks")
+        middle_blk_num = get_seq_len(state_dict, 'middle_blks')
 
-        enc_count = get_seq_len(state_dict, "encoders")
+        enc_count = get_seq_len(state_dict, 'encoders')
         enc_blk_nums = [1] * enc_count
         for i in range(enc_count):
-            enc_blk_nums[i] = get_seq_len(state_dict, f"encoders.{i}")
+            enc_blk_nums[i] = get_seq_len(state_dict, f'encoders.{i}')
 
-        dec_count = get_seq_len(state_dict, "decoders")
+        dec_count = get_seq_len(state_dict, 'decoders')
         dec_blk_nums = [1] * dec_count
         for i in range(dec_count):
-            dec_blk_nums[i] = get_seq_len(state_dict, f"decoders.{i}")
+            dec_blk_nums[i] = get_seq_len(state_dict, f'decoders.{i}')
 
         # in code: ffn_ch = int(c * ffn_scale)
-        temp_c = state_dict["middle_blks.0.conv4.weight"].shape[1]
-        temp_ffn_ch = state_dict["middle_blks.0.conv4.weight"].shape[0]
+        temp_c = state_dict['middle_blks.0.conv4.weight'].shape[1]
+        temp_ffn_ch = state_dict['middle_blks.0.conv4.weight'].shape[0]
         ffn_scale = temp_ffn_ch / temp_c
 
         # kernel size is 3 for lightweight and 5 otherwise
-        kernel_size = state_dict["encoders.0.0.conv11.1.weight"].shape[2]
+        kernel_size = state_dict['encoders.0.0.conv11.1.weight'].shape[2]
         lightweight = kernel_size == 3
 
         model = KBNet_s(
@@ -147,11 +146,11 @@ class KBNetArch(Architecture[_KBNet]):
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration",
+            purpose='Restoration',
             tags=[
-                "S",
-                f"{width}w",
-                *(["lightweight"] if lightweight else []),
+                'S',
+                f'{width}w',
+                *(['lightweight'] if lightweight else []),
             ],
             supports_half=False,
             supports_bfloat16=True,
@@ -162,10 +161,9 @@ class KBNetArch(Architecture[_KBNet]):
 
     @override
     def load(self, state_dict: StateDict) -> ImageModelDescriptor[_KBNet]:
-        if "patch_embed.proj.weight" in state_dict:
+        if 'patch_embed.proj.weight' in state_dict:
             return self._load_l(state_dict)
-        else:
-            return self._load_s(state_dict)
+        return self._load_s(state_dict)
 
 
-__all__ = ["KBNetArch", "KBNet_s", "KBNet_l"]
+__all__ = ['KBNetArch', 'KBNet_l', 'KBNet_s']

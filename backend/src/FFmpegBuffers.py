@@ -1,20 +1,19 @@
-import queue
-import sys
-from abc import ABC, abstractmethod
 import os
-import subprocess
+import pathlib
 import queue
+import subprocess
 import time
+from abc import ABC, abstractmethod
+
 import cv2
 import numpy as np
-from .utils.LogConfig import get_logger
 
+from .utils.Encoders import EncoderSettings
+from .utils.Frame import Frame
+from .utils.LogConfig import get_logger
 from .utils.Util import (
     subprocess_popen_without_terminal,
 )
-from .utils.Encoders import EncoderSettings
-from .utils.Frame import Frame
-
 
 logger = get_logger(__name__)
 
@@ -36,15 +35,15 @@ class FFmpegRead(Buffer):
         borderX,
         borderY,
         hdr_mode,
-        backend: str = "pytorch",
-        device: str = "cuda",
+        backend: str = 'pytorch',
+        device: str = 'cuda',
         gpu_id: int = 0,
-        dtype: str = "float16",
+        dtype: str = 'float16',
         color_space=None,
         color_primaries=None,
         color_transfer=None,
         input_pixel_format: str | None = None,
-        ffmpeg_path: str = "./bin/ffmpeg",
+        ffmpeg_path: str = './bin/ffmpeg',
     ):
         self.inputFile = inputFile
         self.width = width
@@ -62,18 +61,19 @@ class FFmpegRead(Buffer):
         self.color_primaries = color_primaries
         self.color_transfer = color_transfer
         self.input_pixel_format = input_pixel_format
-        self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
+        self.yuv420pMOD = (
+            self.input_pixel_format == 'yuv420p' and not self.hdr_mode
+        )
         self.ffmpeg_path = ffmpeg_path
         # self.yuv420pMOD = False
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
+        elif self.yuv420pMOD:
+            self.inputFrameChunkSize = width * height * 3 // 2
         else:
-            if self.yuv420pMOD:
-                self.inputFrameChunkSize = width * height * 3 // 2
-            else:
-                self.inputFrameChunkSize = width * height * 3
+            self.inputFrameChunkSize = width * height * 3
         command = self.command()
-        logger.info("FFMPEG READ COMMAND: %s", command)
+        logger.info('FFMPEG READ COMMAND: %s', command)
         self.readProcess = subprocess_popen_without_terminal(
             self.command(),
             stdout=subprocess.PIPE,
@@ -83,34 +83,34 @@ class FFmpegRead(Buffer):
 
     def command(self):
         command = [
-            f"{self.ffmpeg_path}",
-            "-nostdin",
-            "-i",
-            f"{self.inputFile}",
+            f'{self.ffmpeg_path}',
+            '-nostdin',
+            '-i',
+            f'{self.inputFile}',
         ]
 
-        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih"  # + ":in_range=limited:out_range=full,format=yuv420p" if self.yuv420pMOD == "yuv420p" else "" # fix dar != sar
+        filter_string = f'crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih'  # + ":in_range=limited:out_range=full,format=yuv420p" if self.yuv420pMOD == "yuv420p" else "" # fix dar != sar
         # if not self.hdr_mode:
         #    if self.input_pixel_format == "yuv420p":
         #        filter_string += ":in_range=tv:out_range=pc" # color shifts a smidgen but helps with artifacts when converting yuv to raw
         command += [
-            "-vf",
+            '-vf',
             filter_string,
-            "-f",
-            "image2pipe",
-            "-pix_fmt",
-            "rgb48le"
+            '-f',
+            'image2pipe',
+            '-pix_fmt',
+            'rgb48le'
             if self.hdr_mode
-            else (self.input_pixel_format if self.yuv420pMOD else "rgb24"),
+            else (self.input_pixel_format if self.yuv420pMOD else 'rgb24'),
             # "rgb48le" if self.hdr_mode else "rgb24",
-            "-vcodec",
-            "rawvideo",
-            "-s",
-            f"{self.width}x{self.height}",
-            "-",
+            '-vcodec',
+            'rawvideo',
+            '-s',
+            f'{self.width}x{self.height}',
+            '-',
         ]
 
-        logger.info("FFMPEG READ COMMAND: %s", command)
+        logger.info('FFMPEG READ COMMAND: %s', command)
         return command
 
     def read_frame(self):
@@ -187,13 +187,15 @@ class FFmpegWrite(Buffer):
         color_space: str = None,
         color_primaries: str = None,
         color_transfer: str = None,
-        ffmpeg_path: str = "./bin/ffmpeg",
-        ffmpeg_log_file: str = "ffmpeg_log.txt",
+        ffmpeg_path: str = './bin/ffmpeg',
+        ffmpeg_log_file: str = 'ffmpeg_log.txt',
     ):
         self.inputFile = inputFile
         self.outputFile = outputFile
         if self.outputFile:
-            self.outputFileExtension = os.path.split(self.outputFile)[-1].split(".")[-1]
+            self.outputFileExtension = os.path.split(self.outputFile)[-1].split(
+                '.'
+            )[-1]
         self.width = width
         self.height = height
         self.start_time = start_time
@@ -227,12 +229,14 @@ class FFmpegWrite(Buffer):
         self.ffmpeg_path = ffmpeg_path
         self.ffmpeg_log_file = ffmpeg_log_file
         self.outputFPS = (
-            (self.fps * self.interpolateFactor) if not self.slowmo_mode else self.fps
+            (self.fps * self.interpolateFactor)
+            if not self.slowmo_mode
+            else self.fps
         )
-        self.ffmpeg_log = open(self.ffmpeg_log_file, "w", encoding="utf-8")
+        self.ffmpeg_log = pathlib.Path(self.ffmpeg_log_file).open('w', encoding='utf-8')
         try:
             command = self.command()
-            logger.info("FFMPEG WRITE COMMAND: %s", command)
+            logger.info('FFMPEG WRITE COMMAND: %s', command)
             self.writeProcess = subprocess_popen_without_terminal(
                 command,
                 stdin=subprocess.PIPE,
@@ -241,67 +245,67 @@ class FFmpegWrite(Buffer):
                 text=True,
                 universal_newlines=True,
             )
-        except Exception as e:
-            logger.exception("Exception while starting FFmpeg write process")
+        except Exception:
+            logger.exception('Exception while starting FFmpeg write process')
             self.onErroredExit()
 
     def command(self):
         if self.mpv_output:
             command = [
-                f"{self.ffmpeg_path}",
-                "-loglevel",
-                "error",
-                "-framerate",
-                f"{self.outputFPS}",
-                "-f",
-                "rawvideo",
-                "-pix_fmt",
-                "rgb48le" if self.hdr_mode else "rgb24",
-                "-vcodec",
-                "rawvideo",
-                "-s",
-                f"{self.outputWidth}x{self.outputHeight}",
-                "-i",
-                "-",
-                "-r",
-                f"{self.outputFPS}",
-                "-f",
-                "matroska",
-                "-b:v",
-                "15000k",
-                "-crf",
-                "0",
-                "-af",
-                f"atrim=start={self.start_time},asetpts=PTS-STARTPTS",
+                f'{self.ffmpeg_path}',
+                '-loglevel',
+                'error',
+                '-framerate',
+                f'{self.outputFPS}',
+                '-f',
+                'rawvideo',
+                '-pix_fmt',
+                'rgb48le' if self.hdr_mode else 'rgb24',
+                '-vcodec',
+                'rawvideo',
+                '-s',
+                f'{self.outputWidth}x{self.outputHeight}',
+                '-i',
+                '-',
+                '-r',
+                f'{self.outputFPS}',
+                '-f',
+                'matroska',
+                '-b:v',
+                '15000k',
+                '-crf',
+                '0',
+                '-af',
+                f'atrim=start={self.start_time},asetpts=PTS-STARTPTS',
             ]
 
             if self.hdr_mode:
                 # override pixel format
                 pxfmtdict = {
-                    "yuv420p": "yuv420p10le",
-                    "yuv422": "yuv422p10le",
-                    "yuv444": "yuv444p10le",
+                    'yuv420p': 'yuv420p10le',
+                    'yuv422': 'yuv422p10le',
+                    'yuv444': 'yuv444p10le',
                 }
 
                 if self.pixelFormat in pxfmtdict:
                     self.pixelFormat = pxfmtdict[self.pixelFormat]
 
                 command += [
-                    "-pix_fmt",
+                    '-pix_fmt',
                     self.pixelFormat,
                 ]
 
             command += [
-                "-",
+                '-',
             ]
             return command
 
         if not self.benchmark:
             # maybe i can split this so i can just use ffmpeg normally like with vspipe
             command = [
-                f"{self.ffmpeg_path}",
-                "-loglevel",
-                "error",
+                f'{self.ffmpeg_path}',
+                '-loglevel',
+                'error',
             ]
 
             if self.custom_encoder is None:
@@ -310,141 +314,146 @@ class FFmpegWrite(Buffer):
                     command += pre_in_set.split()
 
             command += [
-                "-framerate",
-                f"{self.outputFPS}",
-                "-f",
-                "rawvideo",
-                "-pix_fmt",
-                "rgb48le" if self.hdr_mode else "rgb24",
-                "-vcodec",
-                "rawvideo",
-                "-s",
-                f"{self.outputWidth}x{self.outputHeight}",
-                "-i",
-                "-",
-                "-r",
-                f"{self.outputFPS}",
+                '-framerate',
+                f'{self.outputFPS}',
+                '-f',
+                'rawvideo',
+                '-pix_fmt',
+                'rgb48le' if self.hdr_mode else 'rgb24',
+                '-vcodec',
+                'rawvideo',
+                '-s',
+                f'{self.outputWidth}x{self.outputHeight}',
+                '-i',
+                '-',
+                '-r',
+                f'{self.outputFPS}',
             ]
 
             if not self.slowmo_mode:
                 command += [
                     # Input 1: original file for audio/subtitles.
                     # Put timestamp hygiene flags *before* the input they apply to.
-                    "-fflags",
-                    "+genpts",
-                    "-i",
-                    f"{self.inputFile}",
-                    "-map",
-                    "0:v",  # Map video stream from input 0
-                    "-map",
-                    "1:a?",
-                    "-map",
-                    "1:s?",
+                    '-fflags',
+                    '+genpts',
+                    '-i',
+                    f'{self.inputFile}',
+                    '-map',
+                    '0:v',  # Map video stream from input 0
+                    '-map',
+                    '1:a?',
+                    '-map',
+                    '1:s?',
                 ]
 
                 # Output timestamp/interleave hygiene.
                 command += [
-                    "-avoid_negative_ts",
-                    "make_zero",
-                    "-max_interleave_delta",
-                    "0",
-                    "-muxpreload",
-                    "0",
-                    "-muxdelay",
-                    "0",
+                    '-avoid_negative_ts',
+                    'make_zero',
+                    '-max_interleave_delta',
+                    '0',
+                    '-muxpreload',
+                    '0',
+                    '-muxdelay',
+                    '0',
                 ]
 
             if self.custom_encoder is not None:
                 for i in self.custom_encoder.split():
                     command.append(i)
             else:
-                if not self.audio_encoder.getPresetTag() == "copy_audio":
+                if not self.audio_encoder.getPresetTag() == 'copy_audio':
                     command += [
-                        "-b:a",
+                        '-b:a',
                         self.audio_bitrate,
                     ]
                 command += self.video_encoder.getPostInputSettings().split()
-                command += [self.video_encoder.getQualityControlMode(), str(self.crf)]
+                command += [
+                    self.video_encoder.getQualityControlMode(),
+                    str(self.crf),
+                ]
                 command += self.audio_encoder.getPostInputSettings().split()
                 command += self.subtitle_encoder.getPostInputSettings().split()
 
                 if self.hdr_mode:
                     # override pixel format
                     pxfmtdict = {
-                        "yuv420p": "yuv420p10le",
-                        "yuv422": "yuv422p10le",
-                        "yuv444": "yuv444p10le",
+                        'yuv420p': 'yuv420p10le',
+                        'yuv422': 'yuv422p10le',
+                        'yuv444': 'yuv444p10le',
                     }
 
                     if self.pixelFormat in pxfmtdict:
                         self.pixelFormat = pxfmtdict[self.pixelFormat]
 
                     if (
-                        self.video_encoder.getPresetTag() == "libx265"
-                        or self.video_encoder.getPresetTag() == "x265_nvenc"
+                        self.video_encoder.getPresetTag() == 'libx265'
+                        or self.video_encoder.getPresetTag() == 'x265_nvenc'
                     ):
                         command += [
-                            "-x265-params",
-                            "hdr-opt=1:colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc",
+                            '-x265-params',
+                            'hdr-opt=1:colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc',
                         ]
-                    elif self.video_encoder.getPresetTag() == "prores":
+                    elif self.video_encoder.getPresetTag() == 'prores':
                         command += [
-                            "-profile:v",
-                            "4",
-                            "-vendor",
-                            "ap10",
-                            "-color_range",
-                            "full",
+                            '-profile:v',
+                            '4',
+                            '-vendor',
+                            'ap10',
+                            '-color_range',
+                            'full',
                         ]
 
                 command += [
-                    "-pix_fmt",
+                    '-pix_fmt',
                     self.pixelFormat,
                 ]
 
                 # MP4/MOV: improve seekability by moving the moov atom to the front.
                 if self.outputFile and self.outputFileExtension.lower() in (
-                    "mp4",
-                    "mov",
-                    "m4v",
+                    'mp4',
+                    'mov',
+                    'm4v',
                 ):
                     command += [
-                        "-movflags",
-                        "+faststart",
+                        '-movflags',
+                        '+faststart',
                     ]
             command += [
-                f"{self.outputFile}",
+                f'{self.outputFile}',
             ]
 
             if self.overwrite:
-                command.append("-y")
+                command.append('-y')
 
             if self.slowmo_mode:
-                logger.info("Slowmo mode enabled, will not merge audio or subtitles.")
+                logger.info(
+                    'Slowmo mode enabled, will not merge audio or subtitles.'
+                )
 
         else:  # Benchmark mode
             command = [
-                f"{self.ffmpeg_path}",
-                "-hide_banner",
-                "-loglevel",
-                "error",
-                "-stats",
-                "-f",
-                "rawvideo",
-                "-vcodec",
-                "rawvideo",
-                "-video_size",
-                f"{self.width * self.upscaleTimes}x{self.upscaleTimes * self.height}",
-                "-pix_fmt",
-                "rgb48le" if self.hdr_mode else "rgb24",
-                "-r",
+                f'{self.ffmpeg_path}',
+                '-hide_banner',
+                '-loglevel',
+                'error',
+                '-stats',
+                '-f',
+                'rawvideo',
+                '-vcodec',
+                'rawvideo',
+                '-video_size',
+                f'{self.width * self.upscaleTimes}x{self.upscaleTimes * self.height}',
+                '-pix_fmt',
+                'rgb48le' if self.hdr_mode else 'rgb24',
+                '-r',
                 str(self.outputFPS),
-                "-i",
-                "-",
-                "-benchmark",
-                "-f",
-                "null",
-                "-",
+                '-i',
+                '-',
+                '-benchmark',
+                '-f',
+                'null',
+                '-',
             ]
 
         return command
@@ -456,7 +465,7 @@ class FFmpegWrite(Buffer):
         self.writeQueue.put(frame)
 
     def write_out_frames(self):
-        logger.info("Rendering")
+        logger.info('Rendering')
         self.startTime = time.time()
 
         exit_code: int = 0
@@ -473,10 +482,10 @@ class FFmpegWrite(Buffer):
             exit_code = self.writeProcess.returncode
 
             renderTime = time.time() - self.startTime
-            logger.info("Time to complete render: %s", round(renderTime, 2))
+            logger.info('Time to complete render: %s', round(renderTime, 2))
 
-        except Exception as e:
-            logger.exception("Exception while writing frames")
+        except Exception:
+            logger.exception('Exception while writing frames')
             self.onErroredExit()
 
         if exit_code != 0:
@@ -484,25 +493,25 @@ class FFmpegWrite(Buffer):
             return
 
     def onErroredExit(self):
-        logger.error("FFmpeg failed to render the video.")
+        logger.error('FFmpeg failed to render the video.')
         try:
-            with open(self.ffmpeg_log_file, "r") as f:
-                logger.error("FULL FFMPEG LOG:")
-                for line in f.readlines():
-                    logger.error("%s", line.rstrip("\n"))
+            with pathlib.Path(self.ffmpeg_log_file).open('r') as f:
+                logger.error('FULL FFMPEG LOG:')
+                for line in f:
+                    logger.error('%s', line.rstrip('\n'))
 
-            with open(self.ffmpeg_log_file, "r") as f:
-                for line in f.readlines():
-                    if f"[{self.outputFileExtension}" in line:
-                        logger.error("%s", line.rstrip("\n"))
+            with pathlib.Path(self.ffmpeg_log_file).open('r') as f:
+                for line in f:
+                    if f'[{self.outputFileExtension}' in line:
+                        logger.error('%s', line.rstrip('\n'))
 
-            if self.video_encoder.getPresetTag() == "x264_vulkan":
-                logger.error("Vulkan encode failed, try restarting the render.")
+            if self.video_encoder.getPresetTag() == 'x264_vulkan':
+                logger.error('Vulkan encode failed, try restarting the render.')
                 logger.error(
-                    "Make sure you have the latest drivers installed and your GPU supports vulkan encoding."
+                    'Make sure you have the latest drivers installed and your GPU supports vulkan encoding.'
                 )
-        except Exception as e:
-            logger.exception("Failed to read FFmpeg log file")
+        except Exception:
+            logger.exception('Failed to read FFmpeg log file')
 
         time.sleep(1)
         os._exit(1)
@@ -525,22 +534,22 @@ class MPVOutput:
 
     def command(self):
         command = [
-            "mpv",
-            f"--audio-file={self.FFMPegWrite.inputFile}",
-            "--no-config",
-            "--cache=yes",
-            "--cache-secs=5",  # Cache 30 seconds of video
-            "--demuxer-max-bytes=500Mib",  # Increase max bytes
-            "--demuxer-readahead-secs=5",  # Read ahead 30 seconds
-            "--demuxer-seekable-cache=yes",  # Enable seekable cache
-            "--stream-buffer-size=500MiB",  # Increase buffer size
-            "--hr-seek-framedrop=no",  # Prevent frame dropping during seeks
-            "-",
+            'mpv',
+            f'--audio-file={self.FFMPegWrite.inputFile}',
+            '--no-config',
+            '--cache=yes',
+            '--cache-secs=5',  # Cache 30 seconds of video
+            '--demuxer-max-bytes=500Mib',  # Increase max bytes
+            '--demuxer-readahead-secs=5',  # Read ahead 30 seconds
+            '--demuxer-seekable-cache=yes',  # Enable seekable cache
+            '--stream-buffer-size=500MiB',  # Increase buffer size
+            '--hr-seek-framedrop=no',  # Prevent frame dropping during seeks
+            '-',
         ]
         return command
 
     def write_out_frames(self):
-        with open("mpv_log.txt", "w") as f:
+        with pathlib.Path('mpv_log.txt').open('w') as f:
             while not self.FFMPegWrite.writeProcess:
                 time.sleep(1)
             self.proc = subprocess_popen_without_terminal(

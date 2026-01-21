@@ -20,6 +20,7 @@ class StyleGAN2GeneratorBilinearSFT(StyleGAN2GeneratorBilinear):
     """StyleGAN2 Generator with SFT modulation (Spatial Feature Transform).
     It is the bilinear version. It does not use the complicated UpFirDnSmooth function that is not friendly for
     deployment. It can be easily converted to the clean version: StyleGAN2GeneratorCSFT.
+
     Args:
         out_size (int): The spatial size of outputs.
         num_style_feat (int): Channel number of style features. Default: 512.
@@ -63,6 +64,7 @@ class StyleGAN2GeneratorBilinearSFT(StyleGAN2GeneratorBilinear):
         return_latents=False,
     ):
         """Forward function for StyleGAN2GeneratorBilinearSFT.
+
         Args:
             styles (list[Tensor]): Sample codes of styles.
             conditions (list[Tensor]): SFT conditions to generators.
@@ -83,7 +85,8 @@ class StyleGAN2GeneratorBilinearSFT(StyleGAN2GeneratorBilinear):
                 noise = [None] * self.num_layers  # for each style conv layer
             else:  # use the stored noise
                 noise = [
-                    getattr(self.noises, f"noise{i}") for i in range(self.num_layers)
+                    getattr(self.noises, f'noise{i}')
+                    for i in range(self.num_layers)
                 ]
         # style truncation
         if truncation < 1:
@@ -107,7 +110,9 @@ class StyleGAN2GeneratorBilinearSFT(StyleGAN2GeneratorBilinear):
                 inject_index = random.randint(1, self.num_latent - 1)
             latent1 = styles[0].unsqueeze(1).repeat(1, inject_index, 1)
             latent2 = (
-                styles[1].unsqueeze(1).repeat(1, self.num_latent - inject_index, 1)
+                styles[1]
+                .unsqueeze(1)
+                .repeat(1, self.num_latent - inject_index, 1)
             )
             latent = torch.cat([latent1, latent2], 1)
 
@@ -130,22 +135,25 @@ class StyleGAN2GeneratorBilinearSFT(StyleGAN2GeneratorBilinear):
             if i < len(conditions):
                 # SFT part to combine the conditions
                 if self.sft_half:  # only apply SFT to half of the channels
-                    out_same, out_sft = torch.split(out, int(out.size(1) // 2), dim=1)
+                    out_same, out_sft = torch.split(
+                        out, int(out.size(1) // 2), dim=1
+                    )
                     out_sft = out_sft * conditions[i - 1] + conditions[i]
                     out = torch.cat([out_same, out_sft], dim=1)
                 else:  # apply SFT to all the channels
                     out = out * conditions[i - 1] + conditions[i]
 
             out = conv2(out, latent[:, i + 1], noise=noise2)
-            skip = to_rgb(out, latent[:, i + 2], skip)  # feature back to the rgb space
+            skip = to_rgb(
+                out, latent[:, i + 2], skip
+            )  # feature back to the rgb space
             i += 2
 
         image = skip
 
         if return_latents:
             return image, latent
-        else:
-            return image, None
+        return image, None
 
 
 class GFPGANBilinear(nn.Module):
@@ -153,6 +161,7 @@ class GFPGANBilinear(nn.Module):
     It is the bilinear version and it does not use the complicated UpFirDnSmooth function that is not friendly for
     deployment. It can be easily converted to the clean version: GFPGANv1Clean.
     Ref: GFP-GAN: Towards Real-World Blind Face Restoration with Generative Facial Prior.
+
     Args:
         out_size (int): The spatial size of outputs.
         num_style_feat (int): Channel number of style features. Default: 512.
@@ -190,41 +199,41 @@ class GFPGANBilinear(nn.Module):
 
         unet_narrow = narrow * 0.5  # by default, use a half of input channels
         channels = {
-            "4": int(512 * unet_narrow),
-            "8": int(512 * unet_narrow),
-            "16": int(512 * unet_narrow),
-            "32": int(512 * unet_narrow),
-            "64": int(256 * channel_multiplier * unet_narrow),
-            "128": int(128 * channel_multiplier * unet_narrow),
-            "256": int(64 * channel_multiplier * unet_narrow),
-            "512": int(32 * channel_multiplier * unet_narrow),
-            "1024": int(16 * channel_multiplier * unet_narrow),
+            '4': int(512 * unet_narrow),
+            '8': int(512 * unet_narrow),
+            '16': int(512 * unet_narrow),
+            '32': int(512 * unet_narrow),
+            '64': int(256 * channel_multiplier * unet_narrow),
+            '128': int(128 * channel_multiplier * unet_narrow),
+            '256': int(64 * channel_multiplier * unet_narrow),
+            '512': int(32 * channel_multiplier * unet_narrow),
+            '1024': int(16 * channel_multiplier * unet_narrow),
         }
 
         self.log_size = int(math.log(out_size, 2))
         first_out_size = 2 ** (int(math.log(out_size, 2)))
 
         self.conv_body_first = ConvLayer(
-            3, channels[f"{first_out_size}"], 1, bias=True, activate=True
+            3, channels[f'{first_out_size}'], 1, bias=True, activate=True
         )
 
         # downsample
-        in_channels = channels[f"{first_out_size}"]
+        in_channels = channels[f'{first_out_size}']
         self.conv_body_down = nn.ModuleList()
         for i in range(self.log_size, 2, -1):
-            out_channels = channels[f"{2 ** (i - 1)}"]
+            out_channels = channels[f'{2 ** (i - 1)}']
             self.conv_body_down.append(ResBlock(in_channels, out_channels))
             in_channels = out_channels
 
         self.final_conv = ConvLayer(
-            in_channels, channels["4"], 3, bias=True, activate=True
+            in_channels, channels['4'], 3, bias=True, activate=True
         )
 
         # upsample
-        in_channels = channels["4"]
+        in_channels = channels['4']
         self.conv_body_up = nn.ModuleList()
         for i in range(3, self.log_size + 1):
-            out_channels = channels[f"{2**i}"]
+            out_channels = channels[f'{2**i}']
             self.conv_body_up.append(ResUpBlock(in_channels, out_channels))
             in_channels = out_channels
 
@@ -233,7 +242,7 @@ class GFPGANBilinear(nn.Module):
         for i in range(3, self.log_size + 1):
             self.toRGB.append(
                 EqualConv2d(
-                    channels[f"{2**i}"],
+                    channels[f'{2**i}'],
                     3,
                     1,
                     stride=1,
@@ -244,12 +253,14 @@ class GFPGANBilinear(nn.Module):
             )
 
         if different_w:
-            linear_out_channel = (int(math.log(out_size, 2)) * 2 - 2) * num_style_feat
+            linear_out_channel = (
+                int(math.log(out_size, 2)) * 2 - 2
+            ) * num_style_feat
         else:
             linear_out_channel = num_style_feat
 
         self.final_linear = EqualLinear(
-            channels["4"] * 4 * 4,
+            channels['4'] * 4 * 4,
             linear_out_channel,
             bias=True,
             bias_init_val=0,
@@ -270,7 +281,7 @@ class GFPGANBilinear(nn.Module):
 
         if decoder_load_path:
             # Refuse to attempt to load a decoder here
-            raise NotImplementedError(f"Got a non-empty {decoder_load_path=}")
+            raise NotImplementedError(f'Got a non-empty {decoder_load_path=}')
 
         # fix decoder without updating params
         if fix_decoder:
@@ -281,7 +292,7 @@ class GFPGANBilinear(nn.Module):
         self.condition_scale = nn.ModuleList()
         self.condition_shift = nn.ModuleList()
         for i in range(3, self.log_size + 1):
-            out_channels = channels[f"{2**i}"]
+            out_channels = channels[f'{2**i}']
             if sft_half:
                 sft_out_channels = out_channels
             else:
@@ -333,8 +344,11 @@ class GFPGANBilinear(nn.Module):
                 )
             )
 
-    def forward(self, x, return_latents=False, return_rgb=True, randomize_noise=True):
+    def forward(
+        self, x, return_latents=False, return_rgb=True, randomize_noise=True
+    ):
         """Forward function for GFPGANBilinear.
+
         Args:
             x (Tensor): Input images.
             return_latents (bool): Whether to return style latents. Default: False.
@@ -356,7 +370,9 @@ class GFPGANBilinear(nn.Module):
         # style code
         style_code = self.final_linear(feat.view(feat.size(0), -1))
         if self.different_w:
-            style_code = style_code.view(style_code.size(0), -1, self.num_style_feat)
+            style_code = style_code.view(
+                style_code.size(0), -1, self.num_style_feat
+            )
 
         # decode
         for i in range(self.log_size - 2):

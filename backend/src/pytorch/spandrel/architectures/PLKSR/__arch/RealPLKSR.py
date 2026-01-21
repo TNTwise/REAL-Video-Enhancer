@@ -23,7 +23,7 @@ class LayerNorm(nn.Module):
 
 
 class DCCM(nn.Sequential):
-    "Doubled Convolutional Channel Mixer"
+    """Doubled Convolutional Channel Mixer"""
 
     def __init__(self, dim: int):
         super().__init__(
@@ -35,7 +35,7 @@ class DCCM(nn.Sequential):
 
 
 class PLKConv2d(nn.Module):
-    "Partial Large Kernel Convolutional Layer"
+    """Partial Large Kernel Convolutional Layer"""
 
     def __init__(self, dim: int, kernel_size: int):
         super().__init__()
@@ -53,7 +53,7 @@ class PLKConv2d(nn.Module):
 
 
 class EA(nn.Module):
-    "Element-wise Attention"
+    """Element-wise Attention"""
 
     def __init__(self, dim: int):
         super().__init__()
@@ -152,7 +152,14 @@ class RealPLKSR(nn.Module):
         self.feats = nn.Sequential(
             *[nn.Conv2d(in_ch, dim, 3, 1, 1)]
             + [
-                PLKBlock(dim, kernel_size, split_ratio, use_ea, norm_groups, layer_norm)
+                PLKBlock(
+                    dim,
+                    kernel_size,
+                    split_ratio,
+                    use_ea,
+                    norm_groups,
+                    layer_norm,
+                )
                 for _ in range(n_blocks)
             ]
             + [nn.Dropout2d(dropout)]

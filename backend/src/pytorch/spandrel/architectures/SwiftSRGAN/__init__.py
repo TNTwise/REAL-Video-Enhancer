@@ -1,19 +1,22 @@
 from typing_extensions import override
 
+from ...__helpers.model_descriptor import (
+    Architecture,
+    ImageModelDescriptor,
+    StateDict,
+)
 from ...util import KeyCondition, get_seq_len
-
-from ...__helpers.model_descriptor import Architecture, ImageModelDescriptor, StateDict
 from .__arch.SwiftSRGAN import Generator as SwiftSRGAN
 
 
 class SwiftSRGANArch(Architecture[SwiftSRGAN]):
     def __init__(self) -> None:
         super().__init__(
-            id="SwiftSRGAN",
-            name="Swift-SRGAN",
+            id='SwiftSRGAN',
+            name='Swift-SRGAN',
             detect=KeyCondition.has_all(
-                "initial.cnn.depthwise.weight",
-                "final_conv.pointwise.weight",
+                'initial.cnn.depthwise.weight',
+                'final_conv.pointwise.weight',
             ),
         )
 
@@ -24,10 +27,10 @@ class SwiftSRGANArch(Architecture[SwiftSRGAN]):
         num_blocks: int = 16
         upscale_factor: int = 4
 
-        in_channels = state_dict["initial.cnn.depthwise.weight"].shape[0]
-        num_channels = state_dict["initial.cnn.pointwise.weight"].shape[0]
-        num_blocks = get_seq_len(state_dict, "residual")
-        upscale_factor = 2 ** get_seq_len(state_dict, "upsampler")
+        in_channels = state_dict['initial.cnn.depthwise.weight'].shape[0]
+        num_channels = state_dict['initial.cnn.pointwise.weight'].shape[0]
+        num_blocks = get_seq_len(state_dict, 'residual')
+        upscale_factor = 2 ** get_seq_len(state_dict, 'upsampler')
 
         model = SwiftSRGAN(
             in_channels=in_channels,
@@ -36,15 +39,15 @@ class SwiftSRGANArch(Architecture[SwiftSRGAN]):
             upscale_factor=upscale_factor,
         )
         tags = [
-            f"{num_channels}nf",
-            f"{num_blocks}nb",
+            f'{num_channels}nf',
+            f'{num_blocks}nb',
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose="Restoration" if upscale_factor == 1 else "SR",
+            purpose='Restoration' if upscale_factor == 1 else 'SR',
             tags=tags,
             supports_half=True,
             supports_bfloat16=True,
@@ -54,4 +57,4 @@ class SwiftSRGANArch(Architecture[SwiftSRGAN]):
         )
 
 
-__all__ = ["SwiftSRGANArch", "SwiftSRGAN"]
+__all__ = ['SwiftSRGAN', 'SwiftSRGANArch']

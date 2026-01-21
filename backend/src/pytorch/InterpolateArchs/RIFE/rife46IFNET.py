@@ -23,10 +23,7 @@ SOFTWARE.
 """
 
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-
-
+from torch import nn
 from torch.nn.functional import interpolate
 
 
@@ -47,7 +44,7 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
 
 class MyPixelShuffle(nn.Module):
     def __init__(self, upscale_factor):
-        super(MyPixelShuffle, self).__init__()
+        super().__init__()
         self.upscale_factor = upscale_factor
 
     def forward(self, input):
@@ -63,7 +60,7 @@ class MyPixelShuffle(nn.Module):
 
 class ResConv(nn.Module):
     def __init__(self, c, dilation=1):
-        super(ResConv, self).__init__()
+        super().__init__()
         self.conv = nn.Conv2d(c, c, 3, 1, dilation, dilation=dilation, groups=1)
         self.beta = nn.Parameter(torch.ones((1, c, 1, 1)), requires_grad=True)
         self.relu = nn.LeakyReLU(0.2, True)
@@ -74,7 +71,7 @@ class ResConv(nn.Module):
 
 class IFBlock(nn.Module):
     def __init__(self, in_planes, c=64):
-        super(IFBlock, self).__init__()
+        super().__init__()
         self.conv0 = nn.Sequential(
             conv(in_planes, c // 2, 3, 2, 1),
             conv(c // 2, c, 3, 2, 1),
@@ -94,10 +91,10 @@ class IFBlock(nn.Module):
         )
 
     def forward(self, x, flow=None, scale=1):
-        x = interpolate(x, scale_factor=1.0 / scale, mode="bilinear")
+        x = interpolate(x, scale_factor=1.0 / scale, mode='bilinear')
         if flow is not None:
             flow = (
-                interpolate(flow, scale_factor=1.0 / scale, mode="bilinear")
+                interpolate(flow, scale_factor=1.0 / scale, mode='bilinear')
                 * 1.0
                 / scale
             )
@@ -105,7 +102,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear")
+        tmp = interpolate(tmp, scale_factor=scale, mode='bilinear')
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         return flow, mask
@@ -117,11 +114,11 @@ class IFNet(nn.Module):
         scale=1.0,
         ensemble=False,
         dtype=torch.float32,
-        device: torch.device = torch.device("cuda"),
+        device: torch.device = torch.device('cuda'),
         width=1920,
         height=1080,
     ):
-        super(IFNet, self).__init__()
+        super().__init__()
         self.block0 = IFBlock(7, c=192)
         self.block1 = IFBlock(8 + 4, c=128)
         self.block2 = IFBlock(8 + 4, c=96)
@@ -138,7 +135,9 @@ class IFNet(nn.Module):
 
         self.warp = warp
 
-    def forward(self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid, scale=None):
+    def forward(
+        self, img0, img1, timestep, tenFlow_div, backwarp_tenGrid, scale=None
+    ):
         img0 = img0.clamp(0.0, 1.0)
         img1 = img1.clamp(0.0, 1.0)
         if scale is not None:
@@ -188,8 +187,12 @@ class IFNet(nn.Module):
                 flow = flow + f0
                 mask = mask + m0
             latest_mask = mask
-            warped_img0 = self.warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
-            warped_img1 = self.warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
+            warped_img0 = self.warp(
+                img0, flow[:, :2], tenFlow_div, backwarp_tenGrid
+            )
+            warped_img1 = self.warp(
+                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
+            )
 
         temp = torch.sigmoid(latest_mask)
         frame = warped_img0 * temp + warped_img1 * (1 - temp)

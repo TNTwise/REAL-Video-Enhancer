@@ -37,11 +37,13 @@ class SizeRequirements:
     """
 
     def __post_init__(self):
-        assert self.minimum >= 0, "minimum must be >= 0"
-        assert self.multiple_of >= 1, "multiple_of must be >= 1"
+        assert self.minimum >= 0, 'minimum must be >= 0'
+        assert self.multiple_of >= 1, 'multiple_of must be >= 1'
 
         if self.minimum % self.multiple_of != 0:
-            self.minimum = (self.minimum // self.multiple_of + 1) * self.multiple_of
+            self.minimum = (
+                self.minimum // self.multiple_of + 1
+            ) * self.multiple_of
 
     @property
     def none(self) -> bool:
@@ -90,13 +92,14 @@ def pad_tensor(t: torch.Tensor, req: SizeRequirements):
         # reflect padding only allows a maximum padding of size - 1
         reflect_pad_w = min(pad_w, w - 1)
         reflect_pad_h = min(pad_h, h - 1)
-        t = torch.nn.functional.pad(t, (0, reflect_pad_w, 0, reflect_pad_h), "reflect")
+        t = torch.nn.functional.pad(
+            t, (0, reflect_pad_w, 0, reflect_pad_h), 'reflect'
+        )
 
         # do the rest of the padding (if any) with replicate, which has no such restrictions
         pad_w -= reflect_pad_w
         pad_h -= reflect_pad_h
-        t = torch.nn.functional.pad(t, (0, pad_w, 0, pad_h), "replicate")
+        t = torch.nn.functional.pad(t, (0, pad_w, 0, pad_h), 'replicate')
 
         return True, t
-    else:
-        return False, t
+    return False, t

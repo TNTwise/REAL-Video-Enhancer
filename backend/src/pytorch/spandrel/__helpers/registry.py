@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import Callable, Literal, Mapping, Sequence
+from typing import Literal
 
 import torch
 
@@ -87,7 +88,7 @@ class ArchRegistry:
         """
         Returns an iterator over all architectures in insertion order.
         """
-        return iter(self.architectures("insertion"))
+        return iter(self.architectures('insertion'))
 
     def __len__(self) -> int:
         return len(self._architectures)
@@ -97,19 +98,18 @@ class ArchRegistry:
 
     def architectures(
         self,
-        order: Literal["insertion", "detection"] = "insertion",
+        order: Literal['insertion', 'detection'] = 'insertion',
     ) -> list[ArchSupport]:
         """
         Returns a new list with all architectures in the registry.
 
         The order of architectures in the list is either insertion order or the order in which architectures are detected.
         """
-        if order == "insertion":
+        if order == 'insertion':
             return list(self._architectures)
-        elif order == "detection":
+        if order == 'detection':
             return list(self._ordered)
-        else:
-            raise ValueError(f"Invalid order: {order}")
+        raise ValueError(f'Invalid order: {order}')
 
     def add(
         self,
@@ -128,7 +128,6 @@ class ArchRegistry:
 
         Returns a list of architectures that were added.
         """
-
         new_architectures = list(self._architectures)
         new_by_id = dict(self._by_id)
         added = []
@@ -137,7 +136,7 @@ class ArchRegistry:
                 if ignore_duplicates:
                     continue
                 raise DuplicateArchitectureError(
-                    f"Duplicate architecture: {arch.architecture.id}"
+                    f'Duplicate architecture: {arch.architecture.id}'
                 )
 
             new_architectures.append(arch)
@@ -169,7 +168,7 @@ class ArchRegistry:
         def visit(arch: ArchSupport):
             if arch.architecture.id in stack:
                 raise ValueError(
-                    f"Circular dependency in architecture detection: {' -> '.join([*stack, arch.architecture.id])}"
+                    f'Circular dependency in architecture detection: {" -> ".join([*stack, arch.architecture.id])}'
                 )
             if arch in seen:
                 return
@@ -195,7 +194,6 @@ class ArchRegistry:
 
         Throws an `UnsupportedModelError` if the model architecture is not supported.
         """
-
         state_dict = canonicalize_state_dict(state_dict)
 
         for arch in self._ordered:
