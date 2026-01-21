@@ -4,7 +4,6 @@ import subprocess
 import re
 import cv2
 from typing import Optional
-import sys
 import logging
 
 
@@ -129,30 +128,31 @@ class FFMpegInfoWrapper(VideoInfo):
             command, stderr=subprocess.PIPE, errors="replace"
         ).stderr.read()
         self.ffmpeg_output_stripped = self.ffmpeg_output_raw.lower().strip()
-        try:
-            for line in self.ffmpeg_output_raw.split("\n"):
-                if "Stream #" in line and "Video" in line:
-                    self.stream_line = line
-                    self.ffmpeg_output_raw = self.ffmpeg_output_raw.replace(line, "")
-                    break
 
-            for line in self.ffmpeg_output_raw.split("\n"):
-                if "Stream #" in line and "Video" in line:
-                    self.stream_line_2 = line
-                    self.ffmpeg_output_raw = self.ffmpeg_output_raw.replace(line, "")
-                    break
-            if self.stream_line is None:
-                logger.warning("No video stream found in the input file.")
-        except Exception:
-            logger.exception("Input file seems to have no video stream")
+        for line in self.ffmpeg_output_raw.split("\n"):
+            if "Stream #" in line and "Video" in line:
+                self.stream_line = line
+                self.ffmpeg_output_raw.replace(line, "")
+                break
+
+        for line in self.ffmpeg_output_raw.split("\n"):
+            if "Stream #" in line and "Video" in line:
+                self.stream_line_2 = line
+                self.ffmpeg_output_raw = \
+                    self.ffmpeg_output_raw.replace(line, "")
+                break
+
+        if self.stream_line is None:
+            logger.error("No video stream found in the input file.")
             exit(1)
 
     def get_duration_seconds(self) -> float:
         total_duration: float = 0.0
 
-        duration = re.search(r"duration: (.*?),", self.ffmpeg_output_stripped).groups()[
-            0
-        ]
+        duration = re.search(
+            r"duration: (.*?),",
+            self.ffmpeg_output_stripped
+        ).groups()[0]
         hours, minutes, seconds = duration.split(":")
         total_duration += int(int(hours) * 3600)
         total_duration += int(int(minutes) * 60)
@@ -169,7 +169,10 @@ class FFMpegInfoWrapper(VideoInfo):
         return [int(width), int(height)]
 
     def get_fps(self) -> float:
-        fps = re.search(r"(\d+\.?\d*) fps", self.ffmpeg_output_stripped).groups()[0]
+        fps = re.search(
+            r"(\d+\.?\d*) fps",
+            self.ffmpeg_output_stripped
+        ).groups()[0]
         return float(fps)
 
     def check_color_opt(self, color_opt: str) -> str | None:
@@ -178,67 +181,73 @@ class FFMpegInfoWrapper(VideoInfo):
                 string_pattern = "1,"
             else:
                 string_pattern = "),"
-            try:
-                match color_opt:
-                    case "Space":
+            match color_opt:
+                case "Space":
+                    color_opt_detected = (
+                        self.stream_line_2.split(",")[1].split("(")[1].strip()
+                    )
+                    if color_opt_detected not in FFMPEG_COLORSPACES:
                         color_opt_detected = (
-                            self.stream_line_2.split(",")[1].split("(")[1].strip()
+                            self.stream_line.split(string_pattern)[1]
+                            .split(",")[1]
+                            .split("/")[0]
+                            .strip()
                         )
                         if color_opt_detected not in FFMPEG_COLORSPACES:
-                            color_opt_detected = (
-                                self.stream_line.split(string_pattern)[1]
-                                .split(",")[1]
-                                .split("/")[0]
-                                .strip()
-                            )
-                            if color_opt_detected not in FFMPEG_COLORSPACES:
-                                return None
-
-                    case "Primaries":
-                        color_opt_detected = (
-                            self.stream_line.split(string_pattern)[1]
-                            .split("/")[1]
-                            .strip()
-                        )
-                        if color_opt_detected not in FFMPEG_COLOR_PRIMARIES:
-                            return None
-                    case "Transfer":
-                        color_opt_detected = (
-                            self.stream_line.split(string_pattern)[1]
-                            .split("/")[2]
-                            .replace(")", "")
-                            .split(",")[0]
-                            .strip()
-                        )
-                        if color_opt_detected not in FFMPEG_COLOR_TRC:
                             return None
 
-                if "progressive" in color_opt_detected.lower():
-                    return None
-                if "unknown" in color_opt_detected.lower():
-                    return None
+                case "Primaries":
+                    color_opt_detected = (
+                        self.stream_line.split(string_pattern)[1]
+                        .split("/")[1]
+                        .strip()
+                    )
+                    if color_opt_detected not in FFMPEG_COLOR_PRIMARIES:
+                        return None
+                case "Transfer":
+                    color_opt_detected = (
+                        self.stream_line.split(string_pattern)[1]
+                        .split("/")[2]
+                        .replace(")", "")
+                        .split(",")[0]
+                        .strip()
+                    )
+                    if color_opt_detected not in FFMPEG_COLOR_TRC:
+                        return None
 
-                if len(color_opt_detected.strip()) > 1:
-                    return color_opt_detected
-
-            except Exception:
-                logger.exception("Failed to parse color option '%s'", color_opt)
+            if "progressive" in color_opt_detected.lower():
                 return None
+            if "unknown" in color_opt_detected.lower():
+                return None
+
+            if len(color_opt_detected.strip()) > 1:
+                return color_opt_detected
+
         return None
 
     def get_color_space(self) -> str:
-        return self.check_color_opt("Space")
+        try:
+            self.check_color_opt("Space")
+        except Exception:
+            logger.exception("Can't detect color space.")
 
     def get_color_primaries(self) -> str:
-        return self.check_color_opt("Primaries")
+        try:
+            return self.check_color_opt("Primaries")
+        except Exception:
+            logger.exception("Can't detect color primaries.")
 
     def get_color_transfer(self) -> str:
-        return self.check_color_opt("Transfer")
+        try:
+            return self.check_color_opt("Transfer")
+        except Exception:
+            logger.exception("Can't detect color transfer.")
 
     def get_pixel_format(self) -> str:
         if self.stream_line:
             try:
-                pixel_format = self.stream_line.split(",")[1].split("(")[0].strip()
+                pixel_format = self.stream_line \
+                    .split(",")[1].split("(")[0].strip()
                 return pixel_format
             except Exception:
                 logger.exception("Can't detect pixel format.")
@@ -280,14 +289,12 @@ class OpenCVInfo(VideoInfo):
         self.start_time = start_time
         self.end_time = end_time
         self.cap = cv2.VideoCapture(input_file)
-        self.ffmpeg_info = FFMpegInfoWrapper(input_file, ffmpeg_path=ffmpeg_path)
+        self.ffmpeg_info = FFMpegInfoWrapper(
+                                input_file,
+                                ffmpeg_path=ffmpeg_path
+                            )
 
     def is_valid_video(self):
-        # frame_count = self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
-        # log(f"Frame count: {frame_count}")
-        # if frame_count <= 1:
-        #    log("Invalid video: Frame count is less than or equal to 1.")
-        #    return False
 
         return self.cap.isOpened() and self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
@@ -352,7 +359,9 @@ def print_video_info(video_info: VideoInfo):
     print(f"Duration: {video_info.get_duration_seconds()} seconds")
     print(f"Total Frames: {video_info.get_total_frames()}")
     print(
-        f"Resolution: {video_info.get_width_x_height()[0]}x{video_info.get_width_x_height()[1]}"
+        f"Resolution: {video_info.get_width_x_height()[0]}" +
+        f"x" +
+        f"{video_info.get_width_x_height()[1]}"
     )
     print(f"FPS: {video_info.get_fps()}")
     print(f"Color Space: {video_info.get_color_space()}")
@@ -366,30 +375,3 @@ def print_video_info(video_info: VideoInfo):
 
 
 __all__ = ["FFMpegInfoWrapper", "OpenCVInfo", "print_video_info"]
-
-if __name__ == "__main__":
-    video_path = "/home/pax/Downloads/ffv1_youtube_test2.mkv"
-    # video_path = "/home/pax/Documents/test/LG New York HDR UHD 4K Demo.ts"
-    # video_path = "/home/pax/Documents/test/out.mkv"
-    # video_path = "/home/pax/Videos/TVアニメ「WIND BREAKER Season 2」ノンクレジットオープニング映像「BOYZ」SixTONES [AWlUVr7Du04]_gmfss-pro_deh264-span_janai-v2_72.0fps_3840x2160.mkv"
-    """print("Using FFMpeg:")
-    video_info = FFMpegInfoWrapper(video_path)
-    print(f"Duration: {video_info.get_duration_seconds()} seconds")
-    print(f"Total Frames: {video_info.get_total_frames()}")
-    print(f"Resolution: {video_info.get_width_x_height()}")
-    print(f"FPS: {video_info.get_fps()}")
-    print(f"Color Space: {video_info.get_color_space()}")
-    print("\nUsing OpenCV:")"""
-    video_info = OpenCVInfo(video_path)
-    print(f"Duration: {video_info.get_duration_seconds()} seconds")
-    print(f"Total Frames: {video_info.get_total_frames()}")
-    print(f"Resolution: {video_info.get_width_x_height()}")
-    print(f"FPS: {video_info.get_fps()}")
-    print(f"Color Space: {video_info.get_color_space()}")
-    print(f"Color Transfer: {video_info.get_color_transfer()}")
-    print(f"Color Primaries: {video_info.get_color_primaries()}")
-    print(f"Pixel Format: {video_info.get_pixel_format()}")
-    print(f"Video Codec: {video_info.get_codec()}")
-    print(f"Video Bitrate: {video_info.get_bitrate()} kbps")
-    print(f"Is HDR: {video_info.is_hdr()}")
-    print(f"Bit Depth: {video_info.get_bit_depth()}")
