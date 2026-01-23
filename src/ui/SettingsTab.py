@@ -459,7 +459,7 @@ class Settings:
             "auto_border_cropping": ("True", "False"),
             "video_container": ("mkv", "mp4", "mov", "webm", "avi"),
             "video_pixel_format": "ANY",
-            "pytorch_version": ("2.9.0", "2.8.0", "2.6.0"),
+            "pytorch_version": ("2.10.0", "2.9.0", "2.6.0"),
             "pytorch_backend": "ANY",
             "auto_hdr_mode": ("True", "False"),
         }

@@ -462,6 +462,7 @@ class DownloadDependencies:
                         deps += [
                             "--no-deps",
                             "dllist",
+                            "psutil",
                             f"torch-tensorrt=={torch_version}{torch_backend}",
                         ]
 

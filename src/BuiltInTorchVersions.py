@@ -17,6 +17,13 @@ class TorchVersion:
     xpu_version: str
     mps_version: str
 
+class Torch2_10(TorchVersion):
+    torch_version = "2.10.0"
+    torchvision_version = "0.25.0"
+    cuda_version = "+cu130"
+    rocm_version = "+rocm7.1"
+    xpu_version = "+xpu"
+    mps_version = ""
 
 class Torch2_9(TorchVersion):
     torch_version = "2.9.0"
@@ -26,14 +33,6 @@ class Torch2_9(TorchVersion):
     xpu_version = "+xpu"
     mps_version = ""
 
-
-class Torch2_8(TorchVersion):
-    torch_version = "2.8.0"
-    torchvision_version = "0.23.0"
-    cuda_version = "+cu129"
-    rocm_version = "+rocm6.4"
-    xpu_version = "+xpu"
-    mps_version = ""
 
 
 class Torch2_6(TorchVersion):
