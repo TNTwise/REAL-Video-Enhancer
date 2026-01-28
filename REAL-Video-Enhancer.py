@@ -462,7 +462,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.upscaleContainer.setVisible(isUpscale or isDeblur or isDenoise or isDecompress)
         self.generalUpscaleContainer.setVisible(isUpscale)
         self.settings.readSettings()
-        self.setDefaultOutputFile(self.inputFileText.text(), str(os.path.dirname(self.inputFileText.text())) if (self.settings.settings["use_same_output_folder_from_input_enabled"] == "True" and self.isVideoLoaded and len(self.batchVideos) == 0 and os.path.exists(os.path.dirname(self.inputFileText.text()))) else self.settings.settings["output_folder_location"])
+        self.setDefaultOutputFile(self.inputFileText.text(), str(os.path.dirname(self.inputFileText.text())) if (self.settings.settings["use_same_output_folder_as_input_file_enabled"] == "True" and self.isVideoLoaded and len(self.batchVideos) == 0 and os.path.exists(os.path.dirname(self.inputFileText.text()))) else self.settings.settings["output_folder_location"])
         self.updateVideoGUIText()
         self.startTimeSpinBox.setMaximum(self.videoLength)
         self.endTimeSpinBox.setMaximum(self.videoLength)

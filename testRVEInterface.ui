@@ -4509,7 +4509,7 @@ QTabWidget::pane { /* The tab widget frame */
                               </widget>
                              </item>
                              <item>
-                              <widget class="QWidget" name="use_same_output_folder_from_inputContainer" native="true">
+                              <widget class="QWidget" name="use_same_output_folder_as_input_fileContainer" native="true">
                                <layout class="QHBoxLayout" name="horizontalLayout_61">
                                 <property name="spacing">
                                  <number>10</number>
@@ -4534,7 +4534,7 @@ QTabWidget::pane { /* The tab widget frame */
                                    </font>
                                   </property>
                                   <property name="text">
-                                   <string>Use same output folder from input file folder</string>
+                                   <string>Use the same output folder as the input file</string>
                                   </property>
                                  </widget>
                                 </item>
@@ -4560,7 +4560,7 @@ QTabWidget::pane { /* The tab widget frame */
                                    </size>
                                   </property>
                                   <property name="toolTip">
-                                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Use same output folder as input:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Enabled: Use the same output folder as the inputfile folder. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Use the same output folder as the input file:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;- Enabled: The output folder will be the same as the directory where the original input file is located. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                                   </property>
                                   <property name="text">
                                    <string/>
@@ -4574,7 +4574,7 @@ QTabWidget::pane { /* The tab widget frame */
                                  </widget>
                                 </item>
                                 <item>
-                                 <widget class="QCheckBox" name="use_same_output_folder_from_input_enabled">
+                                 <widget class="QCheckBox" name="use_same_output_folder_as_input_file_enabled">
                                   <property name="text">
                                    <string/>
                                   </property>
