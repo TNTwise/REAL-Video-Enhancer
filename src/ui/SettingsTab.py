@@ -169,6 +169,12 @@ class SettingsTab:
         self.parent.output_folder_location.textChanged.connect(
             lambda: self.writeOutputFolder()
         )
+        self.parent.use_same_output_folder_from_input_enabled.stateChanged.connect(
+            lambda: self.settings.writeSetting(
+                "use_same_output_folder_from_input_enabled",
+                "True" if self.parent.use_same_output_folder_from_input_enabled.isChecked() else "False",
+            )
+        )
 
         self.parent.resetSettingsBtn.clicked.connect(self.resetSettings)
 
@@ -325,6 +331,9 @@ class SettingsTab:
         self.parent.select_output_folder_location_btn.clicked.connect(
             self.selectOutputFolder
         )
+        self.parent.use_same_output_folder_from_input_enabled.setChecked(
+            self.settings.settings["use_same_output_folder_from_input_enabled"] == "True"
+        )
         self.parent.uhd_mode.setChecked(self.settings.settings["uhd_mode"] == "True")
         self.parent.ncnn_gpu_id.setValue(int(self.settings.settings["ncnn_gpu_id"]))
         self.parent.pytorch_gpu_id.setValue(
@@ -401,6 +410,7 @@ class Settings:
             "discord_rich_presence": "False",
             "video_quality": "High",
             "output_folder_location": output_folder_default,
+            "use_same_output_folder_from_input_enabled": "False",
             "last_input_folder_location": output_folder_default,
             "uhd_mode": "True",
             "ncnn_gpu_id": "0",
@@ -446,6 +456,7 @@ class Settings:
             "discord_rich_presence": ("True", "False"),
             "video_quality": ("Low", "Medium", "High", "Very_High", "Ultra", "Lossless"),
             "output_folder_location": "ANY",
+            "use_same_output_folder_from_input_enabled": ("True", "False"),
             "last_input_folder_location": "ANY",
             "uhd_mode": ("True", "False"),
             "ncnn_gpu_id": "ANY",
