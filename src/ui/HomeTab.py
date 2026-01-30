@@ -29,9 +29,6 @@ class HomeTab:
         self.parent.githubBtn.clicked.connect(
             lambda: openLink("https://github.com/tntwise/REAL-Video-Enhancer")
         )
-        self.parent.kofiBtn.clicked.connect(
-            lambda: openLink("https://ko-fi.com/tntwise")
-        )
         if networkCheck(
             "https://api.github.com/repos/tntwise/real-video-enhancer/releases"
         ):
