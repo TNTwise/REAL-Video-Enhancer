@@ -1,4 +1,6 @@
 # RVE 2.4.2
+### Added
+ - input folder structure for output files thanks @adriabama06
 ### Fixed
  - FFMpeg reading randomly stopping, thanks @potocpav
  - PLKSR LayerNorm models
