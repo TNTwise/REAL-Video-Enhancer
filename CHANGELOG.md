@@ -1,6 +1,7 @@
 # RVE 2.4.2
 ### Added
- - input folder structure for output files thanks @adriabama06
+ - Input folder structure for output files thanks @adriabama06
+ - Toggle for custom encoder settings, saves on restart now.
 ### Fixed
  - FFMpeg reading randomly stopping, thanks @potocpav
  - PLKSR LayerNorm models
