@@ -52,8 +52,19 @@ class SettingsTab:
         self.parent.openRVEFolderBtn.clicked.connect(
             lambda: open_folder(currentDirectory())
         )
-
+        self.parent.use_custom_encoder_command.stateChanged.connect(
+            self.toggleCustomEncoderCommandVisibility
+        )
+        self.toggleCustomEncoderCommandVisibility()
         self.updateFFMpegCommand()
+
+    def toggleCustomEncoderCommandVisibility(self):
+        self.parent.EncoderCommandContainer.setVisible(
+            self.parent.use_custom_encoder_command.isChecked()
+        )
+        self.parent.EncoderCommand.setText(
+            self.settings.settings["encoder_command"]
+        )
 
     def updateFFMpegCommand(self):
         """
@@ -116,7 +127,8 @@ class SettingsTab:
             self.color_primaries,
             self.color_transfer,
         ).build_command()
-        self.parent.EncoderCommand.setText(" ".join(command))
+        if not self.parent.use_custom_encoder_command.isChecked():
+            self.parent.EncoderCommand.setText(" ".join(command))
         self.parent.updateVideoGUIText()
 
     def connectWriteSettings(self):
@@ -241,6 +253,21 @@ class SettingsTab:
                 "video_encoder_speed", self.parent.video_encoder_speed.currentText()
             )
         )
+        self.parent.use_custom_encoder_command.stateChanged.connect(
+            lambda: self.settings.writeSetting(
+                "use_custom_encoder_command",
+                "True"
+                if self.parent.use_custom_encoder_command.isChecked()
+                else "False",
+            )
+        )
+        self.parent.EncoderCommand.textChanged.connect(
+            lambda: self.settings.writeSetting(
+                "encoder_command",
+                self.parent.EncoderCommand.text(),
+            ) if self.parent.use_custom_encoder_command.isChecked() else None
+        )
+
         self.parent.inputFileText.textChanged.connect(self.updateFFMpegCommand)
         self.parent.encoder.currentIndexChanged.connect(self.updateFFMpegCommand)
         self.parent.audio_encoder.currentIndexChanged.connect(self.updateFFMpegCommand)
@@ -356,6 +383,12 @@ class SettingsTab:
         self.parent.subtitle_encoder.setCurrentText(
             self.settings.settings["subtitle_encoder"]
         )
+        self.parent.use_custom_encoder_command.setChecked(
+            self.settings.settings["use_custom_encoder_command"] == "True"
+        )
+        self.parent.EncoderCommand.setText(
+            self.settings.settings["encoder_command"]
+        )
 
     def selectOutputFolder(self):
         outputFile = QFileDialog.getExistingDirectory(
@@ -410,6 +443,8 @@ class Settings:
             "pytorch_version": "2.9.0",
             "pytorch_backend": "CUDA",
             "auto_hdr_mode": "True",
+            "use_custom_encoder_command": "False",
+            "encoder_command": "",
         }
         self.allowedSettings = {
             "precision": ("auto", "float32", "float16"),
@@ -462,6 +497,8 @@ class Settings:
             "pytorch_version": ("2.10.0", "2.9.0", "2.6.0"),
             "pytorch_backend": "ANY",
             "auto_hdr_mode": ("True", "False"),
+            "use_custom_encoder_command": ("True", "False"),
+            "encoder_command": "ANY",
         }
         self.settings = self.defaultSettings.copy()
         if not os.path.isfile(self.settingsFile):
