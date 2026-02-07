@@ -39,5 +39,12 @@ def warp(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
     if tenInput.device.type == 'mps':
         pd = 'zeros'
         g = g.clamp(-1, 1)
-    
-    return torch.ops.aten.grid_sampler_2d(tenInput, g, 0, 1, True).to(dtype)
+        return F.grid_sample(
+            input=tenInput,
+            grid=g,
+            mode='bilinear',
+            padding_mode=pd,
+            align_corners=True,
+        ).to(dtype)
+    else:
+        return torch.ops.aten.grid_sampler_2d(tenInput, g, 0, 1, True).to(dtype)
