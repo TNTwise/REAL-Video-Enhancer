@@ -36,6 +36,7 @@ logger = get_logger(__name__)
 with suppress_stdout_stderr():
     import tensorrt as trt
     import torch
+    from torch._decomp import get_decompositions
     import torch_tensorrt
     from torch._export.converter import TS2EPConverter
     from torch.export.exported_program import ExportedProgram
@@ -147,6 +148,7 @@ class TorchTensorRTHandler:
             1: trt.InterpolationMode.NEAREST,
             2: trt.InterpolationMode.CUBIC,
         })
+        exported_program = exported_program.run_decompositions(get_decompositions([torch.ops.aten.grid_sampler_2d]))
         return exported_program
 
     def check_engine_exists(self, trt_engine_name: str) -> bool:

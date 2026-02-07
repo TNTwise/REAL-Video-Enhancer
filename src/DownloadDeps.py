@@ -448,7 +448,7 @@ class DownloadDependencies:
                 return_codes.append(return_code)
 
                 if backend == "tensorrt":
-                    trt_ver = "10.13.3.9"
+                    trt_ver = "10.15.1.29"
                     deps = [
                         f"tensorrt=={trt_ver}",
                         f"tensorrt_cu12=={trt_ver}",
