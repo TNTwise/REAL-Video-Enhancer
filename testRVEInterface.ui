@@ -343,13 +343,6 @@ padding:5px 10px;
                     </spacer>
                    </item>
                    <item>
-                    <widget class="QLabel" name="label_13">
-                     <property name="text">
-                      <string>Support Me!</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
                     <widget class="QLabel" name="label_16">
                      <property name="text">
                       <string>GitHub Page</string>
