@@ -62,9 +62,13 @@ class SettingsTab:
         self.parent.EncoderCommandContainer.setVisible(
             self.parent.use_custom_encoder_command.isChecked()
         )
-        self.parent.EncoderCommand.setText(
-            self.settings.settings["encoder_command"]
-        )
+        encoder_command = self.settings.settings["encoder_command"]
+        if encoder_command.strip() == "":
+            self.updateFFMpegCommand()
+        else:
+            self.parent.EncoderCommand.setText(
+                encoder_command
+            )
 
     def updateFFMpegCommand(self):
         """
