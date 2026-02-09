@@ -2,6 +2,7 @@
 ### Added
  - Input folder structure for output files thanks @adriabama06
  - Toggle for custom encoder settings, saves on restart now.
+ - Decimal frame timestep
 ### Fixed
  - FFMpeg reading randomly stopping, thanks @potocpav
  - PLKSR LayerNorm models
