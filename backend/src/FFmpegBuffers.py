@@ -176,7 +176,7 @@ class FFmpegWrite(Buffer):
         benchmark: bool,
         slowmo_mode: bool,
         upscaleTimes: int,
-        interpolateFactor: int,
+        interpolateFactor: float,
         ceilInterpolateFactor: int,
         video_encoder: EncoderSettings,
         audio_encoder: EncoderSettings,
@@ -233,6 +233,15 @@ class FFmpegWrite(Buffer):
             if not self.slowmo_mode
             else self.fps
         )
+        # inputFPS reflects the actual rate of frames the model produces (using ceil)
+        # For integer factors, inputFPS == outputFPS (no frame dropping).
+        # For decimal factors (e.g. 2.5x), inputFPS > outputFPS and FFmpeg
+        # drops the excess frames to achieve the correct target FPS.
+        self.inputFPS = (
+            (self.fps * self.ceilInterpolateFactor)
+            if not self.slowmo_mode
+            else (self.fps * self.ceilInterpolateFactor / self.interpolateFactor)
+        )
         self.ffmpeg_log = pathlib.Path(self.ffmpeg_log_file).open('w', encoding='utf-8')
         try:
             command = self.command()
@@ -256,7 +265,7 @@ class FFmpegWrite(Buffer):
                 '-loglevel',
                 'error',
                 '-framerate',
-                f'{self.outputFPS}',
+                f'{self.inputFPS}',
                 '-f',
                 'rawvideo',
                 '-pix_fmt',
@@ -315,7 +324,7 @@ class FFmpegWrite(Buffer):
 
             command += [
                 '-framerate',
-                f'{self.outputFPS}',
+                f'{self.inputFPS}',
                 '-f',
                 'rawvideo',
                 '-pix_fmt',
@@ -326,8 +335,6 @@ class FFmpegWrite(Buffer):
                 f'{self.outputWidth}x{self.outputHeight}',
                 '-i',
                 '-',
-                '-r',
-                f'{self.outputFPS}',
             ]
 
             if not self.slowmo_mode:
@@ -357,6 +364,13 @@ class FFmpegWrite(Buffer):
                     '-muxdelay',
                     '0',
                 ]
+
+            # Output frame rate must come after all -i inputs
+            # so FFmpeg treats it as an output option, not an input option.
+            command += [
+                '-r',
+                f'{self.outputFPS}',
+            ]
 
             if self.custom_encoder is not None:
                 for i in self.custom_encoder.split():
@@ -447,7 +461,7 @@ class FFmpegWrite(Buffer):
                 '-pix_fmt',
                 'rgb48le' if self.hdr_mode else 'rgb24',
                 '-r',
-                str(self.outputFPS),
+                str(self.inputFPS),
                 '-i',
                 '-',
                 '-benchmark',

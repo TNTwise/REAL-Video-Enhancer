@@ -1056,7 +1056,7 @@ background-color:#343b47
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-479</y>
+                                   <y>0</y>
                                    <width>470</width>
                                    <height>1015</height>
                                   </rect>
@@ -1546,7 +1546,7 @@ background-color:#343b47
                                            <enum>QAbstractSpinBox::ButtonSymbols::UpDownArrows</enum>
                                           </property>
                                           <property name="decimals">
-                                           <number>0</number>
+                                           <number>1</number>
                                           </property>
                                           <property name="minimum">
                                            <double>2.000000000000000</double>
@@ -2367,8 +2367,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                  <property name="geometry">
                                   <rect>
                                    <x>0</x>
-                                   <y>-32</y>
-                                   <width>452</width>
+                                   <y>0</y>
+                                   <width>410</width>
                                    <height>550</height>
                                   </rect>
                                  </property>
@@ -3511,8 +3511,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>460</width>
-                                <height>518</height>
+                                <width>395</width>
+                                <height>387</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -4461,7 +4461,7 @@ QTabWidget::pane { /* The tab widget frame */
                    <x>0</x>
                    <y>0</y>
                    <width>397</width>
-                   <height>379</height>
+                   <height>369</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -4503,8 +4503,8 @@ QTabWidget::pane { /* The tab widget frame */
                              <rect>
                               <x>0</x>
                               <y>0</y>
-                              <width>489</width>
-                              <height>173</height>
+                              <width>470</width>
+                              <height>168</height>
                              </rect>
                             </property>
                             <layout class="QVBoxLayout" name="verticalLayout_25">

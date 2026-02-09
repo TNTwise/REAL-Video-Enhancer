@@ -57,7 +57,7 @@ class Render:
     FFMpegRender options:
     inputFile: str, The path to the input file.
     outputFile: str, The path to the output file.
-    interpolateTimes: int, this sets the multiplier for the framerate when interpolating, when only upscaling this will be set to 1.
+    interpolateTimes: float, this sets the multiplier for the framerate when interpolating (supports decimal values like 2.5), when only upscaling this will be set to 1.
     encoder: str, The exact name of the encoder ffmpeg will use (default=libx264)
     pixelFormat: str, The pixel format ffmpeg will use, (default=yuv420p)
 
@@ -90,7 +90,7 @@ class Render:
         # model settings
         upscaleModel=None,
         interpolateModel=None,
-        interpolateFactor: int = 1,
+        interpolateFactor: float = 1.0,
         extraRestorationModels=None,
         sceneDetectModel: str = None,
         tile_size=None,
@@ -133,10 +133,11 @@ class Render:
         self.device = device
         self.precision = precision
         self.interpolateFactor = interpolateFactor
+        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
         # max timestep is a hack to make sure ncnn cache frames too early, and ncnn breaks if i modify the code at all so ig this is what we are doing
         # also used to help with performace and caching
-        self.maxTimestep = (interpolateFactor - 1) / interpolateFactor
-        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
+        # must use ceilInterpolateFactor so the last timestep matches exactly
+        self.maxTimestep = (self.ceilInterpolateFactor - 1) / self.ceilInterpolateFactor
 
         # self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
         self.setupFrame0 = None

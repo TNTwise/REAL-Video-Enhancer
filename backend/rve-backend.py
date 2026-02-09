@@ -256,7 +256,7 @@ class HandleApplication:
         )
         parser.add_argument(
             '--interpolate_factor',
-            help='Multiplier for interpolation, will round up to nearest integer for interpolation but the fps will be correct',
+            help='Multiplier for interpolation. Supports decimal values (e.g. 2.5). The model rounds up to the nearest integer internally and FFmpeg adjusts the output to the exact target FPS.',
             type=float,
             default=1.0,
         )
@@ -518,18 +518,18 @@ class HandleApplication:
                 raise OSError('Input file does not exist!')
         if self.args.tilesize < 0:
             raise ValueError('Tilesize must be greater than 0')
-        if self.args.interpolate_factor < 0:
-            raise ValueError('Interpolation factor must be greater than 0')
-        if self.args.interpolate_factor == 1 and self.args.interpolate_model:
+        if self.args.interpolate_factor < 1:
+            raise ValueError('Interpolation factor must be at least 1')
+        if self.args.interpolate_factor <= 1 and self.args.interpolate_model:
             raise ValueError(
-                'Interpolation factor must be greater than 1 if interpolation model is used.\nPlease use --interpolateFactor 2 for 2x interpolation!'
+                'Interpolation factor must be greater than 1 if interpolation model is used.\nPlease use --interpolate_factor 2 for 2x interpolation (decimal values like 2.5 are also supported)!'
             )
         if (
-            self.args.interpolate_factor != 1
+            self.args.interpolate_factor > 1
             and not self.args.interpolate_model
         ):
             raise ValueError(
-                'Interpolation factor must be 1 if no interpolation model is used.\nPlease use --interpolateFactor 1 for no interpolation!'
+                'Interpolation factor must be 1 if no interpolation model is used.\nPlease use --interpolate_factor 1 for no interpolation!'
             )
         if self.args.backend == 'ncnn' and self.args.hdr_mode:
             print(

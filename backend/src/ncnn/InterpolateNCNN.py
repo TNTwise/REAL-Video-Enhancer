@@ -134,7 +134,7 @@ class InterpolateRIFENCNN:
         height: int = 1080,
         threads: int = 1,
         gpuid: int = 0,
-        max_timestep: int = 1,
+        max_timestep: float = 1.0,
         interpolateFactor: int = 2,
         hdr_mode: bool = False,
     ):
