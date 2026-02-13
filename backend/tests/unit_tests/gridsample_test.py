@@ -23,7 +23,7 @@ class TorchModel(torch.nn.Module):
         return F.grid_sample(input=tenInput, grid=g, mode="bilinear", padding_mode=pd, align_corners=True).to(dtype)
 
 
-def _build_inputs(device, dtype=torch.float16, height=64, width=64, seed=1234):
+def _build_inputs(device, dtype=torch.float16, height=1080, width=1920, seed=1234):
     generator = torch.Generator(device=device)
     generator.manual_seed(seed)
     tenInput = torch.rand(1, 3, height, width, device=device, dtype=dtype, generator=generator)
