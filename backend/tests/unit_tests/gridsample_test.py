@@ -25,19 +25,19 @@ class TorchModel(torch.nn.Module):
         ).to(dtype)
 
 def test_warp():
-    tenInput = torch.rand(1, 3, 4, 4)
-    tenFlow = torch.rand(1, 2, 4, 4)
-    tenFlow_div = torch.tensor([1.0, 1.0])
-    backwarp_tenGrid = torch.rand(1, 2, 4, 4)
+    tenInput = torch.rand(1, 3, 4, 4).cuda()
+    tenFlow = torch.rand(1, 2, 4, 4).cuda()
+    tenFlow_div = torch.tensor([1.0, 1.0]).cuda()
+    backwarp_tenGrid = torch.rand(1, 2, 4, 4).cuda()
 
-    model = TorchModel()
+    model = TorchModel().cuda()
     output = model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
 
 def test_warp_trt():
-    tenInput = torch.rand(1, 3, 4, 4)
-    tenFlow = torch.rand(1, 2, 4, 4)
-    tenFlow_div = torch.tensor([1.0, 1.0])
-    backwarp_tenGrid = torch.rand(1, 2, 4, 4)
+    tenInput = torch.rand(1, 3, 4, 4).cuda()
+    tenFlow = torch.rand(1, 2, 4, 4).cuda()
+    tenFlow_div = torch.tensor([1.0, 1.0]).cuda()
+    backwarp_tenGrid = torch.rand(1, 2, 4, 4).cuda()
 
     model = TorchModel()
     trt_model = torch_tensorrt.compile(model, inputs=[tenInput, tenFlow, tenFlow_div, backwarp_tenGrid])
