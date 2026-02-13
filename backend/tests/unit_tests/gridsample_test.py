@@ -32,17 +32,17 @@ def test_warp():
 
     model = TorchModel().cuda()
     output = model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
-
+    return output
 def test_warp_trt():
     tenInput = torch.rand(1, 3, 4, 4).cuda()
     tenFlow = torch.rand(1, 2, 4, 4).cuda()
     tenFlow_div = torch.tensor([1.0, 1.0]).cuda()
     backwarp_tenGrid = torch.rand(1, 2, 4, 4).cuda()
 
-    model = TorchModel()
+    model = TorchModel().cuda()
     trt_model = torch_tensorrt.compile(model, inputs=[tenInput, tenFlow, tenFlow_div, backwarp_tenGrid])
     output = trt_model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
-
+    return output
 if __name__ == "__main__":
-    test_warp()
-    test_warp_trt()
+    print(test_warp())
+    print(test_warp_trt())
