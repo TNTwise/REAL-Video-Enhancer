@@ -1,6 +1,10 @@
 import torch
 import torch.nn.functional as F
 import torch_tensorrt
+from torch.export.exported_program import ExportedProgram
+
+
+
 
 class TorchModel(torch.nn.Module):
     def forward(self, tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
@@ -31,13 +35,24 @@ def test_warp_trt():
 
     return output
 if __name__ == "__main__":
-    tenInput = torch.rand(1, 3, 1920, 1920).cuda()
-    tenFlow = torch.rand(1, 2, 1920, 1920).cuda()
-    tenFlow_div = torch.tensor([1.0, 1.0]).cuda()
-    backwarp_tenGrid = torch.rand(1, 2, 1920, 1920).cuda()
-    model = TorchModel().cuda()
-    trt_model = torch_tensorrt.compile(model, inputs=[tenInput, tenFlow, tenFlow_div, backwarp_tenGrid])
-    output_trt = trt_model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
+    tenInput = torch.rand(1, 3, 1920, 1920).cuda().half()
+    tenFlow = torch.rand(1, 2, 1920, 1920).cuda().half()
+    tenFlow_div = torch.tensor([1.0, 1.0]).cuda().half()
+    backwarp_tenGrid = torch.rand(1, 2, 1920, 1920).cuda().half()
+    model = TorchModel().cuda().half()
+    example_inputs = tuple(tenInput,tenFlow,tenFlow_div,backwarp_tenGrid)
+    exported = torch.export.export(
+        model, example_inputs
+    )
+    model_trt = torch_tensorrt.dynamo.compile(
+                exported,
+                example_inputs,
+                device=torch.device('cuda'),
+                use_explicit_typing=True,
+                num_avg_timing_iters=4,
+                min_block_size=1,
+            )
+    output_trt = model_trt(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
     output = model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
     
     print(test_warp())
