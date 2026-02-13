@@ -97,10 +97,13 @@ def test_warp_trt():
 
 if __name__ == "__main__":
     output = test_warp()
+    print(output)
+    
     save_output_image(output, 'backend/tests/unit_tests/output_pytorch.png')
     print('Saved backend/tests/unit_tests/output_pytorch.png')
 
     output_trt = test_warp_trt()
+    
     if output_trt is not None:
         save_output_image(output_trt, 'backend/tests/unit_tests/output_trt.png')
         print('Saved backend/tests/unit_tests/output_trt.png')
