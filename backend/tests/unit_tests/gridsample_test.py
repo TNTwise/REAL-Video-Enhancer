@@ -80,8 +80,10 @@ def test_warp_trt():
         exported,
         tuple(example_inputs),
         device=torch.device('cuda:0'),
+        enabled_precisions=(torch.float,),
         use_explicit_typing=True,
         num_avg_timing_iters=4,
+        workspace_size=0,
         min_block_size=1,
     )
     output = model_trt(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
