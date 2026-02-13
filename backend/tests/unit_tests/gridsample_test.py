@@ -27,11 +27,13 @@ class TorchModel(torch.nn.Module):
         ).to(dtype)
 
 
-def _build_inputs(device, dtype=torch.float16, height=64, width=64):
-    tenInput = torch.rand(1, 3, height, width, device=device, dtype=dtype)
-    tenFlow = torch.rand(1, 2, height, width, device=device, dtype=dtype)
+def _build_inputs(device, dtype=torch.float16, height=64, width=64, seed=1234):
+    generator = torch.Generator(device=device)
+    generator.manual_seed(seed)
+    tenInput = torch.rand(1, 3, height, width, device=device, dtype=dtype, generator=generator)
+    tenFlow = torch.rand(1, 2, height, width, device=device, dtype=dtype, generator=generator)
     tenFlow_div = torch.tensor([1.0, 1.0], device=device, dtype=dtype)
-    backwarp_tenGrid = torch.rand(1, 2, height, width, device=device, dtype=dtype)
+    backwarp_tenGrid = torch.rand(1, 2, height, width, device=device, dtype=dtype, generator=generator)
     return tenInput, tenFlow, tenFlow_div, backwarp_tenGrid
 
 
@@ -39,7 +41,9 @@ def test_warp():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     model = TorchModel().to(device).eval()
     tenInput, tenFlow, tenFlow_div, backwarp_tenGrid = _build_inputs(
-        device, dtype=torch.float16 if device.type == 'cuda' else torch.float32
+        device,
+        dtype=torch.float16 if device.type == 'cuda' else torch.float32,
+        seed=1234,
     )
     output = model(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
     assert output.shape == tenInput.shape
@@ -53,7 +57,7 @@ def test_warp_trt():
     device = torch.device('cuda:0')
     model = TorchModel().to(device).half().eval()
     tenInput, tenFlow, tenFlow_div, backwarp_tenGrid = _build_inputs(
-        device, dtype=torch.float16
+        device, dtype=torch.float16, seed=1234
     )
     example_inputs = (tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
 
