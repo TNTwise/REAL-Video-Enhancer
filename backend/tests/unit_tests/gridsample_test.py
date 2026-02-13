@@ -11,22 +11,16 @@ class TorchModel(torch.nn.Module):
         dtype = tenInput.dtype
         tenInput = tenInput.to(torch.float)
         tenFlow = tenFlow.to(torch.float)
-        tenFlow_div = tenFlow_div.to(torch.float)
 
         tenFlow = torch.cat(
             [tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1
         )
         g = (backwarp_tenGrid + tenFlow).permute(0, 2, 3, 1)
         pd = 'border'
-        pd = 'zeros'
-        g = g.clamp(-1, 1)
-        return F.grid_sample(
-            input=tenInput,
-            grid=g,
-            mode='bilinear',
-            padding_mode=pd,
-            align_corners=True,
-        ).to(dtype)
+        if tenInput.device.type == "mps":
+            pd = 'zeros'
+            g = g.clamp(-1, 1)
+        return F.grid_sample(input=tenInput, grid=g, mode="bilinear", padding_mode=pd, align_corners=True).to(dtype)
 
 
 def _build_inputs(device, dtype=torch.float16, height=64, width=64, seed=1234):
