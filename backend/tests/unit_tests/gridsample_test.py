@@ -3,10 +3,11 @@ import torch.nn.functional as F
 import torch_tensorrt
 
 class TorchModel(torch.nn.Module):
-    def forward(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
+    def forward(self, tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
         dtype = tenInput.dtype
         tenInput = tenInput.to(torch.float)
         tenFlow = tenFlow.to(torch.float)
+        tenFlow_div = tenFlow_div.to(torch.float)
 
         tenFlow = torch.cat(
             [tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1
@@ -26,7 +27,7 @@ class TorchModel(torch.nn.Module):
 def test_warp():
     tenInput = torch.rand(1, 3, 4, 4)
     tenFlow = torch.rand(1, 2, 4, 4)
-    tenFlow_div = [1.0, 1.0]
+    tenFlow_div = torch.tensor([1.0, 1.0])
     backwarp_tenGrid = torch.rand(1, 2, 4, 4)
 
     model = TorchModel()
@@ -35,7 +36,7 @@ def test_warp():
 def test_warp_trt():
     tenInput = torch.rand(1, 3, 4, 4)
     tenFlow = torch.rand(1, 2, 4, 4)
-    tenFlow_div = [1.0, 1.0]
+    tenFlow_div = torch.tensor([1.0, 1.0])
     backwarp_tenGrid = torch.rand(1, 2, 4, 4)
 
     model = TorchModel()
