@@ -1,6 +1,8 @@
 import torch
 import torch.nn.functional as F
-import torch_tensorrt
+import importlib
+
+torch_tensorrt = importlib.import_module('torch_tensorrt') if importlib.util.find_spec('torch_tensorrt') else None
 
 class TorchModel(torch.nn.Module):
     def forward(self, tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
@@ -45,7 +47,7 @@ def test_warp():
 
 
 def test_warp_trt():
-    if not torch.cuda.is_available():
+    if torch_tensorrt is None or not torch.cuda.is_available():
         return None
 
     device = torch.device('cuda:0')
