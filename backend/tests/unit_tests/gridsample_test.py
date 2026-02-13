@@ -40,7 +40,7 @@ if __name__ == "__main__":
     tenFlow_div = torch.tensor([1.0, 1.0]).cuda().half()
     backwarp_tenGrid = torch.rand(1, 2, 1920, 1920).cuda().half()
     model = TorchModel().cuda().half()
-    example_inputs = tuple(tenInput,tenFlow,tenFlow_div,backwarp_tenGrid)
+    example_inputs = tuple([tenInput,tenFlow,tenFlow_div,backwarp_tenGrid])
     exported = torch.export.export(
         model, example_inputs
     )
