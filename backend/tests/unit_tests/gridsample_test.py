@@ -86,8 +86,7 @@ def test_warp_trt():
         exported,
         tuple(example_inputs),
         device=torch.device('cuda:0'),
-        enabled_precisions={torch.half},
-        use_explicit_typing=False,
+        use_explicit_typing=True,
         num_avg_timing_iters=4,
         min_block_size=1,
     )
