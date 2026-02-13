@@ -86,6 +86,14 @@ def test_warp_trt():
         workspace_size=0,
         min_block_size=1,
     )
+    trt_engine_path = Path('trt_engine.pt')
+    torch_tensorrt.save(
+            model_trt,
+            trt_engine_path,
+            output_format='torchscript',
+            inputs=tuple(example_inputs),
+        )
+    model_trt = torch.jit.load(trt_engine_path).eval().to(device)
     output = model_trt(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid)
     assert output.shape == tenInput.shape
     return output
