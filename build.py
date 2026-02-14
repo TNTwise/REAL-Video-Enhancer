@@ -156,9 +156,13 @@ class BuildManager:
         print("Building GUI")
         #set_mainwindow_size()
         if PLATFORM == "darwin" or PLATFORM == "linux":
-            os.system(
-                f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic -g python testRVEInterface.ui > mainwindow.py"
-            )
+            uic_path = f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/uic"
+            with open("mainwindow.py", "w", encoding="utf-8") as mainwindow_out:
+                subprocess.run(
+                    [uic_path, "-g", "python", "testRVEInterface.ui"],
+                    stdout=mainwindow_out,
+                    check=True,
+                )
         if PLATFORM == "win32":
             os.system(
                 r".\venv\Lib\site-packages\PySide6\uic.exe -g python testRVEInterface.ui > mainwindow.py"
@@ -167,9 +171,13 @@ class BuildManager:
     def build_resources(self):
         print("Building resources.rc")
         if PLATFORM == "darwin" or PLATFORM == "linux":
-            os.system(
-                f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/rcc -g python resources.qrc > resources_rc.py"
-            )
+            rcc_path = f"{self.python_manager.get_venv_site_packages()}/PySide6/Qt/libexec/rcc"
+            with open("resources_rc.py", "w", encoding="utf-8") as resources_out:
+                subprocess.run(
+                    [rcc_path, "-g", "python", "resources.qrc"],
+                    stdout=resources_out,
+                    check=True,
+                )
         if PLATFORM == "win32":
             os.system(
                 r".\venv\Lib\site-packages\PySide6\rcc.exe -g python resources.qrc > resources_rc.py"
