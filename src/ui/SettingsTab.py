@@ -30,6 +30,9 @@ class SettingsTab:
         self.color_transfer = None
         self.in_pix_fmt = ""
         self.hdr_mode = False
+        self.fps = None
+        self.output_fps = None
+        self.use_ffmpeg_reduce_framerate = False
         self.ffmpeg_settings_dict = {
             "encoder": self.parent.encoder,
             "audio_encoder": self.parent.audio_encoder,
@@ -102,6 +105,16 @@ class SettingsTab:
                 self.color_primaries = self.ffmpegInfoWrapper.color_primaries
                 self.color_transfer = self.ffmpegInfoWrapper.color_transfer
                 self.in_pix_fmt = self.ffmpegInfoWrapper.pixel_format
+                self.fps = self.ffmpegInfoWrapper.fps
+        
+        if self.fps:
+            inter_mult = self.parent.getInterpolationMultiplier(self.parent.interpolateModelComboBox.currentText())
+            self.output_fps = self.fps * inter_mult
+            self.use_ffmpeg_reduce_framerate = (
+                self.fps * inter_mult != int(self.fps * inter_mult)
+                and
+                self.settings.settings["use_custom_encoder_command"] != "True")
+                
 
         if self.hdr_mode or (
             "10" in self.in_pix_fmt
@@ -130,6 +143,8 @@ class SettingsTab:
             self.color_space if self.in_pix_fmt != "yuv420p" else None,
             self.color_primaries,
             self.color_transfer,
+            self.output_fps,
+            self.use_ffmpeg_reduce_framerate
         ).build_command()
         if not self.parent.use_custom_encoder_command.isChecked():
             self.parent.EncoderCommand.setText(" ".join(command))
@@ -287,6 +302,7 @@ class SettingsTab:
         self.parent.subtitle_encoder.currentIndexChanged.connect(
             self.updateFFMpegCommand
         )
+        self.parent.interpolationMultiplierSpinBox.valueChanged.connect(self.updateFFMpegCommand)
 
     def writeOutputFolder(self):
         outputlocation = self.parent.output_folder_location.text()

@@ -12,6 +12,8 @@ class FFMpegCommand:
         color_space: str,
         color_primaries: str,
         color_transfer: str,
+        output_fps: str,
+        use_ffmpeg_reduce_framerate: str,
     ):
         self._video_encoder = video_encoder
         self._video_encoder_speed = video_encoder_speed
@@ -24,6 +26,8 @@ class FFMpegCommand:
         self._color_primaries = color_primaries
         self._color_transfer = color_transfer
         self._subtitle_encoder = subtitle_encoder
+        self._output_fps = output_fps
+        self._use_ffmpeg_reduce_framerate = use_ffmpeg_reduce_framerate
 
     def _get_video_quality(
         self,
@@ -300,5 +304,8 @@ class FFMpegCommand:
                 command += ["-c:s", "webvtt"]
             case _:
                 command += ["-c:s", "copy"]
+
+        if self._use_ffmpeg_reduce_framerate:
+            command += ["-vf", f"fps={self._output_fps}"]
 
         return command

@@ -1058,7 +1058,7 @@ background-color:#343b47
                                    <x>0</x>
                                    <y>0</y>
                                    <width>470</width>
-                                   <height>1015</height>
+                                   <height>1022</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -1550,6 +1550,9 @@ background-color:#343b47
                                           </property>
                                           <property name="minimum">
                                            <double>2.000000000000000</double>
+                                          </property>
+                                          <property name="singleStep">
+                                           <double>0.500000000000000</double>
                                           </property>
                                           <property name="value">
                                            <double>2.000000000000000</double>
@@ -2368,8 +2371,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
                                   <rect>
                                    <x>0</x>
                                    <y>0</y>
-                                   <width>410</width>
-                                   <height>550</height>
+                                   <width>452</width>
+                                   <height>558</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_40">
@@ -3511,8 +3514,8 @@ border-radius:10px;
                                <rect>
                                 <x>0</x>
                                 <y>0</y>
-                                <width>395</width>
-                                <height>387</height>
+                                <width>460</width>
+                                <height>518</height>
                                </rect>
                               </property>
                               <property name="sizePolicy">
@@ -4460,8 +4463,8 @@ QTabWidget::pane { /* The tab widget frame */
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>397</width>
-                   <height>369</height>
+                   <width>374</width>
+                   <height>385</height>
                   </rect>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_18">
@@ -4503,8 +4506,8 @@ QTabWidget::pane { /* The tab widget frame */
                              <rect>
                               <x>0</x>
                               <y>0</y>
-                              <width>470</width>
-                              <height>168</height>
+                              <width>444</width>
+                              <height>174</height>
                              </rect>
                             </property>
                             <layout class="QVBoxLayout" name="verticalLayout_25">
@@ -5792,8 +5795,8 @@ color: red;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>791</width>
-                      <height>292</height>
+                      <width>721</width>
+                      <height>294</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
@@ -6528,6 +6531,7 @@ color: red;
   </widget>
  </widget>
  <resources>
+  <include location="resources.qrc"/>
   <include location="resources.qrc"/>
  </resources>
  <connections/>
