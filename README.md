@@ -11,6 +11,11 @@
 <a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">
     <img src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg" height="50px"/>
   </a>
+<br/>
+<strong> Download on Steam! </strong>
+<br/>
+[![Download on Steam](https://img.shields.io/badge/Steam-000000?style=for-the-badge&logo=steam&logoColor=white)](https://store.steampowered.com/app/4087640/)
+
 
 
 <p align=center>

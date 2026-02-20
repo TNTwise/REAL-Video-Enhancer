@@ -512,9 +512,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         )
         self.generalUpscaleContainer.setVisible(isUpscale)
         self.settings.readSettings()
+<<<<<<< HEAD
         self.setDefaultOutputFile(
             self.inputFileText.text(), self.settings.settings["output_folder_location"]
         )
+=======
+        self.setDefaultOutputFile(self.inputFileText.text(), str(os.path.dirname(self.inputFileText.text())) if (self.settings.settings["use_same_output_folder_as_input_file_enabled"] == "True" and self.isVideoLoaded and len(self.batchVideos) == 0 and os.path.exists(os.path.dirname(self.inputFileText.text()))) else self.settings.settings["output_folder_location"])
+>>>>>>> a7294b33362e386c777367c9ae4843c7720a797d
         self.updateVideoGUIText()
         self.startTimeSpinBox.setMaximum(self.videoLength)
         self.endTimeSpinBox.setMaximum(self.videoLength)
