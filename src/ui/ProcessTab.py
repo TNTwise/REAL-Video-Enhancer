@@ -1,3 +1,4 @@
+import math
 import subprocess
 import os
 from threading import Thread
@@ -362,7 +363,7 @@ class ProcessTab:
                 channels=6 if renderOptions.hdrMode else 3
             )
             self.max_value = (
-                renderOptions.videoFrameCount * renderOptions.interpolateTimes
+                renderOptions.videoFrameCount * math.ceil(renderOptions.interpolateTimes)
             )
             command = self.build_command(renderOptions)
             log(str(command))

@@ -205,7 +205,7 @@ class RenderOptions:
         return self._interpolateTimes
 
     @interpolateTimes.setter
-    def interpolateTimes(self, value: int):
+    def interpolateTimes(self, value: float):
         self._interpolateTimes = value
 
     @property
