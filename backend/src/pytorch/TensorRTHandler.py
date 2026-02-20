@@ -148,7 +148,7 @@ class TorchTensorRTHandler:
             1: trt.InterpolationMode.NEAREST,
             2: trt.InterpolationMode.CUBIC,
         })
-        # exported_program = exported_program.run_decompositions(get_decompositions([torch.ops.aten.grid_sampler_2d]))
+        exported_program = exported_program.run_decompositions(get_decompositions([torch.ops.aten.grid_sampler_2d]))
         return exported_program
 
     def check_engine_exists(self, trt_engine_name: str) -> bool:
