@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import platform
+import cpuinfo
 from PySide6.QtCore import QDir
 
 
@@ -46,8 +47,13 @@ if IS_FLATPAK:
         HOME_PATH, ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
     )
 
+CPU_INFO = cpuinfo.get_cpu_info()["brand_raw"]
+
 CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
 if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
+    CPU_ARCH = "arm64"
+
+if "apple" in CPU_INFO:
     CPU_ARCH = "arm64"
 
 

@@ -7,7 +7,6 @@ import subprocess
 import shutil
 import platform
 import psutil
-import cpuinfo
 import distro
 import webbrowser
 import zipfile
@@ -22,6 +21,7 @@ from .constants import (
     PLATFORM,
     HOME_PATH,
     CPU_ARCH,
+    CPU_INFO,
 )
 
 
@@ -282,7 +282,7 @@ def getCPUInfo() -> str:
                 print(f"An error occurred while getting CPU brand: {e}")
                 return "X86_64 CPU" if CPU_ARCH == "x86_64" else "ARM64 CPU"
         else:
-            return cpuinfo.get_cpu_info()["brand_raw"]
+            return str(CPU_INFO)
     except Exception as e:
         log(f"An error occurred while getting CPU information: {e}")
         return "Unknown"
