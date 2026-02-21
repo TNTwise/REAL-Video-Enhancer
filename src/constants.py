@@ -22,7 +22,7 @@ HAS_NETWORK_ON_STARTUP = networkCheck()
 LOCKFILE = QDir.tempPath() + "/REAL-Video-Enhancer.lock"
 
 
-PLATFORM = sys.platform  # win32, darwin, linux
+PLATFORM = sys.platform.strip().lower()  # win32, darwin, linux
 IS_STEAM = "SteamAppId" in os.environ
 IS_FLATPAK = "FLATPAK_ID" in os.environ and not IS_STEAM
 
