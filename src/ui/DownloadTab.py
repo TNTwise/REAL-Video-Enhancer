@@ -56,16 +56,27 @@ class DownloadTab:
             print(e)
 
         # set this all to not visible, as scrapping the idea for now.
+        
+
         if PLATFORM != "linux":
             remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
         else:
             if CPU_ARCH == "arm64":
                 remove_combobox_item_by_text(self.parent.pytorch_backend, "XPU")
                 remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
+        
         if IS_FLATPAK:
             remove_combobox_item_by_text(self.parent.pytorch_backend, "XPU")
             remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
-        if PLATFORM == "darwin" or IS_STEAM and PLATFORM != "win32":
+        
+        if IS_FLATPAK or USE_LOCAL_BACKEND:
+            self.parent.uninstallAppBtn.setDisabled(True)
+        else:
+            self.parent.uninstallAppBtn.clicked.connect(self.uninstallApp)
+
+        self.parent.ApplicationUpdateContainer.setVisible(False)
+
+        if PLATFORM == "darwin":
             self.parent.downloadTorchBtn.setEnabled(False)
             if CPU_ARCH == "arm64":
                 self.parent.pytorch_backend.clear()
@@ -77,12 +88,14 @@ class DownloadTab:
                 self.parent.pytorch_backend.setEnabled(False)
                 self.parent.downloadTorchBtn.setEnabled(True)
             self.parent.downloadTensorRTBtn.setEnabled(False)
-        if IS_FLATPAK or USE_LOCAL_BACKEND:
-            self.parent.uninstallAppBtn.setDisabled(True)
-        else:
-            self.parent.uninstallAppBtn.clicked.connect(self.uninstallApp)
+        self.parent.pytorch_backend.clear()
+        self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
+        # force 2.9.0 as it should include support for uint16
+        self.parent.pytorch_version.setEnabled(False)
 
-        self.parent.ApplicationUpdateContainer.setVisible(False)
+        self.parent.pytorch_backend.setCurrentText("MPS (Apple Silicon)")
+        self.parent.pytorch_backend.setEnabled(False)
+        self.parent.downloadTorchBtn.setEnabled(True)
         self.QButtonConnect()
 
     def QButtonConnect(self):
