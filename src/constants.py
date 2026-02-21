@@ -47,6 +47,8 @@ if IS_FLATPAK:
     )
 
 CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
+if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
+    CPU_ARCH = "arm64"
 
 
 EXE_NAME = "REAL-Video-Enhancer.exe" if PLATFORM == "win32" else "REAL-Video-Enhancer"
