@@ -70,6 +70,7 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import RegularQTPopup, NotificationOverlay, TextOutputPopup
 from src.ui.RenderQueue import RenderQueue, RenderOptions
 from src.VideoInfo import VideoLoader
+from src.PresetManager import PresetManager
 
 svg = (
     QtSvg.QSvgRenderer()
@@ -284,6 +285,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             total_ncnn_gpus=total_ncnn_gpus,
             total_pytorch_gpus=total_pytorch_gpus,
         )
+        self.presetManager = PresetManager(ui_parent=self)
         downloadDeps = DownloadDependencies(False)
         self.downloadTab.hideUninstallButtons()
         self.downloadTab.showUninstallButton(self.backends)

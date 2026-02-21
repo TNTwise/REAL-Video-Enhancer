@@ -62,6 +62,7 @@ LIBS_NAME = "_internal" if PLATFORM == "win32" else "lib"
 # dirs
 MODELS_PATH = os.path.join(CWD, "models")
 CUSTOM_MODELS_PATH = os.path.join(CWD, "custom_models")
+PRESETS_PATH = os.path.join(CWD, "presets")
 VIDEOS_PATH = (
     os.path.join(HOME_PATH, "Desktop")
     if PLATFORM == "darwin"

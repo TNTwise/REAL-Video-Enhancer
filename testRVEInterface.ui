@@ -1058,7 +1058,7 @@ background-color:#343b47
                                    <x>0</x>
                                    <y>0</y>
                                    <width>470</width>
-                                   <height>1022</height>
+                                   <height>1183</height>
                                   </rect>
                                  </property>
                                  <layout class="QVBoxLayout" name="verticalLayout_32">
@@ -1279,6 +1279,51 @@ background-color:#343b47
                                      </size>
                                     </property>
                                    </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QWidget" name="widget_40" native="true">
+                                    <layout class="QVBoxLayout" name="verticalLayout_42">
+                                     <item>
+                                      <widget class="QLabel" name="label_61">
+                                       <property name="font">
+                                        <font>
+                                         <pointsize>16</pointsize>
+                                        </font>
+                                       </property>
+                                       <property name="text">
+                                        <string>Manage Presets</string>
+                                       </property>
+                                       <property name="alignment">
+                                        <set>Qt::AlignmentFlag::AlignCenter</set>
+                                       </property>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QPushButton" name="addPresetBtn">
+                                       <property name="text">
+                                        <string>Add Preset</string>
+                                       </property>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QPushButton" name="savePresetBtn">
+                                       <property name="text">
+                                        <string>Save Preset</string>
+                                       </property>
+                                      </widget>
+                                     </item>
+                                     <item>
+                                      <widget class="QComboBox" name="selectAvailablePreset">
+                                       <property name="placeholderText">
+                                        <string>Select Available Preset</string>
+                                       </property>
+                                      </widget>
+                                     </item>
+                                    </layout>
+                                   </widget>
+                                  </item>
+                                  <item>
+                                   <widget class="QOpenGLWidget" name="openGLWidget"/>
                                   </item>
                                   <item>
                                    <widget class="Line" name="line">
@@ -4507,7 +4552,7 @@ QTabWidget::pane { /* The tab widget frame */
                               <x>0</x>
                               <y>0</y>
                               <width>444</width>
-                              <height>174</height>
+                              <height>205</height>
                              </rect>
                             </property>
                             <layout class="QVBoxLayout" name="verticalLayout_25">
@@ -5870,8 +5915,8 @@ color: red;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>721</width>
-                      <height>294</height>
+                      <width>1008</width>
+                      <height>397</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_13">
