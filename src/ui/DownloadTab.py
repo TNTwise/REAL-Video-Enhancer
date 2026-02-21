@@ -76,9 +76,9 @@ class DownloadTab:
 
         self.parent.ApplicationUpdateContainer.setVisible(False)
 
-        if PLATFORM != "win32" or PLATFORM != "linux":
+        if PLATFORM != "win32" and PLATFORM != "linux" and PLATFORM.strip().lower() == "darwin":
             self.parent.downloadTorchBtn.setEnabled(False)
-            if CPU_ARCH == "arm64":
+            if CPU_ARCH == "x86_64":
                 self.parent.pytorch_backend.clear()
                 self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
                 # force 2.9.0 as it should include support for uint16
