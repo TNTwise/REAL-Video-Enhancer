@@ -53,7 +53,7 @@ CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
 if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
     CPU_ARCH = "arm64"
 
-if "apple" in CPU_INFO:
+if "apple" in CPU_INFO.lower():
     CPU_ARCH = "arm64"
 
 
