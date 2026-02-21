@@ -78,6 +78,7 @@ class DownloadTab:
 
         if PLATFORM != "win32" and PLATFORM != "linux" and PLATFORM.strip().lower() == "darwin":
             self.parent.downloadTorchBtn.setEnabled(False)
+            self.parent.pytorch_backend.clear()
             if CPU_ARCH == "arm64":
                 self.parent.pytorch_backend.clear()
                 self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
