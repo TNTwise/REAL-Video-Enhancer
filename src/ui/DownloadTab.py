@@ -5,6 +5,7 @@ from ..DownloadDeps import DownloadDependencies
 from .Updater import ApplicationUpdater
 from ..constants import (
     IS_FLATPAK,
+    IS_STEAM,
     PLATFORM,
     CWD,
     USE_LOCAL_BACKEND,
@@ -64,7 +65,8 @@ class DownloadTab:
         if IS_FLATPAK:
             remove_combobox_item_by_text(self.parent.pytorch_backend, "XPU")
             remove_combobox_item_by_text(self.parent.pytorch_backend, "ROCm")
-        if PLATFORM == "darwin":
+        if PLATFORM == "darwin" or IS_STEAM and PLATFORM != "win32":
+            self.parent.downloadTorchBtn.setEnabled(False)
             if CPU_ARCH == "arm64":
                 self.parent.pytorch_backend.clear()
                 self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
@@ -73,7 +75,6 @@ class DownloadTab:
 
                 self.parent.pytorch_backend.setCurrentText("MPS (Apple Silicon)")
                 self.parent.pytorch_backend.setEnabled(False)
-
                 self.parent.downloadTorchBtn.setEnabled(True)
             self.parent.downloadTensorRTBtn.setEnabled(False)
         if IS_FLATPAK or USE_LOCAL_BACKEND:

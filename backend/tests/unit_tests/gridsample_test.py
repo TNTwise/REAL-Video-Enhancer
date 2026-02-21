@@ -14,18 +14,9 @@ def warp(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
     tenInput = tenInput.to(torch.float)
     tenFlow = tenFlow.to(torch.float)
 
-    tenFlow = torch.cat(
-        [tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1
-    )
+    tenFlow = torch.cat([tenFlow[:, 0:1] / tenFlow_div[0], tenFlow[:, 1:2] / tenFlow_div[1]], 1)
     g = (backwarp_tenGrid + tenFlow).permute(0, 2, 3, 1)
-    pd = 'border'
-    return F.grid_sample( # here is the issue
-        input=tenInput,
-        grid=g,
-        mode='bilinear',
-        padding_mode=pd,
-        align_corners=True,
-    ).to(dtype)
+    return F.grid_sample(input=tenInput, grid=g, mode="bilinear", padding_mode="border", align_corners=True).to(dtype)
     
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
@@ -239,7 +230,6 @@ def test_warp_trt(img0, img1, timestep, tenFlow_div, backwarp_tenGrid, use_expli
         exported,
         tuple(example_inputs),
         device=torch.device('cuda:0'),
-        enabled_precisions=(torch.float,) if use_explicit_typing else (dtype,),
         use_explicit_typing=use_explicit_typing,
         num_avg_timing_iters=4,
         workspace_size=0,

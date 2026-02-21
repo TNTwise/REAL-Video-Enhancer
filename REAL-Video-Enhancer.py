@@ -7,6 +7,7 @@ from src.constants import (
     TEMP_DOWNLOAD_PATH,
     USE_LOCAL_BACKEND,
     PLATFORM,
+    CPU_ARCH
 )
 import os
 
@@ -237,6 +238,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + "Available Disk Space: "
             + str(round(getAvailableDiskSpace(), 2))
             + "GB"
+            + "\n"
+            + "Platform: "
+            + PLATFORM
+            + "\n"
+            + "CPU ARCH: "
+            + CPU_ARCH
+            + "\n"
             + "\n"
             + "\nSoftware Information:\n"
             + f"REAL Video Enhancer Version: {version}\n"
