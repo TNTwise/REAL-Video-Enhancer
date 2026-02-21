@@ -76,18 +76,15 @@ class DownloadTab:
 
         self.parent.ApplicationUpdateContainer.setVisible(False)
 
-        if PLATFORM != "win32" and PLATFORM != "linux" and PLATFORM.strip().lower() == "darwin":
-            self.parent.downloadTorchBtn.setEnabled(False)
+        if PLATFORM.strip().lower() == "darwin":
             self.parent.pytorch_backend.clear()
-            if CPU_ARCH == "arm64":
-                self.parent.pytorch_backend.clear()
-                self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
-                # force 2.9.0 as it should include support for uint16
-                self.parent.pytorch_version.setEnabled(False)
+            self.parent.pytorch_backend.addItems(["MPS (Apple Silicon)"])
+            # force 2.9.0 as it should include support for uint16
+            self.parent.pytorch_version.setEnabled(False)
 
-                self.parent.pytorch_backend.setCurrentText("MPS (Apple Silicon)")
-                self.parent.pytorch_backend.setEnabled(False)
-                self.parent.downloadTorchBtn.setEnabled(True)
+            self.parent.pytorch_backend.setCurrentText("MPS (Apple Silicon)")
+            self.parent.pytorch_backend.setEnabled(False)
+            self.parent.downloadTorchBtn.setEnabled(True)
             self.parent.downloadTensorRTBtn.setEnabled(False)
         
         self.QButtonConnect()
