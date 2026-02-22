@@ -52,7 +52,7 @@ CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
 if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
     CPU_ARCH = "arm64"
 
-if platform != 'win32':
+if CPU_ARCH != 'win32':
     CPU_INFO = cpuinfo.get_cpu_info()["brand_raw"]
 else:
     CPU_INFO = "Generic " + CPU_ARCH + " CPU" 
