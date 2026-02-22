@@ -1,7 +1,6 @@
 from src.constants import (
     CUSTOM_MODELS_PATH,
-    IS_STEAM,
-    MODELS_PATH,
+    CPU_INFO,
     CWD,
     IS_INSTALLED,
     TEMP_DOWNLOAD_PATH,
@@ -46,7 +45,6 @@ from src.ModelHandler import getModels, getModelDisplayName
 from src.Util import (
     getOSInfo,
     getRAMAmount,
-    getCPUInfo,
     getAvailableDiskSpace,
     FileHandler,
     log,
@@ -231,7 +229,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + getOSInfo()
             + "\n"
             + "CPU: "
-            + getCPUInfo()
+            + CPU_INFO
             + "\n"
             + "RAM: "
             + getRAMAmount()

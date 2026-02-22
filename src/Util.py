@@ -261,32 +261,6 @@ def removeFolder(folder):
     shutil.rmtree(folder)
 
 
-def getCPUInfo() -> str:
-    """
-    Returns the CPU information of the system.
-    """
-    # return platform.processor() + " " + str(psutil.cpu_count(logical=False)) + " cores" + platform.
-    try:
-        if PLATFORM == "win32":
-            try:
-                # Run the 'wmic' command to get CPU information
-                result = subprocess.run(
-                    ["wmic", "cpu", "get", "name"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                # Split the result by lines and return the second line which contains the CPU name
-                return result.stdout.split("\n")[2].strip()
-            except Exception as e:
-                print(f"An error occurred while getting CPU brand: {e}")
-                return "X86_64 CPU" if CPU_ARCH == "x86_64" else "ARM64 CPU"
-        else:
-            return str(CPU_INFO)
-    except Exception as e:
-        log(f"An error occurred while getting CPU information: {e}")
-        return "Unknown"
-
 
 def copy(prev: str, new: str):
     """

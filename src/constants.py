@@ -2,7 +2,7 @@ import os
 import sys
 import requests
 import platform
-import cpuinfo
+import subprocess
 from PySide6.QtCore import QDir
 
 
@@ -16,6 +16,8 @@ def networkCheck(hostname="https://raw.githubusercontent.com") -> bool:
     except Exception as e:
         pass
     return False
+
+
 
 
 HAS_NETWORK_ON_STARTUP = networkCheck()
@@ -52,10 +54,32 @@ CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
 if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
     CPU_ARCH = "arm64"
 
-if PLATFORM != 'win32':
-    CPU_INFO = cpuinfo.get_cpu_info()["brand_raw"] # if this runs on windows, it causes a weird bug where the backend install gets stuck in an infinite loop, as it cannot detect the cpu arch, and thus cannot download the correct backend, which causes it to try to download the backend again, ad infinitum. So we will just set it to generic on windows, as it is not used for anything other than display purposes.
-else:
-    CPU_INFO = "Generic " + CPU_ARCH + " CPU" 
+def getCPUInfo() -> str:
+    """
+    Returns the CPU information of the system.
+    """
+    # return platform.processor() + " " + str(psutil.cpu_count(logical=False)) + " cores" + platform.
+    try:
+        if PLATFORM == "win32":
+            try:
+                # Run the 'wmic' command to get CPU information
+                result = subprocess.run(
+                    ["wmic", "cpu", "get", "name"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                )
+                # Split the result by lines and return the second line which contains the CPU name
+                return result.stdout.split("\n")[2].strip()
+            except Exception as e:
+                return "X86_64 CPU" if CPU_ARCH == "x86_64" else "ARM64 CPU"
+        else:
+            import cpuinfo
+            return cpuinfo.get_cpu_info()["brand_raw"]
+    except Exception as e:
+        return "Unknown"
+    
+CPU_INFO = getCPUInfo()
 
 if "apple" in CPU_INFO.lower():
     CPU_ARCH = "arm64"
