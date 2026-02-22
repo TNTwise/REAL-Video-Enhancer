@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import platform
+import cpuinfo
 from PySide6.QtCore import QDir
 
 
@@ -22,7 +23,7 @@ HAS_NETWORK_ON_STARTUP = networkCheck()
 LOCKFILE = QDir.tempPath() + "/REAL-Video-Enhancer.lock"
 
 
-PLATFORM = sys.platform  # win32, darwin, linux
+PLATFORM = sys.platform.strip().lower()  # win32, darwin, linux
 IS_STEAM = "SteamAppId" in os.environ
 IS_FLATPAK = "FLATPAK_ID" in os.environ and not IS_STEAM
 
@@ -46,7 +47,18 @@ if IS_FLATPAK:
         HOME_PATH, ".var", "app", "io.github.tntwise.REAL-Video-Enhancer"
     )
 
+
 CPU_ARCH = "x86_64" if platform.machine() == "AMD64" else platform.machine()
+if CPU_ARCH.lower() == "arm64" or CPU_ARCH.lower() == "aarch64":
+    CPU_ARCH = "arm64"
+
+if platform != 'win32':
+    CPU_INFO = cpuinfo.get_cpu_info()["brand_raw"]
+else:
+    CPU_INFO = "Generic " + CPU_ARCH + " CPU" 
+
+if "apple" in CPU_INFO.lower():
+    CPU_ARCH = "arm64"
 
 
 EXE_NAME = "REAL-Video-Enhancer.exe" if PLATFORM == "win32" else "REAL-Video-Enhancer"
@@ -54,6 +66,7 @@ LIBS_NAME = "_internal" if PLATFORM == "win32" else "lib"
 # dirs
 MODELS_PATH = os.path.join(CWD, "models")
 CUSTOM_MODELS_PATH = os.path.join(CWD, "custom_models")
+PRESETS_PATH = os.path.join(CWD, "presets")
 VIDEOS_PATH = (
     os.path.join(HOME_PATH, "Desktop")
     if PLATFORM == "darwin"

@@ -7,6 +7,7 @@ from src.constants import (
     TEMP_DOWNLOAD_PATH,
     USE_LOCAL_BACKEND,
     PLATFORM,
+    CPU_ARCH
 )
 import os
 
@@ -69,6 +70,7 @@ from src.ui.QTstyle import Palette
 from src.ui.QTcustom import RegularQTPopup, NotificationOverlay, TextOutputPopup
 from src.ui.RenderQueue import RenderQueue, RenderOptions
 from src.VideoInfo import VideoLoader
+from src.PresetManager import PresetManager
 
 svg = (
     QtSvg.QSvgRenderer()
@@ -238,6 +240,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             + str(round(getAvailableDiskSpace(), 2))
             + "GB"
             + "\n"
+            + "Platform: "
+            + PLATFORM
+            + "\n"
+            + "CPU ARCH: "
+            + CPU_ARCH
+            + "\n"
+            + "\n"
             + "\nSoftware Information:\n"
             + f"REAL Video Enhancer Version: {version}\n"
             + f"Python Version: {Python().get_version()}\n"
@@ -276,6 +285,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             total_ncnn_gpus=total_ncnn_gpus,
             total_pytorch_gpus=total_pytorch_gpus,
         )
+        self.presetManager = PresetManager(ui_parent=self)
         downloadDeps = DownloadDependencies(False)
         self.downloadTab.hideUninstallButtons()
         self.downloadTab.showUninstallButton(self.backends)
