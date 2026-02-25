@@ -9,6 +9,7 @@ assignees: ''
 
 Before submitting an issue, please confirm it meets all the criteria
 - [ ] I am on a distribution that is at least Ubuntu 20.04+, this means that your distros packages are the same as, or more up to date than Ubuntu 20.04, Or using Windows 10/11.
+- [ ] I have the latest GPU drivers installed (AMD/Intel/NVIDIA)
 
 **Describe the bug**
 A clear and concise description of what the bug is.
