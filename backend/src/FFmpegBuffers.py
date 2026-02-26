@@ -254,7 +254,8 @@ class FFmpegWrite(Buffer):
                 text=True,
                 universal_newlines=True,
             )
-        except Exception:
+        except Exception as e:
+            logger.info(e.__str__())
             logger.exception('Exception while starting FFmpeg write process')
             self.onErroredExit()
 
@@ -495,38 +496,40 @@ class FFmpegWrite(Buffer):
             self.writeProcess.wait()
             exit_code = self.writeProcess.returncode
 
-            renderTime = time.time() - self.startTime
-            logger.info('Time to complete render: %s', round(renderTime, 2))
-
         except Exception:
             logger.exception('Exception while writing frames')
             self.onErroredExit()
 
         if exit_code != 0:
-            self.onErroredExit()
-            return
+            logger.info('Exception while writing frames')
+            logger.info('FFmpeg exited with code %s', exit_code)
+        else:
+            renderTime = time.time() - self.startTime
+            logger.info('Time to complete render: %s', round(renderTime, 2))
+        
 
     def onErroredExit(self):
-        logger.error('FFmpeg failed to render the video.')
+        logger.info('FFmpeg failed to render the video.')
         try:
             with pathlib.Path(self.ffmpeg_log_file).open('r') as f:
-                logger.error('FULL FFMPEG LOG:')
+                logger.info('FULL FFMPEG LOG:')
                 for line in f:
-                    logger.error('%s', line.rstrip('\n'))
+                    logger.info('%s', line.rstrip('\n'))
 
             with pathlib.Path(self.ffmpeg_log_file).open('r') as f:
                 for line in f:
                     if f'[{self.outputFileExtension}' in line:
-                        logger.error('%s', line.rstrip('\n'))
+                        logger.info('%s', line.rstrip('\n'))
 
             if self.video_encoder.getPresetTag() == 'x264_vulkan':
-                logger.error('Vulkan encode failed, try restarting the render.')
-                logger.error(
+                logger.info('Vulkan encode failed, try restarting the render.')
+                logger.info(
                     'Make sure you have the latest drivers installed and your GPU supports vulkan encoding.'
                 )
         except Exception:
             logger.exception('Failed to read FFmpeg log file')
 
+        logger.info('Time to complete render: Nan')
         time.sleep(1)
         os._exit(1)
 

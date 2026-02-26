@@ -95,10 +95,8 @@ class FFMpegCommand:
             ]
             encoder_params += f":transfer={self._color_transfer}:"
         if self._color_space is not None:
-            command += [
-                "-colorspace",
-                self._color_space,
-            ]
+            # Note: -colorspace is not a valid output encoding option in FFmpeg
+            # Color matrix is set via encoder params (colormatrix=) instead
             encoder_params += f":colormatrix={self._color_space}:"
 
         if len(encoder_params) > 3:
