@@ -16,12 +16,9 @@ from functools import wraps
 
 from .constants import (
     CWD,
-    HAS_NETWORK_ON_STARTUP,
     IS_FLATPAK,
     PLATFORM,
     HOME_PATH,
-    CPU_ARCH,
-    CPU_INFO,
 )
 
 

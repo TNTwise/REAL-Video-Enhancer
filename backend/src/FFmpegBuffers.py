@@ -3,6 +3,7 @@ import pathlib
 import queue
 import subprocess
 import time
+import shlex
 from abc import ABC, abstractmethod
 
 import cv2
@@ -374,7 +375,7 @@ class FFmpegWrite(Buffer):
             ]
 
             if self.custom_encoder is not None:
-                for i in self.custom_encoder.split():
+                for i in shlex.split(self.custom_encoder):
                     command.append(i)
             else:
                 if not self.audio_encoder.getPresetTag() == 'copy_audio':

@@ -617,7 +617,7 @@ class ProcessTab:
             "--precision",
             f"{self.settings.settings['precision']}",
             "--custom_encoder",
-            f" {renderOptions.encoderCommand} ",
+            f"{renderOptions.encoderCommand.strip()}",
             "--tensorrt_opt_profile",
             f"{self.settings.settings['tensorrt_optimization_level']}",
             "--pause_shared_memory_id",

@@ -264,7 +264,6 @@ class subprocess_popen_without_terminal(subprocess.Popen):
 
 class CudaChecker:
     def __init__(self):
-        self.HAS_SYSTEM_CUDA = self.checkForCUDA()
         self.HAS_PYTORCH_CUDA = self.checkForCUDAPytorch()
 
     @staticmethod
