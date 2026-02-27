@@ -13,8 +13,8 @@ ncnn
 upscale_ncnn_py
 rife-ncnn-vulkan-python-tntwise
 scenedetect
-torch==2.7.0
-torchvision==0.22.0
+torch==2.10.0
+torchvision==0.25.0
 einops
 safetensors
-torch_tensorrt==2.7.0
+torch_tensorrt==2.10.0
