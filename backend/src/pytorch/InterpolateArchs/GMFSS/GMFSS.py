@@ -39,10 +39,7 @@ class GMFSS:
         tmp = max(_pad, int(_pad / self.scale))
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
-        if CudaChecker.checkForCUDA():
-            from ..util.softsplat_cupy import softsplat
-        else:
-            from ..util.softsplat_torch import softsplat
+        from ..util.softsplat_torch import softsplat
         self.warp = softsplat
 
         combined_state_dict = torch.load(model_path, map_location='cpu')

@@ -267,6 +267,11 @@ class CudaChecker:
         self.HAS_PYTORCH_CUDA = self.checkForCUDAPytorch()
 
     @staticmethod
+    def checForCuda() -> bool:
+        _logger.warning("This function is depricated.")
+        return False
+
+    @staticmethod
     def checkForCUDAPytorch() -> bool:
         try:
             import torch
