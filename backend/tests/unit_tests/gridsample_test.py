@@ -6,7 +6,7 @@ from PIL import Image
 import torch.nn as nn
 from torch.nn.functional import interpolate
 
-device = torch.device('cuda:0')
+device = torch.device('cuda:0') if torch.cuda.is_available() else torch.device('cpu')
 torch_tensorrt = importlib.import_module('torch_tensorrt') if importlib.util.find_spec('torch_tensorrt') else None
 
 def warp(tenInput, tenFlow, tenFlow_div, backwarp_tenGrid):
@@ -184,7 +184,7 @@ def _build_inputs(device, dtype=torch.float16, height=1088, width=1920, seed=123
     timestep = timestep_tens = torch.full(
                 (1, 1, height, width),
                 0.5,
-            ).cuda().to(dtype)
+            ).to(device).to(dtype)
     return img0, img1, tenFlow_div, backwarp_tenGrid, timestep
 
 
@@ -209,6 +209,13 @@ def test_warp(img0, img1, timestep, tenFlow_div, backwarp_tenGrid, dtype=torch.f
     tenFlow_div = tenFlow_div.to(device, dtype)
     backwarp_tenGrid =backwarp_tenGrid.to(device, dtype)
     model = IFNet().eval().to(device, dtype)
+    state_dict = torch.load('rife4.6.pkl', map_location=device)
+    state_dict = {
+        k.replace("module.", ""): v
+        for k, v in state_dict.items()
+        if "module." in k
+    }
+    model.load_state_dict(state_dict)
     
     output = model(img0, img1, timestep, tenFlow_div, backwarp_tenGrid)
     assert output.shape == img0.shape
@@ -222,6 +229,13 @@ def test_warp_trt(img0, img1, timestep, tenFlow_div, backwarp_tenGrid, use_expli
     tenFlow_div = tenFlow_div.to(device, dtype)
     backwarp_tenGrid =backwarp_tenGrid.to(device, dtype)
     model = IFNet().eval().to(device, dtype)
+    
+    state_dict = torch.load('rife4.6.pkl', map_location=device)
+    state_dict = {
+        k.replace("module.", ""): v
+        for k, v in state_dict.items()
+        if "module." in k
+    }
     
     example_inputs = (img0, img1, timestep, tenFlow_div, backwarp_tenGrid)
 
