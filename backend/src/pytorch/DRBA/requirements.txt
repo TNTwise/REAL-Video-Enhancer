@@ -1,7 +1,0 @@
-numpy>=1.16, <=1.23.5
-torch>=2.5.1
-torchvision>=0.20.1
-tqdm>=4.35.0
-opencv-python>=4.1.2
-Pillow>=9.3.0
-flowiz>=2.4.0

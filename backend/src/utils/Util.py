@@ -268,22 +268,9 @@ class CudaChecker:
         self.HAS_PYTORCH_CUDA = self.checkForCUDAPytorch()
 
     @staticmethod
-    def checkForCUDA() -> bool:
-        try:
-            import cupy
-
-            if cupy.cuda.get_cuda_path() == None:
-                return False
-        except Exception:
-            _logger.exception('CUDA environment check failed')
-            return False
-        return True
-
-    @staticmethod
     def checkForCUDAPytorch() -> bool:
         try:
             import torch
-
             return torch.cuda.is_available()
         except Exception:
             _logger.exception('PyTorch CUDA availability check failed')

@@ -173,7 +173,6 @@ class HandleApplication:
             trt_dynamic_shapes=self.args.tensorrt_dynamic_shapes,
             override_upscale_scale=self.args.override_upscale_scale,
             UHD_mode=self.args.UHD_mode,
-            drba=False,
             slomo_mode=self.args.slomo_mode,
             dynamic_scaled_optical_flow=self.args.dynamic_scaled_optical_flow,
             ensemble=self.args.ensemble,

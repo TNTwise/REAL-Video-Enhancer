@@ -9,7 +9,6 @@ mpmath
 pillow
 numpy==2.2.2
 
-cupy-cuda12x==13.3.0
 ncnn
 upscale_ncnn_py
 rife-ncnn-vulkan-python-tntwise

@@ -5,18 +5,16 @@ from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .InterpolateGIMM import InterpolateGIMMTorch
 from .InterpolateGMFSS import InterpolateGMFSSTorch
 from .InterpolateIFRNET import InterpolateIFRNetTorch
-from .InterpolateRIFE import InterpolateRIFEDRBA, InterpolateRifeTorch
+from .InterpolateRIFE import InterpolateRifeTorch
 
 
 class InterpolateFactory:
     @staticmethod
-    def build_interpolation_method(interpolate_model_path, backend, drba=False):
+    def build_interpolation_method(interpolate_model_path, backend):
         ad = ArchDetect(interpolate_model_path)
         base_arch = ad.getArchBase()
         match base_arch:
             case 'rife':
-                if drba:
-                    return InterpolateRIFEDRBA
                 return InterpolateRifeTorch
             case 'gimm':
                 return InterpolateGIMMTorch

@@ -8,7 +8,6 @@ import torch.nn.functional as F
 from ..utils.Frame import Frame
 from ..utils.LogConfig import get_logger
 from ..utils.Util import (
-    CudaChecker,
     warnAndLog,
 )
 
@@ -132,13 +131,7 @@ class InterpolateGMFSSTorch(BaseInterpolate):
 
             logger.info('GMFSS loaded')
             logger.info('Scale: %s', self.scale)
-            HAS_SYSTEM_CUDA = CudaChecker().HAS_SYSTEM_CUDA
-            logger.info('Using System CUDA: %s', HAS_SYSTEM_CUDA)
-            if not HAS_SYSTEM_CUDA:
-                print(
-                    'WARNING: System CUDA not found, falling back to PyTorch softsplat. This will be a bit slower.',
-                    file=sys.stderr,
-                )
+            
             if self.backend == 'tensorrt':
                 warnAndLog(
                     'TensorRT is not implemented for GMFSS yet, falling back to PyTorch'

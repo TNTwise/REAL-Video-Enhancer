@@ -94,7 +94,6 @@ class Render:
         extraRestorationModels=None,
         sceneDetectModel: str = None,
         tile_size=None,
-        drba=False,
         # ffmpeg settings
         ffmpeg_path: str = './bin/ffmpeg',
         start_time=None,
@@ -144,7 +143,6 @@ class Render:
         self.interpolateOption = None
         self.upscaleOption = None
         self.isPaused = False
-        self.drba = drba
         self.sceneDetectModelPath = sceneDetectModel
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
@@ -580,7 +578,6 @@ class Render:
             self.interpolateOption = InterpolateFactory.build_interpolation_method(
                 self.interpolateModel,
                 self.backend,
-                self.drba,
             )(
                 modelPath=self.interpolateModel,
                 ceilInterpolateFactor=self.ceilInterpolateFactor,
@@ -591,7 +588,6 @@ class Render:
                 backend=self.backend,
                 gpu_id=self.pytorch_gpu_id,
                 UHDMode=self.UHD_mode,
-                drba=self.drba,
                 trt_optimization_level=self.trt_optimization_level,
                 ensemble=self.ensemble,
                 dynamicScaledOpticalFlow=self.dynamic_scaled_optical_flow,

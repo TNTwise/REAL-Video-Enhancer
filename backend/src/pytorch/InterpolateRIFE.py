@@ -13,7 +13,6 @@ from ..utils.Util import errorAndLog
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
-from .DRBA.infer import DRBA_RVE
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .TorchUtils import TorchUtils
 
@@ -37,7 +36,6 @@ class InterpolateRifeTorch(BaseInterpolate):
         UHDMode: bool = False,
         ensemble: bool = False,
         dynamicScaledOpticalFlow: bool = False,
-        drba: bool = False,
         gpu_id: int = 0,
         # trt options
         trt_optimization_level: int = 5,
@@ -104,17 +102,7 @@ class InterpolateRifeTorch(BaseInterpolate):
                 'UHD Mode has been depricated for RIFE.', file=sys.stderr
             )  # causes issues with 4k warp.
             self.scale = 1
-
-        if drba:
-            fps = 24
-            self.drba = DRBA_RVE(
-                model_type='rife',
-                model_path='./flownet.pkl',
-                times=ceilInterpolateFactor,
-                dst_fps=fps * ceilInterpolateFactor,
-                fps=fps,
-                scale=1,
-            )
+        
         self._load()
 
     @torch.inference_mode()
@@ -670,17 +658,3 @@ class InterpolateRifeTorch(BaseInterpolate):
         return frame
 
 
-class InterpolateRIFEDRBA(InterpolateRifeTorch):
-    @torch.inference_mode()
-    def __call__(
-        self,
-        img1,
-        transition=False,
-    ):
-        if self.frame0 is None:
-            self.frame0 = img1
-            out = self.drba.header(self.frame0, img1)
-            yield self.tensor_to_frame(out)
-        with torch.cuda.stream(self.stream):  # type: ignore
-            out = self.drba.inference(img1)
-            yield self.tensor_to_frame(out)
