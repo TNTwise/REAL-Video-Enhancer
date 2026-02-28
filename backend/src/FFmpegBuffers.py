@@ -97,7 +97,7 @@ class FFmpegRead(Buffer):
             f'{self.inputFile}',
         ]
         
-        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
+        filter_string = f"crop=min({self.width}\\,max(1\\,iw-{self.borderX})):min({self.height}\\,max(1\\,ih-{self.borderY})):{self.borderX}:{self.borderY},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
         command += [
             '-vf',
             filter_string,
@@ -362,6 +362,10 @@ class FFmpegWrite(Buffer):
                     '1:a?',
                     '-map',
                     '1:s?',
+                    '-map_metadata:s:v',
+                    '1:s:v',  # Copy video stream metadata from input 1 (the original file) to the video output
+                    '-metadata:s:v',
+                    'rotate=0', # Ensure custom rotation is stripped as the output is physically rotated
                 ]
 
                 # Output timestamp/interleave hygiene.

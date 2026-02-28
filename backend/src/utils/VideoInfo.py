@@ -92,6 +92,8 @@ class VideoInfo(ABC):
     @abstractmethod
     def get_color_primaries(self) -> str: ...
     @abstractmethod
+    def get_rotation(self) -> float: ...
+    @abstractmethod
     def get_bitrate(self) -> int: ...
     @abstractmethod
     def get_codec(self) -> str: ...
@@ -164,7 +166,22 @@ class FFMpegInfoWrapper(VideoInfo):
         width, height = re.search(
             r'video:.* (\d+)x(\d+)', self.ffmpeg_output_stripped
         ).groups()[:2]
-        return [int(width), int(height)]
+        
+        width = int(width)
+        height = int(height)
+        
+        rot = abs(self.get_rotation())
+        if rot in [90, 270]:
+            return [height, width]
+            
+        return [width, height]
+
+    def get_rotation(self) -> float:
+        m = re.search(r'rotate\s*:\s*(-?\d+)', self.ffmpeg_output_stripped, re.IGNORECASE)
+        if m: return float(m.group(1))
+        m = re.search(r'rotation of (-?\d+\.?\d*) degrees', self.ffmpeg_output_stripped, re.IGNORECASE)
+        if m: return float(m.group(1))
+        return 0.0
 
     def get_fps(self) -> float:
         fps = re.search(
@@ -321,7 +338,15 @@ class OpenCVInfo(VideoInfo):
             int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
             int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
         ]
+        
+        rot = abs(self.get_rotation())
+        if rot in [90, 270]:
+            return [res[1], res[0]]
+            
         return res
+
+    def get_rotation(self) -> float:
+        return self.ffmpeg_info.get_rotation()
 
     def get_fps(self) -> float:
         fps = self.cap.get(cv2.CAP_PROP_FPS)
