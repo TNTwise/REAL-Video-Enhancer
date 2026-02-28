@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 
 import cv2
 import numpy as np
+import tempfile
 
 from .utils.Encoders import EncoderSettings
 from .utils.Frame import Frame
@@ -75,25 +76,28 @@ class FFmpegRead(Buffer):
             self.inputFrameChunkSize = width * height * 3
         command = self.command()
         logger.info('FFMPEG READ COMMAND: %s', command)
+        
+
+        self.stderr_file = tempfile.TemporaryFile(mode='w+', encoding='utf-8', errors='replace')
+        
         self.readProcess = subprocess_popen_without_terminal(
             self.command(),
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=self.stderr_file,
         )
         self.readQueue = queue.Queue(maxsize=25)
 
     def command(self):
         command = [
             f'{self.ffmpeg_path}',
+            '-loglevel',
+            'error',
             '-nostdin',
             '-i',
             f'{self.inputFile}',
         ]
-
-        filter_string = f'crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=w=iw*sar:h=ih'  # + ":in_range=limited:out_range=full,format=yuv420p" if self.yuv420pMOD == "yuv420p" else "" # fix dar != sar
-        # if not self.hdr_mode:
-        #    if self.input_pixel_format == "yuv420p":
-        #        filter_string += ":in_range=tv:out_range=pc" # color shifts a smidgen but helps with artifacts when converting yuv to raw
+        
+        filter_string = f"crop={self.width}:{self.height}:{self.borderX}:{self.borderY},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
         command += [
             '-vf',
             filter_string,
@@ -154,9 +158,14 @@ class FFmpegRead(Buffer):
     def get(self) -> Frame:
         return self.readQueue.get()
 
-    def close(self):
+    def __del__(self):
         self.readProcess.stdout.close()
+        if self.readProcess.returncode != 0:
+            self.stderr_file.seek(0)
+            stderr_output = self.stderr_file.read()
+            logger.info("FFmpeg Read Process stderr:\n%s", stderr_output)
         self.readProcess.terminate()
+        self.stderr_file.close()
 
 
 class FFmpegWrite(Buffer):
