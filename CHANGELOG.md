@@ -6,6 +6,7 @@
 ### Fixed
  - FFMpeg reading randomly stopping, thanks @potocpav
  - PLKSR LayerNorm models
+ - Vertical RES iphone videos failing to render.
  - PySceneDetect with Restoration models enabled.
 ### Changed
  - Under-the-hood improvements to the overall flow of the program
