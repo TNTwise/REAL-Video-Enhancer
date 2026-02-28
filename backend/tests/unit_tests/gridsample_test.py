@@ -209,7 +209,7 @@ def test_warp(img0, img1, timestep, tenFlow_div, backwarp_tenGrid, dtype=torch.f
     tenFlow_div = tenFlow_div.to(device, dtype)
     backwarp_tenGrid =backwarp_tenGrid.to(device, dtype)
     model = IFNet().eval().to(device, dtype)
-    state_dict = torch.load('rife4.6.pkl', map_location=device)
+    state_dict = torch.load('rife4.6.pkl', map_location=device, weights_only=True)
     state_dict = {
         k.replace("module.", ""): v
         for k, v in state_dict.items()
@@ -230,12 +230,13 @@ def test_warp_trt(img0, img1, timestep, tenFlow_div, backwarp_tenGrid, use_expli
     backwarp_tenGrid =backwarp_tenGrid.to(device, dtype)
     model = IFNet().eval().to(device, dtype)
     
-    state_dict = torch.load('rife4.6.pkl', map_location=device)
+    state_dict = torch.load('rife4.6.pkl', map_location=device, weights_only=True)
     state_dict = {
         k.replace("module.", ""): v
         for k, v in state_dict.items()
         if "module." in k
     }
+    model.load_state_dict(state_dict)
     
     example_inputs = (img0, img1, timestep, tenFlow_div, backwarp_tenGrid)
 
@@ -260,6 +261,12 @@ if __name__ == "__main__":
         dtype=torch.float32,
         seed=1234,
     )
+    # Make `img0` a solid red image and `img1` a solid yellow image for testing
+    img0 = torch.zeros_like(img0)
+    img0[:, 0:1, :, :] = 1.0
+    img1 = torch.zeros_like(img1)
+    img1[:, 0:1, :, :] = 1.0
+    img1[:, 1:2, :, :] = 1.0
     output = test_warp(img0, img1, timestep, tenFlow_div, backwarp_tenGrid)
     
     save_output_image(output, 'backend/tests/unit_tests/output_pytorch.png')
