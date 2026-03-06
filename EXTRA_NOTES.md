@@ -1,4 +1,17 @@
 ### Extra Notes
+
+
+<br/>
+<strong> Download on Steam! </strong>
+<br/>
+<a href="https://store.steampowered.com/app/4087640/">
+<img src="https://img.shields.io/badge/Steam-000000?style=for-the-badge&logo=steam&logoColor=white" height="50px"/>
+</a>
+<a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">
+    <img src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg" height="50px"/>
+</a>
+
+
  - Join the Discord: https://discord.gg/S5UxqWgEBC
  - Install MacOS version requires you to give it permission to run. use the command `xattr -cr {install directory}`
  - MacOS version has very limited support, as my testing is confined to a virtual machine. Please make issues if something is broken.
