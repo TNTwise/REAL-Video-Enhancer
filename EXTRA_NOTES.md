@@ -2,11 +2,14 @@
 
 
 <br/>
-<strong> Download on Steam! </strong>
+<strong> Download on Steam! (Windows + Mac)</strong>
 <br/>
 <a href="https://store.steampowered.com/app/4087640/">
-<img src="https://img.shields.io/badge/Steam-000000?style=for-the-badge&logo=steam&logoColor=white" height="50px"/>
+<img src="https://img.shields.io/badge/Steam-000000?style=for-the-badge&logo=steam&logoColor=white" height="500px"/>
 </a>
+<br/>
+<strong> Download on Flathub! (Linux)</strong>
+<br/>
 <a href="https://flathub.org/apps/io.github.tntwise.REAL-Video-Enhancer">
     <img src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg" height="50px"/>
 </a>
