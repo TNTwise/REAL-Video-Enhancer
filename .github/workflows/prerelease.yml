@@ -94,7 +94,7 @@ jobs:
 
   build-Linux_arm64:
     needs: [validate]
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     permissions: write-all  
     steps:
       - uses: actions/checkout@v3
