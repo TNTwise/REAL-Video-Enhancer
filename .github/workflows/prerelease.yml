@@ -112,6 +112,7 @@ jobs:
 
       - name: Install Python Dependencies
         run: |
+          ./python/bin/python3 --version
           ./python/bin/python3 -m pip install -r requirements.txt
       - name: install other requirements
         run : |
