@@ -45,10 +45,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: 3.10.15"
       - name: Setup Distrobox
         run : |
           sudo apt install distrobox
@@ -98,12 +94,6 @@ jobs:
     permissions: write-all  
     steps:
       - uses: actions/checkout@v3
-      
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: 3.10.15"
-   
 
       - name: Install Python in distrobox
         run : |
