@@ -67,6 +67,7 @@ class UpscaleModelWrapper:
                 assert isinstance(model, ImageModelDescriptor)
                 self.__scale = model.scale
                 model = model.model
+                model.eval()  # Fix BatchNorm training mode issue for neosr-trained models
                 self.__model = model
                 self.inference_helper = self.__model
                 self.__dummy_input_pre_channels = [1]
