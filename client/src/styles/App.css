@@ -4,23 +4,11 @@
   --primary-widget: rgb(31, 35, 44);
   --secondary-widget: rgb(43, 49, 61);
   --text-color: white;
-  --page-nav-size: 60px;
-  --border: none;
+  --nav-size: 10%;
+  --nav-button-size: 20px;
+  --border: 1px solid #474a4d;
   --border-radius: 8px;
   --speed: 500ms;
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
 }
 
 ul {
@@ -32,4 +20,22 @@ ul {
 a {
   color: var(--text-color);
   text-decoration: none;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Full viewport layout */
+.layout {
+  display: flex;
+  height: 100vh; /* or 100dvh for better mobile support */
+}
+
+.content {
+  flex: 1; /* Takes remaining space */
+  padding: 2rem;
+  overflow-y: auto; /* Enables independent scrolling */
 }
