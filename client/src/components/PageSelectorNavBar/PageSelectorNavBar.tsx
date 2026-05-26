@@ -1,4 +1,6 @@
-import { type ComponentType, type SVGProps, ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
+import { type ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
+import { Link } from 'react-router-dom';
+
 import "./PageSelectorNavBar.css";
 
 export function PageSelectorNavBar(props: { children: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) {
@@ -22,9 +24,9 @@ export function PageSelectorNavItem(props: {
   
   return (
     <li className={`nav-item ${props.active ? 'active' : ''}`}>
-      <a href={props.href} className="icon-button">
+      <Link to={props.href} className="icon-button">
         <img src={props.icon} />
-      </a>
+      </Link>
     </li>
   );
 }
