@@ -1,24 +1,28 @@
+/* 🌟 Navbar Container */
 .navbar {
-  display: flex; /* 🔑 MISSING: Enables flex context */
-  width: var(--nav-size);
-  min-width: var(--button-size);
-  background-color: var(--primary-bg);
-  padding: 1.5rem;
-  border-bottom: var(--border);
+  display: flex;
   flex-direction: column;
-  gap: 1rem;
   height: 100%;
-  border-radius: 0%;
+  width: var(--nav-size, 260px);
+  flex: 0 0 var(--nav-size, 260px);
+  min-width: var(--nav-min-size, 200px);
+  background-color: var(--primary-bg, #111827);
+  padding: 1.7rem;
+  border-bottom: var(--border, 1px solid #374151);
+  gap: 1rem;
+  box-sizing: border-box; 
 }
 
 .navbar-nav {
-  list-style: none;
-  margin-top: 10rem;
-  padding: 0; 
-  margin-left: 0;
-  display: flex; 
+  display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  flex: 1;     
+  justify-content: center; 
 }
 
 .nav-item {
@@ -27,21 +31,27 @@
 
 .icon-button {
   display: flex;
-  width: var(--button-size);
-  aspect-ratio: 1 / 1;      
-  flex: 0 0 auto;
-  flex-shrink: 0;
-  background-color: var(--primary-widget);
-  border-radius: 20%;
-  padding: 20px;
-  margin: px;
   align-items: center;
   justify-content: center;
-  transition: filter 300ms;
+  width: var(--button-size);
+  height: var(--button-size);
+  background-color: var(--primary-widget, #1f2937);
+  border-radius: 20%;
+  padding: 10px;
+  transition: filter 300ms ease, transform 150ms ease;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
+.icon-button img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+}
 
-.icon-button:hover {
+.icon-button:hover,
+.icon-button:focus-visible {
   filter: brightness(1.2);
+  outline: none;
 }

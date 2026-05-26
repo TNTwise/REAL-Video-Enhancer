@@ -13,12 +13,18 @@ export function PageSelectorNavBar(props: { children: string | number | bigint |
 
 
 
-export function PageSelectorNavItem(props: { icon: Icon }) {
-    return (
-        <li className="nav-item">
-            <a href="#" className="icon-button">
-                {props.icon}
-            </a>
-        </li>
-    )
+export function PageSelectorNavItem(props: { 
+  icon: string;
+  label: string; 
+  href: string; 
+  active: boolean 
+}) {
+  
+  return (
+    <li className={`nav-item ${props.active ? 'active' : ''}`}>
+      <a href={props.href} className="icon-button">
+        <img src={props.icon} />
+      </a>
+    </li>
+  );
 }
