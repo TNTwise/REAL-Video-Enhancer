@@ -305,7 +305,5 @@ class FFMpegCommand:
             case _:
                 command += ["-c:s", "copy"]
 
-        if self._use_ffmpeg_reduce_framerate:
-            command += ["-vf", f"fps={self._output_fps}"]
 
         return command
