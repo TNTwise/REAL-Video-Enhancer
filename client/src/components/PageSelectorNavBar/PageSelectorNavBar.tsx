@@ -1,32 +1,42 @@
-import { type ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
-import { Link } from 'react-router-dom';
-
-import "./PageSelectorNavBar.css";
-
-export function PageSelectorNavBar(props: { children: string | number | bigint | boolean | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<string | number | bigint | boolean | ReactPortal | ReactElement<unknown, string | JSXElementConstructor<any>> | Iterable<ReactNode> | null | undefined> | null | undefined; }) {
-    return (
-        <nav className="navbar">
-            <ul className="navbar-nav">
-                {props.children}
-            </ul>
-        </nav>
-    );
-}
+import { Flex, Button, CloseButton, Drawer, Portal } from "@chakra-ui/react"
+import { useState } from "react"
 
 
+export const Navbar = () => {
+  const [open, setOpen] = useState(false)
 
-export function PageSelectorNavItem(props: { 
-  icon: string;
-  label: string; 
-  href: string; 
-  active: boolean 
-}) {
-  
   return (
-    <li className={`nav-item ${props.active ? 'active' : ''}`}>
-      <Link to={props.href} className="icon-button">
-        <img src={props.icon} />
-      </Link>
-    </li>
-  );
+    <Flex as="nav">
+      <Drawer.Root key={"start"} placement={"start"} open={open} onOpenChange={(e) => setOpen(e.open)}>
+        <Drawer.Trigger asChild>
+          <Button variant="outline" size="sm">
+            Open Drawer
+          </Button>
+        </Drawer.Trigger>
+        <Portal>
+          <Drawer.Backdrop />
+          <Drawer.Positioner>
+            <Drawer.Content>
+              <Drawer.Header>
+                <Drawer.Title>Drawer Title</Drawer.Title>
+              </Drawer.Header>
+              <Drawer.Body>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                </p>
+              </Drawer.Body>
+              <Drawer.Footer>
+                <Button variant="outline">Cancel</Button>
+                <Button>Save</Button>
+              </Drawer.Footer>
+              <Drawer.CloseTrigger asChild>
+                <CloseButton size="sm" />
+              </Drawer.CloseTrigger>
+            </Drawer.Content>
+          </Drawer.Positioner>
+        </Portal>
+      </Drawer.Root>
+    </Flex>
+  )
 }
