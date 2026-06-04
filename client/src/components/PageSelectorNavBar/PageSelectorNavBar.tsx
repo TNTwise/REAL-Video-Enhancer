@@ -1,15 +1,14 @@
 import { HStack, Link as ChakraLink } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom"; // 1. Import React Router's Link
+import { primaryBGColor } from "@/styles/styles";
 const links = [
   { name: "Home", href: "/home" },
   { name: "Download", href: "/download" },
 ];
 
-
 export const Navbar = () => {
-
   return (
-    <HStack gap={8} align="center">
+    <HStack gap={8} align="center" bg={primaryBGColor}>
       {links.map((link) => (
         <ChakraLink
           key={link.name}
@@ -28,5 +27,4 @@ export const Navbar = () => {
       ))}
     </HStack>
   );
-
-}
+};
