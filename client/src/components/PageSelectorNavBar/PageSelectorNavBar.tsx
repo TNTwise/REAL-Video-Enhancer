@@ -1,42 +1,32 @@
-import { Flex, Button, CloseButton, Drawer, Portal } from "@chakra-ui/react"
-import { useState } from "react"
+import { HStack, Link as ChakraLink } from "@chakra-ui/react";
+import { Link as RouterLink } from "react-router-dom"; // 1. Import React Router's Link
+const links = [
+  { name: "Home", href: "/home" },
+  { name: "Download", href: "/download" },
+];
 
 
 export const Navbar = () => {
-  const [open, setOpen] = useState(false)
 
   return (
-    <Flex as="nav">
-      <Drawer.Root key={"start"} placement={"start"} open={open} onOpenChange={(e) => setOpen(e.open)}>
-        <Drawer.Trigger asChild>
-          <Button variant="outline" size="sm">
-            Open Drawer
-          </Button>
-        </Drawer.Trigger>
-        <Portal>
-          <Drawer.Backdrop />
-          <Drawer.Positioner>
-            <Drawer.Content>
-              <Drawer.Header>
-                <Drawer.Title>Drawer Title</Drawer.Title>
-              </Drawer.Header>
-              <Drawer.Body>
-                <p>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-                  eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                </p>
-              </Drawer.Body>
-              <Drawer.Footer>
-                <Button variant="outline">Cancel</Button>
-                <Button>Save</Button>
-              </Drawer.Footer>
-              <Drawer.CloseTrigger asChild>
-                <CloseButton size="sm" />
-              </Drawer.CloseTrigger>
-            </Drawer.Content>
-          </Drawer.Positioner>
-        </Portal>
-      </Drawer.Root>
-    </Flex>
-  )
+    <HStack gap={8} align="center">
+      {links.map((link) => (
+        <ChakraLink
+          key={link.name}
+          as={RouterLink}
+          to={link.href} // ignore
+          fontWeight="medium"
+          color="blue.600"
+          _hover={{
+            color: "blue.500",
+            textDecoration: "underline",
+          }}
+          transition="color 0.2s ease"
+        >
+          {link.name}
+        </ChakraLink>
+      ))}
+    </HStack>
+  );
+
 }
