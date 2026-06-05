@@ -1,7 +1,7 @@
 import os
 from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 
-SETTINGS_FILE = os.path.join(CONFIG_PATH, '/settings.txt')
+SETTINGS_FILE = CONFIG_PATH / 'settings.txt'
 
 class Settings:
     def __init__(self):
@@ -26,9 +26,9 @@ class Settings:
             "scene_change_detection_threshold": "3.5",
             "discord_rich_presence": "False",
             "video_quality": "High",
-            "output_folder_location": DEFAULT_VIDEOS_PATH,
+            "output_folder_location": DEFAULT_VIDEOS_PATH._str,
             "use_same_output_folder_as_input_file_enabled": "False",
-            "last_input_folder_location": DEFAULT_VIDEOS_PATH,
+            "last_input_folder_location": DEFAULT_VIDEOS_PATH._str,
             "uhd_mode": "True",
             "ncnn_gpu_id": "0",
             "pytorch_gpu_id": "0",
@@ -176,8 +176,8 @@ class Settings:
             for key, value in self.settings.items():
                 if key in self.default_settings:  # check if the key is valid
                     if (
-                        value in self.allowed_settings[key]
-                        or self.allowed_settings[key] == "ANY"
+                        self.allowed_settings[key] == "ANY"
+                        or value in self.allowed_settings[key]
                     ):  # check if it is in the allowed settings dict
                         file.write(f"{key},{value}\n")
                 else:
