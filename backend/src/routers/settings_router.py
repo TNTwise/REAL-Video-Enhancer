@@ -8,7 +8,7 @@ router = APIRouter(prefix="/settings")
 def update_setting(body: Setting):
     return settings.write_setting(body.setting, str(body.value))
 
-@router.get("/get_setting")
+@router.get("/get_setting_value")
 def get_setting_value(setting: str):
     return settings.get_setting_value(setting)
 
