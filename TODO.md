@@ -1,12 +1,21 @@
-# Move UI To typescript
+# Migrate UI to Tauri + TypeScript
 
-- Get usable tauri build
-- Store settings utilizing the backend, rather than the frontend
-- Get available port in client, and launch API from client
-- Read settings in RVE using the built-in settings module and api requests, rather than command line args.
-- Setup python dependency manager in the backend, refresh imports automatically. Install via api request.
-- Integrate FastAPI into the backend
-- Connect UI with backend
+## Core Tauri Setup
+- [ ] Get a working Tauri build running (dev + production)
+
+## Settings Management
+- [ ] Move all settings storage to the backend API (replace frontend-only persistence)
+- [ ] Load settings through the built-in settings module via API requests instead of command-line arguments
+
+## Backend Service
+- [ ] Integrate FastAPI into the Python backend
+- [ ] Add per-backend installation via API — each AI backend (NCNN, PyTorch, TensorRT) exposes its Python dependencies as a list the frontend can install on demand
+- [ ] Have the client discover an available port and launch the backend API on start-up
+
+## End-to-End Integration
+- [ ] Connect the Tauri frontend to the backend API so enhancement workflows run end-to-end
 
 
-# Package all dependencies with app, instead of installing them (ffmpeg, python)
+# Bundle Base Dependencies
+
+Package FFmpeg and the Python runtime inside the app so it runs without system-level prerequisites. Per-backend AI libraries (PyTorch, TensorRT, etc.) install on demand through the API instead.
