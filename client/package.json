@@ -14,6 +14,7 @@
     "@emotion/react": "^11.14.0",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "get-port": "^7.2.0",
     "next-themes": "^0.4.6",
     "path": "^0.12.7",
     "react": "^19.1.0",
