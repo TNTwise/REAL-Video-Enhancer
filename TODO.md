@@ -1,3 +1,7 @@
+# Design UI
+
+- [ ] Design the interface for the new Tauri + React frontend
+
 # Migrate UI to Tauri + TypeScript
 
 ## Core Tauri Setup
