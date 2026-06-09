@@ -1,0 +1,878 @@
+{
+  "ncnn": {
+    "interpolate": [
+      {
+        "id": "rife-4.6",
+        "type": "interpolate",
+        "variant": "RIFE 4.6",
+        "description": "Fastest Model",
+        "url": "rife-v4.6.tar.gz",
+        "file_path": "rife-v4.6.tar.gz"
+      },
+      {
+        "id": "rife-4.7",
+        "type": "interpolate",
+        "variant": "RIFE 4.7",
+        "description": "Smoothest Model",
+        "url": "rife-v4.7.tar.gz",
+        "file_path": "rife-v4.7.tar.gz"
+      },
+      {
+        "id": "rife-4.15",
+        "type": "interpolate",
+        "variant": "RIFE 4.15",
+        "description": null,
+        "url": "rife-v4.15.tar.gz",
+        "file_path": "rife-v4.15.tar.gz"
+      },
+      {
+        "id": "rife-4.18",
+        "type": "interpolate",
+        "variant": "RIFE 4.18",
+        "description": "Realistic",
+        "url": "rife-v4.18.tar.gz",
+        "file_path": "rife-v4.18.tar.gz"
+      },
+      {
+        "id": "rife-4.22",
+        "type": "interpolate",
+        "variant": "RIFE 4.22",
+        "description": "Slow, Animation",
+        "url": "rife-v4.22.tar.gz",
+        "file_path": "rife-v4.22.tar.gz"
+      },
+      {
+        "id": "rife-4.22-lite",
+        "type": "interpolate",
+        "variant": "RIFE 4.22-lite",
+        "description": "Latest LITE model",
+        "url": "rife-v4.22-lite.tar.gz",
+        "file_path": "rife-v4.22-lite.tar.gz"
+      },
+      {
+        "id": "rife-4.25",
+        "type": "interpolate",
+        "variant": "RIFE 4.25",
+        "description": null,
+        "url": "rife-v4.25.tar.gz",
+        "file_path": "rife-v4.25.tar.gz"
+      },
+      {
+        "id": "rife-4.26-heavy",
+        "type": "interpolate",
+        "variant": "RIFE 4.26 Heavy",
+        "description": "Slowest RIFE Model, Animation",
+        "url": "rife-v4.26-heavy.tar.gz",
+        "file_path": "rife-v4.26-heavy.tar.gz"
+      },
+      {
+        "id": "rife-4.26",
+        "type": "interpolate",
+        "variant": "RIFE 4.26",
+        "description": "Latest General Model, Recommended",
+        "url": "rife-v4.26.tar.gz",
+        "file_path": "rife-v4.26.tar.gz"
+      }
+    ],
+    "upscale": [
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, High Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_weak.tar.gz",
+        "file_path": "4xNomos8k_span_otf_weak.tar.gz"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Medium Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_medium.tar.gz",
+        "file_path": "4xNomos8k_span_otf_medium.tar.gz"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Low Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_strong.tar.gz",
+        "file_path": "4xNomos8k_span_otf_strong.tar.gz"
+      },
+      {
+        "id": "openproteus",
+        "type": "upscale",
+        "variant": "OpenProteus",
+        "description": "Realistic, HD Input, Fast",
+        "scale": 2,
+        "url": "2x_OpenProteus_Compact_i2_70K.tar.gz",
+        "file_path": "2x_OpenProteus_Compact_i2_70K.tar.gz"
+      },
+      {
+        "id": "realcugan-pro",
+        "type": "upscale",
+        "variant": "RealCUGAN Pro",
+        "description": "Animation, Slow",
+        "scale": 2,
+        "url": "up2x-conservative.tar.gz",
+        "file_path": "up2x-conservative.tar.gz"
+      },
+      {
+        "id": "realcugan-pro",
+        "type": "upscale",
+        "variant": "RealCUGAN Pro",
+        "description": "Animation, Slow",
+        "scale": 3,
+        "url": "up2x-conservative.tar.gz",
+        "file_path": "up2x-conservative.tar.gz"
+      },
+      {
+        "id": "realisticvideo",
+        "type": "upscale",
+        "variant": "RealisticVideo",
+        "description": "Fast",
+        "scale": 4,
+        "url": "realesr-general-x4v3.tar.gz",
+        "file_path": "realesr-general-x4v3.tar.gz"
+      },
+      {
+        "id": "janai-v2",
+        "type": "upscale",
+        "variant": "JaNai V2",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_V2_Compact_36k.tar.gz",
+        "file_path": "2x_AnimeJaNai_V2_Compact_36k.tar.gz"
+      },
+      {
+        "id": "janai-v3",
+        "type": "upscale",
+        "variant": "JaNai V3",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.tar.gz",
+        "file_path": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.tar.gz"
+      },
+      {
+        "id": "spanimation",
+        "type": "upscale",
+        "variant": "Spanimation",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_ModernSpanimationV2.tar.gz",
+        "file_path": "2x_ModernSpanimationV2.tar.gz"
+      },
+      {
+        "id": "esrgan-animevideo-v3",
+        "type": "upscale",
+        "variant": "ESRGAN AnimeVideo V3",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "realesr-animevideov3-x2.tar.gz",
+        "file_path": "realesr-animevideov3-x2.tar.gz"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, High Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_G6i1_SPAN_215K.ncnn.tar.gz",
+        "file_path": "2x_AniSD_G6i1_SPAN_215K.ncnn.tar.gz"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Medium Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_V2_Compact_36k.tar.gz",
+        "file_path": "2x_AnimeJaNai_V2_Compact_36k.tar.gz"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Low Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_DC_SPAN_92500.ncnn.tar.gz",
+        "file_path": "2x_AniSD_DC_SPAN_92500.ncnn.tar.gz"
+      },
+      {
+        "id": "esrgan-animevideo-v3",
+        "type": "upscale",
+        "variant": "ESRGAN AnimeVideo V3",
+        "description": "Animation, Fast",
+        "scale": 3,
+        "url": "realesr-animevideov3-x3.tar.gz",
+        "file_path": "realesr-animevideov3-x3.tar.gz"
+      },
+      {
+        "id": "esrgan-animevideo-v3",
+        "type": "upscale",
+        "variant": "ESRGAN AnimeVideo V3",
+        "description": "Animation, Fast",
+        "scale": 4,
+        "url": "realesr-animevideov3-x4.tar.gz",
+        "file_path": "realesr-animevideov3-x4.tar.gz"
+      },
+      {
+        "id": "esrgan-plus",
+        "type": "upscale",
+        "variant": "ESRGAN Plus",
+        "description": "General Model, Slow",
+        "scale": 4,
+        "url": "realesrgan-x4plus.tar.gz",
+        "file_path": "realesrgan-x4plus.tar.gz"
+      },
+      {
+        "id": "esrgan-plus",
+        "type": "upscale",
+        "variant": "ESRGAN Plus",
+        "description": "Animation Model, Slow",
+        "scale": 4,
+        "url": "realesrgan-x4plus-anime.tar.gz",
+        "file_path": "realesrgan-x4plus-anime.tar.gz"
+      }
+    ],
+    "enhancement": [
+      {
+        "id": "nafnet-gopro",
+        "type": "enhancement",
+        "variant": "NAFNet GoPro",
+        "description": "Deblur, Slow",
+        "url": "nafnet_gopro1x.ncnn.tar.gz",
+        "file_path": "nafnet_gopro1x.ncnn.tar.gz"
+      },
+      {
+        "id": "dncnn",
+        "type": "enhancement",
+        "variant": "DNcnn",
+        "description": "Fast",
+        "url": "dncnn_color_blind.pth.ncnn.tar.gz",
+        "file_path": "dncnn_color_blind.pth.ncnn.tar.gz"
+      },
+      {
+        "id": "deh264-superultracompact",
+        "type": "enhancement",
+        "variant": "DeH264 SuperUltraCompact",
+        "description": "UltraFast, High/Medium Quality Source",
+        "url": "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn.tar.gz",
+        "file_path": "deH264_SuperUltraCompact.safetensors_torch.float16.ncnn.tar.gz"
+      },
+      {
+        "id": "deh264-span",
+        "type": "enhancement",
+        "variant": "DeH264 SPAN",
+        "description": "Fast, Medium/Low Quality Source",
+        "url": "1x_DeH264_SPAN.ncnn.tar.gz",
+        "file_path": "1x_DeH264_SPAN.ncnn.tar.gz"
+      },
+      {
+        "id": "deh264-rtmosr",
+        "type": "enhancement",
+        "variant": "DeH264 RTMoSR",
+        "description": "Fast, High/Medium Quality Source",
+        "url": "1xDeH264_RTMoSR.ncnn.tar.gz",
+        "file_path": "1xDeH264_RTMoSR.ncnn.tar.gz"
+      },
+      {
+        "id": "sudo_scene_detect",
+        "type": "enhancement",
+        "variant": "sudo_scene_detect",
+        "description": "Scene Detection",
+        "url": "sudo_efficientnet_scenedetect.tar.gz",
+        "file_path": "sudo_efficientnet_scenedetect.tar.gz"
+      }
+    ]
+  },
+  "pytorch": {
+    "interpolate": [
+      {
+        "id": "gmfss",
+        "type": "interpolate",
+        "variant": "GMFSS",
+        "description": "Slow Model, Animation/Realistic",
+        "url": "GMFSS.pkl",
+        "file_path": "GMFSS.pkl"
+      },
+      {
+        "id": "gmfss-pro",
+        "type": "interpolate",
+        "variant": "GMFSS Pro",
+        "description": "Slow Model, Animation/Realistic, Helps with text warping",
+        "url": "GMFSS_PRO.pkl",
+        "file_path": "GMFSS_PRO.pkl"
+      },
+      {
+        "id": "gimm",
+        "type": "interpolate",
+        "variant": "GIMM",
+        "description": "Slow Model, Realistic/General",
+        "url": "GIMMVFI_RAFT.pth",
+        "file_path": "GIMMVFI_RAFT.pth"
+      },
+      {
+        "id": "ifrnet",
+        "type": "interpolate",
+        "variant": "IFRNet",
+        "description": "Fast Model, Realistic only",
+        "url": "IFRNet_Vimeo90K.pth",
+        "file_path": "IFRNet_Vimeo90K.pth"
+      },
+      {
+        "id": "rife-4.6",
+        "type": "interpolate",
+        "variant": "RIFE 4.6",
+        "description": "Fastest Model",
+        "url": "rife4.6.pkl",
+        "file_path": "rife4.6.pkl"
+      },
+      {
+        "id": "rife-4.7",
+        "type": "interpolate",
+        "variant": "RIFE 4.7",
+        "description": "Smoothest Model",
+        "url": "rife4.7.pkl",
+        "file_path": "rife4.7.pkl"
+      },
+      {
+        "id": "rife-4.15",
+        "type": "interpolate",
+        "variant": "RIFE 4.15",
+        "description": null,
+        "url": "rife4.15.pkl",
+        "file_path": "rife4.15.pkl"
+      },
+      {
+        "id": "rife-4.18",
+        "type": "interpolate",
+        "variant": "RIFE 4.18",
+        "description": "Realistic",
+        "url": "rife4.18.pkl",
+        "file_path": "rife4.18.pkl"
+      },
+      {
+        "id": "rife-4.22",
+        "type": "interpolate",
+        "variant": "RIFE 4.22",
+        "description": "Slow, Animation",
+        "url": "rife4.22.pkl",
+        "file_path": "rife4.22.pkl"
+      },
+      {
+        "id": "rife-4.22-lite",
+        "type": "interpolate",
+        "variant": "RIFE 4.22-lite",
+        "description": "Latest LITE model",
+        "url": "rife4.22-lite.pkl",
+        "file_path": "rife4.22-lite.pkl"
+      },
+      {
+        "id": "rife-4.25",
+        "type": "interpolate",
+        "variant": "RIFE 4.25",
+        "description": null,
+        "url": "rife4.25.pkl",
+        "file_path": "rife4.25.pkl"
+      },
+      {
+        "id": "rife-4.26-heavy",
+        "type": "interpolate",
+        "variant": "RIFE 4.26 Heavy",
+        "description": "Slowest RIFE Model, Animation",
+        "url": "rife4.26.heavy.pkl",
+        "file_path": "rife4.26.heavy.pkl"
+      },
+      {
+        "id": "rife-4.26",
+        "type": "interpolate",
+        "variant": "RIFE 4.26",
+        "description": "Latest General Model, Recommended",
+        "url": "rife4.26.pkl",
+        "file_path": "rife4.26.pkl"
+      }
+    ],
+    "upscale": [
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, High Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_weak_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_weak_no_update_params.pth"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Medium Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_medium_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_medium_no_update_params.pth"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Low Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_strong_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_strong_no_update_params.pth"
+      },
+      {
+        "id": "openproteus",
+        "type": "upscale",
+        "variant": "OpenProteus",
+        "description": "Realistic, HD Input, Fast",
+        "scale": 2,
+        "url": "2x_OpenProteus_Compact_i2_70K.pth",
+        "file_path": "2x_OpenProteus_Compact_i2_70K.pth"
+      },
+      {
+        "id": "realisticvideo",
+        "type": "upscale",
+        "variant": "RealisticVideo",
+        "description": "Fast",
+        "scale": 4,
+        "url": "realesr-general-x4v3.pth",
+        "file_path": "realesr-general-x4v3.pth"
+      },
+      {
+        "id": "janai-v2",
+        "type": "upscale",
+        "variant": "JaNai V2",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_V2_Compact_36k.pth",
+        "file_path": "2x_AnimeJaNai_V2_Compact_36k.pth"
+      },
+      {
+        "id": "janai-v3",
+        "type": "upscale",
+        "variant": "JaNai V3",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.pth",
+        "file_path": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.pth"
+      },
+      {
+        "id": "sudo-shuffle-span",
+        "type": "upscale",
+        "variant": "Sudo Shuffle SPAN",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2xSudo_Shuffle_Span_no_update_params.pth",
+        "file_path": "2xSudo_Shuffle_Span_no_update_params.pth"
+      },
+      {
+        "id": "span-spanimation-v2",
+        "type": "upscale",
+        "variant": "SPAN Spanimation V2",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_ModernSpanimationV2.pth",
+        "file_path": "2x_ModernSpanimationV2.pth"
+      },
+      {
+        "id": "spanplus-spanimation-v3",
+        "type": "upscale",
+        "variant": "SPANPlus Spanimation V3",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_ModernSpanimationV3.pth",
+        "file_path": "2x_ModernSpanimationV3.pth"
+      },
+      {
+        "id": "spanplus-dynamic-bhi",
+        "type": "upscale",
+        "variant": "SPANPlus Dynamic BHI",
+        "description": "Realistic, Fast",
+        "scale": 2,
+        "url": "2x_BHI_SpanPlusDynamic_Light.pth",
+        "file_path": "2x_BHI_SpanPlusDynamic_Light.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, High Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_G6i1_SPAN_215K.pth",
+        "file_path": "2x_AniSD_G6i1_SPAN_215K.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Medium Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_AC_G6i2b_SPAN_190K.pth",
+        "file_path": "2x_AniSD_AC_G6i2b_SPAN_190K.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Low Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_DC_SPAN_92500.pth",
+        "file_path": "2x_AniSD_DC_SPAN_92500.pth"
+      },
+      {
+        "id": "animesr",
+        "type": "upscale",
+        "variant": "AnimeSR",
+        "description": "Animation, Low-High Quality Source, Slow",
+        "scale": 4,
+        "url": "AnimeSR_v2.pth",
+        "file_path": "AnimeSR_v2.pth"
+      }
+    ],
+    "enhancement": [
+      {
+        "id": "nafnet-gopro",
+        "type": "enhancement",
+        "variant": "NAFNet GoPro",
+        "description": "Deblur, Fast",
+        "url": "nafnet_gopro1x.pth",
+        "file_path": "nafnet_gopro1x.pth"
+      },
+      {
+        "id": "drunet",
+        "type": "enhancement",
+        "variant": "DRUNET",
+        "description": "Slow",
+        "url": "drunet_color.pth",
+        "file_path": "drunet_color.pth"
+      },
+      {
+        "id": "dncnn",
+        "type": "enhancement",
+        "variant": "DNcnn",
+        "description": "Fast",
+        "url": "dncnn_color_blind.pth",
+        "file_path": "dncnn_color_blind.pth"
+      },
+      {
+        "id": "scunet-color",
+        "type": "enhancement",
+        "variant": "SCUNet Color",
+        "description": "Slow",
+        "url": "scunet_color_real_psnr.pth",
+        "file_path": "scunet_color_real_psnr.pth"
+      },
+      {
+        "id": "deh264-superultracompact",
+        "type": "enhancement",
+        "variant": "DeH264 SuperUltraCompact",
+        "description": "UltraFast, High/Medium Quality Source",
+        "url": "deH264_SuperUltraCompact.safetensors",
+        "file_path": "deH264_SuperUltraCompact.safetensors"
+      },
+      {
+        "id": "deh264-rtmosr",
+        "type": "enhancement",
+        "variant": "DeH264 RTMoSR",
+        "description": "Fast, High/Medium Quality Source",
+        "url": "1xDeH264_RTMoSR.pth",
+        "file_path": "1xDeH264_RTMoSR.pth"
+      },
+      {
+        "id": "deh264-span",
+        "type": "enhancement",
+        "variant": "DeH264 SPAN",
+        "description": "Fast, Medium/Low Quality Source",
+        "url": "1x_DeH264_SPAN.safetensors",
+        "file_path": "1x_DeH264_SPAN.safetensors"
+      },
+      {
+        "id": "deh264-plksr",
+        "type": "enhancement",
+        "variant": "DeH264 PLKSR",
+        "description": "Very Slow, Low Quality Source",
+        "url": "1xDeH264_realplksr.pth",
+        "file_path": "1xDeH264_realplksr.pth"
+      },
+      {
+        "id": "sudo_maxxvit",
+        "type": "enhancement",
+        "variant": "sudo_maxxvit",
+        "description": "Scene Detection",
+        "url": "sudo_maxxvit_scenedetect.pt",
+        "file_path": "sudo_maxxvit_scenedetect.pt"
+      },
+      {
+        "id": "sudo_scene_detect",
+        "type": "enhancement",
+        "variant": "sudo_scene_detect",
+        "description": "Scene Detection",
+        "url": "sudo_maxxvit_scenedetect.pt",
+        "file_path": "sudo_maxxvit_scenedetect.pt"
+      }
+    ]
+  },
+  "tensorrt": {
+    "interpolate": [
+      {
+        "id": "gmfss",
+        "type": "interpolate",
+        "variant": "GMFSS",
+        "description": "Slow Model, Animation",
+        "url": "GMFSS.pkl",
+        "file_path": "GMFSS.pkl"
+      },
+      {
+        "id": "gmfss-pro",
+        "type": "interpolate",
+        "variant": "GMFSS Pro",
+        "description": "Slow Model, Animation, Helps with text warping",
+        "url": "GMFSS_PRO.pkl",
+        "file_path": "GMFSS_PRO.pkl"
+      },
+      {
+        "id": "rife-4.6",
+        "type": "interpolate",
+        "variant": "RIFE 4.6",
+        "description": "Fastest Model",
+        "url": "rife4.6.pkl",
+        "file_path": "rife4.6.pkl"
+      },
+      {
+        "id": "rife-4.7",
+        "type": "interpolate",
+        "variant": "RIFE 4.7",
+        "description": "Smoothest Model",
+        "url": "rife4.7.pkl",
+        "file_path": "rife4.7.pkl"
+      },
+      {
+        "id": "rife-4.15",
+        "type": "interpolate",
+        "variant": "RIFE 4.15",
+        "description": null,
+        "url": "rife4.15.pkl",
+        "file_path": "rife4.15.pkl"
+      },
+      {
+        "id": "rife-4.18",
+        "type": "interpolate",
+        "variant": "RIFE 4.18",
+        "description": "Realistic",
+        "url": "rife4.18.pkl",
+        "file_path": "rife4.18.pkl"
+      },
+      {
+        "id": "rife-4.22",
+        "type": "interpolate",
+        "variant": "RIFE 4.22",
+        "description": "Slow, Animation",
+        "url": "rife4.22.pkl",
+        "file_path": "rife4.22.pkl"
+      },
+      {
+        "id": "rife-4.22-lite",
+        "type": "interpolate",
+        "variant": "RIFE 4.22-lite",
+        "description": "Latest LITE model",
+        "url": "rife4.22-lite.pkl",
+        "file_path": "rife4.22-lite.pkl"
+      },
+      {
+        "id": "rife-4.25",
+        "type": "interpolate",
+        "variant": "RIFE 4.25",
+        "description": null,
+        "url": "rife4.25.pkl",
+        "file_path": "rife4.25.pkl"
+      },
+      {
+        "id": "rife-4.26-heavy",
+        "type": "interpolate",
+        "variant": "RIFE 4.26 Heavy",
+        "description": "Slowest RIFE Model, Animation",
+        "url": "rife4.26.heavy.pkl",
+        "file_path": "rife4.26.heavy.pkl"
+      },
+      {
+        "id": "rife-4.26",
+        "type": "interpolate",
+        "variant": "RIFE 4.26",
+        "description": "Latest General Model, Recommended",
+        "url": "rife4.26.pkl",
+        "file_path": "rife4.26.pkl"
+      }
+    ],
+    "upscale": [
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, High Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_weak_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_weak_no_update_params.pth"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Medium Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_medium_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_medium_no_update_params.pth"
+      },
+      {
+        "id": "nomos8k",
+        "type": "upscale",
+        "variant": "Nomos8k",
+        "description": "Realistic, Low Quality Source, Fast",
+        "scale": 4,
+        "url": "4xNomos8k_span_otf_strong_no_update_params.pth",
+        "file_path": "4xNomos8k_span_otf_strong_no_update_params.pth"
+      },
+      {
+        "id": "openproteus",
+        "type": "upscale",
+        "variant": "OpenProteus",
+        "description": "Realistic, HD Input, Fast",
+        "scale": 2,
+        "url": "2x_OpenProteus_Compact_i2_70K.pth",
+        "file_path": "2x_OpenProteus_Compact_i2_70K.pth"
+      },
+      {
+        "id": "realisticvideo",
+        "type": "upscale",
+        "variant": "RealisticVideo",
+        "description": "Fast",
+        "scale": 4,
+        "url": "realesr-general-x4v3.pth",
+        "file_path": "realesr-general-x4v3.pth"
+      },
+      {
+        "id": "janai-v2",
+        "type": "upscale",
+        "variant": "JaNai V2",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_V2_Compact_36k.pth",
+        "file_path": "2x_AnimeJaNai_V2_Compact_36k.pth"
+      },
+      {
+        "id": "janai-v3",
+        "type": "upscale",
+        "variant": "JaNai V3",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.pth",
+        "file_path": "2x_AnimeJaNai_HD_V3_Sharp1_Compact_430k.pth"
+      },
+      {
+        "id": "spanimation-v2",
+        "type": "upscale",
+        "variant": "Spanimation V2",
+        "description": "Animation, Fast",
+        "scale": 2,
+        "url": "2x_ModernSpanimationV2.pth",
+        "file_path": "2x_ModernSpanimationV2.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, High Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_G6i1_SPAN_215K.pth",
+        "file_path": "2x_AniSD_G6i1_SPAN_215K.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Medium Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_AC_G6i2b_SPAN_190K.pth",
+        "file_path": "2x_AniSD_AC_G6i2b_SPAN_190K.pth"
+      },
+      {
+        "id": "anisd",
+        "type": "upscale",
+        "variant": "AniSD",
+        "description": "Old Animation, Low Quality Source, Fast",
+        "scale": 2,
+        "url": "2x_AniSD_DC_SPAN_92500.pth",
+        "file_path": "2x_AniSD_DC_SPAN_92500.pth"
+      }
+    ],
+    "enhancement": [
+      {
+        "id": "nafnet-gopro",
+        "type": "enhancement",
+        "variant": "NAFNet GoPro",
+        "description": "Deblur, Fast",
+        "url": "nafnet_gopro1x.pth",
+        "file_path": "nafnet_gopro1x.pth"
+      },
+      {
+        "id": "drunet",
+        "type": "enhancement",
+        "variant": "DRUNET",
+        "description": "Slow",
+        "url": "drunet_color.pth",
+        "file_path": "drunet_color.pth"
+      },
+      {
+        "id": "deh264-superultracompact",
+        "type": "enhancement",
+        "variant": "DeH264 SuperUltraCompact",
+        "description": "UltraFast, High/Medium Quality Source",
+        "url": "deH264_SuperUltraCompact.safetensors",
+        "file_path": "deH264_SuperUltraCompact.safetensors"
+      },
+      {
+        "id": "deh264-rtmosr",
+        "type": "enhancement",
+        "variant": "DeH264 RTMoSR",
+        "description": "Fast, High/Medium Quality Source",
+        "url": "1xDeH264_RTMoSR.pth",
+        "file_path": "1xDeH264_RTMoSR.pth"
+      },
+      {
+        "id": "deh264-span",
+        "type": "enhancement",
+        "variant": "DeH264 SPAN",
+        "description": "Fast, Medium/Low Quality Source",
+        "url": "1x_DeH264_SPAN.safetensors",
+        "file_path": "1x_DeH264_SPAN.safetensors"
+      }
+    ]
+  },
+  "onnx": {
+    "interpolate": [
+      {
+        "id": "rife-4.22",
+        "type": "interpolate",
+        "variant": "RIFE 4.22",
+        "description": "Recommended Model",
+        "url": "rife422_v2_ensembleFalse_op20_clamp.onnx",
+        "file_path": "rife422_v2_ensembleFalse_op20_clamp.onnx"
+      }
+    ],
+    "upscale": [
+      {
+        "id": "span",
+        "type": "upscale",
+        "variant": "SPAN",
+        "description": "Animation, 2X",
+        "scale": 2,
+        "url": "2x_ModernSpanimationV2_clamp_op20.onnx",
+        "file_path": "2x_ModernSpanimationV2_clamp_op20.onnx"
+      }
+    ],
+    "enhancement": []
+  }
+}
