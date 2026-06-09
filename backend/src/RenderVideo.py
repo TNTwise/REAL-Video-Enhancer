@@ -37,22 +37,10 @@ class Render:
         self.read_buffer = read_buffer
         self.write_buffer = write_buffer
 
-        # TODO (bug #1): 'inputFile' is used but not defined in the __init__ params or passed from RenderSettings — will raise NameError at runtime.
-        # TODO (bug #2): 'outputFile' is not defined — same root cause as bug #1.
-        # TODO (bug #3): 'backend' is not defined — same root cause.
-        # TODO (bug #4): 'device' is not defined — same root cause.
-        # TODO (bug #5): 'precision' is not defined — same root cause.
-        # TODO (bug #8): 'crf', 'video_encoder', 'audio_encoder', 'subtitle_encoder' are passed to FFmpegWrite but never bound on self or received as params.
-        # TODO (bug #9): 'color_space', 'color_primaries', 'color_transfer', 'input_pix_fmt' are passed to FFmpegRead but never bound.
-        # max timestep is a hack to make sure ncnn cache frames too early, and ncnn breaks if i modify the code at all so ig this is what we are doing
-        # also used to help with performace and caching
-        # must use ceilInterpolateFactor so the last timestep matches exactly
         self.maxTimestep = (self.ceilInterpolateFactor - 1) / self.ceilInterpolateFactor
 
-        # self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
 
         logger.info("Using backend: %s", self.backend)
-        # upscale has to be called first to get the scale of the upscale model
         if render_settings.upscale_:
             self.setupUpscale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
