@@ -1,5 +1,5 @@
 from __future__ import annotations
-from backend.src.schemas.domain.model import InterpolateModel, UpscaleModel
+from src.schemas.domain.model import InterpolateModel, UpscaleModel
 from pydantic import BaseModel
 
 

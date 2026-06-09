@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from backend.src.schemas import RenderSettings, RenderSettingsClientInput
-from backend.src.repos.model_repo import ModelRepo
+from src.schemas import RenderSettings, RenderSettingsClientInput
+from src.repos.model_repo import ModelRepo
 
 
 class RenderService:

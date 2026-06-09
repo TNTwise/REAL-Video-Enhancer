@@ -1,4 +1,3 @@
-import asyncio
 import os
 from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 
@@ -99,14 +98,19 @@ class Settings:
         }
         self.settings = self.default_settings.copy()
         if not os.path.isfile(SETTINGS_FILE):
-            self._write_out_current_settings_sync()
-        self._read_settings_sync()
+            self.write_default_settings()
+        self.read_settings()
         # check if the settings file is corrupted
         if len(self.default_settings) != len(self.settings):
-            self._write_out_current_settings_sync()
+            self.write_default_settings()
 
-    def _read_settings_sync(self):
-        """Synchronous file read for use in __init__."""
+    def read_settings(self):
+        """
+        Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.
+
+        Returns:
+            None
+        """
         with open(SETTINGS_FILE, "r") as file:
             try:
                 for line in file:
@@ -115,19 +119,10 @@ class Settings:
             except (
                 ValueError
             ):  # writes and reads again if the settings file is corrupted
-                self._write_out_current_settings_sync()
-                self._read_settings_sync()
+                self.write_default_settings()
+                self.read_settings()
 
-    async def read_settings(self):
-        """
-        Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.
-
-        Returns:
-            None
-        """
-        await asyncio.to_thread(self._read_settings_sync)
-
-    async def write_setting(self, setting: str, value: str):
+    def write_setting(self, setting: str, value: str):
         """
         Writes the specified setting with the given value to the settings dictionary.
 
@@ -141,9 +136,9 @@ class Settings:
         if not setting in self.default_settings:
             raise ValueError("Not a valid setting")
         self.settings[setting] = value
-        await self._write_out_current_settings()
+        self.write_out_current_settings()
 
-    async def write_default_settings(self):
+    def write_default_settings(self):
         """
         Writes the default settings to the settings file if it doesn't exist.
 
@@ -154,10 +149,10 @@ class Settings:
             None
         """
         self.settings = self.default_settings.copy()
-        await self._write_out_current_settings()
+        self.write_out_current_settings()
 
-    async def get_setting_value(self, setting: str) -> str:
-        await self.read_settings()
+    def get_setting_value(self, setting: str) -> str:
+        self.read_settings()
         if not setting in self.default_settings:
             raise ValueError("Not a valid setting")
         return self.settings[setting]
@@ -167,23 +162,7 @@ class Settings:
             raise ValueError("Not a valid setting")
         return self.allowed_settings[setting]
 
-    def _write_out_current_settings_sync(self):
-        """Synchronous file write for use in __init__."""
-        with open(SETTINGS_FILE, "w") as file:
-            for key, value in self.settings.items():
-                if key in self.default_settings:  # check if the key is valid
-                    if (
-                        self.allowed_settings[key] == "ANY"
-                        or value in self.allowed_settings[key]
-                    ):  # check if it is in the allowed settings dict
-                        file.write(f"{key},{value}\n")
-                else:
-                    self.settings = self.default_settings.copy()
-                    with open(SETTINGS_FILE, "w") as file:
-                        for k, v in self.settings.items():
-                            file.write(f"{k},{v}\n")
-
-    async def _write_out_current_settings(self):
+    def write_out_current_settings(self):
         """
         Writes the current settings to a file.
 
@@ -193,4 +172,13 @@ class Settings:
         Returns:
             None
         """
-        await asyncio.to_thread(self._write_out_current_settings_sync)
+        with open(SETTINGS_FILE, "w") as file:
+            for key, value in self.settings.items():
+                if key in self.default_settings:  # check if the key is valid
+                    if (
+                        self.allowed_settings[key] == "ANY"
+                        or value in self.allowed_settings[key]
+                    ):  # check if it is in the allowed settings dict
+                        file.write(f"{key},{value}\n")
+                else:
+                    self.write_default_settings()

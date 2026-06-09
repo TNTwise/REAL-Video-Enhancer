@@ -1,5 +1,5 @@
 from __future__ import annotations
-from backend.src.schemas.request.model import (
+from src.schemas.request.model import (
     InterpolateModelClientInput,
     UpscaleModelClientInput,
     EnhancementModelClientInput,
