@@ -1,0 +1,88 @@
+import subprocess
+
+from backend.src.constants import FFMPEG_PATH
+
+from ..utils.LogConfig import get_logger
+from ..utils.Util import subprocess_popen_without_terminal
+
+logger = get_logger(__name__)
+
+
+class BorderDetect:
+    def __init__(self, input_file):
+        self.input_file = input_file
+
+    def process_borders(self):
+        command = [
+            f"{FFMPEG_PATH}",
+            "-noautorotate",
+            "-i",
+            f"{self.input_file}",
+            "-vf",
+            "cropdetect",
+            "-f",
+            "null",
+            "-",
+        ]
+        try:
+            process = subprocess_popen_without_terminal(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                universal_newlines=True,
+            )
+            output = process.communicate()
+            return output
+        except subprocess.SubprocessError:
+            logger.exception("Error during subprocess execution")
+            return None, None
+
+    def process_output(self, output):
+        if output is None:
+            return None
+
+        borders = []
+        for line in output[1].split("\n"):
+            if "crop=" in line:
+                crop_value = line.split("crop=")[1].split(" ")[0]
+                borders.append(crop_value)
+
+        if borders:
+
+            def parse_crop(crop_str):
+                # Expected format: "width:height:x:y"
+                try:
+                    width, height, x, y = map(int, crop_str.split(":"))
+                    if width <= 0 or height <= 0:
+                        logger.warning("Invalid crop dimensions: %s", crop_str)
+                        return None
+                    return width, height, x, y
+                except ValueError:
+                    logger.warning("Invalid crop format: %s", crop_str)
+                    return None
+
+            # Parse all crop values and filter out any invalid entries
+            parsed_crops = [parse_crop(crop) for crop in borders]
+            parsed_crops = [crop for crop in parsed_crops if crop is not None]
+
+            if not parsed_crops:
+                logger.warning("No valid crop values found.")
+                return None
+
+            # Determine the least cropped crop (i.e., largest area)
+            least_cropped = max(parsed_crops, key=lambda dims: dims[0] * dims[1])
+            least_cropped_str = f"{least_cropped[0]}:{least_cropped[1]}:{least_cropped[2]}:{least_cropped[3]}"
+
+            return least_cropped_str
+
+        return None
+
+    def get_borders(self):
+        output = self.process_borders()
+        output = self.process_output(output)
+        if output is None:
+            logger.warning("No valid borders detected.")
+            return None, None, None, None
+        width, height, border_x, border_y = map(int, output.split(":"))
+        return width, height, border_x, border_y

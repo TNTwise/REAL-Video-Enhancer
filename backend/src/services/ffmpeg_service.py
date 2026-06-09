@@ -10,6 +10,7 @@ from backend.src.constants import FFMPEG_PATH
 from backend.src.schemas.domain.render import RenderSettings
 from backend.src.services.settings import Settings
 from backend.src.services.video_info_service import OpenCVInfo
+from backend.src.utils import BorderDetect
 import cv2
 import numpy as np
 import tempfile
@@ -31,17 +32,25 @@ class Buffer(ABC):
 
 class FFmpegRead(Buffer):
     def __init__(
+        self,
         render_settings: RenderSettings,
         video_info: OpenCVInfo,
-        settings: Settings
+        settings: Settings,
+        border_detect: BorderDetect
     ):
-        
+        self.render_settings = render_settings
+        self.video_info = video_info
+        self.settings = settings
+        self.border_detect = border_detect
+
+
+        self._yuv420p_mod = video_info.pixel_format == "yuv420p"
         if render_settings.hdr_mode:
-            inputFrameChunkSize = video_info.width * height * 6
-        elif self.yuv420pMOD:
-            self.inputFrameChunkSize = width * height * 3 // 2
+            self.input_frame_chunk_size = video_info.width * video_info.height * 6
+        elif self._yuv420p_mod:
+            self.input_frame_chunk_size = video_info.width * video_info.height * 3 // 2
         else:
-            self.inputFrameChunkSize = width * height * 3
+            self.input_frame_chunk_size = video_info.width * video_info.height * 3
         command = self.command()
         logger.info("FFMPEG READ COMMAND: %s", command)
 
@@ -49,50 +58,51 @@ class FFmpegRead(Buffer):
             mode="w+", encoding="utf-8", errors="replace"
         )
 
-        self.readProcess = subprocess_popen_without_terminal(
-            self.command(),
+        self._read_process = subprocess_popen_without_terminal(
+            command,
             stdout=subprocess.PIPE,
             stderr=self.stderr_file,
         )
-        self.readQueue = queue.Queue(maxsize=25)
+        self._read_queue = queue.Queue(maxsize=25)
 
     def command(self):
+        # will have to figure out a cleaner solution to this later
+        #border_width, border_height, border_x, border_y = self.border_detect.get_borders()
+        #filter_string = f"crop=min({self.video_info.width}\\,max(1\\,iw-{border_x})):min({self.video_info.height}\\,max(1\\,ih-{border_y})):{border_x}:{border_y},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
+        
+
         command = [
-            f"{self.ffmpeg_path}",
+            f"{FFMPEG_PATH}",
             "-loglevel",
             "error",
             "-nostdin",
             "-i",
-            f"{self.inputFile}",
-        ]
-
-        filter_string = f"crop=min({self.width}\\,max(1\\,iw-{self.borderX})):min({self.height}\\,max(1\\,ih-{self.borderY})):{self.borderX}:{self.borderY},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
-        command += [
-            "-vf",
-            filter_string,
+            f"{self.render_settings.video_path}",
+        #    "-vf",
+        #    filter_string,
             "-f",
             "image2pipe",
             "-pix_fmt",
             "rgb48le"
-            if self.hdr_mode
-            else (self.input_pixel_format if self.yuv420pMOD else "rgb24"),
+            if self.render_settings.hdr_mode
+            else (self.video_info.pixel_format if self._yuv420p_mod else "rgb24"),
             # "rgb48le" if self.hdr_mode else "rgb24",
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.width}x{self.height}",
+            f"{self.video_info.width}x{self.video_info.height}",
             "-",
         ]
-
+        
         logger.info("FFMPEG READ COMMAND: %s", command)
         return command
 
     def read_frame(self):
-        chunk = self.readProcess.stdout.read(self.inputFrameChunkSize)
-        if len(chunk) < self.inputFrameChunkSize:
+        chunk = self._read_process.stdout.read(self.input_frame_chunk_size)
+        if len(chunk) < self.input_frame_chunk_size:
             return None
 
-        if self.yuv420pMOD:
+        if self._yuv420p_mod:
             # Convert raw YUV420p data to RGB
             # The data is Y plane, then U plane, then V plane, concatenated.
             # cv2.COLOR_YUV420P2RGB expects a single channel image of shape (height * 3 // 2, width)
@@ -121,19 +131,19 @@ class FFmpegRead(Buffer):
                 self.dtype,
             )
             frame.set_frame_bytes(chunk)
-            self.readQueue.put(frame)
-        self.readQueue.put(None)
+            self._read_queue.put(frame)
+        self._read_queue.put(None)
 
     def get(self) -> Frame:
-        return self.readQueue.get()
+        return self._read_queue.get()
 
     def __del__(self):
-        self.readProcess.stdout.close()
-        if self.readProcess.returncode != 0:
+        self._read_process.stdout.close()
+        if self._read_process.returncode != 0:
             self.stderr_file.seek(0)
             stderr_output = self.stderr_file.read()
             logger.info("FFmpeg Read Process stderr:\n%s", stderr_output)
-        self.readProcess.terminate()
+        self._read_process.terminate()
         self.stderr_file.close()
 
 
