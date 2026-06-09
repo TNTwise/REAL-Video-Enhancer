@@ -16,7 +16,7 @@ from .utils.BorderDetect import BorderDetect
 from .utils.Encoders import EncoderSettings
 from .utils.LogConfig import get_logger
 from .utils.SceneDetect import SceneDetect
-from .utils.VideoInfo import OpenCVInfo
+from .services.video_info_service import OpenCVInfo
 
 
 def global_thread_handler(args):
@@ -122,61 +122,6 @@ class Render:
         self.trt_dynamic_shapes = trt_dynamic_shapes
         self.extraRestorationModels = []
 
-        if cwd:
-            logger.info("Working Directory: %s", cwd)
-        else:
-            cwd = os.getcwd()
-            logger.info(
-                "No Working Directory specified, using current directory: %s",
-                cwd,
-            )
-        videoInfo = OpenCVInfo(
-            input_file=inputFile,
-            start_time=start_time,
-            end_time=end_time,
-            ffmpeg_path=ffmpeg_path,
-        )
-
-        if not videoInfo.is_valid_video:
-            logger.error("Input video is not valid!")
-
-        if start_time is None:
-            start_time = 0
-        if end_time is None:
-            end_time = videoInfo.get_duration_seconds()
-
-        self.width, self.height = videoInfo.get_width_x_height()
-        self.originalWidth = self.width
-        self.originalHeight = self.height
-        input_pix_fmt = videoInfo.get_pixel_format()
-        self.borderX = 0
-        self.borderY = 0  # set borders for cropping automatically to 0, will be overwritten if borders are detected
-        self.totalInputFrames = videoInfo.get_total_frames()
-        self.totalOutputFrames = int(self.totalInputFrames * self.ceilInterpolateFactor)
-        self.fps = videoInfo.get_fps()
-        color_space = videoInfo.get_color_space()
-        color_primaries = videoInfo.get_color_primaries()
-        color_transfer = videoInfo.get_color_transfer()
-
-        video_encoder = EncoderSettings(video_encoder_preset)
-        audio_encoder = EncoderSettings(audio_encoder_preset, type="audio")
-        subtitle_encoder = EncoderSettings(subtitle_encoder_preset, type="subtitle")
-
-        if border_detect:  # border detect has to be put before everything, to overwrite the width and height
-            print("Detecting borders", file=sys.stderr)
-            borderDetect = BorderDetect(
-                inputFile=self.inputFile, ffmpeg_path=ffmpeg_path
-            )
-            self.width, self.height, self.borderX, self.borderY = (
-                borderDetect.getBorders()
-            )
-            logger.info(
-                "Detected borders: Width,Height:%sx%s, X,Y: %sx%s",
-                self.width,
-                self.height,
-                self.borderX,
-                self.borderY,
-            )
 
         logger.info("Using backend: %s", self.backend)
         # upscale has to be called first to get the scale of the upscale model

@@ -5,6 +5,14 @@ from pydantic import BaseModel
 
 class RenderSettings(BaseModel):
     video_path: str
+    tiling_enabled: bool
+    tilesize: int
+    interpolate_times: int
+    benchmark_mode: bool
+    slow_mo_mode: bool
+    hdr_mode: bool = False
+    start_time: float | None = None
+    end_time: float | None = None
     default_output_path_override: str | None = None
     interpolate_model: InterpolateModel | None = None
     upscale_model: UpscaleModel | None = None

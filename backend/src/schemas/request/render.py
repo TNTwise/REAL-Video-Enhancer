@@ -9,7 +9,15 @@ from pydantic import BaseModel
 
 class RenderSettingsClientInput(BaseModel):
     video_path: str
-    default_output_path_override: str | None
+    tiling_enabled: bool
+    tilesize: int
+    interpolate_times: int
+    benchmark_mode: bool
+    slow_mo_mode: bool
     interpolate_model: InterpolateModelClientInput
     upscale_model: UpscaleModelClientInput
     enhancement_models: list[EnhancementModelClientInput]
+    hdr_mode: bool = False
+    start_time: float | None = None
+    end_time: float | None = None
+    default_output_path_override: str | None

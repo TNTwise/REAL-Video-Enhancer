@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from src.schemas import RenderSettings, RenderSettingsClientInput
 from src.repos.model_repo import ModelRepo
-
+from backend.src.services.video_info_service import OpenCVInfo
 
 class RenderService:
-    def __init__(self, model_repo: ModelRepo):
+    def __init__(self, model_repo: ModelRepo, video_info_service: OpenCVInfo):
         self._model_repo = model_repo
+        self._video_info_service = video_info_service
 
     def _renderclientinput_to_rendersettings(
         self, input: RenderSettingsClientInput
@@ -41,5 +42,10 @@ class RenderService:
 
     async def start_render(self, input: RenderSettingsClientInput):
         settings = self._renderclientinput_to_rendersettings(input)
+        video_info = self._video_info_service(
+            input_file=settings.video_path,
+        )
+
+
 
         

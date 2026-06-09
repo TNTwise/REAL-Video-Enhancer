@@ -6,6 +6,10 @@ import time
 import shlex
 from abc import ABC, abstractmethod
 
+from backend.src.constants import FFMPEG_PATH
+from backend.src.schemas.domain.render import RenderSettings
+from backend.src.services.settings import Settings
+from backend.src.services.video_info_service import OpenCVInfo
 import cv2
 import numpy as np
 import tempfile
@@ -28,44 +32,11 @@ class Buffer(ABC):
 
 class FFmpegRead(Buffer):
     def __init__(
-        self,
-        inputFile,
-        width,
-        height,
-        start_time,
-        end_time,
-        borderX,
-        borderY,
-        hdr_mode,
-        backend: str = "pytorch",
-        device: str = "cuda",
-        gpu_id: int = 0,
-        dtype: str = "float16",
-        color_space=None,
-        color_primaries=None,
-        color_transfer=None,
-        input_pixel_format: str | None = None,
-        ffmpeg_path: str = "./bin/ffmpeg",
+        render_settings: RenderSettings,
+        video_info: OpenCVInfo,
+        settings: Settings
     ):
-        self.inputFile = inputFile
-        self.width = width
-        self.height = height
-        self.start_time = start_time
-        self.end_time = end_time
-        self.borderX = borderX
-        self.borderY = borderY
-        self.hdr_mode = hdr_mode
-        self.backend = backend
-        self.device = device
-        self.gpu_id = gpu_id
-        self.dtype = dtype
-        self.color_space = color_space
-        self.color_primaries = color_primaries
-        self.color_transfer = color_transfer
-        self.input_pixel_format = input_pixel_format
-        self.yuv420pMOD = self.input_pixel_format == "yuv420p" and not self.hdr_mode
-        self.ffmpeg_path = ffmpeg_path
-        # self.yuv420pMOD = False
+        
         if self.hdr_mode:
             self.inputFrameChunkSize = width * height * 6
         elif self.yuv420pMOD:
@@ -170,37 +141,12 @@ class FFmpegRead(Buffer):
 class FFmpegWrite(Buffer):
     def __init__(
         self,
-        inputFile: str,
-        outputFile: str,
-        width: int,
-        height: int,
-        start_time: float,
-        end_time: float,
-        fps: float,
-        crf: str,
-        audio_bitrate: str,
-        pixelFormat: str,
-        overwrite: bool,
-        custom_encoder: str,
-        benchmark: bool,
-        slowmo_mode: bool,
-        upscaleTimes: int,
-        interpolateFactor: float,
-        ceilInterpolateFactor: int,
-        video_encoder: EncoderSettings,
-        audio_encoder: EncoderSettings,
-        subtitle_encoder: EncoderSettings,
-        hdr_mode: bool,
-        mpv_output: bool,
-        merge_subtitles: bool,
-        color_space: str = None,
-        color_primaries: str = None,
-        color_transfer: str = None,
-        ffmpeg_path: str = "./bin/ffmpeg",
-        ffmpeg_log_file: str = "ffmpeg_log.txt",
+        render_settings: RenderSettings,
+        video_info: OpenCVInfo,
+        settings: Settings
     ):
-        self.inputFile = inputFile
-        self.outputFile = outputFile
+        self.inputFile = render_settings.video_path
+        self.outputFile = render_settings.default_output_path_override
         if self.outputFile:
             self.outputFileExtension = os.path.split(self.outputFile)[-1].split(".")[-1]
         self.width = width
