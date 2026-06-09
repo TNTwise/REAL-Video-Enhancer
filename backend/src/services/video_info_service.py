@@ -336,7 +336,6 @@ class OpenCVInfo(VideoInfo):
     def height(self) -> int:
         return int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    
     @property
     def rotation(self) -> float:
         return self.ffmpeg_info.get_rotation()
@@ -383,6 +382,7 @@ class OpenCVInfo(VideoInfo):
 
     def __del__(self):
         self.cap.release()
+
 
 def print_video_info(video_info: VideoInfo):
     print(f"Duration: {video_info.get_duration_seconds()} seconds")

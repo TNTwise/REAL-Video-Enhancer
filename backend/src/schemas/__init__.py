@@ -17,5 +17,5 @@ __all__ = [
     "InterpolateModelClientInput",
     "UpscaleModelClientInput",
     "EnhancementModelClientInput",
-    "Setting"
+    "Setting",
 ]

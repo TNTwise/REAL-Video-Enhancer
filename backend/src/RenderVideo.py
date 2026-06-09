@@ -121,7 +121,6 @@ class Render:
         self.trt_dynamic_shapes = trt_dynamic_shapes
         self.extraRestorationModels = []
 
-
         logger.info("Using backend: %s", self.backend)
         # upscale has to be called first to get the scale of the upscale model
         if upscaleModel:

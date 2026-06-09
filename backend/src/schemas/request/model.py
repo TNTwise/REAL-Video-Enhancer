@@ -15,6 +15,7 @@ class UpscaleModelClientInput(BaseModel):
     id: str
     backed_type: str
 
+
 class EnhancementModelClientInput(BaseModel):
     type: Literal["enhancement"] = "enhancement"
     id: str

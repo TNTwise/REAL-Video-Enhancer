@@ -79,13 +79,12 @@ class FFmpegRead(ReadBuffer):
         render_settings: RenderSettings,
         video_info: OpenCVInfo,
         settings: Settings,
-        border_detect: BorderDetect
+        border_detect: BorderDetect,
     ):
         self.render_settings = render_settings
         self.video_info = video_info
         self.settings = settings
         self.border_detect = border_detect
-
 
         self._yuv420p_mod = video_info.pixel_format == "yuv420p"
         if render_settings.hdr_mode:
@@ -110,9 +109,8 @@ class FFmpegRead(ReadBuffer):
 
     def command(self):
         # will have to figure out a cleaner solution to this later
-        #border_width, border_height, border_x, border_y = self.border_detect.get_borders()
-        #filter_string = f"crop=min({self.video_info.width}\\,max(1\\,iw-{border_x})):min({self.video_info.height}\\,max(1\\,ih-{border_y})):{border_x}:{border_y},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
-        
+        # border_width, border_height, border_x, border_y = self.border_detect.get_borders()
+        # filter_string = f"crop=min({self.video_info.width}\\,max(1\\,iw-{border_x})):min({self.video_info.height}\\,max(1\\,ih-{border_y})):{border_x}:{border_y},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
 
         command = [
             f"{FFMPEG_PATH}",
@@ -121,8 +119,8 @@ class FFmpegRead(ReadBuffer):
             "-nostdin",
             "-i",
             f"{self.render_settings.video_path}",
-        #    "-vf",
-        #    filter_string,
+            #    "-vf",
+            #    filter_string,
             "-f",
             "image2pipe",
             "-pix_fmt",
@@ -136,7 +134,7 @@ class FFmpegRead(ReadBuffer):
             f"{self.video_info.width}x{self.video_info.height}",
             "-",
         ]
-        
+
         logger.info("FFMPEG READ COMMAND: %s", command)
         return command
 
@@ -195,7 +193,7 @@ class FFmpegWrite(WriteBuffer):
         self,
         render_settings: RenderSettings,
         video_info: OpenCVInfo,
-        settings: Settings
+        settings: Settings,
     ):
         self.inputFile = render_settings.video_path
         self.outputFile = render_settings.default_output_path_override

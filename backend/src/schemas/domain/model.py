@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from typing import Literal, Annotated, Union
 from src.schemas.domain.backend import Backend
 
+
 class InterpolateModel(BaseModel):
     id: str
     type: Literal["interpolate"] = "interpolate"
@@ -14,6 +15,7 @@ class InterpolateModel(BaseModel):
     url: str | None = None
     precision: Precision
     backend: Backend
+
 
 class UpscaleModel(BaseModel):
     id: str

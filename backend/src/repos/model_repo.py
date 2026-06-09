@@ -52,7 +52,9 @@ class ModelRepo:
             if backend_name == "onnx":
                 continue
 
-            backend_info = self._backends.get(backend_name, {"version": "0.0.0", "installed": False})
+            backend_info = self._backends.get(
+                backend_name, {"version": "0.0.0", "installed": False}
+            )
             backend = self._to_backend(
                 backend_name,
                 version=backend_info["version"],
@@ -98,11 +100,15 @@ class ModelRepo:
     # ------------------------------------------------------------------
 
     @staticmethod
-    def _to_backend(backend_name: str, version: str, installed: bool, accelerator: str | None = None) -> Backend:
+    def _to_backend(
+        backend_name: str, version: str, installed: bool, accelerator: str | None = None
+    ) -> Backend:
         if backend_name == "ncnn":
             return NCNNBackend(version=version, installed=installed)
         if backend_name == "pytorch":
-            return PyTorchBackend(version=version, installed=installed, accelerator=accelerator or "CPU")
+            return PyTorchBackend(
+                version=version, installed=installed, accelerator=accelerator or "CPU"
+            )
         if backend_name == "tensorrt":
             return TensorRTBackend(version=version, installed=installed)
         raise ValueError(f"Unknown backend: {backend_name}")
