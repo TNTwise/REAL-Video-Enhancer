@@ -23,6 +23,17 @@
 ## Model Management
 - [ ] Implement a local JSON file for model definitions — downloadable models include a URL and a `downloadable` boolean tag, while non-downloadable models use a direct file path
 
+# Refactor Backend
+
+## FFmpegWrite
+- [ ] Refactor FFmpegWrite
+
+## RenderVideo
+- [ ] Refactor RenderVideo (after FFmpegWrite)
+
+## InformationWriteout
+- [ ] Refactor InformationWriteout
+
 # Bundle Base Dependencies
 
 Package FFmpeg and the Python runtime inside the app so it runs without system-level prerequisites. Per-backend AI libraries (PyTorch, TensorRT, etc.) install on demand through the API instead.
