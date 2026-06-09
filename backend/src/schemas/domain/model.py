@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 from typing import Literal, Annotated, Union
-
+from src.schemas.domain import Backend
 
 class InterpolateModel(BaseModel):
     id: str
@@ -11,7 +11,7 @@ class InterpolateModel(BaseModel):
     file_path: str
     description: str | None = None
     url: str | None = None
-
+    backend: Backend
 
 class UpscaleModel(BaseModel):
     id: str
@@ -21,6 +21,7 @@ class UpscaleModel(BaseModel):
     file_path: str
     description: str | None = None
     url: str | None = None
+    backend: Backend
 
 
 class EnhancementModel(BaseModel):
@@ -30,7 +31,7 @@ class EnhancementModel(BaseModel):
     file_path: str
     description: str | None = None
     url: str | None = None
-
+    backend: Backend
 
 
 ModelVariant = Annotated[

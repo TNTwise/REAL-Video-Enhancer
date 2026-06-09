@@ -1,6 +1,6 @@
-from .model import InterpolateModel, UpscaleModel, EnhancementModel
+from .model import InterpolateModel, UpscaleModel, EnhancementModel, ModelVariant
 from .render import RenderSettings
-from .backend import NCNNBackend, PyTorchBackend, TensorRTBackend
+from .backend import NCNNBackend, PyTorchBackend, TensorRTBackend, Backend
 
 __all__ = [
     "NCNNBackend",
@@ -10,4 +10,6 @@ __all__ = [
     "UpscaleModel",
     "EnhancementModel",
     "RenderSettings",
+    "ModelVariant",
+    "Backend",
 ]

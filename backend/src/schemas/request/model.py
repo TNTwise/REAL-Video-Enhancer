@@ -7,16 +7,18 @@ from typing import Literal, Annotated, Union
 class InterpolateModelClientInput(BaseModel):
     type: Literal["interpolate"] = "interpolate"
     id: str
+    backed_type: str
 
 
 class UpscaleModelClientInput(BaseModel):
     type: Literal["upscale"] = "upscale"
     id: str
-
+    backed_type: str
 
 class EnhancementModelClientInput(BaseModel):
     type: Literal["enhancement"] = "enhancement"
     id: str
+    backed_type: str
 
 
 ModelInputVariant = Annotated[
