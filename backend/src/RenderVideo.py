@@ -37,43 +37,7 @@ threading.excepthook = global_thread_handler
 logger = get_logger(__name__)
 
 
-def remove_shared_memory_block(name):
-    try:
-        existing_shm = shared_memory.SharedMemory(name=name)
-        existing_shm.close()
-        existing_shm.unlink()
-        logger.info("Shared memory block '%s' removed.", name)
-    except FileNotFoundError:
-        logger.info("Shared memory block '%s' does not exist.", name)
-    except Exception:
-        logger.exception("Error removing shared memory block '%s'", name)
-
-
 class Render:
-    """
-    Subclass of FFmpegRender
-    FFMpegRender options:
-    inputFile: str, The path to the input file.
-    outputFile: str, The path to the output file.
-    interpolateTimes: float, this sets the multiplier for the framerate when interpolating (supports decimal values like 2.5), when only upscaling this will be set to 1.
-    encoder: str, The exact name of the encoder ffmpeg will use (default=libx264)
-    pixelFormat: str, The pixel format ffmpeg will use, (default=yuv420p)
-
-    interpolateOptions:
-    interpolationMethod
-    upscaleModel
-    backend (pytorch,ncnn,tensorrt)
-    device (cpu,cuda)
-    precision (float16,float32)
-
-    NOTE:
-    Everything in here has to happen in a specific order:
-    Get the video properties (res,fps,etc)
-    set up upscaling/interpolation, this gets the scale for upscaling if upscaling is the current task
-    assign framechunksize to a value, as this is needed to catch bytes and set up shared memory
-    set up shared memory
-    """
-
     def __init__(
         self,
         inputFile: str,
