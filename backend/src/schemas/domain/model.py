@@ -9,6 +9,7 @@ class InterpolateModel(BaseModel):
     id: str
     type: Literal["interpolate"] = "interpolate"
     variant: str
+    interpolate_factor: int
     file_path: str
     description: str | None = None
     url: str | None = None

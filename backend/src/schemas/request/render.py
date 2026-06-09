@@ -11,7 +11,6 @@ class RenderSettingsClientInput(BaseModel):
     video_path: str
     tiling_enabled: bool
     tilesize: int
-    interpolate_times: int
     benchmark_mode: bool
     slow_mo_mode: bool
     interpolate_model: InterpolateModelClientInput
