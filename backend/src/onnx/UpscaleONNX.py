@@ -11,10 +11,10 @@ from onnxruntime import InferenceSession
 import onnx
 
 
-def getONNXScale(modelPath: str = '') -> int:
+def getONNXScale(modelPath: str = "") -> int:
     paramName = os.path.basename(modelPath).lower()
     for i in range(100):
-        if f'{i}x' in paramName or f'x{i}' in paramName:
+        if f"{i}x" in paramName or f"x{i}" in paramName:
             return i
 
 
@@ -23,16 +23,16 @@ class UpscaleONNX:
     def getModelScale(cls, modelPath: str) -> int:
         model_name = os.path.basename(modelPath).lower()
         for i in range(100):
-            if f'{i}x' in model_name or f'x{i}' in model_name:
+            if f"{i}x" in model_name or f"x{i}" in model_name:
                 return i
-        raise ValueError('Scale not found in model name!')
+        raise ValueError("Scale not found in model name!")
 
     def __init__(
         self,
         modelPath: str,
-        device='default',
+        device="default",
         tile_pad: int = 10,
-        precision: str = 'auto',
+        precision: str = "auto",
         width: int = 1920,
         height: int = 1080,
         scale: int = 2,
@@ -63,19 +63,17 @@ class UpscaleONNX:
         model = onnx.load(self.modelPath)
 
         if self.precision == np.float16:
-            model = float16.convert_float_to_float16(
-                model, check_fp16_ready=False
-            )
+            model = float16.convert_float_to_float16(model, check_fp16_ready=False)
             # Optimized DirectML provider options
         self.model = model
         directml_options = {
-            'device_id': gpu_id,
+            "device_id": gpu_id,
             #    "enable_dynamic_graph_fusion": True,
             #    "disable_memory_arena": False,  # Keep memory arena for better performance
             #   "memory_limit_in_mb": 0,  # Use all available memory
         }
 
-        directml_backend = [('DmlExecutionProvider', directml_options)]
+        directml_backend = [("DmlExecutionProvider", directml_options)]
 
         session_options = ort.SessionOptions()
         session_options.graph_optimization_level = (
@@ -113,9 +111,7 @@ class UpscaleONNX:
         return np.ascontiguousarray(image)
 
     def renderTensor(self, image_as_np_array: np.ndarray) -> np.ndarray:
-        onnx_input = {
-            self.inference_session.get_inputs()[0].name: image_as_np_array
-        }
+        onnx_input = {self.inference_session.get_inputs()[0].name: image_as_np_array}
         onnx_output = self.inference_session.run(None, onnx_input)[0]
         return onnx_output
 
@@ -123,8 +119,7 @@ class UpscaleONNX:
         self.output_buffer[0] = image.clip(0, 1).squeeze().transpose(1, 2, 0)
         self.output_buffer[0] /= self.norm_factor
         image = (
-            self
-            .output_buffer[0]
+            self.output_buffer[0]
             .astype(np.uint8)
             .reshape(self.height * self.scale, self.width * self.scale, 3)
         )
@@ -144,29 +139,31 @@ class UpscaleONNX:
         return self.frameToBytes(output)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     def download_file(url, local_path):
         import requests
 
         response = requests.get(url, stream=True)
         response.raise_for_status()  # Ensure we notice bad responses
-        with pathlib.Path(local_path).open('wb') as f:
+        with pathlib.Path(local_path).open("wb") as f:
             f.writelines(response.iter_content(chunk_size=8192))
 
-    if not pathlib.Path('2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx').is_file():
+    if not pathlib.Path(
+        "2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx"
+    ).is_file():
         download_file(
-            'https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx',
-            '2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx',
+            "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx",
+            "2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx",
         )
-    if not pathlib.Path('models.png').is_file():
+    if not pathlib.Path("models.png").is_file():
         download_file(
-            'https://github.com/TNTwise/REAL-Video-Enhancer/blob/v2-main/screenshots/models.png?raw=true',
-            'models.png',
+            "https://github.com/TNTwise/REAL-Video-Enhancer/blob/v2-main/screenshots/models.png?raw=true",
+            "models.png",
         )
 
-    up = UpscaleONNX('2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx')
-    image = cv2.imread('models.png')
+    up = UpscaleONNX("2x_ModernSpanimationV2_clamp_op20_fp16_onnxslim.onnx")
+    image = cv2.imread("models.png")
     image = cv2.resize(image, (1920, 1080)).astype(np.uint8).tobytes()
     start_time = time.time()
 
@@ -177,7 +174,7 @@ if __name__ == '__main__':
 
     image1 = up.bytesToFrame(image)
     cv2.imwrite(
-        'input.jpg', np.frombuffer(image, dtype=np.uint8).reshape(1080, 1920, 3)
+        "input.jpg", np.frombuffer(image, dtype=np.uint8).reshape(1080, 1920, 3)
     )
     output = up.renderTensor(image1)
     o = up.frameToBytes(output)
@@ -185,14 +182,12 @@ if __name__ == '__main__':
 
     # tracer.stop()
     # tracer.save("onnx_viztracer_result.json")
-    print(f'Processing time: {end_time - start_time:.2f} seconds')
+    print(f"Processing time: {end_time - start_time:.2f} seconds")
     fps = iter / (end_time - start_time)
-    print(f'FPS: {fps:.2f}')
+    print(f"FPS: {fps:.2f}")
 
     output = up.frameToBytes(output)
-    output = np.frombuffer(output, dtype=np.uint8).reshape(
-        1080 * 2, 1920 * 2, 3
-    )
+    output = np.frombuffer(output, dtype=np.uint8).reshape(1080 * 2, 1920 * 2, 3)
 
-    cv2.imwrite('output.jpg', output)
-    print('Done')
+    cv2.imwrite("output.jpg", output)
+    print("Done")

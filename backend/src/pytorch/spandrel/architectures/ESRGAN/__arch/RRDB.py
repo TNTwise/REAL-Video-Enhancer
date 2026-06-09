@@ -27,9 +27,9 @@ class RRDBNet(nn.Module):
         plus: bool = False,
         shuffle_factor: int | None = None,
         norm=None,
-        act: str = 'leakyrelu',
-        upsampler: str = 'upconv',
-        mode: B.ConvMode = 'CNA',
+        act: str = "leakyrelu",
+        upsampler: str = "upconv",
+        mode: B.ConvMode = "CNA",
     ) -> None:
         """
         ESRGAN - Enhanced Super-Resolution Generative Adversarial Networks.
@@ -53,13 +53,11 @@ class RRDBNet(nn.Module):
         self.scale = scale
 
         upsample_block = {
-            'upconv': B.upconv_block,
-            'pixel_shuffle': B.pixelshuffle_block,
+            "upconv": B.upconv_block,
+            "pixel_shuffle": B.pixelshuffle_block,
         }.get(upsampler)
         if upsample_block is None:
-            raise NotImplementedError(
-                f'Upsample mode [{upsampler}] is not found'
-            )
+            raise NotImplementedError(f"Upsample mode [{upsampler}] is not found")
 
         if scale == 3:
             upsample_blocks = upsample_block(
@@ -97,10 +95,10 @@ class RRDBNet(nn.Module):
                             gc=32,
                             stride=1,
                             bias=True,
-                            pad_type='zero',
+                            pad_type="zero",
                             norm_type=norm,
                             act_type=act,
-                            mode='CNA',
+                            mode="CNA",
                             plus=plus,
                         )
                         for _ in range(num_blocks)
@@ -139,7 +137,7 @@ class RRDBNet(nn.Module):
         x = x.clamp(0.0, 1.0)
         if self.shuffle_factor:
             _, _, h, w = x.size()
-            x = pad_to_multiple(x, self.shuffle_factor, mode='reflect')
+            x = pad_to_multiple(x, self.shuffle_factor, mode="reflect")
             x = torch.pixel_unshuffle(x, downscale_factor=self.shuffle_factor)
             x = self.model(x)
             return x[:, :, : h * self.scale, : w * self.scale]

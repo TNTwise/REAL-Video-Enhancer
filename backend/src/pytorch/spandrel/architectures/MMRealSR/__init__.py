@@ -48,7 +48,7 @@ def _get_in_ch_and_scale(combined: int, num_out_ch: int) -> tuple[int, int]:
         scale = 1
     else:
         raise ValueError(
-            f'Could not infer scale from num_in_ch={num_in_ch} and num_out_ch={num_out_ch}'
+            f"Could not infer scale from num_in_ch={num_in_ch} and num_out_ch={num_out_ch}"
         )
 
     return num_in_ch, scale
@@ -67,9 +67,9 @@ def _get_num_feats_blocks_and_downscales(state_dict: StateDict):
 
     i = 0
     while True:
-        if f'de_net.body.0.{i}.conv1.weight' in state_dict:
+        if f"de_net.body.0.{i}.conv1.weight" in state_dict:
             # ResidualBlockNoBN
-            feats = state_dict[f'de_net.body.0.{i}.conv1.weight'].shape[0]
+            feats = state_dict[f"de_net.body.0.{i}.conv1.weight"].shape[0]
 
             if last_feats is None:
                 last_feats = feats
@@ -84,7 +84,7 @@ def _get_num_feats_blocks_and_downscales(state_dict: StateDict):
                 last_feats = feats
                 blocks = 1
 
-        elif f'de_net.body.0.{i}.weight' in state_dict:
+        elif f"de_net.body.0.{i}.weight" in state_dict:
             # nn.Conv2d
             # Since downscales=2 is a superset of downscales=1, we cannot
             # differentiate	them and have to assume downscales=2
@@ -113,20 +113,20 @@ def _get_num_feats_blocks_and_downscales(state_dict: StateDict):
 class MMRealSRArch(Architecture[MMRealSR]):
     def __init__(self) -> None:
         super().__init__(
-            id='MMRealSR',
+            id="MMRealSR",
             detect=KeyCondition.has_all(
-                'conv_first.weight',
-                'conv_body.weight',
-                'conv_up1.weight',
-                'conv_up2.weight',
-                'conv_hr.weight',
-                'conv_last.weight',
-                'body.0.rdb1.conv1.weight',
-                'am_list.0.fc.0.weight',
-                'de_net.conv_first.0.weight',
-                'de_net.body.0.0.conv1.weight',
-                'de_net.fc_degree.0.0.weight',
-                'dd_embed.0.weight',
+                "conv_first.weight",
+                "conv_body.weight",
+                "conv_up1.weight",
+                "conv_up2.weight",
+                "conv_hr.weight",
+                "conv_last.weight",
+                "body.0.rdb1.conv1.weight",
+                "am_list.0.fc.0.weight",
+                "de_net.conv_first.0.weight",
+                "de_net.body.0.0.conv1.weight",
+                "de_net.fc_degree.0.0.weight",
+                "dd_embed.0.weight",
             ),
         )
 
@@ -140,24 +140,24 @@ class MMRealSRArch(Architecture[MMRealSR]):
         num_block = 23
         num_grow_ch = 32
         num_degradation = 2
-        degradation_degree_actv = 'sigmoid'  # cannot be deduced from state_dict
+        degradation_degree_actv = "sigmoid"  # cannot be deduced from state_dict
         num_feats = [64, 128, 256, 512]
         num_blocks = [2, 2, 2, 2]
         downscales = [2, 2, 2, 1]
 
-        num_out_ch = state_dict['conv_last.weight'].shape[0]
-        num_feat = state_dict['conv_last.weight'].shape[1]
+        num_out_ch = state_dict["conv_last.weight"].shape[0]
+        num_feat = state_dict["conv_last.weight"].shape[1]
 
-        combined = state_dict['conv_first.weight'].shape[1]
+        combined = state_dict["conv_first.weight"].shape[1]
         num_in_ch, scale = _get_in_ch_and_scale(combined, num_out_ch)
 
-        num_block = get_seq_len(state_dict, 'body')
-        num_grow_ch = state_dict['body.0.rdb1.conv1.weight'].shape[0]
+        num_block = get_seq_len(state_dict, "body")
+        num_grow_ch = state_dict["body.0.rdb1.conv1.weight"].shape[0]
 
-        num_degradation = state_dict['dd_embed.0.weight'].shape[1]
+        num_degradation = state_dict["dd_embed.0.weight"].shape[1]
 
-        num_feats, num_blocks, downscales = (
-            _get_num_feats_blocks_and_downscales(state_dict)
+        num_feats, num_blocks, downscales = _get_num_feats_blocks_and_downscales(
+            state_dict
         )
 
         model = MMRealSR(
@@ -178,10 +178,10 @@ class MMRealSRArch(Architecture[MMRealSR]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if scale == 1 else 'SR',
+            purpose="Restoration" if scale == 1 else "SR",
             tags=[
-                f'{num_feat}nf',
-                f'{num_block}nb',
+                f"{num_feat}nf",
+                f"{num_block}nb",
             ],
             supports_half=True,  # TODO: Test this
             supports_bfloat16=True,
@@ -193,4 +193,4 @@ class MMRealSRArch(Architecture[MMRealSR]):
         )
 
 
-__all__ = ['MMRealSR', 'MMRealSRArch']
+__all__ = ["MMRealSR", "MMRealSRArch"]

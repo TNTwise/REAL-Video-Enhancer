@@ -51,14 +51,16 @@ class IPT(nn.Module):
         self.sub_mean = MeanShift(rgb_range)
         self.add_mean = MeanShift(rgb_range, sign=1)
 
-        self.head = nn.ModuleList([
-            nn.Sequential(
-                conv(n_colors, n_feats, kernel_size),
-                ResBlock(conv, n_feats, 5, act=act),
-                ResBlock(conv, n_feats, 5, act=act),
-            )
-            for _ in scale
-        ])
+        self.head = nn.ModuleList(
+            [
+                nn.Sequential(
+                    conv(n_colors, n_feats, kernel_size),
+                    ResBlock(conv, n_feats, 5, act=act),
+                    ResBlock(conv, n_feats, 5, act=act),
+                )
+                for _ in scale
+            ]
+        )
 
         self.body = VisionTransformer(
             img_dim=patch_size,
@@ -76,13 +78,15 @@ class IPT(nn.Module):
             no_norm=no_norm,
         )
 
-        self.tail = nn.ModuleList([
-            nn.Sequential(
-                Upsampler(conv, s, n_feats, act=None),
-                conv(n_feats, n_colors, kernel_size),
-            )
-            for s in scale
-        ])
+        self.tail = nn.ModuleList(
+            [
+                nn.Sequential(
+                    Upsampler(conv, s, n_feats, act=None),
+                    conv(n_feats, n_colors, kernel_size),
+                )
+                for s in scale
+            ]
+        )
 
     def forward(self, x):
         x = self.sub_mean(x)
@@ -176,8 +180,7 @@ class VisionTransformer(nn.Module):
 
     def forward(self, x, query_idx, con=False):
         x = (
-            torch.nn.functional
-            .unfold(x, self.patch_dim, stride=self.patch_dim)
+            torch.nn.functional.unfold(x, self.patch_dim, stride=self.patch_dim)
             .transpose(1, 2)
             .transpose(0, 1)
             .contiguous()
@@ -187,8 +190,7 @@ class VisionTransformer(nn.Module):
             x = self.dropout_layer1(self.linear_encoding(x)) + x
 
             query_embed = (
-                self.query_embed
-                .weight[query_idx]
+                self.query_embed.weight[query_idx]
                 .view(-1, 1, self.embedding_dim)
                 .repeat(1, x.size(1), 1)
             )
@@ -242,7 +244,7 @@ class LearnedPositionalEncoding(nn.Module):
         self.seq_length = seq_length
 
         self.register_buffer(
-            'position_ids', torch.arange(self.seq_length).expand((1, -1))
+            "position_ids", torch.arange(self.seq_length).expand((1, -1))
         )
 
     def forward(self, x, position_ids=None):
@@ -276,7 +278,7 @@ class TransformerEncoderLayer(nn.Module):
         dim_feedforward=2048,
         dropout=0.1,
         no_norm=False,
-        activation='relu',
+        activation="relu",
     ):
         super().__init__()
         self.self_attn = nn.MultiheadAttention(
@@ -333,7 +335,7 @@ class TransformerDecoderLayer(nn.Module):
         dim_feedforward=2048,
         dropout=0.1,
         no_norm=False,
-        activation='relu',
+        activation="relu",
     ):
         super().__init__()
         self.self_attn = nn.MultiheadAttention(
@@ -383,10 +385,10 @@ def _get_clones(module: nn.Module, N: int):
 
 def _get_activation_fn(activation: str):
     """Return an activation function given a string"""
-    if activation == 'relu':
+    if activation == "relu":
         return F.relu
-    if activation == 'gelu':
+    if activation == "gelu":
         return F.gelu
-    if activation == 'glu':
+    if activation == "glu":
         return F.glu
-    raise RuntimeError(f'activation should be relu/gelu, not {activation}.')
+    raise RuntimeError(f"activation should be relu/gelu, not {activation}.")

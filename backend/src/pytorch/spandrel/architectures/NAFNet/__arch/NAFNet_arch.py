@@ -177,15 +177,13 @@ class NAFNet(nn.Module):
 
         chan = width
         for num in enc_blk_nums:
-            self.encoders.append(
-                nn.Sequential(*[NAFBlock(chan) for _ in range(num)])
-            )
+            self.encoders.append(nn.Sequential(*[NAFBlock(chan) for _ in range(num)]))
             self.downs.append(nn.Conv2d(chan, 2 * chan, 2, 2))
             chan = chan * 2
 
-        self.middle_blks = nn.Sequential(*[
-            NAFBlock(chan) for _ in range(middle_blk_num)
-        ])
+        self.middle_blks = nn.Sequential(
+            *[NAFBlock(chan) for _ in range(middle_blk_num)]
+        )
 
         for num in dec_blk_nums:
             self.ups.append(
@@ -194,9 +192,7 @@ class NAFNet(nn.Module):
                 )
             )
             chan = chan // 2
-            self.decoders.append(
-                nn.Sequential(*[NAFBlock(chan) for _ in range(num)])
-            )
+            self.decoders.append(nn.Sequential(*[NAFBlock(chan) for _ in range(num)]))
 
         self.padder_size = 2 ** len(self.encoders)
 

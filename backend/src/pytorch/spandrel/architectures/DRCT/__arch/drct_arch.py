@@ -80,14 +80,9 @@ def window_partition(x, window_size):
         windows: (num_windows*B, window_size, window_size, C)
     """
     B, H, W, C = x.shape
-    x = x.view(
-        B, H // window_size, window_size, W // window_size, window_size, C
-    )
+    x = x.view(B, H // window_size, window_size, W // window_size, window_size, C)
     windows = (
-        x
-        .permute(0, 1, 3, 2, 4, 5)
-        .contiguous()
-        .view(-1, window_size, window_size, C)
+        x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size, window_size, C)
     )
     return windows
 
@@ -143,16 +138,14 @@ class WindowAttention(nn.Module):
 
         # define a parameter table of relative position bias
         self.relative_position_bias_table = nn.Parameter(  # type: ignore
-            torch.zeros(
-                (2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads
-            )
+            torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads)
         )  # 2*Wh-1 * 2*Ww-1, nH
 
         # get pair-wise relative position index for each token inside the window
         coords_h = torch.arange(self.window_size[0])
         coords_w = torch.arange(self.window_size[1])
         coords = torch.stack(
-            torch.meshgrid([coords_h, coords_w], indexing='ij')
+            torch.meshgrid([coords_h, coords_w], indexing="ij")
         )  # 2, Wh, Ww
         coords_flatten = torch.flatten(coords, 1)  # 2, Wh*Ww
         relative_coords = (
@@ -161,13 +154,11 @@ class WindowAttention(nn.Module):
         relative_coords = relative_coords.permute(
             1, 2, 0
         ).contiguous()  # Wh*Ww, Wh*Ww, 2
-        relative_coords[:, :, 0] += (
-            self.window_size[0] - 1
-        )  # shift to start from 0
+        relative_coords[:, :, 0] += self.window_size[0] - 1  # shift to start from 0
         relative_coords[:, :, 1] += self.window_size[1] - 1
         relative_coords[:, :, 0] *= 2 * self.window_size[1] - 1
         relative_position_index = relative_coords.sum(-1)  # Wh*Ww, Wh*Ww
-        self.register_buffer('relative_position_index', relative_position_index)
+        self.register_buffer("relative_position_index", relative_position_index)
 
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
         self.attn_drop = nn.Dropout(attn_drop)
@@ -186,8 +177,7 @@ class WindowAttention(nn.Module):
         """
         B_, N, C = x.shape
         qkv = (
-            self
-            .qkv(x)
+            self.qkv(x)
             .reshape(B_, N, 3, self.num_heads, C // self.num_heads)
             .permute(2, 0, 3, 1, 4)
         )
@@ -214,9 +204,9 @@ class WindowAttention(nn.Module):
 
         if mask is not None:
             nW = mask.shape[0]
-            attn = attn.view(
-                B_ // nW, nW, self.num_heads, N, N
-            ) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(B_ // nW, nW, self.num_heads, N, N) + mask.unsqueeze(
+                1
+            ).unsqueeze(0)
             attn = attn.view(-1, self.num_heads, N, N)
             attn = self.softmax(attn)
         else:
@@ -230,7 +220,7 @@ class WindowAttention(nn.Module):
         return x
 
     def extra_repr(self) -> str:
-        return f'dim={self.dim}, window_size={self.window_size}, num_heads={self.num_heads}'
+        return f"dim={self.dim}, window_size={self.window_size}, num_heads={self.num_heads}"
 
 
 class RDG(nn.Module):
@@ -264,9 +254,7 @@ class RDG(nn.Module):
             qk_scale=qk_scale,
             drop=drop,
             attn_drop=attn_drop,
-            drop_path=drop_path[0]
-            if isinstance(drop_path, list)
-            else drop_path,
+            drop_path=drop_path[0] if isinstance(drop_path, list) else drop_path,
             norm_layer=norm_layer,  # type: ignore
         )
         self.adjust1 = nn.Conv2d(dim, gc, 1)
@@ -282,9 +270,7 @@ class RDG(nn.Module):
             qk_scale=qk_scale,
             drop=drop,
             attn_drop=attn_drop,
-            drop_path=drop_path[0]
-            if isinstance(drop_path, list)
-            else drop_path,
+            drop_path=drop_path[0] if isinstance(drop_path, list) else drop_path,
             norm_layer=norm_layer,  # type: ignore
         )
         self.adjust2 = nn.Conv2d(dim + gc, gc, 1)
@@ -300,9 +286,7 @@ class RDG(nn.Module):
             qk_scale=qk_scale,
             drop=drop,
             attn_drop=attn_drop,
-            drop_path=drop_path[0]
-            if isinstance(drop_path, list)
-            else drop_path,
+            drop_path=drop_path[0] if isinstance(drop_path, list) else drop_path,
             norm_layer=norm_layer,  # type: ignore
         )
         self.adjust3 = nn.Conv2d(dim + gc * 2, gc, 1)
@@ -318,9 +302,7 @@ class RDG(nn.Module):
             qk_scale=qk_scale,
             drop=drop,
             attn_drop=attn_drop,
-            drop_path=drop_path[0]
-            if isinstance(drop_path, list)
-            else drop_path,
+            drop_path=drop_path[0] if isinstance(drop_path, list) else drop_path,
             norm_layer=norm_layer,  # type: ignore
         )
         self.adjust4 = nn.Conv2d(dim + gc * 3, gc, 1)
@@ -336,9 +318,7 @@ class RDG(nn.Module):
             qk_scale=qk_scale,
             drop=drop,
             attn_drop=attn_drop,
-            drop_path=drop_path[0]
-            if isinstance(drop_path, list)
-            else drop_path,
+            drop_path=drop_path[0] if isinstance(drop_path, list) else drop_path,
             norm_layer=norm_layer,  # type: ignore
         )
         self.adjust5 = nn.Conv2d(dim + gc * 4, dim, 1)
@@ -362,39 +342,29 @@ class RDG(nn.Module):
         )
 
     def forward(self, x, xsize):
-        x1 = self.pe(
-            self.lrelu(self.adjust1(self.pue(self.swin1(x, xsize), xsize)))
-        )
+        x1 = self.pe(self.lrelu(self.adjust1(self.pue(self.swin1(x, xsize), xsize))))
         x2 = self.pe(
             self.lrelu(
-                self.adjust2(
-                    self.pue(self.swin2(torch.cat((x, x1), -1), xsize), xsize)
-                )
+                self.adjust2(self.pue(self.swin2(torch.cat((x, x1), -1), xsize), xsize))
             )
         )
         x3 = self.pe(
             self.lrelu(
                 self.adjust3(
-                    self.pue(
-                        self.swin3(torch.cat((x, x1, x2), -1), xsize), xsize
-                    )
+                    self.pue(self.swin3(torch.cat((x, x1, x2), -1), xsize), xsize)
                 )
             )
         )
         x4 = self.pe(
             self.lrelu(
                 self.adjust4(
-                    self.pue(
-                        self.swin4(torch.cat((x, x1, x2, x3), -1), xsize), xsize
-                    )
+                    self.pue(self.swin4(torch.cat((x, x1, x2, x3), -1), xsize), xsize)
                 )
             )
         )
         x5 = self.pe(
             self.adjust5(
-                self.pue(
-                    self.swin5(torch.cat((x, x1, x2, x3, x4), -1), xsize), xsize
-                )
+                self.pue(self.swin5(torch.cat((x, x1, x2, x3, x4), -1), xsize), xsize)
             )
         )
 
@@ -448,7 +418,7 @@ class SwinTransformerBlock(nn.Module):
             self.shift_size = 0
             self.window_size = min(self.input_resolution)
         assert 0 <= self.shift_size < self.window_size, (
-            'shift_size must in 0-window_size'
+            "shift_size must in 0-window_size"
         )
 
         self.norm1 = norm_layer(dim)
@@ -462,9 +432,7 @@ class SwinTransformerBlock(nn.Module):
             proj_drop=drop,
         )
 
-        self.drop_path = (
-            DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
-        )
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(
@@ -479,7 +447,7 @@ class SwinTransformerBlock(nn.Module):
         else:
             attn_mask = None
 
-        self.register_buffer('attn_mask', attn_mask)
+        self.register_buffer("attn_mask", attn_mask)
 
     def calculate_mask(self, x_size):
         # calculate attention mask for SW-MSA
@@ -504,9 +472,7 @@ class SwinTransformerBlock(nn.Module):
         mask_windows = window_partition(
             img_mask, self.window_size
         )  # nW, window_size, window_size, 1
-        mask_windows = mask_windows.view(
-            -1, self.window_size * self.window_size
-        )
+        mask_windows = mask_windows.view(-1, self.window_size * self.window_size)
         attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
         attn_mask = attn_mask.masked_fill(attn_mask != 0, -100.0).masked_fill(
             attn_mask == 0, 0.0
@@ -550,12 +516,8 @@ class SwinTransformerBlock(nn.Module):
             )
 
         # merge windows
-        attn_windows = attn_windows.view(
-            -1, self.window_size, self.window_size, C
-        )
-        shifted_x = window_reverse(
-            attn_windows, self.window_size, H, W
-        )  # B H' W' C
+        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, C)
+        shifted_x = window_reverse(attn_windows, self.window_size, H, W)  # B H' W' C
 
         # reverse cyclic shift
         if self.shift_size > 0:
@@ -576,8 +538,8 @@ class SwinTransformerBlock(nn.Module):
 
     def extra_repr(self) -> str:
         return (
-            f'dim={self.dim}, input_resolution={self.input_resolution}, num_heads={self.num_heads}, '
-            f'window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}'
+            f"dim={self.dim}, input_resolution={self.input_resolution}, num_heads={self.num_heads}, "
+            f"window_size={self.window_size}, shift_size={self.shift_size}, mlp_ratio={self.mlp_ratio}"
         )
 
 
@@ -603,8 +565,8 @@ class PatchMerging(nn.Module):
         """
         h, w = self.input_resolution
         b, seq_len, c = x.shape
-        assert seq_len == h * w, 'input feature has wrong size'
-        assert h % 2 == 0 and w % 2 == 0, f'x size ({h}*{w}) are not even.'
+        assert seq_len == h * w, "input feature has wrong size"
+        assert h % 2 == 0 and w % 2 == 0, f"x size ({h}*{w}) are not even."
 
         x = x.view(b, h, w, c)
 
@@ -730,7 +692,7 @@ class Upsample(nn.Sequential):
             m.append(nn.PixelShuffle(3))
         else:
             raise ValueError(
-                f'scale {scale} is not supported. Supported scales: 2^n and 3.'
+                f"scale {scale} is not supported. Supported scales: 2^n and 3."
             )
         super().__init__(*m)
 
@@ -760,8 +722,8 @@ class DRCT(nn.Module):
         patch_norm=True,
         upscale=1,
         img_range=1.0,
-        upsampler='',
-        resi_connection='1conv',
+        upsampler="",
+        resi_connection="1conv",
         gc=32,
     ):
         super().__init__()
@@ -840,9 +802,7 @@ class DRCT(nn.Module):
                 qk_scale=qk_scale,
                 drop=drop_rate,
                 attn_drop=attn_drop_rate,
-                drop_path=dpr[
-                    sum(depths[:i_layer]) : sum(depths[: i_layer + 1])
-                ],
+                drop_path=dpr[sum(depths[:i_layer]) : sum(depths[: i_layer + 1])],
                 norm_layer=norm_layer,
                 gc=gc,
                 img_size=img_size,
@@ -853,13 +813,13 @@ class DRCT(nn.Module):
         self.norm = norm_layer(self.num_features)
 
         # build the last conv layer in deep feature extraction
-        if resi_connection == '1conv':
+        if resi_connection == "1conv":
             self.conv_after_body = nn.Conv2d(embed_dim, embed_dim, 3, 1, 1)
-        elif resi_connection == 'identity':
+        elif resi_connection == "identity":
             self.conv_after_body = nn.Identity()
 
         # ------------------------- 3, high quality image reconstruction ------------------------- #
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             self.conv_before_upsample = nn.Sequential(
                 nn.Conv2d(embed_dim, num_feat, 3, 1, 1),
@@ -881,11 +841,11 @@ class DRCT(nn.Module):
 
     @torch.jit.ignore  # type: ignore
     def no_weight_decay(self):
-        return {'absolute_pos_embed'}
+        return {"absolute_pos_embed"}
 
     @torch.jit.ignore  # type: ignore
     def no_weight_decay_keywords(self):
-        return {'relative_position_bias_table'}
+        return {"relative_position_bias_table"}
 
     def forward_features(self, x):
         x_size = (x.shape[2], x.shape[3])
@@ -907,7 +867,7 @@ class DRCT(nn.Module):
         self.mean = self.mean.type_as(x)
         x = (x - self.mean) * self.img_range
 
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             x = self.conv_first(x)
             x = self.conv_after_body(self.forward_features(x)) + x

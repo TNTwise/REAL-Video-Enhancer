@@ -56,14 +56,12 @@ class CSA(nn.Module):
         )  # （B，16,1,1）全局平均池化后的通道向量
 
         y_forward = (
-            self
-            .channel_attention_forward(y.squeeze(-1).transpose(-1, -2))
+            self.channel_attention_forward(y.squeeze(-1).transpose(-1, -2))
             .transpose(-1, -2)
             .unsqueeze(-1)
         )  # （B，1,1,1）
         y_backward = (
-            self
-            .channel_attention_backward(
+            self.channel_attention_backward(
                 y.squeeze(-1).transpose(-1, -2).flip(dims=[1])
             )
             .transpose(-1, -2)
@@ -166,7 +164,7 @@ class RTSRSebica(nn.Module):
         h = self.tail(body_out)
 
         base = F.interpolate(
-            x, scale_factor=self.scale, mode='bilinear', align_corners=False
+            x, scale_factor=self.scale, mode="bilinear", align_corners=False
         )
 
         out = h + base

@@ -20,10 +20,7 @@ def img2windows(img, H_sp, W_sp):
     B, C, H, W = img.shape
     img_reshape = img.view(B, C, H // H_sp, H_sp, W // W_sp, W_sp)
     img_perm = (
-        img_reshape
-        .permute(0, 2, 4, 3, 5, 1)
-        .contiguous()
-        .reshape(-1, H_sp * W_sp, C)
+        img_reshape.permute(0, 2, 4, 3, 5, 1).contiguous().reshape(-1, H_sp * W_sp, C)
     )
     return img_perm
 
@@ -53,10 +50,7 @@ class Gate(nn.Module):
         x1, x2 = x.chunk(2, dim=-1)
         B, _N, C = x.shape
         x2 = (
-            self
-            .conv(
-                self.norm(x2).transpose(1, 2).contiguous().view(B, C // 2, H, W)
-            )
+            self.conv(self.norm(x2).transpose(1, 2).contiguous().view(B, C // 2, H, W))
             .flatten(2)
             .transpose(-1, -2)
             .contiguous()
@@ -172,39 +166,31 @@ class WindowAttention(nn.Module):
         elif idx == 1:
             W_sp, H_sp = self.split_size[0], self.split_size[1]
         else:
-            raise ValueError(f'ERROR MODE: {idx}')
+            raise ValueError(f"ERROR MODE: {idx}")
         self.H_sp = H_sp
         self.W_sp = W_sp
 
         if self.position_bias:
-            self.pos = DynamicPosBias(
-                self.dim // 4, self.num_heads, residual=False
-            )
+            self.pos = DynamicPosBias(self.dim // 4, self.num_heads, residual=False)
             # generate mother-set
             position_bias_h = torch.arange(1 - self.H_sp, self.H_sp)
             position_bias_w = torch.arange(1 - self.W_sp, self.W_sp)
-            biases = torch.stack(
-                torch.meshgrid([position_bias_h, position_bias_w])
-            )
+            biases = torch.stack(torch.meshgrid([position_bias_h, position_bias_w]))
             biases = biases.flatten(1).transpose(0, 1).contiguous().float()
-            self.register_buffer('rpe_biases', biases)
+            self.register_buffer("rpe_biases", biases)
 
             # get pair-wise relative position index for each token inside the window
             coords_h = torch.arange(self.H_sp)
             coords_w = torch.arange(self.W_sp)
             coords = torch.stack(torch.meshgrid([coords_h, coords_w]))
             coords_flatten = torch.flatten(coords, 1)
-            relative_coords = (
-                coords_flatten[:, :, None] - coords_flatten[:, None, :]
-            )
+            relative_coords = coords_flatten[:, :, None] - coords_flatten[:, None, :]
             relative_coords = relative_coords.permute(1, 2, 0).contiguous()
             relative_coords[:, :, 0] += self.H_sp - 1
             relative_coords[:, :, 1] += self.W_sp - 1
             relative_coords[:, :, 0] *= 2 * self.W_sp - 1
             relative_position_index = relative_coords.sum(-1)
-            self.register_buffer(
-                'relative_position_index', relative_position_index
-            )
+            self.register_buffer("relative_position_index", relative_position_index)
 
         self.attn_drop = nn.Dropout(attn_drop)
 
@@ -213,10 +199,7 @@ class WindowAttention(nn.Module):
         x = x.transpose(-2, -1).contiguous().view(B, C, H, W)
         x = img2windows(x, self.H_sp, self.W_sp)
         x = (
-            x
-            .reshape(
-                -1, self.H_sp * self.W_sp, self.num_heads, C // self.num_heads
-            )
+            x.reshape(-1, self.H_sp * self.W_sp, self.num_heads, C // self.num_heads)
             .permute(0, 2, 1, 3)
             .contiguous()
         )
@@ -230,7 +213,7 @@ class WindowAttention(nn.Module):
         q, k, v = qkv[0], qkv[1], qkv[2]
 
         B, L, C = q.shape
-        assert L == H * W, 'flatten img_tokens has wrong size'
+        assert L == H * W, "flatten img_tokens has wrong size"
 
         # partition the q,k,v, image to window
         q = self.im2win(q, H, W)
@@ -244,9 +227,9 @@ class WindowAttention(nn.Module):
         if self.position_bias:
             pos = self.pos(self.rpe_biases)
             # select position bias
-            relative_position_bias = pos[
-                self.relative_position_index.view(-1)
-            ].view(self.H_sp * self.W_sp, self.H_sp * self.W_sp, -1)
+            relative_position_bias = pos[self.relative_position_index.view(-1)].view(
+                self.H_sp * self.W_sp, self.H_sp * self.W_sp, -1
+            )
             relative_position_bias = relative_position_bias.permute(
                 2, 0, 1
             ).contiguous()
@@ -257,9 +240,9 @@ class WindowAttention(nn.Module):
         # use mask for shift window
         if mask is not None:
             nW = mask.shape[0]
-            attn = attn.view(B, nW, self.num_heads, N, N) + mask.unsqueeze(
-                1
-            ).unsqueeze(0)
+            attn = attn.view(B, nW, self.num_heads, N, N) + mask.unsqueeze(1).unsqueeze(
+                0
+            )
             attn = attn.view(-1, self.num_heads, N, N)
 
         attn = nn.functional.softmax(attn, dim=-1, dtype=attn.dtype)
@@ -303,10 +286,10 @@ class L_SA(nn.Module):
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
 
         assert 0 <= self.shift_size[0] < self.split_size[0], (
-            'shift_size must in 0-split_size0'
+            "shift_size must in 0-split_size0"
         )
         assert 0 <= self.shift_size[1] < self.split_size[1], (
-            'shift_size must in 0-split_size1'
+            "shift_size must in 0-split_size1"
         )
 
         self.branch_num = 2
@@ -314,35 +297,37 @@ class L_SA(nn.Module):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(drop)
 
-        self.attns = nn.ModuleList([
-            WindowAttention(
-                dim // 2,
-                idx=i,
-                split_size=split_size,
-                num_heads=num_heads // 2,
-                dim_out=dim // 2,
-                qk_scale=qk_scale,
-                attn_drop=attn_drop,
-                proj_drop=drop,
-                position_bias=True,
-            )
-            for i in range(self.branch_num)
-        ])
+        self.attns = nn.ModuleList(
+            [
+                WindowAttention(
+                    dim // 2,
+                    idx=i,
+                    split_size=split_size,
+                    num_heads=num_heads // 2,
+                    dim_out=dim // 2,
+                    qk_scale=qk_scale,
+                    attn_drop=attn_drop,
+                    proj_drop=drop,
+                    position_bias=True,
+                )
+                for i in range(self.branch_num)
+            ]
+        )
 
-        if (
-            self.rs_id % 2 == 0 and self.idx > 0 and (self.idx - 2) % 4 == 0
-        ) or (self.rs_id % 2 != 0 and self.idx % 4 == 0):
+        if (self.rs_id % 2 == 0 and self.idx > 0 and (self.idx - 2) % 4 == 0) or (
+            self.rs_id % 2 != 0 and self.idx % 4 == 0
+        ):
             attn_mask = self.calculate_mask(
                 self.patches_resolution, self.patches_resolution
             )
 
-            self.register_buffer('attn_mask_0', attn_mask[0])
-            self.register_buffer('attn_mask_1', attn_mask[1])
+            self.register_buffer("attn_mask_0", attn_mask[0])
+            self.register_buffer("attn_mask_1", attn_mask[1])
         else:
             attn_mask = None
 
-            self.register_buffer('attn_mask_0', None)
-            self.register_buffer('attn_mask_1', None)
+            self.register_buffer("attn_mask_0", None)
+            self.register_buffer("attn_mask_1", None)
 
         self.get_v = nn.Conv2d(
             dim, dim, kernel_size=3, stride=1, padding=1, groups=dim
@@ -395,18 +380,15 @@ class L_SA(nn.Module):
             1,
         )
         img_mask_0 = (
-            img_mask_0
-            .permute(0, 1, 3, 2, 4, 5)
+            img_mask_0.permute(0, 1, 3, 2, 4, 5)
             .contiguous()
             .view(-1, self.split_size[0], self.split_size[1], 1)
         )  # nW, sw[0], sw[1], 1
-        mask_windows_0 = img_mask_0.view(
-            -1, self.split_size[0] * self.split_size[1]
-        )
+        mask_windows_0 = img_mask_0.view(-1, self.split_size[0] * self.split_size[1])
         attn_mask_0 = mask_windows_0.unsqueeze(1) - mask_windows_0.unsqueeze(2)
-        attn_mask_0 = attn_mask_0.masked_fill(
-            attn_mask_0 != 0, -100.0
-        ).masked_fill(attn_mask_0 == 0, 0.0)
+        attn_mask_0 = attn_mask_0.masked_fill(attn_mask_0 != 0, -100.0).masked_fill(
+            attn_mask_0 == 0, 0.0
+        )
 
         # calculate mask for V-Shift
         img_mask_1 = img_mask_1.view(
@@ -418,18 +400,15 @@ class L_SA(nn.Module):
             1,
         )
         img_mask_1 = (
-            img_mask_1
-            .permute(0, 1, 3, 2, 4, 5)
+            img_mask_1.permute(0, 1, 3, 2, 4, 5)
             .contiguous()
             .view(-1, self.split_size[1], self.split_size[0], 1)
         )  # nW, sw[1], sw[0], 1
-        mask_windows_1 = img_mask_1.view(
-            -1, self.split_size[1] * self.split_size[0]
-        )
+        mask_windows_1 = img_mask_1.view(-1, self.split_size[1] * self.split_size[0])
         attn_mask_1 = mask_windows_1.unsqueeze(1) - mask_windows_1.unsqueeze(2)
-        attn_mask_1 = attn_mask_1.masked_fill(
-            attn_mask_1 != 0, -100.0
-        ).masked_fill(attn_mask_1 == 0, 0.0)
+        attn_mask_1 = attn_mask_1.masked_fill(attn_mask_1 != 0, -100.0).masked_fill(
+            attn_mask_1 == 0, 0.0
+        )
 
         return attn_mask_0, attn_mask_1
 
@@ -439,11 +418,9 @@ class L_SA(nn.Module):
         Output: x: (B, H*W, C)
         """
         B, L, C = x.shape
-        assert L == H * W, 'flatten img_tokens has wrong size'
+        assert L == H * W, "flatten img_tokens has wrong size"
 
-        qkv = (
-            self.qkv(x).reshape(B, -1, 3, C).permute(2, 0, 1, 3)
-        )  # 3, B, HW, C
+        qkv = self.qkv(x).reshape(B, -1, 3, C).permute(2, 0, 1, 3)  # 3, B, HW, C
         # v without partition
         v = qkv[2].transpose(-2, -1).contiguous().view(B, C, H, W)
 
@@ -454,8 +431,7 @@ class L_SA(nn.Module):
 
         qkv = qkv.reshape(3 * B, H, W, C).permute(0, 3, 1, 2)  # 3B C H W
         qkv = (
-            F
-            .pad(qkv, (pad_l, pad_r, pad_t, pad_b))
+            F.pad(qkv, (pad_l, pad_r, pad_t, pad_b))
             .reshape(3, B, C, -1)
             .transpose(-2, -1)
         )  # l r t b
@@ -463,9 +439,9 @@ class L_SA(nn.Module):
         _W = pad_r + W
         _L = _H * _W
 
-        if (
-            self.rs_id % 2 == 0 and self.idx > 0 and (self.idx - 2) % 4 == 0
-        ) or (self.rs_id % 2 != 0 and self.idx % 4 == 0):
+        if (self.rs_id % 2 == 0 and self.idx > 0 and (self.idx - 2) % 4 == 0) or (
+            self.rs_id % 2 != 0 and self.idx % 4 == 0
+        ):
             qkv = qkv.view(3, B, _H, _W, C)
             # H-Shift
             qkv_0 = torch.roll(
@@ -485,13 +461,9 @@ class L_SA(nn.Module):
             if self.patches_resolution != _H or self.patches_resolution != _W:
                 mask_tmp = self.calculate_mask(_H, _W)
                 # H-Rwin
-                x1_shift = self.attns[0](
-                    qkv_0, _H, _W, mask=mask_tmp[0].to(x.device)
-                )
+                x1_shift = self.attns[0](qkv_0, _H, _W, mask=mask_tmp[0].to(x.device))
                 # V-Rwin
-                x2_shift = self.attns[1](
-                    qkv_1, _H, _W, mask=mask_tmp[1].to(x.device)
-                )
+                x2_shift = self.attns[1](qkv_1, _H, _W, mask=mask_tmp[1].to(x.device))
 
             else:
                 # H-Rwin
@@ -515,13 +487,13 @@ class L_SA(nn.Module):
             attened_x = torch.cat([x1, x2], dim=2)
         else:
             # V-Rwin
-            x1 = self.attns[0](qkv[:, :, :, : C // 2], _H, _W)[
-                :, :H, :W, :
-            ].reshape(B, L, C // 2)
+            x1 = self.attns[0](qkv[:, :, :, : C // 2], _H, _W)[:, :H, :W, :].reshape(
+                B, L, C // 2
+            )
             # H-Rwin
-            x2 = self.attns[1](qkv[:, :, :, C // 2 :], _H, _W)[
-                :, :H, :W, :
-            ].reshape(B, L, C // 2)
+            x2 = self.attns[1](qkv[:, :, :, C // 2 :], _H, _W)[:, :H, :W, :].reshape(
+                B, L, C // 2
+            )
             # Concat
             attened_x = torch.cat([x1, x2], dim=2)
 
@@ -563,7 +535,7 @@ class RG_SA(nn.Module):
     ):
         super().__init__()
         assert dim % num_heads == 0, (
-            f'dim {dim} should be divided by num_heads {num_heads}.'
+            f"dim {dim} should be divided by num_heads {num_heads}."
         )
         self.num_heads = num_heads
         head_dim = dim // num_heads
@@ -574,9 +546,7 @@ class RG_SA(nn.Module):
         self.scale = qk_scale or (head_dim * c_ratio) ** -0.5
 
         # RGM
-        self.reduction1 = nn.Conv2d(
-            dim, dim, kernel_size=4, stride=4, groups=dim
-        )
+        self.reduction1 = nn.Conv2d(dim, dim, kernel_size=4, stride=4, groups=dim)
         self.dwconv = nn.Conv2d(
             dim, dim, kernel_size=3, stride=1, padding=1, groups=dim
         )
@@ -588,9 +558,7 @@ class RG_SA(nn.Module):
         self.v = nn.Linear(self.cr, dim, bias=qkv_bias)
 
         # CPE
-        self.cpe = nn.Conv2d(
-            dim, dim, kernel_size=3, stride=1, padding=1, groups=dim
-        )
+        self.cpe = nn.Conv2d(dim, dim, kernel_size=3, stride=1, padding=1, groups=dim)
 
         self.proj = nn.Linear(dim, dim)
         self.attn_drop = nn.Dropout(attn_drop)
@@ -608,7 +576,9 @@ class RG_SA(nn.Module):
             _time = max(int(math.log(H // 4, 4)), int(math.log(W // 4, 4)))
         else:
             _time = max(int(math.log(H // 16, 4)), int(math.log(W // 16, 4)))
-            _time = max(_time, 2)  # testing _time must equal or larger than training _time (2)
+            _time = max(
+                _time, 2
+            )  # testing _time must equal or larger than training _time (2)
 
         _scale = 4**_time
 
@@ -617,8 +587,7 @@ class RG_SA(nn.Module):
             _x = self.reduction1(_x)
 
         _x = (
-            self
-            .conv(self.dwconv(_x))
+            self.conv(self.dwconv(_x))
             .reshape(B, self.cr, -1)
             .permute(0, 2, 1)
             .contiguous()
@@ -627,20 +596,17 @@ class RG_SA(nn.Module):
 
         # q, k, v, where q_shape=(B, N, C'), k_shape=(B, N', C'), v_shape=(B, N', C)
         q = (
-            self
-            .q(x)
+            self.q(x)
             .reshape(B, N, self.num_heads, int(self.cr / self.num_heads))
             .permute(0, 2, 1, 3)
         )
         k = (
-            self
-            .k(_x)
+            self.k(_x)
             .reshape(B, -1, self.num_heads, int(self.cr / self.num_heads))
             .permute(0, 2, 1, 3)
         )
         v = (
-            self
-            .v(_x)
+            self.v(_x)
             .reshape(B, -1, self.num_heads, int(C / self.num_heads))
             .permute(0, 2, 1, 3)
         )
@@ -653,15 +619,14 @@ class RG_SA(nn.Module):
         # CPE
         # v_shape=(B, H, N', C//H)
         v = v + self.cpe(
-            v
-            .transpose(1, 2)
+            v.transpose(1, 2)
             .reshape(B, -1, C)
             .transpose(1, 2)
             .contiguous()
             .view(B, C, H // _scale, W // _scale)
-        ).view(B, C, -1).view(
-            B, self.num_heads, int(C / self.num_heads), -1
-        ).transpose(-1, -2)
+        ).view(B, C, -1).view(B, self.num_heads, int(C / self.num_heads), -1).transpose(
+            -1, -2
+        )
 
         x = (attn @ v).transpose(1, 2).reshape(B, N, C)
         x = self.proj(x)
@@ -717,9 +682,7 @@ class Block(nn.Module):
                 proj_drop=drop,
                 c_ratio=c_ratio,
             )
-        self.drop_path = (
-            DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
-        )
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = MLP(
@@ -765,7 +728,7 @@ class ResidualGroup(nn.Module):
         norm_layer=nn.LayerNorm,
         depth=2,
         use_chk=False,
-        resi_connection='1conv',
+        resi_connection="1conv",
         rs_id=0,
         split_size=[8, 8],
         c_ratio=0.5,
@@ -774,30 +737,32 @@ class ResidualGroup(nn.Module):
         self.use_chk = use_chk
         self.reso = reso
 
-        self.blocks = nn.ModuleList([
-            Block(
-                dim=dim,
-                num_heads=num_heads,
-                mlp_ratio=mlp_ratio,
-                qkv_bias=qkv_bias,
-                qk_scale=qk_scale,
-                drop=drop,
-                attn_drop=attn_drop,
-                drop_path=drop_paths[i],  # type: ignore
-                act_layer=act_layer,
-                norm_layer=norm_layer,
-                idx=i,
-                rs_id=rs_id,
-                split_size=split_size,
-                shift_size=[split_size[0] // 2, split_size[1] // 2],
-                c_ratio=c_ratio,
-            )
-            for i in range(depth)
-        ])
+        self.blocks = nn.ModuleList(
+            [
+                Block(
+                    dim=dim,
+                    num_heads=num_heads,
+                    mlp_ratio=mlp_ratio,
+                    qkv_bias=qkv_bias,
+                    qk_scale=qk_scale,
+                    drop=drop,
+                    attn_drop=attn_drop,
+                    drop_path=drop_paths[i],  # type: ignore
+                    act_layer=act_layer,
+                    norm_layer=norm_layer,
+                    idx=i,
+                    rs_id=rs_id,
+                    split_size=split_size,
+                    shift_size=[split_size[0] // 2, split_size[1] // 2],
+                    c_ratio=c_ratio,
+                )
+                for i in range(depth)
+            ]
+        )
 
-        if resi_connection == '1conv':
+        if resi_connection == "1conv":
             self.conv = nn.Conv2d(dim, dim, 3, 1, 1)
-        elif resi_connection == '3conv':
+        elif resi_connection == "3conv":
             self.conv = nn.Sequential(
                 nn.Conv2d(dim, dim // 4, 3, 1, 1),
                 nn.LeakyReLU(negative_slope=0.2, inplace=True),
@@ -818,9 +783,9 @@ class ResidualGroup(nn.Module):
                 x = checkpoint.checkpoint(blk, x, x_size)
             else:
                 x = blk(x, x_size)
-        x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W)
+        x = rearrange(x, "b (h w) c -> b c h w", h=H, w=W)
         x = self.conv(x)
-        x = rearrange(x, 'b c h w -> b (h w) c')
+        x = rearrange(x, "b c h w -> b (h w) c")
         x = res + x
 
         return x
@@ -845,7 +810,7 @@ class Upsample(nn.Sequential):
             m.append(nn.PixelShuffle(3))
         else:
             raise ValueError(
-                f'scale {scale} is not supported. Supported scales: 2^n and 3.'
+                f"scale {scale} is not supported. Supported scales: 2^n and 3."
             )
         super().__init__(*m)
 
@@ -873,7 +838,7 @@ class RGT(nn.Module):
         use_chk=False,
         upscale=2,
         img_range=1.0,
-        resi_connection='1conv',
+        resi_connection="1conv",
         split_size=[8, 8],
         c_ratio=0.5,
     ):
@@ -902,7 +867,7 @@ class RGT(nn.Module):
         heads = num_heads
 
         self.before_RG = nn.Sequential(
-            Rearrange('b c h w -> b (h w) c'), nn.LayerNorm(embed_dim)
+            Rearrange("b c h w -> b (h w) c"), nn.LayerNorm(embed_dim)
         )
 
         curr_dim = embed_dim
@@ -935,9 +900,9 @@ class RGT(nn.Module):
 
         self.norm = norm_layer(curr_dim)
         # build the last conv layer in deep feature extraction
-        if resi_connection == '1conv':
+        if resi_connection == "1conv":
             self.conv_after_body = nn.Conv2d(embed_dim, embed_dim, 3, 1, 1)
-        elif resi_connection == '3conv':
+        elif resi_connection == "3conv":
             # to save parameters and memory
             self.conv_after_body = nn.Sequential(
                 nn.Conv2d(embed_dim, embed_dim // 4, 3, 1, 1),
@@ -961,7 +926,7 @@ class RGT(nn.Module):
         for layer in self.layers:
             x = layer(x, x_size)
         x = self.norm(x)
-        x = rearrange(x, 'b (h w) c -> b c h w', h=H, w=W)
+        x = rearrange(x, "b (h w) c -> b c h w", h=H, w=W)
 
         return x
 

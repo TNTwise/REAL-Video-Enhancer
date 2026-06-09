@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from itertools import repeat
 from typing import TypeVar
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 def _to_n(x: T | Iterable[T], n: int):

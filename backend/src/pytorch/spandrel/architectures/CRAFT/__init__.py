@@ -17,10 +17,10 @@ class CRAFTArch(Architecture[CRAFT]):
         self,
     ) -> None:
         super().__init__(
-            id='CRAFT',
+            id="CRAFT",
             detect=KeyCondition.has_all(
-                'conv_first.weight',
-                'layers.0.residual_group.hf_blocks.0.attn.temperature',
+                "conv_first.weight",
+                "layers.0.residual_group.hf_blocks.0.attn.temperature",
             ),
         )
 
@@ -39,38 +39,32 @@ class CRAFTArch(Architecture[CRAFT]):
         qk_scale = None  # cannot be deduced from state dict
         upscale = 4
         img_range = 1.0
-        resi_connection = '1conv'
+        resi_connection = "1conv"
 
         # detect parameters
-        in_chans = state_dict['conv_first.weight'].shape[1]
-        embed_dim = state_dict['conv_first.weight'].shape[0]
+        in_chans = state_dict["conv_first.weight"].shape[1]
+        embed_dim = state_dict["conv_first.weight"].shape[0]
 
-        num_layers = get_seq_len(state_dict, 'layers')
+        num_layers = get_seq_len(state_dict, "layers")
         depths = [2] * num_layers
         num_heads = [6] * num_layers
         for i in range(num_layers):
-            depths[i] = get_seq_len(
-                state_dict, f'layers.{i}.residual_group.hf_blocks'
-            )
+            depths[i] = get_seq_len(state_dict, f"layers.{i}.residual_group.hf_blocks")
             num_heads[i] = state_dict[
-                f'layers.{i}.residual_group.hf_blocks.0.attn.temperature'
+                f"layers.{i}.residual_group.hf_blocks.0.attn.temperature"
             ].shape[0]
 
-        upscale = int(
-            math.sqrt(state_dict['upsample.0.bias'].shape[0] / in_chans)
-        )
+        upscale = int(math.sqrt(state_dict["upsample.0.bias"].shape[0] / in_chans))
 
-        if 'conv_after_body.weight' in state_dict:
-            resi_connection = '1conv'
+        if "conv_after_body.weight" in state_dict:
+            resi_connection = "1conv"
         else:
-            resi_connection = 'identity'
+            resi_connection = "identity"
 
-        qkv_bias = (
-            'layers.0.residual_group.srwa_blocks.0.qkv.bias' in state_dict
-        )
+        qkv_bias = "layers.0.residual_group.srwa_blocks.0.qkv.bias" in state_dict
 
         mlp_hidden_dim = state_dict[
-            'layers.0.residual_group.srwa_blocks.0.mlp.fc1.bias'
+            "layers.0.residual_group.srwa_blocks.0.mlp.fc1.bias"
         ].shape[0]
         mlp_ratio = float(mlp_hidden_dim / embed_dim)
 
@@ -78,8 +72,8 @@ class CRAFTArch(Architecture[CRAFT]):
         # What we know:
         #   a = s0 * s1
         #   b = (2*s0-1) * (2*s1-1)
-        a = state_dict['relative_position_index_h'].shape[0]
-        b = state_dict['biases_v'].shape[0]
+        a = state_dict["relative_position_index_h"].shape[0]
+        b = state_dict["biases_v"].shape[0]
         # Let's rearrange:
         #   s0 = a / s1
         #   b = (2*a/s1-1) * (2*s1-1)
@@ -87,18 +81,11 @@ class CRAFTArch(Architecture[CRAFT]):
         #   s1 = 1/4 (-sqrt(16 a^2 - 8 a (b + 1) + (b - 1)^2) + 4 a - b + 1)
         s1 = int(
             0.25
-            * (
-                -math.sqrt(16 * a**2 - 8 * a * (b + 1) + (b - 1) ** 2)
-                + 4 * a
-                - b
-                + 1
-            )
+            * (-math.sqrt(16 * a**2 - 8 * a * (b + 1) + (b - 1) ** 2) + 4 * a - b + 1)
         )
         s0 = a // s1
         if s0 * s1 != a:
-            raise ValueError(
-                'Could not find valid split_size_0 and split_size_1'
-            )
+            raise ValueError("Could not find valid split_size_0 and split_size_1")
         # since we don't know which is which, we'll just assume split_size_0 <= split_size_1
         split_size_0 = min(s0, s1)
         split_size_1 = max(s0, s1)
@@ -120,16 +107,16 @@ class CRAFTArch(Architecture[CRAFT]):
         )
 
         tags = [
-            f'{split_size_0}x{split_size_1}',
-            f'{embed_dim}dim',
-            f'{resi_connection}',
+            f"{split_size_0}x{split_size_1}",
+            f"{embed_dim}dim",
+            f"{resi_connection}",
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if upscale == 1 else 'SR',
+            purpose="Restoration" if upscale == 1 else "SR",
             tags=tags,
             supports_half=True,  # TODO: Not thoroughly tested
             supports_bfloat16=True,
@@ -140,4 +127,4 @@ class CRAFTArch(Architecture[CRAFT]):
         )
 
 
-__all__ = ['CRAFT', 'CRAFTArch']
+__all__ = ["CRAFT", "CRAFTArch"]

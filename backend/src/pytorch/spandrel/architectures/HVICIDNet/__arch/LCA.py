@@ -35,15 +35,9 @@ class CAB(nn.Module):
         kv = self.kv_dwconv(self.kv(y))
         k, v = kv.chunk(2, dim=1)
 
-        q = rearrange(
-            q, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
-        k = rearrange(
-            k, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
-        v = rearrange(
-            v, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
+        q = rearrange(q, "b (head c) h w -> b head c (h w)", head=self.num_heads)
+        k = rearrange(k, "b (head c) h w -> b head c (h w)", head=self.num_heads)
+        v = rearrange(v, "b (head c) h w -> b head c (h w)", head=self.num_heads)
 
         q = torch.nn.functional.normalize(q, dim=-1)
         k = torch.nn.functional.normalize(k, dim=-1)
@@ -55,7 +49,7 @@ class CAB(nn.Module):
 
         out = rearrange(
             out,
-            'b head c (h w) -> b (head c) h w',
+            "b head c (h w) -> b (head c) h w",
             head=self.num_heads,
             h=h,
             w=w,
@@ -72,9 +66,7 @@ class IEL(nn.Module):
 
         hidden_features = int(dim * ffn_expansion_factor)
 
-        self.project_in = nn.Conv2d(
-            dim, hidden_features * 2, kernel_size=1, bias=bias
-        )
+        self.project_in = nn.Conv2d(dim, hidden_features * 2, kernel_size=1, bias=bias)
 
         self.dwconv = nn.Conv2d(
             hidden_features * 2,
@@ -104,9 +96,7 @@ class IEL(nn.Module):
             bias=bias,
         )
 
-        self.project_out = nn.Conv2d(
-            hidden_features, dim, kernel_size=1, bias=bias
-        )
+        self.project_out = nn.Conv2d(hidden_features, dim, kernel_size=1, bias=bias)
 
         self.Tanh = nn.Tanh()
 

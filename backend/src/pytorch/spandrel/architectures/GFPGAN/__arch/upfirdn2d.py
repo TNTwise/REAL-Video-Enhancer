@@ -41,9 +41,7 @@ class UpFirDn2dBackward(Function):
             g_pad_y0,
             g_pad_y1,
         )
-        grad_input = grad_input.view(
-            in_size[0], in_size[1], in_size[2], in_size[3]
-        )
+        grad_input = grad_input.view(in_size[0], in_size[1], in_size[2], in_size[3])
 
         ctx.save_for_backward(kernel)
 
@@ -66,9 +64,7 @@ class UpFirDn2dBackward(Function):
     def backward(ctx, gradgrad_input):
         (kernel,) = ctx.saved_tensors
 
-        gradgrad_input = gradgrad_input.reshape(
-            -1, ctx.in_size[2], ctx.in_size[3], 1
-        )
+        gradgrad_input = gradgrad_input.reshape(-1, ctx.in_size[2], ctx.in_size[3], 1)
 
         gradgrad_out = upfirdn2d_ext.upfirdn2d(
             gradgrad_input,
@@ -158,7 +154,7 @@ class UpFirDn2d(Function):
 
 
 def upfirdn2d(input, kernel, up=1, down=1, pad=(0, 0)):
-    if input.device.type == 'cpu':
+    if input.device.type == "cpu":
         out = upfirdn2d_native(
             input, kernel, up, up, down, down, pad[0], pad[1], pad[0], pad[1]
         )
@@ -199,12 +195,14 @@ def upfirdn2d_native(
     ]
 
     out = out.permute(0, 3, 1, 2)
-    out = out.reshape([
-        -1,
-        1,
-        in_h * up_y + pad_y0 + pad_y1,
-        in_w * up_x + pad_x0 + pad_x1,
-    ])
+    out = out.reshape(
+        [
+            -1,
+            1,
+            in_h * up_y + pad_y0 + pad_y1,
+            in_w * up_x + pad_x0 + pad_x1,
+        ]
+    )
     w = torch.flip(kernel, [0, 1]).view(1, 1, kernel_h, kernel_w)
     out = F.conv2d(out, w)
     out = out.reshape(

@@ -125,9 +125,7 @@ class KBBlock_s(nn.Module):
             nn.Conv2d(interc // 2, self.nset, 1, padding=0, stride=1),
         )
 
-        self.conv211 = nn.Conv2d(
-            in_channels=c, out_channels=self.nset, kernel_size=1
-        )
+        self.conv211 = nn.Conv2d(in_channels=c, out_channels=self.nset, kernel_size=1)
 
         self.conv3 = nn.Conv2d(
             in_channels=dw_ch // 2,
@@ -161,20 +159,14 @@ class KBBlock_s(nn.Module):
         self.dropout1 = nn.Identity()
         self.dropout2 = nn.Identity()
 
-        self.ga1 = nn.Parameter(
-            torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True
-        )
+        self.ga1 = nn.Parameter(torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True)
         self.attgamma = nn.Parameter(
             torch.zeros((1, self.nset, 1, 1)) + 1e-2, requires_grad=True
         )
         self.sg = SimpleGate()
 
-        self.beta = nn.Parameter(
-            torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True
-        )
-        self.gamma = nn.Parameter(
-            torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True
-        )
+        self.beta = nn.Parameter(torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True)
+        self.gamma = nn.Parameter(torch.zeros((1, c, 1, 1)) + 1e-2, requires_grad=True)
 
     def init_p(self, weight, bias=None):
         init.kaiming_uniform_(weight, a=math.sqrt(5))
@@ -260,20 +252,22 @@ class KBNet_s(nn.Module):
         chan = width
         for num in enc_blk_nums:
             self.encoders.append(
-                nn.Sequential(*[
-                    KBBlock_s(
-                        chan, FFN_Expand=ffn_scale, lightweight=lightweight
-                    )
-                    for _ in range(num)
-                ])
+                nn.Sequential(
+                    *[
+                        KBBlock_s(chan, FFN_Expand=ffn_scale, lightweight=lightweight)
+                        for _ in range(num)
+                    ]
+                )
             )
             self.downs.append(nn.Conv2d(chan, 2 * chan, 2, 2))
             chan = chan * 2
 
-        self.middle_blks = nn.Sequential(*[
-            KBBlock_s(chan, FFN_Expand=ffn_scale, lightweight=lightweight)
-            for _ in range(middle_blk_num)
-        ])
+        self.middle_blks = nn.Sequential(
+            *[
+                KBBlock_s(chan, FFN_Expand=ffn_scale, lightweight=lightweight)
+                for _ in range(middle_blk_num)
+            ]
+        )
 
         for num in dec_blk_nums:
             self.ups.append(
@@ -283,12 +277,12 @@ class KBNet_s(nn.Module):
             )
             chan = chan // 2
             self.decoders.append(
-                nn.Sequential(*[
-                    KBBlock_s(
-                        chan, FFN_Expand=ffn_scale, lightweight=lightweight
-                    )
-                    for _ in range(num)
-                ])
+                nn.Sequential(
+                    *[
+                        KBBlock_s(chan, FFN_Expand=ffn_scale, lightweight=lightweight)
+                        for _ in range(num)
+                    ]
+                )
             )
 
         self.padder_size = 2 ** len(self.encoders)
@@ -318,4 +312,4 @@ class KBNet_s(nn.Module):
         return x[:, :, :H, :W]
 
     def check_image_size(self, x):
-        return pad_to_multiple(x, self.padder_size, mode='constant')
+        return pad_to_multiple(x, self.padder_size, mode="constant")

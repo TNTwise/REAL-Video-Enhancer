@@ -58,9 +58,7 @@ class VectorQuantizer(nn.Module):
 
         min_encoding_indices = min_encoding_indices.unsqueeze(1)
 
-        min_encodings = torch.zeros(min_encoding_indices.shape[0], self.n_e).to(
-            z
-        )
+        min_encodings = torch.zeros(min_encoding_indices.shape[0], self.n_e).to(z)
         min_encodings.scatter_(1, min_encoding_indices, 1)
 
         # dtype min encodings: torch.float32
@@ -135,7 +133,7 @@ class Upsample(nn.Module):
             )
 
     def forward(self, x):
-        x = torch.nn.functional.interpolate(x, scale_factor=2.0, mode='nearest')
+        x = torch.nn.functional.interpolate(x, scale_factor=2.0, mode="nearest")
         if self.with_conv:
             x = self.conv(x)
         return x
@@ -154,7 +152,7 @@ class Downsample(nn.Module):
     def forward(self, x):
         if self.with_conv:
             pad = (0, 1, 0, 1)
-            x = torch.nn.functional.pad(x, pad, mode='constant', value=0)
+            x = torch.nn.functional.pad(x, pad, mode="constant", value=0)
             x = self.conv(x)
         else:
             x = torch.nn.functional.avg_pool2d(x, kernel_size=2, stride=2)
@@ -236,7 +234,7 @@ class MultiHeadAttnBlock(nn.Module):
         self.head_size = head_size
         self.att_size = in_channels // head_size
         assert in_channels % head_size == 0, (
-            'The size of head should be divided by the number of channels.'
+            "The size of head should be divided by the number of channels."
         )
 
         self.norm1 = Normalize(in_channels)
@@ -392,7 +390,7 @@ class MultiHeadEncoder(nn.Module):
 
         # downsampling
         h = self.conv_in(x)
-        hs['in'] = h
+        hs["in"] = h
         for i_level in range(self.num_resolutions):
             for i_block in range(self.num_res_blocks):
                 h = self.down[i_level].block[i_block](h, temb)
@@ -401,24 +399,24 @@ class MultiHeadEncoder(nn.Module):
 
             if i_level != self.num_resolutions - 1:
                 # hs.append(h)
-                hs['block_' + str(i_level)] = h
+                hs["block_" + str(i_level)] = h
                 h = self.down[i_level].downsample(h)
 
         # middle
         # h = hs[-1]
         if self.enable_mid:
             h = self.mid.block_1(h, temb)
-            hs['block_' + str(i_level) + '_atten'] = h
+            hs["block_" + str(i_level) + "_atten"] = h
             h = self.mid.attn_1(h)
             h = self.mid.block_2(h, temb)
-            hs['mid_atten'] = h
+            hs["mid_atten"] = h
 
         # end
         h = self.norm_out(h)
         h = nonlinearity(h)
         h = self.conv_out(h)
         # hs.append(h)
-        hs['out'] = h
+        hs["out"] = h
 
         return hs
 
@@ -653,7 +651,7 @@ class MultiHeadDecoderTransformer(nn.Module):
         # middle
         if self.enable_mid:
             h = self.mid.block_1(h, temb)
-            h = self.mid.attn_1(h, hs['mid_atten'])
+            h = self.mid.attn_1(h, hs["mid_atten"])
             h = self.mid.block_2(h, temb)
 
         # upsampling
@@ -662,7 +660,7 @@ class MultiHeadDecoderTransformer(nn.Module):
                 h = self.up[i_level].block[i_block](h, temb)
                 if len(self.up[i_level].attn) > 0:
                     h = self.up[i_level].attn[i_block](
-                        h, hs['block_' + str(i_level) + '_atten']
+                        h, hs["block_" + str(i_level) + "_atten"]
                     )
                     # hfeature = h.clone()
             if i_level != 0:
@@ -755,7 +753,7 @@ class RestoreFormer(nn.Module):
 
     def encode(self, x):
         hs = self.encoder(x)
-        h = self.quant_conv(hs['out'])
+        h = self.quant_conv(hs["out"])
         quant, emb_loss, info = self.quantize(h)
         return quant, emb_loss, info, hs
 

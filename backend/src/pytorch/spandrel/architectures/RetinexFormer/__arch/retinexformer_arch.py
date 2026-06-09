@@ -45,9 +45,7 @@ class Illumination_Estimator(nn.Module):
             groups=n_fea_in,
         )
 
-        self.conv2 = nn.Conv2d(
-            n_fea_middle, n_fea_out, kernel_size=1, bias=True
-        )
+        self.conv2 = nn.Conv2d(n_fea_middle, n_fea_out, kernel_size=1, bias=True)
 
     def forward(self, img):
         # img:        b,c=3,h,w
@@ -100,7 +98,7 @@ class IG_MSA(nn.Module):
         v_inp = self.to_v(x)
         illu_attn = illu_fea_trans  # illu_fea: b,c,h,w -> b,h,w,c
         q, k, v, illu_attn = (
-            rearrange(t, 'b n (h d) -> b h n d', h=self.num_heads)
+            rearrange(t, "b n (h d) -> b h n d", h=self.num_heads)
             for t in (q_inp, k_inp, v_inp, illu_attn.flatten(1, 2))
         )
         v = v * illu_attn
@@ -117,9 +115,9 @@ class IG_MSA(nn.Module):
         x = x.permute(0, 3, 1, 2)  # Transpose
         x = x.reshape(b, h * w, self.num_heads * self.dim_head)
         out_c = self.proj(x).view(b, h, w, c)
-        out_p = self.pos_emb(
-            v_inp.reshape(b, h, w, c).permute(0, 3, 1, 2)
-        ).permute(0, 2, 3, 1)
+        out_p = self.pos_emb(v_inp.reshape(b, h, w, c).permute(0, 3, 1, 2)).permute(
+            0, 2, 3, 1
+        )
         out = out_c + out_p
 
         return out
@@ -131,9 +129,7 @@ class FeedForward(nn.Module):
         self.net = nn.Sequential(
             nn.Conv2d(dim, dim * mult, 1, 1, bias=False),
             GELU(),
-            nn.Conv2d(
-                dim * mult, dim * mult, 3, 1, 1, bias=False, groups=dim * mult
-            ),
+            nn.Conv2d(dim * mult, dim * mult, 3, 1, 1, bias=False, groups=dim * mult),
             GELU(),
             nn.Conv2d(dim * mult, dim, 1, 1, bias=False),
         )
@@ -159,10 +155,12 @@ class IGAB(nn.Module):
         self.blocks = nn.ModuleList([])
         for _ in range(num_blocks):
             self.blocks.append(
-                nn.ModuleList([
-                    IG_MSA(dim=dim, dim_head=dim_head, heads=heads),
-                    PreNorm(dim, FeedForward(dim=dim)),
-                ])
+                nn.ModuleList(
+                    [
+                        IG_MSA(dim=dim, dim_head=dim_head, heads=heads),
+                        PreNorm(dim, FeedForward(dim=dim)),
+                    ]
+                )
             )
 
     def forward(self, x, illu_fea):
@@ -180,9 +178,7 @@ class IGAB(nn.Module):
 
 
 class Denoiser(nn.Module):
-    def __init__(
-        self, in_dim=3, out_dim=3, dim=31, level=2, num_blocks=[2, 4, 4]
-    ):
+    def __init__(self, in_dim=3, out_dim=3, dim=31, level=2, num_blocks=[2, 4, 4]):
         super().__init__()
         self.dim = dim
         self.level = level
@@ -195,16 +191,18 @@ class Denoiser(nn.Module):
         dim_level = dim
         for i in range(level):
             self.encoder_layers.append(
-                nn.ModuleList([
-                    IGAB(
-                        dim=dim_level,
-                        num_blocks=num_blocks[i],
-                        dim_head=dim,
-                        heads=dim_level // dim,
-                    ),
-                    nn.Conv2d(dim_level, dim_level * 2, 4, 2, 1, bias=False),
-                    nn.Conv2d(dim_level, dim_level * 2, 4, 2, 1, bias=False),
-                ])
+                nn.ModuleList(
+                    [
+                        IGAB(
+                            dim=dim_level,
+                            num_blocks=num_blocks[i],
+                            dim_head=dim,
+                            heads=dim_level // dim,
+                        ),
+                        nn.Conv2d(dim_level, dim_level * 2, 4, 2, 1, bias=False),
+                        nn.Conv2d(dim_level, dim_level * 2, 4, 2, 1, bias=False),
+                    ]
+                )
             )
             dim_level *= 2
 
@@ -220,23 +218,25 @@ class Denoiser(nn.Module):
         self.decoder_layers = nn.ModuleList([])
         for i in range(level):
             self.decoder_layers.append(
-                nn.ModuleList([
-                    nn.ConvTranspose2d(
-                        dim_level,
-                        dim_level // 2,
-                        stride=2,
-                        kernel_size=2,
-                        padding=0,
-                        output_padding=0,
-                    ),
-                    nn.Conv2d(dim_level, dim_level // 2, 1, 1, bias=False),
-                    IGAB(
-                        dim=dim_level // 2,
-                        num_blocks=num_blocks[level - 1 - i],
-                        dim_head=dim,
-                        heads=(dim_level // 2) // dim,
-                    ),
-                ])
+                nn.ModuleList(
+                    [
+                        nn.ConvTranspose2d(
+                            dim_level,
+                            dim_level // 2,
+                            stride=2,
+                            kernel_size=2,
+                            padding=0,
+                            output_padding=0,
+                        ),
+                        nn.Conv2d(dim_level, dim_level // 2, 1, 1, bias=False),
+                        IGAB(
+                            dim=dim_level // 2,
+                            num_blocks=num_blocks[level - 1 - i],
+                            dim_head=dim,
+                            heads=(dim_level // 2) // dim,
+                        ),
+                    ]
+                )
             )
             dim_level //= 2
 
@@ -279,13 +279,9 @@ class Denoiser(nn.Module):
         fea = self.bottleneck(fea, illu_fea)
 
         # Decoder
-        for i, (FeaUpSample, Fution, LeWinBlcok) in enumerate(
-            self.decoder_layers
-        ):  # type: ignore
+        for i, (FeaUpSample, Fution, LeWinBlcok) in enumerate(self.decoder_layers):  # type: ignore
             fea = FeaUpSample(fea)
-            fea = Fution(
-                torch.cat([fea, fea_encoder[self.level - 1 - i]], dim=1)
-            )
+            fea = Fution(torch.cat([fea, fea_encoder[self.level - 1 - i]], dim=1))
             illu_fea = illu_fea_list[self.level - 1 - i]
             fea = LeWinBlcok(fea, illu_fea)
 

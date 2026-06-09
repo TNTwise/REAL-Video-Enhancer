@@ -2,7 +2,7 @@ import logging
 import os
 import sys
 
-_DEFAULT_FORMAT = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+_DEFAULT_FORMAT = "%(asctime)s %(levelname)s %(name)s: %(message)s"
 
 
 def _parse_level(level: str | None) -> int:
@@ -19,10 +19,10 @@ def configure_logging(level: str | None = None) -> None:
     - Safe to call multiple times.
     """
     root = logging.getLogger()
-    if getattr(root, '_rve_configured', False):
+    if getattr(root, "_rve_configured", False):
         return
 
-    env_level = os.environ.get('RVE_BACKEND_LOG_LEVEL')
+    env_level = os.environ.get("RVE_BACKEND_LOG_LEVEL")
     root.setLevel(_parse_level(level or env_level))
 
     handler = logging.StreamHandler(stream=sys.stderr)

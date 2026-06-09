@@ -9,11 +9,11 @@ from ....util import store_hyperparameters
 
 
 def to_3d(x):
-    return rearrange(x, 'b c h w -> b (h w) c')
+    return rearrange(x, "b c h w -> b (h w) c")
 
 
 def to_4d(x, h, w):
-    return rearrange(x, 'b (h w) c -> b c h w', h=h, w=w)
+    return rearrange(x, "b (h w) c -> b c h w", h=h, w=w)
 
 
 class BiasFree_LayerNorm(nn.Module):
@@ -55,7 +55,7 @@ class WithBias_LayerNorm(nn.Module):
 class LayerNorm(nn.Module):
     def __init__(self, dim, LayerNorm_type):
         super().__init__()
-        if LayerNorm_type == 'BiasFree':
+        if LayerNorm_type == "BiasFree":
             self.body = BiasFree_LayerNorm(dim)
         else:
             self.body = WithBias_LayerNorm(dim)
@@ -74,9 +74,7 @@ class DFFN(nn.Module):
         self.patch_size = 8
 
         self.dim = dim
-        self.project_in = nn.Conv2d(
-            dim, hidden_features * 2, kernel_size=1, bias=bias
-        )
+        self.project_in = nn.Conv2d(dim, hidden_features * 2, kernel_size=1, bias=bias)
 
         self.dwconv = nn.Conv2d(
             hidden_features * 2,
@@ -89,34 +87,32 @@ class DFFN(nn.Module):
         )
 
         self.fft = nn.Parameter(
-            torch.ones((
-                hidden_features * 2,
-                1,
-                1,
-                self.patch_size,
-                self.patch_size // 2 + 1,
-            ))
+            torch.ones(
+                (
+                    hidden_features * 2,
+                    1,
+                    1,
+                    self.patch_size,
+                    self.patch_size // 2 + 1,
+                )
+            )
         )
-        self.project_out = nn.Conv2d(
-            hidden_features, dim, kernel_size=1, bias=bias
-        )
+        self.project_out = nn.Conv2d(hidden_features, dim, kernel_size=1, bias=bias)
 
     def forward(self, x):
         x = self.project_in(x)
         x_patch = rearrange(
             x,
-            'b c (h patch1) (w patch2) -> b c h w patch1 patch2',
+            "b c (h patch1) (w patch2) -> b c h w patch1 patch2",
             patch1=self.patch_size,
             patch2=self.patch_size,
         )
         x_patch_fft = torch.fft.rfft2(x_patch.float())
         x_patch_fft = x_patch_fft * self.fft
-        x_patch = torch.fft.irfft2(
-            x_patch_fft, s=(self.patch_size, self.patch_size)
-        )
+        x_patch = torch.fft.irfft2(x_patch_fft, s=(self.patch_size, self.patch_size))
         x = rearrange(
             x_patch,
-            'b c h w patch1 patch2 -> b c (h patch1) (w patch2)',
+            "b c h w patch1 patch2 -> b c (h patch1) (w patch2)",
             patch1=self.patch_size,
             patch2=self.patch_size,
         )
@@ -144,7 +140,7 @@ class FSAS(nn.Module):
 
         self.project_out = nn.Conv2d(dim * 2, dim, kernel_size=1, bias=bias)
 
-        self.norm = LayerNorm(dim * 2, LayerNorm_type='WithBias')
+        self.norm = LayerNorm(dim * 2, LayerNorm_type="WithBias")
 
         self.patch_size = 8
 
@@ -155,13 +151,13 @@ class FSAS(nn.Module):
 
         q_patch = rearrange(
             q,
-            'b c (h patch1) (w patch2) -> b c h w patch1 patch2',
+            "b c (h patch1) (w patch2) -> b c h w patch1 patch2",
             patch1=self.patch_size,
             patch2=self.patch_size,
         )
         k_patch = rearrange(
             k,
-            'b c (h patch1) (w patch2) -> b c h w patch1 patch2',
+            "b c (h patch1) (w patch2) -> b c h w patch1 patch2",
             patch1=self.patch_size,
             patch2=self.patch_size,
         )
@@ -172,7 +168,7 @@ class FSAS(nn.Module):
         out = torch.fft.irfft2(out, s=(self.patch_size, self.patch_size))
         out = rearrange(
             out,
-            'b c h w patch1 patch2 -> b c (h patch1) (w patch2)',
+            "b c h w patch1 patch2 -> b c (h patch1) (w patch2)",
             patch1=self.patch_size,
             patch2=self.patch_size,
         )
@@ -192,7 +188,7 @@ class TransformerBlock(nn.Module):
         dim,
         ffn_expansion_factor=2.66,
         bias=False,
-        LayerNorm_type='WithBias',
+        LayerNorm_type="WithBias",
         att=False,
     ):
         super().__init__()
@@ -256,7 +252,7 @@ class Downsample(nn.Module):
         super().__init__()
 
         self.body = nn.Sequential(
-            nn.Upsample(scale_factor=0.5, mode='bilinear', align_corners=False),
+            nn.Upsample(scale_factor=0.5, mode="bilinear", align_corners=False),
             nn.Conv2d(n_feat, n_feat * 2, 3, stride=1, padding=1, bias=False),
         )
 
@@ -269,7 +265,7 @@ class Upsample(nn.Module):
         super().__init__()
 
         self.body = nn.Sequential(
-            nn.Upsample(scale_factor=2, mode='bilinear', align_corners=False),
+            nn.Upsample(scale_factor=2, mode="bilinear", align_corners=False),
             nn.Conv2d(n_feat, n_feat // 2, 3, stride=1, padding=1, bias=False),
         )
 
@@ -298,78 +294,92 @@ class FFTformer(nn.Module):
 
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
 
-        self.encoder_level1 = nn.Sequential(*[
-            TransformerBlock(
-                dim=dim, ffn_expansion_factor=ffn_expansion_factor, bias=bias
-            )
-            for _ in range(num_blocks[0])
-        ])
+        self.encoder_level1 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=dim, ffn_expansion_factor=ffn_expansion_factor, bias=bias
+                )
+                for _ in range(num_blocks[0])
+            ]
+        )
 
         self.down1_2 = Downsample(dim)
-        self.encoder_level2 = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim * 2**1),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[1])
-        ])
+        self.encoder_level2 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim * 2**1),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[1])
+            ]
+        )
 
         self.down2_3 = Downsample(int(dim * 2**1))
-        self.encoder_level3 = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim * 2**2),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[2])
-        ])
+        self.encoder_level3 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim * 2**2),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[2])
+            ]
+        )
 
-        self.decoder_level3 = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim * 2**2),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-                att=True,
-            )
-            for _ in range(num_blocks[2])
-        ])
+        self.decoder_level3 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim * 2**2),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                    att=True,
+                )
+                for _ in range(num_blocks[2])
+            ]
+        )
 
         self.up3_2 = Upsample(int(dim * 2**2))
         self.reduce_chan_level2 = nn.Conv2d(
             int(dim * 2**2), int(dim * 2**1), kernel_size=1, bias=bias
         )
-        self.decoder_level2 = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim * 2**1),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-                att=True,
-            )
-            for _ in range(num_blocks[1])
-        ])
+        self.decoder_level2 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim * 2**1),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                    att=True,
+                )
+                for _ in range(num_blocks[1])
+            ]
+        )
 
         self.up2_1 = Upsample(int(dim * 2**1))
 
-        self.decoder_level1 = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-                att=True,
-            )
-            for _ in range(num_blocks[0])
-        ])
+        self.decoder_level1 = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                    att=True,
+                )
+                for _ in range(num_blocks[0])
+            ]
+        )
 
-        self.refinement = nn.Sequential(*[
-            TransformerBlock(
-                dim=int(dim),
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-                att=True,
-            )
-            for _ in range(num_refinement_blocks)
-        ])
+        self.refinement = nn.Sequential(
+            *[
+                TransformerBlock(
+                    dim=int(dim),
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                    att=True,
+                )
+                for _ in range(num_refinement_blocks)
+            ]
+        )
 
         self.fuse2 = Fuse(dim * 2)
         self.fuse1 = Fuse(dim)

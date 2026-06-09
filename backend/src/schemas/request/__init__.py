@@ -1,4 +1,8 @@
-from .model import InterpolateModelClientInput, UpscaleModelClientInput, EnhancementModelClientInput
+from .model import (
+    InterpolateModelClientInput,
+    UpscaleModelClientInput,
+    EnhancementModelClientInput,
+)
 from .render import RenderSettingsClientInput
 from .settings import Setting
 
@@ -7,5 +11,5 @@ __all__ = [
     "UpscaleModelClientInput",
     "EnhancementModelClientInput",
     "RenderSettingsClientInput",
-    "Setting"
+    "Setting",
 ]

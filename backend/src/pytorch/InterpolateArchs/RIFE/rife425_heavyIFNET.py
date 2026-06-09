@@ -44,9 +44,7 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-def conv_bn(
-    in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1
-):
+def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
             in_planes,
@@ -119,14 +117,14 @@ class IFBlock(nn.Module):
 
     def forward(self, x, flow=None, scale=1):
         x = interpolate(
-            x, scale_factor=1.0 / scale, mode='bilinear', align_corners=False
+            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
         )
         if flow is not None:
             flow = (
                 interpolate(
                     flow,
                     scale_factor=1.0 / scale,
-                    mode='bilinear',
+                    mode="bilinear",
                     align_corners=False,
                 )
                 * 1.0
@@ -136,9 +134,7 @@ class IFBlock(nn.Module):
         feat = self.conv0(x)
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
-        tmp = interpolate(
-            tmp, scale_factor=scale, mode='bilinear', align_corners=False
-        )
+        tmp = interpolate(tmp, scale_factor=scale, mode="bilinear", align_corners=False)
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
         feat = tmp[:, 5:]
@@ -169,7 +165,7 @@ class IFNet(nn.Module):
         if ensemble:
             import sys
 
-            print('Ensemble is not supported with this model.', file=sys.stderr)
+            print("Ensemble is not supported with this model.", file=sys.stderr)
         self.blocks = [
             self.block0,
             self.block1,
@@ -226,8 +222,6 @@ class IFNet(nn.Module):
                 mask = m0
                 flow = flow + fd
             warped_img0 = warp(img0, flow[:, :2], tenFlow_div, backwarp_tenGrid)
-            warped_img1 = warp(
-                img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid
-            )
+            warped_img1 = warp(img1, flow[:, 2:4], tenFlow_div, backwarp_tenGrid)
         mask = torch.sigmoid(mask)
         return warped_img0 * mask + warped_img1 * (1 - mask)

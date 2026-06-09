@@ -27,9 +27,7 @@ def conv_layer(
     """
     kernel_size_t: tuple[int, int] = _make_pair(kernel_size)
     padding = (int((kernel_size_t[0] - 1) / 2), int((kernel_size_t[1] - 1) / 2))
-    return nn.Conv2d(
-        in_channels, out_channels, kernel_size, padding=padding, bias=bias
-    )
+    return nn.Conv2d(in_channels, out_channels, kernel_size, padding=padding, bias=bias)
 
 
 def sequential(*args: nn.Module) -> nn.Module:
@@ -39,9 +37,7 @@ def sequential(*args: nn.Module) -> nn.Module:
     """
     if len(args) == 1:
         if isinstance(args[0], OrderedDict):
-            raise NotImplementedError(
-                'sequential does not support OrderedDict input.'
-            )
+            raise NotImplementedError("sequential does not support OrderedDict input.")
         return args[0]
     modules = []
     for module in args:
@@ -62,9 +58,7 @@ def pixelshuffle_block(
     """
     Upsample features according to `upscale_factor`.
     """
-    conv = conv_layer(
-        in_channels, out_channels * (upscale_factor**2), kernel_size
-    )
+    conv = conv_layer(in_channels, out_channels * (upscale_factor**2), kernel_size)
 
     # Apply ICNR initialization to prevent checkerboard artifacts
     icnr_init(conv, upscale_factor)
@@ -91,12 +85,14 @@ def icnr_init(
     sub_kernel_channels = out_channels // (upscale_factor**2)
 
     # Create a temporary smaller kernel
-    sub_kernel = torch.zeros([
-        sub_kernel_channels,
-        conv.in_channels,
-        conv.kernel_size[0],
-        conv.kernel_size[1],
-    ])
+    sub_kernel = torch.zeros(
+        [
+            sub_kernel_channels,
+            conv.in_channels,
+            conv.kernel_size[0],
+            conv.kernel_size[1],
+        ]
+    )
 
     # Initialize the sub-kernel
     init_fn(sub_kernel)
@@ -184,16 +180,14 @@ class Conv3XC(nn.Module):
         b3 = self.conv[2].bias.data.clone().detach()
 
         w = (
-            F
-            .conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
+            F.conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
         b = (w2 * b1.reshape(1, -1, 1, 1)).sum((1, 2, 3)) + b2
 
         self.weight_concat = (
-            F
-            .conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
+            F.conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
@@ -231,7 +225,7 @@ class Conv3XC(nn.Module):
     def forward(self, x: Tensor) -> Tensor:
         if self.training:
             pad = 1
-            x_pad = F.pad(x, (pad, pad, pad, pad), 'constant', 0)
+            x_pad = F.pad(x, (pad, pad, pad, pad), "constant", 0)
             out = self.conv(x_pad) + self.sk(x)
         else:
             out = self.eval_conv(x)
@@ -315,16 +309,16 @@ class TemporalSPAN(nn.Module):
         self.center_idx = num_frames // 2
 
         # Separate feature extraction for center frame (full dimension)
-        self.center_conv = Conv3XC(
-            self.in_channels, feature_channels, gain1=2, s=1
-        )
+        self.center_conv = Conv3XC(self.in_channels, feature_channels, gain1=2, s=1)
 
         # Feature extraction for history frames (reduced dimension)
         # Each history frame gets its own conv to extract features independently
-        self.history_convs = nn.ModuleList([
-            Conv3XC(self.in_channels, history_channels, gain1=2, s=1)
-            for _ in range(num_frames - 1)
-        ])
+        self.history_convs = nn.ModuleList(
+            [
+                Conv3XC(self.in_channels, history_channels, gain1=2, s=1)
+                for _ in range(num_frames - 1)
+            ]
+        )
 
         # Fusion layer to merge all features
         # Total channels: feature_channels (center) + history_channels * (num_frames - 1)
@@ -367,7 +361,7 @@ class TemporalSPAN(nn.Module):
         # Verify that the number of frames in the input tensor matches the model's configuration
         if t != self.num_frames:
             raise ValueError(
-                f'Expected input with {self.num_frames} frames, but received {t} frames.'
+                f"Expected input with {self.num_frames} frames, but received {t} frames."
             )
 
         # Extract features separately for each frame
@@ -401,9 +395,7 @@ class TemporalSPAN(nn.Module):
         out_b6, out_b5_2, _att6 = self.block_6(out_b5)
 
         out_b6 = self.conv_2(out_b6)
-        out = self.conv_cat(
-            torch.cat([out_feature, out_b6, out_b1, out_b5_2], 1)
-        )
+        out = self.conv_cat(torch.cat([out_feature, out_b6, out_b1, out_b5_2], 1))
         output = self.upsampler(out)
 
         return output

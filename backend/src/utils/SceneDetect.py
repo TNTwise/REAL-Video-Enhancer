@@ -21,8 +21,8 @@ class ModelDetector(BaseDetector):
         self,
         threshold: int = 0,
         model_path: str = None,
-        model_dtype: str = 'float32',
-        model_device: str = 'cpu',
+        model_dtype: str = "float32",
+        model_device: str = "cpu",
     ):
         super().__init__(threshold)
 
@@ -158,7 +158,7 @@ class PySceneDetect(BaseDetector):
         if len(frameList) > 0:
             if self.frameNum != frameList[0] + 1:
                 print(
-                    f'Transition Mismatch {self.frameNum} is not equal to {frameList[0] + 1}, skipping',
+                    f"Transition Mismatch {self.frameNum} is not equal to {frameList[0] + 1}, skipping",
                     file=sys.stderr,
                 )
                 return False
@@ -170,10 +170,10 @@ class PyTorchSudoSceneDetect(ModelDetector):
     def __init__(
         self,
         threshold=0,
-        model_path='',
-        model_dtype='float32',
-        model_device='cpu',
-        model_backend='pytorch',
+        model_path="",
+        model_dtype="float32",
+        model_device="cpu",
+        model_backend="pytorch",
         model_gpu_id=0,
         **kwargs,
     ):
@@ -197,7 +197,7 @@ class PyTorchSudoSceneDetect(ModelDetector):
         frame = self.torch.nn.functional.interpolate(
             frame.get_frame_tensor(),
             size=(256, 256),
-            mode='bilinear',
+            mode="bilinear",
             align_corners=False,
         ).squeeze(0)
         if self.i0 is None:
@@ -213,9 +213,9 @@ class NCNNSudoSceneDetect(ModelDetector):
     def __init__(
         self,
         threshold=0,
-        model_path='',
-        model_dtype='float32',
-        model_device='cpu',
+        model_path="",
+        model_dtype="float32",
+        model_device="cpu",
         **kwargs,
     ):
         from ..ncnn.NCNNEfficientNetSC import (
@@ -259,41 +259,41 @@ class SceneDetect:
 
     def __init__(
         self,
-        sceneChangeMethod: str = 'mean',
+        sceneChangeMethod: str = "mean",
         sceneChangeSensitivity: float = 2.0,
         width: int = 1920,
         height: int = 1080,
         model_path: str = None,
-        model_backend: str = 'pytorch',
-        model_dtype: str = 'float32',
-        model_device: str = 'cpu',
+        model_backend: str = "pytorch",
+        model_dtype: str = "float32",
+        model_device: str = "cpu",
         model_gpu_id: int = 0,
     ):
         self.width = width
         self.height = height
         self.sceneChangeMethod = sceneChangeMethod.lower()
         scmethoddict = {
-            'mean': NPMeanSCDetect,
-            'mean_diff': NPMeanDiffSCDetect,
-            'mean_segmented': NPMeanSegmentedSCDetect,
-            'pyscenedetect': PySceneDetect,
-            'none': BaseDetector,
+            "mean": NPMeanSCDetect,
+            "mean_diff": NPMeanDiffSCDetect,
+            "mean_segmented": NPMeanSegmentedSCDetect,
+            "pyscenedetect": PySceneDetect,
+            "none": BaseDetector,
         }
 
-        assert (
-            self.sceneChangeMethod in scmethoddict or model_path is not None
-        ), 'Invalid Scene Change Method'
+        assert self.sceneChangeMethod in scmethoddict or model_path is not None, (
+            "Invalid Scene Change Method"
+        )
         if self.sceneChangeMethod in scmethoddict:
             self.detector: BaseDetector = scmethoddict[self.sceneChangeMethod](
                 threshold=sceneChangeSensitivity
             )
         else:
             assert model_path is not None and pathlib.Path(model_path).exists(), (
-                'Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter'
+                "Model path must be provided for model-based scene detection. Please pass --scene_detect_model parameter"
             )
             model = (
                 PyTorchSudoSceneDetect
-                if model_backend == 'pytorch' or model_backend == 'tensorrt'
+                if model_backend == "pytorch" or model_backend == "tensorrt"
                 else NCNNSudoSceneDetect
             )
             self.detector: ModelDetector = model(

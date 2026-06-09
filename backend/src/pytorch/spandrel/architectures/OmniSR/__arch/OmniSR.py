@@ -79,7 +79,7 @@ class OmniSR(nn.Module):
         #         m.weight.data.normal_(0, sqrt(2. / n))
 
     def check_image_size(self, x):
-        return pad_to_multiple(x, self.window_size, mode='constant')
+        return pad_to_multiple(x, self.window_size, mode="constant")
 
     def forward(self, x):
         H, W = x.shape[2:]

@@ -18,7 +18,7 @@ class DetectionHelper:
             self.model.load_state_dict(self.model)
             return self.model
         except Exception:
-            logger.exception('Failed to load AnimeSR VSR architecture')
+            logger.exception("Failed to load AnimeSR VSR architecture")
         try:
             from TSPAN import tspan
 
@@ -26,13 +26,13 @@ class DetectionHelper:
             self.model.load_state_dict(self.model)
             return self.model
         except Exception:
-            logger.exception('Failed to load TSPAN VSR architecture')
+            logger.exception("Failed to load TSPAN VSR architecture")
 
     @torch.inference_mode()
     def inference(self, frame: torch.Tensor):
         if self.model is None:
             raise ValueError(
-                'Model not loaded. Please call get_inference_method first.'
+                "Model not loaded. Please call get_inference_method first."
             )
         with torch.no_grad():
             output = self.model(frame)

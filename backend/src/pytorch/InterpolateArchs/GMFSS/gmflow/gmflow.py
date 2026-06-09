@@ -15,7 +15,7 @@ class GMFlow(nn.Module):
         num_scales=2,
         upsample_factor=4,
         feature_channels=128,
-        attention_type='swin',
+        attention_type="swin",
         num_transformer_layers=6,
         ffn_dim_expansion=4,
         num_head=1,
@@ -44,9 +44,7 @@ class GMFlow(nn.Module):
         )
 
         # flow propagation with self-attn
-        self.feature_flow_attn = FeatureFlowAttention(
-            in_channels=feature_channels
-        )
+        self.feature_flow_attn = FeatureFlowAttention(in_channels=feature_channels)
 
         # convex upsampling: concat feature0 and flow as input
         self.upsampler = nn.Sequential(
@@ -86,7 +84,7 @@ class GMFlow(nn.Module):
                 F.interpolate(
                     flow,
                     scale_factor=upsample_factor,
-                    mode='bilinear',
+                    mode="bilinear",
                     align_corners=True,
                 )
                 * upsample_factor
@@ -167,7 +165,7 @@ class GMFlow(nn.Module):
                     F.interpolate(
                         flow,
                         scale_factor=2,
-                        mode='bilinear',
+                        mode="bilinear",
                         align_corners=True,
                     )
                     * 2
@@ -197,15 +195,17 @@ class GMFlow(nn.Module):
                     feature0, feature1, pred_bidir_flow
                 )[0]
             else:  # local matching
-                flow_pred = local_correlation_softmax(
-                    feature0, feature1, corr_radius
-                )[0]
+                flow_pred = local_correlation_softmax(feature0, feature1, corr_radius)[
+                    0
+                ]
 
             # flow or residual flow
             flow = flow + flow_pred if flow is not None else flow_pred
 
             # upsample to the original resolution for supervison
-            if self.training:  # only need to upsample intermediate flow predictions at training time
+            if (
+                self.training
+            ):  # only need to upsample intermediate flow predictions at training time
                 flow_bilinear = self.upsample_flow(
                     flow, None, bilinear=True, upsample_factor=upsample_factor
                 )

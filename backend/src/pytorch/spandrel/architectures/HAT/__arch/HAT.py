@@ -24,9 +24,7 @@ def drop_path(x, drop_prob: float = 0.0, training: bool = False):
     shape = (x.shape[0],) + (1,) * (
         x.ndim - 1
     )  # work with diff dim tensors, not just 2D ConvNets
-    random_tensor = keep_prob + torch.rand(
-        shape, dtype=x.dtype, device=x.device
-    )
+    random_tensor = keep_prob + torch.rand(shape, dtype=x.dtype, device=x.device)
     random_tensor.floor_()  # binarize
     output = x.div(keep_prob) * random_tensor
     return output
@@ -125,14 +123,9 @@ def window_partition(x, window_size):
         windows: (num_windows*b, window_size, window_size, c)
     """
     b, h, w, c = x.shape
-    x = x.view(
-        b, h // window_size, window_size, w // window_size, window_size, c
-    )
+    x = x.view(b, h // window_size, window_size, w // window_size, window_size, c)
     windows = (
-        x
-        .permute(0, 1, 3, 2, 4, 5)
-        .contiguous()
-        .view(-1, window_size, window_size, c)
+        x.permute(0, 1, 3, 2, 4, 5).contiguous().view(-1, window_size, window_size, c)
     )
     return windows
 
@@ -189,9 +182,7 @@ class WindowAttention(nn.Module):
 
         # define a parameter table of relative position bias
         self.relative_position_bias_table = nn.Parameter(
-            torch.zeros(
-                (2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads
-            )
+            torch.zeros((2 * window_size[0] - 1) * (2 * window_size[1] - 1), num_heads)
         )  # 2*Wh-1 * 2*Ww-1, nH
 
         self.qkv = nn.Linear(dim, dim * 3, bias=qkv_bias)
@@ -211,8 +202,7 @@ class WindowAttention(nn.Module):
         """
         b_, n, c = x.shape
         qkv = (
-            self
-            .qkv(x)
+            self.qkv(x)
             .reshape(b_, n, 3, self.num_heads, c // self.num_heads)
             .permute(2, 0, 3, 1, 4)
         )
@@ -225,9 +215,7 @@ class WindowAttention(nn.Module):
         q = q * self.scale
         attn = q @ k.transpose(-2, -1)
 
-        relative_position_bias = self.relative_position_bias_table[
-            rpi.view(-1)
-        ].view(
+        relative_position_bias = self.relative_position_bias_table[rpi.view(-1)].view(
             self.window_size[0] * self.window_size[1],
             self.window_size[0] * self.window_size[1],
             -1,
@@ -239,9 +227,9 @@ class WindowAttention(nn.Module):
 
         if mask is not None:
             nw = mask.shape[0]
-            attn = attn.view(
-                b_ // nw, nw, self.num_heads, n, n
-            ) + mask.unsqueeze(1).unsqueeze(0)
+            attn = attn.view(b_ // nw, nw, self.num_heads, n, n) + mask.unsqueeze(
+                1
+            ).unsqueeze(0)
             attn = attn.view(-1, self.num_heads, n, n)
             attn = self.softmax(attn)
         else:
@@ -305,7 +293,7 @@ class HAB(nn.Module):
             self.shift_size = 0
             self.window_size = min(self.input_resolution)
         assert 0 <= self.shift_size < self.window_size, (
-            'shift_size must in 0-window_size'
+            "shift_size must in 0-window_size"
         )
 
         self.norm1 = norm_layer(dim)
@@ -326,9 +314,7 @@ class HAB(nn.Module):
             squeeze_factor=squeeze_factor,
         )
 
-        self.drop_path = (
-            DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
-        )
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
         self.norm2 = norm_layer(dim)
         mlp_hidden_dim = int(dim * mlp_ratio)
         self.mlp = Mlp(
@@ -373,12 +359,8 @@ class HAB(nn.Module):
         attn_windows = self.attn(x_windows, rpi=rpi_sa, mask=attn_mask)
 
         # merge windows
-        attn_windows = attn_windows.view(
-            -1, self.window_size, self.window_size, c
-        )
-        shifted_x = window_reverse(
-            attn_windows, self.window_size, h, w
-        )  # b h' w' c
+        attn_windows = attn_windows.view(-1, self.window_size, self.window_size, c)
+        shifted_x = window_reverse(attn_windows, self.window_size, h, w)  # b h' w' c
 
         # reverse cyclic shift
         if self.shift_size > 0:
@@ -458,9 +440,7 @@ class OCAB(nn.Module):
         x = self.norm1(x)
         x = x.view(b, h, w, c)
 
-        qkv = (
-            self.qkv(x).reshape(b, h, w, 3, c).permute(3, 0, 4, 1, 2)
-        )  # 3, b, c, h, w
+        qkv = self.qkv(x).reshape(b, h, w, 3, c).permute(3, 0, 4, 1, 2)  # 3, b, c, h, w
         q = qkv[0].permute(0, 2, 3, 1)  # b, h, w, c
         kv = torch.cat((qkv[1], qkv[2]), dim=1)  # b, 2*c, h, w
 
@@ -475,7 +455,7 @@ class OCAB(nn.Module):
         kv_windows = self.unfold(kv)  # b, c*w*w, nw
         kv_windows = rearrange(
             kv_windows,
-            'b (nc ch owh oww) nw -> nc (b nw) (owh oww) ch',
+            "b (nc ch owh oww) nw -> nc (b nw) (owh oww) ch",
             nc=2,
             ch=c,
             owh=self.overlap_win_size,
@@ -508,9 +488,7 @@ class OCAB(nn.Module):
         q = q * self.scale
         attn = q @ k.transpose(-2, -1)
 
-        relative_position_bias = self.relative_position_bias_table[
-            rpi.view(-1)
-        ].view(
+        relative_position_bias = self.relative_position_bias_table[rpi.view(-1)].view(
             self.window_size * self.window_size,
             self.overlap_win_size * self.overlap_win_size,
             -1,
@@ -584,28 +562,30 @@ class AttenBlocks(nn.Module):
         self.use_checkpoint = use_checkpoint
 
         # build blocks
-        self.blocks = nn.ModuleList([
-            HAB(
-                dim=dim,
-                input_resolution=input_resolution,
-                num_heads=num_heads,
-                window_size=window_size,
-                shift_size=0 if (i % 2 == 0) else window_size // 2,
-                compress_ratio=compress_ratio,
-                squeeze_factor=squeeze_factor,
-                conv_scale=conv_scale,
-                mlp_ratio=mlp_ratio,
-                qkv_bias=qkv_bias,
-                qk_scale=qk_scale,
-                drop=drop,
-                attn_drop=attn_drop,
-                drop_path=drop_path[i]
-                if isinstance(drop_path, list)
-                else drop_path,
-                norm_layer=norm_layer,
-            )
-            for i in range(depth)
-        ])
+        self.blocks = nn.ModuleList(
+            [
+                HAB(
+                    dim=dim,
+                    input_resolution=input_resolution,
+                    num_heads=num_heads,
+                    window_size=window_size,
+                    shift_size=0 if (i % 2 == 0) else window_size // 2,
+                    compress_ratio=compress_ratio,
+                    squeeze_factor=squeeze_factor,
+                    conv_scale=conv_scale,
+                    mlp_ratio=mlp_ratio,
+                    qkv_bias=qkv_bias,
+                    qk_scale=qk_scale,
+                    drop=drop,
+                    attn_drop=attn_drop,
+                    drop_path=drop_path[i]
+                    if isinstance(drop_path, list)
+                    else drop_path,
+                    norm_layer=norm_layer,
+                )
+                for i in range(depth)
+            ]
+        )
 
         # OCAB
         self.overlap_attn = OCAB(
@@ -630,9 +610,9 @@ class AttenBlocks(nn.Module):
 
     def forward(self, x, x_size, params):
         for blk in self.blocks:
-            x = blk(x, x_size, params['rpi_sa'], params['attn_mask'])
+            x = blk(x, x_size, params["rpi_sa"], params["attn_mask"])
 
-        x = self.overlap_attn(x, x_size, params['rpi_oca'])
+        x = self.overlap_attn(x, x_size, params["rpi_oca"])
 
         if self.downsample is not None:
             x = self.downsample(x)
@@ -684,7 +664,7 @@ class RHAG(nn.Module):
         use_checkpoint=False,
         img_size=224,
         patch_size=4,
-        resi_connection='1conv',
+        resi_connection="1conv",
     ):
         super().__init__()
 
@@ -712,9 +692,9 @@ class RHAG(nn.Module):
             use_checkpoint=use_checkpoint,
         )
 
-        if resi_connection == '1conv':
+        if resi_connection == "1conv":
             self.conv = nn.Conv2d(dim, dim, 3, 1, 1)
-        elif resi_connection == 'identity':
+        elif resi_connection == "identity":
             self.conv = nn.Identity()
 
         self.patch_embed = PatchEmbed(
@@ -737,9 +717,7 @@ class RHAG(nn.Module):
         return (
             self.patch_embed(
                 self.conv(
-                    self.patch_unembed(
-                        self.residual_group(x, x_size, params), x_size
-                    )
+                    self.patch_unembed(self.residual_group(x, x_size, params), x_size)
                 )
             )
             + x
@@ -828,8 +806,7 @@ class PatchUnEmbed(nn.Module):
 
     def forward(self, x, x_size):
         x = (
-            x
-            .transpose(1, 2)
+            x.transpose(1, 2)
             .contiguous()
             .view(x.shape[0], self.embed_dim, x_size[0], x_size[1])
         )  # b Ph*Pw c
@@ -855,7 +832,7 @@ class Upsample(nn.Sequential):
             m.append(nn.PixelShuffle(3))
         else:
             raise ValueError(
-                f'scale {scale} is not supported. Supported scales: 2^n and 3.'
+                f"scale {scale} is not supported. Supported scales: 2^n and 3."
             )
         super().__init__(*m)
 
@@ -918,8 +895,8 @@ class HAT(nn.Module):
         use_checkpoint=False,
         upscale=1,
         img_range=1.0,
-        upsampler: Literal['pixelshuffle'] = 'pixelshuffle',
-        resi_connection='1conv',
+        upsampler: Literal["pixelshuffle"] = "pixelshuffle",
+        resi_connection="1conv",
         num_feat=64,
     ):
         super().__init__()
@@ -943,12 +920,8 @@ class HAT(nn.Module):
         # relative position index
         relative_position_index_SA = self.calculate_rpi_sa()
         relative_position_index_OCA = self.calculate_rpi_oca()
-        self.register_buffer(
-            'relative_position_index_SA', relative_position_index_SA
-        )
-        self.register_buffer(
-            'relative_position_index_OCA', relative_position_index_OCA
-        )
+        self.register_buffer("relative_position_index_SA", relative_position_index_SA)
+        self.register_buffer("relative_position_index_OCA", relative_position_index_OCA)
 
         # ------------------------- 1, shallow feature extraction ------------------------- #
         self.conv_first = nn.Conv2d(num_in_ch, embed_dim, 3, 1, 1)
@@ -1030,13 +1003,13 @@ class HAT(nn.Module):
         self.norm = norm_layer(self.num_features)
 
         # build the last conv layer in deep feature extraction
-        if resi_connection == '1conv':
+        if resi_connection == "1conv":
             self.conv_after_body = nn.Conv2d(embed_dim, embed_dim, 3, 1, 1)
-        elif resi_connection == 'identity':
+        elif resi_connection == "identity":
             self.conv_after_body = nn.Identity()
 
         # ------------------------- 3, high quality image reconstruction ------------------------- #
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             self.conv_before_upsample = nn.Sequential(
                 nn.Conv2d(embed_dim, num_feat, 3, 1, 1),
@@ -1068,9 +1041,7 @@ class HAT(nn.Module):
         relative_coords = relative_coords.permute(
             1, 2, 0
         ).contiguous()  # Wh*Ww, Wh*Ww, 2
-        relative_coords[:, :, 0] += (
-            self.window_size - 1
-        )  # shift to start from 0
+        relative_coords[:, :, 0] += self.window_size - 1  # shift to start from 0
         relative_coords[:, :, 1] += self.window_size - 1
         relative_coords[:, :, 0] *= 2 * self.window_size - 1
         relative_position_index = relative_coords.sum(-1)  # Wh*Ww, Wh*Ww
@@ -1079,22 +1050,16 @@ class HAT(nn.Module):
     def calculate_rpi_oca(self):
         # calculate relative position index for OCA
         window_size_ori = self.window_size
-        window_size_ext = self.window_size + int(
-            self.overlap_ratio * self.window_size
-        )
+        window_size_ext = self.window_size + int(self.overlap_ratio * self.window_size)
 
         coords_h = torch.arange(window_size_ori)
         coords_w = torch.arange(window_size_ori)
-        coords_ori = torch.stack(
-            torch.meshgrid([coords_h, coords_w])
-        )  # 2, ws, ws
+        coords_ori = torch.stack(torch.meshgrid([coords_h, coords_w]))  # 2, ws, ws
         coords_ori_flatten = torch.flatten(coords_ori, 1)  # 2, ws*ws
 
         coords_h = torch.arange(window_size_ext)
         coords_w = torch.arange(window_size_ext)
-        coords_ext = torch.stack(
-            torch.meshgrid([coords_h, coords_w])
-        )  # 2, wse, wse
+        coords_ext = torch.stack(torch.meshgrid([coords_h, coords_w]))  # 2, wse, wse
         coords_ext_flatten = torch.flatten(coords_ext, 1)  # 2, wse*wse
 
         relative_coords = (
@@ -1136,9 +1101,7 @@ class HAT(nn.Module):
         mask_windows = window_partition(
             img_mask, self.window_size
         )  # nw, window_size, window_size, 1
-        mask_windows = mask_windows.view(
-            -1, self.window_size * self.window_size
-        )
+        mask_windows = mask_windows.view(-1, self.window_size * self.window_size)
         attn_mask = mask_windows.unsqueeze(1) - mask_windows.unsqueeze(2)
         attn_mask = attn_mask.masked_fill(attn_mask != 0, -100.0).masked_fill(
             attn_mask == 0, 0.0
@@ -1147,7 +1110,7 @@ class HAT(nn.Module):
         return attn_mask
 
     def check_image_size(self, x):
-        return pad_to_multiple(x, self.window_size, mode='reflect')
+        return pad_to_multiple(x, self.window_size, mode="reflect")
 
     def forward_features(self, x):
         x_size = (x.shape[2], x.shape[3])
@@ -1156,9 +1119,9 @@ class HAT(nn.Module):
         # The original code is very time-consuming for large window size.
         attn_mask = self.calculate_mask(x_size).to(x.device)
         params = {
-            'attn_mask': attn_mask,
-            'rpi_sa': self.relative_position_index_SA,
-            'rpi_oca': self.relative_position_index_OCA,
+            "attn_mask": attn_mask,
+            "rpi_sa": self.relative_position_index_SA,
+            "rpi_oca": self.relative_position_index_OCA,
         }
 
         x = self.patch_embed(x)
@@ -1180,7 +1143,7 @@ class HAT(nn.Module):
         x = (x - self.mean) * self.img_range
         x = self.check_image_size(x)
 
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             x = self.conv_first(x)
             x = self.conv_after_body(self.forward_features(x)) + x

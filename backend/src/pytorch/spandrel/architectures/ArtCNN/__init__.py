@@ -17,10 +17,10 @@ class ArtCNNArch(Architecture[ArtCNN]):
         self,
     ) -> None:
         super().__init__(
-            id='ArtCNN',
-            name='ArtCNN',
+            id="ArtCNN",
+            name="ArtCNN",
             detect=KeyCondition.has_all(
-                'depth_to_space.upscale.0.bias',
+                "depth_to_space.upscale.0.bias",
             ),
         )
 
@@ -43,8 +43,8 @@ class ArtCNNArch(Architecture[ArtCNN]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if scale == 1 else 'SR',
-            tags=[f'{filters}nf', f'{n_block}nc'],
+            purpose="Restoration" if scale == 1 else "SR",
+            tags=[f"{filters}nf", f"{n_block}nc"],
             supports_half=True,
             supports_bfloat16=True,
             scale=scale,
@@ -53,4 +53,10 @@ class ArtCNNArch(Architecture[ArtCNN]):
         )
 
 
-__all__ = ['ArtCNN', 'ArtCNNArch', 'SizeRequirements', 'get_scale_and_output_channels', 'get_seq_len']
+__all__ = [
+    "ArtCNN",
+    "ArtCNNArch",
+    "SizeRequirements",
+    "get_scale_and_output_channels",
+    "get_seq_len",
+]

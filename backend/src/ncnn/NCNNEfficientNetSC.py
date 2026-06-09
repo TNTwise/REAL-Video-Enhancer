@@ -13,9 +13,9 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
     def __init__(
         self,
         threshold=0.3,
-        model_path='',
-        model_dtype='float32',
-        model_device='cpu',
+        model_path="",
+        model_dtype="float32",
+        model_device="cpu",
         model_gpu_id=0,
     ):
         """
@@ -43,20 +43,16 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
 
         # Load param and bin files
         # Expecting model_path to be the base path (e.g., "model" for "model.param" and "model.bin")
-        param_path = os.path.join(
-            model_path, os.path.basename(model_path) + '.param'
-        )
-        bin_path = os.path.join(
-            model_path, os.path.basename(model_path) + '.bin'
-        )
+        param_path = os.path.join(model_path, os.path.basename(model_path) + ".param")
+        bin_path = os.path.join(model_path, os.path.basename(model_path) + ".bin")
         self.net.load_param(param_path)
         self.net.load_model(bin_path)
 
         # Store input/output layer names (adjust based on actual model)
-        self.input_name = 'in0'
-        self.output_name = 'out0'
+        self.input_name = "in0"
+        self.output_name = "out0"
 
-    def _preprocess(self, frame: np.ndarray) -> 'ncnn.Mat':
+    def _preprocess(self, frame: np.ndarray) -> "ncnn.Mat":
         """
         Preprocess a numpy array frame for NCNN inference.
 
@@ -81,9 +77,7 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
 
         # Resize to 256x256 if needed
         if frame.shape[0] != 256 or frame.shape[1] != 256:
-            frame = cv2.resize(
-                frame, (256, 256), interpolation=cv2.INTER_LINEAR
-            )
+            frame = cv2.resize(frame, (256, 256), interpolation=cv2.INTER_LINEAR)
         # Convert to NCNN Mat (expects H, W, C format with contiguous memory)
         frame = np.ascontiguousarray(frame)
 
@@ -140,20 +134,20 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         combined_flat = combined.reshape(-1, h, w).astype(np.float32)
 
         if self.debug:
-            np.save('debug_combined_input.npy', combined_flat)
+            np.save("debug_combined_input.npy", combined_flat)
             # visualize channels 0-2 (first frame) and 3-5 (second frame)
             vis0 = np.transpose(combined_flat[:3], (1, 2, 0))
             vis1 = np.transpose(combined_flat[3:6], (1, 2, 0))
             cv2.imwrite(
-                'debug_input_frame0.png',
+                "debug_input_frame0.png",
                 np.clip(vis0 * 255, 0, 255).astype(np.uint8),
             )
             cv2.imwrite(
-                'debug_input_frame1.png',
+                "debug_input_frame1.png",
                 np.clip(vis1 * 255, 0, 255).astype(np.uint8),
             )
             print(
-                'input stats:',
+                "input stats:",
                 combined_flat.min(),
                 combined_flat.max(),
                 combined_flat.mean(),

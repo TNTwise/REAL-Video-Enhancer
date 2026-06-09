@@ -18,42 +18,42 @@ from .__arch.network_dncnn import DnCNN
 class DnCNNArch(Architecture[DnCNN]):
     def __init__(self) -> None:
         super().__init__(
-            id='DnCNN',
+            id="DnCNN",
             detect=KeyCondition.has_all(
-                'model.0.weight',
-                'model.0.bias',
-                'model.2.weight',
-                'model.2.bias',
+                "model.0.weight",
+                "model.0.bias",
+                "model.2.weight",
+                "model.2.bias",
                 KeyCondition.has_any(
                     KeyCondition.has_all(
                         # act_mode="R"
-                        'model.4.weight',
-                        'model.4.bias',
-                        'model.6.weight',
-                        'model.6.bias',
-                        'model.8.weight',
-                        'model.8.bias',
-                        'model.10.weight',
-                        'model.10.bias',
-                        'model.12.weight',
-                        'model.12.bias',
-                        'model.14.weight',
-                        'model.14.bias',
+                        "model.4.weight",
+                        "model.4.bias",
+                        "model.6.weight",
+                        "model.6.bias",
+                        "model.8.weight",
+                        "model.8.bias",
+                        "model.10.weight",
+                        "model.10.bias",
+                        "model.12.weight",
+                        "model.12.bias",
+                        "model.14.weight",
+                        "model.14.bias",
                     ),
                     KeyCondition.has_all(
                         # act_mode="BR"
-                        'model.3.weight',
-                        'model.3.bias',
-                        'model.3.running_mean',
-                        'model.3.running_var',
-                        'model.5.weight',
-                        'model.5.bias',
-                        'model.6.weight',
-                        'model.6.bias',
-                        'model.6.running_mean',
-                        'model.6.running_var',
-                        'model.8.weight',
-                        'model.8.bias',
+                        "model.3.weight",
+                        "model.3.bias",
+                        "model.3.running_mean",
+                        "model.3.running_var",
+                        "model.5.weight",
+                        "model.5.bias",
+                        "model.6.weight",
+                        "model.6.bias",
+                        "model.6.running_mean",
+                        "model.6.running_var",
+                        "model.8.weight",
+                        "model.8.bias",
                     ),
                 ),
             ),
@@ -66,23 +66,23 @@ class DnCNNArch(Architecture[DnCNN]):
         # nc = 64
         # nb = 17
         # act_mode = "BR"
-        mode: Literal['DnCNN', 'FDnCNN'] = 'DnCNN'
+        mode: Literal["DnCNN", "FDnCNN"] = "DnCNN"
 
-        in_nc = state_dict['model.0.weight'].shape[1]
-        nc = state_dict['model.0.weight'].shape[0]
+        in_nc = state_dict["model.0.weight"].shape[1]
+        nc = state_dict["model.0.weight"].shape[0]
 
-        layers = get_seq_len(state_dict, 'model')
-        out_nc = state_dict[f'model.{layers - 1}.weight'].shape[0]
+        layers = get_seq_len(state_dict, "model")
+        out_nc = state_dict[f"model.{layers - 1}.weight"].shape[0]
 
-        if 'model.3.weight' in state_dict:
-            act_mode = 'BR'
+        if "model.3.weight" in state_dict:
+            act_mode = "BR"
             nb = (layers - 3) // 3 + 2
         else:
-            act_mode = 'R'
+            act_mode = "R"
             nb = (layers - 3) // 2 + 2
 
         if in_nc != out_nc:
-            mode = 'FDnCNN'
+            mode = "FDnCNN"
 
         model = DnCNN(
             in_nc=in_nc,
@@ -93,13 +93,13 @@ class DnCNNArch(Architecture[DnCNN]):
             mode=mode,
         )
 
-        tags = [f'{nc}nc', f'{nb}nb']
-        if mode == 'FDnCNN':
-            tags.insert(0, 'FDnCNN')
+        tags = [f"{nc}nc", f"{nb}nb"]
+        if mode == "FDnCNN":
+            tags.insert(0, "FDnCNN")
             in_nc -= 1
 
         def call(model: DnCNN, image: torch.Tensor) -> torch.Tensor:
-            if model.mode == 'FDnCNN':
+            if model.mode == "FDnCNN":
                 # add noise level map
                 _, _, H, W = image.shape  # noqa: N806
 
@@ -113,7 +113,7 @@ class DnCNNArch(Architecture[DnCNN]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration',
+            purpose="Restoration",
             tags=tags,
             supports_half=False,  # TODO: verify
             supports_bfloat16=True,
@@ -125,4 +125,4 @@ class DnCNNArch(Architecture[DnCNN]):
         )
 
 
-__all__ = ['DnCNN', 'DnCNNArch']
+__all__ = ["DnCNN", "DnCNNArch"]

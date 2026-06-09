@@ -87,8 +87,8 @@ class TransformerStage(nn.Module):
         stripe_shift,
         mlp_ratio=4.0,
         qkv_bias=True,
-        qkv_proj_type='linear',
-        anchor_proj_type='avgpool',
+        qkv_proj_type="linear",
+        anchor_proj_type="avgpool",
         anchor_one_stage=True,
         anchor_window_down_factor=1,
         drop=0.0,
@@ -97,8 +97,8 @@ class TransformerStage(nn.Module):
         norm_layer=nn.LayerNorm,
         pretrained_window_size=[0, 0],
         pretrained_stripe_size=[0, 0],
-        conv_type='1conv',
-        init_method='',
+        conv_type="1conv",
+        init_method="",
         fairscale_checkpoint=False,
         offload_to_cpu=False,
         args: GRLConfig = None,  # type: ignore
@@ -120,7 +120,7 @@ class TransformerStage(nn.Module):
                 window_shift=i % 2 == 0,
                 stripe_size=stripe_size,
                 stripe_groups=stripe_groups,
-                stripe_type='H' if i % 2 == 0 else 'W',
+                stripe_type="H" if i % 2 == 0 else "W",
                 stripe_shift=i % 4 in [2, 3] if stripe_shift else False,
                 mlp_ratio=mlp_ratio,
                 qkv_bias=qkv_bias,
@@ -130,13 +130,11 @@ class TransformerStage(nn.Module):
                 anchor_window_down_factor=anchor_window_down_factor,
                 drop=drop,
                 attn_drop=attn_drop,
-                drop_path=drop_path[i]
-                if isinstance(drop_path, list)
-                else drop_path,
+                drop_path=drop_path[i] if isinstance(drop_path, list) else drop_path,
                 norm_layer=norm_layer,
                 pretrained_window_size=pretrained_window_size,
                 pretrained_stripe_size=pretrained_stripe_size,
-                res_scale=0.1 if init_method == 'r' else 1.0,
+                res_scale=0.1 if init_method == "r" else 1.0,
                 args=args,
             )
 
@@ -152,23 +150,18 @@ class TransformerStage(nn.Module):
 
     def _init_weights(self):
         for n, m in self.named_modules():
-            if self.init_method == 'w':
-                if (
-                    isinstance(m, (nn.Linear, nn.Conv2d))
-                    and n.find('cpb_mlp') < 0
-                ):
+            if self.init_method == "w":
+                if isinstance(m, (nn.Linear, nn.Conv2d)) and n.find("cpb_mlp") < 0:
                     # print("nn.Linear and nn.Conv2d weight initilization")
                     m.weight.data *= 0.1
-            elif self.init_method == 'l':
+            elif self.init_method == "l":
                 if isinstance(m, nn.LayerNorm):
                     # print("nn.LayerNorm initialization")
                     nn.init.constant_(m.bias, 0)
                     nn.init.constant_(m.weight, 0)
-            elif self.init_method.find('t') >= 0:
-                scale = 0.1 ** (len(self.init_method) - 1) * int(
-                    self.init_method[-1]
-                )
-                if isinstance(m, nn.Linear) and n.find('cpb_mlp') < 0:
+            elif self.init_method.find("t") >= 0:
+                scale = 0.1 ** (len(self.init_method) - 1) * int(self.init_method[-1])
+                if isinstance(m, nn.Linear) and n.find("cpb_mlp") < 0:
                     trunc_normal_(m.weight, std=scale)
                 elif isinstance(m, nn.Conv2d):
                     m.weight.data *= 0.1
@@ -177,7 +170,7 @@ class TransformerStage(nn.Module):
                 # )
             else:
                 raise NotImplementedError(
-                    f'Parameter initialization method {self.init_method} not implemented in TransformerStage.'
+                    f"Parameter initialization method {self.init_method} not implemented in TransformerStage."
                 )
 
     def forward(self, x, x_size, table_index_mask):
@@ -251,7 +244,7 @@ class GRL(nn.Module):
         embed_dim=96,
         upscale=1,
         img_range=1.0,
-        upsampler='',
+        upsampler="",
         depths: list[int] = [6, 6, 6, 6, 6, 6],
         num_heads_window: list[int] = [3, 3, 3, 3, 3, 3],
         num_heads_stripe: list[int] = [3, 3, 3, 3, 3, 3],
@@ -261,11 +254,11 @@ class GRL(nn.Module):
         stripe_shift=False,
         mlp_ratio=4.0,
         qkv_bias=True,
-        qkv_proj_type='linear',
-        anchor_proj_type='avgpool',
+        qkv_proj_type="linear",
+        anchor_proj_type="avgpool",
         anchor_one_stage=True,
         anchor_window_down_factor=1,
-        out_proj_type: Literal['linear', 'conv2d'] = 'linear',
+        out_proj_type: Literal["linear", "conv2d"] = "linear",
         local_connection=False,
         drop_rate=0.0,
         attn_drop_rate=0.0,
@@ -273,8 +266,8 @@ class GRL(nn.Module):
         norm_layer=nn.LayerNorm,
         pretrained_window_size: list[int] = [0, 0],
         pretrained_stripe_size: list[int] = [0, 0],
-        conv_type='1conv',
-        init_method='n',  # initialization method of the weight parameters used to train large scale models.
+        conv_type="1conv",
+        init_method="n",  # initialization method of the weight parameters used to train large scale models.
         fairscale_checkpoint=False,  # fairscale activation checkpointing
         offload_to_cpu=False,
         euclidean_dist=False,
@@ -373,7 +366,7 @@ class GRL(nn.Module):
 
         #####################################################################################################
         # 3, high quality image reconstruction ################################
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             self.conv_before_upsample = nn.Sequential(
                 nn.Conv2d(embed_dim, num_out_feats, 3, 1, 1),
@@ -381,16 +374,16 @@ class GRL(nn.Module):
             )
             self.upsample = Upsample(upscale, num_out_feats)
             self.conv_last = nn.Conv2d(num_out_feats, out_channels, 3, 1, 1)
-        elif self.upsampler == 'pixelshuffledirect':
+        elif self.upsampler == "pixelshuffledirect":
             # for lightweight SR (to save parameters)
             self.upsample = UpsampleOneStep(
                 upscale,
                 embed_dim,
                 out_channels,
             )
-        elif self.upsampler == 'nearest+conv':
+        elif self.upsampler == "nearest+conv":
             # for real-world SR (less artifacts)
-            assert self.upscale == 4, 'only support x4 now.'
+            assert self.upscale == 4, "only support x4 now."
             self.conv_before_upsample = nn.Sequential(
                 nn.Conv2d(embed_dim, num_out_feats, 3, 1, 1),
                 nn.LeakyReLU(inplace=True),
@@ -405,7 +398,7 @@ class GRL(nn.Module):
             self.conv_last = nn.Conv2d(embed_dim, out_channels, 3, 1, 1)
 
         self.apply(self._init_weights)
-        if init_method in ['l', 'w'] or init_method.find('t') >= 0:
+        if init_method in ["l", "w"] or init_method.find("t") >= 0:
             for layer in self.layers:
                 layer._init_weights()
 
@@ -418,17 +411,13 @@ class GRL(nn.Module):
         # ss - stripe_size, sss - stripe_shift_size
         # ss ~= self.stripe_size
         # sss ~= self.stripe_size / 2
-        ss, sss = get_stripe_info(
-            self.stripe_size, self.stripe_groups, True, x_size
-        )
+        ss, sss = get_stripe_info(self.stripe_size, self.stripe_groups, True, x_size)
         df = self.anchor_window_down_factor
 
         table_w = get_relative_coords_table_all(
             self.window_size, self.pretrained_window_size
         )
-        table_sh = get_relative_coords_table_all(
-            ss, self.pretrained_stripe_size, df
-        )
+        table_sh = get_relative_coords_table_all(ss, self.pretrained_stripe_size, df)
         table_sv = get_relative_coords_table_all(
             ss[::-1], self.pretrained_stripe_size, df
         )
@@ -445,38 +434,38 @@ class GRL(nn.Module):
         mask_sv_a2w = calculate_mask_all(x_size, ss[::-1], sss[::-1], df, False)
         mask_sv_w2a = calculate_mask_all(x_size, ss[::-1], sss[::-1], df, True)
         return {
-            'table_w': table_w,
-            'table_sh': table_sh,
-            'table_sv': table_sv,
-            'index_w': index_w,
-            'index_sh_a2w': index_sh_a2w,
-            'index_sh_w2a': index_sh_w2a,
-            'index_sv_a2w': index_sv_a2w,
-            'index_sv_w2a': index_sv_w2a,
-            'mask_w': mask_w,
-            'mask_sh_a2w': mask_sh_a2w,
-            'mask_sh_w2a': mask_sh_w2a,
-            'mask_sv_a2w': mask_sv_a2w,
-            'mask_sv_w2a': mask_sv_w2a,
+            "table_w": table_w,
+            "table_sh": table_sh,
+            "table_sv": table_sv,
+            "index_w": index_w,
+            "index_sh_a2w": index_sh_a2w,
+            "index_sh_w2a": index_sh_w2a,
+            "index_sv_a2w": index_sv_a2w,
+            "index_sv_w2a": index_sv_w2a,
+            "mask_w": mask_w,
+            "mask_sh_a2w": mask_sh_a2w,
+            "mask_sh_w2a": mask_sh_w2a,
+            "mask_sv_a2w": mask_sv_a2w,
+            "mask_sv_w2a": mask_sv_w2a,
         }
 
     def get_table_index_mask(self, device, input_resolution: tuple[int, int]):
         # Used during forward pass
         if input_resolution == self.input_resolution:
             return {
-                'table_w': self.table_w,
-                'table_sh': self.table_sh,
-                'table_sv': self.table_sv,
-                'index_w': self.index_w,
-                'index_sh_a2w': self.index_sh_a2w,
-                'index_sh_w2a': self.index_sh_w2a,
-                'index_sv_a2w': self.index_sv_a2w,
-                'index_sv_w2a': self.index_sv_w2a,
-                'mask_w': self.mask_w,
-                'mask_sh_a2w': self.mask_sh_a2w,
-                'mask_sh_w2a': self.mask_sh_w2a,
-                'mask_sv_a2w': self.mask_sv_a2w,
-                'mask_sv_w2a': self.mask_sv_w2a,
+                "table_w": self.table_w,
+                "table_sh": self.table_sh,
+                "table_sv": self.table_sv,
+                "index_w": self.index_w,
+                "index_sh_a2w": self.index_sh_a2w,
+                "index_sh_w2a": self.index_sh_w2a,
+                "index_sv_a2w": self.index_sv_a2w,
+                "index_sv_w2a": self.index_sv_w2a,
+                "mask_w": self.mask_w,
+                "mask_sh_a2w": self.mask_sh_a2w,
+                "mask_sh_w2a": self.mask_sh_w2a,
+                "mask_sv_a2w": self.mask_sv_a2w,
+                "mask_sv_w2a": self.mask_sv_w2a,
             }
         table_index_mask = self.set_table_index_mask(input_resolution)
         for k, v in table_index_mask.items():
@@ -501,17 +490,17 @@ class GRL(nn.Module):
 
     @torch.jit.ignore  # type: ignore
     def no_weight_decay(self):
-        return {'absolute_pos_embed'}
+        return {"absolute_pos_embed"}
 
     @torch.jit.ignore  # type: ignore
     def no_weight_decay_keywords(self):
-        return {'relative_position_bias_table'}
+        return {"relative_position_bias_table"}
 
     def check_image_size(self, x):
         try:
-            return pad_to_multiple(x, self.pad_size, mode='reflect')
+            return pad_to_multiple(x, self.pad_size, mode="reflect")
         except BaseException:  # TODO: this is suspicious
-            return pad_to_multiple(x, self.pad_size, mode='constant')
+            return pad_to_multiple(x, self.pad_size, mode="constant")
 
     def forward_features(self, x):
         x_size = (x.shape[2], x.shape[3])
@@ -535,34 +524,30 @@ class GRL(nn.Module):
         self.mean = self.mean.type_as(x)
         x = (x - self.mean) * self.img_range
 
-        if self.upsampler == 'pixelshuffle':
+        if self.upsampler == "pixelshuffle":
             # for classical SR
             x = self.conv_first(x)
             x = self.conv_after_body(self.forward_features(x)) + x
             x = self.conv_before_upsample(x)
             x = self.conv_last(self.upsample(x))
-        elif self.upsampler == 'pixelshuffledirect':
+        elif self.upsampler == "pixelshuffledirect":
             # for lightweight SR
             x = self.conv_first(x)
             x = self.conv_after_body(self.forward_features(x)) + x
             x = self.upsample(x)
-        elif self.upsampler == 'nearest+conv':
+        elif self.upsampler == "nearest+conv":
             # for real-world SR
             x = self.conv_first(x)
             x = self.conv_after_body(self.forward_features(x)) + x
             x = self.conv_before_upsample(x)
             x = self.lrelu(
                 self.conv_up1(
-                    torch.nn.functional.interpolate(
-                        x, scale_factor=2, mode='nearest'
-                    )
+                    torch.nn.functional.interpolate(x, scale_factor=2, mode="nearest")
                 )
             )
             x = self.lrelu(
                 self.conv_up2(
-                    torch.nn.functional.interpolate(
-                        x, scale_factor=2, mode='nearest'
-                    )
+                    torch.nn.functional.interpolate(x, scale_factor=2, mode="nearest")
                 )
             )
             x = self.conv_last(self.lrelu(self.conv_hr(x)))

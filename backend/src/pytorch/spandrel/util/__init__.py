@@ -17,18 +17,18 @@ class KeyCondition:
     """
 
     def __init__(
-        self, kind: Literal['all', 'any'], keys: tuple[str | KeyCondition, ...]
+        self, kind: Literal["all", "any"], keys: tuple[str | KeyCondition, ...]
     ):
         self._keys = keys
-        self._kind: Literal['all', 'any'] = kind
+        self._kind: Literal["all", "any"] = kind
 
     @staticmethod
     def has_all(*keys: str | KeyCondition) -> KeyCondition:
-        return KeyCondition('all', keys)
+        return KeyCondition("all", keys)
 
     @staticmethod
     def has_any(*keys: str | KeyCondition) -> KeyCondition:
-        return KeyCondition('any', keys)
+        return KeyCondition("any", keys)
 
     def __call__(self, state_dict: Mapping[str, object]) -> bool:
         def _detect(key: str | KeyCondition) -> bool:
@@ -36,14 +36,12 @@ class KeyCondition:
                 return key(state_dict)
             return key in state_dict
 
-        if self._kind == 'all':
+        if self._kind == "all":
             return all(_detect(key) for key in self._keys)
         return any(_detect(key) for key in self._keys)
 
 
-def get_first_seq_index(
-    state_dict: Mapping[str, object], key_pattern: str
-) -> int:
+def get_first_seq_index(state_dict: Mapping[str, object], key_pattern: str) -> int:
     """
     Returns the maximum index `i` such that `key_pattern.format(str(i))` is in `state`.
 
@@ -69,12 +67,12 @@ def get_seq_len(state_dict: Mapping[str, object], seq_key: str) -> int:
     Example:
         get_seq_len(state, "body") -> 5
     """
-    prefix = seq_key + '.'
+    prefix = seq_key + "."
 
     keys: set[int] = set()
     for k in state_dict.keys():
         if k.startswith(prefix):
-            index = k[len(prefix) :].split('.', maxsplit=1)[0]
+            index = k[len(prefix) :].split(".", maxsplit=1)[0]
             keys.add(int(index))
 
     if len(keys) == 0:
@@ -82,9 +80,7 @@ def get_seq_len(state_dict: Mapping[str, object], seq_key: str) -> int:
     return max(keys) + 1
 
 
-def get_scale_and_output_channels(
-    x: int, input_channels: int
-) -> tuple[int, int]:
+def get_scale_and_output_channels(x: int, input_channels: int) -> tuple[int, int]:
     """
     Returns a scale and number of output channels such that `scale**2 * out_nc = x`.
 
@@ -110,14 +106,14 @@ def get_scale_and_output_channels(
             return int(math.sqrt(x // c)), c
 
     raise AssertionError(
-        f'Expected output channels to be either 1, 3, or 4.'
-        f' Could not find a pair (scale, out_nc) such that `scale**2 * out_nc = {x}`'
+        f"Expected output channels to be either 1, 3, or 4."
+        f" Could not find a pair (scale, out_nc) such that `scale**2 * out_nc = {x}`"
     )
 
 
 def get_pixelshuffle_params(
     state_dict: Mapping[str, object],
-    upsample_key: str = 'upsample',
+    upsample_key: str = "upsample",
     default_nf: int = 64,
 ) -> tuple[int, int]:
     """
@@ -131,7 +127,7 @@ def get_pixelshuffle_params(
     num_feat = default_nf
 
     for i in range(0, 10, 2):
-        key = f'{upsample_key}.{i}.weight'
+        key = f"{upsample_key}.{i}.weight"
         if key not in state_dict:
             break
 
@@ -165,7 +161,7 @@ def store_hyperparameters(*, extra_parameters: Mapping[str, object] = {}):
     class WithHyperparameters(Protocol):
         hyperparameters: dict[str, Any]
 
-    C = TypeVar('C', bound=WithHyperparameters)
+    C = TypeVar("C", bound=WithHyperparameters)
 
     def inner(cls: type[C]) -> type[C]:
         old_init = cls.__init__
@@ -175,17 +171,17 @@ def store_hyperparameters(*, extra_parameters: Mapping[str, object] = {}):
 
         if spec.varargs is not None:
             raise UserWarning(
-                'Class has *args, which is not allowed in combination with @store_hyperparameters'
+                "Class has *args, which is not allowed in combination with @store_hyperparameters"
             )
         if spec.varkw is not None:
             raise UserWarning(
-                'Class has **kwargs, which is not allowed in combination with @store_hyperparameters'
+                "Class has **kwargs, which is not allowed in combination with @store_hyperparameters"
             )
-        if spec.args != ['self']:
+        if spec.args != ["self"]:
             raise UserWarning(
-                '@store_hyperparameters requires all arguments of `'
+                "@store_hyperparameters requires all arguments of `"
                 + cls.__name__
-                + '.__init__` after `self` to be keyword arguments. Use `def __init__(self, *, a, b, c):`.'
+                + ".__init__` after `self` to be keyword arguments. Use `def __init__(self, *, a, b, c):`."
             )
 
         @functools.wraps(old_init)
@@ -195,7 +191,7 @@ def store_hyperparameters(*, extra_parameters: Mapping[str, object] = {}):
                 if k in kwargs:
                     if kwargs[k] != v:
                         raise ValueError(
-                            f'Expected hyperparameter {k} to be {v}, but got {kwargs[k]}'
+                            f"Expected hyperparameter {k} to be {v}, but got {kwargs[k]}"
                         )
                     del kwargs[k]
 
@@ -209,10 +205,10 @@ def store_hyperparameters(*, extra_parameters: Mapping[str, object] = {}):
 
 
 __all__ = [
-    'KeyCondition',
-    'get_first_seq_index',
-    'get_pixelshuffle_params',
-    'get_scale_and_output_channels',
-    'get_seq_len',
-    'store_hyperparameters',
+    "KeyCondition",
+    "get_first_seq_index",
+    "get_pixelshuffle_params",
+    "get_scale_and_output_channels",
+    "get_seq_len",
+    "store_hyperparameters",
 ]

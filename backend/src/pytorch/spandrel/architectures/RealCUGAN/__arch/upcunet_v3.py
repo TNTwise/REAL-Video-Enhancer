@@ -44,7 +44,7 @@ def dq(inp, if_half: bool, cache_mode, delta, minn, device):
         if if_half:
             return inp.half() / 255 * delta + minn  # 不用CPU转移
         return inp.float() / 255 * delta + minn
-    raise ValueError('cache_mode config error')
+    raise ValueError("cache_mode config error")
 
 
 class SEBlock(nn.Module):
@@ -58,7 +58,7 @@ class SEBlock(nn.Module):
         )
 
     def forward(self, x):
-        if 'Half' in x.type():  # torch.HalfTensor/torch.cuda.HalfTensor
+        if "Half" in x.type():  # torch.HalfTensor/torch.cuda.HalfTensor
             x0 = torch.mean(x.float(), dim=(2, 3), keepdim=True).half()
         else:
             x0 = torch.mean(x, dim=(2, 3), keepdim=True)
@@ -117,9 +117,7 @@ class UNet1(nn.Module):
 
         for m in self.modules():
             if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-                nn.init.kaiming_normal_(
-                    m.weight, mode='fan_out', nonlinearity='relu'
-                )
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.Linear):
                 nn.init.normal_(m.weight, 0, 0.01)
                 if m.bias is not None:  # type: ignore
@@ -171,9 +169,7 @@ class UNet1x3(nn.Module):
 
         for m in self.modules():
             if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-                nn.init.kaiming_normal_(
-                    m.weight, mode='fan_out', nonlinearity='relu'
-                )
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.Linear):
                 nn.init.normal_(m.weight, 0, 0.01)
                 if m.bias is not None:  # type: ignore
@@ -230,9 +226,7 @@ class UNet2(nn.Module):
 
         for m in self.modules():
             if isinstance(m, (nn.Conv2d, nn.ConvTranspose2d)):
-                nn.init.kaiming_normal_(
-                    m.weight, mode='fan_out', nonlinearity='relu'
-                )
+                nn.init.kaiming_normal_(m.weight, mode="fan_out", nonlinearity="relu")
             elif isinstance(m, nn.Linear):
                 nn.init.normal_(m.weight, 0, 0.01)
                 if m.bias is not None:  # type: ignore
@@ -290,7 +284,7 @@ class UNet2(nn.Module):
         return z
 
 
-@store_hyperparameters(extra_parameters={'scale': 2, 'fast': False})
+@store_hyperparameters(extra_parameters={"scale": 2, "fast": False})
 class UpCunet2x(nn.Module):
     hyperparameters = {}
 
@@ -298,7 +292,7 @@ class UpCunet2x(nn.Module):
         super().__init__()
         self.pro: Tensor | None
         if pro:
-            self.register_buffer('pro', torch.zeros(1))
+            self.register_buffer("pro", torch.zeros(1))
         else:
             self.pro = None
 
@@ -318,9 +312,7 @@ class UpCunet2x(nn.Module):
 
         ph = ((h0 - 1) // 2 + 1) * 2
         pw = ((w0 - 1) // 2 + 1) * 2
-        x = F.pad(
-            x, (18, 18 + pw - w0, 18, 18 + ph - h0), 'reflect'
-        )  # 需要保证被2整除
+        x = F.pad(x, (18, 18 + pw - w0, 18, 18 + ph - h0), "reflect")  # 需要保证被2整除
         x = self.unet1.forward(x)
         x0 = self.unet2.forward(x, alpha)
         x = F.pad(x, (-20, -20, -20, -20))
@@ -334,7 +326,7 @@ class UpCunet2x(nn.Module):
         return x
 
 
-@store_hyperparameters(extra_parameters={'scale': 3})
+@store_hyperparameters(extra_parameters={"scale": 3})
 class UpCunet3x(nn.Module):
     hyperparameters = {}
 
@@ -342,7 +334,7 @@ class UpCunet3x(nn.Module):
         super().__init__()
         self.pro: Tensor | None
         if pro:
-            self.register_buffer('pro', torch.zeros(1))
+            self.register_buffer("pro", torch.zeros(1))
         else:
             self.pro = None
 
@@ -362,9 +354,7 @@ class UpCunet3x(nn.Module):
 
         ph = ((h0 - 1) // 4 + 1) * 4
         pw = ((w0 - 1) // 4 + 1) * 4
-        x = F.pad(
-            x, (14, 14 + pw - w0, 14, 14 + ph - h0), 'reflect'
-        )  # 需要保证被2整除
+        x = F.pad(x, (14, 14 + pw - w0, 14, 14 + ph - h0), "reflect")  # 需要保证被2整除
         x = self.unet1.forward(x)
         x0 = self.unet2.forward(x, alpha)
         x = F.pad(x, (-20, -20, -20, -20))
@@ -378,7 +368,7 @@ class UpCunet3x(nn.Module):
         return x
 
 
-@store_hyperparameters(extra_parameters={'scale': 4})
+@store_hyperparameters(extra_parameters={"scale": 4})
 class UpCunet4x(nn.Module):
     hyperparameters = {}
 
@@ -386,16 +376,14 @@ class UpCunet4x(nn.Module):
         super().__init__()
         self.pro: Tensor | None
         if pro:
-            self.register_buffer('pro', torch.zeros(1))
+            self.register_buffer("pro", torch.zeros(1))
         else:
             self.pro = None
 
         self.unet1 = UNet1(in_channels, 64, deconv=True)
         self.unet2 = UNet2(64, 64, deconv=False)
         self.ps = nn.PixelShuffle(2)
-        self.conv_final = nn.Conv2d(
-            64, 4 * out_channels, 3, 1, padding=0, bias=True
-        )
+        self.conv_final = nn.Conv2d(64, 4 * out_channels, 3, 1, padding=0, bias=True)
 
     @property
     def is_pro(self):
@@ -412,9 +400,7 @@ class UpCunet4x(nn.Module):
 
         ph = ((h0 - 1) // 2 + 1) * 2
         pw = ((w0 - 1) // 2 + 1) * 2
-        x = F.pad(
-            x, (19, 19 + pw - w0, 19, 19 + ph - h0), 'reflect'
-        )  # 需要保证被2整除
+        x = F.pad(x, (19, 19 + pw - w0, 19, 19 + ph - h0), "reflect")  # 需要保证被2整除
         x = self.unet1.forward(x)
         x0 = self.unet2.forward(x, alpha)
         x1 = F.pad(x, (-20, -20, -20, -20))
@@ -424,7 +410,7 @@ class UpCunet4x(nn.Module):
         x = self.ps(x)
         if w0 != pw or h0 != ph:
             x = x[:, :, : h0 * 4, : w0 * 4]
-        x += F.interpolate(x00, scale_factor=4, mode='nearest')
+        x += F.interpolate(x00, scale_factor=4, mode="nearest")
 
         if self.is_pro:
             x = (x - 0.15) / 0.7
@@ -432,7 +418,7 @@ class UpCunet4x(nn.Module):
         return x
 
 
-@store_hyperparameters(extra_parameters={'scale': 2, 'fast': True})
+@store_hyperparameters(extra_parameters={"scale": 2, "fast": True})
 class UpCunet2x_fast(nn.Module):
     hyperparameters = {}
 
@@ -441,9 +427,7 @@ class UpCunet2x_fast(nn.Module):
         self.unet1 = UNet1(4 * in_channels, 64, deconv=True)
         self.unet2 = UNet2(64, 64, deconv=False)
         self.ps = nn.PixelShuffle(2)
-        self.conv_final = nn.Conv2d(
-            64, 4 * out_channels, 3, 1, padding=0, bias=True
-        )
+        self.conv_final = nn.Conv2d(64, 4 * out_channels, 3, 1, padding=0, bias=True)
         self.inv = nn.PixelUnshuffle(2)
 
     def forward(self, x: Tensor):
@@ -451,9 +435,7 @@ class UpCunet2x_fast(nn.Module):
         x00 = x
         ph = ((h0 - 1) // 2 + 1) * 2
         pw = ((w0 - 1) // 2 + 1) * 2
-        x = F.pad(
-            x, (38, 38 + pw - w0, 38, 38 + ph - h0), 'reflect'
-        )  # 需要保证被2整除
+        x = F.pad(x, (38, 38 + pw - w0, 38, 38 + ph - h0), "reflect")  # 需要保证被2整除
         x = self.inv(x)  # +18
         x = self.unet1.forward(x)
         x0 = self.unet2.forward(x)
@@ -464,5 +446,5 @@ class UpCunet2x_fast(nn.Module):
         x = self.ps(x)
         if w0 != pw or h0 != ph:
             x = x[:, :, : h0 * 2, : w0 * 2]
-        x += F.interpolate(x00, scale_factor=2, mode='nearest')
+        x += F.interpolate(x00, scale_factor=2, mode="nearest")
         return x

@@ -15,21 +15,19 @@ from .__arch.restoreformer_arch import RestoreFormer
 class RestoreFormerArch(Architecture[RestoreFormer]):
     def __init__(self) -> None:
         super().__init__(
-            id='RestoreFormer',
+            id="RestoreFormer",
             detect=KeyCondition.has_all(
-                'quantize.embedding.weight',
-                'encoder.conv_in.weight',
-                'quant_conv.weight',
-                'encoder.down.0.block.0.norm1.weight',
-                'encoder.conv_out.weight',
-                'decoder.conv_out.weight',
+                "quantize.embedding.weight",
+                "encoder.conv_in.weight",
+                "quant_conv.weight",
+                "encoder.down.0.block.0.norm1.weight",
+                "encoder.conv_out.weight",
+                "decoder.conv_out.weight",
             ),
         )
 
     @override
-    def load(
-        self, state_dict: StateDict
-    ) -> ImageModelDescriptor[RestoreFormer]:
+    def load(self, state_dict: StateDict) -> ImageModelDescriptor[RestoreFormer]:
         n_embed = 1024
         embed_dim = 256
         ch = 64
@@ -43,31 +41,26 @@ class RestoreFormerArch(Architecture[RestoreFormer]):
         z_channels = 256
         double_z = False
         enable_mid = True
-        head_size = (
-            8  # cannot be deduced from the shape of tensors in state_dict
-        )
+        head_size = 8  # cannot be deduced from the shape of tensors in state_dict
 
-        n_embed = state_dict['quantize.embedding.weight'].shape[0]
-        embed_dim = state_dict['quantize.embedding.weight'].shape[1]
-        z_channels = state_dict['quant_conv.weight'].shape[1]
-        double_z = (
-            state_dict['encoder.conv_out.weight'].shape[0] == 2 * z_channels
-        )
+        n_embed = state_dict["quantize.embedding.weight"].shape[0]
+        embed_dim = state_dict["quantize.embedding.weight"].shape[1]
+        z_channels = state_dict["quant_conv.weight"].shape[1]
+        double_z = state_dict["encoder.conv_out.weight"].shape[0] == 2 * z_channels
 
-        enable_mid = 'encoder.mid.block_1.norm1.weight' in state_dict
+        enable_mid = "encoder.mid.block_1.norm1.weight" in state_dict
 
-        ch = state_dict['encoder.conv_in.weight'].shape[0]
-        in_channels = state_dict['encoder.conv_in.weight'].shape[1]
-        out_ch = state_dict['decoder.conv_out.weight'].shape[0]
+        ch = state_dict["encoder.conv_in.weight"].shape[0]
+        in_channels = state_dict["encoder.conv_in.weight"].shape[1]
+        out_ch = state_dict["decoder.conv_out.weight"].shape[0]
 
-        num_res_blocks = get_seq_len(state_dict, 'encoder.down.0.block')
+        num_res_blocks = get_seq_len(state_dict, "encoder.down.0.block")
 
-        ch_mult_len = get_seq_len(state_dict, 'encoder.down')
+        ch_mult_len = get_seq_len(state_dict, "encoder.down")
         ch_mult_list = [1] * ch_mult_len
         for i in range(ch_mult_len):
             ch_mult_list[i] = (
-                state_dict[f'encoder.down.{i}.block.0.conv2.weight'].shape[0]
-                // ch
+                state_dict[f"encoder.down.{i}.block.0.conv2.weight"].shape[0] // ch
             )
         ch_mult = tuple(ch_mult_list)
 
@@ -97,7 +90,7 @@ class RestoreFormerArch(Architecture[RestoreFormer]):
             model,
             state_dict,
             architecture=self,
-            purpose='FaceSR',
+            purpose="FaceSR",
             tags=[],
             supports_half=False,
             supports_bfloat16=True,
@@ -109,4 +102,4 @@ class RestoreFormerArch(Architecture[RestoreFormer]):
         )
 
 
-__all__ = ['RestoreFormer', 'RestoreFormerArch']
+__all__ = ["RestoreFormer", "RestoreFormerArch"]

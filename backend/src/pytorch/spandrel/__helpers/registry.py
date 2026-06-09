@@ -88,7 +88,7 @@ class ArchRegistry:
         """
         Returns an iterator over all architectures in insertion order.
         """
-        return iter(self.architectures('insertion'))
+        return iter(self.architectures("insertion"))
 
     def __len__(self) -> int:
         return len(self._architectures)
@@ -98,18 +98,18 @@ class ArchRegistry:
 
     def architectures(
         self,
-        order: Literal['insertion', 'detection'] = 'insertion',
+        order: Literal["insertion", "detection"] = "insertion",
     ) -> list[ArchSupport]:
         """
         Returns a new list with all architectures in the registry.
 
         The order of architectures in the list is either insertion order or the order in which architectures are detected.
         """
-        if order == 'insertion':
+        if order == "insertion":
             return list(self._architectures)
-        if order == 'detection':
+        if order == "detection":
             return list(self._ordered)
-        raise ValueError(f'Invalid order: {order}')
+        raise ValueError(f"Invalid order: {order}")
 
     def add(
         self,
@@ -136,7 +136,7 @@ class ArchRegistry:
                 if ignore_duplicates:
                     continue
                 raise DuplicateArchitectureError(
-                    f'Duplicate architecture: {arch.architecture.id}'
+                    f"Duplicate architecture: {arch.architecture.id}"
                 )
 
             new_architectures.append(arch)
@@ -168,7 +168,7 @@ class ArchRegistry:
         def visit(arch: ArchSupport):
             if arch.architecture.id in stack:
                 raise ValueError(
-                    f'Circular dependency in architecture detection: {" -> ".join([*stack, arch.architecture.id])}'
+                    f"Circular dependency in architecture detection: {' -> '.join([*stack, arch.architecture.id])}"
                 )
             if arch in seen:
                 return

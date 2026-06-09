@@ -19,20 +19,20 @@ from .__arch.network_unet import DRUNet
 class DRUNetArch(Architecture[DRUNet]):
     def __init__(self) -> None:
         super().__init__(
-            id='DRUNet',
+            id="DRUNet",
             detect=KeyCondition.has_all(
-                'm_head.weight',
-                'm_down1.0.res.0.weight',
-                'm_down1.0.res.2.weight',
-                'm_down2.0.res.0.weight',
-                'm_down3.0.res.0.weight',
-                'm_body.0.res.0.weight',
-                'm_body.0.res.2.weight',
-                'm_up3.2.res.0.weight',
-                'm_up3.2.res.2.weight',
-                'm_up2.2.res.0.weight',
-                'm_up1.2.res.0.weight',
-                'm_tail.weight',
+                "m_head.weight",
+                "m_down1.0.res.0.weight",
+                "m_down1.0.res.2.weight",
+                "m_down2.0.res.0.weight",
+                "m_down3.0.res.0.weight",
+                "m_body.0.res.0.weight",
+                "m_body.0.res.2.weight",
+                "m_up3.2.res.0.weight",
+                "m_up3.2.res.2.weight",
+                "m_up2.2.res.0.weight",
+                "m_up1.2.res.0.weight",
+                "m_tail.weight",
             ),
         )
 
@@ -42,32 +42,32 @@ class DRUNetArch(Architecture[DRUNet]):
         # out_nc = 1
         nc = [64, 128, 256, 512]
         # nb = 4
-        act_mode = 'R'  # this value is assumed
-        downsample_mode = 'strideconv'
-        upsample_mode = 'convtranspose'
+        act_mode = "R"  # this value is assumed
+        downsample_mode = "strideconv"
+        upsample_mode = "convtranspose"
 
-        in_nc = state_dict['m_head.weight'].shape[1]
-        out_nc = state_dict['m_tail.weight'].shape[0]
+        in_nc = state_dict["m_head.weight"].shape[1]
+        out_nc = state_dict["m_tail.weight"].shape[0]
 
-        nb = get_seq_len(state_dict, 'm_body')
+        nb = get_seq_len(state_dict, "m_body")
 
-        nc[0] = state_dict['m_head.weight'].shape[0]
-        nc[1] = state_dict['m_down2.0.res.0.weight'].shape[0]
-        nc[2] = state_dict['m_down3.0.res.0.weight'].shape[0]
-        nc[3] = state_dict['m_body.0.res.0.weight'].shape[0]
+        nc[0] = state_dict["m_head.weight"].shape[0]
+        nc[1] = state_dict["m_down2.0.res.0.weight"].shape[0]
+        nc[2] = state_dict["m_down3.0.res.0.weight"].shape[0]
+        nc[3] = state_dict["m_body.0.res.0.weight"].shape[0]
 
-        if f'm_down1.{nb}.weight' in state_dict:
-            downsample_mode = 'strideconv'
+        if f"m_down1.{nb}.weight" in state_dict:
+            downsample_mode = "strideconv"
         else:
             # avgpool and maxpool have the same state dict
-            downsample_mode = 'avgpool'
+            downsample_mode = "avgpool"
 
-        if 'm_up3.1.weight' in state_dict:
-            upsample_mode = 'upconv'
-        elif state_dict['m_up3.0.weight'].shape[2] == 3:
-            upsample_mode = 'pixelshuffle'
+        if "m_up3.1.weight" in state_dict:
+            upsample_mode = "upconv"
+        elif state_dict["m_up3.0.weight"].shape[2] == 3:
+            upsample_mode = "pixelshuffle"
         else:
-            upsample_mode = 'convtranspose'
+            upsample_mode = "convtranspose"
 
         model = DRUNet(
             in_nc=in_nc,
@@ -98,8 +98,8 @@ class DRUNetArch(Architecture[DRUNet]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration',
-            tags=[f'{nb}nb'],
+            purpose="Restoration",
+            tags=[f"{nb}nb"],
             supports_half=False,  # TODO: verify
             supports_bfloat16=True,
             scale=1,
@@ -110,4 +110,4 @@ class DRUNetArch(Architecture[DRUNet]):
         )
 
 
-__all__ = ['DRUNet', 'DRUNetArch']
+__all__ = ["DRUNet", "DRUNetArch"]

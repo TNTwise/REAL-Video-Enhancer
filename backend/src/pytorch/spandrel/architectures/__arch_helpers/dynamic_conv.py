@@ -39,20 +39,20 @@ SOFTWARE.
 """
 
 
-T = TypeVar('T', bound=Module)
+T = TypeVar("T", bound=Module)
 
 
 def normal_init(module, mean=0, std=1.0, bias=0):
-    if hasattr(module, 'weight') and module.weight is not None:
+    if hasattr(module, "weight") and module.weight is not None:
         trunc_normal_(module.weight, mean, std)
-    if hasattr(module, 'bias') and module.bias is not None:
+    if hasattr(module, "bias") and module.bias is not None:
         nn.init.constant_(module.bias, bias)
 
 
 def constant_init(module, val, bias=0):
-    if hasattr(module, 'weight') and module.weight is not None:
+    if hasattr(module, "weight") and module.weight is not None:
         nn.init.constant_(module.weight, val)
-    if hasattr(module, 'bias') and module.bias is not None:
+    if hasattr(module, "bias") and module.bias is not None:
         nn.init.constant_(module.bias, bias)
 
 
@@ -95,10 +95,7 @@ class TemperatureScheduler:
 
     def get(self, crt_epoch=None):
         crt_epoch = crt_epoch or self.final_epoch
-        return (
-            self.initial_value
-            + (min(crt_epoch, self.final_epoch) - 1) * self.step
-        )
+        return self.initial_value + (min(crt_epoch, self.final_epoch) - 1) * self.step
 
 
 class Conv2dWrapper(nn.Conv2d):
@@ -140,10 +137,7 @@ class TemperatureScheduler:
 
     def get(self, crt_epoch=None):
         crt_epoch = crt_epoch or self.final_epoch
-        return (
-            self.initial_value
-            + (min(crt_epoch, self.final_epoch) - 1) * self.step
-        )
+        return self.initial_value + (min(crt_epoch, self.final_epoch) - 1) * self.step
 
 
 class CustomSequential(TempModule):
@@ -190,9 +184,7 @@ class SmoothNLLLoss(nn.Module):
 class AttentionLayer(nn.Module):
     def __init__(self, c_dim, hidden_dim, nof_kernels):
         super().__init__()
-        self.global_pooling = nn.Sequential(
-            nn.AdaptiveAvgPool2d(1), nn.Flatten()
-        )
+        self.global_pooling = nn.Sequential(nn.AdaptiveAvgPool2d(1), nn.Flatten())
         self.to_scores = nn.Sequential(
             nn.Linear(c_dim, hidden_dim),
             nn.ReLU(inplace=True),
@@ -236,9 +228,9 @@ class DynamicConvolution(TempModule):
 
         self.groups = groups
         self.conv_args = {
-            'stride': stride,
-            'padding': padding,
-            'dilation': dilation,
+            "stride": stride,
+            "padding": padding,
+            "dilation": dilation,
         }
         self.nof_kernels = nof_kernels
         self.attention = AttentionLayer(
@@ -259,14 +251,12 @@ class DynamicConvolution(TempModule):
                 torch.Tensor(nof_kernels, out_channels), requires_grad=True
             )
         else:
-            self.register_parameter('kernels_bias', None)
+            self.register_parameter("kernels_bias", None)
         self.initialize_parameters()
 
     def initialize_parameters(self):
         for i_kernel in range(self.nof_kernels):
-            init.kaiming_uniform_(
-                self.kernels_weights[i_kernel], a=math.sqrt(5)
-            )
+            init.kaiming_uniform_(self.kernels_weights[i_kernel], a=math.sqrt(5))
         if self.kernels_bias is not None:
             bound = 1 / math.sqrt(self.kernels_weights[0, 0].numel())
             nn.init.uniform_(self.kernels_bias, -bound, bound)
@@ -306,8 +296,6 @@ class DynamicConvolution(TempModule):
             groups=self.groups * batch_size,
             **self.conv_args,
         )  # 1 X batch_size*out_C X H' x W'
-        out = out.view(
-            batch_size, -1, *out.shape[-2:]
-        )  # batch_size X out_C X H' x W'
+        out = out.view(batch_size, -1, *out.shape[-2:])  # batch_size X out_C X H' x W'
 
         return out

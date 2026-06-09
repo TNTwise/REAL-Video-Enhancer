@@ -16,14 +16,14 @@ def warp(img, flow):
         1,
     )
     grid_ = (grid + flow_).permute(0, 2, 3, 1)
-    pd = 'border'
-    if img.device.type == 'mps':
-        pd = 'zeros'
+    pd = "border"
+    if img.device.type == "mps":
+        pd = "zeros"
         grid_ = grid_.clamp(-1, 1)
     output = F.grid_sample(
         input=img,
         grid=grid_,
-        mode='bilinear',
+        mode="bilinear",
         padding_mode=pd,
         align_corners=True,
     )
@@ -32,7 +32,7 @@ def warp(img, flow):
 
 def resize(x, scale_factor):
     return F.interpolate(
-        x, scale_factor=scale_factor, mode='bilinear', align_corners=False
+        x, scale_factor=scale_factor, mode="bilinear", align_corners=False
     )
 
 
@@ -236,8 +236,7 @@ class IFRNet(nn.Module):
 
     def forward(self, img0, img1, embt):
         mean_ = (
-            torch
-            .cat([img0, img1], 2)
+            torch.cat([img0, img1], 2)
             .mean(1, keepdim=True)
             .mean(2, keepdim=True)
             .mean(3, keepdim=True)
@@ -272,12 +271,12 @@ class IFRNet(nn.Module):
         up_mask_1 = torch.sigmoid(out1[:, 4:5])
         up_res_1 = out1[:, 5:]
 
-        up_flow0_1 = resize(
-            up_flow0_1, scale_factor=(1.0 / self.scale_factor)
-        ) * (1.0 / self.scale_factor)
-        up_flow1_1 = resize(
-            up_flow1_1, scale_factor=(1.0 / self.scale_factor)
-        ) * (1.0 / self.scale_factor)
+        up_flow0_1 = resize(up_flow0_1, scale_factor=(1.0 / self.scale_factor)) * (
+            1.0 / self.scale_factor
+        )
+        up_flow1_1 = resize(up_flow1_1, scale_factor=(1.0 / self.scale_factor)) * (
+            1.0 / self.scale_factor
+        )
         up_mask_1 = resize(up_mask_1, scale_factor=(1.0 / self.scale_factor))
         up_res_1 = resize(up_res_1, scale_factor=(1.0 / self.scale_factor))
 

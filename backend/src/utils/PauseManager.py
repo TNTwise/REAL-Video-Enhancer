@@ -20,7 +20,7 @@ class PauseManager:
                     break
                 except FileNotFoundError:
                     logger.info(
-                        'Waiting for shared memory to be created: %s',
+                        "Waiting for shared memory to be created: %s",
                         self.paused_shared_memory_id,
                     )
                     time.sleep(0.5)

@@ -14,7 +14,7 @@ class MixStructureBlock(nn.Module):
 
         self.conv1 = nn.Conv2d(dim, dim, kernel_size=1)
         self.conv2 = nn.Conv2d(
-            dim, dim, kernel_size=5, padding=2, padding_mode='reflect'
+            dim, dim, kernel_size=5, padding=2, padding_mode="reflect"
         )
         self.conv3_19 = nn.Conv2d(
             dim,
@@ -23,7 +23,7 @@ class MixStructureBlock(nn.Module):
             padding=9,
             groups=dim,
             dilation=3,
-            padding_mode='reflect',
+            padding_mode="reflect",
         )
         self.conv3_13 = nn.Conv2d(
             dim,
@@ -32,7 +32,7 @@ class MixStructureBlock(nn.Module):
             padding=6,
             groups=dim,
             dilation=3,
-            padding_mode='reflect',
+            padding_mode="reflect",
         )
         self.conv3_7 = nn.Conv2d(
             dim,
@@ -41,7 +41,7 @@ class MixStructureBlock(nn.Module):
             padding=3,
             groups=dim,
             dilation=3,
-            padding_mode='reflect',
+            padding_mode="reflect",
         )
 
         # Simple Channel Attention
@@ -53,7 +53,7 @@ class MixStructureBlock(nn.Module):
                 kernel_size=3,
                 padding=3 // 2,
                 groups=dim,
-                padding_mode='reflect',
+                padding_mode="reflect",
             ),
         )
         self.Wg = nn.Sequential(
@@ -97,17 +97,13 @@ class MixStructureBlock(nn.Module):
         x = self.norm1(x)
         x = self.conv1(x)
         x = self.conv2(x)
-        x = torch.cat(
-            [self.conv3_19(x), self.conv3_13(x), self.conv3_7(x)], dim=1
-        )
+        x = torch.cat([self.conv3_19(x), self.conv3_13(x), self.conv3_7(x)], dim=1)
         x = self.mlp(x)
         x = identity + x
 
         identity = x
         x = self.norm2(x)
-        x = torch.cat(
-            [self.Wv(x) * self.Wg(x), self.ca(x) * x, self.pa(x) * x], dim=1
-        )
+        x = torch.cat([self.Wv(x) * self.Wg(x), self.ca(x) * x, self.pa(x) * x], dim=1)
         x = self.mlp2(x)
         x = identity + x
         return x
@@ -120,9 +116,7 @@ class BasicLayer(nn.Module):
         self.depth = depth
 
         # build blocks
-        self.blocks = nn.ModuleList([
-            MixStructureBlock(dim=dim) for _ in range(depth)
-        ])
+        self.blocks = nn.ModuleList([MixStructureBlock(dim=dim) for _ in range(depth)])
 
     def forward(self, x):
         for blk in self.blocks:
@@ -131,9 +125,7 @@ class BasicLayer(nn.Module):
 
 
 class PatchEmbed(nn.Module):
-    def __init__(
-        self, patch_size=4, in_chans=3, embed_dim=96, kernel_size=None
-    ):
+    def __init__(self, patch_size=4, in_chans=3, embed_dim=96, kernel_size=None):
         super().__init__()
         self.in_chans = in_chans
         self.embed_dim = embed_dim
@@ -147,7 +139,7 @@ class PatchEmbed(nn.Module):
             kernel_size=kernel_size,
             stride=patch_size,
             padding=(kernel_size - patch_size + 1) // 2,
-            padding_mode='reflect',
+            padding_mode="reflect",
         )
 
     def forward(self, x):
@@ -156,9 +148,7 @@ class PatchEmbed(nn.Module):
 
 
 class PatchUnEmbed(nn.Module):
-    def __init__(
-        self, patch_size=4, out_chans=3, embed_dim=96, kernel_size=None
-    ):
+    def __init__(self, patch_size=4, out_chans=3, embed_dim=96, kernel_size=None):
         super().__init__()
         self.out_chans = out_chans
         self.embed_dim = embed_dim
@@ -172,7 +162,7 @@ class PatchUnEmbed(nn.Module):
                 out_chans * patch_size**2,
                 kernel_size=kernel_size,
                 padding=kernel_size // 2,
-                padding_mode='reflect',
+                padding_mode="reflect",
             ),
             nn.PixelShuffle(patch_size),
         )
@@ -293,7 +283,7 @@ class MixDehazeNet(nn.Module):
         _, _, h, w = x.size()
         mod_pad_h = (self.patch_size - h % self.patch_size) % self.patch_size
         mod_pad_w = (self.patch_size - w % self.patch_size) % self.patch_size
-        x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h), 'reflect')
+        x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h), "reflect")
         return x
 
     def forward_features(self, x):

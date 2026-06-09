@@ -15,17 +15,17 @@ from .__arch.safmn import SAFMN
 class SAFMNArch(Architecture[SAFMN]):
     def __init__(self) -> None:
         super().__init__(
-            id='SAFMN',
+            id="SAFMN",
             detect=KeyCondition.has_all(
-                'to_feat.weight',
-                'feats.0.norm1.weight',
-                'feats.0.norm2.weight',
-                'feats.0.safm.mfr.0.weight',
-                'feats.0.safm.mfr.3.weight',
-                'feats.0.safm.aggr.weight',
-                'feats.0.ccm.ccm.0.weight',
-                'feats.0.ccm.ccm.2.weight',
-                'to_img.0.weight',
+                "to_feat.weight",
+                "feats.0.norm1.weight",
+                "feats.0.norm2.weight",
+                "feats.0.safm.mfr.0.weight",
+                "feats.0.safm.mfr.3.weight",
+                "feats.0.safm.aggr.weight",
+                "feats.0.ccm.ccm.0.weight",
+                "feats.0.ccm.ccm.2.weight",
+                "to_img.0.weight",
             ),
         )
 
@@ -36,17 +36,15 @@ class SAFMNArch(Architecture[SAFMN]):
         ffn_scale: float = 2.0
         upscaling_factor: int = 4
 
-        dim = state_dict['to_feat.weight'].shape[0]
-        n_blocks = get_seq_len(state_dict, 'feats')
+        dim = state_dict["to_feat.weight"].shape[0]
+        n_blocks = get_seq_len(state_dict, "feats")
 
         # hidden_dim = int(dim * ffn_scale)
-        hidden_dim = state_dict['feats.0.ccm.ccm.0.weight'].shape[0]
+        hidden_dim = state_dict["feats.0.ccm.ccm.0.weight"].shape[0]
         ffn_scale = hidden_dim / dim
 
         # 3 * upscaling_factor**2
-        upscaling_factor = int(
-            math.sqrt(state_dict['to_img.0.weight'].shape[0] / 3)
-        )
+        upscaling_factor = int(math.sqrt(state_dict["to_img.0.weight"].shape[0] / 3))
 
         model = SAFMN(
             dim=dim,
@@ -59,8 +57,8 @@ class SAFMNArch(Architecture[SAFMN]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if upscaling_factor == 1 else 'SR',
-            tags=[f'{dim}dim', f'{n_blocks}nb'],
+            purpose="Restoration" if upscaling_factor == 1 else "SR",
+            tags=[f"{dim}dim", f"{n_blocks}nb"],
             supports_half=False,  # TODO: verify
             supports_bfloat16=True,
             scale=upscaling_factor,
@@ -70,4 +68,4 @@ class SAFMNArch(Architecture[SAFMN]):
         )
 
 
-__all__ = ['SAFMN', 'SAFMNArch']
+__all__ = ["SAFMN", "SAFMNArch"]

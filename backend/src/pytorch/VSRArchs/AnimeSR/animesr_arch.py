@@ -87,9 +87,7 @@ class MyPixelUnshuffle(nn.Module):
         out_channel = c * (self.downscale_factor**2)
         h = hh // self.downscale_factor
         w = hw // self.downscale_factor
-        x_view = x.view(
-            b, c, h, self.downscale_factor, w, self.downscale_factor
-        )
+        x_view = x.view(b, c, h, self.downscale_factor, w, self.downscale_factor)
         return x_view.permute(0, 1, 3, 5, 2, 4).reshape(b, out_channel, h, w)
 
 
@@ -135,7 +133,7 @@ class RightAlignMSConvResidualBlocks(nn.Module):
         )
 
     def up(self, x, scale=2):
-        return interpolate(x, scale_factor=scale, mode='bilinear')
+        return interpolate(x, scale_factor=scale, mode="bilinear")
 
     def forward(self, x):
         x_s1 = self.conv_s1_first(x)
@@ -151,14 +149,14 @@ class RightAlignMSConvResidualBlocks(nn.Module):
                 + (self.up(x_s4, 4) if flag_s4 else 0)
             )
             if i >= self.num_block[0] - self.num_block[1]:
-                x_s2 = self.body_s2_first[
-                    i - self.num_block[0] + self.num_block[1]
-                ](x_s2 + (self.up(x_s4, 2) if flag_s4 else 0))
+                x_s2 = self.body_s2_first[i - self.num_block[0] + self.num_block[1]](
+                    x_s2 + (self.up(x_s4, 2) if flag_s4 else 0)
+                )
                 flag_s2 = True
             if i >= self.num_block[0] - self.num_block[2]:
-                x_s4 = self.body_s4_first[
-                    i - self.num_block[0] + self.num_block[2]
-                ](x_s4)
+                x_s4 = self.body_s4_first[i - self.num_block[0] + self.num_block[2]](
+                    x_s4
+                )
                 flag_s4 = True
 
         x_fusion = self.fusion(
@@ -198,7 +196,7 @@ class AnimeSR(nn.Module):
         out = self.recurrent_cell(inp)
         out_img = self.pixel_shuffle(
             out[:, : 3 * self.netscale * self.netscale]
-        ) + interpolate(res, scale_factor=self.netscale, mode='bilinear')
+        ) + interpolate(res, scale_factor=self.netscale, mode="bilinear")
         out_state = self.lrelu(out[:, 3 * self.netscale * self.netscale :])
 
         return out_img, out_state

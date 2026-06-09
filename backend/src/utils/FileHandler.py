@@ -20,9 +20,7 @@ class FileHandler:
             available_space = free / (1024**3)
             return available_space
         except Exception:
-            logger.exception(
-                'An error occurred while getting available disk space'
-            )
+            logger.exception("An error occurred while getting available disk space")
             return 0
 
     @staticmethod
@@ -34,13 +32,9 @@ class FileHandler:
             if not pathlib.Path(new).is_file():
                 shutil.move(prev, new)
             else:
-                print(
-                    'WARN tried to rename a file to a file that already exists'
-                )
+                print("WARN tried to rename a file to a file that already exists")
         else:
-            print(
-                'WARN tried to rename a folder to a folder that already exists'
-            )
+            print("WARN tried to rename a folder to a folder that already exists")
 
     @staticmethod
     def unzipFile(file, outputDirectory):
@@ -50,8 +44,8 @@ class FileHandler:
         origCWD = os.getcwd()
         dir_path = os.path.dirname(os.path.realpath(file))
         os.chdir(dir_path)
-        logger.info('Extracting: %s', file)
-        with zipfile.ZipFile(file, 'r') as f:
+        logger.info("Extracting: %s", file)
+        with zipfile.ZipFile(file, "r") as f:
             f.extractall(outputDirectory)
         FileHandler.removeFile(file)
         os.chdir(origCWD)
@@ -81,13 +75,9 @@ class FileHandler:
             if not pathlib.Path(new).is_file():
                 shutil.copytree(prev, new)
             else:
-                print(
-                    'WARN tried to rename a file to a file that already exists'
-                )
+                print("WARN tried to rename a file to a file that already exists")
         else:
-            print(
-                'WARN tried to rename a folder to a folder that already exists'
-            )
+            print("WARN tried to rename a folder to a folder that already exists")
 
     @staticmethod
     def copyFile(prev: str, new: str):
@@ -97,7 +87,7 @@ class FileHandler:
         if not pathlib.Path(new).is_file():
             shutil.copy(prev, new)
         else:
-            print('WARN tried to rename a file to a file that already exists')
+            print("WARN tried to rename a file to a file that already exists")
 
     @staticmethod
     def moveFile(prev: str, new: str):
@@ -108,13 +98,9 @@ class FileHandler:
             if not pathlib.Path(new).is_file():
                 pathlib.Path(prev).rename(new)
             else:
-                print(
-                    'WARN tried to rename a file to a file that already exists'
-                )
+                print("WARN tried to rename a file to a file that already exists")
         else:
-            print(
-                'WARN tried to rename a folder to a folder that already exists'
-            )
+            print("WARN tried to rename a folder to a folder that already exists")
 
     @staticmethod
     def makeExecutable(file_path):
@@ -127,9 +113,7 @@ class FileHandler:
             pathlib.Path(dir).mkdir()
 
     @staticmethod
-    def getUnusedFileName(
-        base_file_name: str, outputDirectory: str, extension: str
-    ):
+    def getUnusedFileName(base_file_name: str, outputDirectory: str, extension: str):
         """
         Returns an unused file name by adding an iteration number to the file name.
         """
@@ -138,7 +122,7 @@ class FileHandler:
         while pathlib.Path(base_file_name).is_file():
             output_file = os.path.join(
                 outputDirectory,
-                f'{base_file_name}_({iteration}).{extension}',
+                f"{base_file_name}_({iteration}).{extension}",
             )
             iteration += 1
         return output_file

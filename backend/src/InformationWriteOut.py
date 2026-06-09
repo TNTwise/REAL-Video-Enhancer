@@ -1,7 +1,7 @@
 import time
 from multiprocessing import shared_memory
 
-if __name__ != '__main__':
+if __name__ != "__main__":
     from .utils.LogConfig import get_logger
     from .utils.PauseManager import PauseManager
     from .utils.RealTimePrint import RealTimePrint
@@ -25,9 +25,9 @@ def convertTime(remaining_time):
     remaining_time -= minutes * 60
     seconds = remaining_time
     if minutes < 10:
-        minutes = str(f'0{minutes}')
+        minutes = str(f"0{minutes}")
     if seconds < 10:
-        seconds = str(f'0{seconds}')
+        seconds = str(f"0{seconds}")
     return hours, minutes, seconds
 
 
@@ -64,16 +64,12 @@ class InformationWriteOut:
         if self.sharedMemoryID is not None:
             while True:
                 try:
-                    self.shm = shared_memory.SharedMemory(
-                        name=self.sharedMemoryID
-                    )
-                    logger.info(
-                        'Connected to shared memory: %s', self.sharedMemoryID
-                    )
+                    self.shm = shared_memory.SharedMemory(name=self.sharedMemoryID)
+                    logger.info("Connected to shared memory: %s", self.sharedMemoryID)
                     break
                 except FileNotFoundError:
                     logger.info(
-                        'Waiting for shared memory to be created: %s',
+                        "Waiting for shared memory to be created: %s",
                         self.sharedMemoryID,
                     )
                     time.sleep(0.5)
@@ -103,7 +99,7 @@ class InformationWriteOut:
         remaining_time = int(remaining_time)
         # convert to hours, minutes, and seconds
         hours, minutes, seconds = convertTime(remaining_time)
-        return f'{hours}:{minutes}:{seconds}'
+        return f"{hours}:{minutes}:{seconds}"
 
     def update(self, preview_frame):
         self.previewFrame = preview_frame
@@ -134,22 +130,13 @@ class InformationWriteOut:
             # print out data to stdout
             fps = round(
                 self.framesRendered
-                / (
-                    time.time()
-                    - self.startTime
-                    - self.total_paused_time_seconds
-                )
+                / (time.time() - self.startTime - self.total_paused_time_seconds)
             )
             eta = self.calculateETA(framesRendered=self.framesRendered)
-            message = (
-                f'FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}'
-            )
+            message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
             self.realTimePrint.realTimePrint(message)
 
-            if (
-                self.sharedMemoryID is not None
-                and self.previewFrame is not None
-            ):
+            if self.sharedMemoryID is not None and self.previewFrame is not None:
                 # Update the shared array
                 padded_frame = padFrame(  # pad frame in case of border detect
                     self.previewFrame,

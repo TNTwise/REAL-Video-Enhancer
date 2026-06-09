@@ -7,24 +7,22 @@ from ....util import store_hyperparameters
 
 # Layer Norm
 class LayerNorm(nn.Module):
-    def __init__(
-        self, normalized_shape, eps=1e-6, data_format='channels_first'
-    ):
+    def __init__(self, normalized_shape, eps=1e-6, data_format="channels_first"):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(normalized_shape))
         self.bias = nn.Parameter(torch.zeros(normalized_shape))
         self.eps = eps
         self.data_format = data_format
-        if self.data_format not in ['channels_last', 'channels_first']:
+        if self.data_format not in ["channels_last", "channels_first"]:
             raise NotImplementedError
         self.normalized_shape = (normalized_shape,)
 
     def forward(self, x):
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             return F.layer_norm(
                 x, self.normalized_shape, self.weight, self.bias, self.eps
             )
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             u = x.mean(1, keepdim=True)
             s = (x - u).pow(2).mean(1, keepdim=True)
             x = (x - u) / torch.sqrt(s + self.eps)
@@ -56,10 +54,12 @@ class SAFM(nn.Module):
         chunk_dim = dim // n_levels
 
         # Spatial Weighting
-        self.mfr = nn.ModuleList([
-            nn.Conv2d(chunk_dim, chunk_dim, 3, 1, 1, groups=chunk_dim)
-            for _ in range(self.n_levels)
-        ])
+        self.mfr = nn.ModuleList(
+            [
+                nn.Conv2d(chunk_dim, chunk_dim, 3, 1, 1, groups=chunk_dim)
+                for _ in range(self.n_levels)
+            ]
+        )
 
         # # Feature Aggregation
         self.aggr = nn.Conv2d(dim, dim, 1, 1, 0)
@@ -77,7 +77,7 @@ class SAFM(nn.Module):
                 p_size = (h // 2**i, w // 2**i)
                 s = F.adaptive_max_pool2d(xc[i], p_size)
                 s = self.mfr[i](s)
-                s = F.interpolate(s, size=(h, w), mode='nearest')
+                s = F.interpolate(s, size=(h, w), mode="nearest")
             else:
                 s = self.mfr[i](xc[i])
             out.append(s)
@@ -109,9 +109,9 @@ class BasicLayer(nn.Module):
     def __init__(self, num_layer, dim, ffn_scale=2.0):
         super().__init__()
 
-        self.layers = nn.Sequential(*[
-            AttBlock(dim, ffn_scale) for _ in range(num_layer)
-        ])
+        self.layers = nn.Sequential(
+            *[AttBlock(dim, ffn_scale) for _ in range(num_layer)]
+        )
         self.conv = nn.Conv2d(dim, dim, 3, 1, 1)
 
     def forward(self, x):
@@ -138,9 +138,9 @@ class SAFMN_BCIE(nn.Module):
             nn.Conv2d(3 * upscaling_factor**2, dim, 3, 1, 1),
         )
 
-        self.feats = nn.Sequential(*[
-            BasicLayer(num_layers, dim, ffn_scale) for _ in range(n_blocks)
-        ])
+        self.feats = nn.Sequential(
+            *[BasicLayer(num_layers, dim, ffn_scale) for _ in range(n_blocks)]
+        )
 
         self.to_img = nn.Sequential(
             nn.Conv2d(dim, dim * upscaling_factor**2, 3, 1, 1),

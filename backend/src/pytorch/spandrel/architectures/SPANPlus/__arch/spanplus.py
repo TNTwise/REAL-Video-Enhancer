@@ -79,16 +79,14 @@ class Conv3XC(nn.Module):
         b3 = self.conv[2].bias.data.clone().detach()
 
         w = (
-            F
-            .conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
+            F.conv2d(w1.flip(2, 3).permute(1, 0, 2, 3), w2, padding=2, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
         b = (w2 * b1.reshape(1, -1, 1, 1)).sum((1, 2, 3)) + b2
 
         self.weight_concat = (
-            F
-            .conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
+            F.conv2d(w.flip(2, 3).permute(1, 0, 2, 3), w3, padding=0, stride=1)
             .flip(2, 3)
             .permute(1, 0, 2, 3)
         )
@@ -119,7 +117,7 @@ class Conv3XC(nn.Module):
     def forward(self, x):
         self.update_params()
         if self.training:
-            x_pad = F.pad(x, (1, 1, 1, 1), 'constant', 0)
+            x_pad = F.pad(x, (1, 1, 1, 1), "constant", 0)
             out = self.conv(x_pad) + self.sk(x)
         else:
             out = self.eval_conv(x)
@@ -156,15 +154,11 @@ class SPAB(nn.Module):
 
 
 class SPABS(nn.Module):
-    def __init__(
-        self, feature_channels: int, n_blocks: int = 4, drop: float = 0.0
-    ):
+    def __init__(self, feature_channels: int, n_blocks: int = 4, drop: float = 0.0):
         super().__init__()
         self.block_1 = SPAB(feature_channels)
 
-        self.block_n = nn.Sequential(*[
-            SPAB(feature_channels) for _ in range(n_blocks)
-        ])
+        self.block_n = nn.Sequential(*[SPAB(feature_channels) for _ in range(n_blocks)])
         self.block_end = SPAB(feature_channels, True)
         self.conv_2 = Conv3XC(feature_channels, feature_channels, gain=2, s=1)
         self.conv_cat = nn.Conv2d(
@@ -197,28 +191,23 @@ class SPANPlus(nn.Module):
         feature_channels: int = 48,
         upscale: int = 4,
         drop_rate: float = 0.0,
-        upsampler: str = 'dys',  # "lp", "ps"
+        upsampler: str = "dys",  # "lp", "ps"
     ):
         super().__init__()
 
         in_channels = num_in_ch
-        out_channels = num_out_ch if upsampler == 'dys' else num_in_ch
+        out_channels = num_out_ch if upsampler == "dys" else num_in_ch
         drop_rate = 0
         self.feats = nn.Sequential(
             *[Conv3XC(in_channels, feature_channels, gain=2, s=1)]
-            + [
-                SPABS(feature_channels, n_blocks, drop_rate)
-                for n_blocks in blocks
-            ]
+            + [SPABS(feature_channels, n_blocks, drop_rate) for n_blocks in blocks]
         )
-        if upsampler == 'ps':
+        if upsampler == "ps":
             self.upsampler = nn.Sequential(
-                nn.Conv2d(
-                    feature_channels, out_channels * (upscale**2), 3, padding=1
-                ),
+                nn.Conv2d(feature_channels, out_channels * (upscale**2), 3, padding=1),
                 nn.PixelShuffle(upscale),
             )
-        elif upsampler == 'dys':
+        elif upsampler == "dys":
             self.upsampler = DySample(feature_channels, out_channels, upscale)
         else:
             raise NotImplementedError(

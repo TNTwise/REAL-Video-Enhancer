@@ -1,5 +1,3 @@
-
-
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .InterpolateGIMM import InterpolateGIMMTorch
@@ -14,11 +12,11 @@ class InterpolateFactory:
         ad = ArchDetect(interpolate_model_path)
         base_arch = ad.getArchBase()
         match base_arch:
-            case 'rife':
+            case "rife":
                 return InterpolateRifeTorch
-            case 'gimm':
+            case "gimm":
                 return InterpolateGIMMTorch
-            case 'gmfss':
+            case "gmfss":
                 return InterpolateGMFSSTorch
-            case 'ifrnet':
+            case "ifrnet":
                 return InterpolateIFRNetTorch  # IFRNet is a RIFE based architecture

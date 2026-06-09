@@ -13,22 +13,20 @@ from .__arch.sudo_SPANPlus import sudo_SPANPlus
 class sudo_SPANPlusArch(Architecture[sudo_SPANPlus]):  # noqa: N801
     def __init__(self):
         super().__init__(
-            id='sudo_SPANPlus',
+            id="sudo_SPANPlus",
             detect=KeyCondition.has_all(
-                'feats.0.sk.weight',
-                'feats.1.block_1.c1_r.sk.weight',
-                'feats.1.conv_2.sk.weight',
-                'feats.1.conv_2.eval_conv.weight',
-                'feats.1.conv_cat.weight',
-                'dynamic.kernels_weights',
-                'dynamic.attention.to_scores.0.weight',
+                "feats.0.sk.weight",
+                "feats.1.block_1.c1_r.sk.weight",
+                "feats.1.conv_2.sk.weight",
+                "feats.1.conv_2.eval_conv.weight",
+                "feats.1.conv_cat.weight",
+                "dynamic.kernels_weights",
+                "dynamic.attention.to_scores.0.weight",
             ),
         )
 
     @override
-    def load(
-        self, state_dict: StateDict
-    ) -> ImageModelDescriptor[sudo_SPANPlus]:
+    def load(self, state_dict: StateDict) -> ImageModelDescriptor[sudo_SPANPlus]:
         # default values
         num_in_ch: int = 3
         num_out_ch: int = 3
@@ -37,8 +35,8 @@ class sudo_SPANPlusArch(Architecture[sudo_SPANPlus]):  # noqa: N801
         upscale: int = 2
         drop_rate: float = 0.0
 
-        num_in_ch = state_dict['feats.0.conv.0.weight'].shape[1]
-        feature_channels = state_dict['feats.0.conv.2.weight'].shape[
+        num_in_ch = state_dict["feats.0.conv.0.weight"].shape[1]
+        feature_channels = state_dict["feats.0.conv.2.weight"].shape[
             0
         ]  # maybe this will work
         upscale = 2
@@ -65,8 +63,8 @@ class sudo_SPANPlusArch(Architecture[sudo_SPANPlus]):  # noqa: N801
         return ImageModelDescriptor(
             model,
             state_dict,
-            architecture='sudo_SPANPlus',
-            purpose='SR',
+            architecture="sudo_SPANPlus",
+            purpose="SR",
             tags=[],
             supports_half=True,
             supports_bfloat16=True,
@@ -76,4 +74,4 @@ class sudo_SPANPlusArch(Architecture[sudo_SPANPlus]):  # noqa: N801
         )
 
 
-__all__ = ['get_scale_and_output_channels', 'sudo_SPANPlus', 'sudo_SPANPlusArch']
+__all__ = ["get_scale_and_output_channels", "sudo_SPANPlus", "sudo_SPANPlusArch"]

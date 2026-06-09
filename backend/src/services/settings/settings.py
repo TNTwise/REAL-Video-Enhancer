@@ -1,11 +1,11 @@
 import os
 from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 
-SETTINGS_FILE = CONFIG_PATH / 'settings.txt'
+SETTINGS_FILE = CONFIG_PATH / "settings.txt"
+
 
 class Settings:
     def __init__(self):
-
         """
         The default settings are set here, and are overwritten by the settings in the settings file if it exists and the legnth of the settings is the same as the default settings.
         The key is equal to the name of the widget of the setting in the settings tab.
@@ -121,7 +121,7 @@ class Settings:
             ):  # writes and reads again if the settings file is corrupted
                 self.write_default_settings()
                 self.read_settings()
-    
+
     def write_setting(self, setting: str, value: str):
         """
         Writes the specified setting with the given value to the settings dictionary.
@@ -150,7 +150,7 @@ class Settings:
         """
         self.settings = self.default_settings.copy()
         self.write_out_current_settings()
-    
+
     def get_setting_value(self, setting: str) -> str:
         self.read_settings()
         if not setting in self.default_settings:

@@ -9,13 +9,9 @@ class CA_layer(nn.Module):
         # global average pooling
         self.gap = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
-            nn.Conv2d(
-                channel, channel // reduction, kernel_size=(1, 1), bias=False
-            ),
+            nn.Conv2d(channel, channel // reduction, kernel_size=(1, 1), bias=False),
             nn.GELU(),
-            nn.Conv2d(
-                channel // reduction, channel, kernel_size=(1, 1), bias=False
-            ),
+            nn.Conv2d(channel // reduction, channel, kernel_size=(1, 1), bias=False),
             # nn.Sigmoid()
         )
 
@@ -71,12 +67,7 @@ class ECA_layer(nn.Module):
         y = self.avg_pool(x)
 
         # Two different branches of ECA module
-        y = (
-            self
-            .conv(y.squeeze(-1).transpose(-1, -2))
-            .transpose(-1, -2)
-            .unsqueeze(-1)
-        )
+        y = self.conv(y.squeeze(-1).transpose(-1, -2)).transpose(-1, -2).unsqueeze(-1)
 
         # Multi-scale information fusion
         # y = self.sigmoid(y)
@@ -113,12 +104,7 @@ class ECA_MaxPool_layer(nn.Module):
         y = self.max_pool(x)
 
         # Two different branches of ECA module
-        y = (
-            self
-            .conv(y.squeeze(-1).transpose(-1, -2))
-            .transpose(-1, -2)
-            .unsqueeze(-1)
-        )
+        y = self.conv(y.squeeze(-1).transpose(-1, -2)).transpose(-1, -2).unsqueeze(-1)
 
         # Multi-scale information fusion
         # y = self.sigmoid(y)

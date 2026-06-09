@@ -9,11 +9,11 @@ from .__helpers import to_2tuple
 from .__weight_init import trunc_normal_
 
 __all__ = [
-    'DropBlock2d',
-    'DropPath',
-    'drop_block_2d',
-    'drop_block_fast_2d',
-    'drop_path',
-    'to_2tuple',
-    'trunc_normal_',
+    "DropBlock2d",
+    "DropPath",
+    "drop_block_2d",
+    "drop_block_fast_2d",
+    "drop_path",
+    "to_2tuple",
+    "trunc_normal_",
 ]

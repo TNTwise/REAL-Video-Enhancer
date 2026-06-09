@@ -19,9 +19,7 @@ from .layernorm import LayerNorm2d
 def moment(x, dim=(2, 3), k=2):
     assert len(x.size()) == 4
     mean = torch.mean(x, dim=dim).unsqueeze(-1).unsqueeze(-1)
-    mk = (1 / (x.size(2) * x.size(3))) * torch.sum(
-        torch.pow(x - mean, k), dim=dim
-    )
+    mk = (1 / (x.size(2) * x.size(3))) * torch.sum(torch.pow(x - mean, k), dim=dim)
     return mk
 
 
@@ -50,7 +48,7 @@ class ESA(nn.Module):
         v_max = F.max_pool2d(c1, kernel_size=7, stride=3)
         c3 = self.conv3(v_max)
         c3 = F.interpolate(
-            c3, (x.size(2), x.size(3)), mode='bilinear', align_corners=False
+            c3, (x.size(2), x.size(3)), mode="bilinear", align_corners=False
         )
         cf = self.conv_f(c1_)
         c4 = self.conv4(c3 + cf)
@@ -215,9 +213,7 @@ class AdaGuidedFilter(nn.Module):
             dtype=torch.float32,
             device=x.device,
         )
-        output = F.conv2d(
-            x, weight=box_kernel, stride=1, padding=r, groups=channel
-        )
+        output = F.conv2d(x, weight=box_kernel, stride=1, padding=r, groups=channel)
         return output
 
     def forward(self, x):

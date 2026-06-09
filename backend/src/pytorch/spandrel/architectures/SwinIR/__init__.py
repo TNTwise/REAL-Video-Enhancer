@@ -16,12 +16,12 @@ from .__arch.SwinIR import SwinIR
 class SwinIRArch(Architecture[SwinIR]):
     def __init__(self) -> None:
         super().__init__(
-            id='SwinIR',
+            id="SwinIR",
             detect=KeyCondition.has_all(
-                'layers.0.residual_group.blocks.0.norm1.weight',
-                'conv_first.weight',
-                'layers.0.residual_group.blocks.0.mlp.fc1.bias',
-                'layers.0.residual_group.blocks.0.attn.relative_position_index',
+                "layers.0.residual_group.blocks.0.norm1.weight",
+                "conv_first.weight",
+                "layers.0.residual_group.blocks.0.mlp.fc1.bias",
+                "layers.0.residual_group.blocks.0.attn.relative_position_index",
             ),
         )
 
@@ -46,94 +46,88 @@ class SwinIRArch(Architecture[SwinIR]):
         use_checkpoint = False
         upscale = 2
         img_range = 1.0
-        upsampler = ''
-        resi_connection = '1conv'
+        upsampler = ""
+        resi_connection = "1conv"
         num_feat = 64
         start_unshuffle = 1
 
-        if 'conv_before_upsample.0.weight' in state_dict:
-            if 'conv_up1.weight' in state_dict:
-                upsampler = 'nearest+conv'
+        if "conv_before_upsample.0.weight" in state_dict:
+            if "conv_up1.weight" in state_dict:
+                upsampler = "nearest+conv"
             else:
-                upsampler = 'pixelshuffle'
-        elif 'upsample.0.weight' in state_dict:
-            upsampler = 'pixelshuffledirect'
+                upsampler = "pixelshuffle"
+        elif "upsample.0.weight" in state_dict:
+            upsampler = "pixelshuffledirect"
         else:
-            upsampler = ''
+            upsampler = ""
 
-        if 'conv_first.1.weight' in state_dict:
-            state_dict['conv_first.weight'] = state_dict.pop(
-                'conv_first.1.weight'
-            )
-            state_dict['conv_first.bias'] = state_dict.pop('conv_first.1.bias')
+        if "conv_first.1.weight" in state_dict:
+            state_dict["conv_first.weight"] = state_dict.pop("conv_first.1.weight")
+            state_dict["conv_first.bias"] = state_dict.pop("conv_first.1.bias")
             start_unshuffle = round(
-                math.sqrt(state_dict['conv_first.weight'].shape[1] // 3)
+                math.sqrt(state_dict["conv_first.weight"].shape[1] // 3)
             )
 
-        num_in_ch = state_dict['conv_first.weight'].shape[1]
-        if 'conv_last.weight' in state_dict:
-            num_out_ch = state_dict['conv_last.weight'].shape[0]
+        num_in_ch = state_dict["conv_first.weight"].shape[1]
+        if "conv_last.weight" in state_dict:
+            num_out_ch = state_dict["conv_last.weight"].shape[0]
         else:
             num_out_ch = num_in_ch
 
         upscale = 1
-        if upsampler == 'nearest+conv':
+        if upsampler == "nearest+conv":
             upsample_keys = [
-                x for x in state_dict if 'conv_up' in x and 'bias' not in x
+                x for x in state_dict if "conv_up" in x and "bias" not in x
             ]
 
             for _upsample_key in upsample_keys:
                 upscale *= 2
-        elif upsampler == 'pixelshuffle':
-            upscale, num_feat = get_pixelshuffle_params(state_dict, 'upsample')
-        elif upsampler == 'pixelshuffledirect':
+        elif upsampler == "pixelshuffle":
+            upscale, num_feat = get_pixelshuffle_params(state_dict, "upsample")
+        elif upsampler == "pixelshuffledirect":
             upscale = int(
-                math.sqrt(state_dict['upsample.0.bias'].shape[0] // num_out_ch)
+                math.sqrt(state_dict["upsample.0.bias"].shape[0] // num_out_ch)
             )
 
-        embed_dim = state_dict['conv_first.weight'].shape[0]
+        embed_dim = state_dict["conv_first.weight"].shape[0]
 
         mlp_ratio = float(
-            state_dict['layers.0.residual_group.blocks.0.mlp.fc1.bias'].shape[0]
+            state_dict["layers.0.residual_group.blocks.0.mlp.fc1.bias"].shape[0]
             / embed_dim
         )
 
         window_size = int(
             math.sqrt(
                 state_dict[
-                    'layers.0.residual_group.blocks.0.attn.relative_position_index'
+                    "layers.0.residual_group.blocks.0.attn.relative_position_index"
                 ].shape[0]
             )
         )
 
-        if 'layers.0.residual_group.blocks.1.attn_mask' in state_dict:
+        if "layers.0.residual_group.blocks.1.attn_mask" in state_dict:
             img_size = int(
                 math.sqrt(
-                    state_dict[
-                        'layers.0.residual_group.blocks.1.attn_mask'
-                    ].shape[0]
+                    state_dict["layers.0.residual_group.blocks.1.attn_mask"].shape[0]
                 )
                 * window_size
             )
 
         # depths & num_heads
-        num_layers = get_seq_len(state_dict, 'layers')
+        num_layers = get_seq_len(state_dict, "layers")
         depths = []
         num_heads = []
         for i in range(num_layers):
-            depths.append(
-                get_seq_len(state_dict, f'layers.{i}.residual_group.blocks')
-            )
+            depths.append(get_seq_len(state_dict, f"layers.{i}.residual_group.blocks"))
             num_heads.append(
                 state_dict[
-                    f'layers.{i}.residual_group.blocks.0.attn.relative_position_bias_table'
+                    f"layers.{i}.residual_group.blocks.0.attn.relative_position_bias_table"
                 ].shape[1]
             )
 
-        if 'conv_after_body.weight' in state_dict:
-            resi_connection = '1conv'
+        if "conv_after_body.weight" in state_dict:
+            resi_connection = "1conv"
         else:
-            resi_connection = '3conv'
+            resi_connection = "3conv"
 
         # The JPEG models are the only ones with window-size 7, and they also use this range
         img_range = 255.0 if window_size == 7 else 1.0
@@ -168,24 +162,24 @@ class SwinIRArch(Architecture[SwinIR]):
 
         head_length = len(depths)  # type: ignore
         if head_length <= 4:
-            size_tag = 'small'
+            size_tag = "small"
         elif head_length < 9:
-            size_tag = 'medium'
+            size_tag = "medium"
         else:
-            size_tag = 'large'
+            size_tag = "large"
         tags = [
             size_tag,
-            f's{img_size}w{window_size}',
-            f'{num_feat}nf',
-            f'{embed_dim}dim',
-            f'{resi_connection}',
+            f"s{img_size}w{window_size}",
+            f"{num_feat}nf",
+            f"{embed_dim}dim",
+            f"{resi_connection}",
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if upscale == 1 else 'SR',
+            purpose="Restoration" if upscale == 1 else "SR",
             tags=tags,
             supports_half=False,  # Too much weirdness to support this at the moment
             supports_bfloat16=True,
@@ -196,4 +190,4 @@ class SwinIRArch(Architecture[SwinIR]):
         )
 
 
-__all__ = ['SwinIR', 'SwinIRArch']
+__all__ = ["SwinIR", "SwinIRArch"]

@@ -12,14 +12,14 @@ from .__arch.FBCNN import FBCNN
 class FBCNNArch(Architecture[FBCNN]):
     def __init__(self) -> None:
         super().__init__(
-            id='FBCNN',
+            id="FBCNN",
             detect=KeyCondition.has_all(
-                'm_head.weight',
-                'm_down1.0.res.0.weight',
-                'm_down2.0.res.0.weight',
-                'm_body_encoder.0.res.0.weight',
-                'm_tail.weight',
-                'qf_pred.0.res.0.weight',
+                "m_head.weight",
+                "m_down1.0.res.0.weight",
+                "m_down2.0.res.0.weight",
+                "m_body_encoder.0.res.0.weight",
+                "m_tail.weight",
+                "qf_pred.0.res.0.weight",
             ),
         )
 
@@ -29,35 +29,35 @@ class FBCNNArch(Architecture[FBCNN]):
         out_nc = 3
         nc = [64, 128, 256, 512]
         nb = 4
-        act_mode = 'R'
-        downsample_mode = 'strideconv'
-        upsample_mode = 'convtranspose'
+        act_mode = "R"
+        downsample_mode = "strideconv"
+        upsample_mode = "convtranspose"
 
-        in_nc = state_dict['m_head.weight'].shape[1]
-        out_nc = state_dict['m_tail.weight'].shape[0]
+        in_nc = state_dict["m_head.weight"].shape[1]
+        out_nc = state_dict["m_tail.weight"].shape[0]
 
-        nb = get_seq_len(state_dict, 'm_body_encoder')
+        nb = get_seq_len(state_dict, "m_body_encoder")
 
-        nc[0] = state_dict['m_head.weight'].shape[0]
-        nc[1] = state_dict['m_down2.0.res.0.weight'].shape[0]
-        nc[2] = state_dict['m_down3.0.res.0.weight'].shape[0]
-        nc[3] = state_dict['m_body_encoder.0.res.0.weight'].shape[0]
+        nc[0] = state_dict["m_head.weight"].shape[0]
+        nc[1] = state_dict["m_down2.0.res.0.weight"].shape[0]
+        nc[2] = state_dict["m_down3.0.res.0.weight"].shape[0]
+        nc[3] = state_dict["m_body_encoder.0.res.0.weight"].shape[0]
 
-        if f'm_down1.{nb}.weight' in state_dict:
-            downsample_mode = 'strideconv'
+        if f"m_down1.{nb}.weight" in state_dict:
+            downsample_mode = "strideconv"
         else:
             # It's either "avgpool" or "maxpool".
             # We cannot detect this from the state dict alone.
-            downsample_mode = 'avgpool'
+            downsample_mode = "avgpool"
 
-        if 'm_up3.0.weight' in state_dict:
-            upsample_mode = 'convtranspose'
-        elif 'm_up3.0.1.weight' in state_dict:
-            upsample_mode = 'upconv'
-        elif 'm_up3.0.0.weight' in state_dict:
-            upsample_mode = 'pixelshuffle'
+        if "m_up3.0.weight" in state_dict:
+            upsample_mode = "convtranspose"
+        elif "m_up3.0.1.weight" in state_dict:
+            upsample_mode = "upconv"
+        elif "m_up3.0.0.weight" in state_dict:
+            upsample_mode = "pixelshuffle"
         else:
-            raise ValueError('Unable to detect upsample mode')
+            raise ValueError("Unable to detect upsample mode")
 
         model = FBCNN(
             in_nc=in_nc,
@@ -73,7 +73,7 @@ class FBCNNArch(Architecture[FBCNN]):
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration',
+            purpose="Restoration",
             tags=[],
             supports_half=True,  # TODO
             supports_bfloat16=True,  # TODO
@@ -84,4 +84,4 @@ class FBCNNArch(Architecture[FBCNN]):
         )
 
 
-__all__ = ['FBCNN', 'FBCNNArch']
+__all__ = ["FBCNN", "FBCNNArch"]

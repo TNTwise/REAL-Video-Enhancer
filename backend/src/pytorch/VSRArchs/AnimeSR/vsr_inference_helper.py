@@ -1,4 +1,3 @@
-
 import torch
 
 from ...TorchUtils import TorchUtils
@@ -21,9 +20,7 @@ class AnimeSRInferenceHelper:
         if len(self.frame_cache) == 0:
             height, width = frame.shape[2:]
             self.state = frame.new_zeros(1, 64, height, width)
-            self.out = frame.new_zeros(
-                1, 3, height * self.scale, width * self.scale
-            )
+            self.out = frame.new_zeros(1, 3, height * self.scale, width * self.scale)
             for i in range(self.num_cached_frames):
                 self.frame_cache.append(frame)
 

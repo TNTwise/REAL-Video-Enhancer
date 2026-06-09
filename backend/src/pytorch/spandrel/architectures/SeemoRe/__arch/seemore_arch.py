@@ -29,7 +29,7 @@ class SeemoRe(nn.Module):
         use_shuffle: bool = True,
         global_kernel_size: int = 11,
         recursive: int = 2,
-        lr_space: LRSpace = 'linear',
+        lr_space: LRSpace = "linear",
         topk: int = 1,
     ):
         super().__init__()
@@ -47,24 +47,24 @@ class SeemoRe(nn.Module):
         )
 
         # -- DEEP FEATURES --
-        self.body = nn.ModuleList([
-            ResGroup(
-                in_ch=embedding_dim,
-                num_experts=num_experts,
-                use_shuffle=use_shuffle,
-                topk=topk,
-                lr_space=lr_space,
-                recursive=recursive,
-                global_kernel_size=global_kernel_size,
-            )
-            for _ in range(num_layers)
-        ])
+        self.body = nn.ModuleList(
+            [
+                ResGroup(
+                    in_ch=embedding_dim,
+                    num_experts=num_experts,
+                    use_shuffle=use_shuffle,
+                    topk=topk,
+                    lr_space=lr_space,
+                    recursive=recursive,
+                    global_kernel_size=global_kernel_size,
+                )
+                for _ in range(num_layers)
+            ]
+        )
 
         # -- UPSCALE --
-        self.norm = LayerNorm(embedding_dim, data_format='channels_first')
-        self.conv_2 = nn.Conv2d(
-            embedding_dim, embedding_dim, kernel_size=3, padding=1
-        )
+        self.norm = LayerNorm(embedding_dim, data_format="channels_first")
+        self.conv_2 = nn.Conv2d(embedding_dim, embedding_dim, kernel_size=3, padding=1)
         self.upsampler = nn.Sequential(
             nn.Conv2d(
                 embedding_dim,
@@ -107,7 +107,7 @@ class ResGroup(nn.Module):
         in_ch: int,
         num_experts: int,
         global_kernel_size: int = 11,
-        lr_space: LRSpace = 'linear',
+        lr_space: LRSpace = "linear",
         topk: int = 2,
         recursive: int = 2,
         use_shuffle: bool = False,
@@ -137,13 +137,11 @@ class SME(nn.Module):
     def __init__(self, in_ch: int, kernel_size: int = 11):
         super().__init__()
 
-        self.norm_1 = LayerNorm(in_ch, data_format='channels_first')
+        self.norm_1 = LayerNorm(in_ch, data_format="channels_first")
         self.block = StripedConvFormer(in_ch=in_ch, kernel_size=kernel_size)
 
-        self.norm_2 = LayerNorm(in_ch, data_format='channels_first')
-        self.ffn = GatedFFN(
-            in_ch, mlp_ratio=2, kernel_size=3, act_layer=nn.GELU()
-        )
+        self.norm_2 = LayerNorm(in_ch, data_format="channels_first")
+        self.ffn = GatedFFN(in_ch, mlp_ratio=2, kernel_size=3, act_layer=nn.GELU())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.block(self.norm_1(x)) + x
@@ -164,9 +162,7 @@ class StripedConvFormer(nn.Module):
             nn.GELU(),
         )
 
-        self.attn = StripedConv2d(
-            in_ch, kernel_size=kernel_size, depthwise=True
-        )
+        self.attn = StripedConv2d(in_ch, kernel_size=kernel_size, depthwise=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         q, v = self.to_qv(x).chunk(2, dim=1)
@@ -184,13 +180,13 @@ class RME(nn.Module):
         in_ch: int,
         num_experts: int,
         topk: int,
-        lr_space: LRSpace = 'linear',
+        lr_space: LRSpace = "linear",
         recursive: int = 2,
         use_shuffle: bool = False,
     ):
         super().__init__()
 
-        self.norm_1 = LayerNorm(in_ch, data_format='channels_first')
+        self.norm_1 = LayerNorm(in_ch, data_format="channels_first")
         self.block = MoEBlock(
             in_ch=in_ch,
             num_experts=num_experts,
@@ -200,10 +196,8 @@ class RME(nn.Module):
             lr_space=lr_space,  # type: ignore
         )
 
-        self.norm_2 = LayerNorm(in_ch, data_format='channels_first')
-        self.ffn = GatedFFN(
-            in_ch, mlp_ratio=2, kernel_size=3, act_layer=nn.GELU()
-        )
+        self.norm_2 = LayerNorm(in_ch, data_format="channels_first")
+        self.ffn = GatedFFN(in_ch, mlp_ratio=2, kernel_size=3, act_layer=nn.GELU())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.block(self.norm_1(x)) + x
@@ -211,7 +205,7 @@ class RME(nn.Module):
         return x
 
 
-LRSpace = Literal['linear', 'exp', 'double']
+LRSpace = Literal["linear", "exp", "double"]
 
 
 #################
@@ -224,7 +218,7 @@ class MoEBlock(nn.Module):
         num_experts: int,
         topk: int,
         use_shuffle: bool = False,
-        lr_space: LRSpace = 'linear',
+        lr_space: LRSpace = "linear",
         recursive: int = 2,
     ):
         super().__init__()
@@ -243,9 +237,7 @@ class MoEBlock(nn.Module):
         )
 
         self.conv = nn.Sequential(
-            nn.Conv2d(
-                in_ch, in_ch, kernel_size=3, stride=1, padding=1, groups=in_ch
-            ),
+            nn.Conv2d(in_ch, in_ch, kernel_size=3, stride=1, padding=1, groups=in_ch),
             nn.Conv2d(in_ch, in_ch, kernel_size=1, padding=0),
         )
 
@@ -253,19 +245,18 @@ class MoEBlock(nn.Module):
             StripedConv2d(in_ch, kernel_size=3, depthwise=True), nn.GELU()
         )
 
-        if lr_space == 'linear':
+        if lr_space == "linear":
             grow_func = lambda i: i + 2  # noqa: E731
-        elif lr_space == 'exp':
+        elif lr_space == "exp":
             grow_func = lambda i: 2 ** (i + 1)  # noqa: E731
-        elif lr_space == 'double':
+        elif lr_space == "double":
             grow_func = lambda i: 2 * i + 2  # noqa: E731
         else:
-            raise NotImplementedError(f'lr_space {lr_space} not implemented')
+            raise NotImplementedError(f"lr_space {lr_space} not implemented")
 
         self.moe_layer = MoELayer(
             experts=[
-                Expert(in_ch=in_ch, low_dim=grow_func(i))
-                for i in range(num_experts)
+                Expert(in_ch=in_ch, low_dim=grow_func(i)) for i in range(num_experts)
             ],  # add here multiple of 2 as low_dim
             gate=Router(in_ch=in_ch, num_experts=num_experts),
             num_expert=topk,
@@ -280,7 +271,7 @@ class MoEBlock(nn.Module):
         for _ in range(self.recursive):
             x = self.agg_conv(x)
         x = self.conv(x)
-        x = F.interpolate(x, size=(h, w), mode='bilinear', align_corners=False)
+        x = F.interpolate(x, size=(h, w), mode="bilinear", align_corners=False)
         return res + x
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -299,9 +290,7 @@ class MoEBlock(nn.Module):
 
 
 class MoELayer(nn.Module):
-    def __init__(
-        self, experts: list[nn.Module], gate: nn.Module, num_expert: int = 1
-    ):
+    def __init__(self, experts: list[nn.Module], gate: nn.Module, num_expert: int = 1):
         super().__init__()
         assert len(experts) > 0
         self.experts = nn.ModuleList(experts)
@@ -316,19 +305,13 @@ class MoELayer(nn.Module):
 
         if self.training:
             exp_weights = torch.zeros_like(weights)
-            exp_weights.scatter_(
-                1, topk_experts, weights.gather(1, topk_experts)
-            )
+            exp_weights.scatter_(1, topk_experts, weights.gather(1, topk_experts))
             for i, expert in enumerate(self.experts):
                 out += expert(inputs, k) * exp_weights[:, i : i + 1, None, None]
         else:
-            selected_experts = [
-                self.experts[i] for i in topk_experts.squeeze(dim=0)
-            ]  # type: ignore
+            selected_experts = [self.experts[i] for i in topk_experts.squeeze(dim=0)]  # type: ignore
             for i, expert in enumerate(selected_experts):
-                out += (
-                    expert(inputs, k) * topk_weights[:, i : i + 1, None, None]
-                )
+                out += expert(inputs, k) * topk_weights[:, i : i + 1, None, None]
 
         return out
 
@@ -357,7 +340,7 @@ class Router(nn.Module):
 
         self.body = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            Rearrange('b c 1 1 -> b c'),
+            Rearrange("b c 1 1 -> b c"),
             nn.Linear(in_ch, num_experts, bias=False),
         )
 
@@ -456,22 +439,22 @@ class LayerNorm(nn.Module):
     with shape (batch_size, channels, height, width).
     """
 
-    def __init__(self, normalized_shape, eps=1e-6, data_format='channels_last'):
+    def __init__(self, normalized_shape, eps=1e-6, data_format="channels_last"):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(normalized_shape))  # type: ignore
         self.bias = nn.Parameter(torch.zeros(normalized_shape))  # type: ignore
         self.eps = eps
         self.data_format = data_format
-        if self.data_format not in ['channels_last', 'channels_first']:
+        if self.data_format not in ["channels_last", "channels_first"]:
             raise NotImplementedError
         self.normalized_shape = (normalized_shape,)
 
     def forward(self, x):
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             return F.layer_norm(
                 x, self.normalized_shape, self.weight, self.bias, self.eps
             )
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             u = x.mean(1, keepdim=True)
             s = (x - u).pow(2).mean(1, keepdim=True)
             x = (x - u) / torch.sqrt(s + self.eps)

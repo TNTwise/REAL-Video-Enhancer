@@ -65,31 +65,29 @@ def _inv_int_div(a: int, c: int) -> float:
     if c == a // (b_float + 0.01):
         return b_float + 0.01
 
-    raise ValueError(
-        f'Could not find a number b such that a // b == c. a={a}, c={c}'
-    )
+    raise ValueError(f"Could not find a number b such that a // b == c. a={a}, c={c}")
 
 
 class HATArch(Architecture[HAT]):
     def __init__(self) -> None:
         super().__init__(
-            id='HAT',
+            id="HAT",
             detect=KeyCondition.has_all(
-                'relative_position_index_SA',
-                'conv_first.weight',
-                'layers.0.residual_group.blocks.0.norm1.weight',
-                'layers.0.residual_group.blocks.0.conv_block.cab.0.weight',
-                'layers.0.residual_group.blocks.0.conv_block.cab.2.weight',
-                'layers.0.residual_group.blocks.0.conv_block.cab.3.attention.1.weight',
-                'layers.0.residual_group.blocks.0.conv_block.cab.3.attention.3.weight',
-                'layers.0.residual_group.blocks.0.mlp.fc1.bias',
-                'layers.0.residual_group.blocks.0.mlp.fc2.weight',
-                'layers.0.residual_group.overlap_attn.relative_position_bias_table',
-                'layers.0.residual_group.overlap_attn.qkv.weight',
-                'layers.0.residual_group.overlap_attn.proj.weight',
-                'layers.0.residual_group.overlap_attn.mlp.fc1.weight',
-                'layers.0.residual_group.overlap_attn.mlp.fc2.weight',
-                'conv_last.weight',
+                "relative_position_index_SA",
+                "conv_first.weight",
+                "layers.0.residual_group.blocks.0.norm1.weight",
+                "layers.0.residual_group.blocks.0.conv_block.cab.0.weight",
+                "layers.0.residual_group.blocks.0.conv_block.cab.2.weight",
+                "layers.0.residual_group.blocks.0.conv_block.cab.3.attention.1.weight",
+                "layers.0.residual_group.blocks.0.conv_block.cab.3.attention.3.weight",
+                "layers.0.residual_group.blocks.0.mlp.fc1.bias",
+                "layers.0.residual_group.blocks.0.mlp.fc2.weight",
+                "layers.0.residual_group.overlap_attn.relative_position_bias_table",
+                "layers.0.residual_group.overlap_attn.qkv.weight",
+                "layers.0.residual_group.overlap_attn.proj.weight",
+                "layers.0.residual_group.overlap_attn.mlp.fc1.weight",
+                "layers.0.residual_group.overlap_attn.mlp.fc2.weight",
+                "conv_last.weight",
             ),
         )
 
@@ -116,79 +114,73 @@ class HATArch(Architecture[HAT]):
         patch_norm = True
         upscale = 2
         img_range = 1.0  # cannot be deduced from state dict
-        upsampler = 'pixelshuffle'  # it's the only possible value
-        resi_connection = '1conv'
+        upsampler = "pixelshuffle"  # it's the only possible value
+        resi_connection = "1conv"
         num_feat = 64
 
-        in_chans = state_dict['conv_first.weight'].shape[1]
-        embed_dim = state_dict['conv_first.weight'].shape[0]
+        in_chans = state_dict["conv_first.weight"].shape[1]
+        embed_dim = state_dict["conv_first.weight"].shape[0]
 
-        num_feat = state_dict['conv_last.weight'].shape[1]
-        upscale, _ = get_pixelshuffle_params(state_dict, 'upsample', num_feat)
+        num_feat = state_dict["conv_last.weight"].shape[1]
+        upscale, _ = get_pixelshuffle_params(state_dict, "upsample", num_feat)
 
-        window_size = int(
-            math.sqrt(state_dict['relative_position_index_SA'].shape[0])
-        )
+        window_size = int(math.sqrt(state_dict["relative_position_index_SA"].shape[0]))
         overlap_ratio = _get_overlap_ratio(
             window_size,
             with_overlap=int(
-                math.sqrt(state_dict['relative_position_index_OCA'].shape[1])
+                math.sqrt(state_dict["relative_position_index_OCA"].shape[1])
             ),
         )
 
         # num_layers = len(depths)
-        num_layers = get_seq_len(state_dict, 'layers')
+        num_layers = get_seq_len(state_dict, "layers")
         depths = [
-            get_seq_len(state_dict, f'layers.{i}.residual_group.blocks')
+            get_seq_len(state_dict, f"layers.{i}.residual_group.blocks")
             for i in range(num_layers)
         ]
         num_heads = [
             state_dict[
-                f'layers.{i}.residual_group.overlap_attn.relative_position_bias_table'
+                f"layers.{i}.residual_group.overlap_attn.relative_position_bias_table"
             ].shape[1]
             for i in range(num_layers)
         ]
 
-        if 'conv_after_body.weight' in state_dict:
-            resi_connection = '1conv'
+        if "conv_after_body.weight" in state_dict:
+            resi_connection = "1conv"
         else:
             # There is no way to decide whether it's "identity" or something else.
             # So we just assume it's identity.
-            resi_connection = 'identity'
+            resi_connection = "identity"
 
         compress_ratio = _inv_int_div(
             embed_dim,
             state_dict[
-                'layers.0.residual_group.blocks.0.conv_block.cab.0.weight'
+                "layers.0.residual_group.blocks.0.conv_block.cab.0.weight"
             ].shape[0],
         )
         squeeze_factor = _inv_int_div(
             embed_dim,
             state_dict[
-                'layers.0.residual_group.blocks.0.conv_block.cab.3.attention.1.weight'
+                "layers.0.residual_group.blocks.0.conv_block.cab.3.attention.1.weight"
             ].shape[0],
         )
 
-        qkv_bias = (
-            'layers.0.residual_group.blocks.0.attn.qkv.bias' in state_dict
-        )
-        patch_norm = 'patch_embed.norm.weight' in state_dict
-        ape = 'absolute_pos_embed' in state_dict
+        qkv_bias = "layers.0.residual_group.blocks.0.attn.qkv.bias" in state_dict
+        patch_norm = "patch_embed.norm.weight" in state_dict
+        ape = "absolute_pos_embed" in state_dict
 
         # mlp_hidden_dim = int(embed_dim * mlp_ratio)
         mlp_hidden_dim = int(
-            state_dict['layers.0.residual_group.blocks.0.mlp.fc1.weight'].shape[
-                0
-            ]
+            state_dict["layers.0.residual_group.blocks.0.mlp.fc1.weight"].shape[0]
         )
         mlp_ratio = mlp_hidden_dim / embed_dim
 
         # img_size and patch_size are linked to each other and not always stored in the
         # state dict. If it isn't stored, then there is no way to deduce it.
-        if 'absolute_pos_embed' in state_dict:
+        if "absolute_pos_embed" in state_dict:
             # patches_resolution = img_size // patch_size
             # num_patches = patches_resolution ** 2
-            num_patches = state_dict['absolute_pos_embed'].shape[1]
+            num_patches = state_dict["absolute_pos_embed"].shape[1]
             patches_resolution = int(math.sqrt(num_patches))
             # we'll just assume that the patch size is 1
             patch_size = 1
@@ -222,22 +214,22 @@ class HATArch(Architecture[HAT]):
         )
 
         if len(depths) < 9:
-            size_tag = 'small' if compress_ratio > 4 else 'medium'
+            size_tag = "small" if compress_ratio > 4 else "medium"
         else:
-            size_tag = 'large'
+            size_tag = "large"
         tags = [
             size_tag,
-            f's{img_size}w{window_size}',
-            f'{num_feat}nf',
-            f'{embed_dim}dim',
-            f'{resi_connection}',
+            f"s{img_size}w{window_size}",
+            f"{num_feat}nf",
+            f"{embed_dim}dim",
+            f"{resi_connection}",
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if upscale == 1 else 'SR',
+            purpose="Restoration" if upscale == 1 else "SR",
             tags=tags,
             supports_half=False,
             supports_bfloat16=True,
@@ -248,4 +240,4 @@ class HATArch(Architecture[HAT]):
         )
 
 
-__all__ = ['HAT', 'HATArch']
+__all__ = ["HAT", "HATArch"]

@@ -10,24 +10,22 @@ class LayerNorm(nn.Module):
     with shape (batch_size, channels, height, width).
     """
 
-    def __init__(
-        self, normalized_shape, eps=1e-6, data_format='channels_first'
-    ):
+    def __init__(self, normalized_shape, eps=1e-6, data_format="channels_first"):
         super().__init__()
         self.weight = nn.Parameter(torch.ones(normalized_shape))
         self.bias = nn.Parameter(torch.zeros(normalized_shape))
         self.eps = eps
         self.data_format = data_format
-        if self.data_format not in ['channels_last', 'channels_first']:
+        if self.data_format not in ["channels_last", "channels_first"]:
             raise NotImplementedError
         self.normalized_shape = (normalized_shape,)
 
     def forward(self, x):
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             return F.layer_norm(
                 x, self.normalized_shape, self.weight, self.bias, self.eps
             )
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             u = x.mean(1, keepdim=True)
             s = (x - u).pow(2).mean(1, keepdim=True)
             x = (x - u) / torch.sqrt(s + self.eps)
@@ -43,9 +41,7 @@ class NormDownsample(nn.Module):
             self.norm = LayerNorm(out_ch)
         self.prelu = nn.PReLU()
         self.down = nn.Sequential(
-            nn.Conv2d(
-                in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=False
-            ),
+            nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=False),
             nn.UpsamplingBilinear2d(scale_factor=scale),
         )
 
@@ -66,9 +62,7 @@ class NormUpsample(nn.Module):
             self.norm = LayerNorm(out_ch)
         self.prelu = nn.PReLU()
         self.up_scale = nn.Sequential(
-            nn.Conv2d(
-                in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=False
-            ),
+            nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=False),
             nn.UpsamplingBilinear2d(scale_factor=scale),
         )
         self.up = nn.Conv2d(

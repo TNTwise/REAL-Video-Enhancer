@@ -8,9 +8,7 @@ from ....util import store_hyperparameters
 
 
 @torch.no_grad()  # type: ignore
-def default_init_weights(
-    module_list, scale: float = 1, bias_fill: float = 0, **kwargs
-):
+def default_init_weights(module_list, scale: float = 1, bias_fill: float = 0, **kwargs):
     """Initialize network weights.
 
     Args:
@@ -189,7 +187,7 @@ class DEResNet(nn.Module):
         self,
         num_in_ch=3,
         num_degradation=2,
-        degradation_degree_actv='sigmoid',
+        degradation_degree_actv="sigmoid",
         num_feats=[64, 128, 256, 512],
         num_blocks=[2, 2, 2, 2],
         downscales=[2, 2, 2, 1],
@@ -199,9 +197,7 @@ class DEResNet(nn.Module):
         assert isinstance(num_feats, list)
         assert isinstance(num_blocks, list)
         assert isinstance(downscales, list)
-        assert len(num_feats) == len(num_blocks) and len(num_feats) == len(
-            downscales
-        )
+        assert len(num_feats) == len(num_blocks) and len(num_feats) == len(downscales)
 
         num_stage = len(num_feats)
 
@@ -220,9 +216,7 @@ class DEResNet(nn.Module):
                         and num_feats[stage] != num_feats[stage + 1]
                     ):
                         body.append(
-                            nn.Conv2d(
-                                num_feats[stage], num_feats[stage + 1], 3, 1, 1
-                            )
+                            nn.Conv2d(num_feats[stage], num_feats[stage + 1], 3, 1, 1)
                         )
                     continue
                 if downscales[stage] == 2:
@@ -243,14 +237,14 @@ class DEResNet(nn.Module):
 
         self.num_degradation = num_degradation
         self.fc_degree = nn.ModuleList()
-        if degradation_degree_actv == 'sigmoid':
+        if degradation_degree_actv == "sigmoid":
             actv = nn.Sigmoid
-        elif degradation_degree_actv == 'tanh':
+        elif degradation_degree_actv == "tanh":
             actv = nn.Tanh
         else:
             raise NotImplementedError(
-                f'only sigmoid and tanh are supported for degradation_degree_actv, '
-                f'{degradation_degree_actv} is not supported yet.'
+                f"only sigmoid and tanh are supported for degradation_degree_actv, "
+                f"{degradation_degree_actv} is not supported yet."
             )
         for _ in range(num_degradation):
             self.fc_degree.append(
@@ -306,9 +300,9 @@ class MMRRDBNet(nn.Module):
         num_feat=64,
         num_block=23,
         num_grow_ch=32,
-        de_net_type='DEResNet',
+        de_net_type="DEResNet",
         num_degradation=2,
-        degradation_degree_actv='sigmoid',
+        degradation_degree_actv="sigmoid",
         num_feats=[64, 128, 256, 512],
         num_blocks=[2, 2, 2, 2],
         downscales=[2, 2, 2, 1],
@@ -325,9 +319,7 @@ class MMRRDBNet(nn.Module):
         self.am_list = nn.ModuleList()
         for _ in range(num_block):
             self.body.append(RRDB(num_feat, num_grow_ch=num_grow_ch))
-            self.am_list.append(
-                AffineModulate(degradation_dim=512, num_feat=num_feat)
-            )
+            self.am_list.append(AffineModulate(degradation_dim=512, num_feat=num_feat))
 
         self.conv_body = nn.Conv2d(num_feat, num_feat, 3, 1, 1)
         # upsample
@@ -342,7 +334,7 @@ class MMRRDBNet(nn.Module):
         self.num_block = num_block
 
         # degradation net
-        assert de_net_type == 'DEResNet'
+        assert de_net_type == "DEResNet"
         self.de_net = DEResNet(
             num_in_ch=num_in_ch,
             num_degradation=num_degradation,
@@ -382,9 +374,7 @@ class MMRRDBNet(nn.Module):
                 reg = degrees[i].view(b, 5)
                 min = torch.zeros_like(reg[:, -2].unsqueeze(-1))
                 max = torch.ones_like(reg[:, -2].unsqueeze(-1))
-                new_degrees.append(
-                    torch.cat([reg[:, :-2], min, max], dim=-1).view(-1)
-                )
+                new_degrees.append(torch.cat([reg[:, :-2], min, max], dim=-1).view(-1))
                 # print(degrees[i].shape)
             else:
                 new_degrees.append(
@@ -401,10 +391,10 @@ class MMRRDBNet(nn.Module):
         feat = feat_res + feat
         # upsample
         feat = self.lrelu(
-            self.conv_up1(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up1(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         feat = self.lrelu(
-            self.conv_up2(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up2(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         out = self.conv_last(self.lrelu(self.conv_hr(feat)))
         return out, degrees
@@ -437,9 +427,9 @@ class MMRRDBNet_decouple(nn.Module):
         num_feat=64,
         num_block=23,
         num_grow_ch=32,
-        de_net_type='DEResNet',
+        de_net_type="DEResNet",
         num_degradation=2,
-        degradation_degree_actv='sigmoid',
+        degradation_degree_actv="sigmoid",
         num_feats=[64, 128, 256, 512],
         num_blocks=[2, 2, 2, 2],
         downscales=[2, 2, 2, 1],
@@ -456,9 +446,7 @@ class MMRRDBNet_decouple(nn.Module):
         self.am_list = nn.ModuleList()
         for _ in range(num_block):
             self.body.append(RRDB(num_feat, num_grow_ch=num_grow_ch))
-            self.am_list.append(
-                AffineModulate(degradation_dim=512, num_feat=num_feat)
-            )
+            self.am_list.append(AffineModulate(degradation_dim=512, num_feat=num_feat))
 
         self.conv_body = nn.Conv2d(num_feat, num_feat, 3, 1, 1)
         # upsample
@@ -473,7 +461,7 @@ class MMRRDBNet_decouple(nn.Module):
         self.num_block = num_block
 
         # degradation net
-        assert de_net_type == 'DEResNet'
+        assert de_net_type == "DEResNet"
         self.de_net = DEResNet(
             num_in_ch=num_in_ch,
             num_degradation=num_degradation,
@@ -533,10 +521,10 @@ class MMRRDBNet_decouple(nn.Module):
         feat = feat_res + feat
         # upsample
         feat = self.lrelu(
-            self.conv_up1(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up1(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         feat = self.lrelu(
-            self.conv_up2(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up2(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         out = self.conv_last(self.lrelu(self.conv_hr(feat)))
         return out, degrees
@@ -573,9 +561,9 @@ class MMRRDBNet_test(nn.Module):
         num_feat=64,
         num_block=23,
         num_grow_ch=32,
-        de_net_type='DEResNet',
+        de_net_type="DEResNet",
         num_degradation=2,
-        degradation_degree_actv='sigmoid',
+        degradation_degree_actv="sigmoid",
         num_feats=[64, 128, 256, 512],
         num_blocks=[2, 2, 2, 2],
         downscales=[2, 2, 2, 1],
@@ -592,9 +580,7 @@ class MMRRDBNet_test(nn.Module):
         self.am_list = nn.ModuleList()
         for _ in range(num_block):
             self.body.append(RRDB(num_feat, num_grow_ch=num_grow_ch))
-            self.am_list.append(
-                AffineModulate(degradation_dim=512, num_feat=num_feat)
-            )
+            self.am_list.append(AffineModulate(degradation_dim=512, num_feat=num_feat))
 
         self.conv_body = nn.Conv2d(num_feat, num_feat, 3, 1, 1)
         # upsample
@@ -609,7 +595,7 @@ class MMRRDBNet_test(nn.Module):
         self.num_block = num_block
 
         # degradation net
-        assert de_net_type == 'DEResNet'
+        assert de_net_type == "DEResNet"
         self.de_net = DEResNet(
             num_in_ch=num_in_ch,
             num_degradation=num_degradation,
@@ -658,10 +644,10 @@ class MMRRDBNet_test(nn.Module):
         feat = feat_res + feat
         # upsample
         feat = self.lrelu(
-            self.conv_up1(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up1(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         feat = self.lrelu(
-            self.conv_up2(F.interpolate(feat, scale_factor=2, mode='nearest'))
+            self.conv_up2(F.interpolate(feat, scale_factor=2, mode="nearest"))
         )
         out = self.conv_last(self.lrelu(self.conv_hr(feat)))
 

@@ -34,8 +34,7 @@ class Model:
         w_cut = (w - padsize) % (int(shave / 2))
 
         x_unfold = (
-            torch.nn.functional
-            .unfold(x, padsize, stride=int(shave / 2))
+            torch.nn.functional.unfold(x, padsize, stride=int(shave / 2))
             .transpose(0, 2)
             .contiguous()
         )
@@ -64,9 +63,7 @@ class Model:
         x_unfold = x_unfold.view(x_unfold.size(0), -1, padsize, padsize)
         y_unfold = []
 
-        x_range = x_unfold.size(0) // batchsize + (
-            x_unfold.size(0) % batchsize != 0
-        )
+        x_range = x_unfold.size(0) // batchsize + (x_unfold.size(0) % batchsize != 0)
         for i in range(x_range):
             y_unfold.append(
                 self.model(x_unfold[i * batchsize : (i + 1) * batchsize, ...])
@@ -111,10 +108,8 @@ class Model:
 
         y[
             ...,
-            int(shave / 2 * scale) : (h - h_cut) * scale
-            - int(shave / 2 * scale),
-            int(shave / 2 * scale) : (w - w_cut) * scale
-            - int(shave / 2 * scale),
+            int(shave / 2 * scale) : (h - h_cut) * scale - int(shave / 2 * scale),
+            int(shave / 2 * scale) : (w - w_cut) * scale - int(shave / 2 * scale),
         ] = y_inter
 
         y = torch.cat(
@@ -157,8 +152,7 @@ class Model:
         batchsize: int,
     ):
         x_h_cut_unfold = (
-            torch.nn.functional
-            .unfold(x_h_cut, padsize, stride=int(shave / 2))
+            torch.nn.functional.unfold(x_h_cut, padsize, stride=int(shave / 2))
             .transpose(0, 2)
             .contiguous()
         )
@@ -172,15 +166,12 @@ class Model:
         y_h_cut_unfold = []
         for i in range(x_range):
             y_h_cut_unfold.append(
-                self.model(
-                    x_h_cut_unfold[i * batchsize : (i + 1) * batchsize, ...]
-                )
+                self.model(x_h_cut_unfold[i * batchsize : (i + 1) * batchsize, ...])
             )
         y_h_cut_unfold = torch.cat(y_h_cut_unfold, dim=0)
 
         y_h_cut = torch.nn.functional.fold(
-            y_h_cut_unfold
-            .view(y_h_cut_unfold.size(0), -1, 1)
+            y_h_cut_unfold.view(y_h_cut_unfold.size(0), -1, 1)
             .transpose(0, 2)
             .contiguous(),
             (padsize * scale, (w - w_cut) * scale),
@@ -193,8 +184,7 @@ class Model:
             int(shave / 2 * scale) : padsize * scale - int(shave / 2 * scale),
         ].contiguous()
         y_h_cut_inter = torch.nn.functional.fold(
-            y_h_cut_unfold
-            .view(y_h_cut_unfold.size(0), -1, 1)
+            y_h_cut_unfold.view(y_h_cut_unfold.size(0), -1, 1)
             .transpose(0, 2)
             .contiguous(),
             (padsize * scale, (w - w_cut - shave) * scale),
@@ -202,9 +192,7 @@ class Model:
             stride=int(shave / 2 * scale),
         )
 
-        y_ones = torch.ones(y_h_cut_inter.shape, dtype=y_h_cut_inter.dtype).to(
-            x_h_cut
-        )
+        y_ones = torch.ones(y_h_cut_inter.shape, dtype=y_h_cut_inter.dtype).to(x_h_cut)
         divisor = torch.nn.functional.fold(
             torch.nn.functional.unfold(
                 y_ones,
@@ -220,8 +208,7 @@ class Model:
         y_h_cut[
             ...,
             :,
-            int(shave / 2 * scale) : (w - w_cut) * scale
-            - int(shave / 2 * scale),
+            int(shave / 2 * scale) : (w - w_cut) * scale - int(shave / 2 * scale),
         ] = y_h_cut_inter
         return y_h_cut
 
@@ -238,8 +225,7 @@ class Model:
         batchsize: int,
     ):
         x_w_cut_unfold = (
-            torch.nn.functional
-            .unfold(x_w_cut, padsize, stride=int(shave / 2))
+            torch.nn.functional.unfold(x_w_cut, padsize, stride=int(shave / 2))
             .transpose(0, 2)
             .contiguous()
         )
@@ -253,15 +239,12 @@ class Model:
         y_w_cut_unfold = []
         for i in range(x_range):
             y_w_cut_unfold.append(
-                self.model(
-                    x_w_cut_unfold[i * batchsize : (i + 1) * batchsize, ...]
-                )
+                self.model(x_w_cut_unfold[i * batchsize : (i + 1) * batchsize, ...])
             )
         y_w_cut_unfold = torch.cat(y_w_cut_unfold, dim=0)
 
         y_w_cut = torch.nn.functional.fold(
-            y_w_cut_unfold
-            .view(y_w_cut_unfold.size(0), -1, 1)
+            y_w_cut_unfold.view(y_w_cut_unfold.size(0), -1, 1)
             .transpose(0, 2)
             .contiguous(),
             ((h - h_cut) * scale, padsize * scale),
@@ -274,8 +257,7 @@ class Model:
             :,
         ].contiguous()
         y_w_cut_inter = torch.nn.functional.fold(
-            y_w_cut_unfold
-            .view(y_w_cut_unfold.size(0), -1, 1)
+            y_w_cut_unfold.view(y_w_cut_unfold.size(0), -1, 1)
             .transpose(0, 2)
             .contiguous(),
             ((h - h_cut - shave) * scale, padsize * scale),
@@ -283,9 +265,7 @@ class Model:
             stride=int(shave / 2 * scale),
         )
 
-        y_ones = torch.ones(y_w_cut_inter.shape, dtype=y_w_cut_inter.dtype).to(
-            x_w_cut
-        )
+        y_ones = torch.ones(y_w_cut_inter.shape, dtype=y_w_cut_inter.dtype).to(x_w_cut)
         divisor = torch.nn.functional.fold(
             torch.nn.functional.unfold(
                 y_ones,
@@ -300,8 +280,7 @@ class Model:
 
         y_w_cut[
             ...,
-            int(shave / 2 * scale) : (h - h_cut) * scale
-            - int(shave / 2 * scale),
+            int(shave / 2 * scale) : (h - h_cut) * scale - int(shave / 2 * scale),
             :,
         ] = y_w_cut_inter
         return y_w_cut

@@ -17,7 +17,7 @@ class Rife:
     def __init__(
         self,
         gpuid: int = -1,
-        model: str = 'rife-v2.3',
+        model: str = "rife-v2.3",
         scale: int = 2,
         tta_mode: bool = False,
         tta_temporal_mode: bool = False,
@@ -45,13 +45,13 @@ class Rife:
         if (scale & (scale - 1)) == 0:
             self.scale = scale
         else:
-            raise ValueError('scale should be a power of 2')
+            raise ValueError("scale should be a power of 2")
 
         # determine if rife-v2 is used
-        rife_v2 = ('rife-v2' in model) or ('rife-v3' in model)
-        rife_v4 = 'rife-v4' in model or 'rife4' in model or 'rife-4' in model
+        rife_v2 = ("rife-v2" in model) or ("rife-v3" in model)
+        rife_v4 = "rife-v4" in model or "rife4" in model or "rife-4" in model
         padding = 32
-        if ('rife-v4.25' in model) or ('rife-v4.26' in model):
+        if ("rife-v4.25" in model) or ("rife-v4.26" in model):
             padding = 64
 
         # create raw RIFE wrapper object
@@ -72,12 +72,12 @@ class Rife:
         if model_dir is None:
             model_dir = pathlib.Path(model)
             if not model_dir.is_absolute() and not model_dir.is_dir():
-                model_dir = pathlib.Path(__file__).parent / 'models' / model
+                model_dir = pathlib.Path(__file__).parent / "models" / model
 
         # if the model_dir is specified and exists
         if model_dir.exists():
             modeldir_str = wrapped.StringType()
-            if sys.platform in ('win32', 'cygwin'):
+            if sys.platform in ("win32", "cygwin"):
                 modeldir_str.wstr = wrapped.new_wstr_p()
                 wrapped.wstr_p_assign(modeldir_str.wstr, str(model_dir))
             else:
@@ -88,7 +88,7 @@ class Rife:
 
         # if no model_dir is specified but doesn't exist
         else:
-            raise FileNotFoundError(f'{model_dir} not found')
+            raise FileNotFoundError(f"{model_dir} not found")
 
     def patch_pause(self):
         """
@@ -146,7 +146,7 @@ class InterpolateRIFENCNN:
         self.gpuid = gpuid
         self.threads = threads
         self.paused = False
-        self.backend = 'ncnn'
+        self.backend = "ncnn"
         self.frame0 = None
         self.hdr_mode = hdr_mode
         self._load()
@@ -164,7 +164,7 @@ class InterpolateRIFENCNN:
                 max_timestep=self.max_timestep,
             )
             device = ncnn.get_gpu_device(self.gpuid).info().device_name()
-        print('Using GPU:', device)
+        print("Using GPU:", device)
 
     def hotUnload(self):
         self.paused = True

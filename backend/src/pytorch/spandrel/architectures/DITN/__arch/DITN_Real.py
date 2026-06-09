@@ -21,20 +21,18 @@ def default_conv(in_channels, out_channels, kernel_size, bias=True):
 
 
 def to_3d(x):
-    return rearrange(x, 'b c h w -> b (h w) c')
+    return rearrange(x, "b c h w -> b (h w) c")
 
 
 def to_4d(x, h, w):
-    return rearrange(x, 'b (h w) c -> b c h w', h=h, w=w)
+    return rearrange(x, "b (h w) c -> b c h w", h=h, w=w)
 
 
 class FeedForward(nn.Module):
     def __init__(self, dim, ffn_expansion_factor, bias):
         super().__init__()
         hidden_features = int(dim * ffn_expansion_factor)
-        self.project_in = nn.Conv2d(
-            dim, hidden_features * 2, kernel_size=1, bias=bias
-        )
+        self.project_in = nn.Conv2d(dim, hidden_features * 2, kernel_size=1, bias=bias)
 
         self.dwconv = nn.Conv2d(
             hidden_features * 2,
@@ -46,9 +44,7 @@ class FeedForward(nn.Module):
             bias=bias,
         )
 
-        self.project_out = nn.Conv2d(
-            hidden_features, dim, kernel_size=1, bias=bias
-        )
+        self.project_out = nn.Conv2d(hidden_features, dim, kernel_size=1, bias=bias)
 
     def forward(self, x):
         x = self.project_in(x)
@@ -97,7 +93,7 @@ class WithBias_LayerNorm(nn.Module):
 class LayerNorm(nn.Module):
     def __init__(self, dim, LayerNorm_type):
         super().__init__()
-        if LayerNorm_type == 'BiasFree':
+        if LayerNorm_type == "BiasFree":
             self.body = BiasFree_LayerNorm(dim)
         else:
             self.body = WithBias_LayerNorm(dim)
@@ -137,12 +133,10 @@ class ISA(nn.Module):
 
 
 class SDA(nn.Module):
-    def __init__(self, n_feats, LayerNorm_type='WithBias'):
+    def __init__(self, n_feats, LayerNorm_type="WithBias"):
         super().__init__()
         i_feats = 2 * n_feats
-        self.scale = nn.Parameter(
-            torch.zeros((1, n_feats, 1, 1)), requires_grad=True
-        )
+        self.scale = nn.Parameter(torch.zeros((1, n_feats, 1, 1)), requires_grad=True)
 
         self.DConvs = nn.Sequential(
             nn.Conv2d(n_feats, n_feats, 5, 1, 5 // 2, groups=n_feats),
@@ -248,8 +242,7 @@ class UFONE(nn.Module):
             self.patch_size,
         )
         local_features = (
-            local_features
-            .permute(0, 2, 4, 1, 3, 5)
+            local_features.permute(0, 2, 4, 1, 3, 5)
             .contiguous()
             .view(-1, C, self.patch_size, self.patch_size)
         )
@@ -263,10 +256,7 @@ class UFONE(nn.Module):
             self.patch_size,
         )
         global_features = (
-            local_features
-            .permute(0, 3, 1, 4, 2, 5)
-            .contiguous()
-            .view(B, C, H, W)
+            local_features.permute(0, 3, 1, 4, 2, 5).contiguous().view(B, C, H, W)
         )
         global_features = self.SALs(global_features)
         return global_features
@@ -286,7 +276,7 @@ class DITN_Real(nn.Module):
         UFONE_blocks=1,
         ffn_expansion_factor=2,
         bias=False,
-        LayerNorm_type='WithBias',
+        LayerNorm_type="WithBias",
         patch_size=8,
         upscale=4,
     ):
@@ -320,12 +310,8 @@ class DITN_Real(nn.Module):
     def check_image_size(self, x):
         wsize = self.patch_sizes[0]
         for i in range(1, len(self.patch_sizes)):
-            wsize = (
-                wsize
-                * self.patch_sizes[i]
-                // math.gcd(wsize, self.patch_sizes[i])
-            )
-        return pad_to_multiple(x, wsize, mode='reflect')
+            wsize = wsize * self.patch_sizes[i] // math.gcd(wsize, self.patch_sizes[i])
+        return pad_to_multiple(x, wsize, mode="reflect")
 
     def forward(self, inp_img):
         _, _, old_h, old_w = inp_img.shape
@@ -337,6 +323,4 @@ class DITN_Real(nn.Module):
         local_features = self.conv_after_body(local_features)
         out_dec_level1 = self.upsample(local_features + sft)
 
-        return out_dec_level1[
-            :, :, 0 : old_h * self.scale, 0 : old_w * self.scale
-        ]
+        return out_dec_level1[:, :, 0 : old_h * self.scale, 0 : old_w * self.scale]

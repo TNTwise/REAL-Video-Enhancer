@@ -28,18 +28,12 @@ class AffineTransform(nn.Module):
         # mlp to generate continuous relative position bias
         self.cpb_mlp = CPB_MLP(2, num_heads)
 
-    def forward(
-        self, attn, relative_coords_table, relative_position_index, mask
-    ):
+    def forward(self, attn, relative_coords_table, relative_position_index, mask):
         B_, H, N1, N2 = attn.shape
         # logit scale
-        attn = (
-            attn * torch.clamp(self.logit_scale, max=math.log(1.0 / 0.01)).exp()
-        )
+        attn = attn * torch.clamp(self.logit_scale, max=math.log(1.0 / 0.01)).exp()
 
-        bias_table = self.cpb_mlp(
-            relative_coords_table
-        )  # 2*Wh-1, 2*Ww-1, num_heads
+        bias_table = self.cpb_mlp(relative_coords_table)  # 2*Wh-1, 2*Ww-1, num_heads
         bias_table = bias_table.view(-1, H)
 
         bias = bias_table[relative_position_index.view(-1)]
@@ -89,9 +83,7 @@ class Attention(ABC, nn.Module):
             # print("use euclidean distance")
             attn = torch.norm(q.unsqueeze(-2) - k.unsqueeze(-3), dim=-1)
         else:
-            attn = F.normalize(q, dim=-1) @ F.normalize(k, dim=-1).transpose(
-                -2, -1
-            )
+            attn = F.normalize(q, dim=-1) @ F.normalize(k, dim=-1).transpose(-2, -1)
         attn = attn_transform(attn, table, index, mask)
         # attention
         attn = self.softmax(attn)
@@ -168,17 +160,15 @@ class WindowAttention(Attention):
 
         # reverse cyclic shift
         if self.shift_size > 0:
-            x = torch.roll(
-                x, shifts=(self.shift_size, self.shift_size), dims=(1, 2)
-            )
+            x = torch.roll(x, shifts=(self.shift_size, self.shift_size), dims=(1, 2))
         x = x.view(B, L, C // 3)
 
         return x
 
     def extra_repr(self) -> str:
         return (
-            f'window_size={self.window_size}, shift_size={self.shift_size}, '
-            f'pretrained_window_size={self.pretrained_window_size}, num_heads={self.num_heads}'
+            f"window_size={self.window_size}, shift_size={self.shift_size}, "
+            f"pretrained_window_size={self.pretrained_window_size}, num_heads={self.num_heads}"
         )
 
     def flops(self, N):
@@ -247,17 +237,11 @@ class AnchorStripeAttention(Attention):
         stripe_size, shift_size = get_stripe_info(
             self.stripe_size, self.stripe_groups, self.stripe_shift, x_size
         )
-        anchor_stripe_size = [
-            s // self.anchor_window_down_factor for s in stripe_size
-        ]
-        anchor_shift_size = [
-            s // self.anchor_window_down_factor for s in shift_size
-        ]
+        anchor_stripe_size = [s // self.anchor_window_down_factor for s in stripe_size]
+        anchor_shift_size = [s // self.anchor_window_down_factor for s in shift_size]
         # cyclic shift
         if self.stripe_shift:
-            qkv = torch.roll(
-                qkv, shifts=(-shift_size[0], -shift_size[1]), dims=(1, 2)
-            )
+            qkv = torch.roll(qkv, shifts=(-shift_size[0], -shift_size[1]), dims=(1, 2))
             anchor = torch.roll(
                 anchor,
                 shifts=(-anchor_shift_size[0], -anchor_shift_size[1]),
@@ -288,9 +272,7 @@ class AnchorStripeAttention(Attention):
             mask_a2w,
             False,
         )
-        x = self.attn(
-            q, anchor, x, self.attn_transform2, table, index_w2a, mask_w2a
-        )
+        x = self.attn(q, anchor, x, self.attn_transform2, table, index_w2a, mask_w2a)
 
         # merge windows
         x = x.view(B_, *stripe_size, C // 3)
@@ -306,8 +288,8 @@ class AnchorStripeAttention(Attention):
 
     def extra_repr(self) -> str:
         return (
-            f'stripe_size={self.stripe_size}, stripe_groups={self.stripe_groups}, stripe_shift={self.stripe_shift}, '
-            f'pretrained_stripe_size={self.pretrained_stripe_size}, num_heads={self.num_heads}, anchor_window_down_factor={self.anchor_window_down_factor}'
+            f"stripe_size={self.stripe_size}, stripe_groups={self.stripe_groups}, stripe_shift={self.stripe_shift}, "
+            f"pretrained_stripe_size={self.pretrained_stripe_size}, num_heads={self.num_heads}, anchor_window_down_factor={self.anchor_window_down_factor}"
         )
 
     def flops(self, N):
@@ -338,8 +320,8 @@ class MixedAttention(nn.Module):
         stripe_groups,
         stripe_shift,
         qkv_bias=True,
-        qkv_proj_type='linear',
-        anchor_proj_type='separable_conv',
+        qkv_proj_type="linear",
+        anchor_proj_type="separable_conv",
         anchor_one_stage=True,
         anchor_window_down_factor=1,
         attn_drop=0.0,
@@ -423,20 +405,20 @@ class MixedAttention(nn.Module):
     def _get_table_index_mask(self, table_index_mask, window_attn=True):
         if window_attn:
             return (
-                table_index_mask['table_w'],
-                table_index_mask['index_w'],
-                table_index_mask['mask_w'],
+                table_index_mask["table_w"],
+                table_index_mask["index_w"],
+                table_index_mask["mask_w"],
             )
         return (
-            table_index_mask['table_s'],
-            table_index_mask['index_a2w'],
-            table_index_mask['index_w2a'],
-            table_index_mask['mask_a2w'],
-            table_index_mask['mask_w2a'],
+            table_index_mask["table_s"],
+            table_index_mask["index_a2w"],
+            table_index_mask["index_w2a"],
+            table_index_mask["mask_a2w"],
+            table_index_mask["mask_w2a"],
         )
 
     def extra_repr(self) -> str:
-        return f'dim={self.dim}, input_resolution={self.input_resolution}'
+        return f"dim={self.dim}, input_resolution={self.input_resolution}"
 
     def flops(self, N):
         pass
@@ -476,11 +458,11 @@ class EfficientMixAttnTransformerBlock(nn.Module):
         stripe_size=[8, 8],
         stripe_groups=[None, None],
         stripe_shift=False,
-        stripe_type='H',
+        stripe_type="H",
         mlp_ratio=4.0,
         qkv_bias=True,
-        qkv_proj_type='linear',
-        anchor_proj_type='separable_conv',
+        qkv_proj_type="linear",
+        anchor_proj_type="separable_conv",
         anchor_one_stage=True,
         anchor_window_down_factor=1,
         drop=0.0,
@@ -503,7 +485,7 @@ class EfficientMixAttnTransformerBlock(nn.Module):
         self.stripe_shift = stripe_shift
         self.stripe_type = stripe_type
         self.args = args
-        if self.stripe_type == 'W':
+        if self.stripe_type == "W":
             self.stripe_size = stripe_size[::-1]
             self.stripe_groups = stripe_groups[::-1]
         else:
@@ -537,9 +519,7 @@ class EfficientMixAttnTransformerBlock(nn.Module):
         if self.args.local_connection:
             self.conv = CAB(dim)
 
-        self.drop_path = (
-            DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
-        )
+        self.drop_path = DropPath(drop_path) if drop_path > 0.0 else nn.Identity()
 
         self.mlp = Mlp(
             in_features=dim,
@@ -551,39 +531,31 @@ class EfficientMixAttnTransformerBlock(nn.Module):
 
     def _get_table_index_mask(self, all_table_index_mask):
         table_index_mask = {
-            'table_w': all_table_index_mask['table_w'],
-            'index_w': all_table_index_mask['index_w'],
+            "table_w": all_table_index_mask["table_w"],
+            "index_w": all_table_index_mask["index_w"],
         }
-        if self.stripe_type == 'W':
-            table_index_mask['table_s'] = all_table_index_mask['table_sv']
-            table_index_mask['index_a2w'] = all_table_index_mask['index_sv_a2w']
-            table_index_mask['index_w2a'] = all_table_index_mask['index_sv_w2a']
+        if self.stripe_type == "W":
+            table_index_mask["table_s"] = all_table_index_mask["table_sv"]
+            table_index_mask["index_a2w"] = all_table_index_mask["index_sv_a2w"]
+            table_index_mask["index_w2a"] = all_table_index_mask["index_sv_w2a"]
         else:
-            table_index_mask['table_s'] = all_table_index_mask['table_sh']
-            table_index_mask['index_a2w'] = all_table_index_mask['index_sh_a2w']
-            table_index_mask['index_w2a'] = all_table_index_mask['index_sh_w2a']
+            table_index_mask["table_s"] = all_table_index_mask["table_sh"]
+            table_index_mask["index_a2w"] = all_table_index_mask["index_sh_a2w"]
+            table_index_mask["index_w2a"] = all_table_index_mask["index_sh_w2a"]
         if self.window_shift:
-            table_index_mask['mask_w'] = all_table_index_mask['mask_w']
+            table_index_mask["mask_w"] = all_table_index_mask["mask_w"]
         else:
-            table_index_mask['mask_w'] = None
+            table_index_mask["mask_w"] = None
         if self.stripe_shift:
-            if self.stripe_type == 'W':
-                table_index_mask['mask_a2w'] = all_table_index_mask[
-                    'mask_sv_a2w'
-                ]
-                table_index_mask['mask_w2a'] = all_table_index_mask[
-                    'mask_sv_w2a'
-                ]
+            if self.stripe_type == "W":
+                table_index_mask["mask_a2w"] = all_table_index_mask["mask_sv_a2w"]
+                table_index_mask["mask_w2a"] = all_table_index_mask["mask_sv_w2a"]
             else:
-                table_index_mask['mask_a2w'] = all_table_index_mask[
-                    'mask_sh_a2w'
-                ]
-                table_index_mask['mask_w2a'] = all_table_index_mask[
-                    'mask_sh_w2a'
-                ]
+                table_index_mask["mask_a2w"] = all_table_index_mask["mask_sh_a2w"]
+                table_index_mask["mask_w2a"] = all_table_index_mask["mask_sh_w2a"]
         else:
-            table_index_mask['mask_a2w'] = None
-            table_index_mask['mask_w2a'] = None
+            table_index_mask["mask_a2w"] = None
+            table_index_mask["mask_w2a"] = None
         return table_index_mask
 
     def forward(self, x, x_size, all_table_index_mask):
@@ -593,9 +565,7 @@ class EfficientMixAttnTransformerBlock(nn.Module):
             x = (
                 x
                 + self.res_scale
-                * self.drop_path(
-                    self.norm1(self.attn(x, x_size, table_index_mask))
-                )
+                * self.drop_path(self.norm1(self.attn(x, x_size, table_index_mask)))
                 + self.conv(x, x_size)
             )
         else:
@@ -609,10 +579,10 @@ class EfficientMixAttnTransformerBlock(nn.Module):
 
     def extra_repr(self) -> str:
         return (
-            f'dim={self.dim}, input_resolution={self.input_resolution}, num_heads=({self.num_heads_w}, {self.num_heads_s}), '
-            f'window_size={self.window_size}, window_shift={self.window_shift}, '
-            f'stripe_size={self.stripe_size}, stripe_groups={self.stripe_groups}, stripe_shift={self.stripe_shift}, self.stripe_type={self.stripe_type}, '
-            f'mlp_ratio={self.mlp_ratio}, res_scale={self.res_scale}'
+            f"dim={self.dim}, input_resolution={self.input_resolution}, num_heads=({self.num_heads_w}, {self.num_heads_s}), "
+            f"window_size={self.window_size}, window_shift={self.window_shift}, "
+            f"stripe_size={self.stripe_size}, stripe_groups={self.stripe_groups}, stripe_shift={self.stripe_shift}, self.stripe_type={self.stripe_type}, "
+            f"mlp_ratio={self.mlp_ratio}, res_scale={self.res_scale}"
         )
 
     def flops(self):

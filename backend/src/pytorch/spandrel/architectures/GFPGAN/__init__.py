@@ -13,10 +13,10 @@ from .__arch.gfpganv1_clean_arch import GFPGANv1Clean as GFPGAN
 class GFPGANArch(Architecture[GFPGAN]):
     def __init__(self) -> None:
         super().__init__(
-            id='GFPGAN',
+            id="GFPGAN",
             detect=KeyCondition.has_all(
-                'toRGB.0.weight',
-                'stylegan_decoder.style_mlp.1.weight',
+                "toRGB.0.weight",
+                "stylegan_decoder.style_mlp.1.weight",
             ),
         )
 
@@ -50,7 +50,7 @@ class GFPGANArch(Architecture[GFPGAN]):
             model,
             state_dict,
             architecture=self,
-            purpose='FaceSR',
+            purpose="FaceSR",
             tags=[],
             supports_half=False,
             supports_bfloat16=True,
@@ -62,4 +62,4 @@ class GFPGANArch(Architecture[GFPGAN]):
         )
 
 
-__all__ = ['GFPGAN', 'GFPGANArch']
+__all__ = ["GFPGAN", "GFPGANArch"]

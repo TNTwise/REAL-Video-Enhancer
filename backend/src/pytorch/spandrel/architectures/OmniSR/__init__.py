@@ -15,11 +15,11 @@ from .__arch.OmniSR import OmniSR
 class OmniSRArch(Architecture[OmniSR]):
     def __init__(self) -> None:
         super().__init__(
-            id='OmniSR',
+            id="OmniSR",
             detect=KeyCondition.has_all(
-                'residual_layer.0.residual_layer.0.layer.0.fn.0.weight',
-                'input.weight',
-                'up.0.weight',
+                "residual_layer.0.residual_layer.0.layer.0.fn.0.weight",
+                "input.weight",
+                "up.0.weight",
             ),
         )
 
@@ -28,7 +28,7 @@ class OmniSRArch(Architecture[OmniSR]):
         # Remove junk from the state dict
         state_dict_keys = set(state_dict.keys())
         for key in state_dict_keys:
-            if key.endswith(('total_ops', 'total_params')):
+            if key.endswith(("total_ops", "total_params")):
                 del state_dict[key]
 
         num_in_ch = 3
@@ -41,22 +41,20 @@ class OmniSRArch(Architecture[OmniSR]):
         up_scale = 4
         bias = True
 
-        num_feat = state_dict['input.weight'].shape[0]
-        num_in_ch = state_dict['input.weight'].shape[1]
-        bias = 'input.bias' in state_dict
+        num_feat = state_dict["input.weight"].shape[0]
+        num_in_ch = state_dict["input.weight"].shape[1]
+        bias = "input.bias" in state_dict
 
-        pixelshuffle_shape = state_dict['up.0.weight'].shape[0]
+        pixelshuffle_shape = state_dict["up.0.weight"].shape[0]
         up_scale, num_out_ch = get_scale_and_output_channels(
             pixelshuffle_shape, num_in_ch
         )
 
-        res_num = get_seq_len(state_dict, 'residual_layer')
-        block_num = (
-            get_seq_len(state_dict, 'residual_layer.0.residual_layer') - 1
-        )
+        res_num = get_seq_len(state_dict, "residual_layer")
+        block_num = get_seq_len(state_dict, "residual_layer.0.residual_layer") - 1
 
         rel_pos_bias_key = (
-            'residual_layer.0.residual_layer.0.layer.2.fn.rel_pos_bias.weight'
+            "residual_layer.0.residual_layer.0.layer.2.fn.rel_pos_bias.weight"
         )
         if rel_pos_bias_key in state_dict:
             pe = True
@@ -79,16 +77,16 @@ class OmniSRArch(Architecture[OmniSR]):
         )
 
         tags = [
-            f'{num_feat}nf',
-            f'w{window_size}',
-            f'{res_num}nr',
+            f"{num_feat}nf",
+            f"w{window_size}",
+            f"{res_num}nr",
         ]
 
         return ImageModelDescriptor(
             model,
             state_dict,
             architecture=self,
-            purpose='Restoration' if up_scale == 1 else 'SR',
+            purpose="Restoration" if up_scale == 1 else "SR",
             tags=tags,
             supports_half=True,  # TODO: Test this
             supports_bfloat16=True,
@@ -99,4 +97,4 @@ class OmniSRArch(Architecture[OmniSR]):
         )
 
 
-__all__ = ['OmniSR', 'OmniSRArch']
+__all__ = ["OmniSR", "OmniSRArch"]

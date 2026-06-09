@@ -88,15 +88,9 @@ class TransAttention(nn.Module):
         qkv = self.qkv_dwconv(self.qkv(x))
         q, k, v = qkv.chunk(3, dim=1)
 
-        q = rearrange(
-            q, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
-        k = rearrange(
-            k, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
-        v = rearrange(
-            v, 'b (head c) h w -> b head c (h w)', head=self.num_heads
-        )
+        q = rearrange(q, "b (head c) h w -> b head c (h w)", head=self.num_heads)
+        k = rearrange(k, "b (head c) h w -> b head c (h w)", head=self.num_heads)
+        v = rearrange(v, "b (head c) h w -> b head c (h w)", head=self.num_heads)
 
         q = torch.nn.functional.normalize(q, dim=-1)
         k = torch.nn.functional.normalize(k, dim=-1)
@@ -108,7 +102,7 @@ class TransAttention(nn.Module):
 
         out = rearrange(
             out,
-            'b head c (h w) -> b (head c) h w',
+            "b head c (h w) -> b (head c) h w",
             head=self.num_heads,
             h=h,
             w=w,
@@ -119,9 +113,7 @@ class TransAttention(nn.Module):
 
 
 class MFF(nn.Module):
-    def __init__(
-        self, dim, ffn_expansion_factor, bias, act=True, gc=2, nset=32, k=3
-    ):
+    def __init__(self, dim, ffn_expansion_factor, bias, act=True, gc=2, nset=32, k=3):
         super().__init__()
         self.act = act
         self.gc = gc
@@ -141,9 +133,7 @@ class MFF(nn.Module):
             ),
         )
 
-        self.project_out = nn.Conv2d(
-            hidden_features, dim, kernel_size=1, bias=bias
-        )
+        self.project_out = nn.Conv2d(hidden_features, dim, kernel_size=1, bias=bias)
 
         self.sca = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
@@ -193,9 +183,7 @@ class MFF(nn.Module):
             SimpleGate(),
             nn.Conv2d(interc // 2, self.nset, 1, padding=0, stride=1),
         )
-        self.conv211 = nn.Conv2d(
-            in_channels=dim, out_channels=self.nset, kernel_size=1
-        )
+        self.conv211 = nn.Conv2d(in_channels=dim, out_channels=self.nset, kernel_size=1)
         self.attgamma = nn.Parameter(
             torch.zeros((1, self.nset, 1, 1)) + 1e-2, requires_grad=True
         )
@@ -262,98 +250,114 @@ class KBNet_l(nn.Module):
 
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
 
-        self.encoder_level1 = nn.Sequential(*[
-            KBBlock_l(
-                dim=dim,
-                num_heads=heads[0],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[0])
-        ])
+        self.encoder_level1 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=dim,
+                    num_heads=heads[0],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[0])
+            ]
+        )
 
         self.down1_2 = Downsample(dim)  # From Level 1 to Level 2
-        self.encoder_level2 = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**1),
-                num_heads=heads[1],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[1])
-        ])
+        self.encoder_level2 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**1),
+                    num_heads=heads[1],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[1])
+            ]
+        )
 
         self.down2_3 = Downsample(int(dim * 2**1))  # From Level 2 to Level 3
-        self.encoder_level3 = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**2),
-                num_heads=heads[2],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[2])
-        ])
+        self.encoder_level3 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**2),
+                    num_heads=heads[2],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[2])
+            ]
+        )
 
         self.down3_4 = Downsample(int(dim * 2**2))  # From Level 3 to Level 4
-        self.latent = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**3),
-                num_heads=heads[3],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[3])
-        ])
+        self.latent = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**3),
+                    num_heads=heads[3],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[3])
+            ]
+        )
 
         self.up4_3 = Upsample(int(dim * 2**3))  # From Level 4 to Level 3
         self.reduce_chan_level3 = nn.Conv2d(
             int(dim * 2**3), int(dim * 2**2), kernel_size=1, bias=bias
         )
-        self.decoder_level3 = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**2),
-                num_heads=heads[2],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[2])
-        ])
+        self.decoder_level3 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**2),
+                    num_heads=heads[2],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[2])
+            ]
+        )
 
         self.up3_2 = Upsample(int(dim * 2**2))  # From Level 3 to Level 2
         self.reduce_chan_level2 = nn.Conv2d(
             int(dim * 2**2), int(dim * 2**1), kernel_size=1, bias=bias
         )
-        self.decoder_level2 = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**1),
-                num_heads=heads[1],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[1])
-        ])
+        self.decoder_level2 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**1),
+                    num_heads=heads[1],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[1])
+            ]
+        )
 
         self.up2_1 = Upsample(int(dim * 2**1))
 
-        self.decoder_level1 = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**1),
-                num_heads=heads[0],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_blocks[0])
-        ])
+        self.decoder_level1 = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**1),
+                    num_heads=heads[0],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_blocks[0])
+            ]
+        )
 
-        self.refinement = nn.Sequential(*[
-            KBBlock_l(
-                dim=int(dim * 2**1),
-                num_heads=heads[0],
-                ffn_expansion_factor=ffn_expansion_factor,
-                bias=bias,
-            )
-            for _ in range(num_refinement_blocks)
-        ])
+        self.refinement = nn.Sequential(
+            *[
+                KBBlock_l(
+                    dim=int(dim * 2**1),
+                    num_heads=heads[0],
+                    ffn_expansion_factor=ffn_expansion_factor,
+                    bias=bias,
+                )
+                for _ in range(num_refinement_blocks)
+            ]
+        )
 
         self.output = nn.Conv2d(
             int(dim * 2**1),

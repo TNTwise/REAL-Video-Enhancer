@@ -3,9 +3,7 @@ import sys
 
 import pytest
 
-BACKEND_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..', '..')
-)
+BACKEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if BACKEND_DIR not in sys.path:
     sys.path.insert(0, BACKEND_DIR)
 
@@ -19,33 +17,33 @@ def frame_module():
 
 
 def _make_sdr_np(width: int, height: int):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     return np.random.randint(0, 256, (height, width, 3), dtype=np.uint8)
 
 
 def _make_hdr_np(width: int, height: int):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     return np.random.randint(0, 65536, (height, width, 3), dtype=np.uint16)
 
 
 def test_set_frame_bytes_requires_bytes(frame_module):
     Frame = frame_module.Frame
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=2,
         height=2,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
 
     with pytest.raises(TypeError):
-        f.set_frame_bytes('not-bytes')  # type: ignore[arg-type]
+        f.set_frame_bytes("not-bytes")  # type: ignore[arg-type]
 
 
 def test_bytes_to_np_roundtrip_sdr(frame_module):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 4, 3
@@ -53,13 +51,13 @@ def test_bytes_to_np_roundtrip_sdr(frame_module):
     raw = arr.tobytes()
 
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=width,
         height=height,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_bytes(raw)
 
@@ -72,7 +70,7 @@ def test_bytes_to_np_roundtrip_sdr(frame_module):
 
 
 def test_bytes_to_np_roundtrip_hdr(frame_module):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 4, 3
@@ -80,13 +78,13 @@ def test_bytes_to_np_roundtrip_hdr(frame_module):
     raw = arr.tobytes()
 
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=width,
         height=height,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=True,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_bytes(raw)
 
@@ -99,7 +97,7 @@ def test_bytes_to_np_roundtrip_hdr(frame_module):
 
 
 def test_get_np_sdr_converts_from_hdr(frame_module):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 2, 2
@@ -111,13 +109,13 @@ def test_get_np_sdr_converts_from_hdr(frame_module):
         dtype=np.uint16,
     )
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=width,
         height=height,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=True,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_np(arr)
 
@@ -129,19 +127,19 @@ def test_get_np_sdr_converts_from_hdr(frame_module):
 
 
 def test_clone_is_deep_copy_for_np(frame_module):
-    np = pytest.importorskip('numpy')
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 3, 3
     arr = _make_sdr_np(width, height)
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=width,
         height=height,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_np(arr)
 
@@ -154,21 +152,21 @@ def test_clone_is_deep_copy_for_np(frame_module):
 
 
 def test_resize_frame_updates_size_and_data(frame_module):
-    cv2 = pytest.importorskip('cv2')
-    np = pytest.importorskip('numpy')
+    cv2 = pytest.importorskip("cv2")
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 8, 6
     arr = _make_sdr_np(width, height)
 
     f = Frame(
-        backend='onnx',
+        backend="onnx",
         width=width,
         height=height,
-        device='cpu',
+        device="cpu",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_np(arr)
     f.resize_frame(new_width=4, new_height=3)
@@ -195,15 +193,15 @@ class MockTorchUtilsCPU:
     def handle_device(device, gpu_id: int = 0):
         import torch
 
-        return torch.device('cpu')
+        return torch.device("cpu")
 
     @staticmethod
     def handle_precision(precision):
         import torch
 
-        if precision in ('float16', 'fp16'):
+        if precision in ("float16", "fp16"):
             return torch.float16
-        if precision in ('bfloat16', 'bf16'):
+        if precision in ("bfloat16", "bf16"):
             return torch.bfloat16
         return torch.float32
 
@@ -214,12 +212,10 @@ class MockTorchUtilsCPU:
     def frame_to_tensor(self, frame: bytes, stream, device, dtype):
         import torch
 
-        np = pytest.importorskip('numpy')
+        np = pytest.importorskip("numpy")
 
         np_dtype = np.uint16 if self.hdr_mode else np.uint8
-        arr = np.frombuffer(frame, dtype=np_dtype).reshape(
-            self.height, self.width, 3
-        )
+        arr = np.frombuffer(frame, dtype=np_dtype).reshape(self.height, self.width, 3)
         t = torch.from_numpy(arr)
         t = t.to(device=device)
         t = t.to(dtype=torch.float32)
@@ -232,8 +228,7 @@ class MockTorchUtilsCPU:
         import torch
 
         return (
-            torch
-            .from_numpy(arr)
+            torch.from_numpy(arr)
             .to(device=device, dtype=dtype)
             .permute(2, 0, 1)
             .unsqueeze(0)
@@ -241,7 +236,7 @@ class MockTorchUtilsCPU:
 
     @staticmethod
     def tensor_to_np(tensor):
-        np = pytest.importorskip('numpy')
+        np = pytest.importorskip("numpy")
 
         return tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()
 
@@ -252,14 +247,14 @@ class MockTorchUtilsCPU:
         return F.interpolate(
             tensor,
             size=(new_height, new_width),
-            mode='bilinear',
+            mode="bilinear",
             align_corners=False,
         )
 
 
 def test_get_frame_tensor_from_bytes_uses_cpu_mock(frame_module, monkeypatch):
-    torch = pytest.importorskip('torch')
-    np = pytest.importorskip('numpy')
+    torch = pytest.importorskip("torch")
+    np = pytest.importorskip("numpy")
     Frame = frame_module.Frame
 
     width, height = 4, 3
@@ -272,25 +267,25 @@ def test_get_frame_tensor_from_bytes_uses_cpu_mock(frame_module, monkeypatch):
             width=width, height=height, hdr_mode=hdr_mode
         )
         frame_module._pytorch_stream = None
-        frame_module._pytorch_device = torch.device('cpu')
+        frame_module._pytorch_device = torch.device("cpu")
         frame_module._pytorch_dtype = torch.float32
 
-    monkeypatch.setattr(frame_module, '_init_pytorch', _init_pytorch_stub)
+    monkeypatch.setattr(frame_module, "_init_pytorch", _init_pytorch_stub)
 
     f = Frame(
-        backend='pytorch',
+        backend="pytorch",
         width=width,
         height=height,
-        device='cuda',
+        device="cuda",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
     f.set_frame_bytes(raw)
     t = f.get_frame_tensor()
 
     assert isinstance(t, torch.Tensor)
-    assert t.device.type == 'cpu'
+    assert t.device.type == "cpu"
     assert t.shape == (1, 3, height, width)
     assert t.dtype == torch.float32
     # Spot-check the conversion is in range [0, 1].
@@ -305,7 +300,7 @@ def test_get_frame_tensor_from_bytes_uses_cpu_mock(frame_module, monkeypatch):
 
 
 def test_set_frame_tensor_type_check_with_mock(frame_module, monkeypatch):
-    torch = pytest.importorskip('torch')
+    torch = pytest.importorskip("torch")
     Frame = frame_module.Frame
 
     def _init_pytorch_stub(device, gpu_id, dtype, width, height, hdr_mode):
@@ -314,20 +309,20 @@ def test_set_frame_tensor_type_check_with_mock(frame_module, monkeypatch):
             width=width, height=height, hdr_mode=hdr_mode
         )
         frame_module._pytorch_stream = None
-        frame_module._pytorch_device = torch.device('cpu')
+        frame_module._pytorch_device = torch.device("cpu")
         frame_module._pytorch_dtype = torch.float32
 
-    monkeypatch.setattr(frame_module, '_init_pytorch', _init_pytorch_stub)
+    monkeypatch.setattr(frame_module, "_init_pytorch", _init_pytorch_stub)
 
     f = Frame(
-        backend='pytorch',
+        backend="pytorch",
         width=2,
         height=2,
-        device='auto',
+        device="auto",
         gpu_id=0,
         hdr_mode=False,
-        dtype='float32',
+        dtype="float32",
     )
 
     with pytest.raises(TypeError):
-        f.set_frame_tensor('not-a-tensor')  # type: ignore[arg-type]
+        f.set_frame_tensor("not-a-tensor")  # type: ignore[arg-type]

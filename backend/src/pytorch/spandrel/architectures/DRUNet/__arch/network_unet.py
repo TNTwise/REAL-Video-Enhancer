@@ -29,88 +29,88 @@ class DRUNet(nn.Module):
         out_nc=1,
         nc=[64, 128, 256, 512],
         nb=4,
-        act_mode='R',
-        downsample_mode='strideconv',
-        upsample_mode='convtranspose',
+        act_mode="R",
+        downsample_mode="strideconv",
+        upsample_mode="convtranspose",
     ):
         super().__init__()
 
-        self.m_head = conv(in_nc, nc[0], bias=False, mode='C')
+        self.m_head = conv(in_nc, nc[0], bias=False, mode="C")
 
         # downsample
-        if downsample_mode == 'avgpool':
+        if downsample_mode == "avgpool":
             downsample_block = downsample_avgpool
-        elif downsample_mode == 'maxpool':
+        elif downsample_mode == "maxpool":
             downsample_block = downsample_maxpool
-        elif downsample_mode == 'strideconv':
+        elif downsample_mode == "strideconv":
             downsample_block = downsample_strideconv
         else:
             raise NotImplementedError(
-                f'downsample mode [{downsample_mode:s}] is not found'
+                f"downsample mode [{downsample_mode:s}] is not found"
             )
 
         self.m_down1 = sequential(
             *[
-                ResBlock(nc[0], nc[0], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[0], nc[0], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
-            downsample_block(nc[0], nc[1], bias=False, mode='2'),
+            downsample_block(nc[0], nc[1], bias=False, mode="2"),
         )
         self.m_down2 = sequential(
             *[
-                ResBlock(nc[1], nc[1], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[1], nc[1], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
-            downsample_block(nc[1], nc[2], bias=False, mode='2'),
+            downsample_block(nc[1], nc[2], bias=False, mode="2"),
         )
         self.m_down3 = sequential(
             *[
-                ResBlock(nc[2], nc[2], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[2], nc[2], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
-            downsample_block(nc[2], nc[3], bias=False, mode='2'),
+            downsample_block(nc[2], nc[3], bias=False, mode="2"),
         )
 
-        self.m_body = sequential(*[
-            ResBlock(nc[3], nc[3], bias=False, mode='C' + act_mode + 'C')
-            for _ in range(nb)
-        ])
+        self.m_body = sequential(
+            *[
+                ResBlock(nc[3], nc[3], bias=False, mode="C" + act_mode + "C")
+                for _ in range(nb)
+            ]
+        )
 
         # upsample
-        if upsample_mode == 'upconv':
+        if upsample_mode == "upconv":
             upsample_block = upsample_upconv
-        elif upsample_mode == 'pixelshuffle':
+        elif upsample_mode == "pixelshuffle":
             upsample_block = upsample_pixelshuffle
-        elif upsample_mode == 'convtranspose':
+        elif upsample_mode == "convtranspose":
             upsample_block = upsample_convtranspose
         else:
-            raise NotImplementedError(
-                f'upsample mode [{upsample_mode:s}] is not found'
-            )
+            raise NotImplementedError(f"upsample mode [{upsample_mode:s}] is not found")
 
         self.m_up3 = sequential(
-            upsample_block(nc[3], nc[2], bias=False, mode='2'),
+            upsample_block(nc[3], nc[2], bias=False, mode="2"),
             *[
-                ResBlock(nc[2], nc[2], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[2], nc[2], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
         )
         self.m_up2 = sequential(
-            upsample_block(nc[2], nc[1], bias=False, mode='2'),
+            upsample_block(nc[2], nc[1], bias=False, mode="2"),
             *[
-                ResBlock(nc[1], nc[1], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[1], nc[1], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
         )
         self.m_up1 = sequential(
-            upsample_block(nc[1], nc[0], bias=False, mode='2'),
+            upsample_block(nc[1], nc[0], bias=False, mode="2"),
             *[
-                ResBlock(nc[0], nc[0], bias=False, mode='C' + act_mode + 'C')
+                ResBlock(nc[0], nc[0], bias=False, mode="C" + act_mode + "C")
                 for _ in range(nb)
             ],
         )
 
-        self.m_tail = conv(nc[0], out_nc, bias=False, mode='C')
+        self.m_tail = conv(nc[0], out_nc, bias=False, mode="C")
 
     def forward(self, x0):
         _, _, H, W = x0.shape  # noqa: N806

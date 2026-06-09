@@ -15,7 +15,7 @@ class GMFSS:
     def __init__(
         self,
         model_path,
-        model_type: str = 'union',
+        model_type: str = "union",
         scale: float = 1.0,
         ensemble: bool = False,
         width: int = 1920,
@@ -23,7 +23,7 @@ class GMFSS:
         trt=False,
         dtype: torch.dtype = torch.float16,
         device: torch.device = torch.device(
-            'cuda' if torch.cuda.is_available() else 'cpu'
+            "cuda" if torch.cuda.is_available() else "cpu"
         ),
         max_timestep: float = 0,
     ):
@@ -40,14 +40,15 @@ class GMFSS:
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
         from ..util.softsplat_torch import softsplat
+
         self.warp = softsplat
 
-        combined_state_dict = torch.load(model_path, map_location='cpu')
+        combined_state_dict = torch.load(model_path, map_location="cpu")
 
-        archDetect = ArchDetect(combined_state_dict['rife'])
+        archDetect = ArchDetect(combined_state_dict["rife"])
         rife_version = archDetect.getArchName()
         # print(rife_version)
-        if rife_version.lower() == 'rife46':
+        if rife_version.lower() == "rife46":
             from .IFNet_HDv3 import IFNet
         else:
             # this is dumb, it detects rife4.7 with a stupid hack, so we need to just force load 422
@@ -62,12 +63,12 @@ class GMFSS:
         self.feat_ext = FeatureNet().to(dtype=dtype, device=device)
         self.fusionnet = GridNet().to(dtype=dtype, device=device)
 
-        if model_type != 'base':
-            self.ifnet.load_state_dict(combined_state_dict['rife'])
-        self.flownet.load_state_dict(combined_state_dict['flownet'])
-        self.metricnet.load_state_dict(combined_state_dict['metricnet'])
-        self.feat_ext.load_state_dict(combined_state_dict['feat_ext'])
-        self.fusionnet.load_state_dict(combined_state_dict['fusionnet'])
+        if model_type != "base":
+            self.ifnet.load_state_dict(combined_state_dict["rife"])
+        self.flownet.load_state_dict(combined_state_dict["flownet"])
+        self.metricnet.load_state_dict(combined_state_dict["metricnet"])
+        self.feat_ext.load_state_dict(combined_state_dict["feat_ext"])
+        self.fusionnet.load_state_dict(combined_state_dict["fusionnet"])
         self.max_timestep = max_timestep
         self.flow01, self.flow10 = None, None
         self.feat11, self.feat12, self.feat13 = None, None, None
@@ -86,28 +87,28 @@ class GMFSS:
                 dtype=dtype,
                 device=device,
                 example_inputs=self.flownet_example_input(),
-                trt_engine_path='Flownet.engine',
+                trt_engine_path="Flownet.engine",
             )
             trtHandler.build_engine(
                 self.ifnet,
                 dtype=dtype,
                 device=device,
                 example_inputs=self.rife_example_input(),
-                trt_engine_path='IFNet.engine',
+                trt_engine_path="IFNet.engine",
             )
             trtHandler.build_engine(
                 self.feat_ext,
                 dtype=dtype,
                 device=device,
                 example_inputs=self.img0_example_input(),
-                trt_engine_path='Feat.engine',
+                trt_engine_path="Feat.engine",
             )
             trtHandler.build_engine(
                 self.fusionnet,
                 dtype=dtype,
                 device=device,
                 example_inputs=self.flownet_example_input(),
-                trt_engine_path='FusionNet.engine',
+                trt_engine_path="FusionNet.engine",
             )
             import gc
 
@@ -115,9 +116,9 @@ class GMFSS:
             # torch.cuda.empty_cache()
             # torch.cuda.reset_max_memory_allocated()
             # torch.cuda.reset_max_memory_cached()
-            self.ifnet = trtHandler.load_engine('IFNet.engine')
-            self.feat_ext = trtHandler.load_engine('Feat.engine')
-            self.flownet = trtHandler.load_engine('Flownet.engine')
+            self.ifnet = trtHandler.load_engine("IFNet.engine")
+            self.feat_ext = trtHandler.load_engine("Feat.engine")
+            self.flownet = trtHandler.load_engine("Flownet.engine")
 
     def forward(self, img0, img1, timestep, scale=None):
         if scale is not None:
@@ -126,16 +127,12 @@ class GMFSS:
             self.feat11, self.feat12, self.feat13 = self.feat_ext(img0)
         feat21, feat22, feat23 = self.feat_ext(img1)
 
-        img0 = F.interpolate(img0, scale_factor=0.5, mode='bilinear')
-        img1 = F.interpolate(img1, scale_factor=0.5, mode='bilinear')
+        img0 = F.interpolate(img0, scale_factor=0.5, mode="bilinear")
+        img1 = F.interpolate(img1, scale_factor=0.5, mode="bilinear")
 
         if self.scale != 1.0:
-            imgf0 = F.interpolate(
-                img0, scale_factor=self.scale, mode='bilinear'
-            )
-            imgf1 = F.interpolate(
-                img1, scale_factor=self.scale, mode='bilinear'
-            )
+            imgf0 = F.interpolate(img0, scale_factor=self.scale, mode="bilinear")
+            imgf1 = F.interpolate(img1, scale_factor=self.scale, mode="bilinear")
         else:
             imgf0 = img0
             imgf1 = img1
@@ -145,13 +142,13 @@ class GMFSS:
         if self.scale != 1.0:
             self.flow01 = (
                 F.interpolate(
-                    self.flow01, scale_factor=1.0 / self.scale, mode='bilinear'
+                    self.flow01, scale_factor=1.0 / self.scale, mode="bilinear"
                 )
                 / self.scale
             )
             self.flow10 = (
                 F.interpolate(
-                    self.flow10, scale_factor=1.0 / self.scale, mode='bilinear'
+                    self.flow10, scale_factor=1.0 / self.scale, mode="bilinear"
                 )
                 / self.scale
             )
@@ -166,33 +163,31 @@ class GMFSS:
         Z1t = timestep * self.metric0
         Z2t = (1 - timestep) * self.metric1
 
-        I1t = self.warp(img0, F1t, Z1t, strMode='soft')
-        I2t = self.warp(img1, F2t, Z2t, strMode='soft')
+        I1t = self.warp(img0, F1t, Z1t, strMode="soft")
+        I2t = self.warp(img1, F2t, Z2t, strMode="soft")
 
-        if self.model_type == 'union':
+        if self.model_type == "union":
             rife = self.ifnet(img0, img1, timestep)
 
-        feat1t1 = self.warp(self.feat11, F1t, Z1t, strMode='soft')
-        feat2t1 = self.warp(feat21, F2t, Z2t, strMode='soft')
+        feat1t1 = self.warp(self.feat11, F1t, Z1t, strMode="soft")
+        feat2t1 = self.warp(feat21, F2t, Z2t, strMode="soft")
 
-        F1td = F.interpolate(F1t, scale_factor=0.5, mode='bilinear') * 0.5
-        Z1d = F.interpolate(Z1t, scale_factor=0.5, mode='bilinear')
-        feat1t2 = self.warp(self.feat12, F1td, Z1d, strMode='soft')
-        F2td = F.interpolate(F2t, scale_factor=0.5, mode='bilinear') * 0.5
-        Z2d = F.interpolate(Z2t, scale_factor=0.5, mode='bilinear')
-        feat2t2 = self.warp(feat22, F2td, Z2d, strMode='soft')
+        F1td = F.interpolate(F1t, scale_factor=0.5, mode="bilinear") * 0.5
+        Z1d = F.interpolate(Z1t, scale_factor=0.5, mode="bilinear")
+        feat1t2 = self.warp(self.feat12, F1td, Z1d, strMode="soft")
+        F2td = F.interpolate(F2t, scale_factor=0.5, mode="bilinear") * 0.5
+        Z2d = F.interpolate(Z2t, scale_factor=0.5, mode="bilinear")
+        feat2t2 = self.warp(feat22, F2td, Z2d, strMode="soft")
 
-        F1tdd = F.interpolate(F1t, scale_factor=0.25, mode='bilinear') * 0.25
-        Z1dd = F.interpolate(Z1t, scale_factor=0.25, mode='bilinear')
-        feat1t3 = self.warp(self.feat13, F1tdd, Z1dd, strMode='soft')
-        F2tdd = F.interpolate(F2t, scale_factor=0.25, mode='bilinear') * 0.25
-        Z2dd = F.interpolate(Z2t, scale_factor=0.25, mode='bilinear')
-        feat2t3 = self.warp(feat23, F2tdd, Z2dd, strMode='soft')
+        F1tdd = F.interpolate(F1t, scale_factor=0.25, mode="bilinear") * 0.25
+        Z1dd = F.interpolate(Z1t, scale_factor=0.25, mode="bilinear")
+        feat1t3 = self.warp(self.feat13, F1tdd, Z1dd, strMode="soft")
+        F2tdd = F.interpolate(F2t, scale_factor=0.25, mode="bilinear") * 0.25
+        Z2dd = F.interpolate(Z2t, scale_factor=0.25, mode="bilinear")
+        feat2t3 = self.warp(feat23, F2tdd, Z2dd, strMode="soft")
 
         in1 = torch.cat(
-            [img0, I1t, I2t, img1]
-            if self.model_type == 'base'
-            else [I1t, rife, I2t],
+            [img0, I1t, I2t, img1] if self.model_type == "base" else [I1t, rife, I2t],
             dim=1,
         )
         in2 = torch.cat([feat1t1, feat2t1], dim=1)
@@ -249,7 +244,7 @@ class GMFSS:
         imgf0 = F.interpolate(
             self.img0_example_input()[0],
             scale_factor=self.scale / 2,
-            mode='bilinear',
+            mode="bilinear",
         )
 
         return [imgf0, imgf0]

@@ -102,7 +102,7 @@ class DIS(nn.Module):
         elif scale == 1:
             self.upsampler = nn.Identity()
         else:
-            raise ValueError(f'Unsupported scale factor: {scale}')
+            raise ValueError(f"Unsupported scale factor: {scale}")
 
         self.tail = nn.Conv2d(num_features, out_channels, 3, padding=1)
 
@@ -111,7 +111,7 @@ class DIS(nn.Module):
             base = x
         else:
             base = functional.interpolate(
-                x, scale_factor=self.scale, mode='bilinear', align_corners=False
+                x, scale_factor=self.scale, mode="bilinear", align_corners=False
             )
 
         feat = self.head_act(self.head(x))

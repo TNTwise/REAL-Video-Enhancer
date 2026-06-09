@@ -10,7 +10,7 @@ from ....architectures.__arch_helpers.padding import pad_to_multiple
 from ....util import store_hyperparameters
 
 
-def get_activation(activation: str = 'relu') -> nn.Module:
+def get_activation(activation: str = "relu") -> nn.Module:
     """Get the specified activation layer.
 
     Args:
@@ -18,20 +18,20 @@ def get_activation(activation: str = 'relu') -> nn.Module:
             ``'swish'``, 'efficient_swish'`` and ``'none'``. Default: ``'relu'``
     """
     assert activation in [
-        'relu',
-        'leaky_relu',
-        'elu',
-        'silu',
-        'gelu',
-        'none',
-    ], f'Get unknown activation key {activation}'
+        "relu",
+        "leaky_relu",
+        "elu",
+        "silu",
+        "gelu",
+        "none",
+    ], f"Get unknown activation key {activation}"
     activation_dict = {
-        'relu': nn.ReLU(inplace=True),
-        'leaky_relu': nn.LeakyReLU(negative_slope=0.2, inplace=True),
-        'elu': nn.ELU(alpha=1.0, inplace=True),
-        'silu': nn.SiLU(inplace=True),
-        'gelu': nn.GELU(),
-        'none': nn.Identity(),
+        "relu": nn.ReLU(inplace=True),
+        "leaky_relu": nn.LeakyReLU(negative_slope=0.2, inplace=True),
+        "elu": nn.ELU(alpha=1.0, inplace=True),
+        "silu": nn.SiLU(inplace=True),
+        "gelu": nn.GELU(),
+        "none": nn.Identity(),
     }
     return activation_dict[activation]
 
@@ -75,7 +75,7 @@ class BasicBlock(nn.Sequential):
         stride: int = 1,
         bias: bool = False,
         bn: bool = True,
-        act_mode: str | None = 'relu',
+        act_mode: str | None = "relu",
     ) -> None:
         m: list[nn.Module] = [
             nn.Conv2d(
@@ -102,7 +102,7 @@ class ResBlock(nn.Module):
         kernel_size: int,
         bias: bool = True,
         bn: bool = False,
-        act_mode: str = 'relu',
+        act_mode: str = "relu",
         res_scale: float = 1,
     ) -> None:
         super().__init__()
@@ -185,7 +185,7 @@ class RCAB(nn.Module):
         reduction: int,
         bias: bool = True,
         bn: bool = False,
-        act_mode: str = 'relu',
+        act_mode: str = "relu",
         res_scale: float = 1,
     ) -> None:
         super().__init__()
@@ -261,7 +261,7 @@ class RCAN(nn.Module):
         kernel_size: int = 3,
         reduction: int = 16,
         res_scale: float = 1,
-        act_mode: str = 'relu',
+        act_mode: str = "relu",
         unshuffle_mod: bool = False,
         conv: Callable[..., nn.Conv2d] = default_conv,
     ) -> None:
@@ -325,7 +325,7 @@ class RCAN(nn.Module):
         self.tail = nn.Sequential(*modules_tail)
 
     def check_img_size(self, x: Tensor) -> Tensor:
-        return pad_to_multiple(x, self.downscale_factor, mode='reflect')
+        return pad_to_multiple(x, self.downscale_factor, mode="reflect")
 
     def forward(self, x: Tensor) -> Tensor:
         _b, _c, h, w = x.shape

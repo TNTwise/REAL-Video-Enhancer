@@ -6,7 +6,7 @@ from .warplayer import warp
 
 # from train_log.refine import *
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
@@ -24,9 +24,7 @@ def conv(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     )
 
 
-def conv_bn(
-    in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1
-):
+def conv_bn(in_planes, out_planes, kernel_size=3, stride=1, padding=1, dilation=1):
     return nn.Sequential(
         nn.Conv2d(
             in_planes,
@@ -98,14 +96,14 @@ class IFBlock(nn.Module):
 
     def forward(self, x, flow=None, scale=1):
         x = F.interpolate(
-            x, scale_factor=1.0 / scale, mode='bilinear', align_corners=False
+            x, scale_factor=1.0 / scale, mode="bilinear", align_corners=False
         )
         if flow is not None:
             flow = (
                 F.interpolate(
                     flow,
                     scale_factor=1.0 / scale,
-                    mode='bilinear',
+                    mode="bilinear",
                     align_corners=False,
                 )
                 * 1.0
@@ -116,7 +114,7 @@ class IFBlock(nn.Module):
         feat = self.convblock(feat)
         tmp = self.lastconv(feat)
         tmp = F.interpolate(
-            tmp, scale_factor=scale, mode='bilinear', align_corners=False
+            tmp, scale_factor=scale, mode="bilinear", align_corners=False
         )
         flow = tmp[:, :4] * scale
         mask = tmp[:, 4:5]
@@ -150,7 +148,7 @@ class IFNet(nn.Module):
         if ensemble:
             import sys
 
-            print('Ensemble is not supported with this model', file=sys.stderr)
+            print("Ensemble is not supported with this model", file=sys.stderr)
 
     def forward(
         self,
@@ -178,7 +176,7 @@ class IFNet(nn.Module):
                     scale=scale_list[i],
                 )
                 if ensemble:
-                    print('warning: ensemble is not supported since RIFEv4.21')
+                    print("warning: ensemble is not supported since RIFEv4.21")
             else:
                 wf0 = warp(f0, flow[:, :2])
                 wf1 = warp(f1, flow[:, 2:4])
@@ -199,7 +197,7 @@ class IFNet(nn.Module):
                     scale=scale_list[i],
                 )
                 if ensemble:
-                    print('warning: ensemble is not supported since RIFEv4.21')
+                    print("warning: ensemble is not supported since RIFEv4.21")
                 else:
                     mask = m0
                 flow = flow + fd

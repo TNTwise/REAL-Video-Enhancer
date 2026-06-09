@@ -73,9 +73,7 @@ class PLKConv2d(nn.Module):
                 x1 = self.conv(x1)
             return torch.cat([x1, x2], dim=1)
         if self.with_idt:
-            x[:, : self.idx] = x[:, : self.idx] + self.conv(
-                x[:, : self.idx]
-            )
+            x[:, : self.idx] = x[:, : self.idx] + self.conv(x[:, : self.idx])
         else:
             x[:, : self.idx] = self.conv(x[:, : self.idx])
         return x
@@ -99,9 +97,7 @@ class RectSparsePLKConv2d(nn.Module):
 
     def forward(
         self, x: torch.Tensor
-    ) -> (
-        torch.Tensor
-    ):  # No reparametrization since this is for a ablative study
+    ) -> torch.Tensor:  # No reparametrization since this is for a ablative study
         if self.training:
             x1, x2 = x[:, : self.idx], x[:, self.idx :]
             x1 = self.mn_conv(x1) + self.nm_conv(x1) + self.nn_conv(x1)
@@ -148,9 +144,7 @@ class SparsePLKConv2d(nn.Module):
         ]
         if use_max_kernel:
             convs.append(
-                nn.Conv2d(
-                    dim, dim, self.max_kernel_size, 1, self.max_kernel_size // 2
-                )
+                nn.Conv2d(dim, dim, self.max_kernel_size, 1, self.max_kernel_size // 2)
             )
         self.convs = nn.ModuleList(convs)
         for m in self.convs:
@@ -231,11 +225,11 @@ class PLKBlock(nn.Module):
         self,
         dim: int,
         # CCM Rep options
-        ccm_type: Literal['CCM', 'ICCM', 'DCCM'],
+        ccm_type: Literal["CCM", "ICCM", "DCCM"],
         # LK Options
         max_kernel_size: int,
         split_ratio: float,
-        lk_type: Literal['PLK', 'SparsePLK', 'RectSparsePLK'] = 'PLK',
+        lk_type: Literal["PLK", "SparsePLK", "RectSparsePLK"] = "PLK",
         # Sparse Rep options
         use_max_kernel: bool = False,
         sparse_kernels: Sequence[int] = [5, 5, 5],
@@ -247,20 +241,20 @@ class PLKBlock(nn.Module):
         super().__init__()
 
         # Local Texture
-        if ccm_type == 'CCM':
+        if ccm_type == "CCM":
             self.channe_mixer = CCM(dim)
-        elif ccm_type == 'ICCM':
+        elif ccm_type == "ICCM":
             self.channe_mixer = ICCM(dim)
-        elif ccm_type == 'DCCM':
+        elif ccm_type == "DCCM":
             self.channe_mixer = DCCM(dim)
         else:
-            raise ValueError(f'Unknown CCM type: {ccm_type}')
+            raise ValueError(f"Unknown CCM type: {ccm_type}")
 
         # Long-range Dependency
         pdim = int(dim * split_ratio)
-        if lk_type == 'PLK':
+        if lk_type == "PLK":
             self.lk = PLKConv2d(pdim, max_kernel_size, with_idt)
-        elif lk_type == 'SparsePLK':
+        elif lk_type == "SparsePLK":
             self.lk = SparsePLKConv2d(
                 pdim,
                 max_kernel_size,
@@ -269,10 +263,10 @@ class PLKBlock(nn.Module):
                 use_max_kernel,
                 with_idt,
             )
-        elif lk_type == 'RectSparsePLK':
+        elif lk_type == "RectSparsePLK":
             self.lk = RectSparsePLKConv2d(pdim, max_kernel_size)
         else:
-            raise ValueError(f'Unknown LK type: {lk_type}')
+            raise ValueError(f"Unknown LK type: {lk_type}")
 
         # Instance-dependent modulation
         if use_ea:
@@ -304,11 +298,11 @@ class PLKSR(nn.Module):
         n_blocks: int = 28,
         upscaling_factor: int = 4,
         # CCM options
-        ccm_type: Literal['CCM', 'ICCM', 'DCCM'] = 'CCM',
+        ccm_type: Literal["CCM", "ICCM", "DCCM"] = "CCM",
         # LK Options
         kernel_size: int = 17,
         split_ratio: float = 0.25,
-        lk_type: Literal['PLK', 'SparsePLK', 'RectSparsePLK'] = 'PLK',
+        lk_type: Literal["PLK", "SparsePLK", "RectSparsePLK"] = "PLK",
         # LK Rep options
         use_max_kernel: bool = False,
         sparse_kernels: Sequence[int] = [5, 5, 5, 5],
