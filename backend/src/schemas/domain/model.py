@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from src.schemas.domain.precision import Precision
 from pydantic import BaseModel, Field
 from typing import Literal, Annotated, Union
 from src.schemas.domain.backend import Backend
@@ -11,6 +12,7 @@ class InterpolateModel(BaseModel):
     file_path: str
     description: str | None = None
     url: str | None = None
+    precision: Precision
     backend: Backend
 
 class UpscaleModel(BaseModel):
@@ -19,6 +21,7 @@ class UpscaleModel(BaseModel):
     variant: str
     scale: int
     file_path: str
+    precision: Precision
     description: str | None = None
     url: str | None = None
     backend: Backend
@@ -29,6 +32,7 @@ class EnhancementModel(BaseModel):
     id: str
     variant: str
     file_path: str
+    precision: Precision
     description: str | None = None
     url: str | None = None
     backend: Backend

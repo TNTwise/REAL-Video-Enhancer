@@ -7,16 +7,17 @@ from multiprocessing import shared_memory
 from threading import Thread
 from time import sleep
 
+from backend.src.schemas import RenderSettings, Setting
 import cv2
 import numpy as np
 
-from .services.ffmpeg_service import FFmpegRead, FFmpegWrite, MPVOutput
-from .InformationWriteOut import InformationWriteOut
-from .utils.BorderDetect import BorderDetect
-from .utils.Encoders import EncoderSettings
-from .utils.LogConfig import get_logger
-from .utils.SceneDetect import SceneDetect
-from .services.video_info_service import OpenCVInfo
+from src.services.ffmpeg_service import FFmpegRead, FFmpegWrite, MPVOutput
+from src.InformationWriteOut import InformationWriteOut
+from src.utils.BorderDetect import BorderDetect
+from src.utils.Encoders import EncoderSettings
+from src.utils.LogConfig import get_logger
+from src.utils.SceneDetect import SceneDetect
+from src.services.video_info_service import OpenCVInfo, VideoInfo
 
 
 def global_thread_handler(args):
@@ -40,12 +41,10 @@ logger = get_logger(__name__)
 class Render:
     def __init__(
         self,
-        inputFile: str,
-        outputFile: str,
+        render_settings: RenderSettings,
+        settings: Setting,
+        video_info: VideoInfo,
         # backend settings
-        backend="pytorch",
-        device="default",
-        precision="float16",
         pytorch_gpu_id: int = 0,
         ncnn_gpu_id: int = 0,
         cwd: str = os.getcwd(),
@@ -342,7 +341,7 @@ class Render:
         """
 
     def upscalePytorchObject(self, modelPath=None):
-        from .pytorch.UpscaleTorch import UpscalePytorch
+        from .services.pytorch.UpscaleTorch import UpscalePytorch
 
         return UpscalePytorch(
             modelPath,
@@ -359,7 +358,7 @@ class Render:
         )
 
     def upscaleNCNNObject(self, scale=None, modelPath=None):
-        from .ncnn.UpscaleNCNN import UpscaleNCNN
+        from .services.ncnn.UpscaleNCNN import UpscaleNCNN
 
         path, last_folder = os.path.split(modelPath)
         modelPath = os.path.join(path, last_folder, last_folder)
@@ -374,7 +373,7 @@ class Render:
         )
 
     def upscaleONNXObject(self, scale=None, modelPath=None):
-        from .onnx.UpscaleONNX import UpscaleONNX
+        from .services.onnx.UpscaleONNX import UpscaleONNX
 
         return UpscaleONNX(
             modelPath=modelPath,
@@ -401,7 +400,7 @@ class Render:
             self.modelScale = self.upscaleOption.getScale()
 
         if self.backend == "ncnn":
-            from .ncnn.UpscaleNCNN import getNCNNScale
+            from .services.ncnn.UpscaleNCNN import getNCNNScale
 
             self.modelScale = getNCNNScale(modelPath=self.upscaleModel)
 
@@ -410,7 +409,7 @@ class Render:
             )
 
         if self.backend == "directml":  # i dont want to work with this shit
-            from .onnx.UpscaleONNX import UpscaleONNX
+            from .services.onnx.UpscaleONNX import UpscaleONNX
 
             self.modelScale = UpscaleONNX.getModelScale(self.upscaleModel)
 
@@ -449,7 +448,7 @@ class Render:
             logger.info("Scene Detection Disabled")
 
         if self.backend == "ncnn":
-            from .ncnn.InterpolateNCNN import InterpolateRIFENCNN
+            from .services.ncnn.InterpolateNCNN import InterpolateRIFENCNN
 
             self.interpolateOption = InterpolateRIFENCNN(
                 interpolateModelPath=self.interpolateModel,
@@ -462,7 +461,7 @@ class Render:
             )
 
         if self.backend == "pytorch" or self.backend == "tensorrt":
-            from .pytorch.InterpolateTorch import InterpolateFactory
+            from .services.pytorch.InterpolateTorch import InterpolateFactory
 
             self.interpolateOption = InterpolateFactory.build_interpolation_method(
                 self.interpolateModel,

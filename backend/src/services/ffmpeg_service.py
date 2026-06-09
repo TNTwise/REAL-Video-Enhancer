@@ -24,13 +24,56 @@ from ..utils.Util import (
 logger = get_logger(__name__)
 
 
-class Buffer(ABC):
+class ReadBuffer(ABC):
     @abstractmethod
     def command(self) -> list[str]:
+        """Build the FFmpeg command for reading frames from the source video."""
+        pass
+
+    @abstractmethod
+    def read_frame(self) -> bytes | None:
+        """Read a single raw frame from the FFmpeg stdout pipe. Returns None on EOF."""
+        pass
+
+    @abstractmethod
+    def read_frames_into_queue(self) -> None:
+        """Read all frames into the internal queue, sentinel None at the end."""
+        pass
+
+    @abstractmethod
+    def get(self) -> Frame:
+        """Get the next processed Frame from the internal queue."""
         pass
 
 
-class FFmpegRead(Buffer):
+class WriteBuffer(ABC):
+    @abstractmethod
+    def command(self) -> list[str]:
+        """Build the FFmpeg command for writing encoded output video."""
+        pass
+
+    @abstractmethod
+    def get_num_frames_rendered(self) -> int:
+        """Return the current count of frames that have been rendered."""
+        pass
+
+    @abstractmethod
+    def put_frame_in_write_queue(self, frame: Frame) -> None:
+        """Enqueue a processed Frame for writing to the FFmpeg stdin pipe."""
+        pass
+
+    @abstractmethod
+    def write_out_frames(self) -> None:
+        """Drain the write queue and feed raw frames into the FFmpeg process."""
+        pass
+
+    @abstractmethod
+    def onErroredExit(self) -> None:
+        """Handle an error exit from the FFmpeg write process."""
+        pass
+
+
+class FFmpegRead(ReadBuffer):
     def __init__(
         self,
         render_settings: RenderSettings,
@@ -147,7 +190,7 @@ class FFmpegRead(Buffer):
         self.stderr_file.close()
 
 
-class FFmpegWrite(Buffer):
+class FFmpegWrite(WriteBuffer):
     def __init__(
         self,
         render_settings: RenderSettings,
