@@ -14,10 +14,9 @@ import cv2
 import numpy as np
 import tempfile
 
-from .utils.Encoders import EncoderSettings
-from .utils.Frame import Frame
-from .utils.LogConfig import get_logger
-from .utils.Util import (
+from ..schemas.domain.frame import Frame
+from ..utils.LogConfig import get_logger
+from ..utils.Util import (
     subprocess_popen_without_terminal,
 )
 
@@ -37,8 +36,8 @@ class FFmpegRead(Buffer):
         settings: Settings
     ):
         
-        if self.hdr_mode:
-            self.inputFrameChunkSize = width * height * 6
+        if render_settings.hdr_mode:
+            inputFrameChunkSize = video_info.width * height * 6
         elif self.yuv420pMOD:
             self.inputFrameChunkSize = width * height * 3 // 2
         else:

@@ -27,7 +27,7 @@ import numpy as np
 import ncnn
 
 T = TypeVar("T")
-from ..utils.Frame import Frame
+from ..schemas.domain.frame import Frame
 
 
 def checked_cast(t: type[T], value: object) -> T:

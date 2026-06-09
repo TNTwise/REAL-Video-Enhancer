@@ -9,7 +9,7 @@ from rife_ncnn_vulkan_python import wrapped
 
 import ncnn
 
-from ..utils.Frame import Frame
+from ..schemas.domain.frame import Frame
 from ..utils.Util import suppress_stdout_stderr
 
 

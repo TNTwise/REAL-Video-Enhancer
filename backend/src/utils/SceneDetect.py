@@ -4,7 +4,7 @@ import sys
 import cv2
 import numpy as np
 
-from ..utils.Frame import Frame
+from ..schemas.domain.frame import Frame
 from .PySceneDetectUtils import ContentDetector
 
 

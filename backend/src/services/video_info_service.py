@@ -328,17 +328,14 @@ class OpenCVInfo(VideoInfo):
             fc = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         return fc
 
-    def get_width_x_height(self) -> list[int]:
-        res = [
-            int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)),
-            int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)),
-        ]
+    @property
+    def width(self) -> int:
+        return int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
-        rot = abs(self.rotation)
-        if rot in [90, 270]:
-            return [res[1], res[0]]
+    @property
+    def height(self) -> int:
+        return int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        return res
     
     @property
     def rotation(self) -> float:
@@ -381,14 +378,7 @@ class OpenCVInfo(VideoInfo):
         return self.ffmpeg_info.is_hdr()
 
     @property
-    def rotation(self) -> float:
-        return self.ffmpeg_info.get_rotation()
-
-    @property
-    def fps(self) -> float:
-        return self.cap.get(cv2.CAP_PROP_FPS)
-
-    def get_bit_depth(self) -> int:
+    def bit_depth(self) -> int:
         return self.ffmpeg_info.get_bit_depth()
 
     def __del__(self):

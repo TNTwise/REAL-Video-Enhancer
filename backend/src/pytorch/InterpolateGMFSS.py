@@ -5,7 +5,7 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
-from ..utils.Frame import Frame
+from ..schemas.domain.frame import Frame
 from ..utils.LogConfig import get_logger
 from ..utils.Util import (
     warnAndLog,

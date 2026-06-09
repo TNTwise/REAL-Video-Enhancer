@@ -10,7 +10,7 @@ from time import sleep
 import cv2
 import numpy as np
 
-from .FFmpegBuffers import FFmpegRead, FFmpegWrite, MPVOutput
+from .services.ffmpeg_service import FFmpegRead, FFmpegWrite, MPVOutput
 from .InformationWriteOut import InformationWriteOut
 from .utils.BorderDetect import BorderDetect
 from .utils.Encoders import EncoderSettings

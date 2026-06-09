@@ -4,8 +4,8 @@ try:
     import numpy as np
 except ImportError:
     pass
-from .LogConfig import get_logger
-from .Util import resize_image_np
+from ...utils.LogConfig import get_logger
+from ...utils.Util import resize_image_np
 
 logger = get_logger(__name__)
 
@@ -21,7 +21,7 @@ def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
     if _torch_utils is None:
         import torch
 
-        from ..pytorch.TorchUtils import TorchUtils
+        from ...pytorch.TorchUtils import TorchUtils
 
         _torch = torch
         _torch_utils = TorchUtils(

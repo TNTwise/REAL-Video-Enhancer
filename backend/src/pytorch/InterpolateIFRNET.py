@@ -3,7 +3,7 @@ from collections.abc import Generator
 
 import torch
 
-from ..utils.Frame import Frame
+from ..schemas.domain.frame import Frame
 from ..utils.LogConfig import get_logger
 from ..utils.Util import (
     warnAndLog,
