@@ -6,11 +6,11 @@ import time
 import shlex
 from abc import ABC, abstractmethod
 
-from backend.src.constants import FFMPEG_PATH
-from backend.src.schemas.domain.render import RenderSettings
-from backend.src.services.settings import Settings
-from backend.src.services.video_info_service import OpenCVInfo
-from backend.src.utils import BorderDetect
+from src.constants import FFMPEG_PATH
+from src.schemas.domain.render import RenderSettings
+from src.services.settings import Settings
+from src.services.video_info_service import OpenCVInfo
+from src.utils import BorderDetect
 import cv2
 import numpy as np
 import tempfile
@@ -127,7 +127,6 @@ class FFmpegRead(ReadBuffer):
             "rgb48le"
             if self.render_settings.hdr_mode
             else (self.video_info.pixel_format if self._yuv420p_mod else "rgb24"),
-            # "rgb48le" if self.hdr_mode else "rgb24",
             "-vcodec",
             "rawvideo",
             "-s",
@@ -199,8 +198,6 @@ class FFmpegWrite(WriteBuffer):
         self.outputFile = render_settings.default_output_path_override
         if self.outputFile:
             self.outputFileExtension = os.path.split(self.outputFile)[-1].split(".")[-1]
-        self.width = width
-        self.height = height
         self.start_time = start_time
         self.end_time = end_time
         self.outputWidth = width * upscaleTimes

@@ -2,6 +2,7 @@ import logging
 import re
 import subprocess
 from abc import ABC, abstractmethod
+from datetime import time
 
 from backend.src.constants import FFMPEG_PATH
 import cv2
@@ -296,8 +297,8 @@ class OpenCVInfo(VideoInfo):
     def __init__(
         self,
         input_file: str,
-        start_time: float | None = None,
-        end_time: float | None = None,
+        start_time: time | None = None,
+        end_time: time | None = None,
     ):
         logger.info("Getting Input Video Properties")
         self.input_file = input_file

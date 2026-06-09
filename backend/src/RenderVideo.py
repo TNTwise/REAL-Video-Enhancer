@@ -11,32 +11,14 @@ from backend.src.schemas import RenderSettings, Setting
 import cv2
 import numpy as np
 
-from src.services.ffmpeg_service import FFmpegRead, FFmpegWrite, MPVOutput
+from src.services.ffmpeg_service import ReadBuffer, WriteBuffer
 from src.InformationWriteOut import InformationWriteOut
-from src.utils.BorderDetect import BorderDetect
-from src.utils.Encoders import EncoderSettings
 from src.utils.LogConfig import get_logger
 from src.utils.SceneDetect import SceneDetect
-from src.services.video_info_service import OpenCVInfo, VideoInfo
-
-
-def global_thread_handler(args):
-    # args.exc_value contains the error
-    # args.exc_traceback contains the stack trace
-    tb_string = "".join(
-        traceback.format_exception(args.exc_type, args.exc_value, args.exc_traceback)
-    )
-
-    print(f"Thread '{args.thread.name}' crashed. Full Traceback:\n{tb_string}")
-    print("Exiting application due to thread crash.")
-    sleep(1)  # Give time for the print to flush
-    os._exit(1)
-
-
-threading.excepthook = global_thread_handler
+from src.utils.BorderDetect import BorderDetect
+from src.services.video_info_service import VideoInfo
 
 logger = get_logger(__name__)
-
 
 class Render:
     def __init__(
@@ -44,86 +26,34 @@ class Render:
         render_settings: RenderSettings,
         settings: Setting,
         video_info: VideoInfo,
-        # backend settings
-        pytorch_gpu_id: int = 0,
-        ncnn_gpu_id: int = 0,
-        cwd: str = os.getcwd(),
-        # model settings
-        upscaleModel=None,
-        interpolateModel=None,
-        interpolateFactor: float = 1.0,
-        extraRestorationModels=None,
-        sceneDetectModel: str = None,
-        tile_size=None,
-        # ffmpeg settings
-        ffmpeg_path: str = "./bin/ffmpeg",
-        start_time=None,
-        end_time=None,
-        custom_encoder: str = "libx264",
-        pixelFormat: str = "yuv420p",
-        benchmark: bool = False,
-        overwrite: bool = False,
-        crf: str = "18",
-        video_encoder_preset: str = "libx264",
-        audio_encoder_preset: str = "aac",
-        subtitle_encoder_preset: str = "srt",
-        audio_bitrate: str = "192k",
-        border_detect: bool = False,
-        hdr_mode: bool = False,
-        merge_subtitles: bool = True,
-        # misc
-        pause_shared_memory_id=None,
-        sceneDetectMethod: str = "pyscenedetect",
-        sceneDetectSensitivity: float = 3.0,
-        sharedMemoryID: str | None = None,
-        trt_optimization_level: int = 3,
-        trt_dynamic_shapes: bool = False,
-        override_upscale_scale: int | None = None,
-        UHD_mode: bool = False,
-        slomo_mode: bool = False,
-        dynamic_scaled_optical_flow: bool = False,
-        ensemble: bool = False,
-        output_to_mpv: bool = False,
+        border_detect: BorderDetect,
+        read_buffer: ReadBuffer,
+        write_buffer: WriteBuffer,
     ):
-        self.inputFile = inputFile
-        self.backend = backend
-        self.upscaleModel = upscaleModel
-        self.interpolateModel = interpolateModel
-        self.tilesize = tile_size
-        self.device = device
-        self.precision = precision
-        self.interpolateFactor = interpolateFactor
-        self.ceilInterpolateFactor = math.ceil(self.interpolateFactor)
+        self.render_settings = render_settings
+        self.settings = settings
+        self.video_info = video_info
+        self.border_detect = border_detect
+        self.read_buffer = read_buffer
+        self.write_buffer = write_buffer
+
+        # TODO (bug #1): 'inputFile' is used but not defined in the __init__ params or passed from RenderSettings — will raise NameError at runtime.
+        # TODO (bug #2): 'outputFile' is not defined — same root cause as bug #1.
+        # TODO (bug #3): 'backend' is not defined — same root cause.
+        # TODO (bug #4): 'device' is not defined — same root cause.
+        # TODO (bug #5): 'precision' is not defined — same root cause.
+        # TODO (bug #8): 'crf', 'video_encoder', 'audio_encoder', 'subtitle_encoder' are passed to FFmpegWrite but never bound on self or received as params.
+        # TODO (bug #9): 'color_space', 'color_primaries', 'color_transfer', 'input_pix_fmt' are passed to FFmpegRead but never bound.
         # max timestep is a hack to make sure ncnn cache frames too early, and ncnn breaks if i modify the code at all so ig this is what we are doing
         # also used to help with performace and caching
         # must use ceilInterpolateFactor so the last timestep matches exactly
         self.maxTimestep = (self.ceilInterpolateFactor - 1) / self.ceilInterpolateFactor
 
         # self.setupRender = self.returnFrame  # set it to not convert the bytes to array by default, and just pass chunk through
-        self.setupFrame0 = None
-        self.interpolateOption = None
-        self.upscaleOption = None
-        self.isPaused = False
-        self.sceneDetectModelPath = sceneDetectModel
-        self.sceneDetectMethod = sceneDetectMethod
-        self.sceneDetectSensitivty = sceneDetectSensitivity
-        self.sharedMemoryID = sharedMemoryID
-        self.trt_optimization_level = trt_optimization_level
-        self.uncacheNextFrame = False
-        self.UHD_mode = UHD_mode
-        self.dynamic_scaled_optical_flow = dynamic_scaled_optical_flow
-        self.ensemble = ensemble
-        self.pytorch_gpu_id = pytorch_gpu_id
-        self.ncnn_gpu_id = ncnn_gpu_id
-        self.outputFrameChunkSize = None
-        self.hdr_mode = hdr_mode
-        self.override_upscale_scale = override_upscale_scale
-        self.trt_dynamic_shapes = trt_dynamic_shapes
-        self.extraRestorationModels = []
 
         logger.info("Using backend: %s", self.backend)
         # upscale has to be called first to get the scale of the upscale model
-        if upscaleModel:
+        if render_settings.upscale_:
             self.setupUpscale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
             logger.info("Using Upscaling Model: %s", self.upscaleModel)
@@ -131,137 +61,23 @@ class Render:
             self.upscaleTimes = 1  # if no upscaling, it will default to 1
             self.modelScale = 1
 
-        if extraRestorationModels:
-            for model in extraRestorationModels:
+        if render_settings.extra_restoration_models:
+            for model in render_settings.extra_restoration_models:
                 extraRestoration = self.setupExtraRestoration(model)
                 if extraRestoration:
                     logger.info("Using Extra Restoration Model: %s", model)
                     self.extraRestorationModels.append(extraRestoration)
                     extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
 
-        if interpolateModel:
+        if render_settings.interpolate_model:
             self.setupInterpolate()
             logger.info("Using Interpolation Model: %s", self.interpolateModel)
 
-        if upscaleModel:  # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
+        if render_settings.upscale_model:
             self.upscaleOption.hotReload()
 
         for extraRestoration in self.extraRestorationModels:
             extraRestoration.hotReload()
-
-        if self.modelScale and self.override_upscale_scale:
-            if int(self.modelScale) == int(self.override_upscale_scale):
-                logger.warning(
-                    "Override upscale scale is set to the same value as the model scale; output resolution will not change."
-                )
-                self.override_upscale_scale = False
-
-        logger.info(
-            "Upscale Times: %s",
-            self.override_upscale_scale or self.upscaleTimes,
-        )
-        logger.info("Interpolate Factor: %s", self.interpolateFactor)
-        logger.info("Total Output Frames: %s", self.totalOutputFrames)
-        logger.info("Model Scale: %s", self.modelScale)
-        logger.info("HDR Mode: %s", hdr_mode)
-
-        self.readBuffer = FFmpegRead(  # input width
-            inputFile=inputFile,
-            width=self.width,
-            height=self.height,
-            start_time=start_time,
-            end_time=end_time,
-            borderX=self.borderX,
-            borderY=self.borderY,
-            hdr_mode=hdr_mode,
-            backend=self.backend,
-            device=self.device,
-            gpu_id=self.pytorch_gpu_id
-            if self.backend in ["pytorch", "tensorrt"]
-            else self.ncnn_gpu_id,
-            dtype=self.precision,
-            color_space=color_space,
-            color_primaries=color_primaries,
-            color_transfer=color_transfer,
-            input_pixel_format=input_pix_fmt,
-            ffmpeg_path=ffmpeg_path,
-        )
-
-        self.writeBuffer = FFmpegWrite(
-            inputFile=inputFile,
-            outputFile=outputFile,
-            width=self.width,
-            height=self.height,
-            start_time=start_time,
-            end_time=end_time,
-            fps=self.fps,
-            crf=crf,
-            audio_bitrate=audio_bitrate,
-            pixelFormat=pixelFormat,
-            overwrite=overwrite,
-            custom_encoder=custom_encoder,
-            benchmark=benchmark,
-            slowmo_mode=slomo_mode,
-            upscaleTimes=self.upscaleTimes
-            if not self.override_upscale_scale
-            else self.override_upscale_scale,
-            interpolateFactor=self.interpolateFactor,
-            ceilInterpolateFactor=self.ceilInterpolateFactor,
-            video_encoder=video_encoder,
-            audio_encoder=audio_encoder,
-            subtitle_encoder=subtitle_encoder,
-            mpv_output=output_to_mpv,
-            hdr_mode=hdr_mode,
-            merge_subtitles=merge_subtitles,
-            color_space=color_space,
-            color_primaries=color_primaries,
-            color_transfer=color_transfer,
-            ffmpeg_path=ffmpeg_path,
-            ffmpeg_log_file=os.path.join(cwd, "ffmpeg_log.txt"),
-        )
-
-        shm_mul = self.override_upscale_scale or self.upscaleTimes
-        hdr_mul = 6 if hdr_mode else 3
-
-        self.informationHandler = InformationWriteOut(
-            sharedMemoryID=sharedMemoryID,
-            sharedMemoryChunkSize=self.originalHeight
-            * self.originalWidth
-            * shm_mul
-            * shm_mul
-            * hdr_mul,
-            paused_shared_memory_id=pause_shared_memory_id,
-            outputWidth=self.originalWidth * shm_mul,
-            outputHeight=self.originalHeight * shm_mul,
-            croppedOutputWidth=self.width * shm_mul,
-            croppedOutputHeight=self.height * shm_mul,
-            totalOutputFrames=self.totalOutputFrames,
-            border_detect=border_detect,
-            hdr_mode=hdr_mode,
-        )
-
-        self.renderThread = Thread(target=self.render)
-        self.ffmpegReadThread = Thread(target=self.readBuffer.read_frames_into_queue)
-        self.ffmpegWriteThread = Thread(target=self.writeBuffer.write_out_frames)
-        self.sharedMemoryThread = Thread(
-            target=self.informationHandler.writeOutInformation
-        )
-
-        self.sharedMemoryThread.start()
-        self.ffmpegReadThread.start()
-        self.ffmpegWriteThread.start()
-        self.renderThread.start()
-
-        if output_to_mpv:
-            MPVOut = MPVOutput(
-                self.writeBuffer,
-                width=self.width * self.upscaleTimes,
-                height=self.height * self.upscaleTimes,
-                fps=self.fps * self.interpolateFactor,
-                outputFrameChunkSize=self.outputFrameChunkSize,
-            )
-            MPVoutThread = Thread(target=MPVOut.write_out_frames)
-            MPVoutThread.start()
 
     def write_bytes_to_cv2_frame_debug(self, frame):
         # Convert the byte array to a numpy array

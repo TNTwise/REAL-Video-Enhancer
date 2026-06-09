@@ -1,3 +1,7 @@
+from src.utils.LogConfig import get_logger
+
+logger = get_logger(__name__)
+
 class TorchHandler:
     def __init__(self):
         try:
@@ -7,7 +11,7 @@ class TorchHandler:
             self.torch = torch
             self.torchvision = torchvision
         except ImportError as e:
-            print(f"Error importing torch: {e}")
+            logger.error(f"Error importing torch: {e}")
             self.torch = None
             self.torchvision = None
 
