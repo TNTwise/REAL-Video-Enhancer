@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 class RenderSettings(BaseModel):
     video_path: str
-    default_output_path_override: str | None
-    interpolate_model: InterpolateModel
-    upscale_model: UpscaleModel
-    enhancement_models: list[UpscaleModel]
+    default_output_path_override: str | None = None
+    interpolate_model: InterpolateModel | None = None
+    upscale_model: UpscaleModel | None = None
+    enhancement_models: list[UpscaleModel] | None = None

@@ -5,22 +5,32 @@ from typing import Literal, Annotated, Union
 
 
 class InterpolateModel(BaseModel):
+    id: str
     type: Literal["interpolate"] = "interpolate"
     variant: str
-    url: str
+    file_path: str
+    description: str | None = None
+    url: str | None = None
 
 
 class UpscaleModel(BaseModel):
+    id: str
     type: Literal["upscale"] = "upscale"
     variant: str
     scale: int
-    url: str
+    file_path: str
+    description: str | None = None
+    url: str | None = None
 
 
 class EnhancementModel(BaseModel):
     type: Literal["enhancement"] = "enhancement"
+    id: str
     variant: str
-    url: str
+    file_path: str
+    description: str | None = None
+    url: str | None = None
+
 
 
 ModelVariant = Annotated[
