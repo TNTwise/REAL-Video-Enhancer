@@ -1,7 +1,6 @@
 import os
 import platform
 import sys
-from pathlib import Path
 
 CPU_ARCH = 'x86_64' if platform.machine() == 'AMD64' else platform.machine()
 IS_FLATPAK = 'FLATPAK_ID' in os.environ

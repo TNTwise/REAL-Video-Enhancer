@@ -20,6 +20,9 @@
 - [ ] Connect the Tauri frontend to the backend API so enhancement workflows run end-to-end
 
 
+## Model Management
+- [ ] Implement a local JSON file for model definitions — downloadable models include a URL and a `downloadable` boolean tag, while non-downloadable models use a direct file path
+
 # Bundle Base Dependencies
 
 Package FFmpeg and the Python runtime inside the app so it runs without system-level prerequisites. Per-backend AI libraries (PyTorch, TensorRT, etc.) install on demand through the API instead.
