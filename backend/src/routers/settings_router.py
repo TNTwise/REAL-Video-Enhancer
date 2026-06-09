@@ -1,20 +1,22 @@
-from fastapi import APIRouter
-from src.models.settings import Setting
-from src.settings import settings
+from fastapi import APIRouter, Depends
+from src.schemas import Setting
+from src.services import Settings
 
 router = APIRouter(prefix="/settings")
+# FastAPI example
+def get_user_service() -> Settings:
+    return Settings()
 
-
-@router.put("/write_setting")
-def update_setting(body: Setting):
-    return settings.write_setting(body.setting, str(body.value))
+@router.post("/update_setting")
+def update_setting(body: Setting, service: Settings = Depends(get_user_service)):
+    return service.write_setting(body.setting, str(body.value))
 
 
 @router.get("/get_setting_value")
-def get_setting_value(setting: str):
-    return settings.get_setting_value(setting)
+def get_setting_value(setting: str, service: Settings = Depends(get_user_service)):
+    return service.get_setting_value(setting)
 
 
 @router.get("/get_allowed_options")
-def get_allowed_options(setting: str):
-    return settings.get_allowed_options(setting)
+def get_allowed_options(setting: str, service: Settings = Depends(get_user_service)):
+    return service.get_allowed_options(setting)

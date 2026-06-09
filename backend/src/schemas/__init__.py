@@ -5,6 +5,7 @@ from .request import (
     InterpolateModelClientInput,
     UpscaleModelClientInput,
     EnhancementModelClientInput,
+    Setting,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "InterpolateModelClientInput",
     "UpscaleModelClientInput",
     "EnhancementModelClientInput",
+    "Setting"
 ]
