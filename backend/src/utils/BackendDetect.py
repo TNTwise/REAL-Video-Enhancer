@@ -36,7 +36,7 @@ class BackendDetect:
         try:
             from rife_ncnn_vulkan_python import Rife
 
-            import backend.src.services.backends.ncnn as ncnn
+            import backend.src.proxy.backends.ncnn as ncnn
 
             try:
                 from upscale_ncnn_py import UPSCALE

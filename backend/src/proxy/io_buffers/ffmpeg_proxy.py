@@ -8,16 +8,16 @@ from abc import ABC, abstractmethod
 
 from src.constants import FFMPEG_PATH
 from src.schemas.domain.render import RenderSettings
-from src.services.settings import Settings
-from src.services.video_info_service import OpenCVInfo
+from backend.src.proxy.settings import Settings
+from backend.src.proxy.video_info_proxy import OpenCVInfo
 from src.utils import BorderDetect
 import cv2
 import numpy as np
 import tempfile
 
-from ..schemas.domain.frame import Frame
-from ..utils.LogConfig import get_logger
-from ..utils.Util import (
+from ...schemas.domain.frame import Frame
+from ...utils.LogConfig import get_logger
+from ...utils.Util import (
     subprocess_popen_without_terminal,
 )
 

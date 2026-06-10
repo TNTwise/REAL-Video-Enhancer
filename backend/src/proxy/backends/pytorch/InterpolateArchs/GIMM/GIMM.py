@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import torch.nn.functional as F
-from backend.src.services.backends.pytorch.InterpolateArchs.GIMM.gimmvfi_r import GIMMVFI_R
+from backend.src.proxy.backends.pytorch.InterpolateArchs.GIMM.gimmvfi_r import GIMMVFI_R
 from PIL import Image
 
 

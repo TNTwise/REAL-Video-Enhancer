@@ -7,6 +7,11 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
+from backend.src.proxy.settings import Settings
+from backend.src.schemas.domain.render import RenderSettings
+from backend.src.proxy.video_info_proxy import VideoInfo
+from src.schemas.domain.model import InterpolateModel
+
 from ....schemas.domain.frame import Frame
 from ....utils.LogConfig import get_logger
 from ....utils.Util import errorAndLog
@@ -26,81 +31,17 @@ class InterpolateRifeTorch(BasePyTorchInterpolate):
     @torch.inference_mode()
     def __init__(
         self,
-        modelPath: str,
-        ceilInterpolateFactor: int = 2,
-        width: int = 1920,
-        height: int = 1080,
-        device: str = "auto",
-        dtype: str = "auto",
-        backend: str = "pytorch",
-        UHDMode: bool = False,
-        ensemble: bool = False,
-        dynamicScaledOpticalFlow: bool = False,
-        gpu_id: int = 0,
-        # trt options
-        trt_optimization_level: int = 5,
-        hdr_mode: bool = False,
-        trt_static_shape: bool = False,
-        *args,
-        **kwargs,
+        interpolate_model: InterpolateModel,
+        video_info: VideoInfo,
+        render_settings: RenderSettings,
+        settings: Settings,
     ):
-        self.interpolateModel = modelPath
-        self.width = width
-        self.height = height
-        self.device_type = device
-        self.device: torch.device = TorchUtils.handle_device(device, gpu_id=gpu_id)
-        self.dtype = TorchUtils.handle_precision(dtype)
-        self.backend = backend
-        self.ceilInterpolateFactor = ceilInterpolateFactor
-        self.dynamicScaledOpticalFlow = dynamicScaledOpticalFlow
-
-        if width <= 3840 and height <= 3840 and (width > 1920 or height > 1920):
-            self.trt_min_shape = (
-                ([1920, height] if height < width else [width, 1920])
-                if width < 1920 or height < 1920
-                else [1920, 1920]
-            )
-            self.trt_opt_shape = [3840, 2160]
-            self.trt_max_shape = [3840, 3840]
-
-        if width <= 1920 and height <= 1920 and (width >= 128 or height >= 128):
-            self.trt_min_shape = [128, 128]
-            self.trt_opt_shape = [1920, 1080]
-            self.trt_max_shape = [1920, 1920]
-
-        if width > 3840 or (height > 3840 and not trt_static_shape):
-            logger.warning(
-                "The video resolution is very large for TensorRT dynamic shape; falling back to static shape"
-            )
-            trt_static_shape = True
-
-        if width < 128 or (height < 128 and not trt_static_shape):
-            logger.warning(
-                "The video resolution is too small for TensorRT dynamic shape; falling back to static shape"
-            )
-            trt_static_shape = True
-
-        self.trt_static_shape = trt_static_shape
-
-        self.CompareNet = None
-        self.frame0 = None
-        self.encode0 = None
-        # set up streams for async processing
-        self.scale = 1
-        self.ensemble = ensemble
-        self.hdr_mode = hdr_mode  # used in base interpolate class (ik inheritance is bad leave me alone)
-
-        self.trt_optimization_level = trt_optimization_level
-        self.trt_cache_dir = os.path.dirname(
-            modelPath
-        )  # use the model directory as the cache directory
-        self.UHDMode = UHDMode
-        if self.UHDMode:
-            print(
-                "UHD Mode has been depricated for RIFE.", file=sys.stderr
-            )  # causes issues with 4k warp.
-            self.scale = 1
-
+        self.interpolate_model = interpolate_model
+        self.video_info = video_info
+        self.render_settings = render_settings
+        self.settings = settings
+        self.device = torch.cuda()
+        self.dtype = torch.float16
         self._load()
 
     @torch.inference_mode()

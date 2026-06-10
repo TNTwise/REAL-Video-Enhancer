@@ -5,9 +5,11 @@ from queue import Queue
 
 import torch
 
+from src.schemas.domain.model import InterpolateModel
+
 from ....utils.SSIM import SSIM
 from ....utils.Util import CudaChecker
-from src.services.backends.interpolate_base import InterpolateBase
+from src.proxy.backends.interpolate_base import InterpolateBase
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .UpscaleTorch import UpscalePytorch
@@ -54,7 +56,7 @@ class BasePyTorchInterpolate(InterpolateBase):
         self.hdr_mode = False
         self.CompareNet = None
 
-    def hotUnload(self):
+    def hot_unload(self):
         self.flownet = None
         self.encode = None
         self.tenFlow_div = None
@@ -67,7 +69,7 @@ class BasePyTorchInterpolate(InterpolateBase):
             torch.cuda.reset_max_memory_cached()
 
     @torch.inference_mode()
-    def hotReload(self):
+    def hot_reload(self):
         self._load()
 
     @abstractmethod

@@ -179,7 +179,7 @@ class PyTorchSudoSceneDetect(ModelDetector):
     ):
         import torch
 
-        from ..services.backends.pytorch.scenechangedetect.PyTorchEfficientNetSC import (
+        from ..proxy.backends.pytorch.scenechangedetect.PyTorchEfficientNetSC import (
             InferenceSceneChangeDetectEfficientNet,
         )
 
@@ -218,7 +218,7 @@ class NCNNSudoSceneDetect(ModelDetector):
         model_device="cpu",
         **kwargs,
     ):
-        from ..services.backends.ncnn.NCNNEfficientNetSC import (
+        from ..proxy.backends.ncnn.NCNNEfficientNetSC import (
             InferenceSceneChangeDetectEfficientNetNCNN,
         )
 

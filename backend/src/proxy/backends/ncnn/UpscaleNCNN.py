@@ -24,7 +24,7 @@ from typing import TypeVar
 
 import numpy as np
 
-import backend.src.services.backends.ncnn as ncnn
+import backend.src.proxy.backends.ncnn as ncnn
 
 T = TypeVar("T")
 from ....schemas.domain.frame import Frame

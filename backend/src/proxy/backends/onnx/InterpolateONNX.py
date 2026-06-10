@@ -5,7 +5,7 @@ import onnxruntime as ort
 from onnxconverter_common import float16
 from onnxruntime import InferenceSession
 
-import backend.src.services.backends.onnx as onnx
+import backend.src.proxy.backends.onnx as onnx
 
 from ....utils.Util import checkForDirectMLHalfPrecisionSupport
 

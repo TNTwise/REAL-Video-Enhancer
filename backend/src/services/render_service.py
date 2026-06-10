@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from src.schemas import RenderSettings, RenderSettingsClientInput
 from src.repos.model_repo import ModelRepo
-from backend.src.services.video_info_service import OpenCVInfo
+from backend.src.proxy.video_info_proxy import OpenCVInfo
 
 
 class RenderService:

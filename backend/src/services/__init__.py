@@ -1,5 +1,5 @@
 from .render_service import RenderService
-from .settings import Settings
-from .video_info_service import OpenCVInfo
+from ..proxy.settings import Settings
+from ..proxy.video_info_proxy import OpenCVInfo
 
 __all__ = ["RenderService", "Settings", "OpenCVInfo"]
