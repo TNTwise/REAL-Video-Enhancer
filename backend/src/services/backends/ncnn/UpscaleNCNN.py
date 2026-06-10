@@ -24,10 +24,10 @@ from typing import TypeVar
 
 import numpy as np
 
-import ncnn
+import backend.src.services.backends.ncnn as ncnn
 
 T = TypeVar("T")
-from ..schemas.domain.frame import Frame
+from ....schemas.domain.frame import Frame
 
 
 def checked_cast(t: type[T], value: object) -> T:
@@ -4297,7 +4297,7 @@ class UpscaleNCNN:
         self._load()
 
     def _load(self):
-        from ..utils.Util import suppress_stdout_stderr
+        from ....utils.Util import suppress_stdout_stderr
 
         with suppress_stdout_stderr():
             if method == "ncnn_vulkan":

@@ -5,14 +5,14 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
-from ..schemas.domain.frame import Frame
-from ..utils.LogConfig import get_logger
-from ..utils.Util import (
+from ....schemas.domain.frame import Frame
+from ....utils.LogConfig import get_logger
+from ....utils.Util import (
     warnAndLog,
 )
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
-from .BaseInterpolate import BaseInterpolate
+from .BaseInterpolate import BasePyTorchInterpolate
 from .TorchUtils import TorchUtils
 
 torch.set_float32_matmul_precision("medium")
@@ -21,7 +21,7 @@ torch.set_grad_enabled(False)
 logger = get_logger(__name__)
 
 
-class InterpolateGIMMTorch(BaseInterpolate):
+class InterpolateGIMMTorch(BasePyTorchInterpolate):
     @torch.inference_mode()
     def __init__(
         self,

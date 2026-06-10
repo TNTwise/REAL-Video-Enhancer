@@ -21,7 +21,7 @@ def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
     if _torch_utils is None:
         import torch
 
-        from ...pytorch.TorchUtils import TorchUtils
+        from ...services.backends.pytorch.TorchUtils import TorchUtils
 
         _torch = torch
         _torch_utils = TorchUtils(

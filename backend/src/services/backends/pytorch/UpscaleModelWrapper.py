@@ -1,6 +1,6 @@
 import torch
 
-from ..utils.LogConfig import get_logger
+from ....utils.LogConfig import get_logger
 from .TorchUtils import TorchUtils
 from .VSRArchs.AnimeSR.animesr_arch import AnimeSR
 from .VSRArchs.AnimeSR.vsr_inference_helper import AnimeSRInferenceHelper

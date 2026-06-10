@@ -3,12 +3,12 @@ import sys
 import torch
 import torch.nn.functional as F
 
-from ..utils.BackendDetect import BackendDetect
-from ..utils.LogConfig import get_logger
+from ....utils.BackendDetect import BackendDetect
+from ....utils.LogConfig import get_logger
 
 backendDetect = BackendDetect()
 
-from ..utils.Util import CudaChecker
+from ....utils.Util import CudaChecker
 
 logger = get_logger(__name__)
 

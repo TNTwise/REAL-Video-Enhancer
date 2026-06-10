@@ -1,51 +1,11 @@
 from __future__ import annotations
 
+from ..architectures import ATD, CRAFT, DAT, DCTLSA, DIS, DITN, DRCT, ESRGAN, FBCNN, GFPGAN, GRL, HAT, IPT, PLKSR, RCAN, RGT, SAFMN, SAFMNBCIE, SPAN, ArtCNN, Compact, DRUNet, DnCNN, FFTformer, HVICIDNet, KBNet, LaMa, MMRealSR, MixDehazeNet, MoSR, NAFNet, OmniSR, RTMoSR, RealCUGAN, RestoreFormer, RetinexFormer, SCUNet, SPANPlus, Sebica, SeemoRe, SwiftSRGAN, Swin2SR, SwinIR
+
+from ..architectures import Uformer
+
 from ..architectures import (
-    ATD,
-    CRAFT,
-    DAT,
-    DCTLSA,
-    DITN,
-    DRCT,
-    ESRGAN,
-    FBCNN,
-    GFPGAN,
-    GRL,
-    HAT,
-    IPT,
-    PLKSR,
-    RCAN,
-    RGT,
-    SAFMN,
-    SAFMNBCIE,
-    SPAN,
-    ArtCNN,
-    Compact,
-    DnCNN,
-    DRUNet,
-    FFTformer,
-    HVICIDNet,
-    KBNet,
-    LaMa,
-    MixDehazeNet,
-    MMRealSR,
-    MoSR,
-    NAFNet,
-    OmniSR,
-    RealCUGAN,
-    RestoreFormer,
-    RetinexFormer,
-    RTMoSR,
-    SCUNet,
-    Sebica,
-    SeemoRe,
-    SPANPlus,
-    SwiftSRGAN,
-    Swin2SR,
-    SwinIR,
-    Uformer,
     sudo_SPANPlus,
-    DIS,
 )
 from .registry import ArchRegistry, ArchSupport
 

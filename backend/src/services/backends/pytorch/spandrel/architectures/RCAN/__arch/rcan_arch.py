@@ -6,7 +6,7 @@ from collections.abc import Callable
 import torch
 from torch import Tensor, nn
 
-from ....architectures.__arch_helpers.padding import pad_to_multiple
+from ...__arch_helpers.padding import pad_to_multiple
 from ....util import store_hyperparameters
 
 

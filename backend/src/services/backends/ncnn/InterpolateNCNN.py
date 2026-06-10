@@ -7,10 +7,10 @@ from time import sleep
 import numpy as np
 from rife_ncnn_vulkan_python import wrapped
 
-import backend.src.services.ncnn as ncnn
+import backend.src.services.backends.ncnn as ncnn
 
-from ...schemas.domain.frame import Frame
-from ...utils.Util import suppress_stdout_stderr
+from ....schemas.domain.frame import Frame
+from ....utils.Util import suppress_stdout_stderr
 
 
 class Rife:

@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from torch.nn.init import trunc_normal_
 
-from ....architectures.__arch_helpers.dysample import DySample
+from ...__arch_helpers.dysample import DySample
 from ....util import store_hyperparameters
 
 

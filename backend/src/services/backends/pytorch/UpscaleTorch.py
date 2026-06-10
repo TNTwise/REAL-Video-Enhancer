@@ -6,9 +6,9 @@ from time import sleep
 import torch as torch
 import torch.nn.functional as F
 
-from ..schemas.domain.frame import Frame
-from ..utils.LogConfig import get_logger
-from ..utils.Util import CudaChecker
+from ....schemas.domain.frame import Frame
+from ....utils.LogConfig import get_logger
+from ....utils.Util import CudaChecker
 from .TorchUtils import TorchUtils
 from .UpscaleModelWrapper import UpscaleModelWrapper
 

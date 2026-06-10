@@ -27,7 +27,7 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
             model_dtype: Data type for inference (unused for NCNN, kept for API compatibility)
             model_device: Device for inference (unused for NCNN, kept for API compatibility)
         """
-        import ncnn
+        import backend.src.services.backends.ncnn as ncnn
 
         self.threshold = threshold * 0.1
         self.ncnn = ncnn

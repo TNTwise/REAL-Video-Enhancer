@@ -7,12 +7,12 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
-from ..schemas.domain.frame import Frame
-from ..utils.LogConfig import get_logger
-from ..utils.Util import errorAndLog
+from ....schemas.domain.frame import Frame
+from ....utils.LogConfig import get_logger
+from ....utils.Util import errorAndLog
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
-from .BaseInterpolate import BaseInterpolate, DynamicScale
+from .BaseInterpolate import BasePyTorchInterpolate, DynamicScale
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .TorchUtils import TorchUtils
 
@@ -22,7 +22,7 @@ torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 
 
-class InterpolateRifeTorch(BaseInterpolate):
+class InterpolateRifeTorch(BasePyTorchInterpolate):
     @torch.inference_mode()
     def __init__(
         self,
@@ -255,7 +255,7 @@ class InterpolateRifeTorch(BaseInterpolate):
                     file=sys.stderr,
                 )
             else:
-                from ..utils.SSIM import SSIM
+                from ....utils.SSIM import SSIM
 
                 CompareNet = SSIM().to(device=self.device, dtype=self.dtype)
                 possible_values = {

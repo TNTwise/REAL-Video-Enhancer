@@ -5,8 +5,9 @@ from queue import Queue
 
 import torch
 
-from ..utils.SSIM import SSIM
-from ..utils.Util import CudaChecker
+from ....utils.SSIM import SSIM
+from ....utils.Util import CudaChecker
+from src.services.backends.interpolate_base import InterpolateBase
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .UpscaleTorch import UpscalePytorch
@@ -33,7 +34,7 @@ class DynamicScale:
     # limit gmfss scale to 1.0 max
 
 
-class BaseInterpolate(ABC):
+class BasePyTorchInterpolate(InterpolateBase):
     @abstractmethod
     def _load(self):
         """Loads in the model"""

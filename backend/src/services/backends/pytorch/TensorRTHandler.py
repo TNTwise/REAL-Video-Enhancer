@@ -27,9 +27,9 @@ import pathlib
 import sys
 import time
 
-from ..utils.LogConfig import get_logger
-from ..utils.Util import suppress_stdout_stderr
-from ..version import __version__
+from ....utils.LogConfig import get_logger
+from ....utils.Util import suppress_stdout_stderr
+from ....version import __version__
 
 logger = get_logger(__name__)
 

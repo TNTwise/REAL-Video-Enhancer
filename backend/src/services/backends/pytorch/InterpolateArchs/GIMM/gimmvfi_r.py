@@ -31,7 +31,7 @@ try:
         warp,
     )
 except ImportError:
-    from raft import (
+    from backend.src.services.backends.pytorch.InterpolateArchs.GIMM.raft import (
         BasicUpdateBlock,
         CoordSampler3D,
         HypoNet,
@@ -48,7 +48,7 @@ except ImportError:
 try:
     from .raftarch import RAFT, BidirCorrBlock
 except ImportError:
-    from raftarch import RAFT, BidirCorrBlock
+    from backend.src.services.backends.pytorch.InterpolateArchs.GIMM.raftarch import RAFT, BidirCorrBlock
 
 from ..util.softsplat_torch import softsplat
 

@@ -5,14 +5,14 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
-from ..schemas.domain.frame import Frame
-from ..utils.LogConfig import get_logger
-from ..utils.Util import (
+from ....schemas.domain.frame import Frame
+from ....utils.LogConfig import get_logger
+from ....utils.Util import (
     warnAndLog,
 )
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
-from .BaseInterpolate import BaseInterpolate, DynamicScale
+from .BaseInterpolate import BasePyTorchInterpolate, DynamicScale
 from .TorchUtils import TorchUtils
 
 torch.set_float32_matmul_precision("medium")
@@ -21,7 +21,7 @@ torch.set_grad_enabled(False)
 logger = get_logger(__name__)
 
 
-class InterpolateGMFSSTorch(BaseInterpolate):
+class InterpolateGMFSSTorch(BasePyTorchInterpolate):
     @torch.inference_mode()
     def __init__(
         self,
@@ -83,7 +83,7 @@ class InterpolateGMFSSTorch(BaseInterpolate):
         self.copy_stream = self.torchUtils.init_stream(gpu_id=self.gpu_id)
         with self.torchUtils.run_stream(self.prepareStream):  # type: ignore
             if self.dynamicScaledOpticalFlow:
-                from ..utils.SSIM import SSIM
+                from ....utils.SSIM import SSIM
 
                 compareNet = SSIM()
                 self.CompareNet = compareNet.to(device=self.device, dtype=self.dtype)

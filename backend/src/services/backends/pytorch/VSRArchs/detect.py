@@ -12,7 +12,7 @@ class DetectionHelper:
     def get_inference_method(self, modelPath: str):
         self.model = torch.load(modelPath)
         try:
-            from AnimeSR import animesr_arch
+            from backend.src.services.backends.pytorch.VSRArchs.AnimeSR import animesr_arch
 
             self.model = animesr_arch.AnimeSR()
             self.model.load_state_dict(self.model)
@@ -20,7 +20,7 @@ class DetectionHelper:
         except Exception:
             logger.exception("Failed to load AnimeSR VSR architecture")
         try:
-            from TSPAN import tspan
+            from backend.src.services.backends.pytorch.VSRArchs.TSPAN import tspan
 
             self.model = tspan.TemporalSPAN(upscale=1)
             self.model.load_state_dict(self.model)
