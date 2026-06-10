@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod 
 from src.schemas.domain import Frame, InterpolateModel
 
 class InterpolateBase(ABC):
@@ -14,6 +13,7 @@ class InterpolateBase(ABC):
         """Reload the interpolation model."""
         raise NotImplementedError("Subclasses must implement this method")
     
+    def process_frame(self, frame: Frame):
+
     def setup_interpolation(self, interpolate_model: InterpolateModel) -> InterpolateBase:
-        if interpolate_model.backend.type == "pytorch":
-            
+        pass 

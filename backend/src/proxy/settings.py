@@ -6,11 +6,6 @@ SETTINGS_FILE = CONFIG_PATH / "settings.txt"
 
 class Settings:
     def __init__(self):
-        """
-        The default settings are set here, and are overwritten by the settings in the settings file if it exists and the legnth of the settings is the same as the default settings.
-        The key is equal to the name of the widget of the setting in the settings tab.
-        """
-
         self.default_settings = {
             "precision": "auto",
             "tensorrt_optimization_level": "3",
@@ -100,85 +95,274 @@ class Settings:
         if not os.path.isfile(SETTINGS_FILE):
             self.write_default_settings()
         self.read_settings()
-        # check if the settings file is corrupted
         if len(self.default_settings) != len(self.settings):
             self.write_default_settings()
 
-    def read_settings(self):
-        """
-        Reads the settings from the 'settings.txt' file and stores them in the 'settings' dictionary.
+    # --- Properties ---
 
-        Returns:
-            None
-        """
+    @property
+    def precision(self) -> str:
+        return self.settings["precision"]
+
+    @precision.setter
+    def precision(self, value: str):
+        self._validate_and_set("precision", value)
+
+    @property
+    def tensorrt_optimization_level(self) -> str:
+        return self.settings["tensorrt_optimization_level"]
+
+    @tensorrt_optimization_level.setter
+    def tensorrt_optimization_level(self, value: str):
+        self._validate_and_set("tensorrt_optimization_level", value)
+
+    @property
+    def dynamic_tensorrt_engine(self) -> str:
+        return self.settings["dynamic_tensorrt_engine"]
+
+    @dynamic_tensorrt_engine.setter
+    def dynamic_tensorrt_engine(self, value: str):
+        self._validate_and_set("dynamic_tensorrt_engine", value)
+
+    @property
+    def encoder(self) -> str:
+        return self.settings["encoder"]
+
+    @encoder.setter
+    def encoder(self, value: str):
+        self._validate_and_set("encoder", value)
+
+    @property
+    def video_encoder_speed(self) -> str:
+        return self.settings["video_encoder_speed"]
+
+    @video_encoder_speed.setter
+    def video_encoder_speed(self, value: str):
+        self._validate_and_set("video_encoder_speed", value)
+
+    @property
+    def audio_encoder(self) -> str:
+        return self.settings["audio_encoder"]
+
+    @audio_encoder.setter
+    def audio_encoder(self, value: str):
+        self._validate_and_set("audio_encoder", value)
+
+    @property
+    def subtitle_encoder(self) -> str:
+        return self.settings["subtitle_encoder"]
+
+    @subtitle_encoder.setter
+    def subtitle_encoder(self, value: str):
+        self._validate_and_set("subtitle_encoder", value)
+
+    @property
+    def audio_bitrate(self) -> str:
+        return self.settings["audio_bitrate"]
+
+    @audio_bitrate.setter
+    def audio_bitrate(self, value: str):
+        self._validate_and_set("audio_bitrate", value)
+
+    @property
+    def preview_enabled(self) -> str:
+        return self.settings["preview_enabled"]
+
+    @preview_enabled.setter
+    def preview_enabled(self, value: str):
+        self._validate_and_set("preview_enabled", value)
+
+    @property
+    def scene_change_detection_method(self) -> str:
+        return self.settings["scene_change_detection_method"]
+
+    @scene_change_detection_method.setter
+    def scene_change_detection_method(self, value: str):
+        self._validate_and_set("scene_change_detection_method", value)
+
+    @property
+    def scene_change_detection_enabled(self) -> str:
+        return self.settings["scene_change_detection_enabled"]
+
+    @scene_change_detection_enabled.setter
+    def scene_change_detection_enabled(self, value: str):
+        self._validate_and_set("scene_change_detection_enabled", value)
+
+    @property
+    def scene_change_detection_threshold(self) -> str:
+        return self.settings["scene_change_detection_threshold"]
+
+    @scene_change_detection_threshold.setter
+    def scene_change_detection_threshold(self, value: str):
+        self._validate_and_set("scene_change_detection_threshold", value)
+
+    @property
+    def discord_rich_presence(self) -> str:
+        return self.settings["discord_rich_presence"]
+
+    @discord_rich_presence.setter
+    def discord_rich_presence(self, value: str):
+        self._validate_and_set("discord_rich_presence", value)
+
+    @property
+    def video_quality(self) -> str:
+        return self.settings["video_quality"]
+
+    @video_quality.setter
+    def video_quality(self, value: str):
+        self._validate_and_set("video_quality", value)
+
+    @property
+    def output_folder_location(self) -> str:
+        return self.settings["output_folder_location"]
+
+    @output_folder_location.setter
+    def output_folder_location(self, value: str):
+        self._validate_and_set("output_folder_location", value)
+
+    @property
+    def use_same_output_folder_as_input_file_enabled(self) -> str:
+        return self.settings["use_same_output_folder_as_input_file_enabled"]
+
+    @use_same_output_folder_as_input_file_enabled.setter
+    def use_same_output_folder_as_input_file_enabled(self, value: str):
+        self._validate_and_set("use_same_output_folder_as_input_file_enabled", value)
+
+    @property
+    def last_input_folder_location(self) -> str:
+        return self.settings["last_input_folder_location"]
+
+    @last_input_folder_location.setter
+    def last_input_folder_location(self, value: str):
+        self._validate_and_set("last_input_folder_location", value)
+
+    @property
+    def uhd_mode(self) -> str:
+        return self.settings["uhd_mode"]
+
+    @uhd_mode.setter
+    def uhd_mode(self, value: str):
+        self._validate_and_set("uhd_mode", value)
+
+    @property
+    def ncnn_gpu_id(self) -> str:
+        return self.settings["ncnn_gpu_id"]
+
+    @ncnn_gpu_id.setter
+    def ncnn_gpu_id(self, value: str):
+        self._validate_and_set("ncnn_gpu_id", value)
+
+    @property
+    def pytorch_gpu_id(self) -> str:
+        return self.settings["pytorch_gpu_id"]
+
+    @pytorch_gpu_id.setter
+    def pytorch_gpu_id(self, value: str):
+        self._validate_and_set("pytorch_gpu_id", value)
+
+    @property
+    def auto_border_cropping(self) -> str:
+        return self.settings["auto_border_cropping"]
+
+    @auto_border_cropping.setter
+    def auto_border_cropping(self, value: str):
+        self._validate_and_set("auto_border_cropping", value)
+
+    @property
+    def video_container(self) -> str:
+        return self.settings["video_container"]
+
+    @video_container.setter
+    def video_container(self, value: str):
+        self._validate_and_set("video_container", value)
+
+    @property
+    def video_pixel_format(self) -> str:
+        return self.settings["video_pixel_format"]
+
+    @video_pixel_format.setter
+    def video_pixel_format(self, value: str):
+        self._validate_and_set("video_pixel_format", value)
+
+    @property
+    def pytorch_version(self) -> str:
+        return self.settings["pytorch_version"]
+
+    @pytorch_version.setter
+    def pytorch_version(self, value: str):
+        self._validate_and_set("pytorch_version", value)
+
+    @property
+    def pytorch_backend(self) -> str:
+        return self.settings["pytorch_backend"]
+
+    @pytorch_backend.setter
+    def pytorch_backend(self, value: str):
+        self._validate_and_set("pytorch_backend", value)
+
+    @property
+    def auto_hdr_mode(self) -> str:
+        return self.settings["auto_hdr_mode"]
+
+    @auto_hdr_mode.setter
+    def auto_hdr_mode(self, value: str):
+        self._validate_and_set("auto_hdr_mode", value)
+
+    @property
+    def use_custom_encoder_command(self) -> str:
+        return self.settings["use_custom_encoder_command"]
+
+    @use_custom_encoder_command.setter
+    def use_custom_encoder_command(self, value: str):
+        self._validate_and_set("use_custom_encoder_command", value)
+
+    @property
+    def encoder_command(self) -> str:
+        return self.settings["encoder_command"]
+
+    @encoder_command.setter
+    def encoder_command(self, value: str):
+        self._validate_and_set("encoder_command", value)
+
+    # --- Private helpers ---
+
+    def _validate_and_set(self, setting: str, value: str):
+        """Validate against allowed settings and persist."""
+        if setting not in self.default_settings:
+            raise ValueError(f"Not a valid setting: {setting}")
+        allowed = self.allowed_settings[setting]
+        if allowed != "ANY" and value not in allowed:
+            raise ValueError(
+                f"Invalid value '{value}' for setting '{setting}'. "
+                f"Allowed: {allowed}"
+            )
+        self.settings[setting] = value
+        self.write_out_current_settings()
+
+    # --- File I/O (unchanged) ---
+
+    def read_settings(self):
         with open(SETTINGS_FILE, "r") as file:
             try:
                 for line in file:
                     key, value = line.strip().split(",")
                     self.settings[key] = value
-            except (
-                ValueError
-            ):  # writes and reads again if the settings file is corrupted
+            except ValueError:
                 self.write_default_settings()
                 self.read_settings()
 
-    def write_setting(self, setting: str, value: str):
-        """
-        Writes the specified setting with the given value to the settings dictionary.
-
-        Parameters:
-        - setting (str): The name of the setting to be written, this will be equal to the widget name in the settings tab if set correctly.
-        - value (str): The value to be assigned to the setting.
-
-        Returns:
-        None
-        """
-        if not setting in self.default_settings:
-            raise ValueError("Not a valid setting")
-        self.settings[setting] = value
-        self.write_out_current_settings()
-
     def write_default_settings(self):
-        """
-        Writes the default settings to the settings file if it doesn't exist.
-
-        Parameters:
-            None
-
-        Returns:
-            None
-        """
         self.settings = self.default_settings.copy()
         self.write_out_current_settings()
 
-    def get_setting_value(self, setting: str) -> str:
-        self.read_settings()
-        if not setting in self.default_settings:
-            raise ValueError("Not a valid setting")
-        return self.settings[setting]
-
-    def get_allowed_options(self, setting: str) -> list[str]:
-        if not setting in self.allowed_settings:
-            raise ValueError("Not a valid setting")
-        return self.allowed_settings[setting]
-
     def write_out_current_settings(self):
-        """
-        Writes the current settings to a file.
-
-        Parameters:
-            self (SettingsTab): The instance of the SettingsTab class.
-
-        Returns:
-            None
-        """
         with open(SETTINGS_FILE, "w") as file:
             for key, value in self.settings.items():
-                if key in self.default_settings:  # check if the key is valid
+                if key in self.default_settings:
                     if (
                         self.allowed_settings[key] == "ANY"
                         or value in self.allowed_settings[key]
-                    ):  # check if it is in the allowed settings dict
+                    ):
                         file.write(f"{key},{value}\n")
                 else:
                     self.write_default_settings()

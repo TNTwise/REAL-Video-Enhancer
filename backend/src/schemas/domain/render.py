@@ -11,6 +11,7 @@ class RenderSettings(BaseModel):
     benchmark_mode: bool
     slow_mo_mode: bool
     hdr_mode: bool = False
+    overwrite: bool = False
     start_time: time | None = None
     end_time: time | None = None
     default_output_path_override: str | None = None
