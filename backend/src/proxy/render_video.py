@@ -14,10 +14,7 @@ import numpy as np
 from backend.src.proxy.backends.interpolate_base import InterpolateBase
 from backend.src.proxy.backends.upscale_base import UpscaleBase
 from backend.src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
-from src.InformationWriteOut import InformationWriteOut
 from src.utils.LogConfig import get_logger
-from src.utils.SceneDetect import SceneDetect
-from src.utils.BorderDetect import BorderDetect
 from backend.src.proxy.video_info_proxy import VideoInfo
 
 logger = get_logger(__name__)
