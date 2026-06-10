@@ -36,24 +36,12 @@ class Render:
         self.border_detect = border_detect
         self.read_buffer = read_buffer
         self.write_buffer = write_buffer
-
-
-
-        logger.info("Using backend: %s", self.backend)
+        logger.info("Using backend: %s", self.render_settings.backend)
         if render_settings.upscale_mode:
             self.setupUpscale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
             logger.info("Using Upscaling Model: %s", self.render_settings.upscale_model)
 
-        """
-        if render_settings.extra_restoration_models:
-            for model in render_settings.extra_restoration_models:
-                extraRestoration = self.setupExtraRestoration(model)
-                if extraRestoration:
-                    logger.info("Using Extra Restoration Model: %s", model)
-                    self.render_settings.extra_restoration_models.append(extraRestoration)
-                    extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
-        """
         if render_settings.interpolate_model:
             self.setupInterpolate()
             logger.info("Using Interpolation Model: %s", self.interpolateModel)
@@ -65,14 +53,14 @@ class Render:
             extraRestoration.hotReload()
 
 
-    def render(self):
-        frames_rendered = 0
+    def render(self,
+               interpolate_option: ):
         frame = self.read_buffer.get()
         while frame:
             for extraRestoration in self.render_settings.extra_restoration_models:
                 frame = extraRestoration(frame)
 
-            if self.interpolateModel:
+            if self.render_settings.interpolate_model:
                 interpolated_frames = self.interpolateOption(
                     img1=frame,
                     transition=False,
@@ -81,11 +69,6 @@ class Render:
                 for interpolated_frame in interpolated_frames:
                     if self.render_settings.upscale_model:
                         interpolated_frame = self.upscaleOption(interpolated_frame)
-                    if self.override_upscale_scale:
-                        interpolated_frame = interpolated_frame.resize_frame_optimal(
-                            new_width=self.width * self.override_upscale_scale,
-                            new_height=self.height * self.override_upscale_scale,
-                        )
 
                     self.write_buffer.put_frame_in_write_queue(interpolated_frame)
 
@@ -100,7 +83,6 @@ class Render:
 
 
             self.write_buffer.put_frame_in_write_queue(frame)
-            frames_rendered += int(self.ceilInterpolateFactor)
 
             # grab new frame
             frame = self.read_buffer.get()

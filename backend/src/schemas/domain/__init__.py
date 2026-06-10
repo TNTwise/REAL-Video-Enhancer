@@ -1,7 +1,7 @@
 from .model import InterpolateModel, UpscaleModel, EnhancementModel, ModelVariant
 from .render import RenderSettings
 from .backend import NCNNBackend, PyTorchBackend, TensorRTBackend, Backend
-# TODO (bug #10): Frame exists in .frame but is not imported here — 'from ...domain import Frame' will fail. Add import and to __all__.
+from .frame import Frame
 
 __all__ = [
     "NCNNBackend",
@@ -13,5 +13,5 @@ __all__ = [
     "RenderSettings",
     "ModelVariant",
     "Backend",
-    # TODO (bug #10): add "Frame" here once imported above
+    "Frame"
 ]
