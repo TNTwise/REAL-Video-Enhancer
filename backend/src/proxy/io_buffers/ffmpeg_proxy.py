@@ -1,4 +1,4 @@
-import queue
+import asyncio
 import subprocess
 import time
 from abc import ABC, abstractmethod
@@ -33,12 +33,12 @@ class ReadBuffer(ABC):
         pass
 
     @abstractmethod
-    def read_frames_into_queue(self) -> None:
+    async def read_frames_into_queue(self) -> None:
         """Read all frames into the internal queue, sentinel None at the end."""
         pass
 
     @abstractmethod
-    def get(self) -> Frame:
+    async def get(self) -> Frame:
         """Get the next processed Frame from the internal queue."""
         pass
 
@@ -55,18 +55,13 @@ class WriteBuffer(ABC):
         pass
 
     @abstractmethod
-    def put_frame_in_write_queue(self, frame: Frame) -> None:
+    async def put_frame_in_write_queue(self, frame: Frame) -> None:
         """Enqueue a processed Frame for writing to the FFmpeg stdin pipe."""
         pass
 
     @abstractmethod
-    def write_out_frames(self) -> None:
+    async def write_out_frames(self) -> None:
         """Drain the write queue and feed raw frames into the FFmpeg process."""
-        pass
-
-    @abstractmethod
-    def onErroredExit(self) -> None:
-        """Handle an error exit from the FFmpeg write process."""
         pass
 
 
@@ -106,7 +101,7 @@ class FFmpegRead(ReadBuffer):
             stdout=subprocess.PIPE,
             stderr=self.stderr_file,
         )
-        self._read_queue = queue.Queue(maxsize=25)
+        self._read_queue: asyncio.Queue[Frame | None] = asyncio.Queue(maxsize=25)
 
     def command(self):
         # will have to figure out a cleaner solution to this later
@@ -159,7 +154,7 @@ class FFmpegRead(ReadBuffer):
 
         return chunk
 
-    def read_frames_into_queue(self):
+    async def read_frames_into_queue(self):
         while True:
             chunk = self.read_frame()
             if chunk is None:
@@ -169,11 +164,11 @@ class FFmpegRead(ReadBuffer):
                 self.video_info.input_height,
             )
             frame.set_frame_bytes(chunk)
-            self._read_queue.put(frame)
-        self._read_queue.put(None)
+            await self._read_queue.put(frame)
+        await self._read_queue.put(None)
 
-    def get(self) -> Frame:
-        return self._read_queue.get()
+    async def get(self) -> Frame | None:
+        return await self._read_queue.get()
 
     def __del__(self):
         self._read_process.stdout.close()
@@ -199,7 +194,7 @@ class FFmpegWrite(WriteBuffer):
         # For integer factors, inputFPS == outputFPS (no frame dropping).
         # For decimal factors (e.g. 2.5x), inputFPS > outputFPS and FFmpeg
         # drops the excess frames to achieve the correct target FPS.
-        self.write_queue = queue.Queue(25)
+        self.write_queue: asyncio.Queue[Frame | None] = asyncio.Queue(25)
         try:
             command = self.command()
             logger.info("FFMPEG WRITE COMMAND: %s", command)
@@ -286,17 +281,17 @@ class FFmpegWrite(WriteBuffer):
 
         return command
 
-    def put_frame_in_write_queue(self, frame: Frame | None) -> None:
-        self.write_queue.put(frame)
+    async def put_frame_in_write_queue(self, frame: Frame | None) -> None:
+        await self.write_queue.put(frame)
 
-    def write_out_frames(self):
+    async def write_out_frames(self):
         logger.info("Rendering")
         self.startTime = time.time()
 
         exit_code: int = 0
         try:
             while True:
-                frame = self.write_queue.get()
+                frame = await self.write_queue.get()
                 if frame is None:
                     break
 
