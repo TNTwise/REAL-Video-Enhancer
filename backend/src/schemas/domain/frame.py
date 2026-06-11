@@ -1,9 +1,7 @@
+from logging import raiseExceptions
 from typing import Any
 
-try:
-    import numpy as np
-except ImportError:
-    pass
+import numpy as np
 from ...utils.LogConfig import get_logger
 from ...utils.Util import resize_image_np
 
@@ -16,53 +14,19 @@ _torch_utils = None
 _torch = None
 
 
-def _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode):
-    global _pytorch_device, _pytorch_dtype, _torch_utils, _torch, _pytorch_stream
-    if _torch_utils is None:
-        import torch
-
-        from ...proxy.backends.pytorch.TorchUtils import TorchUtils
-
-        _torch = torch
-        _torch_utils = TorchUtils(
-            width=width,
-            height=height,
-            device_type=device,
-            hdr_mode=hdr_mode,
-            gpu_id=gpu_id,
-        )
-        _pytorch_stream = _torch_utils.init_stream(gpu_id=gpu_id)
-        _pytorch_device = _torch_utils.handle_device(device, gpu_id)
-        _pytorch_dtype = _torch_utils.handle_precision(dtype)
-        logger.info("Initialized Frame PyTorch utils")
-
-
 class Frame:
     def __init__(
         self,
-        backend: str,
         width: int,
         height: int,
-        device,
-        gpu_id,
-        hdr_mode,
-        dtype,
     ):
-        self.backend = backend
         self.width = width
         self.height = height
-        self.gpu_id = gpu_id
-        self.device = device
-        self.hdr_mode = hdr_mode
-        self.dtype = dtype
-
+        self._bit_depth = 3
         self.tensor_conversions = 0
         self._tensor: Any | None = None
         self._np: np.ndarray | None = None
         self._bytes: bytes | None = None
-
-        if backend in ("pytorch", "tensorrt"):
-            _init_pytorch(device, gpu_id, dtype, width, height, hdr_mode)
 
     def _invalidate_cache(self, keep: str):
         """Clear cached representations except the one being set."""
@@ -133,7 +97,8 @@ class Frame:
 
         if clear_cache:
             self._invalidate_cache("bytes")
-
+        if self._bytes is None:
+            raise Exception("Bytes cannot be null")
         return self._bytes
 
     def get_frame_np(self, clear_cache: bool = False) -> Any:
@@ -157,7 +122,7 @@ class Frame:
         channels = 3
 
         return np.frombuffer(
-            data, dtype=np.uint8 if not self.hdr_mode else np.uint16
+            data, dtype=np.uint8 if self._bit_depth == 8 else np.uint16
         ).reshape(self.height, self.width, int(channels))
 
     def _np_to_bytes(self, arr: Any) -> bytes:
@@ -215,13 +180,8 @@ class Frame:
 
     def clone(self) -> "Frame":
         new_frame = Frame(
-            backend=self.backend,
             width=self.width,
             height=self.height,
-            device=self.device,
-            gpu_id=self.gpu_id,
-            hdr_mode=self.hdr_mode,
-            dtype=self.dtype,
         )
         if self._tensor is not None:
             new_frame.set_frame_tensor(self._tensor.clone())
@@ -233,11 +193,6 @@ class Frame:
 
     def get_dummy_frame(self) -> "Frame":
         return Frame(
-            backend=self.backend,
             width=self.width,
             height=self.height,
-            device=self.device,
-            gpu_id=self.gpu_id,
-            hdr_mode=self.hdr_mode,
-            dtype=self.dtype,
         )

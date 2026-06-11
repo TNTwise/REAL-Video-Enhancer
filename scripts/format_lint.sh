@@ -14,7 +14,7 @@ FILES=$(find "$PROJECT_ROOT" -name "*.py" \
   -not -path "*__pycache__*" \
   -not -path "*/bin/*")
 
-MODE="${1:-check}"  # check (default) or fix
+MODE="${1:-check}" # check (default) or fix
 
 # ---------- colour helpers ----------
 RED='\033[0;31m'
@@ -22,9 +22,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # no colour
 
-info()  { echo -e "${YELLOW}[format_lint] $*${NC}"; }
-ok()    { echo -e "${GREEN}[PASS]  $*${NC}"; }
-fail()  { echo -e "${RED}[FAIL]  $*${NC}"; }
+info() { echo -e "${YELLOW}[format_lint] $*${NC}"; }
+ok() { echo -e "${GREEN}[PASS]  $*${NC}"; }
+fail() { echo -e "${RED}[FAIL]  $*${NC}"; }
 
 EXIT_CODE=0
 

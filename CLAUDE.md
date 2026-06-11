@@ -1,138 +1,86 @@
-# REAL Video Enhancer (RVE)
+# CLAUDE.md
 
-## Project Summary
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-REAL Voice Enhancer is a cross-platform AI video enhancement desktop application for upscaling and interpolating videos. It supports multiple AI backends (NCNN, PyTorch, TensorRT) and runs on Windows, macOS, and Linux with CPU or GPU acceleration. The project is undergoing a major UI migration from PySide6 to a Tauri + React frontend.
+## Project Overview
 
----
-
-## Development Environment
-
-- **OS:** Linux (Arch), Windows, macOS
-- **Python:** 3.12+ (main app), 3.11 for Linux portable builds
-- **Frontend:** TypeScript, React 19, Vite 7 (in `client/`)
-- **Package Manager:** npm (frontend), pip/uv (Python backend)
-
-### Getting Started
-
-```bash
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Install frontend dependencies
-cd client && npm install
-```
-
----
+REAL Video Enhancer applies AI super-resolution models (Real-ESRGAN, SwinIR, SRVGG, etc.) to upscale and enhance video resolution. The project is migrating from a PySide6 desktop app (v1) to a Tauri + React desktop app (v2). The current branch `redesign-ui` is the v2 migration work; PRs target `v2-main`.
 
 ## Architecture
 
-### Dual-UI Architecture (Transition Phase)
+### Three-Tier Structure
 
-The project maintains TWO UIs simultaneously during migration:
-
-| Component | Location | Status |
-|-----------|----------|--------|
-| **Legacy UI** | `REAL-Video-Enhancer.py` + `mainwindow.py` + `src/` | PySide6, production |
-| **New UI** | `client/` | Tauri + React + TypeScript + Chakra UI v3, in development |
-| **Backend API** | `backend/rve-backend.py` | Python backend service |
-
-### Legacy UI (PySide6) – `REAL-Video-Enhancer.py`
-
-Entry point: `REAL-Video-Enhancer.py` → loads `mainwindow.py` (Qt generated UI from `testRVEInterface.ui`)
-
-#### Key Source Files (`src/`)
-
-| File | Purpose |
-|------|---------|
-| `ModelHandler.py` | AI model registry (NCNN, PyTorch, TensorRT for upscale/interpolate) |
-| `GenerateFFMpegCommand.py` | FFmpeg command builder for video processing pipelines |
-| `DownloadDeps.py` | Dependency downloader (Python runtime, FFmpeg, etc.) |
-| `DownloadModels.py` | AI model download from GitHub releases |
-| `PresetManager.py` | Preset configuration management |
-| `VideoInfo.py` | Video metadata extraction |
-| `Util.py` | Logging, file ops, OS detection, disk/RAM utilities |
-| `constants.py` | Global paths, platform detection, config |
-| `version.py` | App version string |
-| `ui/ProcessTab.py` | Per-processing-tab widget class |
-
-### New UI (Tauri + React) – `client/`
-
-- **Stack:** Tauri 2 (Rust backend) + Vite + React 19 + TypeScript + Chakra UI v3 + react-router-dom
-- **Theme:** next-themes for dark/light mode support
-- **Structure:** Standard Vite+React layout in `client/src/`, Tauri config in `client/src-tauri/`
-
-### Backend API – `backend/rve-backend.py`
-
-Python backend service for the new UI. Handles settings storage and AI processing orchestration. Uses FastAPI (planned per TODO.md).
-
----
-
-## Build System
-
-### Build Script – `build.py`
-
-Primary build tool. Supports two modes:
-- **PyInstaller** (`--build pyinstaller`) — Windows/macOS builds
-- **cx_Freeze** (`--build cx_freeze`) — Linux portable builds
-
-Flags: `--copy_backend` includes the backend submodule. Downloads embedded Python runtime and Qt dependencies for portable bundles.
-
-### Frontend Build
-
-```bash
-cd client
-npm run build      # TypeScript + Vite production build
-npm run dev        # Vite dev server
-npm run tauri build  # Full Tauri desktop bundle
+```
+┌─────────────────────────────────────────────────────────┐
+│                   Tauri Window (Rust)                    │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │              React Frontend (client/)                ││
+│  │  - Pages: HomePage, DownloadPage                     ││
+│  │  - UI: Chakra components (DefaultButton, etc.)       ││
+│  │  - Theme: dark/light mode support                    ││
+│  └────────────────────┬────────────────────────────────┘│
+│                       │ HTTP / Tauri IPC                 │
+│  ┌────────────────────▼────────────────────────────────┐│
+│  │           Python Backend (backend/)                  ││
+│  │  - FastAPI server (routers started, no entrypoint)   ││
+│  │  - AI backends: NCNN (default), PyTorch, ONNX        ││
+│  │  - Render pipeline: extract → enhance → encode       ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
 ```
 
-### CI/CD
+### Backend (`backend/`)
+- **AI backends**: `ncnn/` (fast CPU, default), `pytorch/` (GPU via Spandrel), `onnx/` (alternative)
+- **Render pipeline** (`render/`): `RenderVideo.py` orchestrates FFmpeg frame extraction → AI enhancement per frame → video re-encoding. `InformationWriteout.py` logs progress. `FFmpegWrite.py` handles encoding.
+- **Model repo** (`model/`): Discovers model definition JSON, validates weights, configures backend loaders
+- **Settings** (`settings/`): Python dataclasses for app config; v2 migrates to FastAPI endpoints
+- **Routers**: `render_router.py` and `settings_router.py` exist but no `server.py` entrypoint yet
 
-Workflow: `.github/workflows/prerelease.yml` — builds all platforms on PRs to `main` or manual dispatch on `dev`:
-- **Linux x86_64/arm64:** cx_Freeze in distrobox (Ubuntu 20.04)
-- **Windows x86_64:** PyInstaller + NSIS installer
-- **macOS x86_64/arm64:** PyInstaller on macOS runners
-- Produces portable zips, Windows installer exe, and backend tarball
+### Frontend (`client/`)
+- React + TypeScript + Vite, built with Chakra UI components
+- Routing via `BrowserRouter`, layout in `RootLayout.tsx`
+- **Missing**: API client layer, state management, Tauri IPC bridge, backend process launcher
 
----
+### Tauri Shell (`src-tauri/`)
+- Rust app wrapping React frontend; basic config exists, production build not yet working
 
-## Data Flow
+## Common Commands
 
-1. User selects video → `VideoInfo.py` extracts metadata (resolution, FPS, codec)
-2. User chooses enhancement model from `ModelHandler.py` registry
-3. Processing tab (`ProcessTab.py`) manages per-tab state and progress
-4. `GenerateFFMpprogCommand.py` constructs FFmpeg pipeline: extract frames → run AI model → reassemble video
-5. Settings persisted to `settings.txt` (legacy) / backend API (new UI)
+### Frontend (run from `client/`)
+```bash
+npm install              # Install dependencies
+npm run dev              # Vite dev server
+npm run build            # Production build
+npm run lint             # ESLint
+```
 
----
+### Backend / Project Root
+```bash
+bash scripts/format_lint.sh   # Format and lint Python code
+```
 
-## Key Directories
+### Tauri (from project root)
+```bash
+cargo tauri dev              # Dev mode (requires Tauri CLI)
+cargo tauri build            # Production build
+```
 
-| Path | Contents |
-|------|----------|
-| `icons/` | Application icon assets (SVG, PNG for Qt resources) |
-| `models/` | Downloaded AI model weights |
-| `presets/` | Enhancement preset configurations |
-| `custom_models/` | User-provided custom models |
-| `scripts/` | Release/changelog utilities |
-| `bin/` | Build output (untracked) |
+### Legacy v1 Build (PySide — reference only)
+```bash
+python build.py --build cx_freeze --copy_backend
+python build.py --build pyinstaller --copy_backend
+```
 
----
+## Key Files
+- `TODO.md` — v2 migration task list
+- `src-tauri/tauri.conf.json` — Tauri app configuration
+- `client/package.json` — frontend scripts
+- `.github/workflows/build-prerelease.yml` — cross-platform CI build (v1 reference)
 
-## Current Goals (TODO.md)
+## Git
+- **Main branch**: `v2-main` (not `main`)
+- **Current work**: `redesign-ui` branch
+- PRs always target `v2-main`
 
-1. **Migrate UI to TypeScript/Tauri** – get usable Tauri build running
-2. **Store settings via backend** – move from frontend-local storage to backend API
-3. **Integrate FastAPI** – into the Python backend
-4. **Connect UI with backend** – full end-to-end integration
-5. **Bundle all dependencies** – package FFmpeg and Python runtime with the app
-
----
-
-## Working Notes
-
-- Main branch for PRs: `v2-main` (current dev work on `redesign-ui` branch)
-- Settings file: `settings.txt` at project root
-- Models download from: `https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/`
-- The `backend/` submodule contains the AI processing library (pytorch/spandrel)
+## Memory
+Project context and decisions are stored in `.claude/memory/`. See `MEMORY.md` for index.

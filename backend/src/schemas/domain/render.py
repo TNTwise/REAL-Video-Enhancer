@@ -3,6 +3,7 @@ from src.schemas.domain.model import InterpolateModel, UpscaleModel
 from pydantic import BaseModel
 from datetime import time
 
+
 class RenderSettings(BaseModel):
     video_path: str
     tiling_enabled: bool

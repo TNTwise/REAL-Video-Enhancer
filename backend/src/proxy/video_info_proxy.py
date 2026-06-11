@@ -6,6 +6,8 @@ from datetime import time
 
 from backend.src.constants import FFMPEG_PATH
 import cv2
+from schemas.domain.model import UpscaleModel
+from schemas.domain.render import RenderSettings
 
 FFMPEG_COLORSPACES = [
     "rgb",
@@ -294,18 +296,14 @@ class FFMpegInfoWrapper(VideoInfo):
 
 
 class OpenCVInfo(VideoInfo):
-    def __init__(
-        self,
-        input_file: str,
-        start_time: time | None = None,
-        end_time: time | None = None,
-    ):
+    def __init__(self, render_settings: RenderSettings, upscale_model: UpscaleModel):
         logger.info("Getting Input Video Properties")
-        self.input_file = input_file
-        self.start_time = start_time
-        self.end_time = end_time
-        self.cap = cv2.VideoCapture(input_file)
-        self.ffmpeg_info = FFMpegInfoWrapper(input_file, ffmpeg_path=FFMPEG_PATH)
+        self.render_settings = render_settings
+        self.upscale_model = upscale_model
+        self.cap = cv2.VideoCapture(render_settings.video_path)
+        self.ffmpeg_info = FFMpegInfoWrapper(
+            render_settings.video_path, ffmpeg_path=FFMPEG_PATH
+        )
 
     @property
     def is_valid_video(self):
@@ -314,36 +312,68 @@ class OpenCVInfo(VideoInfo):
     def get_duration_seconds(self) -> float:
         duration = self.cap.get(cv2.CAP_PROP_FRAME_COUNT) / self.get_fps()
 
-        if self.start_time is not None and self.end_time is not None:
-            duration = self.end_time - self.start_time
-        elif self.start_time and not self.end_time:
-            duration = duration - self.start_time
-        elif self.end_time and not self.start_time:
-            duration = self.end_time
+        def time_to_seconds(t: time) -> float:
+            return t.hour * 3600 + t.minute * 60 + t.second + t.microsecond / 1_000_000
+
+        if (
+            self.render_settings.start_time is not None
+            and self.render_settings.end_time is not None
+        ):
+            duration = time_to_seconds(self.render_settings.end_time) - time_to_seconds(
+                self.render_settings.start_time
+            )
+        elif self.render_settings.start_time and not self.render_settings.end_time:
+            duration = duration - time_to_seconds(self.render_settings.start_time)
+        elif self.render_settings.end_time and not self.render_settings.start_time:
+            duration = time_to_seconds(self.render_settings.end_time)
         return duration
 
     def get_total_frames(self) -> int:
-        if self.start_time or self.end_time:
+        if self.render_settings.start_time or self.render_settings.end_time:
             fc = int(self.get_duration_seconds() * self.get_fps())
         else:
             fc = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
         return fc
 
     @property
-    def width(self) -> int:
+    def input_width(self) -> int:
         return int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 
     @property
-    def height(self) -> int:
+    def input_height(self) -> int:
         return int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    @property
+    def output_width(self) -> int:
+        return (
+            int(self.input_height) * self.render_settings.upscale_model.scale
+            if self.render_settings.upscale_model
+            else 1
+        )
+
+    @property
+    def output_height(self) -> int:
+        return (
+            int(self.output_height) * self.render_settings.upscale_model.scale
+            if self.render_settings.upscale_model
+            else 1
+        )
 
     @property
     def rotation(self) -> float:
         return self.ffmpeg_info.get_rotation()
 
     @property
-    def fps(self) -> float:
+    def input_fps(self) -> float:
         return self.cap.get(cv2.CAP_PROP_FPS)
+
+    @property
+    def output_fps(self) -> float:
+        return (
+            self.input_fps * self.render_settings.interpolate_model.interpolate_factor
+            if self.render_settings.interpolate_model
+            else 1
+        )
 
     @property
     def color_space(self) -> str:
@@ -368,14 +398,6 @@ class OpenCVInfo(VideoInfo):
     @property
     def codec(self) -> str:
         return self.ffmpeg_info.get_codec()
-
-    @property
-    def bit_depth(self) -> int:
-        return self.ffmpeg_info.get_bit_depth()
-
-    @property
-    def is_hdr(self) -> bool:
-        return self.ffmpeg_info.is_hdr()
 
     @property
     def bit_depth(self) -> int:
