@@ -2,7 +2,6 @@ import os
 
 from src.schemas.domain.video_info import InputVideoInfo, InputVideoInfoTransformer
 from src.schemas.request.video_info import InputVideoInfoClientInput
-from src.utils.video_info import OpenCVInfo
 
 
 class VideoInfoService:
