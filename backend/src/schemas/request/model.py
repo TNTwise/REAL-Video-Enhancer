@@ -10,10 +10,12 @@ class InterpolateModelClientInput(BaseModel):
     backed_type: str
     interpolate_factor: int
 
+
 class UpscaleModelClientInput(BaseModel):
     type: Literal["upscale"] = "upscale"
     id: str
     backed_type: str
+
 
 class EnhancementModelClientInput(BaseModel):
     type: Literal["enhancement"] = "enhancement"

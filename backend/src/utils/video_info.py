@@ -36,7 +36,6 @@ FFMPEG_COLOR_PRIMARIES = [
     "bt470bg",
     "smpte170m",
     "smpte240m",
-    "film",
     "bt2020",
     "smpte428",
     "smpte431",

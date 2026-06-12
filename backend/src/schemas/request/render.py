@@ -8,7 +8,6 @@ from pydantic import BaseModel
 
 
 class RenderSettingsClientInput(BaseModel):
-    video_path: str
     tiling_enabled: bool
     tilesize: int
     benchmark_mode: bool
@@ -19,4 +18,3 @@ class RenderSettingsClientInput(BaseModel):
     hdr_mode: bool = False
     start_time: float | None = None
     end_time: float | None = None
-    default_output_path_override: str | None
