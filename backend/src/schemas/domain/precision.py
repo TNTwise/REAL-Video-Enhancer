@@ -1,16 +1,16 @@
-from pydantic import BaseModel
+from __future__ import annotations
+
 from src.handlers import TorchHandler
 import numpy
 from pydantic import BaseModel, Field
-from typing import Annotated, Union
-    
+from typing import Annotated, Literal, Union
 
 
 class TorchPrecision(BaseModel):
     """precision id: (float16, float32, etc)"""
 
+    type: Literal["torch"] = "torch"
     precision_id: str
-
     @property
     def dtype(self):
         if not TorchHandler().is_available():
@@ -21,6 +21,7 @@ class TorchPrecision(BaseModel):
 class NumpyPrecision(BaseModel):
     """precision id: (float16, float32, etc)"""
 
+    type: Literal["numpy"] = "numpy"
     precision_id: str
 
     @property

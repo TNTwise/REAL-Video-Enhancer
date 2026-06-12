@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 from src.constants import FFMPEG_PATH
 from src.schemas.domain.render import RenderSettings
+from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
 from src.proxy.settings import Settings
-from src.proxy.video_info_proxy import OpenCVInfo
 from src.utils import BorderDetect
 import cv2
 import numpy as np
@@ -69,26 +69,28 @@ class FFmpegRead(ReadBuffer):
     def __init__(
         self,
         render_settings: RenderSettings,
-        video_info: OpenCVInfo,
+        input_video_info: InputVideoInfo,
+        output_video_info: OutputVideoInfo,
         settings: Settings,
     ):
         self.render_settings = render_settings
-        self.video_info = video_info
+        self.video_info = input_video_info
         self.settings = settings
 
-        self._yuv420p_mod = video_info.pixel_format == "yuv420p"
+        self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
         if render_settings.hdr_mode:
             self.input_frame_chunk_size = (
-                video_info.input_width * video_info.input_height * 6
+                self.video_info.width * self.video_info.height * 6
             )
         elif self._yuv420p_mod:
             self.input_frame_chunk_size = (
-                video_info.input_width * video_info.input_height * 3 // 2
+                self.video_info.width * self.video_info.height * 3 // 2
             )
         else:
             self.input_frame_chunk_size = (
-                video_info.input_width * video_info.input_height * 3
+                self.video_info.width * self.video_info.height * 3
             )
+
         command = self.command()
         logger.info("FFMPEG READ COMMAND: %s", command)
 

@@ -1,20 +1,13 @@
 from __future__ import annotations
 
-from proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
 from src.schemas import RenderSettings, RenderSettingsClientInput
 from src.repos.model_repo import ModelRepo
-from src.proxy.video_info_proxy import OpenCVInfo
 from src.proxy.render_video import Render
 
 
 class RenderService:
     def __init__(
         self,
-        model_repo: ModelRepo,
-        video_info_proxy: OpenCVInfo,
-        render_proxy: Render,
-        read_buffer: ReadBuffer,
-        write_buffer: WriteBuffer,
     ):
         self._model_repo = model_repo
         self._video_info_service = video_info_proxy
@@ -53,4 +46,4 @@ class RenderService:
 
     async def start_render(self, input: RenderSettingsClientInput):
         settings = self._renderclientinput_to_rendersettings(input)
-        await self._render_proxy.render(self.read_buffer, self.write_buffer)
+        await self._render_proxy.render(read_buffer, self.write_buffer)
