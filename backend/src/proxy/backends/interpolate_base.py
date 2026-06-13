@@ -20,6 +20,6 @@ class InterpolateBase(ABC):
 
     def setup_interpolation(
         self, interpolate_model: InterpolateModel
-    ) -> InterpolateBase:
+    ):
         pass
 

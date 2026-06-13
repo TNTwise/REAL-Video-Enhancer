@@ -186,7 +186,8 @@ class FFmpegWrite(WriteBuffer):
     def __init__(
         self,
         render_settings: RenderSettings,
-        video_info: OpenCVInfo,
+        input_video_info: InputVideoInfo,
+        output_video_info: OutputVideoInfo,
         settings: Settings,
     ):
         self.render_settings = render_settings
