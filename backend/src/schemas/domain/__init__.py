@@ -1,7 +1,7 @@
-from .model import InterpolateModel, UpscaleModel, EnhancementModel, ModelVariant
-from .render import RenderSettings
-from .backend import NCNNBackend, PyTorchBackend, TensorRTBackend, Backend
+from .backend import Backend, NCNNBackend, PyTorchBackend, TensorRTBackend
 from .frame import Frame
+from .model import EnhancementModel, InterpolateModel, ModelVariant, UpscaleModel
+from .render import RenderSettings
 
 __all__ = [
     "NCNNBackend",
@@ -13,5 +13,5 @@ __all__ = [
     "RenderSettings",
     "ModelVariant",
     "Backend",
-    "Frame"
+    "Frame",
 ]

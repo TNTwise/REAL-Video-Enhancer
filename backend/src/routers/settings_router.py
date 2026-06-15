@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
-from src.schemas import Setting
+
+from src.schemas.request import Setting
 from src.services import Settings
 
 router = APIRouter(prefix="/settings")

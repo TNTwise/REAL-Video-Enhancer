@@ -9,6 +9,7 @@ from src.schemas.request.video_info import (
     InputVideoInfoClientInput,
     OutputVideoInfoClientInput,
 )
+from src.schemas.transforms.render import RenderSettingsTransformer
 from src.utils.video_info import OpenCVInfo
 
 
@@ -36,31 +37,28 @@ class InputVideoInfoTransformer:
 
 
 class OutputVideoInfoTransformer:
-    def __init__(
-        self,
-        render_settings: RenderSettings,
-        interpolate_model: Optional[InterpolateModel] = None,
-        upscale_model: Optional[UpscaleModel] = None,
-    ):
-        self.render_settings = render_settings
-        self.interpolate_model = interpolate_model
-        self.upscale_model = upscale_model
-
     def to_domain(
-        self, client_model: OutputVideoInfoClientInput, domain_input: InputVideoInfo
+        self,
+        client_model: OutputVideoInfoClientInput,
+        domain_input: InputVideoInfo,
+        upscale_model: Optional[UpscaleModel],
+        interpolate_model: Optional[InterpolateModel],
+        hdr_mode: bool,
     ) -> OutputVideoInfo:
 
         return OutputVideoInfo(
             output_file=client_model.output_file,
             duration_seconds=domain_input.duration_seconds,  # pulled from input domain
             total_frames=domain_input.total_frames,  # pulled from input domain
-            width=domain_input.width * self.upscale_model.scale
-            if self.upscale_model
-            else 1,  # (or scale based on self.upscale_model)
-            height=domain_input.height,
-            fps=domain_input.fps * self.interpolate_model.interpolate_factor
-            if self.interpolate_model
-            else 1,  # (or modify based on self.interpolate_model)
+            width=domain_input.width * upscale_model.scale
+            if upscale_model
+            else domain_input.width,  # (or scale based on self.upscale_model)
+            height=domain_input.height * upscale_model.scale
+            if upscale_model
+            else domain_input.height,
+            fps=domain_input.fps * interpolate_model.interpolate_factor
+            if interpolate_model
+            else domain_input.fps,  # (or modify based on self.interpolate_model)
             color_space=domain_input.color_space,
             pixel_format=domain_input.pixel_format,
             color_transfer=domain_input.color_transfer,
@@ -68,6 +66,6 @@ class OutputVideoInfoTransformer:
             rotation=domain_input.rotation,
             bitrate=domain_input.bitrate,
             codec=domain_input.codec,
-            is_hdr=domain_input.is_hdr and self.render_settings.hdr_mode,
+            is_hdr=domain_input.is_hdr and hdr_mode,
             bit_depth=domain_input.bit_depth,
         )

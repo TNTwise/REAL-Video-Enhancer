@@ -1,8 +1,8 @@
-from src.schemas import RenderSettings, Setting
-
 from src.proxy.backends.interpolate_base import InterpolateBase
 from src.proxy.backends.upscale_base import UpscaleBase
 from src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
+from src.schemas.domain import RenderSettings
+from src.schemas.request import Setting
 from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)

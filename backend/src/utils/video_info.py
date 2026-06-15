@@ -3,9 +3,11 @@ import re
 import subprocess
 from abc import ABC, abstractmethod
 from datetime import time
+from time import sleep
+
+import cv2
 
 from src.constants import FFMPEG_PATH
-import cv2
 from src.schemas.request.video_info import InputVideoInfoClientInput
 
 FFMPEG_COLORSPACES = [
@@ -77,16 +79,16 @@ else:
 
 
 class FFMpegInfoWrapper:
-    def __init__(self, input_file: str, ffmpeg_path: str = "./bin/ffmpeg"):
+    def __init__(self, input_file: str, ffmpeg_path: str):
+        self._ffmpeg_path = ffmpeg_path
         self.input_file = input_file
-        self.ffmpeg_path = ffmpeg_path
         self.stream_line = None
         self.stream_line_2 = None
         self._get_ffmpeg_info()
 
     def _get_ffmpeg_info(self):
         command = [
-            self.ffmpeg_path,
+            self._ffmpeg_path,
             "-i",
             self.input_file,
             "-t",
@@ -116,7 +118,7 @@ class FFMpegInfoWrapper:
 
         if self.stream_line is None:
             logger.error("No video stream found in the input file.")
-            exit(1)
+            logger.error(self.ffmpeg_output_raw)
 
     def get_duration_seconds(self) -> float:
         total_duration: float = 0.0

@@ -114,13 +114,22 @@ class ModelRepo:
         raise ValueError(f"Unknown backend: {backend_name}")
 
     @staticmethod
+    def _default_precision(backend: Backend):
+        if backend.type == "ncnn":
+            return {"type": "numpy", "precision_id": "float32"}
+
+        return {"type": "torch", "precision_id": "float32"}
+
+    @staticmethod
     def _parse_interpolate(data: dict, backend: Backend) -> InterpolateModel:
         return InterpolateModel(
             id=data["id"],
             variant=data["variant"],
+            interpolate_factor=data.get("interpolate_factor", 2),
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
+            precision=ModelRepo._default_precision(backend),
             backend=backend,
         )
 
@@ -133,6 +142,7 @@ class ModelRepo:
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
+            precision=ModelRepo._default_precision(backend),
             backend=backend,
         )
 
@@ -144,5 +154,6 @@ class ModelRepo:
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
+            precision=ModelRepo._default_precision(backend),
             backend=backend,
         )

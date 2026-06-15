@@ -1,4 +1,5 @@
 import os
+
 from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 
 SETTINGS_FILE = CONFIG_PATH / "settings.txt"
@@ -333,8 +334,7 @@ class Settings:
         allowed = self.allowed_settings[setting]
         if allowed != "ANY" and value not in allowed:
             raise ValueError(
-                f"Invalid value '{value}' for setting '{setting}'. "
-                f"Allowed: {allowed}"
+                f"Invalid value '{value}' for setting '{setting}'. Allowed: {allowed}"
             )
         self.settings[setting] = value
         self.write_out_current_settings()

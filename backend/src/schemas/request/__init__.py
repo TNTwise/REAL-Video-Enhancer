@@ -1,10 +1,11 @@
 from .model import (
+    EnhancementModelClientInput,
     InterpolateModelClientInput,
     UpscaleModelClientInput,
-    EnhancementModelClientInput,
 )
 from .render import RenderSettingsClientInput
 from .settings import Setting
+from .video_info import InputVideoInfoClientInput, OutputVideoInfoClientInput
 
 __all__ = [
     "InterpolateModelClientInput",
@@ -12,4 +13,6 @@ __all__ = [
     "EnhancementModelClientInput",
     "RenderSettingsClientInput",
     "Setting",
+    "InputVideoInfoClientInput",
+    "OutputVideoInfoClientInput",
 ]
