@@ -5,6 +5,7 @@ from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 SETTINGS_FILE = CONFIG_PATH / "settings.txt"
 
 
+# TODO: Make this cleaner
 class PersistentSettingsProxy:
     def __init__(self):
         self.default_settings = {
@@ -100,7 +101,7 @@ class PersistentSettingsProxy:
             self.write_default_settings()
 
     # --- Properties ---
-
+    # I dont like all this shit,
     @property
     def precision(self) -> str:
         return self.settings["precision"]

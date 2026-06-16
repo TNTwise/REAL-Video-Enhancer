@@ -1,6 +1,6 @@
 import asyncio
-import tempfile
 import shlex
+import tempfile
 import time
 from abc import ABC, abstractmethod
 
@@ -292,6 +292,7 @@ class FFmpegWrite(WriteBuffer):
         return command
 
     def _encoder_args(self) -> list[str]:
+        # TODO: Make settings save as actual values, none of this mapping bullshit
         args: list[str] = []
 
         encoder_map = {

@@ -19,6 +19,7 @@ from src.schemas.transforms import (
 )
 
 
+# TODO: the render service should return immidiately, not hang the server up on a single thread. Mess with asyncio shit to fix this
 class RenderService:
     def __init__(
         self,
