@@ -4,7 +4,7 @@ from src.proxy.backends.interpolate_base import InterpolateBase
 from src.proxy.backends.upscale_base import UpscaleBase
 from src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
 from src.schemas.domain import RenderSettings
-from src.schemas.request import Setting
+from src.services import PersistentSettingsProxy
 from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)
@@ -16,7 +16,7 @@ class RenderProxy:
         write_buffer: WriteBuffer,
         read_buffer: ReadBuffer,
         render_settings: RenderSettings,
-        settings: Setting,
+        persistent_settings: PersistentSettingsProxy,
     ):
         async def reader_task():
             await read_buffer.read_frames_into_queue()
