@@ -1,5 +1,6 @@
 import asyncio
 import tempfile
+import shlex
 import time
 from abc import ABC, abstractmethod
 
@@ -273,6 +274,14 @@ class FFmpegWrite(WriteBuffer):
             f"{self.output_video_info.fps}",
         ]
 
+        if (
+            self.settings.use_custom_encoder_command == "True"
+            and self.settings.encoder_command.strip()
+        ):
+            command += shlex.split(self.settings.encoder_command)
+        else:
+            command += self._encoder_args()
+
         command += [
             f"{self.output_video_info.output_file}",
         ]
@@ -281,6 +290,150 @@ class FFmpegWrite(WriteBuffer):
             command.append("-y")
 
         return command
+
+    def _encoder_args(self) -> list[str]:
+        args: list[str] = []
+
+        encoder_map = {
+            "libx264": "libx264",
+            "libx265": "libx265",
+            "vp9": "libvpx-vp9",
+            "av1": "libaom-av1",
+            "prores": "prores_ks",
+            "ffv1": "ffv1",
+            "utvideo": "utvideo",
+            "x264_nvenc": "h264_nvenc",
+            "x265_nvenc": "hevc_nvenc",
+            "av1_nvenc (40 series and up)": "av1_nvenc",
+        }
+
+        quality = self.settings.video_quality
+
+        crf_values = {
+            "Lossless": "0",
+            "Ultra": "10",
+            "Very_High": "14",
+            "High": "18",
+            "Medium": "23",
+            "Low": "28",
+        }
+        crf = crf_values.get(quality, "18")
+
+        encoder = self.settings.encoder
+        ffmpeg_encoder = encoder_map.get(encoder, encoder)
+        args += ["-c:v", ffmpeg_encoder]
+
+        if encoder in ("libx264", "libx265"):
+            if quality == "Lossless":
+                if encoder == "libx264":
+                    args += ["-qp", "0"]
+                else:
+                    args += ["-x265-params", "lossless=1"]
+            else:
+                args += ["-crf", crf]
+            preset_map = {
+                "placebo": "placebo",
+                "slow": "slow",
+                "medium": "medium",
+                "fast": "fast",
+                "fastest": "ultrafast",
+            }
+            args += [
+                "-preset",
+                preset_map.get(self.settings.video_encoder_speed, "medium"),
+            ]
+
+        elif encoder == "vp9":
+            if quality == "Lossless":
+                args += ["-lossless", "1"]
+            else:
+                args += ["-crf", crf]
+            speed_map = {
+                "placebo": "0",
+                "slow": "0",
+                "medium": "1",
+                "fast": "2",
+                "fastest": "3",
+            }
+            args += ["-cpu-used", speed_map.get(self.settings.video_encoder_speed, "1")]
+            args += [
+                "-deadline",
+                "best"
+                if self.settings.video_encoder_speed in ("placebo", "slow")
+                else "good",
+            ]
+
+        elif encoder in ("x264_nvenc", "x265_nvenc", "av1_nvenc (40 series and up)"):
+            if quality == "Lossless":
+                args += ["-qp", "0"]
+            else:
+                args += ["-cq", crf]
+            nvenc_presets = {
+                "placebo": "p7",
+                "slow": "p7",
+                "medium": "p5",
+                "fast": "p3",
+                "fastest": "p1",
+            }
+            args += [
+                "-preset",
+                nvenc_presets.get(self.settings.video_encoder_speed, "p5"),
+            ]
+
+        elif encoder == "prores":
+            prores_map = {
+                "Lossless": "5",
+                "Ultra": "4",
+                "Very_High": "3",
+                "High": "2",
+                "Medium": "1",
+                "Low": "0",
+            }
+            args += ["-profile:v", prores_map.get(quality, "2")]
+
+        elif encoder == "av1":
+            if quality == "Lossless":
+                args += ["-lossless", "1"]
+            else:
+                args += ["-crf", crf]
+
+        elif encoder in ("ffv1", "utvideo"):
+            pass
+
+        # Output pixel format
+        args += ["-pix_fmt", self.settings.video_pixel_format]
+
+        # Audio
+        audio_enc = self.settings.audio_encoder
+        if audio_enc == "copy_audio":
+            args += ["-c:a", "copy"]
+        else:
+            args += ["-c:a", audio_enc]
+        args += ["-b:a", self.settings.audio_bitrate]
+
+        # Subtitles
+        sub_enc = self.settings.subtitle_encoder
+        if sub_enc == "copy_subtitle":
+            args += ["-c:s", "copy"]
+        else:
+            args += ["-c:s", sub_enc]
+
+        # Container
+        container_map = {
+            "mkv": "matroska",
+            "mp4": "mp4",
+            "mov": "mov",
+            "webm": "webm",
+            "avi": "avi",
+        }
+        args += [
+            "-f",
+            container_map.get(
+                self.settings.video_container, self.settings.video_container
+            ),
+        ]
+
+        return args
 
     async def start(self):
         if self._process is not None:
