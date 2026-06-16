@@ -1,27 +1,18 @@
 import asyncio
-import subprocess
 import tempfile
 import time
 from abc import ABC, abstractmethod
 
-from src.constants import FFMPEG_PATH
-from src.schemas.domain.render import RenderSettings
-from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
-from src.proxy.settings import Settings
-from src.utils import BorderDetect
 import cv2
 import numpy as np
 
-from src.proxy.settings import Settings
+from src.constants import FFMPEG_PATH
+from src.proxy.settings import PersistentSettingsProxy
 from src.schemas.domain.render import RenderSettings
 from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
-from src.utils import BorderDetect
 
 from ...schemas.domain.frame import Frame
 from ...utils.LogConfig import get_logger
-from ...utils.Util import (
-    subprocess_popen_without_terminal,
-)
 
 logger = get_logger(__name__)
 
@@ -29,44 +20,36 @@ logger = get_logger(__name__)
 class ReadBuffer(ABC):
     @abstractmethod
     def command(self) -> list[str]:
-        """Build the FFmpeg command for reading frames from the source video."""
-        pass
-
-    @abstractmethod
-    def read_frame(self) -> bytes | None:
-        """Read a single raw frame from the FFmpeg stdout pipe. Returns None on EOF."""
         pass
 
     @abstractmethod
     async def read_frames_into_queue(self) -> None:
-        """Read all frames into the internal queue, sentinel None at the end."""
         pass
 
     @abstractmethod
-    async def get(self) -> Frame:
-        """Get the next processed Frame from the internal queue."""
+    async def get(self) -> Frame | None:
+        pass
+
+    @abstractmethod
+    async def close(self) -> None:
         pass
 
 
 class WriteBuffer(ABC):
     @abstractmethod
     def command(self) -> list[str]:
-        """Build the FFmpeg command for writing encoded output video."""
         pass
 
     @abstractmethod
-    def get_num_frames_rendered(self) -> int:
-        """Return the current count of frames that have been rendered."""
-        pass
-
-    @abstractmethod
-    async def put_frame_in_write_queue(self, frame: Frame) -> None:
-        """Enqueue a processed Frame for writing to the FFmpeg stdin pipe."""
+    async def put_frame_in_write_queue(self, frame: Frame | None) -> None:
         pass
 
     @abstractmethod
     async def write_out_frames(self) -> None:
-        """Drain the write queue and feed raw frames into the FFmpeg process."""
+        pass
+
+    @abstractmethod
+    async def close(self) -> None:
         pass
 
 
@@ -76,7 +59,7 @@ class FFmpegRead(ReadBuffer):
         render_settings: RenderSettings,
         input_video_info: InputVideoInfo,
         output_video_info: OutputVideoInfo,
-        settings: Settings,
+        settings: PersistentSettingsProxy,
     ):
         self.render_settings = render_settings
         self.video_info = input_video_info
@@ -96,34 +79,22 @@ class FFmpegRead(ReadBuffer):
                 self.video_info.width * self.video_info.height * 3
             )
 
-        command = self.command()
-        logger.info("FFMPEG READ COMMAND: %s", command)
-
-        self.stderr_file = tempfile.TemporaryFile(
+        self._read_queue: asyncio.Queue[Frame | None] = asyncio.Queue(maxsize=200)
+        self._process: asyncio.subprocess.Process | None = None
+        self._stderr_task: asyncio.Task | None = None
+        self._stderr_file = tempfile.TemporaryFile(
             mode="w+", encoding="utf-8", errors="replace"
         )
-
-        self._read_process = subprocess_popen_without_terminal(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=self.stderr_file,
-        )
-        self._read_queue: asyncio.Queue[Frame | None] = asyncio.Queue(maxsize=25)
+        self._closed = False
 
     def command(self):
-        # will have to figure out a cleaner solution to this later
-        # border_width, border_height, border_x, border_y = self.border_detect.get_borders()
-        # filter_string = f"crop=min({self.video_info.width}\\,max(1\\,iw-{border_x})):min({self.video_info.height}\\,max(1\\,ih-{border_y})):{border_x}:{border_y},scale=if(gt(sar\\,0)\\,trunc(iw*max(sar\\,0)/2)*2\\,iw):ih,setsar=1"  # fix dar != sar
-
         command = [
             f"{FFMPEG_PATH}",
             "-loglevel",
             "error",
             "-nostdin",
             "-i",
-            f"{self.render_settings.video_path}",
-            #    "-vf",
-            #    filter_string,
+            f"{self.render_settings.input_video_info.input_file}",
             "-f",
             "image2pipe",
             "-pix_fmt",
@@ -133,58 +104,79 @@ class FFmpegRead(ReadBuffer):
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.video_info.input_width}x{self.video_info.input_height}",
+            f"{self.video_info.width}x{self.video_info.height}",
             "-",
         ]
-
         logger.info("FFMPEG READ COMMAND: %s", command)
         return command
 
-    def read_frame(self):
-        chunk = self._read_process.stdout.read(self.input_frame_chunk_size)
-        if len(chunk) < self.input_frame_chunk_size:
-            return None
+    async def start(self):
+        if self._process is not None:
+            return
+        command = self.command()
+        self._process = await asyncio.create_subprocess_exec(
+            *command,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=self._stderr_file,
+        )
+        self._stderr_task = asyncio.create_task(self._read_stderr())
 
-        if self._yuv420p_mod:
-            # Convert raw YUV420p data to RGB
-            # The data is Y plane, then U plane, then V plane, concatenated.
-            # cv2.COLOR_YUV420P2RGB expects a single channel image of shape (height * 3 // 2, width)
-            np_frame = np.frombuffer(chunk, dtype=np.uint8)
-            # Ensure height is an integer for reshape, Python 3 // operator already does this.
-            yuv_image_height = self.video_info.input_height * 3 // 2
-            yuv_image = np_frame.reshape(
-                (yuv_image_height, self.video_info.input_width)
-            )
-            rgb_image = cv2.cvtColor(yuv_image, cv2.COLOR_YUV2RGB_I420)
-            # cv2.imwrite("temp_rgb_image.png", rgb_image)  # Debugging line, can be removed
-            chunk = rgb_image.tobytes()
-
-        return chunk
+    async def _read_stderr(self):
+        if self._process and self._process.stderr:
+            await self._process.stderr.read()
 
     async def read_frames_into_queue(self):
-        while True:
-            chunk = self.read_frame()
-            if chunk is None:
-                break
-            frame = Frame(
-                self.video_info.input_width,
-                self.video_info.input_height,
-            )
-            frame.set_frame_bytes(chunk)
-            await self._read_queue.put(frame)
-        await self._read_queue.put(None)
+        if self._process is None:
+            await self.start()
+        assert self._process is not None
+        assert self._process.stdout is not None
+
+        try:
+            while not self._closed:
+                chunk = await self._process.stdout.readexactly(
+                    self.input_frame_chunk_size
+                )
+                if not chunk:
+                    break
+
+                if self._yuv420p_mod:
+                    pass
+
+                frame = Frame(
+                    self.video_info.width,
+                    self.video_info.height,
+                )
+                frame.set_frame_bytes(chunk)
+                await self._read_queue.put(frame)
+        except asyncio.IncompleteReadError:
+            pass
+        finally:
+            await self._read_queue.put(None)
 
     async def get(self) -> Frame | None:
+        if self._process is None:
+            await self.start()
         return await self._read_queue.get()
 
-    def __del__(self):
-        self._read_process.stdout.close()
-        if self._read_process.returncode != 0:
-            self.stderr_file.seek(0)
-            stderr_output = self.stderr_file.read()
-            logger.info("FFmpeg Read Process stderr:\n%s", stderr_output)
-        self._read_process.terminate()
-        self.stderr_file.close()
+    async def close(self):
+        self._closed = True
+        if self._process:
+            try:
+                self._process.terminate()
+                await asyncio.wait_for(self._process.wait(), timeout=5.0)
+            except (ProcessLookupError, asyncio.TimeoutError):
+                try:
+                    self._process.kill()
+                    await self._process.wait()
+                except ProcessLookupError:
+                    pass
+        if self._stderr_task:
+            self._stderr_task.cancel()
+            try:
+                await self._stderr_task
+            except asyncio.CancelledError:
+                pass
+        self._stderr_file.close()
 
 
 class FFmpegWrite(WriteBuffer):
@@ -193,34 +185,23 @@ class FFmpegWrite(WriteBuffer):
         render_settings: RenderSettings,
         input_video_info: InputVideoInfo,
         output_video_info: OutputVideoInfo,
-        settings: Settings,
+        settings: PersistentSettingsProxy,
     ):
         self.render_settings = render_settings
-        self.video_info = video_info
+        self.input_video_info = input_video_info
+        self.output_video_info = output_video_info
         self.settings = settings
-        # inputFPS reflects the actual rate of frames the model produces (using ceil)
-        # For integer factors, inputFPS == outputFPS (no frame dropping).
-        # For decimal factors (e.g. 2.5x), inputFPS > outputFPS and FFmpeg
-        # drops the excess frames to achieve the correct target FPS.
-        self.write_queue: asyncio.Queue[Frame | None] = asyncio.Queue(25)
-        try:
-            command = self.command()
-            logger.info("FFMPEG WRITE COMMAND: %s", command)
-            self.write_process = subprocess_popen_without_terminal(
-                command,
-                stdin=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                stdout=subprocess.PIPE,
-                text=True,
-                universal_newlines=True,
-            )
-        except Exception as e:
-            logger.info(e.__str__())
-            logger.exception("Exception while starting FFmpeg write process")
-            self.onErroredExit()
+
+        self.write_queue: asyncio.Queue[Frame | None] = asyncio.Queue(maxsize=200)
+        self._process: asyncio.subprocess.Process | None = None
+        self._write_task: asyncio.Task | None = None
+        self._start_time: float = 0
+        self._closed = False
+        self._frames_written: int = 0
+        self._current_fps: float = 0.0
+        self._last_fps_update: float = 0
 
     def command(self):
-        # maybe i can split this so i can just use ffmpeg normally like with vspipe
         command = [
             FFMPEG_PATH,
             "-loglevel",
@@ -229,7 +210,7 @@ class FFmpegWrite(WriteBuffer):
 
         command += [
             "-framerate",
-            f"{self.video_info.input_fps}",
+            f"{self.input_video_info.fps}",
             "-f",
             "rawvideo",
             "-pix_fmt",
@@ -237,31 +218,28 @@ class FFmpegWrite(WriteBuffer):
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.video_info.output_width}x{self.video_info.output_height}",
+            f"{self.input_video_info.width}x{self.input_video_info.height}",
             "-i",
             "-",
         ]
 
         command += [
-            # Input 1: original file for audio/subtitles.
-            # Put timestamp hygiene flags *before* the input they apply to.
             "-fflags",
             "+genpts",
             "-i",
-            f"{self.render_settings.video_path}",
+            f"{self.render_settings.input_video_info.input_file}",
             "-map",
-            "0:v",  # Map video stream from input 0
+            "0:v",
             "-map",
             "1:a?",
             "-map",
             "1:s?",
             "-map_metadata:s:v",
-            "1:s:v",  # Copy video stream metadata from input 1 (the original file) to the video output
+            "1:s:v",
             "-metadata:s:v",
-            "rotate=0",  # Ensure custom rotation is stripped as the output is physically rotated
+            "rotate=0",
         ]
 
-        # Output timestamp/interleave hygiene.
         command += [
             "-avoid_negative_ts",
             "make_zero",
@@ -273,15 +251,13 @@ class FFmpegWrite(WriteBuffer):
             "0",
         ]
 
-        # Output frame rate must come after all -i inputs
-        # so FFmpeg treats it as an output option, not an input option.
         command += [
             "-r",
-            f"{self.video_info.output_fps}",
+            f"{self.output_video_info.fps}",
         ]
 
         command += [
-            f"{self.render_settings.output_path}",
+            f"{self.output_video_info.output_file}",
         ]
 
         if self.render_settings.overwrite:
@@ -289,34 +265,91 @@ class FFmpegWrite(WriteBuffer):
 
         return command
 
+    async def start(self):
+        if self._process is not None:
+            return
+        command = self.command()
+        logger.info("FFMPEG WRITE COMMAND: %s", command)
+        self._process = await asyncio.create_subprocess_exec(
+            *command,
+            stdin=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+        )
+
     async def put_frame_in_write_queue(self, frame: Frame | None) -> None:
+        if self._process is None:
+            await self.start()
         await self.write_queue.put(frame)
 
-    async def write_out_frames(self):
-        logger.info("Rendering")
-        self.startTime = time.time()
+    async def _write_loop(self):
+        if self._process is None:
+            await self.start()
+        assert self._process is not None
+        assert self._process.stdin is not None
 
-        exit_code: int = 0
         try:
-            while True:
+            while not self._closed:
                 frame = await self.write_queue.get()
                 if frame is None:
                     break
 
-                self.write_process.stdin.buffer.write(frame)
+                frame_bytes = frame.get_frame_bytes()
+                self._process.stdin.write(frame_bytes)
+                await self._process.stdin.drain()
 
-            self.write_process.stdin.close()
-            self.write_process.wait()
-            exit_code = self.write_process.returncode
+                self._frames_written += 1
+                now = time.time()
+                if now - self._last_fps_update >= 1.0:
+                    elapsed = now - self._start_time
+                    if elapsed > 0:
+                        self._current_fps = self._frames_written / elapsed
+                    self._last_fps_update = now
+        except (BrokenPipeError, ConnectionResetError):
+            logger.warning("FFmpeg write pipe broken")
+        finally:
+            if self._process and self._process.stdin:
+                self._process.stdin.close()
 
-        except Exception:
-            logger.exception("Exception while writing frames")
+    async def write_out_frames(self):
+        logger.info("Rendering")
+        self._start_time = time.time()
+
+        self._write_task = asyncio.create_task(self._write_loop())
+        await self._write_task
+
+        if self._process:
+            try:
+                await asyncio.wait_for(self._process.wait(), timeout=30.0)
+                exit_code = self._process.returncode
+            except asyncio.TimeoutError:
+                logger.warning("FFmpeg write process timeout, killing")
+                self._process.kill()
+                await self._process.wait()
+                exit_code = -1
 
         if exit_code != 0:
-            logger.info("Exception while writing frames")
             logger.info("FFmpeg exited with code %s", exit_code)
         else:
-            renderTime = time.time() - self.startTime
-            logger.info("Time to complete render: %s", round(renderTime, 2))
+            render_time = time.time() - self._start_time
+            logger.info("Time to complete render: %s", round(render_time, 2))
 
-        logger.info("Time to complete render: Nan")
+    def get_current_fps(self) -> float:
+        return self._current_fps
+
+    def get_frames_written(self) -> int:
+        return self._frames_written
+
+    async def close(self):
+        self._closed = True
+        if self._process:
+            try:
+                if self._process.stdin:
+                    self._process.stdin.close()
+                await asyncio.wait_for(self._process.wait(), timeout=5.0)
+            except (ProcessLookupError, asyncio.TimeoutError):
+                try:
+                    self._process.kill()
+                    await self._process.wait()
+                except ProcessLookupError:
+                    pass
