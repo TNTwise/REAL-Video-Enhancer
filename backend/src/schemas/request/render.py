@@ -23,6 +23,5 @@ class RenderSettingsClientInput(BaseModel):
     interpolate_model: InterpolateModelClientInput | None
     upscale_model: UpscaleModelClientInput | None
     enhancement_models: list[EnhancementModelClientInput | None] | None
-    hdr_mode: bool = False
     start_time: float | None = None
     end_time: float | None = None

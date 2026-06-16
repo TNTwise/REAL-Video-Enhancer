@@ -5,10 +5,7 @@ import os
 from src.proxy.io_buffers.ffmpeg_proxy import (
     FFmpegRead,
     FFmpegWrite,
-    ReadBuffer,
-    WriteBuffer,
 )
-from src.proxy.render_video import RenderProxy
 from src.proxy.settings import PersistentSettingsProxy
 from src.repos.model_repo import ModelRepo
 from src.schemas.request import RenderSettingsClientInput
@@ -32,7 +29,7 @@ class RenderService:
         upscale_transformer: UpscaleModelTransformer,
         enhancement_transformer: EnhancementModelTransformer,
         render_settings_transformer: RenderSettingsTransformer,
-        render_proxy: RenderProxy,
+        render_proxy,
     ):
         # Injecting the sub-transformers via the constructor
         self.interpolate_tf = interpolate_transformer

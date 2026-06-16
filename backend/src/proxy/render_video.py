@@ -1,7 +1,5 @@
 import asyncio
 
-from src.proxy.backends.interpolate_base import InterpolateBase
-from src.proxy.backends.upscale_base import UpscaleBase
 from src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
 from src.schemas.domain import RenderSettings
 from src.services import PersistentSettingsProxy
@@ -38,15 +36,3 @@ class RenderProxy:
             processor_task(),
             writer_task(),
         )
-
-    async def _process_frame(
-        self,
-        frame,
-        interpolate_option: InterpolateBase | None,
-        upscale_option: UpscaleBase | None,
-    ):
-        if interpolate_option is not None:
-            frame = await interpolate_option.process_frame(frame)
-        if upscale_option is not None:
-            frame = await upscale_option.process_frame(frame)
-        return frame

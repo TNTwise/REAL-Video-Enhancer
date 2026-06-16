@@ -66,7 +66,7 @@ class FFmpegRead(ReadBuffer):
         self.settings = settings
 
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
-        if render_settings.hdr_mode:
+        if settings.auto_hdr_mode:
             self.input_frame_chunk_size = (
                 self.video_info.width * self.video_info.height * 6
             )
@@ -99,7 +99,7 @@ class FFmpegRead(ReadBuffer):
             "image2pipe",
             "-pix_fmt",
             "rgb48le"
-            if self.render_settings.hdr_mode
+            if self.settings.auto_hdr_mode and self.video_info.is_hdr
             else (self.video_info.pixel_format if self._yuv420p_mod else "rgb24"),
             "-vcodec",
             "rawvideo",
@@ -214,7 +214,9 @@ class FFmpegWrite(WriteBuffer):
             "-f",
             "rawvideo",
             "-pix_fmt",
-            "rgb48le" if self.render_settings.hdr_mode else "rgb24",
+            "rgb48le"
+            if self.input_video_info.is_hdr and self.settings.auto_hdr_mode
+            else "rgb24",
             "-vcodec",
             "rawvideo",
             "-s",
@@ -271,10 +273,12 @@ class FFmpegWrite(WriteBuffer):
         command = self.command()
 
         logger.info("FFMPEG WRITE COMMAND: %s", command)
+        import sys
+
         self._process = await asyncio.create_subprocess_exec(
             *command,
             stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.STDOUT,
+            stdout=sys.stdout,
             stderr=asyncio.subprocess.STDOUT,
         )
 
@@ -329,11 +333,11 @@ class FFmpegWrite(WriteBuffer):
                 await self._process.wait()
                 exit_code = -1
 
-        if exit_code != 0:
-            logger.info("FFmpeg exited with code %s", exit_code)
-        else:
-            render_time = time.time() - self._start_time
-            logger.info("Time to complete render: %s", round(render_time, 2))
+            if exit_code != 0:
+                logger.info("FFmpeg exited with code %s", exit_code)
+            else:
+                render_time = time.time() - self._start_time
+                logger.info("Time to complete render: %s", round(render_time, 2))
 
     def get_current_fps(self) -> float:
         return self._current_fps
