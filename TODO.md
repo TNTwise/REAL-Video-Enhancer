@@ -37,3 +37,5 @@
 # Bundle Base Dependencies
 
 Package FFmpeg and the Python runtime inside the app so it runs without system-level prerequisites. Per-backend AI libraries (PyTorch, TensorRT, etc.) install on demand through the API instead.
+
+# Fix all code # TODOs

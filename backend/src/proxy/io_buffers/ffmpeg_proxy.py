@@ -65,6 +65,7 @@ class FFmpegRead(ReadBuffer):
         self.video_info = input_video_info
         self.settings = settings
 
+        # TODO: Make yuv mod work
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
         self._yuv420p_mod = False
         if settings.auto_hdr_mode and self.video_info.is_hdr:
