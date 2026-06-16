@@ -66,7 +66,8 @@ class FFmpegRead(ReadBuffer):
         self.settings = settings
 
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
-        if settings.auto_hdr_mode:
+        self._yuv420p_mod = False
+        if settings.auto_hdr_mode and self.video_info.is_hdr:
             self.input_frame_chunk_size = (
                 self.video_info.width * self.video_info.height * 6
             )
@@ -86,6 +87,13 @@ class FFmpegRead(ReadBuffer):
             mode="w+", encoding="utf-8", errors="replace"
         )
         self._closed = False
+        self._debug_counter = 0
+        if self.settings.auto_hdr_mode and self.video_info.is_hdr:
+            self._input_pix_fmt = "rgb48le"
+        elif self._yuv420p_mod:
+            self._input_pix_fmt = "yuv420p"
+        else:
+            self._input_pix_fmt = "rgb24"
 
     def command(self):
         command = [
@@ -125,6 +133,21 @@ class FFmpegRead(ReadBuffer):
         if self._process and self._process.stderr:
             await self._process.stderr.read()
 
+    def _save_input_debug_frame(self, data: bytes) -> None:
+        import os
+
+        os.makedirs("debug_frames", exist_ok=True)
+        w, h = self.video_info.width, self.video_info.height
+        if self._input_pix_fmt == "rgb48le":
+            raw = np.frombuffer(data, dtype=np.uint16).reshape(h, w, 3)
+            raw = (raw / 65535.0 * 255).astype(np.uint8)
+            bgr = cv2.cvtColor(raw, cv2.COLOR_RGB2BGR)
+        else:
+            raw = np.frombuffer(data, dtype=np.uint8).reshape(h, w, 3)
+            bgr = cv2.cvtColor(raw, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(f"debug_frames/input_{self._debug_counter}.jpg", bgr)
+        self._debug_counter += 1
+
     async def read_frames_into_queue(self):
         if self._process is None:
             await self.start()
@@ -141,6 +164,8 @@ class FFmpegRead(ReadBuffer):
 
                 if self._yuv420p_mod:
                     pass
+
+                self._save_input_debug_frame(chunk)
 
                 frame = Frame(
                     self.video_info.width,
@@ -200,6 +225,12 @@ class FFmpegWrite(WriteBuffer):
         self._frames_written: int = 0
         self._current_fps: float = 0.0
         self._last_fps_update: float = 0
+        self._debug_counter = 0
+        self._output_pix_fmt = (
+            "rgb48le"
+            if self.input_video_info.is_hdr and self.settings.auto_hdr_mode
+            else "rgb24"
+        )
 
     def command(self):
         command = [
@@ -287,6 +318,22 @@ class FFmpegWrite(WriteBuffer):
             await self.start()
         await self.write_queue.put(frame)
 
+    def _save_output_debug_frame(self, data: bytes) -> None:
+        import os
+
+        os.makedirs("debug_frames", exist_ok=True)
+        w = self.input_video_info.width
+        h = self.input_video_info.height
+        if self._output_pix_fmt == "rgb48le":
+            raw = np.frombuffer(data, dtype=np.uint16).reshape(h, w, 3)
+            raw = (raw / 65535.0 * 255).astype(np.uint8)
+            bgr = cv2.cvtColor(raw, cv2.COLOR_RGB2BGR)
+        else:
+            raw = np.frombuffer(data, dtype=np.uint8).reshape(h, w, 3)
+            bgr = cv2.cvtColor(raw, cv2.COLOR_RGB2BGR)
+        cv2.imwrite(f"debug_frames/output_{self._debug_counter}.jpg", bgr)
+        self._debug_counter += 1
+
     async def _write_loop(self):
         if self._process is None:
             await self.start()
@@ -300,6 +347,7 @@ class FFmpegWrite(WriteBuffer):
                     break
 
                 frame_bytes = frame.get_frame_bytes()
+                self._save_output_debug_frame(frame_bytes)
                 self._process.stdin.write(frame_bytes)
                 await self._process.stdin.drain()
 
