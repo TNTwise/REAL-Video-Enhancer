@@ -1,3 +1,5 @@
+import asyncio
+
 from src.proxy.backends.interpolate_base import InterpolateBase
 from src.proxy.backends.upscale_base import UpscaleBase
 from src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
@@ -8,10 +10,7 @@ from src.utils.LogConfig import get_logger
 logger = get_logger(__name__)
 
 
-import asyncio
-
-
-class Render:
+class RenderProxy:
     def __init__(
         self,
         render_settings: RenderSettings,
