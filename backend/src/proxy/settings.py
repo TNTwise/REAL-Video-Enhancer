@@ -5,7 +5,7 @@ from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
 SETTINGS_FILE = CONFIG_PATH / "settings.txt"
 
 
-class Settings:
+class PersistentSettingsProxy:
     def __init__(self):
         self.default_settings = {
             "precision": "auto",
@@ -366,3 +366,30 @@ class Settings:
                         file.write(f"{key},{value}\n")
                 else:
                     self.write_default_settings()
+
+    def write_setting(self, setting: str, value: str):
+        # TODO: this is shit, and should use custom exceptions
+        if setting not in self.settings:
+            raise Exception("Setting not in settings!")
+        throw = True
+        for setting in self.default_settings:
+            if value in setting:
+                throw = False
+        if self.default_settings[setting] == "ANY":
+            throw = False
+        if throw:
+            raise Exception("Value not allowed")
+
+        self.settings[setting] = value
+        self.write_default_settings()
+
+    def get_setting(self, setting):
+        if setting not in self.settings:
+            raise Exception("Setting not in settings!")
+        return self.settings[setting]
+
+    def get_allowed_options(self, setting: str):
+        # TODO: again, this is shit
+        if setting not in self.default_settings:
+            raise Exception("Setting not in default settings")
+        return self.default_settings[setting]

@@ -269,12 +269,13 @@ class FFmpegWrite(WriteBuffer):
         if self._process is not None:
             return
         command = self.command()
+
         logger.info("FFMPEG WRITE COMMAND: %s", command)
         self._process = await asyncio.create_subprocess_exec(
             *command,
             stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.PIPE,
+            stdout=asyncio.subprocess.STDOUT,
+            stderr=asyncio.subprocess.STDOUT,
         )
 
     async def put_frame_in_write_queue(self, frame: Frame | None) -> None:

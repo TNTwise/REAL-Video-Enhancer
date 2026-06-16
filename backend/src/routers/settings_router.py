@@ -1,26 +1,32 @@
 from fastapi import APIRouter, Depends
 
+from src.proxy.settings import PersistentSettingsProxy
 from src.schemas.request import Setting
-from src.services import Settings
 
-router = APIRouter(prefix="/settings")
+router = APIRouter(prefix="/PersistentSettingsProxy")
 
 
 # FastAPI example
-def get_user_service() -> Settings:
-    return Settings()
+def get_user_service() -> PersistentSettingsProxy:
+    return PersistentSettingsProxy()
 
 
 @router.post("/update_setting")
-def update_setting(body: Setting, service: Settings = Depends(get_user_service)):
+def update_setting(
+    body: Setting, service: PersistentSettingsProxy = Depends(get_user_service)
+):
     return service.write_setting(body.setting, str(body.value))
 
 
 @router.get("/get_setting_value")
-def get_setting_value(setting: str, service: Settings = Depends(get_user_service)):
-    return service.get_setting_value(setting)
+def get_setting_value(
+    setting: str, service: PersistentSettingsProxy = Depends(get_user_service)
+):
+    return service.get_setting(setting)
 
 
 @router.get("/get_allowed_options")
-def get_allowed_options(setting: str, service: Settings = Depends(get_user_service)):
+def get_allowed_options(
+    setting: str, service: PersistentSettingsProxy = Depends(get_user_service)
+):
     return service.get_allowed_options(setting)
