@@ -100,7 +100,6 @@ class RenderService:
             upscale_model=upscale_model,
             interpolate_model=interpolate_model,
             enhancement_models=enhancement_models,
-            hdr_mode=hdr_mode,
         )
 
         # TODO make this not so shit, breaks DI

@@ -11,20 +11,12 @@ logger = get_logger(__name__)
 
 
 class RenderProxy:
-    def __init__(
-        self,
-        render_settings: RenderSettings,
-        settings: Setting,
-    ):
-        self.render_settings = render_settings
-        self.settings = settings
-
     async def render(
         self,
         write_buffer: WriteBuffer,
         read_buffer: ReadBuffer,
-        interpolate_option: InterpolateBase | None = None,
-        upscale_option: UpscaleBase | None = None,
+        render_settings: RenderSettings,
+        settings: Setting,
     ):
         async def reader_task():
             await read_buffer.read_frames_into_queue()
@@ -34,10 +26,8 @@ class RenderProxy:
                 frame = await read_buffer.get()
                 if frame is None:
                     break
-                processed_frame = await self._process_frame(
-                    frame, interpolate_option, upscale_option
-                )
-                await write_buffer.put_frame_in_write_queue(processed_frame)
+
+                await write_buffer.put_frame_in_write_queue(frame)
             await write_buffer.put_frame_in_write_queue(None)
 
         async def writer_task():

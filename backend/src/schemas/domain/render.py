@@ -13,7 +13,6 @@ class RenderSettings(BaseModel):
     tilesize: int
     benchmark_mode: bool
     slow_mo_mode: bool
-    hdr_mode: bool = False
     overwrite: bool = False
     interpolate_model: InterpolateModel | None
     upscale_model: UpscaleModel | None
