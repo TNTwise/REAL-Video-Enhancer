@@ -7,16 +7,13 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
-from backend.src.proxy.settings import Settings
-from backend.src.schemas.domain.render import RenderSettings
-from backend.src.proxy.video_info_proxy import VideoInfo
 from src.schemas.domain.model import InterpolateModel
+from src.schemas.domain.render import RenderSettings
+from src.schemas.domain.video_info import InputVideoInfo
 
 from ....schemas.domain.frame import Frame
 from ....utils.LogConfig import get_logger
 from ....utils.Util import errorAndLog
-
-# from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BasePyTorchInterpolate, DynamicScale
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
 from .TorchUtils import TorchUtils
@@ -27,21 +24,47 @@ torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 
 
+# TODO: Get this code to work
 class InterpolateRifeTorch(BasePyTorchInterpolate):
     @torch.inference_mode()
     def __init__(
         self,
         interpolate_model: InterpolateModel,
-        video_info: VideoInfo,
+        video_info: InputVideoInfo,
         render_settings: RenderSettings,
-        settings: Settings,
+        settings,
     ):
         self.interpolate_model = interpolate_model
         self.video_info = video_info
         self.render_settings = render_settings
         self.settings = settings
-        self.device = torch.cuda()
-        self.dtype = torch.float16
+
+        self.interpolateModel = interpolate_model.file_path
+        self.width = video_info.width
+        self.height = video_info.height
+        self.hdr_mode = video_info.is_hdr
+        self.ceilInterpolateFactor = interpolate_model.interpolate_factor
+        self.backend = interpolate_model.backend.type
+        self.UHDMode = settings.uhd_mode == "True"
+        self.scale = 0.5 if self.UHDMode else 1.0
+        self.ensemble = False
+        self.dynamicScaledOpticalFlow = False
+        self.gpu_id = int(settings.pytorch_gpu_id)
+        self.device_type = "default"
+        self.trt_optimization_level = int(settings.tensorrt_optimization_level)
+        self.trt_static_shape = settings.dynamic_tensorrt_engine == "False"
+        self.trt_min_shape = [256, 256]
+        self.trt_max_shape = [1920, 1080]
+        self.trt_opt_shape = [1080, 720]
+
+        self.frame0 = None
+        self.encode0 = None
+        self.CompareNet = None
+        self.dynamicScale = None
+
+        self.device = TorchUtils.handle_device(self.device_type, gpu_id=self.gpu_id)
+        self.dtype = TorchUtils.handle_precision(settings.precision)
+
         self._load()
 
     @torch.inference_mode()
@@ -52,7 +75,6 @@ class InterpolateRifeTorch(BasePyTorchInterpolate):
             weights_only=True,
             mmap=True,
         )
-        # detect what rife arch to use
 
         ad = ArchDetect(self.interpolateModel)
         interpolateArch = ad.getArchName()
@@ -122,7 +144,6 @@ class InterpolateRifeTorch(BasePyTorchInterpolate):
         self.pw = math.ceil(self.width / tmp) * tmp
         self.ph = math.ceil(self.height / tmp) * tmp
         self.padding = (0, self.pw - self.width, 0, self.ph - self.height)
-        need_pad = any(p > 0 for p in self.padding)
         self.torchUtils = TorchUtils(
             width=self.width,
             height=self.height,
@@ -463,13 +484,6 @@ class InterpolateRifeTorch(BasePyTorchInterpolate):
 
         self.torchUtils.sync_all_streams()
 
-    def debug_save_tensor_as_img(self, img: torch.Tensor, name: str):
-        import cv2
-
-        img = img.squeeze().permute(1, 2, 0).detach().cpu().numpy() * 255
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.imwrite(name, img)
-
     @torch.inference_mode()
     def __call__(
         self,
@@ -491,13 +505,6 @@ class InterpolateRifeTorch(BasePyTorchInterpolate):
 
             if self.encode:
                 encode1 = self.encode_Frame(frame1, self.f2tStream)
-
-            if self.dynamicScaledOpticalFlow:
-                closest_value = self.dynamicScale.dynamicScaleCalculation(
-                    self.frame0, frame1
-                )
-            else:
-                closest_value = None
 
             for n in range(self.ceilInterpolateFactor - 1):
                 if not transition:
