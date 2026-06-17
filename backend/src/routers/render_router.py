@@ -10,6 +10,7 @@ from src.schemas.transforms.model import (
     InterpolateModelTransformer,
     UpscaleModelTransformer,
 )
+from src.schemas.transforms.precision import PrecisionTransform
 from src.schemas.transforms.render import RenderSettingsTransformer
 from src.schemas.transforms.video_info import (
     InputVideoInfoTransformer,
@@ -49,22 +50,29 @@ def get_output_video_transformer() -> OutputVideoInfoTransformer:
     return OutputVideoInfoTransformer()
 
 
+def get_precision_transformer() -> PrecisionTransform:
+    return PrecisionTransform()
+
+
 def get_interpolate_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
+    precision_tf: PrecisionTransform = Depends(get_precision_transformer),
 ) -> InterpolateModelTransformer:
-    return InterpolateModelTransformer(model_repo)
+    return InterpolateModelTransformer(model_repo, precision_tf)
 
 
 def get_upscale_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
+    precision_tf: PrecisionTransform = Depends(get_precision_transformer),
 ) -> UpscaleModelTransformer:
-    return UpscaleModelTransformer(model_repo)
+    return UpscaleModelTransformer(model_repo, precision_tf)
 
 
 def get_enhancement_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
+    precision_tf: PrecisionTransform = Depends(get_precision_transformer),
 ) -> EnhancementModelTransformer:
-    return EnhancementModelTransformer(model_repo)
+    return EnhancementModelTransformer(model_repo, precision_tf)
 
 
 def get_render_settings_transformer() -> RenderSettingsTransformer:

@@ -1,15 +1,26 @@
 from src.repos import ModelRepo
 from src.schemas.domain import EnhancementModel, InterpolateModel, UpscaleModel
+from src.schemas.repo.model import (
+    EnhancementModelRepo,
+    InterpolateModelRepo,
+    UpscaleModelRepo,
+)
 from src.schemas.request.model import (
     EnhancementModelClientInput,
     InterpolateModelClientInput,
     UpscaleModelClientInput,
 )
+from src.schemas.transforms.precision import PrecisionTransform
 
 
 class InterpolateModelTransformer:
-    def __init__(self, model_repo: ModelRepo):
+    def __init__(
+        self,
+        model_repo: ModelRepo,
+        precision_transform: PrecisionTransform,
+    ):
         self._model_repo = model_repo
+        self._precision_transform = precision_transform
 
     def to_domain(
         self, client_input: InterpolateModelClientInput
@@ -25,13 +36,15 @@ class InterpolateModelTransformer:
             file_path=base_model.file_path,
             description=base_model.description,
             url=base_model.url,
-            precision=base_model.precision,
+            precision=self._precision_transform.to_domain(
+                base_model.precision, base_model.backend.type
+            ),
             backend=base_model.backend,
         )
 
     def _find_model(
         self, client_input: InterpolateModelClientInput
-    ) -> InterpolateModel | None:
+    ) -> InterpolateModelRepo | None:
         for model in self._model_repo.interpolate_models:
             if (
                 model.id == client_input.id
@@ -42,8 +55,13 @@ class InterpolateModelTransformer:
 
 
 class UpscaleModelTransformer:
-    def __init__(self, model_repo: ModelRepo):
+    def __init__(
+        self,
+        model_repo: ModelRepo,
+        precision_transform: PrecisionTransform,
+    ):
         self._model_repo = model_repo
+        self._precision_transform = precision_transform
 
     def to_domain(self, client_input: UpscaleModelClientInput) -> UpscaleModel | None:
         base_model = self._find_model(client_input)
@@ -57,11 +75,15 @@ class UpscaleModelTransformer:
             file_path=base_model.file_path,
             description=base_model.description,
             url=base_model.url,
-            precision=base_model.precision,
+            precision=self._precision_transform.to_domain(
+                base_model.precision, base_model.backend.type
+            ),
             backend=base_model.backend,
         )
 
-    def _find_model(self, client_input: UpscaleModelClientInput) -> UpscaleModel | None:
+    def _find_model(
+        self, client_input: UpscaleModelClientInput
+    ) -> UpscaleModelRepo | None:
         for model in self._model_repo.upscale_models:
             if (
                 model.id == client_input.id
@@ -72,8 +94,13 @@ class UpscaleModelTransformer:
 
 
 class EnhancementModelTransformer:
-    def __init__(self, model_repo: ModelRepo):
+    def __init__(
+        self,
+        model_repo: ModelRepo,
+        precision_transform: PrecisionTransform,
+    ):
         self._model_repo = model_repo
+        self._precision_transform = precision_transform
 
     def to_domain(
         self, client_input: EnhancementModelClientInput
@@ -88,13 +115,15 @@ class EnhancementModelTransformer:
             file_path=base_model.file_path,
             description=base_model.description,
             url=base_model.url,
-            precision=base_model.precision,
+            precision=self._precision_transform.to_domain(
+                base_model.precision, base_model.backend.type
+            ),
             backend=base_model.backend,
         )
 
     def _find_model(
         self, client_input: EnhancementModelClientInput
-    ) -> EnhancementModel | None:
+    ) -> EnhancementModelRepo | None:
         for model in self._model_repo.enhancement_models:
             if (
                 model.id == client_input.id

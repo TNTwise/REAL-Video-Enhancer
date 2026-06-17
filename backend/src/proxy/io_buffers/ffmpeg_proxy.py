@@ -4,9 +4,6 @@ import tempfile
 import time
 from abc import ABC, abstractmethod
 
-import cv2
-import numpy as np
-
 from src.constants import FFMPEG_PATH
 from src.proxy.settings import PersistentSettingsProxy
 from src.schemas.domain.render import RenderSettings

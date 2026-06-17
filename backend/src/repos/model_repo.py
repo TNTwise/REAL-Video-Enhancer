@@ -5,15 +5,17 @@ from pathlib import Path
 from typing import List
 
 from src.schemas.domain import (
-    InterpolateModel,
-    UpscaleModel,
-    EnhancementModel,
-    ModelVariant,
+    Backend,
     NCNNBackend,
     PyTorchBackend,
     TensorRTBackend,
-    Backend,
 )
+from src.schemas.repo import (
+    EnhancementModelRepo,
+    InterpolateModelRepo,
+    UpscaleModelRepo,
+)
+from src.schemas.repo.model import ModelRepoVariant
 
 _REPO_DIR = Path(__file__).parent
 _MODEL_REPO_JSON = _REPO_DIR / "model_repo.json"
@@ -34,14 +36,14 @@ class ModelRepo:
             "tensorrt": {"version": "0.0.0", "installed": False},
         }
 
-        self._models: List[ModelVariant] = []
+        self._models: List[ModelRepoVariant] = []
         self._loaded = False
 
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
-    def load(self) -> List[ModelVariant]:
+    def load(self) -> List[ModelRepoVariant]:
         """Parse the JSON repo and populate internal model lists."""
         with open(self._json_path) as f:
             repo = json.load(f)
@@ -75,23 +77,23 @@ class ModelRepo:
         return self._models
 
     @property
-    def models(self) -> List[ModelVariant]:
+    def models(self) -> List[ModelRepoVariant]:
         """All loaded models. Call .load() first."""
         return self._models
 
     @property
-    def interpolate_models(self) -> List[InterpolateModel]:
-        return [m for m in self._models if isinstance(m, InterpolateModel)]
+    def interpolate_models(self) -> List[InterpolateModelRepo]:
+        return [m for m in self._models if isinstance(m, InterpolateModelRepo)]
 
     @property
-    def upscale_models(self) -> List[UpscaleModel]:
-        return [m for m in self._models if isinstance(m, UpscaleModel)]
+    def upscale_models(self) -> List[UpscaleModelRepo]:
+        return [m for m in self._models if isinstance(m, UpscaleModelRepo)]
 
     @property
-    def enhancement_models(self) -> List[EnhancementModel]:
-        return [m for m in self._models if isinstance(m, EnhancementModel)]
+    def enhancement_models(self) -> List[EnhancementModelRepo]:
+        return [m for m in self._models if isinstance(m, EnhancementModelRepo)]
 
-    def get_by_backend(self, backend_type: str) -> List[ModelVariant]:
+    def get_by_backend(self, backend_type: str) -> List[ModelRepoVariant]:
         """Filter models by backend type string (e.g. 'pytorch', 'ncnn')."""
         return [m for m in self._models if m.backend.type == backend_type]
 
@@ -114,46 +116,39 @@ class ModelRepo:
         raise ValueError(f"Unknown backend: {backend_name}")
 
     @staticmethod
-    def _default_precision(backend: Backend):
-        if backend.type == "ncnn":
-            return {"type": "numpy", "precision_id": "float32"}
-
-        return {"type": "torch", "precision_id": "float32"}
-
-    @staticmethod
-    def _parse_interpolate(data: dict, backend: Backend) -> InterpolateModel:
-        return InterpolateModel(
+    def _parse_interpolate(data: dict, backend: Backend) -> InterpolateModelRepo:
+        return InterpolateModelRepo(
             id=data["id"],
             variant=data["variant"],
             interpolate_factor=data.get("interpolate_factor", 2),
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
-            precision=ModelRepo._default_precision(backend),
+            precision=data.get("precision", "float32"),
             backend=backend,
         )
 
     @staticmethod
-    def _parse_upscale(data: dict, backend: Backend) -> UpscaleModel:
-        return UpscaleModel(
+    def _parse_upscale(data: dict, backend: Backend) -> UpscaleModelRepo:
+        return UpscaleModelRepo(
             id=data["id"],
             variant=data["variant"],
             scale=data.get("scale", 2),
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
-            precision=ModelRepo._default_precision(backend),
+            precision=data.get("precision", "float32"),
             backend=backend,
         )
 
     @staticmethod
-    def _parse_enhancement(data: dict, backend: Backend) -> EnhancementModel:
-        return EnhancementModel(
+    def _parse_enhancement(data: dict, backend: Backend) -> EnhancementModelRepo:
+        return EnhancementModelRepo(
             id=data["id"],
             variant=data["variant"],
             file_path=data.get("file_path", ""),
             description=data.get("description"),
             url=data.get("url"),
-            precision=ModelRepo._default_precision(backend),
+            precision=data.get("precision", "float32"),
             backend=backend,
         )
