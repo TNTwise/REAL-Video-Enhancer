@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import os
 
-from src.proxy.io_buffers.ffmpeg_proxy import (
+from src.logic.io.ffmpeg import (
     FFmpegRead,
     FFmpegWrite,
 )
-from src.proxy.settings import PersistentSettingsProxy
-from src.repos.model_repo import ModelRepo
+from src.logic.proxy.settings import PersistentSettingsProxy
+from src.logic.repos.model_repo import ModelRepo
 from src.schemas.request import RenderSettingsClientInput
 from src.schemas.transforms import (
     EnhancementModelTransformer,

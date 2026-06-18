@@ -1,4 +1,4 @@
-from src.repos import ModelRepo
+from src.logic.repos import ModelRepo
 from src.schemas.domain import EnhancementModel, InterpolateModel, UpscaleModel
 from src.schemas.repo.model import (
     EnhancementModelRepo,

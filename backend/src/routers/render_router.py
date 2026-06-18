@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 
-from src.proxy.io_buffers.ffmpeg_proxy import FFmpegWrite
-from src.proxy.render_video import RenderProxy
-from src.proxy.settings import PersistentSettingsProxy
-from src.repos.model_repo import ModelRepo
+from src.logic.io.ffmpeg import FFmpegWrite
+from src.logic.proxy.settings import PersistentSettingsProxy
+from src.logic.render.render_video import RenderProxy
+from src.logic.repos.model_repo import ModelRepo
+from src.logic.services import RenderService
 from src.schemas.request import RenderSettingsClientInput
 from src.schemas.transforms.model import (
     EnhancementModelTransformer,
@@ -16,7 +17,6 @@ from src.schemas.transforms.video_info import (
     InputVideoInfoTransformer,
     OutputVideoInfoTransformer,
 )
-from src.services import RenderService
 
 router = APIRouter(prefix="/render")
 

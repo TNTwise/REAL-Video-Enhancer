@@ -1,6 +1,6 @@
 import subprocess
 
-from backend.src.constants import FFMPEG_PATH
+from src.constants import FFMPEG_PATH
 
 from ..utils.LogConfig import get_logger
 from ..utils.Util import subprocess_popen_without_terminal

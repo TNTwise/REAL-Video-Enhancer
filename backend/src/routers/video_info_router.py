@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from src.repos import ModelRepo
+from src.logic.repos import ModelRepo
+from src.logic.services.video_info_service import VideoInfoService
 from src.schemas.domain.video_info import OutputVideoInfo
 from src.schemas.request import OutputVideoInfoClientInput
 from src.schemas.request.model import (
@@ -15,7 +16,6 @@ from src.schemas.transforms import (
     RenderSettingsTransformer,
     UpscaleModelTransformer,
 )
-from src.services.video_info_service import VideoInfoService
 
 router = APIRouter(prefix="/video")
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from src.proxy.settings import PersistentSettingsProxy
+from src.logic.proxy import PersistentSettingsProxy
 from src.schemas.request import Setting
 
 router = APIRouter(prefix="/PersistentSettingsProxy")

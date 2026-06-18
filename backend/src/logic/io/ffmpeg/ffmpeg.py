@@ -2,53 +2,16 @@ import asyncio
 import shlex
 import tempfile
 import time
-from abc import ABC, abstractmethod
 
 from src.constants import FFMPEG_PATH
-from src.proxy.settings import PersistentSettingsProxy
+from src.logic.io import ReadBuffer, WriteBuffer
+from src.logic.proxy import PersistentSettingsProxy
+from src.schemas.domain.frame import Frame
 from src.schemas.domain.render import RenderSettings
 from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
-
-from ...schemas.domain.frame import Frame
-from ...utils.LogConfig import get_logger
+from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)
-
-
-class ReadBuffer(ABC):
-    @abstractmethod
-    def command(self) -> list[str]:
-        pass
-
-    @abstractmethod
-    async def read_frames_into_queue(self) -> None:
-        pass
-
-    @abstractmethod
-    async def get(self) -> Frame | None:
-        pass
-
-    @abstractmethod
-    async def close(self) -> None:
-        pass
-
-
-class WriteBuffer(ABC):
-    @abstractmethod
-    def command(self) -> list[str]:
-        pass
-
-    @abstractmethod
-    async def put_frame_in_write_queue(self, frame: Frame | None) -> None:
-        pass
-
-    @abstractmethod
-    async def write_out_frames(self) -> None:
-        pass
-
-    @abstractmethod
-    async def close(self) -> None:
-        pass
 
 
 class FFmpegRead(ReadBuffer):

@@ -1,8 +1,8 @@
 import asyncio
 
-from src.proxy.io_buffers.ffmpeg_proxy import ReadBuffer, WriteBuffer
+from src.logic.io import ReadBuffer, WriteBuffer
+from src.logic.proxy import PersistentSettingsProxy
 from src.schemas.domain import RenderSettings
-from src.services import PersistentSettingsProxy
 from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)

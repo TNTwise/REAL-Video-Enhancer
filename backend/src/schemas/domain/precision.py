@@ -1,9 +1,11 @@
 from __future__ import annotations
 
-from src.handlers import TorchHandler
+from typing import Annotated, Literal, Union
+
 import numpy
 from pydantic import BaseModel, Field
-from typing import Annotated, Literal, Union
+
+from src.logic.handlers import TorchHandler
 
 
 class TorchPrecision(BaseModel):
@@ -11,12 +13,14 @@ class TorchPrecision(BaseModel):
 
     type: Literal["torch"] = "torch"
     precision_id: str
+
     @property
     def dtype(self):
         if not TorchHandler().is_available():
             raise RuntimeError("PyTorch is not available")
 
         return getattr(TorchHandler().get_torch(), self.precision_id)
+
 
 class NumpyPrecision(BaseModel):
     """precision id: (float16, float32, etc)"""
