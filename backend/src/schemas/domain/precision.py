@@ -5,7 +5,7 @@ from typing import Annotated, Literal, Union
 import numpy
 from pydantic import BaseModel, Field
 
-from src.logic.handlers import TorchHandler
+from src.logic.handlers.backend import TorchHandler
 
 
 class TorchPrecision(BaseModel):

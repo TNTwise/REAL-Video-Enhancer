@@ -4,7 +4,9 @@ from time import sleep
 
 import numpy as np
 
+from src.logic.handlers.backend.backend_handler import BackendHandler
 from src.logic.handlers.backend.ncnn_handler import NCNNHandler
+from src.logic.render.backends import InterpolateBase
 from src.schemas.domain import Frame, InterpolateModel
 from src.schemas.domain.video_info import InputVideoInfo
 
@@ -124,13 +126,14 @@ class Rife:
         return bytes(self.output_bytes)
 
 
-class InterpolateNCNN:
+class InterpolateNCNN(InterpolateBase):
     def __init__(
         self,
-        backend_handler: NCNNHandler,
+        backend_handler: BackendHandler,
         interpolate_model: InterpolateModel,
         input_video_info: InputVideoInfo,
     ):
+        assert isinstance(backend_handler, NCNNHandler)
         # TODO: Create a model for Device, had attribute id and name
         self._gpu_id = 0
         # TODO: Implement paused feature
@@ -158,32 +161,32 @@ class InterpolateNCNN:
 
     def process_frame(
         self,
-        img1: Frame,
+        frame: Frame,
         transition=False,
     ):
         if self.frame0 is None:
-            self.frame0 = img1.get_frame_bytes()
+            self.frame0 = frame.get_frame_bytes()
             return
         if transition:
             self.render.process_bytes(
-                self.frame0, img1.get_frame_bytes(), 0
+                self.frame0, frame.get_frame_bytes(), 0
             )  # get the cache to skip to next frame
-            self.frame0 = img1
+            self.frame0 = frame
 
             for n in range(self._interpolate_model.interpolate_factor - 1):
-                yield img1
+                yield frame
             return
         for n in range(self._interpolate_model.interpolate_factor - 1):
             while self._paused:
                 sleep(1)
             timestep = (n + 1) * 1.0 / (self._interpolate_model.interpolate_factor)
-            frame = self.render.process_bytes(
-                self.frame0, img1.get_frame_bytes(), timestep
+            interp_frame = self.render.process_bytes(
+                self.frame0, frame.get_frame_bytes(), timestep
             )
             retFrame = Frame(
                 self._input_video_info.width,
                 self._input_video_info.height,
             )
-            retFrame.set_frame_bytes(frame)
+            retFrame.set_frame_bytes(interp_frame)
             yield retFrame
-        self.frame0 = img1
+        self.frame0 = frame
