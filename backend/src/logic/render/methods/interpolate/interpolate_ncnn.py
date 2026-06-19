@@ -2,6 +2,7 @@ import pathlib
 import sys
 from time import sleep
 
+import cv2
 import numpy as np
 
 from src.logic.handlers.backend.backend_handler import BackendHandler
@@ -145,6 +146,9 @@ class InterpolateNCNN(InterpolateMethodBase):
         self._interpolate_model = interpolate_model
         self._input_video_info = input_video_info
         self.frame0 = None
+        self._save_counter = 0
+        self._output_dir = pathlib.Path("/tmp/debug_frames")
+        self._output_dir.mkdir(parents=True, exist_ok=True)
 
     def _load(self):
         max_timestep = (
@@ -158,10 +162,24 @@ class InterpolateNCNN(InterpolateMethodBase):
             uhd_mode=False,
             channels=3,
             height=self._input_video_info.height,
-            width=self._input_video_info.height,
+            width=self._input_video_info.width,
             max_timestep=max_timestep,
         )
         # device = ncnn.get_gpu_device(self.gpuid).info().device_name()
+
+    def _debug_save_frame(ret_frame):
+        np_frame = ret_frame.get_frame_np()
+        if np_frame.dtype == np.uint16:
+            np_frame = (
+                np.clip(np_frame.astype(np.float32) / 65535.0, 0, 1) * 255
+            ).astype(np.uint8)
+        bgr = cv2.cvtColor(np_frame, cv2.COLOR_RGB2BGR)
+        self._save_counter += 1
+        cv2.imwrite(
+            str(self._output_dir / f"frame_{self._save_counter:06d}.jpg"),
+            bgr,
+            [cv2.IMWRITE_JPEG_QUALITY, 95],
+        )
 
     def process_frame(
         self,
@@ -192,5 +210,6 @@ class InterpolateNCNN(InterpolateMethodBase):
                 self._input_video_info.height,
             )
             retFrame.set_frame_bytes(interp_frame)
+
             yield retFrame
         self.frame0 = frame
