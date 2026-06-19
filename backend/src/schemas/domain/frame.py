@@ -14,6 +14,7 @@ _torch_utils = None
 _torch = None
 
 
+# TODO Get this working again with torch
 class Frame:
     def __init__(
         self,
