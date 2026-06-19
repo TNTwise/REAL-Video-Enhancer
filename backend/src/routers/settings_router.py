@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-
 from src.logic.proxy import PersistentSettingsProxy
 from src.schemas.request import Setting
 

@@ -34,6 +34,7 @@ class PersistentSettingsProxy:
             "video_pixel_format": "yuv420p",
             "pytorch_version": "2.9.0",
             "pytorch_backend": "CUDA",
+            "torch_accelerator": "cuda",
             "auto_hdr_mode": "True",
             "use_custom_encoder_command": "False",
             "encoder_command": "",
@@ -89,6 +90,7 @@ class PersistentSettingsProxy:
             "video_pixel_format": "ANY",
             "pytorch_version": ("2.10.0", "2.9.0", "2.6.0"),
             "pytorch_backend": "ANY",
+            "torch_accelerator": ("cuda", "cpu", "mps"),
             "auto_hdr_mode": ("True", "False"),
             "use_custom_encoder_command": ("True", "False"),
             "encoder_command": "ANY",
@@ -301,6 +303,14 @@ class PersistentSettingsProxy:
     @pytorch_backend.setter
     def pytorch_backend(self, value: str):
         self._validate_and_set("pytorch_backend", value)
+
+    @property
+    def torch_accelerator(self) -> str:
+        return self.settings["torch_accelerator"]
+
+    @torch_accelerator.setter
+    def torch_accelerator(self, value: str):
+        self._validate_and_set("torch_accelerator", value)
 
     @property
     def auto_hdr_mode(self) -> str:

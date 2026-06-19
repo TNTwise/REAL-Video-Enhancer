@@ -48,7 +48,10 @@ except ImportError:
 try:
     from .raftarch import RAFT, BidirCorrBlock
 except ImportError:
-    from backend.src.proxy.backends.pytorch.InterpolateArchs.GIMM.raftarch import RAFT, BidirCorrBlock
+    from backend.src.proxy.backends.pytorch.InterpolateArchs.GIMM.raftarch import (
+        RAFT,
+        BidirCorrBlock,
+    )
 
 from ..util.softsplat_torch import softsplat
 

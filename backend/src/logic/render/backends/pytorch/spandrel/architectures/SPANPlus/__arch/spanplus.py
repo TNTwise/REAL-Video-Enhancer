@@ -3,8 +3,8 @@ import torch.nn.functional as F
 from torch import nn
 from torch.nn.init import trunc_normal_
 
-from ...__arch_helpers.dysample import DySample
 from ....util import store_hyperparameters
+from ...__arch_helpers.dysample import DySample
 
 
 class Conv3XC(nn.Module):

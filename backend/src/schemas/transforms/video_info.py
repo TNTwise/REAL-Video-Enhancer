@@ -1,7 +1,6 @@
 from typing import Optional
 
 from src.schemas.domain.model import InterpolateModel, UpscaleModel
-from src.schemas.domain.render import RenderSettings
 
 # --- Assuming these are your imports from your domain/schemas ---
 from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
@@ -9,7 +8,6 @@ from src.schemas.request.video_info import (
     InputVideoInfoClientInput,
     OutputVideoInfoClientInput,
 )
-from src.schemas.transforms.render import RenderSettingsTransformer
 from src.utils.video_info import OpenCVInfo
 
 

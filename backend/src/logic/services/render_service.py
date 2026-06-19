@@ -1,14 +1,17 @@
 from __future__ import annotations
 
+import asyncio
 import os
 
 from src.logic.handlers.backend.ncnn_handler import NCNNHandler
+from src.logic.handlers.backend.pytorch_handler import TorchHandler
 from src.logic.io.ffmpeg import (
     FFmpegRead,
     FFmpegWrite,
 )
 from src.logic.proxy.settings import PersistentSettingsProxy
 from src.logic.render.methods.interpolate.interpolate_ncnn import InterpolateNCNN
+from src.logic.render.methods.interpolate.interpolate_pytorch import InterpolatePyTorch
 from src.logic.repos.model_repo import ModelRepo
 from src.schemas.request import RenderSettingsClientInput
 from src.schemas.transforms import (
@@ -19,9 +22,13 @@ from src.schemas.transforms import (
     RenderSettingsTransformer,
     UpscaleModelTransformer,
 )
+from src.utils.LogConfig import get_logger
+
+logger = get_logger(__name__)
+
+_background_tasks: set[asyncio.Task] = set()
 
 
-# TODO: the render service should return immidiately, not hang the server up on a single thread. Mess with asyncio shit to fix this
 class RenderService:
     def __init__(
         self,
@@ -80,6 +87,12 @@ class RenderService:
                     ncnn_handler, interpolate_model, input_settings
                 )
                 interpolate_method._load()
+            elif interpolate_model.backend.type == "pytorch":
+                torch_handler = TorchHandler()
+                interpolate_method = InterpolatePyTorch(
+                    torch_handler, interpolate_model, input_settings
+                )
+                interpolate_method._load()
 
         upscale_model = (
             self.upscale_tf.to_domain(input.upscale_model)
@@ -115,8 +128,6 @@ class RenderService:
             enhancement_models=enhancement_models,
         )
 
-        # TODO make this not so shit, breaks DI
-
         read_buffer = FFmpegRead(
             render_settings, input_settings, output_settings, persistent_settings
         )
@@ -125,10 +136,38 @@ class RenderService:
             render_settings, input_settings, output_settings, persistent_settings
         )
 
-        await self._render_proxy.render(
-            render_settings=render_settings,
-            persistent_settings=persistent_settings,
-            read_buffer=read_buffer,
-            write_buffer=write_buffer,
-            interpolate_method=interpolate_method,
+        task = asyncio.create_task(
+            self._background_render(
+                render_settings=render_settings,
+                persistent_settings=persistent_settings,
+                read_buffer=read_buffer,
+                write_buffer=write_buffer,
+                interpolate_method=interpolate_method,
+            )
         )
+        _background_tasks.add(task)
+        task.add_done_callback(_background_tasks.discard)
+
+        return {
+            "status": "started",
+            "message": "Render started",
+        }
+
+    async def _background_render(
+        self,
+        render_settings,
+        persistent_settings,
+        read_buffer,
+        write_buffer,
+        interpolate_method,
+    ):
+        try:
+            await self._render_proxy.render(
+                render_settings=render_settings,
+                persistent_settings=persistent_settings,
+                read_buffer=read_buffer,
+                write_buffer=write_buffer,
+                interpolate_method=interpolate_method,
+            )
+        except Exception:
+            logger.exception("Background render failed")

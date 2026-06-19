@@ -1,6 +1,7 @@
 from src.logic.proxy import PersistentSettingsProxy
 from src.logic.repos import ModelRepo
 from src.schemas.domain import EnhancementModel, InterpolateModel, UpscaleModel
+from src.schemas.domain.backend import PyTorchBackend
 from src.schemas.repo.model import (
     EnhancementModelRepo,
     InterpolateModelRepo,
@@ -32,6 +33,12 @@ class InterpolateModelTransformer:
         if base_model is None:
             return None
 
+        backend = base_model.backend
+        if isinstance(backend, PyTorchBackend):
+            backend = backend.model_copy(
+                update={"accelerator": self._settings.torch_accelerator}
+            )
+
         return InterpolateModel(
             id=base_model.id,
             variant=base_model.variant,
@@ -42,7 +49,7 @@ class InterpolateModelTransformer:
             precision=self._precision_transform.to_domain(
                 self._settings.precision, base_model.backend.type
             ),
-            backend=base_model.backend,
+            backend=backend,
         )
 
     def _find_model(
@@ -73,6 +80,12 @@ class UpscaleModelTransformer:
         if base_model is None:
             return None
 
+        backend = base_model.backend
+        if isinstance(backend, PyTorchBackend):
+            backend = backend.model_copy(
+                update={"accelerator": self._settings.torch_accelerator}
+            )
+
         return UpscaleModel(
             id=base_model.id,
             variant=base_model.variant,
@@ -83,7 +96,7 @@ class UpscaleModelTransformer:
             precision=self._precision_transform.to_domain(
                 self._settings.precision, base_model.backend.type
             ),
-            backend=base_model.backend,
+            backend=backend,
         )
 
     def _find_model(
@@ -116,6 +129,12 @@ class EnhancementModelTransformer:
         if base_model is None:
             return None
 
+        backend = base_model.backend
+        if isinstance(backend, PyTorchBackend):
+            backend = backend.model_copy(
+                update={"accelerator": self._settings.torch_accelerator}
+            )
+
         return EnhancementModel(
             id=base_model.id,
             variant=base_model.variant,
@@ -125,7 +144,7 @@ class EnhancementModelTransformer:
             precision=self._precision_transform.to_domain(
                 self._settings.precision, base_model.backend.type
             ),
-            backend=base_model.backend,
+            backend=backend,
         )
 
     def _find_model(

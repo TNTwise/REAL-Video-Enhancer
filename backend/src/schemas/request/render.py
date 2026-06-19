@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-
 from src.schemas.request.model import (
     EnhancementModelClientInput,
     InterpolateModelClientInput,

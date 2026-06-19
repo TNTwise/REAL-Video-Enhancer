@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-
+from fastapi import APIRouter, Depends, Response
 from src.logic.io.ffmpeg import FFmpegWrite
 from src.logic.proxy.settings import PersistentSettingsProxy
 from src.logic.render.render_video import RenderProxy
@@ -18,9 +17,15 @@ from src.schemas.transforms.video_info import (
     OutputVideoInfoTransformer,
 )
 
+
+def get_persistent_settings() -> PersistentSettingsProxy:
+    return PersistentSettingsProxy()
+
+
 router = APIRouter(prefix="/render", tags=["Render"])
 
 _current_write_buffer: FFmpegWrite | None = None
+_render_proxy_instance: RenderProxy | None = None
 
 
 def get_current_write_buffer() -> FFmpegWrite | None:
@@ -33,7 +38,10 @@ def set_current_write_buffer(buffer: FFmpegWrite | None):
 
 
 def get_render_proxy() -> RenderProxy:
-    return RenderProxy()
+    global _render_proxy_instance
+    if _render_proxy_instance is None:
+        _render_proxy_instance = RenderProxy()
+    return _render_proxy_instance
 
 
 def get_model_repo() -> ModelRepo:
@@ -82,10 +90,6 @@ def get_render_settings_transformer() -> RenderSettingsTransformer:
     return RenderSettingsTransformer()
 
 
-def get_persistent_settings() -> PersistentSettingsProxy:
-    return PersistentSettingsProxy()
-
-
 def get_render_service(
     model_repo: ModelRepo = Depends(get_model_repo),
     input_video_tf: InputVideoInfoTransformer = Depends(get_input_video_transformer),
@@ -117,3 +121,33 @@ async def start_render(
     settings: PersistentSettingsProxy = Depends(get_persistent_settings),
 ):
     return await service.start_render(body, settings)
+
+
+@router.get("/latest_image")
+async def latest_image(
+    proxy: RenderProxy = Depends(get_render_proxy),
+):
+    if proxy.current_frame_bytes is None:
+        return Response(status_code=404, content=b"No frame available")
+    return Response(
+        content=proxy.current_frame_bytes,
+        media_type="application/octet-stream",
+        headers={
+            "X-Frame-Width": str(proxy.frame_width),
+            "X-Frame-Height": str(proxy.frame_height),
+        },
+    )
+
+
+@router.get("/fps")
+async def fps(
+    proxy: RenderProxy = Depends(get_render_proxy),
+):
+    return {"fps": proxy.current_fps}
+
+
+@router.get("/current_frame")
+async def current_frame(
+    proxy: RenderProxy = Depends(get_render_proxy),
+):
+    return {"current_frame": proxy.current_frame_number}

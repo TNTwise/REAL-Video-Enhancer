@@ -4,10 +4,8 @@ from time import sleep
 
 import cv2
 import numpy as np
-
 from src.logic.handlers.backend.backend_handler import BackendHandler
 from src.logic.handlers.backend.ncnn_handler import NCNNHandler
-from src.logic.render.backends import InterpolateBase
 from src.logic.render.methods.interpolate.interpolate_method_base import (
     InterpolateMethodBase,
 )

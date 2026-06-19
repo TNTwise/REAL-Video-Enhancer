@@ -1,12 +1,8 @@
 import logging
 import re
 import subprocess
-from abc import ABC, abstractmethod
-from datetime import time
-from time import sleep
 
 import cv2
-
 from src.constants import FFMPEG_PATH
 from src.schemas.request.video_info import InputVideoInfoClientInput
 

@@ -4,7 +4,6 @@ from typing import Annotated, Literal, Union
 
 import numpy
 from pydantic import BaseModel, Field
-
 from src.logic.handlers.backend import TorchHandler
 
 

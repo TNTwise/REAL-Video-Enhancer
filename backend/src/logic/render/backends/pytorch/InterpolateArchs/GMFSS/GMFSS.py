@@ -3,7 +3,6 @@ import math
 import torch
 import torch.nn.functional as F
 
-from ......utils.Util import CudaChecker
 from ..DetectInterpolateArch import ArchDetect
 from .FeatureNet import FeatureNet
 from .FusionNet_u import GridNet

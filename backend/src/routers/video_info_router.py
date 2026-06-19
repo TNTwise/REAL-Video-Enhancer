@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-
 from src.logic.proxy import PersistentSettingsProxy
 from src.logic.repos import ModelRepo
 from src.logic.services.video_info_service import VideoInfoService

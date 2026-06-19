@@ -3,7 +3,6 @@ import sys
 import numpy as np
 import torch
 import torch.nn.functional as F
-
 from src.utils.LogConfig import get_logger
 from src.utils.Util import CudaChecker
 

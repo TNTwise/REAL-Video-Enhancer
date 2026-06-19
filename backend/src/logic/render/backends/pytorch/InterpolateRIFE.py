@@ -6,7 +6,6 @@ from time import sleep
 
 import torch
 import torch.nn.functional as F
-
 from src.schemas.domain.model import InterpolateModel
 from src.schemas.domain.render import RenderSettings
 from src.schemas.domain.video_info import InputVideoInfo

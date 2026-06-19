@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pydantic import BaseModel
-
 from src.schemas.domain.model import EnhancementModel, InterpolateModel, UpscaleModel
 from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
 

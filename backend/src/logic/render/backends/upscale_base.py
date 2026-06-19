@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from src.schemas.domain import Frame, UpscaleModel
 
@@ -20,4 +20,3 @@ class UpscaleBase(ABC):
     def setup_upscale(self, upscale_model: UpscaleModel):
         """Set up the upscaling model."""
         raise NotImplementedError("Subclasses must implement this method")
-

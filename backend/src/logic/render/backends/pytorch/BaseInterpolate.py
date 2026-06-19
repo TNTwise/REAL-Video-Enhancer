@@ -1,15 +1,13 @@
 import gc
 import logging
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from queue import Queue
 
 import torch
-
-from src.schemas.domain.model import InterpolateModel
+from src.proxy.backends.interpolate_base import InterpolateBase
 
 from ....utils.SSIM import SSIM
 from ....utils.Util import CudaChecker
-from src.proxy.backends.interpolate_base import InterpolateBase
 
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .UpscaleTorch import UpscalePytorch

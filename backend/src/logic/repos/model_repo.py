@@ -39,7 +39,7 @@ class ModelRepo:
         self._models_dir = models_dir or _MODELS_DIR
         self._backends = backends or {
             "ncnn": {"version": "0.0.0", "installed": False},
-            "pytorch": {"version": "0.0.0", "installed": False, "accelerator": "CPU"},
+            "pytorch": {"version": "0.0.0", "installed": False, "accelerator": "cuda"},
             "tensorrt": {"version": "0.0.0", "installed": False},
         }
 
@@ -144,10 +144,8 @@ class ModelRepo:
                         extracted_dir.mkdir(parents=True, exist_ok=True)
                         tar.extractall(path=extracted_dir)
                 model.file_path = str(extracted_dir)
-                full_path.unlink()
             else:
                 model.file_path = str(extracted_dir)
-                full_path.unlink()
         else:
             model.file_path = str(full_path)
 
@@ -172,7 +170,7 @@ class ModelRepo:
             return NCNNBackend(version=version, installed=installed)
         if backend_name == "pytorch":
             return PyTorchBackend(
-                version=version, installed=installed, accelerator=accelerator or "CPU"
+                version=version, installed=installed, accelerator=accelerator or "cuda"
             )
         if backend_name == "tensorrt":
             return TensorRTBackend(version=version, installed=installed)
