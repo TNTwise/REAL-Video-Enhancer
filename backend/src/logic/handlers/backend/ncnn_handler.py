@@ -1,14 +1,17 @@
-from .backend_handler import BackendHandler
 from src.utils.LogConfig import get_logger
+
+from .backend_handler import BackendHandler
 
 logger = get_logger(__name__)
 
-class NCNNHandler(BackendHandler)
+
+class NCNNHandler(BackendHandler):
     def __init__(self):
         try:
             import ncnn
             import rife_ncnn_vulkan_python
             import upscale_ncnn_py
+
             self._ncnn = ncnn
             self._rife = rife_ncnn_vulkan_python
             self._upscale = upscale_ncnn_py
@@ -19,12 +22,18 @@ class NCNNHandler(BackendHandler)
             logger.error("NCNN Not installed!")
 
     def is_available(self) -> bool:
-        return self._ncnn is not None and self._rife is not None and self._upscale is not None
+        return (
+            self._ncnn is not None
+            and self._rife is not None
+            and self._upscale is not None
+        )
 
     def get_ncnn(self):
         # TODO: Custom exception
         if not self._ncnn:
-            raise Exception("NCNN Does not exist! Cannot get backend that is not installed")
+            raise Exception(
+                "NCNN Does not exist! Cannot get backend that is not installed"
+            )
         return self._ncnn
 
     def get_rife(self):

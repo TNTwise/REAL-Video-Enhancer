@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 from typing import List
 
+import requests
 from src.schemas.domain import (
     Backend,
     NCNNBackend,
@@ -19,6 +20,10 @@ from src.schemas.repo.model import ModelRepoVariant
 
 _REPO_DIR = Path(__file__).parent
 _MODEL_REPO_JSON = _REPO_DIR / "model_repo.json"
+_MODELS_DIR = _REPO_DIR / "models"
+_MODEL_DOWNLOAD_BASE_URL = (
+    "https://github.com/TNTwise/real-video-enhancer-models/releases/download/models/"
+)
 
 
 class ModelRepo:
@@ -28,8 +33,10 @@ class ModelRepo:
         self,
         json_path: Path | None = None,
         backends: dict[str, dict] | None = None,
+        models_dir: Path | None = None,
     ):
         self._json_path = json_path or _MODEL_REPO_JSON
+        self._models_dir = models_dir or _MODELS_DIR
         self._backends = backends or {
             "ncnn": {"version": "0.0.0", "installed": False},
             "pytorch": {"version": "0.0.0", "installed": False, "accelerator": "CPU"},
@@ -96,6 +103,47 @@ class ModelRepo:
     def get_by_backend(self, backend_type: str) -> List[ModelRepoVariant]:
         """Filter models by backend type string (e.g. 'pytorch', 'ncnn')."""
         return [m for m in self._models if m.backend.type == backend_type]
+
+    def ensure(self, model_id: str, backend_type: str) -> str:
+        """Resolve a model's file path, downloading if needed.
+
+        Returns the absolute path to the model file or directory.
+        """
+        for model in self._models:
+            if model.id == model_id and model.backend.type == backend_type:
+                self._ensure_model(model)
+                return model.file_path
+        raise ValueError(f"Model '{model_id}' not found for backend '{backend_type}'")
+
+    # ------------------------------------------------------------------
+    # Model file resolution
+    # ------------------------------------------------------------------
+
+    def _ensure_model(self, model: ModelRepoVariant) -> None:
+        full_path = self._models_dir / model.file_path
+        if not full_path.exists():
+            url = _MODEL_DOWNLOAD_BASE_URL + model.file_path
+            self._download(url, full_path)
+        if full_path.suffix == ".gz" and full_path.name.endswith(".tar.gz"):
+            extracted_dir = full_path.with_suffix("").with_suffix("")
+            if not extracted_dir.exists():
+                import tarfile
+
+                extracted_dir.mkdir(parents=True, exist_ok=True)
+                with tarfile.open(full_path, "r:gz") as tar:
+                    tar.extractall(path=extracted_dir)
+            model.file_path = str(extracted_dir)
+        else:
+            model.file_path = str(full_path)
+
+    @staticmethod
+    def _download(url: str, dest: Path) -> None:
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        with dest.open("wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
 
     # ------------------------------------------------------------------
     # Internal helpers

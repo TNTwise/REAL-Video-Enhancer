@@ -3,10 +3,12 @@ import sys
 from time import sleep
 
 import numpy as np
-
 from src.logic.handlers.backend.backend_handler import BackendHandler
 from src.logic.handlers.backend.ncnn_handler import NCNNHandler
 from src.logic.render.backends import InterpolateBase
+from src.logic.render.methods.interpolate.interpolate_method_base import (
+    InterpolateMethodBase,
+)
 from src.schemas.domain import Frame, InterpolateModel
 from src.schemas.domain.video_info import InputVideoInfo
 
@@ -126,7 +128,7 @@ class Rife:
         return bytes(self.output_bytes)
 
 
-class InterpolateNCNN(InterpolateBase):
+class InterpolateNCNN(InterpolateBase, InterpolateMethodBase):
     def __init__(
         self,
         backend_handler: BackendHandler,
@@ -141,6 +143,7 @@ class InterpolateNCNN(InterpolateBase):
         self._backend_hander = backend_handler
         self._interpolate_model = interpolate_model
         self._input_video_info = input_video_info
+        self.frame0 = None
 
     def _load(self):
         max_timestep = (

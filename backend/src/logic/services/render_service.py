@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import os
 
+from src.logic.handlers.backend.ncnn_handler import NCNNHandler
 from src.logic.io.ffmpeg import (
     FFmpegRead,
     FFmpegWrite,
 )
 from src.logic.proxy.settings import PersistentSettingsProxy
+from src.logic.render.methods.interpolate.interpolate_ncnn import InterpolateNCNN
 from src.logic.repos.model_repo import ModelRepo
 from src.schemas.request import RenderSettingsClientInput
 from src.schemas.transforms import (
@@ -66,6 +68,19 @@ class RenderService:
             else None
         )
 
+        interpolate_method = None
+        if interpolate_model:
+            abs_path = self._model_repo.ensure(
+                interpolate_model.id, interpolate_model.backend.type
+            )
+            interpolate_model.file_path = abs_path
+            if interpolate_model.backend.type == "ncnn":
+                ncnn_handler = NCNNHandler()
+                interpolate_method = InterpolateNCNN(
+                    ncnn_handler, interpolate_model, input_settings
+                )
+                interpolate_method._load()
+
         upscale_model = (
             self.upscale_tf.to_domain(input.upscale_model)
             if input.upscale_model
@@ -115,4 +130,5 @@ class RenderService:
             persistent_settings=persistent_settings,
             read_buffer=read_buffer,
             write_buffer=write_buffer,
+            interpolate_method=interpolate_method,
         )
