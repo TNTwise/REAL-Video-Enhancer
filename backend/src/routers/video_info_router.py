@@ -13,6 +13,7 @@ from src.schemas.transforms import (
     InputVideoInfoTransformer,
     InterpolateModelTransformer,
     OutputVideoInfoTransformer,
+    PrecisionTransform,
     RenderSettingsTransformer,
     UpscaleModelTransformer,
 )
@@ -22,6 +23,10 @@ router = APIRouter(prefix="/video")
 # Singleton model repo instance
 _model_repo = ModelRepo()
 _model_repo.load()
+
+
+def get_precision_transform() -> PrecisionTransform:
+    return PrecisionTransform()
 
 
 def get_input_video_info_transformer() -> InputVideoInfoTransformer:
@@ -37,11 +42,15 @@ def get_render_settings_transformer() -> RenderSettingsTransformer:
 
 
 def get_interpolate_model_transformer() -> InterpolateModelTransformer:
-    return InterpolateModelTransformer(model_repo=_model_repo)
+    return InterpolateModelTransformer(
+        model_repo=_model_repo, precision_transform=get_precision_transform()
+    )
 
 
 def get_upscale_model_transformer() -> UpscaleModelTransformer:
-    return UpscaleModelTransformer(model_repo=_model_repo)
+    return UpscaleModelTransformer(
+        model_repo=_model_repo, precision_transform=get_precision_transform()
+    )
 
 
 def get_video_info_service(

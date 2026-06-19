@@ -1,5 +1,6 @@
+from abc import ABC, abstractmethod
+
 from src.schemas.domain import Frame, InterpolateModel
-from abc import abstractmethod, ABC
 
 
 class InterpolateBase(ABC):
@@ -18,8 +19,5 @@ class InterpolateBase(ABC):
     def process_frame(self, frame: Frame):
         pass
 
-    def setup_interpolation(
-        self, interpolate_model: InterpolateModel
-    ):
+    def setup_interpolation(self, interpolate_model: InterpolateModel):
         pass
-

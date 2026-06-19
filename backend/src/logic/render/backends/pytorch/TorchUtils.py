@@ -1,19 +1,17 @@
 import sys
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 
-from ....utils.BackendDetect import BackendDetect
-from ....utils.LogConfig import get_logger
-
-backendDetect = BackendDetect()
-
-from ....utils.Util import CudaChecker
+from src.utils.LogConfig import get_logger
+from src.utils.Util import CudaChecker
 
 logger = get_logger(__name__)
 
 HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
-import numpy as np
+
+backendDetect = BackendDetect()
 
 
 def dummy_function(*args, **kwargs):

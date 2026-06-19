@@ -33,16 +33,6 @@ from ....version import __version__
 
 logger = get_logger(__name__)
 
-with suppress_stdout_stderr():
-    import tensorrt as trt
-    import torch
-    from torch._decomp import get_decompositions
-    import torch_tensorrt
-    from torch._export.converter import TS2EPConverter
-    from torch.export.exported_program import ExportedProgram
-
-    from .TorchUtils import TorchUtils
-
 
 def _normalize_example_inputs(example_inputs):
     # Accept torch.Tensor or sequence of tensors; always return a tuple of args

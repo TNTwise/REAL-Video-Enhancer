@@ -1,8 +1,10 @@
+from src.logic.handlers.backend.backend_handler import BackendHandler
 from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)
 
-class TorchHandler:
+
+class TorchHandler(BackendHandler):
     def __init__(self):
         try:
             import torch

@@ -1,9 +1,8 @@
 import subprocess
 
 from src.constants import FFMPEG_PATH
-
-from ..utils.LogConfig import get_logger
-from ..utils.Util import subprocess_popen_without_terminal
+from src.utils.LogConfig import get_logger
+from src.utils.Util import subprocess_popen_without_terminal
 
 logger = get_logger(__name__)
 
