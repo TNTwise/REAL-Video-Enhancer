@@ -37,7 +37,7 @@ class InterpolateModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                base_model.precision, base_model.backend.type
+                client_input.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )
@@ -76,7 +76,7 @@ class UpscaleModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                base_model.precision, base_model.backend.type
+                client_input.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )
@@ -116,7 +116,7 @@ class EnhancementModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                base_model.precision, base_model.backend.type
+                client_input.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )
