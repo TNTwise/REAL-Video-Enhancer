@@ -30,8 +30,8 @@ class RenderProxy:
                 if interpolate_method:
                     interpolated_frames = interpolate_method.process_frame(frame, False)
 
-                    for frame in interpolated_frames:
-                        await write_buffer.put_frame_in_write_queue(frame)
+                    for interpolated_frame in interpolated_frames:
+                        await write_buffer.put_frame_in_write_queue(interpolated_frame)
 
                 await write_buffer.put_frame_in_write_queue(frame)
             await write_buffer.put_frame_in_write_queue(None)

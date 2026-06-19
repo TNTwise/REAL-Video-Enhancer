@@ -18,7 +18,7 @@ from src.schemas.transforms import (
     UpscaleModelTransformer,
 )
 
-router = APIRouter(prefix="/video")
+router = APIRouter(prefix="/video", tags=["Video Info"])
 
 # Singleton model repo instance
 _model_repo = ModelRepo()

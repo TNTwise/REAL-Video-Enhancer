@@ -167,6 +167,10 @@ class FFmpegWrite(WriteBuffer):
         self._current_fps: float = 0.0
         self._last_fps_update: float = 0
         self._debug_counter = 0
+        self._log_file = tempfile.TemporaryFile(
+            mode="w+", encoding="utf-8", errors="replace"
+        )
+        self._log_task: asyncio.Task | None = None
         self._output_pix_fmt = (
             "rgb48le"
             if self.input_video_info.is_hdr and self.settings.auto_hdr_mode
@@ -182,7 +186,7 @@ class FFmpegWrite(WriteBuffer):
 
         command += [
             "-framerate",
-            f"{self.input_video_info.fps}",
+            f"{self.output_video_info.fps}",
             "-f",
             "rawvideo",
             "-pix_fmt",
@@ -398,14 +402,19 @@ class FFmpegWrite(WriteBuffer):
         command = self.command()
 
         logger.info("FFMPEG WRITE COMMAND: %s", command)
-        import sys
 
         self._process = await asyncio.create_subprocess_exec(
             *command,
             stdin=asyncio.subprocess.PIPE,
-            stdout=sys.stdout,
+            stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
         )
+        self._log_task = asyncio.create_task(self._drain_logs())
+
+    async def _drain_logs(self):
+        if self._process and self._process.stdout:
+            while chunk := await self._process.stdout.read(4096):
+                self._log_file.write(chunk.decode("utf-8", errors="replace"))
 
     async def put_frame_in_write_queue(self, frame: Frame | None) -> None:
         if self._process is None:
@@ -483,3 +492,10 @@ class FFmpegWrite(WriteBuffer):
                     await self._process.wait()
                 except ProcessLookupError:
                     pass
+        if self._log_task:
+            self._log_task.cancel()
+            try:
+                await self._log_task
+            except asyncio.CancelledError:
+                pass
+        self._log_file.close()

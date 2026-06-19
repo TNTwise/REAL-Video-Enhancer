@@ -144,8 +144,10 @@ class ModelRepo:
                         extracted_dir.mkdir(parents=True, exist_ok=True)
                         tar.extractall(path=extracted_dir)
                 model.file_path = str(extracted_dir)
+                full_path.unlink()
             else:
                 model.file_path = str(extracted_dir)
+                full_path.unlink()
         else:
             model.file_path = str(full_path)
 

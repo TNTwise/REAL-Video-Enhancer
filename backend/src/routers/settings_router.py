@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from src.logic.proxy import PersistentSettingsProxy
 from src.schemas.request import Setting
 
-router = APIRouter(prefix="/PersistentSettingsProxy")
+router = APIRouter(prefix="/PersistentSettingsProxy", tags=["Settings"])
 
 
 # FastAPI example

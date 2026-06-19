@@ -18,7 +18,7 @@ from src.schemas.transforms.video_info import (
     OutputVideoInfoTransformer,
 )
 
-router = APIRouter(prefix="/render")
+router = APIRouter(prefix="/render", tags=["Render"])
 
 _current_write_buffer: FFmpegWrite | None = None
 
