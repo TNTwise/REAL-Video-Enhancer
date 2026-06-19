@@ -3,6 +3,7 @@ import sys
 from time import sleep
 
 import numpy as np
+
 from src.logic.handlers.backend.backend_handler import BackendHandler
 from src.logic.handlers.backend.ncnn_handler import NCNNHandler
 from src.logic.render.backends import InterpolateBase
@@ -128,7 +129,7 @@ class Rife:
         return bytes(self.output_bytes)
 
 
-class InterpolateNCNN(InterpolateBase, InterpolateMethodBase):
+class InterpolateNCNN(InterpolateMethodBase):
     def __init__(
         self,
         backend_handler: BackendHandler,

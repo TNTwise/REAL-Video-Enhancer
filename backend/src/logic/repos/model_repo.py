@@ -129,10 +129,23 @@ class ModelRepo:
             if not extracted_dir.exists():
                 import tarfile
 
-                extracted_dir.mkdir(parents=True, exist_ok=True)
                 with tarfile.open(full_path, "r:gz") as tar:
-                    tar.extractall(path=extracted_dir)
-            model.file_path = str(extracted_dir)
+                    members = tar.getmembers()
+                    prefixes = {m.name.split("/")[0] for m in members}
+                    # Strip single top-level directory (e.g. rife-v4.6/) so contents
+                    # land directly in extracted_dir instead of a nested wrapper.
+                    if len(prefixes) == 1:
+                        extracted_dir.mkdir(parents=True, exist_ok=True)
+                        for member in members:
+                            name = member.name
+                            member.name = name.split("/", 1)[1] if "/" in name else name
+                            tar.extract(member, path=extracted_dir)
+                    else:
+                        extracted_dir.mkdir(parents=True, exist_ok=True)
+                        tar.extractall(path=extracted_dir)
+                model.file_path = str(extracted_dir)
+            else:
+                model.file_path = str(extracted_dir)
         else:
             model.file_path = str(full_path)
 
