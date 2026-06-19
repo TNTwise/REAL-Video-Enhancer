@@ -22,9 +22,8 @@ class FFmpegRead(ReadBuffer):
         output_video_info: OutputVideoInfo,
         settings: PersistentSettingsProxy,
     ):
-        self.render_settings = render_settings
+        super().__init__(render_settings, input_video_info, output_video_info, settings)
         self.video_info = input_video_info
-        self.settings = settings
 
         # TODO: Make yuv mod work
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
@@ -157,10 +156,7 @@ class FFmpegWrite(WriteBuffer):
         output_video_info: OutputVideoInfo,
         settings: PersistentSettingsProxy,
     ):
-        self.render_settings = render_settings
-        self.input_video_info = input_video_info
-        self.output_video_info = output_video_info
-        self.settings = settings
+        super().__init__(render_settings, input_video_info, output_video_info, settings)
 
         self.write_queue: asyncio.Queue[Frame | None] = asyncio.Queue(maxsize=200)
         self._process: asyncio.subprocess.Process | None = None
