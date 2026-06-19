@@ -9,21 +9,18 @@ class InterpolateModelClientInput(BaseModel):
     id: str
     backed_type: str
     interpolate_factor: int
-    precision: str = "auto"
 
 
 class UpscaleModelClientInput(BaseModel):
     type: Literal["upscale"] = "upscale"
     id: str
     backed_type: str
-    precision: str = "auto"
 
 
 class EnhancementModelClientInput(BaseModel):
     type: Literal["enhancement"] = "enhancement"
     id: str
     backed_type: str
-    precision: str = "auto"
 
 
 ModelInputVariant = Annotated[

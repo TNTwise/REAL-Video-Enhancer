@@ -1,3 +1,4 @@
+from src.logic.proxy import PersistentSettingsProxy
 from src.logic.repos import ModelRepo
 from src.schemas.domain import EnhancementModel, InterpolateModel, UpscaleModel
 from src.schemas.repo.model import (
@@ -18,9 +19,11 @@ class InterpolateModelTransformer:
         self,
         model_repo: ModelRepo,
         precision_transform: PrecisionTransform,
+        settings: PersistentSettingsProxy,
     ):
         self._model_repo = model_repo
         self._precision_transform = precision_transform
+        self._settings = settings
 
     def to_domain(
         self, client_input: InterpolateModelClientInput
@@ -37,7 +40,7 @@ class InterpolateModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                client_input.precision, base_model.backend.type
+                self._settings.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )
@@ -59,9 +62,11 @@ class UpscaleModelTransformer:
         self,
         model_repo: ModelRepo,
         precision_transform: PrecisionTransform,
+        settings: PersistentSettingsProxy,
     ):
         self._model_repo = model_repo
         self._precision_transform = precision_transform
+        self._settings = settings
 
     def to_domain(self, client_input: UpscaleModelClientInput) -> UpscaleModel | None:
         base_model = self._find_model(client_input)
@@ -76,7 +81,7 @@ class UpscaleModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                client_input.precision, base_model.backend.type
+                self._settings.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )
@@ -98,9 +103,11 @@ class EnhancementModelTransformer:
         self,
         model_repo: ModelRepo,
         precision_transform: PrecisionTransform,
+        settings: PersistentSettingsProxy,
     ):
         self._model_repo = model_repo
         self._precision_transform = precision_transform
+        self._settings = settings
 
     def to_domain(
         self, client_input: EnhancementModelClientInput
@@ -116,7 +123,7 @@ class EnhancementModelTransformer:
             description=base_model.description,
             url=base_model.url,
             precision=self._precision_transform.to_domain(
-                client_input.precision, base_model.backend.type
+                self._settings.precision, base_model.backend.type
             ),
             backend=base_model.backend,
         )

@@ -57,22 +57,25 @@ def get_precision_transformer() -> PrecisionTransform:
 def get_interpolate_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
     precision_tf: PrecisionTransform = Depends(get_precision_transformer),
+    settings: PersistentSettingsProxy = Depends(get_persistent_settings),
 ) -> InterpolateModelTransformer:
-    return InterpolateModelTransformer(model_repo, precision_tf)
+    return InterpolateModelTransformer(model_repo, precision_tf, settings)
 
 
 def get_upscale_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
     precision_tf: PrecisionTransform = Depends(get_precision_transformer),
+    settings: PersistentSettingsProxy = Depends(get_persistent_settings),
 ) -> UpscaleModelTransformer:
-    return UpscaleModelTransformer(model_repo, precision_tf)
+    return UpscaleModelTransformer(model_repo, precision_tf, settings)
 
 
 def get_enhancement_transformer(
     model_repo: ModelRepo = Depends(get_model_repo),
     precision_tf: PrecisionTransform = Depends(get_precision_transformer),
+    settings: PersistentSettingsProxy = Depends(get_persistent_settings),
 ) -> EnhancementModelTransformer:
-    return EnhancementModelTransformer(model_repo, precision_tf)
+    return EnhancementModelTransformer(model_repo, precision_tf, settings)
 
 
 def get_render_settings_transformer() -> RenderSettingsTransformer:

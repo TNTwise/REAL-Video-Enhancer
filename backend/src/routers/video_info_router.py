@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from src.logic.proxy import PersistentSettingsProxy
 from src.logic.repos import ModelRepo
 from src.logic.services.video_info_service import VideoInfoService
 from src.schemas.domain.video_info import OutputVideoInfo
@@ -37,19 +38,31 @@ def get_output_video_info_transformer() -> OutputVideoInfoTransformer:
     return OutputVideoInfoTransformer()
 
 
+def get_persistent_settings() -> PersistentSettingsProxy:
+    return PersistentSettingsProxy()
+
+
 def get_render_settings_transformer() -> RenderSettingsTransformer:
     return RenderSettingsTransformer()
 
 
-def get_interpolate_model_transformer() -> InterpolateModelTransformer:
+def get_interpolate_model_transformer(
+    settings: PersistentSettingsProxy = Depends(get_persistent_settings),
+) -> InterpolateModelTransformer:
     return InterpolateModelTransformer(
-        model_repo=_model_repo, precision_transform=get_precision_transform()
+        model_repo=_model_repo,
+        precision_transform=get_precision_transform(),
+        settings=settings,
     )
 
 
-def get_upscale_model_transformer() -> UpscaleModelTransformer:
+def get_upscale_model_transformer(
+    settings: PersistentSettingsProxy = Depends(get_persistent_settings),
+) -> UpscaleModelTransformer:
     return UpscaleModelTransformer(
-        model_repo=_model_repo, precision_transform=get_precision_transform()
+        model_repo=_model_repo,
+        precision_transform=get_precision_transform(),
+        settings=settings,
     )
 
 
