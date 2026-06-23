@@ -32,9 +32,10 @@ class PersistentSettingsProxy:
             "auto_border_cropping": "False",
             "video_container": "mkv",
             "video_pixel_format": "yuv420p",
-            "pytorch_version": "2.9.0",
-            "pytorch_backend": "CUDA",
-            "torch_accelerator": "cuda",
+            "pytorch_version": "2.12.1",
+            "torch_accelerator": "cu132",
+            "tensorrt_version": "10.16.1.11",
+            "torchvision_version": "0.27.1",
             "auto_hdr_mode": "True",
             "use_custom_encoder_command": "False",
             "encoder_command": "",
@@ -88,9 +89,10 @@ class PersistentSettingsProxy:
             "auto_border_cropping": ("True", "False"),
             "video_container": ("mkv", "mp4", "mov", "webm", "avi"),
             "video_pixel_format": "ANY",
-            "pytorch_version": ("2.10.0", "2.9.0", "2.6.0"),
-            "pytorch_backend": "ANY",
-            "torch_accelerator": ("cuda", "cpu", "mps"),
+            "pytorch_version": ("2.12.1"),
+            "tensorrt_version": ("10.16.1.11"),
+            "torchvision_version": ("0.27.1"),
+            "torch_accelerator": ("cu132", "cpu", "macosx", "xpu", "rocm"),
             "auto_hdr_mode": ("True", "False"),
             "use_custom_encoder_command": ("True", "False"),
             "encoder_command": "ANY",
@@ -297,12 +299,20 @@ class PersistentSettingsProxy:
         self._validate_and_set("pytorch_version", value)
 
     @property
-    def pytorch_backend(self) -> str:
-        return self.settings["pytorch_backend"]
+    def tensorrt_version(self) -> str:
+        return self.settings["tensorrt_version"]
 
-    @pytorch_backend.setter
+    @tensorrt_version.setter
     def pytorch_backend(self, value: str):
-        self._validate_and_set("pytorch_backend", value)
+        self._validate_and_set("tensorrt_version", value)
+
+    @property
+    def torchvision_version(self) -> str:
+        return self.settings["torchvision_version"]
+
+    @torchvision_version.setter
+    def torchvision_version(self, value: str):
+        self._validate_and_set("torchvision_version", value)
 
     @property
     def torch_accelerator(self) -> str:

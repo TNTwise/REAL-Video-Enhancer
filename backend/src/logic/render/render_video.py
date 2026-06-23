@@ -48,6 +48,7 @@ class RenderProxy:
 
                     for interpolated_frame in interpolated_frames:
                         await write_buffer.put_frame_in_write_queue(interpolated_frame)
+                        frame_count += 1
 
                 await write_buffer.put_frame_in_write_queue(frame)
 

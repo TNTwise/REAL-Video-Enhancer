@@ -38,4 +38,7 @@
 
 Package FFmpeg and the Python runtime inside the app so it runs without system-level prerequisites. Per-backend AI libraries (PyTorch, TensorRT, etc.) install on demand through the API instead.
 
+Make the ffmpeg render error out, instead of saying render started when calling the render api endpoint.
+say fps is none if there is no render occuring
+
 # Fix all code # TODOs
