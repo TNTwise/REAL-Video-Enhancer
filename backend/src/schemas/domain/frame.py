@@ -3,27 +3,19 @@ from typing import Any
 import numpy as np
 
 from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
-
-from ...utils.LogConfig import get_logger
-from ...utils.Util import resize_image_np
+from src.utils.LogConfig import get_logger
+from src.utils.Util import resize_image_np
 
 logger = get_logger(__name__)
 
-_pytorch_device = None
-_pytorch_dtype = None
-_pytorch_stream = None
-_torch_utils = None
-_torch = None
 
-
-# TODO Get this working again with torch
 class Frame:
     def __init__(
         self,
         width: int,
         height: int,
+        torch_utils: TorchUtils | None = None,
         hdr_mode: bool = False,
-        torch_utils: TorchUtils
     ):
         self.width = width
         self.height = height
@@ -33,17 +25,14 @@ class Frame:
         self._tensor: Any | None = None
         self._np: np.ndarray | None = None
         self._bytes: bytes | None = None
+        self._torch_utils = torch_utils
 
     def _invalidate_cache(self, keep: str):
-        """Clear cached representations except the one being set."""
         if keep != "tensor":
-            del self._tensor
             self._tensor = None
         if keep != "np":
-            del self._np
             self._np = None
         if keep != "bytes":
-            del self._bytes
             self._bytes = None
 
     def set_frame_bytes(self, frame: bytes) -> "Frame":
@@ -54,12 +43,14 @@ class Frame:
         return self
 
     def set_frame_tensor(self, frame: Any) -> "Frame":
-        # might need to sync streams here
-        if _torch is not None and not isinstance(frame, _torch.Tensor):
+        if self._torch_utils is not None and not isinstance(
+            frame, self._torch_utils._torch.Tensor
+        ):
             raise TypeError(f"Expected torch.Tensor, got {type(frame).__name__}")
         self._invalidate_cache("tensor")
         self._tensor = frame.clone()
-        _torch_utils.sync_all_streams()
+        if self._torch_utils is not None:
+            self._torch_utils.sync_all_streams()
         return self
 
     def set_frame_np(self, frame: Any) -> "Frame":
@@ -69,67 +60,59 @@ class Frame:
         self._np = frame
         return self
 
-    # --- Lazy Getters ---
-
     def get_frame_tensor(self, clear_cache: bool = False) -> Any:
-        """
-        Get the frame as a torch tensor in format (1, C, H, W).
-        """
         if self._tensor is None:
             if self._bytes is not None:
-                self._tensor = _torch_utils.frame_to_tensor(
-                    self._bytes,
-                    _pytorch_stream,
-                    _pytorch_device,
-                    _pytorch_dtype,
-                )
+                if self._torch_utils is None:
+                    raise RuntimeError("TorchUtils required to convert bytes to tensor")
+                t = self._torch_utils._torch
+                self._tensor = self.bytes_to_tensor(t.device("cpu"), t.float32)
             elif self._np is not None:
-                self._tensor = _torch_utils.np_to_tensor(
-                    self._np, _pytorch_device, _pytorch_dtype
+                if self._torch_utils is None:
+                    raise RuntimeError("TorchUtils required to convert np to tensor")
+                t = self._torch_utils._torch
+                self._tensor = self._torch_utils.np_to_tensor(
+                    self._np, t.device("cpu"), t.float32
                 )
         if clear_cache:
             self._invalidate_cache("tensor")
-
-        return (
-            self._tensor.clone()
-        )  # this helps so the frame wont be overwritten? have to test later.
+        if self._tensor is None:
+            raise RuntimeError("No frame data available")
+        return self._tensor.clone()
 
     def get_frame_bytes(self, clear_cache: bool = False) -> bytes:
         if self._bytes is None:
             if self._tensor is not None:
-                self._bytes = _torch_utils.tensor_to_frame(self._tensor)
+                self._bytes = self.tensor_to_bytes(self._tensor)
             elif self._np is not None:
                 self._bytes = self._np_to_bytes(self._np)
-
         if clear_cache:
             self._invalidate_cache("bytes")
         if self._bytes is None:
-            raise Exception("Bytes cannot be null")
+            raise RuntimeError("Bytes cannot be null")
         return self._bytes
 
     def get_frame_np(self, clear_cache: bool = False) -> Any:
-        """
-        Get the frame as a numpy array in format (H, W, C).
-        """
         if self._np is None:
             if self._tensor is not None:
-                self._np = _torch_utils.tensor_to_np(self._tensor)
-
+                if self._torch_utils is None:
+                    raise RuntimeError("TorchUtils required to convert tensor to np")
+                self._np = self._torch_utils.tensor_to_np(self._tensor)
             elif self._bytes is not None:
                 self._np = self._bytes_to_np(self._bytes)
-
         if clear_cache:
             self._invalidate_cache("np")
         return self._np
 
     def bytes_to_tensor(self, device, dtype) -> Any:
-        import torch
-
+        if self._torch_utils is None:
+            raise RuntimeError("TorchUtils required for tensor conversion")
+        t = self._torch_utils._torch
         data = self.get_frame_bytes()
-        src_dtype = torch.uint16 if self.hdr_mode else torch.uint8
-        t = torch.frombuffer(data, dtype=src_dtype)
-        t = (
-            t.to(device=device)
+        src_dtype = t.uint16 if self.hdr_mode else t.uint8
+        frame = t.frombuffer(data, dtype=src_dtype)
+        frame = (
+            frame.to(device=device)
             .div(65535.0 if self.hdr_mode else 255.0)
             .clamp(0.0, 1.0)
             .reshape(self.height, self.width, 3)
@@ -138,29 +121,27 @@ class Frame:
             .contiguous()
             .to(dtype=dtype)
         )
-        return t
+        return frame
 
-    def tensor_to_bytes(self, t) -> bytes:
-        import torch
-
-        t = (
-            t.squeeze(0)
+    def tensor_to_bytes(self, tensor) -> bytes:
+        if self._torch_utils is None:
+            raise RuntimeError("TorchUtils required for tensor conversion")
+        t = self._torch_utils._torch
+        arr = (
+            tensor.squeeze(0)
             .permute(1, 2, 0)
             .clamp(0.0, 1.0)
             .mul(65535.0 if self.hdr_mode else 255.0)
             .round()
-            .to(torch.uint16 if self.hdr_mode else torch.uint8)
+            .to(t.uint16 if self.hdr_mode else t.uint8)
             .contiguous()
             .detach()
             .cpu()
         )
-        return t.numpy().tobytes()
+        return arr.numpy().tobytes()
 
-    # --- Conversion helpers ---
     def _bytes_to_np(self, data: bytes) -> Any:
-        # Assuming raw RGB/BGR bytes
         channels = 3
-
         return np.frombuffer(
             data, dtype=np.uint8 if self._bit_depth == 8 else np.uint16
         ).reshape(self.height, self.width, int(channels))
@@ -170,9 +151,10 @@ class Frame:
 
     def resize_frame(self, new_width: int, new_height: int) -> "Frame":
         if self._tensor is not None:
-            self._tensor = _torch_utils.resize_tensor(
-                self._tensor, new_width, new_height
-            )
+            if self._torch_utils is not None:
+                self._tensor = self._torch_utils.resize_tensor(
+                    self._tensor, new_width, new_height
+                )
         if self._np is not None:
             self._np = resize_image_np(self._np, new_width, new_height)
         if self._bytes is not None:
@@ -184,17 +166,6 @@ class Frame:
         return self
 
     def resize_frame_optimal(self, new_width: int, new_height: int):
-        """
-        Docstring for resize_frame_optimal
-
-        :param self: "Frame"
-        :param new_width: new width of the frame
-        :type new_width: int
-        :param new_height: new height of the frame
-        :type new_height: int
-
-        Clears all cache but the optimal frame to resize, then resizes the frame.
-        """
         if self._tensor is not None:
             self._invalidate_cache("tensor")
         elif self._np is not None:
@@ -202,17 +173,12 @@ class Frame:
         elif self._bytes is not None:
             self._invalidate_cache("bytes")
         else:
-            raise ValueError("Tried to rezise nothing!")
-
+            raise ValueError("Tried to resize nothing!")
         return self.resize_frame(new_width=new_width, new_height=new_height)
 
     def get_np_sdr(self):
-        """
-        Get the frame as a numpy array in SDR format (H, W, C) with dtype uint8.
-        """
         np_frame = self.get_frame_np()
         if self.hdr_mode:
-            # Convert from HDR (uint16) to SDR (uint8)
             np_frame = (
                 np.clip(np_frame.astype(np.float32) / 65535.0, 0, 1) * 255
             ).astype(np.uint8)
@@ -222,6 +188,7 @@ class Frame:
         new_frame = Frame(
             width=self.width,
             height=self.height,
+            torch_utils=self._torch_utils,
         )
         if self._tensor is not None:
             new_frame.set_frame_tensor(self._tensor.clone())
@@ -235,5 +202,6 @@ class Frame:
         return Frame(
             width=self.width,
             height=self.height,
+            torch_utils=self._torch_utils,
             hdr_mode=self.hdr_mode,
         )

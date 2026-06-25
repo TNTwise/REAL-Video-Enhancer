@@ -4,8 +4,9 @@ from time import sleep
 
 import torch
 import torch.nn.functional as F
-from src.logic.handlers.backend.backend_handler import BackendHandler
+
 from src.logic.render.backends.pytorch.UpscaleModelWrapper import UpscaleModelWrapper
+from src.logic.render.methods._torch_helpers import resolve_device_and_dtype
 from src.schemas.domain import Frame, UpscaleModel
 from src.schemas.domain.video_info import InputVideoInfo
 from src.utils.LogConfig import get_logger
@@ -20,7 +21,7 @@ class UpscalePyTorch:
     @torch.inference_mode()
     def __init__(
         self,
-        backend_handler: BackendHandler,
+        backend_handler,
         upscale_model: UpscaleModel,
         input_video_info: InputVideoInfo,
     ):
@@ -29,16 +30,10 @@ class UpscalePyTorch:
         self.height = input_video_info.height
         self.hdr_mode = input_video_info.is_hdr
 
-        accelerator = upscale_model.backend.accelerator
-        if accelerator == "cuda" and torch.cuda.is_available():
-            self.device = torch.device("cuda", 0)
-        elif accelerator == "mps" and torch.backends.mps.is_available():
-            self.device = torch.device("mps")
-        else:
-            self.device = torch.device("cpu")
-
-        precision_id = upscale_model.precision.precision_id
-        self.dtype = getattr(torch, precision_id, torch.float32)
+        self.device, self.dtype = resolve_device_and_dtype(
+            upscale_model.backend.accelerator,
+            upscale_model.precision.precision_id,
+        )
 
         self.tile_pad = 10
         self.tile = [0, 0]
@@ -61,15 +56,11 @@ class UpscalePyTorch:
                 modulo = 1
         if all(t > 0 for t in self.tile):
             self.pad_w = (
-                math.ceil(
-                    min(self.tile[0] + 2 * self.tile_pad, self.width) / modulo
-                )
+                math.ceil(min(self.tile[0] + 2 * self.tile_pad, self.width) / modulo)
                 * modulo
             )
             self.pad_h = (
-                math.ceil(
-                    min(self.tile[1] + 2 * self.tile_pad, self.height) / modulo
-                )
+                math.ceil(min(self.tile[1] + 2 * self.tile_pad, self.height) / modulo)
                 * modulo
             )
         else:

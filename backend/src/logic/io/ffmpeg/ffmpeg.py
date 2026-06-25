@@ -6,6 +6,7 @@ import time
 from src.constants import FFMPEG_PATH
 from src.logic.io import ReadBuffer, WriteBuffer
 from src.logic.proxy import PersistentSettingsProxy
+from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.schemas.domain.frame import Frame
 from src.schemas.domain.render import RenderSettings
 from src.schemas.domain.video_info import InputVideoInfo, OutputVideoInfo
@@ -21,9 +22,11 @@ class FFmpegRead(ReadBuffer):
         input_video_info: InputVideoInfo,
         output_video_info: OutputVideoInfo,
         settings: PersistentSettingsProxy,
+        torch_utils: TorchUtils,
     ):
         super().__init__(render_settings, input_video_info, output_video_info, settings)
         self.video_info = input_video_info
+        self._torch_utils = torch_utils
 
         # TODO: Make yuv mod work
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
@@ -114,6 +117,7 @@ class FFmpegRead(ReadBuffer):
                 frame = Frame(
                     self.video_info.width,
                     self.video_info.height,
+                    torch_utils=self._torch_utils,
                 )
                 frame.set_frame_bytes(chunk)
                 await self._read_queue.put(frame)

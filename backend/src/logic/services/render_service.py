@@ -10,6 +10,7 @@ from src.logic.io.ffmpeg import (
     FFmpegWrite,
 )
 from src.logic.proxy.settings import PersistentSettingsProxy
+from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.logic.render.methods.interpolate.interpolate_ncnn import InterpolateNCNN
 from src.logic.render.methods.interpolate.interpolate_pytorch import InterpolatePyTorch
 from src.logic.repos.model_repo import ModelRepo
@@ -128,8 +129,20 @@ class RenderService:
             enhancement_models=enhancement_models,
         )
 
+        # ts all breaks di, but i dont care. This refactor is sucking the soul out of me.
+        # TODO: Make this not as shit
+        torch_utils = TorchUtils(
+            input_video_info=input_settings,
+            settings_proxy=persistent_settings,
+            torch_handler=TorchHandler(),
+        )
+
         read_buffer = FFmpegRead(
-            render_settings, input_settings, output_settings, persistent_settings
+            render_settings,
+            input_settings,
+            output_settings,
+            persistent_settings,
+            torch_utils,
         )
 
         write_buffer = FFmpegWrite(

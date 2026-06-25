@@ -7,10 +7,11 @@ import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
-from src.logic.handlers.backend.backend_handler import BackendHandler
+
 from src.logic.render.backends.pytorch.InterpolateArchs.DetectInterpolateArch import (
     ArchDetect,
 )
+from src.logic.render.methods._torch_helpers import resolve_device_and_dtype
 from src.logic.render.methods.interpolate.interpolate_method_base import (
     InterpolateMethodBase,
 )
@@ -29,7 +30,7 @@ class InterpolatePyTorch(InterpolateMethodBase):
     @torch.inference_mode()
     def __init__(
         self,
-        backend_handler: BackendHandler,
+        backend_handler,
         interpolate_model: InterpolateModel,
         input_video_info: InputVideoInfo,
     ):
@@ -46,16 +47,10 @@ class InterpolatePyTorch(InterpolateMethodBase):
         self._output_dir = pathlib.Path("/tmp/debug_frames")
         self._output_dir.mkdir(parents=True, exist_ok=True)
 
-        accelerator = interpolate_model.backend.accelerator
-        if accelerator == "cuda" and torch.cuda.is_available():
-            self.device = torch.device("cuda", 0)
-        elif accelerator == "mps" and torch.backends.mps.is_available():
-            self.device = torch.device("mps")
-        else:
-            self.device = torch.device("cpu")
-
-        precision_id = interpolate_model.precision.precision_id
-        self.dtype = getattr(torch, precision_id, torch.float32)
+        self.device, self.dtype = resolve_device_and_dtype(
+            interpolate_model.backend.accelerator,
+            interpolate_model.precision.precision_id,
+        )
 
     @torch.inference_mode()
     def _load(self):
