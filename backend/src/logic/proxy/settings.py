@@ -36,6 +36,7 @@ class PersistentSettingsProxy:
             "torch_accelerator": "cu132",
             "tensorrt_version": "10.16.1.11",
             "torchvision_version": "0.27.1",
+            "torch_accelerator_detection_mode": "auto",
             "auto_hdr_mode": "True",
             "use_custom_encoder_command": "False",
             "encoder_command": "",
@@ -93,6 +94,7 @@ class PersistentSettingsProxy:
             "tensorrt_version": ("10.16.1.11"),
             "torchvision_version": ("0.27.1"),
             "torch_accelerator": ("cu132", "cpu", "macosx", "xpu", "rocm"),
+            "torch_accelerator_detection_mode": ("auto", "manual"),
             "auto_hdr_mode": ("True", "False"),
             "use_custom_encoder_command": ("True", "False"),
             "encoder_command": "ANY",
@@ -321,6 +323,14 @@ class PersistentSettingsProxy:
     @torch_accelerator.setter
     def torch_accelerator(self, value: str):
         self._validate_and_set("torch_accelerator", value)
+
+    @property
+    def torch_accelerator_detection_mode(self) -> str:
+        return self.settings["torch_accelerator_detection_mode"]
+
+    @torch_accelerator_detection_mode.setter
+    def torch_accelerator_detection_mode(self, value: str):
+        self._validate_and_set("torch_accelerator_detection_mode", value)
 
     @property
     def auto_hdr_mode(self) -> str:

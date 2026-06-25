@@ -2,6 +2,8 @@ from typing import Any
 
 import numpy as np
 
+from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
+
 from ...utils.LogConfig import get_logger
 from ...utils.Util import resize_image_np
 
@@ -20,9 +22,12 @@ class Frame:
         self,
         width: int,
         height: int,
+        hdr_mode: bool = False,
+        torch_utils: TorchUtils
     ):
         self.width = width
         self.height = height
+        self.hdr_mode = hdr_mode
         self._bit_depth = 3
         self.tensor_conversions = 0
         self._tensor: Any | None = None
@@ -117,6 +122,40 @@ class Frame:
             self._invalidate_cache("np")
         return self._np
 
+    def bytes_to_tensor(self, device, dtype) -> Any:
+        import torch
+
+        data = self.get_frame_bytes()
+        src_dtype = torch.uint16 if self.hdr_mode else torch.uint8
+        t = torch.frombuffer(data, dtype=src_dtype)
+        t = (
+            t.to(device=device)
+            .div(65535.0 if self.hdr_mode else 255.0)
+            .clamp(0.0, 1.0)
+            .reshape(self.height, self.width, 3)
+            .permute(2, 0, 1)
+            .unsqueeze(0)
+            .contiguous()
+            .to(dtype=dtype)
+        )
+        return t
+
+    def tensor_to_bytes(self, t) -> bytes:
+        import torch
+
+        t = (
+            t.squeeze(0)
+            .permute(1, 2, 0)
+            .clamp(0.0, 1.0)
+            .mul(65535.0 if self.hdr_mode else 255.0)
+            .round()
+            .to(torch.uint16 if self.hdr_mode else torch.uint8)
+            .contiguous()
+            .detach()
+            .cpu()
+        )
+        return t.numpy().tobytes()
+
     # --- Conversion helpers ---
     def _bytes_to_np(self, data: bytes) -> Any:
         # Assuming raw RGB/BGR bytes
@@ -196,4 +235,5 @@ class Frame:
         return Frame(
             width=self.width,
             height=self.height,
+            hdr_mode=self.hdr_mode,
         )

@@ -57,35 +57,6 @@ class InterpolatePyTorch(InterpolateMethodBase):
         precision_id = interpolate_model.precision.precision_id
         self.dtype = getattr(torch, precision_id, torch.float32)
 
-    def _bytes_to_tensor(self, data: bytes) -> torch.Tensor:
-        src_dtype = torch.uint16 if self.hdr_mode else torch.uint8
-        t = torch.frombuffer(data, dtype=src_dtype)
-        t = (
-            t.to(device=self.device)
-            .div(65535.0 if self.hdr_mode else 255.0)
-            .clamp(0.0, 1.0)
-            .reshape(self.height, self.width, 3)
-            .permute(2, 0, 1)
-            .unsqueeze(0)
-            .contiguous()
-            .to(dtype=self.dtype)
-        )
-        return t
-
-    def _tensor_to_bytes(self, t: torch.Tensor) -> bytes:
-        t = (
-            t.squeeze(0)
-            .permute(1, 2, 0)
-            .clamp(0.0, 1.0)
-            .mul(65535.0 if self.hdr_mode else 255.0)
-            .round()
-            .to(torch.uint16 if self.hdr_mode else torch.uint8)
-            .contiguous()
-            .detach()
-            .cpu()
-        )
-        return t.numpy().tobytes()
-
     @torch.inference_mode()
     def _load(self):
         state_dict = torch.load(
@@ -232,7 +203,7 @@ class InterpolatePyTorch(InterpolateMethodBase):
         frame: Frame,
         transition=False,
     ) -> Generator[Frame, None, None]:
-        frame_tensor = self._bytes_to_tensor(frame.get_frame_bytes())
+        frame_tensor = frame.bytes_to_tensor(self.device, self.dtype)
 
         if self.frame0 is None:
             self.frame0 = F.pad(frame_tensor, self.padding)
@@ -272,7 +243,7 @@ class InterpolatePyTorch(InterpolateMethodBase):
                     )
 
                 crop = output[:, :, : self.height, : self.width]
-                out_bytes = self._tensor_to_bytes(crop)
+                out_bytes = frame.tensor_to_bytes(crop)
                 ret_frame = frame.get_dummy_frame()
                 ret_frame.set_frame_bytes(out_bytes)
                 yield ret_frame
