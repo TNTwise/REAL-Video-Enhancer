@@ -45,6 +45,7 @@
 * **[Credits](#credits)**
   * [People](#people) 
   * [Software](#software)
+* **[Support Me!](#support-me)**
 
 # Introduction
 
@@ -196,3 +197,8 @@ python3 build.py --build BUILD_OPTION --copy_backend
 
 # Star History
 [![Star History Chart](https://api.star-history.com/svg?repos=tntwise/real-video-enhancer&type=Date)](https://star-history.com/#tntwise/real-video-enhancer&Date)
+
+
+# Support Me:
+ * [Ko-Fi](https://ko-fi.com/tntwise)
+ * [Steam](https://store.steampowered.com/app/4382640/REAL_Video_Enhancer_Donation/)
