@@ -8,10 +8,11 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
+from src.logic.proxy.settings import PersistentSettingsProxy
 from src.logic.render.backends.pytorch.InterpolateArchs.DetectInterpolateArch import (
     ArchDetect,
 )
-from src.logic.render.methods._torch_helpers import resolve_device_and_dtype
+from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.logic.render.methods.interpolate.interpolate_method_base import (
     InterpolateMethodBase,
 )
@@ -30,9 +31,10 @@ class InterpolatePyTorch(InterpolateMethodBase):
     @torch.inference_mode()
     def __init__(
         self,
-        backend_handler,
+        backend_handler: TorchUtils,
         interpolate_model: InterpolateModel,
         input_video_info: InputVideoInfo,
+        persistent_settings_proxy: PersistentSettingsProxy,
     ):
         self.interpolate_model = interpolate_model
         self.ceilInterpolateFactor = interpolate_model.interpolate_factor
@@ -47,9 +49,11 @@ class InterpolatePyTorch(InterpolateMethodBase):
         self._output_dir = pathlib.Path("/tmp/debug_frames")
         self._output_dir.mkdir(parents=True, exist_ok=True)
 
-        self.device, self.dtype = resolve_device_and_dtype(
-            interpolate_model.backend.accelerator,
-            interpolate_model.precision.precision_id,
+        self.dtype = backend_handler.handle_precision(
+            interpolate_model.precision.precision_id
+        )
+        self.device = backend_handler.handle_device(
+            int(persistent_settings_proxy.pytorch_gpu_id)
         )
 
     @torch.inference_mode()

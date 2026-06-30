@@ -106,7 +106,6 @@ async def output_video_info(
     input_video: InputVideoInfoClientInput,
     interpolate: InterpolateModelClientInput | None = None,
     upscale: UpscaleModelClientInput | None = None,
-    hdr_mode: bool = False,
     video_service: VideoInfoService = Depends(get_video_info_service),
 ) -> OutputVideoInfo:
     try:
@@ -116,7 +115,6 @@ async def output_video_info(
             input_video_info_client_input=input_video,
             interpolate_model_client_input=interpolate,
             upscale_model_client_input=upscale,
-            hdr_mode=hdr_mode,
         )
     except FileExistsError as e:
         # Map the Python error to a 409 Conflict or 400 Bad Request

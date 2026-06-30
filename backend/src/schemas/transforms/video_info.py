@@ -41,7 +41,6 @@ class OutputVideoInfoTransformer:
         domain_input: InputVideoInfo,
         upscale_model: Optional[UpscaleModel],
         interpolate_model: Optional[InterpolateModel],
-        hdr_mode: bool,
     ) -> OutputVideoInfo:
 
         return OutputVideoInfo(
@@ -64,6 +63,6 @@ class OutputVideoInfoTransformer:
             rotation=domain_input.rotation,
             bitrate=domain_input.bitrate,
             codec=domain_input.codec,
-            is_hdr=domain_input.is_hdr and hdr_mode,
+            is_hdr=domain_input.is_hdr,
             bit_depth=domain_input.bit_depth,
         )

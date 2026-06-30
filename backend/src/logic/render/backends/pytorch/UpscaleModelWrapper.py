@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import torch
 
-from ....utils.LogConfig import get_logger
+from src.utils.LogConfig import get_logger
+
 from .TorchUtils import TorchUtils
 from .VSRArchs.AnimeSR.animesr_arch import AnimeSR
 from .VSRArchs.AnimeSR.vsr_inference_helper import AnimeSRInferenceHelper
@@ -13,7 +16,7 @@ logger = get_logger(__name__)
 class UpscaleModelWrapper:
     def __init__(
         self,
-        model_path: torch.nn.Module,
+        model_path: str | Path,
         device: torch.device,
         precision: torch.dtype,
     ):

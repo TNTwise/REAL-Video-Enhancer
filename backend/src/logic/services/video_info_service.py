@@ -44,7 +44,6 @@ class VideoInfoService:
         input_video_info_client_input: InputVideoInfoClientInput,
         interpolate_model_client_input: InterpolateModelClientInput | None,
         upscale_model_client_input: UpscaleModelClientInput | None,
-        hdr_mode: bool,
     ) -> OutputVideoInfo:
         if os.path.isfile(body.output_file):
             raise FileExistsError("File already exists!")
@@ -71,5 +70,4 @@ class VideoInfoService:
             domain_input=input_settings,
             interpolate_model=interpolate_model,
             upscale_model=upscale_model,
-            hdr_mode=hdr_mode,
         )

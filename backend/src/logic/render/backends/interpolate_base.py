@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from src.schemas.domain import Frame, InterpolateModel
+from src.schemas.domain.frame import Frame
+from src.schemas.domain.model import InterpolateModel
 
 
 class InterpolateBase(ABC):

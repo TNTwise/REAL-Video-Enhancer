@@ -5,8 +5,8 @@ from time import sleep
 import torch
 import torch.nn.functional as F
 
+from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.logic.render.backends.pytorch.UpscaleModelWrapper import UpscaleModelWrapper
-from src.logic.render.methods._torch_helpers import resolve_device_and_dtype
 from src.schemas.domain import Frame, UpscaleModel
 from src.schemas.domain.video_info import InputVideoInfo
 from src.utils.LogConfig import get_logger
@@ -21,7 +21,7 @@ class UpscalePyTorch:
     @torch.inference_mode()
     def __init__(
         self,
-        backend_handler,
+        backend_handler: TorchUtils,
         upscale_model: UpscaleModel,
         input_video_info: InputVideoInfo,
     ):
@@ -29,11 +29,6 @@ class UpscalePyTorch:
         self.width = input_video_info.width
         self.height = input_video_info.height
         self.hdr_mode = input_video_info.is_hdr
-
-        self.device, self.dtype = resolve_device_and_dtype(
-            upscale_model.backend.accelerator,
-            upscale_model.precision.precision_id,
-        )
 
         self.tile_pad = 10
         self.tile = [0, 0]

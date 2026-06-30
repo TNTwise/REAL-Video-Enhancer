@@ -1,9 +1,12 @@
-from typing import Any
+from __future__ import annotations
+from typing import Any, TYPE_CHECKING
 
 import numpy as np
 
-from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.utils.LogConfig import get_logger
+
+if TYPE_CHECKING:
+    from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.utils.Util import resize_image_np
 
 logger = get_logger(__name__)

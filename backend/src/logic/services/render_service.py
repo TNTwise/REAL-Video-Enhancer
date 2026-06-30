@@ -77,6 +77,14 @@ class RenderService:
         )
 
         interpolate_method = None
+
+        # ts all breaks di, but i dont care. This refactor is sucking the soul out of me.
+        # TODO: Make this not as shit
+        torch_utils = TorchUtils(
+            input_video_info=input_settings,
+            settings_proxy=persistent_settings,
+            torch_handler=TorchHandler(),
+        )
         if interpolate_model:
             abs_path = self._model_repo.ensure(
                 interpolate_model.id, interpolate_model.backend.type
@@ -89,9 +97,8 @@ class RenderService:
                 )
                 interpolate_method._load()
             elif interpolate_model.backend.type == "pytorch":
-                torch_handler = TorchHandler()
                 interpolate_method = InterpolatePyTorch(
-                    torch_handler, interpolate_model, input_settings
+                    torch_utils, interpolate_model, input_settings, persistent_settings
                 )
                 interpolate_method._load()
 
@@ -110,14 +117,11 @@ class RenderService:
         else:
             enhancement_models = None
 
-        hdr_mode = persistent_settings.auto_hdr_mode == "True"
-
         output_settings = self.output_video_tf.to_domain(
             client_model=input.output_video_info,
             domain_input=input_settings,
             interpolate_model=interpolate_model,
             upscale_model=upscale_model,
-            hdr_mode=hdr_mode,
         )
 
         render_settings = self._render_settings_tf.to_domain(
@@ -127,14 +131,6 @@ class RenderService:
             upscale_model=upscale_model,
             interpolate_model=interpolate_model,
             enhancement_models=enhancement_models,
-        )
-
-        # ts all breaks di, but i dont care. This refactor is sucking the soul out of me.
-        # TODO: Make this not as shit
-        torch_utils = TorchUtils(
-            input_video_info=input_settings,
-            settings_proxy=persistent_settings,
-            torch_handler=TorchHandler(),
         )
 
         read_buffer = FFmpegRead(

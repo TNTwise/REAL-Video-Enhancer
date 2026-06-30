@@ -31,7 +31,7 @@ class FFmpegRead(ReadBuffer):
         # TODO: Make yuv mod work
         self._yuv420p_mod = self.video_info.pixel_format == "yuv420p"
         self._yuv420p_mod = False
-        if settings.auto_hdr_mode and self.video_info.is_hdr:
+        if self.video_info.is_hdr:
             self.input_frame_chunk_size = (
                 self.video_info.width * self.video_info.height * 6
             )
@@ -52,7 +52,7 @@ class FFmpegRead(ReadBuffer):
         )
         self._closed = False
         self._debug_counter = 0
-        if self.settings.auto_hdr_mode and self.video_info.is_hdr:
+        if self.video_info.is_hdr:
             self._input_pix_fmt = "rgb48le"
         elif self._yuv420p_mod:
             self._input_pix_fmt = "yuv420p"
@@ -71,7 +71,7 @@ class FFmpegRead(ReadBuffer):
             "image2pipe",
             "-pix_fmt",
             "rgb48le"
-            if self.settings.auto_hdr_mode and self.video_info.is_hdr
+            if self.video_info.is_hdr
             else (self.video_info.pixel_format if self._yuv420p_mod else "rgb24"),
             "-vcodec",
             "rawvideo",
@@ -177,7 +177,7 @@ class FFmpegWrite(WriteBuffer):
         self._log_task: asyncio.Task | None = None
         self._output_pix_fmt = (
             "rgb48le"
-            if self.input_video_info.is_hdr and self.settings.auto_hdr_mode
+            if self.input_video_info.is_hdr
             else "rgb24"
         )
 
@@ -195,7 +195,7 @@ class FFmpegWrite(WriteBuffer):
             "rawvideo",
             "-pix_fmt",
             "rgb48le"
-            if self.input_video_info.is_hdr and self.settings.auto_hdr_mode
+            if self.input_video_info.is_hdr
             else "rgb24",
             "-vcodec",
             "rawvideo",
