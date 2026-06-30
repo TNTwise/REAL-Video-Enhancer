@@ -79,7 +79,8 @@ class InstallPackagesService:
         torch_version = f"torch=={self._settings_proxy.pytorch_version}+{self._settings_proxy.torch_accelerator}"
         torchvision_version = f"torchvision=={self._settings_proxy.torchvision_version}+{self._settings_proxy.torch_accelerator}"
         await self._install_packages(
-            [torch_version, torchvision_version], upgrade=upgrade
+            [torch_version, torchvision_version, "einops", "safetensors"],
+            upgrade=upgrade,
         )
 
     async def install_ncnn_packages(self, upgrade: bool = False):
@@ -90,5 +91,5 @@ class InstallPackagesService:
         tensorrt_version = f"tensorrt=={self._settings_proxy.tensorrt_version}"
         torch_tensorrt = f"torch_tensorrt=={self._settings_proxy.pytorch_version}"
         await self._install_packages(
-            [tensorrt_version, torch_tensorrt], upgrade=upgrade
+            [tensorrt_version, torch_tensorrt, "einops", "safetensors"], upgrade=upgrade
         )

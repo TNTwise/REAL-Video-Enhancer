@@ -19,6 +19,7 @@ class UpscaleModelWrapper:
         model_path: str | Path,
         device: torch.device,
         precision: torch.dtype,
+        torch_utils: TorchUtils,
     ):
         self.__model_path = model_path
         self.__device = device
@@ -26,6 +27,7 @@ class UpscaleModelWrapper:
         self.__dummy_input_pre_channels = None
         self.__channels = 3
         self.__inference_mode = None
+        self._torch_utils = torch_utils
         self.load_model()
         self.set_precision(self.__precision)
         self.__test_model_precision()
@@ -48,11 +50,10 @@ class UpscaleModelWrapper:
         with torch.inference_mode():
             model = self.inference_helper
             model(test_input)
-            output = model(test_input)
             self.__model.load_state_dict(
                 model.state_dict()
             )  # reload state dict to fix span
-            TorchUtils.clear_cache()
+            self._torch_utils.clear_cache()
             del model
 
     def __test_model_precision(self):
@@ -68,6 +69,7 @@ class UpscaleModelWrapper:
                     exc_info=True,
                 )
                 self.set_precision(torch.float32)
+                test_input.to(torch.float32)
                 self.__test_inference(test_input)
 
     def get_dummy_input(self, width: int, height: int) -> torch.Tensor:

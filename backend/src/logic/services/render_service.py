@@ -11,8 +11,10 @@ from src.logic.io.ffmpeg import (
 )
 from src.logic.proxy.settings import PersistentSettingsProxy
 from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
+from src.logic.render.backends.pytorch.UpscaleTorch import UpscalePytorch
 from src.logic.render.methods.interpolate.interpolate_ncnn import InterpolateNCNN
 from src.logic.render.methods.interpolate.interpolate_pytorch import InterpolatePyTorch
+from src.logic.render.methods.upscale.upscale_pytorch import UpscalePyTorch
 from src.logic.repos.model_repo import ModelRepo
 from src.schemas.request import RenderSettingsClientInput
 from src.schemas.transforms import (
@@ -76,7 +78,11 @@ class RenderService:
             else None
         )
 
-        interpolate_method = None
+        upscale_model = (
+            self.upscale_tf.to_domain(input.upscale_model)
+            if input.upscale_model
+            else None
+        )
 
         # ts all breaks di, but i dont care. This refactor is sucking the soul out of me.
         # TODO: Make this not as shit
@@ -85,6 +91,10 @@ class RenderService:
             settings_proxy=persistent_settings,
             torch_handler=TorchHandler(),
         )
+
+        interpolate_method = None
+        upscale_method = None
+
         if interpolate_model:
             abs_path = self._model_repo.ensure(
                 interpolate_model.id, interpolate_model.backend.type
@@ -102,11 +112,17 @@ class RenderService:
                 )
                 interpolate_method._load()
 
-        upscale_model = (
-            self.upscale_tf.to_domain(input.upscale_model)
-            if input.upscale_model
-            else None
-        )
+        if upscale_model:
+            abs_path = self._model_repo.ensure(
+                upscale_model.id, upscale_model.backend.type
+            )
+            upscale_model.file_path = abs_path
+            if upscale_model.backend.type == "pytorch":
+                upscale_method = UpscalePyTorch(
+                    torch_utils, upscale_model, input_settings, persistent_settings
+                )
+                upscale_method._load()
+
         if input.enhancement_models:
             enhancement_models = []
             for enhancement_model in input.enhancement_models:
@@ -152,6 +168,7 @@ class RenderService:
                 read_buffer=read_buffer,
                 write_buffer=write_buffer,
                 interpolate_method=interpolate_method,
+                upscale_method=upscale_method,
             )
         )
         _background_tasks.add(task)
@@ -169,6 +186,7 @@ class RenderService:
         read_buffer,
         write_buffer,
         interpolate_method,
+        upscale_method,
     ):
         try:
             await self._render_proxy.render(
@@ -177,6 +195,7 @@ class RenderService:
                 read_buffer=read_buffer,
                 write_buffer=write_buffer,
                 interpolate_method=interpolate_method,
+                upscale_method=upscale_method,
             )
         except Exception:
             logger.exception("Background render failed")

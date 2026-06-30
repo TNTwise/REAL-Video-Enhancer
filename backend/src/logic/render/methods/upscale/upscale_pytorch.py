@@ -1,12 +1,16 @@
 import math
 from collections.abc import Generator
+from readline import backend
 from time import sleep
 
 import torch
 import torch.nn.functional as F
 
+from src.logic.handlers.backend import backend_handler
+from src.logic.proxy.settings import PersistentSettingsProxy
 from src.logic.render.backends.pytorch.TorchUtils import TorchUtils
 from src.logic.render.backends.pytorch.UpscaleModelWrapper import UpscaleModelWrapper
+from src.logic.render.methods.upscale.upscale_method_base import UpscaleMethodBase
 from src.schemas.domain import Frame, UpscaleModel
 from src.schemas.domain.video_info import InputVideoInfo
 from src.utils.LogConfig import get_logger
@@ -17,18 +21,24 @@ torch.set_float32_matmul_precision("medium")
 torch.set_grad_enabled(False)
 
 
-class UpscalePyTorch:
+class UpscalePyTorch(UpscaleMethodBase):
     @torch.inference_mode()
     def __init__(
         self,
         backend_handler: TorchUtils,
         upscale_model: UpscaleModel,
         input_video_info: InputVideoInfo,
+        persistent_settings: PersistentSettingsProxy,
     ):
         self.upscale_model = upscale_model
         self.width = input_video_info.width
         self.height = input_video_info.height
         self.hdr_mode = input_video_info.is_hdr
+        self.device = backend_handler.handle_device(persistent_settings.pytorch_gpu_id)
+        self.dtype = backend_handler.handle_precision(
+            upscale_model.precision.precision_id
+        )
+        self._torch_utils = backend_handler
 
         self.tile_pad = 10
         self.tile = [0, 0]
@@ -39,6 +49,7 @@ class UpscalePyTorch:
             model_path=self.upscale_model.file_path,
             device=self.device,
             precision=self.dtype,
+            torch_utils=self._torch_utils,
         )
         self.scale = self.upscale_model_wrapper.get_scale()
 
@@ -140,7 +151,7 @@ class UpscalePyTorch:
     def process_frame(
         self,
         frame: Frame,
-    ) -> Generator[Frame, None, None]:
+    ) -> Frame:
         frame_tensor = frame.bytes_to_tensor(self.device, self.dtype)
 
         while self.upscale_model_wrapper is None:
@@ -160,4 +171,4 @@ class UpscalePyTorch:
         ret_frame.width = out_width
         ret_frame.height = out_height
         ret_frame.set_frame_bytes(out_bytes)
-        yield ret_frame
+        return ret_frame

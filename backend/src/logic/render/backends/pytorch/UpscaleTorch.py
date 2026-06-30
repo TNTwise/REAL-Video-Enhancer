@@ -6,15 +6,14 @@ from time import sleep
 import torch as torch
 import torch.nn.functional as F
 
-from ....schemas.domain.frame import Frame
-from ....utils.LogConfig import get_logger
-from ....utils.Util import CudaChecker
+from src.schemas.domain.frame import Frame
+from src.utils.LogConfig import get_logger
+
 from .TorchUtils import TorchUtils
 from .UpscaleModelWrapper import UpscaleModelWrapper
 
 logger = get_logger(__name__)
 
-HAS_PYTORCH_CUDA = CudaChecker().HAS_PYTORCH_CUDA
 import numpy as np
 
 

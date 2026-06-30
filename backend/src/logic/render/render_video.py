@@ -3,9 +3,13 @@ import time
 
 from src.logic.io import ReadBuffer, WriteBuffer
 from src.logic.proxy import PersistentSettingsProxy
+from src.logic.render.backends.pytorch.spandrel.architectures.sudo_SPANPlus.__arch.sudo_SPANPlus import (
+    upscale,
+)
 from src.logic.render.methods.interpolate.interpolate_method_base import (
     InterpolateMethodBase,
 )
+from src.logic.render.methods.upscale.upscale_method_base import UpscaleMethodBase
 from src.schemas.domain import RenderSettings
 from src.utils.LogConfig import get_logger
 
@@ -27,6 +31,7 @@ class RenderProxy:
         render_settings: RenderSettings,
         persistent_settings: PersistentSettingsProxy,
         interpolate_method: InterpolateMethodBase | None,
+        upscale_method: UpscaleMethodBase | None,
     ):
         async def reader_task():
             await read_buffer.read_frames_into_queue()
@@ -47,8 +52,15 @@ class RenderProxy:
                     interpolated_frames = interpolate_method.process_frame(frame, False)
 
                     for interpolated_frame in interpolated_frames:
+                        if upscale_method:
+                            interpolated_frame = upscale_method.process_frame(
+                                interpolated_frame
+                            )
                         await write_buffer.put_frame_in_write_queue(interpolated_frame)
                         frame_count += 1
+
+                if upscale_method:
+                    frame = upscale_method.process_frame(frame)
 
                 await write_buffer.put_frame_in_write_queue(frame)
 

@@ -175,11 +175,7 @@ class FFmpegWrite(WriteBuffer):
             mode="w+", encoding="utf-8", errors="replace"
         )
         self._log_task: asyncio.Task | None = None
-        self._output_pix_fmt = (
-            "rgb48le"
-            if self.input_video_info.is_hdr
-            else "rgb24"
-        )
+        self._output_pix_fmt = "rgb48le" if self.input_video_info.is_hdr else "rgb24"
 
     def command(self):
         command = [
@@ -194,13 +190,11 @@ class FFmpegWrite(WriteBuffer):
             "-f",
             "rawvideo",
             "-pix_fmt",
-            "rgb48le"
-            if self.input_video_info.is_hdr
-            else "rgb24",
+            "rgb48le" if self.input_video_info.is_hdr else "rgb24",
             "-vcodec",
             "rawvideo",
             "-s",
-            f"{self.input_video_info.width}x{self.input_video_info.height}",
+            f"{self.output_video_info.width}x{self.output_video_info.height}",
             "-i",
             "-",
         ]

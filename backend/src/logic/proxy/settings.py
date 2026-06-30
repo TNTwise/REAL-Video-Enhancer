@@ -251,16 +251,16 @@ class PersistentSettingsProxy:
         self._validate_and_set("uhd_mode", value)
 
     @property
-    def ncnn_gpu_id(self) -> str:
-        return self.settings["ncnn_gpu_id"]
+    def ncnn_gpu_id(self) -> int:
+        return int(self.settings["ncnn_gpu_id"])
 
     @ncnn_gpu_id.setter
     def ncnn_gpu_id(self, value: str):
         self._validate_and_set("ncnn_gpu_id", value)
 
     @property
-    def pytorch_gpu_id(self) -> str:
-        return self.settings["pytorch_gpu_id"]
+    def pytorch_gpu_id(self) -> int:
+        return int(self.settings["pytorch_gpu_id"])
 
     @pytorch_gpu_id.setter
     def pytorch_gpu_id(self, value: str):
