@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers import (
     install_packages_router,
+    models_router,
     render_router,
     settings_router,
     video_info_router,
@@ -20,6 +21,7 @@ app.add_middleware(
 
 # Routers
 app.include_router(install_packages_router)
+app.include_router(models_router)
 app.include_router(settings_router)
 app.include_router(render_router)
 app.include_router(video_info_router)
