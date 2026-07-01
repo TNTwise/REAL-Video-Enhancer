@@ -22,6 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from __future__ import annotations
+
 import os
 import pathlib
 import sys
@@ -82,6 +84,21 @@ class TorchTensorRTHandler:
         or maybe its just the model not playing nice with explicit_typing,
         either way, forcing one precision helps with speed in some cases.
     """
+
+    _available: bool | None = None
+
+    @staticmethod
+    def is_available() -> bool:
+        if TorchTensorRTHandler._available is not None:
+            return TorchTensorRTHandler._available
+        try:
+            import tensorrt  # noqa: F401
+            import torch_tensorrt  # noqa: F401
+
+            TorchTensorRTHandler._available = True
+        except ImportError:
+            TorchTensorRTHandler._available = False
+        return TorchTensorRTHandler._available
 
     trt_path_appendix = f"_{__version__}.engine"  # this is used to identify the models that were exported with this version of RVE
 

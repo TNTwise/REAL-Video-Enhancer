@@ -1,3 +1,5 @@
+from .ncnn_handler import NCNNHandler
 from .pytorch_handler import TorchHandler
+from .tensorrt_handler import TorchTensorRTHandler
 
-__all__ = ["TorchHandler"]
+__all__ = ["NCNNHandler", "TorchHandler", "TorchTensorRTHandler"]

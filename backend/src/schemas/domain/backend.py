@@ -27,3 +27,9 @@ class TensorRTBackend(BaseModel):
 Backend = Annotated[
     Union[NCNNBackend, PyTorchBackend, TensorRTBackend], Field(discriminator="type")
 ]
+
+
+class AvailableBackends(BaseModel):
+    pytorch: PyTorchBackend
+    ncnn: NCNNBackend
+    tensorrt: TensorRTBackend

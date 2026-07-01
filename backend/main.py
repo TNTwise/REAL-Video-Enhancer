@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.routers import (
+    backend_router,
     install_packages_router,
     models_router,
     render_router,
@@ -20,6 +21,7 @@ app.add_middleware(
 )
 
 # Routers
+app.include_router(backend_router)
 app.include_router(install_packages_router)
 app.include_router(models_router)
 app.include_router(settings_router)
