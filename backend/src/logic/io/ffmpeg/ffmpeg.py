@@ -246,7 +246,31 @@ class FFmpegWrite(WriteBuffer):
 
         if self.render_settings.overwrite:
             command.append("-y")
-
+        
+        if self.render_settings.benchmark_mode:
+            command = [
+                f"{FFMPEG_PATH}",
+                "-hide_banner",
+                "-loglevel",
+                "error",
+                "-stats",
+                "-f",
+                "rawvideo",
+                "-vcodec",
+                "rawvideo",
+                "-video_size",
+                f"{self.output_video_info.width}x{self.output_video_info.height}",
+                "-pix_fmt",
+                "rgb48le" if self.input_video_info.is_hdr else "rgb24",
+                "-r",
+                str(self.output_video_info.fps),
+                "-i",
+                "-",
+                "-benchmark",
+                "-f",
+                "null",
+                "-",
+            ]
         return command
 
     def _encoder_args(self) -> list[str]:
