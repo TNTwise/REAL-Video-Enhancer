@@ -3,7 +3,6 @@ tqdm
 typing_extensions
 packaging
 requests
-opencv-python-headless
 pypresence
 mpmath
 pillow
