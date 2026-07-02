@@ -1,6 +1,10 @@
 import os
+import threading
 
 from src.dirs import CONFIG_PATH, DEFAULT_VIDEOS_PATH
+
+
+_settings_file_lock: threading.RLock = threading.RLock()
 
 SETTINGS_FILE = CONFIG_PATH / "settings.txt"
 
@@ -363,30 +367,32 @@ class PersistentSettingsProxy:
     # --- File I/O (unchanged) ---
 
     def read_settings(self):
-        with open(SETTINGS_FILE, "r") as file:
-            try:
-                for line in file:
-                    key, value = line.strip().split(",")
-                    self.settings[key] = value
-            except ValueError:
-                self.write_default_settings()
-                self.read_settings()
+        with _settings_file_lock:
+            with open(SETTINGS_FILE, "r") as file:
+                try:
+                    for line in file:
+                        key, value = line.strip().split(",")
+                        self.settings[key] = value
+                except ValueError:
+                    self.write_default_settings()
+                    self.read_settings()
 
     def write_default_settings(self):
         self.settings = self.default_settings.copy()
         self.write_out_current_settings()
 
     def write_out_current_settings(self):
-        with open(SETTINGS_FILE, "w") as file:
-            for key, value in self.settings.items():
-                if key in self.default_settings:
-                    if (
-                        self.allowed_settings[key] == "ANY"
-                        or value in self.allowed_settings[key]
-                    ):
-                        file.write(f"{key},{value}\n")
-                else:
-                    self.write_default_settings()
+        with _settings_file_lock:
+            with open(SETTINGS_FILE, "w") as file:
+                for key, value in self.settings.items():
+                    if key in self.default_settings:
+                        if (
+                            self.allowed_settings[key] == "ANY"
+                            or value in self.allowed_settings[key]
+                        ):
+                            file.write(f"{key},{value}\n")
+                    else:
+                        self.write_default_settings()
 
     def write_setting(self, setting: str, value: str):
         # TODO: this is shit, and should use custom exceptions

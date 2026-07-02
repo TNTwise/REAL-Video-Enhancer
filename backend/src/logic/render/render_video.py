@@ -3,17 +3,31 @@ import time
 
 from src.logic.io import ReadBuffer, WriteBuffer
 from src.logic.proxy import PersistentSettingsProxy
-from src.logic.render.backends.pytorch.spandrel.architectures.sudo_SPANPlus.__arch.sudo_SPANPlus import (
-    upscale,
-)
 from src.logic.render.methods.interpolate.interpolate_method_base import (
     InterpolateMethodBase,
 )
 from src.logic.render.methods.upscale.upscale_method_base import UpscaleMethodBase
-from src.schemas.domain import RenderSettings
+from src.schemas.domain import Frame, RenderSettings
 from src.utils.LogConfig import get_logger
 
 logger = get_logger(__name__)
+
+
+def _process_frame(
+    frame: Frame,
+    interpolate_method: InterpolateMethodBase | None,
+    upscale_method: UpscaleMethodBase | None,
+) -> list[Frame]:
+    result: list[Frame] = []
+    if interpolate_method:
+        for f in interpolate_method.process_frame(frame, False):
+            if upscale_method:
+                f = upscale_method.process_frame(f)
+            result.append(f)
+    if upscale_method:
+        frame = upscale_method.process_frame(frame)
+    result.append(frame)
+    return result
 
 
 class RenderProxy:
@@ -48,28 +62,18 @@ class RenderProxy:
                     self.frame_width = frame.width
                     self.frame_height = frame.height
 
-                if interpolate_method:
-                    interpolated_frames = interpolate_method.process_frame(frame, False)
+                processed = await asyncio.to_thread(
+                    _process_frame, frame, interpolate_method, upscale_method
+                )
 
-                    for interpolated_frame in interpolated_frames:
-                        if upscale_method:
-                            interpolated_frame = upscale_method.process_frame(
-                                interpolated_frame
-                            )
-                        await write_buffer.put_frame_in_write_queue(interpolated_frame)
-                        frame_count += 1
-
-                if upscale_method:
-                    frame = upscale_method.process_frame(frame)
-
-                await write_buffer.put_frame_in_write_queue(frame)
-
-                frame_count += 1
-                self.current_frame_bytes = frame.get_frame_bytes()
-                self.current_frame_number = frame_count
-                elapsed = time.time() - start_time
-                if elapsed > 0:
-                    self.current_fps = frame_count / elapsed
+                for processed_frame in processed:
+                    await write_buffer.put_frame_in_write_queue(processed_frame)
+                    frame_count += 1
+                    self.current_frame_bytes = processed_frame.get_frame_bytes()
+                    self.current_frame_number = frame_count
+                    elapsed = time.time() - start_time
+                    if elapsed > 0:
+                        self.current_fps = frame_count / elapsed
 
             await write_buffer.put_frame_in_write_queue(None)
 

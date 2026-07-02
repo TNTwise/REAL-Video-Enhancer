@@ -1,3 +1,5 @@
+import threading
+
 from fastapi import APIRouter, Depends, Response
 from src.logic.io.ffmpeg import FFmpegWrite
 from src.logic.proxy.settings import PersistentSettingsProxy
@@ -24,24 +26,28 @@ def get_persistent_settings() -> PersistentSettingsProxy:
 
 router = APIRouter(prefix="/render", tags=["Render"])
 
+_lock: threading.Lock = threading.Lock()
 _current_write_buffer: FFmpegWrite | None = None
 _render_proxy_instance: RenderProxy | None = None
 
 
 def get_current_write_buffer() -> FFmpegWrite | None:
-    return _current_write_buffer
+    with _lock:
+        return _current_write_buffer
 
 
 def set_current_write_buffer(buffer: FFmpegWrite | None):
     global _current_write_buffer
-    _current_write_buffer = buffer
+    with _lock:
+        _current_write_buffer = buffer
 
 
 def get_render_proxy() -> RenderProxy:
     global _render_proxy_instance
-    if _render_proxy_instance is None:
-        _render_proxy_instance = RenderProxy()
-    return _render_proxy_instance
+    with _lock:
+        if _render_proxy_instance is None:
+            _render_proxy_instance = RenderProxy()
+        return _render_proxy_instance
 
 
 def get_model_repo() -> ModelRepo:
