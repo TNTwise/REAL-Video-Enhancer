@@ -1,6 +1,5 @@
 import os
 
-import cv2
 import numpy as np
 
 
@@ -134,6 +133,7 @@ class InferenceSceneChangeDetectEfficientNetNCNN:
         combined_flat = combined.reshape(-1, h, w).astype(np.float32)
 
         if self.debug:
+            import cv2
             np.save("debug_combined_input.npy", combined_flat)
             # visualize channels 0-2 (first frame) and 3-5 (second frame)
             vis0 = np.transpose(combined_flat[:3], (1, 2, 0))

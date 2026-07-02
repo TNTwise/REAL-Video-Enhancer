@@ -2,7 +2,12 @@ import logging
 import re
 import subprocess
 
-import cv2
+try:
+    import cv2
+except ImportError:
+    cv2 = None
+
+
 from src.constants import FFMPEG_PATH
 from src.schemas.request.video_info import InputVideoInfoClientInput
 
@@ -164,6 +169,18 @@ class FFMpegInfoWrapper:
         fps = re.search(r"(\d+\.?\d*) fps", self.ffmpeg_output_stripped).groups()[0]
         return float(fps)
 
+    def _parse_color_part(self, string_pattern: str, index: int) -> str | None:
+        try:
+            parts = self.stream_line.split(string_pattern)
+            if len(parts) < 2:
+                return None
+            segments = parts[1].split("/")
+            if len(segments) <= index:
+                return None
+            return segments[index].replace(")", "").split(",")[0].strip()
+        except Exception:
+            return None
+
     def check_color_opt(self, color_opt: str) -> str | None:
         if self.stream_line:
             if "ffv1" in self.get_codec():
@@ -186,19 +203,15 @@ class FFMpegInfoWrapper:
                             return None
 
                 case "Primaries":
-                    color_opt_detected = (
-                        self.stream_line.split(string_pattern)[1].split("/")[1].strip()
-                    )
+                    color_opt_detected = self._parse_color_part(string_pattern, 1)
+                    if color_opt_detected is None:
+                        return None
                     if color_opt_detected not in FFMPEG_COLOR_PRIMARIES:
                         return None
                 case "Transfer":
-                    color_opt_detected = (
-                        self.stream_line.split(string_pattern)[1]
-                        .split("/")[2]
-                        .replace(")", "")
-                        .split(",")[0]
-                        .strip()
-                    )
+                    color_opt_detected = self._parse_color_part(string_pattern, 2)
+                    if color_opt_detected is None:
+                        return None
                     if color_opt_detected not in FFMPEG_COLOR_TRC:
                         return None
 
@@ -217,6 +230,7 @@ class FFMpegInfoWrapper:
             return self.check_color_opt("Space")
         except Exception:
             logger.exception("Can't detect color space.")
+            return ""
 
     def get_color_primaries(self) -> str:
         try:
@@ -265,31 +279,45 @@ class FFMpegInfoWrapper:
 class OpenCVInfo:
     def __init__(self, video_info_client: InputVideoInfoClientInput):
         logger.info("Getting Input Video Properties")
-        self.cap = cv2.VideoCapture(video_info_client.input_file)
+        if cv2:
+            self.cap = cv2.VideoCapture(video_info_client.input_file)
+        else:
+            self.cap = None
         self.ffmpeg_info = FFMpegInfoWrapper(
             video_info_client.input_file, ffmpeg_path=FFMPEG_PATH
         )
 
     @property
     def is_valid_video(self):
+        if not self.cap:
+            return True
         return self.cap.isOpened() and self.cap.get(cv2.CAP_PROP_FRAME_COUNT)
 
     def get_duration_seconds(self) -> float:
-        duration = self.cap.get(cv2.CAP_PROP_FRAME_COUNT) / self.input_fps
-
+        if self.cap:
+            duration = self.cap.get(cv2.CAP_PROP_FRAME_COUNT) / self.input_fps
+        else:
+            duration = self.ffmpeg_info.get_duration_seconds()
         return duration
 
     def get_total_frames(self) -> int:
-        fc = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        if self.cap:
+            fc = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        else:
+            fc = self.ffmpeg_info.get_total_frames()
         return fc
 
     @property
     def input_width(self) -> int:
-        return int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        if self.cap:
+            return int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        return self.ffmpeg_info.get_width_x_height()[0]
 
     @property
     def input_height(self) -> int:
-        return int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        if self.cap:
+            return int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        return self.ffmpeg_info.get_width_x_height()[1]
 
     @property
     def rotation(self) -> float:
@@ -297,8 +325,10 @@ class OpenCVInfo:
 
     @property
     def input_fps(self) -> float:
-        return self.cap.get(cv2.CAP_PROP_FPS)
-
+        if self.cap:
+            return self.cap.get(cv2.CAP_PROP_FPS)
+        return self.ffmpeg_info.get_fps()
+    
     @property
     def color_space(self) -> str:
         return self.ffmpeg_info.get_color_space()

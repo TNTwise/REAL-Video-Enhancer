@@ -3,7 +3,6 @@ import pathlib
 from collections.abc import Generator
 from time import sleep
 
-import cv2
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -183,6 +182,8 @@ class InterpolatePyTorch(InterpolateMethodBase):
             self.timestepDict[timestep] = timestep_tens
 
     def _debug_save_frame(self, frame):
+
+        import cv2
         np_frame = frame.get_frame_np()
         if np_frame.dtype == np.uint16:
             np_frame = (

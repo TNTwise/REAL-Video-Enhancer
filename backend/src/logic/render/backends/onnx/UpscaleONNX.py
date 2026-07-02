@@ -2,7 +2,6 @@ import os
 import pathlib
 import time
 
-import cv2
 import numpy as np
 import onnxruntime as ort
 from onnxconverter_common import float16

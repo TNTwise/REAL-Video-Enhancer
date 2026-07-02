@@ -2,7 +2,6 @@ import pathlib
 import sys
 from time import sleep
 
-import cv2
 import numpy as np
 
 from src.logic.handlers.backend.backend_handler import BackendHandler
@@ -167,6 +166,7 @@ class InterpolateNCNN(InterpolateMethodBase):
         # device = ncnn.get_gpu_device(self.gpuid).info().device_name()
 
     def _debug_save_frame(ret_frame):
+        import cv2
         np_frame = ret_frame.get_frame_np()
         if np_frame.dtype == np.uint16:
             np_frame = (
