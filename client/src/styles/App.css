@@ -1,42 +1,10 @@
-:root {
-  --primary-bg: rgb(21, 24, 29);
-  --secondary-bg: rgb(31, 35, 44);
-  --primary-widget: rgb(31, 35, 44);
-  --secondary-widget: rgb(43, 49, 61);
-  --text-color: white;
-  --nav-size: 10%;
-  --nav-min-size: 100px;
-  --nav-button-size: 20px;
-  --border: 1px solid #474a4d;
-  --border-radius: 8px;
-  --speed: 500ms;
-}
-
-ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-a {
-  color: var(--text-color);
-  text-decoration: none;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Full viewport layout */
 .layout {
   display: flex;
-  height: 100vh; /* or 100dvh for better mobile support */
+  height: 100vh;
 }
 
 .content {
-  flex: 1; /* Takes remaining space */
+  flex: 1;
   padding: 2rem;
-  overflow-y: auto; /* Enables independent scrolling */
+  overflow-y: auto;
 }

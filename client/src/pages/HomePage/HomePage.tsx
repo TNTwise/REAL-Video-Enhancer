@@ -1,61 +1,102 @@
-import { Box, Center, Flex, Heading, Image, SimpleGrid, Text, VStack } from "@chakra-ui/react";
-import RVELogo from '/src/assets/logo-v2.svg';
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Cpu, HardDrive, Languages, Monitor, CuboidIcon as CubeIcon } from "lucide-react"
+import RVELogo from "/src/assets/logo-v2.svg"
 
-const appVersion = import.meta.env.VITE_APP_VERSION ?? "0.1.0";
+const appVersion = import.meta.env.VITE_APP_VERSION ?? "0.1.0"
 
-function InfoCard({ label, value }: { label: string; value: string }) {
+const systemInfo = [
+  { label: "OS", value: navigator.platform, icon: Monitor },
+  { label: "CPU", value: `${navigator.hardwareConcurrency ?? 0} cores`, icon: Cpu },
+  { label: "Memory", value: `${(navigator as any).deviceMemory ?? 8} GB`, icon: HardDrive },
+  { label: "Language", value: navigator.language, icon: Languages },
+]
+
+const softwareInfo = [
+  { label: "Python", value: "3.12", icon: CubeIcon },
+  { label: "OpenCV", value: "4.10.0", icon: CubeIcon },
+  { label: "PyTorch", value: "2.5.1+cu124", icon: CubeIcon },
+  { label: "CUDA", value: "Checking...", icon: CubeIcon },
+]
+
+function InfoCard({ label, value, icon: Icon }: { label: string; value: string; icon: React.ElementType }) {
   return (
-    <Box
-      bg="var(--primary-widget)"
-      borderColor="#343b47"
-      borderWidth="1px"
-      borderRadius="var(--border-radius)"
-      p={4}
-    >
-      <Text fontSize="sm" color="#838ea2" mb={1}>{label}</Text>
-      <Text fontWeight="semibold" color="#fff">{value}</Text>
-    </Box>
-  );
+    <div className="flex items-center gap-3 rounded-lg bg-[#2c313c] px-3 py-2.5">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#343b47]">
+        <Icon className="h-4 w-4 text-[#838ea2]" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[11px] text-[#838ea2]">{label}</p>
+        <p className="text-sm font-semibold text-white truncate">{value}</p>
+      </div>
+    </div>
+  )
 }
 
 export function HomePage() {
   return (
-    <Center h="full">
-      <VStack align="stretch" maxW="md" w="full" gap={6}>
-        {/* App Header */}
-        <Flex direction="column" align="center" mb={2}>
-          <Image src={RVELogo} w="100px" h="100px" mb={4} />
-          <Heading size="lg">REAL Video Enhancer</Heading>
-          <Text color="#838ea2" fontSize="sm">v{appVersion}</Text>
-        </Flex>
+    <div className="flex h-full items-center justify-center">
+      <div className="flex w-full max-w-2xl flex-col items-center gap-5">
+        {/* Header */}
+        <div className="flex flex-col items-center text-center">
+          <div className="mb-3 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#1f232a] border border-[#343b47]">
+            <img src={RVELogo} alt="RVE Logo" className="h-full w-full p-3" />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-white">
+            REAL Video Enhancer
+          </h1>
+          <div className="mt-1 flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs">
+              v{appVersion}
+            </Badge>
+            <Badge variant="outline" className="text-xs text-[#838ea2] border-[#343b47]">
+              Beta
+            </Badge>
+          </div>
+        </div>
 
-        {/* Software Info */}
-        <VStack align="stretch" gap={3}>
-          <Heading size="sm">Software Information</Heading>
-          <SimpleGrid columns={2} gap={4}>
-            <InfoCard label="Python Version" value="3.12" />
-            <InfoCard label="OpenCV Version" value="4.10.0" />
-            <InfoCard label="PyTorch Version" value="2.5.1+cu124" />
-            <InfoCard label="CUDA Available" value="Checking..." />
-          </SimpleGrid>
-        </VStack>
+        {/* Cards side by side */}
+        <div className="flex w-full gap-4">
+          {/* Software Information */}
+          <Card className="flex-1 bg-[#1f232a] border-[#343b47]">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm text-white">Software</CardTitle>
+              <CardDescription className="text-xs text-[#838ea2]">
+                Runtime environment
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="flex flex-col gap-2">
+                {softwareInfo.map((info) => (
+                  <InfoCard key={info.label} {...info} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* System Info */}
-        <VStack align="stretch" gap={3}>
-          <Heading size="sm">System Information</Heading>
-          <SimpleGrid columns={2} gap={4}>
-            <InfoCard label="OS" value={navigator.platform} />
-            <InfoCard label="CPU" value={`${navigator.hardwareConcurrency ?? 0} cores`} />
-            <InfoCard label="Device Memory" value={`${navigator.deviceMemory ?? 8} GB`} />
-            <InfoCard label="Language" value={navigator.language} />
-          </SimpleGrid>
-        </VStack>
+          {/* System Information */}
+          <Card className="flex-1 bg-[#1f232a] border-[#343b47]">
+            <CardHeader className="pb-2 pt-4 px-4">
+              <CardTitle className="text-sm text-white">System</CardTitle>
+              <CardDescription className="text-xs text-[#838ea2]">
+                Machine specifications
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="flex flex-col gap-2">
+                {systemInfo.map((info) => (
+                  <InfoCard key={info.label} {...info} />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Footer */}
-        <Text fontSize="xs" color="#838ea2" textAlign="center">
+        <p className="text-center text-xs text-[#838ea2]">
           Built with PyTorch, OpenCV, and Tauri
-        </Text>
-      </VStack>
-    </Center>
-  );
+        </p>
+      </div>
+    </div>
+  )
 }
