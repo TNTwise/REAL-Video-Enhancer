@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import "./styles/App.css";
 import { HomePage } from './pages/HomePage/HomePage';
 import { DownloadPage } from './pages/DownloadPage/DownloadPage';
+import { RenderPage } from './pages/RenderPage/RenderPage';
 import RootLayout from './layouts/RootLayout';
 import { getBackendUrl } from './lib/api';
 
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={<RootLayout />} >
             <Route index element={<HomePage />} />
             <Route path="/home" element={<HomePage />} />
+            <Route path="/system" element={<RenderPage />} />
             <Route path="/download" element={<DownloadPage />} />
             <Route path="*" element={<div>404 - Page Not Found</div>} />
           </Route>
