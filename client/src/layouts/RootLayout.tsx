@@ -3,27 +3,33 @@ import { Home, Cpu, Settings, Download } from "lucide-react";
 import Dock from "../components/Dock/Dock";
 
 const dockItems = [
-  { icon: <Home size={18} />, label: 'Home', onClick: () => {} },
-  { icon: <Cpu size={18} />, label: 'System', onClick: () => {} },
-  { icon: <Settings size={18} />, label: 'Settings', onClick: () => {} },
-  { icon: <Download size={18} />, label: 'Downloads', onClick: () => {} },
+  { icon: <Home size={18} />, label: "Home", onClick: () => {} },
+  { icon: <Cpu size={18} />, label: "System", onClick: () => {} },
+  { icon: <Settings size={18} />, label: "Settings", onClick: () => {} },
+  { icon: <Download size={18} />, label: "Downloads", onClick: () => {} },
 ];
 
 const routeIndexMap: Record<string, number> = {
-  '/': 0,
-  '/home': 0,
-  '/download': 3,
+  "/": 0,
+  "/home": 0,
+  "/system": 1,
+  "/download": 3,
 };
 
 export default function RootLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const items = dockItems.map(item => ({
+  const items = dockItems.map((item) => ({
     ...item,
-    onClick: item.label === 'Home' ? () => navigate('/home')
-      : item.label === 'Downloads' ? () => navigate('/download')
-      : item.onClick
+    onClick:
+      item.label === "Home"
+        ? () => navigate("/home")
+        : item.label === "System"
+          ? () => navigate("/system")
+          : item.label === "Downloads"
+            ? () => navigate("/download")
+            : item.onClick,
   }));
 
   const activeIndex = routeIndexMap[location.pathname] ?? -1;

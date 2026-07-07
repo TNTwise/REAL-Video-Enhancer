@@ -7,7 +7,6 @@ import RootLayout from './layouts/RootLayout';
 function App() {
   return (
     <div className="layout">
-      
 
       <main className="content">
         <Routes>
