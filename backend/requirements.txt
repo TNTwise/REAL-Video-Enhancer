@@ -20,3 +20,4 @@ torch_tensorrt==2.10.0
 platformdirs
 fastapi
 uvicorn
+gpu-detector

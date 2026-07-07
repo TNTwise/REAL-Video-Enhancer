@@ -1,23 +1,37 @@
+import { useEffect, useState } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Cpu, HardDrive, Languages, Monitor, CuboidIcon as CubeIcon } from "lucide-react"
+import { apiFetch } from "@/lib/api"
+import { Cpu, HardDrive, Monitor, CuboidIcon as CubeIcon } from "lucide-react"
 import RVELogo from "/src/assets/logo-v2.svg"
+
+interface GPUInfo {
+  name: string
+  vendor: string | null
+  memory_mb: number | null
+  driver_version: string | null
+  device_id: string | null
+}
+
+interface SystemInfo {
+  python_version: string
+  app_version: string
+  opencv_version: string | null
+  pytorch_version: string | null
+  cuda_version: string | null
+  torch_accelerator: string
+  total_memory_gb: number | null
+  gpus: GPUInfo[]
+}
 
 const appVersion = import.meta.env.VITE_APP_VERSION ?? "0.1.0"
 
-const systemInfo = [
-  { label: "OS", value: navigator.platform, icon: Monitor },
-  { label: "CPU", value: `${navigator.hardwareConcurrency ?? 0} cores`, icon: Cpu },
-  { label: "Memory", value: `${(navigator as any).deviceMemory ?? 8} GB`, icon: HardDrive },
-  { label: "Language", value: navigator.language, icon: Languages },
-]
-
-const softwareInfo = [
-  { label: "Python", value: "3.12", icon: CubeIcon },
-  { label: "OpenCV", value: "4.10.0", icon: CubeIcon },
-  { label: "PyTorch", value: "2.5.1+cu124", icon: CubeIcon },
-  { label: "CUDA", value: "Checking...", icon: CubeIcon },
-]
+function gpuLabel(sysInfo: SystemInfo | null): string {
+  if (!sysInfo?.gpus.length) return sysInfo?.torch_accelerator ?? "..."
+  const gpu = sysInfo.gpus[0]
+  const mem = gpu.memory_mb ? `${Math.round(gpu.memory_mb / 1024)} GB` : ""
+  return `${gpu.name}${mem ? ` (${mem})` : ""}`
+}
 
 function InfoCard({ label, value, icon: Icon }: { label: string; value: string; icon: React.ElementType }) {
   return (
@@ -34,6 +48,28 @@ function InfoCard({ label, value, icon: Icon }: { label: string; value: string; 
 }
 
 export function HomePage() {
+  const [sysInfo, setSysInfo] = useState<SystemInfo | null>(null)
+
+  useEffect(() => {
+    apiFetch<SystemInfo>("/system/info")
+      .then(setSysInfo)
+      .catch(() => {})
+  }, [])
+
+  const softwareInfo = [
+    { label: "Python", value: sysInfo?.python_version ?? "...", icon: CubeIcon },
+    { label: "OpenCV", value: sysInfo?.opencv_version ?? "Not installed", icon: CubeIcon },
+    { label: "PyTorch", value: sysInfo?.pytorch_version ?? "Not installed", icon: CubeIcon },
+    { label: "CUDA", value: sysInfo?.cuda_version ?? sysInfo?.torch_accelerator ?? "...", icon: CubeIcon },
+  ]
+
+  const systemInfo = [
+    { label: "OS", value: navigator.platform, icon: Monitor },
+    { label: "CPU", value: `${navigator.hardwareConcurrency ?? 0} cores`, icon: Cpu },
+    { label: "Memory", value: sysInfo?.total_memory_gb ? `${sysInfo.total_memory_gb} GB` : "...", icon: HardDrive },
+    { label: "GPU", value: gpuLabel(sysInfo), icon: Monitor },
+  ]
+
   return (
     <div className="flex h-full items-center justify-center">
       <div className="flex w-full max-w-2xl flex-col items-center gap-5">

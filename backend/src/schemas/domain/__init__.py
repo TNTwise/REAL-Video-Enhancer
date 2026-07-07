@@ -8,6 +8,7 @@ from .backend import (
 from .frame import Frame
 from .model import EnhancementModel, InterpolateModel, ModelVariant, UpscaleModel
 from .render import RenderSettings
+from .system import GPUInfo, SystemInfo
 
 __all__ = [
     "AvailableBackends",
@@ -21,4 +22,6 @@ __all__ = [
     "ModelVariant",
     "Backend",
     "Frame",
+    "GPUInfo",
+    "SystemInfo",
 ]
