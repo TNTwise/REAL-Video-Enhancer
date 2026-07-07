@@ -1,4 +1,4 @@
-import type { ReactNode, ComponentPropsWithoutRef } from 'react';
+import type { ReactNode } from 'react';
 
 export interface DockItemData {
   icon: ReactNode;
@@ -11,11 +11,11 @@ export interface DockProps {
   items: DockItemData[];
   className?: string;
   distance?: number;
-  panelHeight?: number;
+  panelWidth?: number;
   baseItemSize?: number;
-  dockHeight?: number;
   magnification?: number;
   spring?: { mass: number; stiffness: number; damping: number };
+  activeIndex?: number;
 }
 
 export default function Dock(props: DockProps): JSX.Element;

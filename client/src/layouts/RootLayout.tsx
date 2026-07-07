@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Home, Cpu, Settings, Download } from "lucide-react";
 import Dock from "../components/Dock/Dock";
 
@@ -9,8 +9,15 @@ const dockItems = [
   { icon: <Download size={18} />, label: 'Downloads', onClick: () => {} },
 ];
 
+const routeIndexMap: Record<string, number> = {
+  '/': 0,
+  '/home': 0,
+  '/download': 3,
+};
+
 export default function RootLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const items = dockItems.map(item => ({
     ...item,
@@ -19,9 +26,11 @@ export default function RootLayout() {
       : item.onClick
   }));
 
+  const activeIndex = routeIndexMap[location.pathname] ?? -1;
+
   return (
     <div>
-      <Dock items={items} />
+      <Dock items={items} activeIndex={activeIndex} />
       <Outlet />
     </div>
   );
