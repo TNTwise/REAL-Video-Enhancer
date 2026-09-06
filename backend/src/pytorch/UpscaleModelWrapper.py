@@ -34,6 +34,7 @@ class UpscaleModelWrapper:
         # inference and get re-load state dict due to issue with span.
         with torch.inference_mode():
             model = self.inference_helper
+            model.eval()
             model(test_input)
             output = model(test_input)
             self.__model.load_state_dict(model.state_dict()) # reload state dict to fix span
@@ -67,6 +68,7 @@ class UpscaleModelWrapper:
                 assert isinstance(model, ImageModelDescriptor)
                 self.__scale = model.scale
                 model = model.model
+                model.eval()  # Fix BatchNorm training mode issue for neosr-trained models
                 self.__model = model
                 self.inference_helper = self.__model
                 self.__dummy_input_pre_channels = [1]
