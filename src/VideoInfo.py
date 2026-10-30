@@ -14,7 +14,7 @@ class RVEBackendWrapper:
 
         command = [
             PYTHON_EXECUTABLE_PATH,
-            os.path.join(BACKEND_PATH, "rve-backend.py"),
+            os.path.join(BACKEND_PATH, "rve_backend.py"),
             "--print_video_info",
             self.input_file,
             "--ffmpeg_path",

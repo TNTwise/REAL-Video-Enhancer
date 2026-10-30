@@ -15,7 +15,7 @@ from ...__helpers.model_descriptor import (
     SizeRequirements,
     StateDict,
 )
-from .__arch.RRDB import RRDBNet as ESRGAN
+from .__arch.rrdb import RRDBNet as ESRGAN
 
 
 def _new_to_old_arch(state: StateDict, state_map: dict, num_blocks: int):

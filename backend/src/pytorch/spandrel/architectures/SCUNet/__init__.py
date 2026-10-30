@@ -9,7 +9,7 @@ from ...__helpers.model_descriptor import (
     SizeRequirements,
     StateDict,
 )
-from .__arch.SCUNet import SCUNet
+from .__arch.scu_net import SCUNet
 
 
 class SCUNetArch(Architecture[SCUNet]):

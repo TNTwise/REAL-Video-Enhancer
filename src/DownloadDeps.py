@@ -102,7 +102,7 @@ class Backend(Dependency):
     def get_if_update_available(self) -> bool:
         try:
             process = subprocess_popen_without_terminal(
-                [PYTHON_EXECUTABLE_PATH, os.path.join(BACKEND_PATH, "rve-backend.py"), "--version"],
+                [PYTHON_EXECUTABLE_PATH, os.path.join(BACKEND_PATH, "rve_backend.py"), "--version"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True

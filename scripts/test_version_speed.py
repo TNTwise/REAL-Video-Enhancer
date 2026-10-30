@@ -27,6 +27,6 @@ download_file("https://github.com/TNTwise/real-video-enhancer-models/releases/do
 tags = get_git_tags()  # reverse to get the latest version first
 print("Found tags:", tags)
 for tag in reversed(tags):
-    os.system("python3 backend/rve-backend.py -i test_video.webm --benchmark --interpolate_model rife4.6.pkl --interpolate_factor 2 -b tensorrt")
+    os.system("python3 backend/rve_backend.py -i test_video.webm --benchmark --interpolate_model rife4.6.pkl --interpolate_factor 2 -b tensorrt")
     os.system(f"git checkout {tag}")
     

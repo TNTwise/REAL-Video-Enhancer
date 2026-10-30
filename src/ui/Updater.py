@@ -64,7 +64,7 @@ class BackendUpdater:
         
     def get_backend_version(self, iter=0):
         try:
-            output = subprocess.run([PYTHON_EXECUTABLE_PATH, os.path.join(BACKEND_PATH, "rve-backend.py"), "--version"], check=True, capture_output=True, text=True)
+            output = subprocess.run([PYTHON_EXECUTABLE_PATH, os.path.join(BACKEND_PATH, "rve_backend.py"), "--version"], check=True, capture_output=True, text=True)
             output = output.stdout.strip() # this extracts the version number from the output
             log(f"Backend Version: {output}")
             return output

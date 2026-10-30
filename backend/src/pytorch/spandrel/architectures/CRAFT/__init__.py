@@ -10,7 +10,7 @@ from ...__helpers.model_descriptor import (
     SizeRequirements,
     StateDict,
 )
-from .__arch.CRAFT import CRAFT
+from .__arch.craft import CRAFT
 
 
 class CRAFTArch(Architecture[CRAFT]):

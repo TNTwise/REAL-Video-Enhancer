@@ -3,8 +3,8 @@ import torch.nn as nn
 
 from ....util import store_hyperparameters
 
-from .HVI_transform import RGB_HVI
-from .LCA import HV_LCA, I_LCA
+from .hvi_transform import RGB_HVI
+from .lca import HV_LCA, I_LCA
 from .transformer_utils import NormDownsample, NormUpsample
 
 

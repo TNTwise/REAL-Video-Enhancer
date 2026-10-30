@@ -21,7 +21,7 @@ class BackendHandler:
                 PYTHON_EXECUTABLE_PATH,
                 "-W",
                 "ignore",
-                os.path.join(BACKEND_PATH, "rve-backend.py"),
+                os.path.join(BACKEND_PATH, "rve_backend.py"),
                 "--list_backends",
             ]
         )

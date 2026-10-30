@@ -10,7 +10,7 @@ from ...__helpers.model_descriptor import (
     SizeRequirements,
     StateDict,
 )
-from .__arch.Swin2SR import Swin2SR
+from .__arch.swin2_sr import Swin2SR
 
 
 class Swin2SRArch(Architecture[Swin2SR]):

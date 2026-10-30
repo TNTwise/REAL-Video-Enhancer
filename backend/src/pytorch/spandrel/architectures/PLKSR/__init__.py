@@ -8,8 +8,8 @@ from typing_extensions import override
 from ...util import KeyCondition, get_seq_len
 
 from ...__helpers.model_descriptor import Architecture, ImageModelDescriptor, StateDict
-from .__arch.PLKSR import PLKSR
-from .__arch.RealPLKSR import RealPLKSR
+from .__arch.plksr import PLKSR
+from .__arch.real_plksr import RealPLKSR
 
 _PLKSR = Union[PLKSR, RealPLKSR]
 

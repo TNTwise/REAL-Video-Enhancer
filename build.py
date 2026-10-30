@@ -291,7 +291,7 @@ if __name__ == "__main__":
     if args.run:
         PythonManager.run_venv_python("REAL-Video-Enhancer.py")
     elif args.run_backend:
-        PythonManager.run_venv_python("backend/rve-backend.py")
+        PythonManager.run_venv_python("backend/rve_backend.py")
     else:
         BuildManager().build_resources()
         

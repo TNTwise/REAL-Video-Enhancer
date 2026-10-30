@@ -12,7 +12,7 @@ if BACKEND_DIR not in sys.path:
 @pytest.fixture()
 def frame_module():
 	# Import as a module so we can monkeypatch module-level globals.
-	import src.utils.Frame as frame_module
+	import src.utils.frame as frame_module
 
 	return frame_module
 

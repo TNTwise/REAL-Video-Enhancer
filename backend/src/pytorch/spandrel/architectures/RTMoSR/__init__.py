@@ -8,7 +8,7 @@ from ...__helpers.model_descriptor import (
     StateDict,
 )
 from ...util import KeyCondition, get_seq_len
-from .__arch.RTMoSR import RTMoSR
+from .__arch.rt_mo_sr import RTMoSR
 
 
 class RTMoSRArch(Architecture[RTMoSR]):

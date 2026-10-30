@@ -10,7 +10,7 @@ from ...__helpers.model_descriptor import (
     SizeRequirements,
     StateDict,
 )
-from .__arch.Uformer import Uformer
+from .__arch.uformer import Uformer
 
 
 class UformerArch(Architecture[Uformer]):
