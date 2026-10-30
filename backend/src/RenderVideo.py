@@ -7,7 +7,7 @@ import sys
 from multiprocessing import shared_memory
 import cv2
 
-from .FFmpegBuffers import FFmpegRead, FFmpegWrite, MPVOutput
+from .io import FFmpegRead, FFmpegWrite, MPVOutput
 from .FFmpeg import InformationWriteOut
 from .utils.Encoders import EncoderSettings
 from .utils.SceneDetect import SceneDetect
