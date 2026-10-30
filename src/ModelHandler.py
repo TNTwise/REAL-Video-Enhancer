@@ -364,12 +364,6 @@ pytorchUpscaleModels = {
         2,
         "SPAN",
     ),
-    "AnimeSR (Animation) (Low-High Quality Source) (4X) (Slow)": (
-        "AnimeSR_v2.pth",
-        "AnimeSR_v2.pth",
-        4,
-        "AnimeSR",
-    ),
 }
 
 tensorrtUpscaleModels = {

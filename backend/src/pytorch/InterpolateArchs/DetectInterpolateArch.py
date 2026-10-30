@@ -9,11 +9,24 @@ class Arch(metaclass=ABCMeta):
     base_arch: str
     unique_shapes: dict
     excluded_keys: list
+    # Per-model strategy for loading the Head/encode module (Strategy pattern).
+    # Each concrete model overrides these to describe how its Head is built.
+    num_ch_for_encode: int = 0  # channels produced by the encode (Head) module
+    pad: int = 32  # base pad unit used to compute the padded output dimensions
 
     @staticmethod
     @abstractmethod
     def module() -> torch.nn.Module:
         """The actual module"""
+
+    @staticmethod
+    def encode() -> torch.nn.Module | None:
+        """Strategy for building the Head/encode module.
+
+        Returns an ``nn.Module`` to use as the encode stage, or ``None`` when
+        this model has no encode stage.
+        """
+        return None
 
 
 class RIFE46(Arch):
@@ -56,7 +69,7 @@ class RIFE46(Arch):
     def module() -> torch.nn.Module:
         from .RIFE.rife46IFNET import IFNet
 
-        return IFNet()
+        return IFNet
 
 
 class RIFE47(Arch):
@@ -86,11 +99,20 @@ class RIFE47(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 4
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife47IFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        return torch.nn.Sequential(
+            torch.nn.Conv2d(3, 16, 3, 2, 1),
+            torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
+        ).float()
 
 
 class RIFE413(Arch):
@@ -118,11 +140,19 @@ class RIFE413(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 8
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife413IFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife413IFNET import Head
+
+        return Head()
 
 
 class RIFE420(Arch):
@@ -139,11 +169,19 @@ class RIFE420(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 8
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife420IFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife420IFNET import Head
+
+        return Head()
 
 
 class RIFE421(Arch):
@@ -160,10 +198,19 @@ class RIFE421(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
-    def module():
+    num_ch_for_encode: int = 8
+
+    @staticmethod
+    def module() -> torch.nn.Module:
         from .RIFE.rife421IFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife421IFNET import Head
+
+        return Head()
 
 
 class RIFE422lite(Arch):
@@ -180,11 +227,19 @@ class RIFE422lite(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 4
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife422_liteIFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife422_liteIFNET import Head
+
+        return Head()
 
 
 class RIFE425(Arch):
@@ -201,11 +256,20 @@ class RIFE425(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 4
+    pad: int = 64
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife425IFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife425IFNET import Head
+
+        return Head()
 
 class RIFE425_heavy(Arch):
     base_arch: str = "rife"
@@ -221,11 +285,20 @@ class RIFE425_heavy(Arch):
         "encoder.pyramid1.0.0.weight"
     ]
 
+    num_ch_for_encode: int = 16
+    pad: int = 64
+
     @staticmethod
     def module() -> torch.nn.Module:
         from .RIFE.rife425_heavyIFNET import IFNet
 
         return IFNet
+
+    @staticmethod
+    def encode() -> torch.nn.Module:
+        from .RIFE.rife425_heavyIFNET import Head
+
+        return Head()
 
 class GMFSS(Arch):
     base_arch: str = "gmfss"
@@ -346,6 +419,9 @@ class ArchDetect:
     def getArchModule(self):
         return IFRNET
         return self.detected_arch.module()"""
+    def getArch(self):
+        return self.detected_arch
+
     def getArchName(self):
         return self.detected_arch.__name__
     def getArchBase(self):

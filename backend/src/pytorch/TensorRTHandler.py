@@ -116,7 +116,6 @@ class TorchTensorRTHandler:
             if cleared_models:
                 print("Cleared old TensorRT models...", file=sys.stderr)
     
-    
 
     def grid_sample_decomp(self, exported_program):
         from torch_tensorrt.dynamo.conversion.impl.grid import GridSamplerInterpolationMode
@@ -129,11 +128,14 @@ class TorchTensorRTHandler:
         )
         return exported_program
 
+    def get_engine_path(self, trt_engine_name: str) -> str:
+        """Returns the full path of a TensorRT engine, including the RVE version appendix."""
+        trt_engine_name += self.trt_path_appendix
+        return os.path.join(self.model_parent_path, trt_engine_name)
+
     def check_engine_exists(self, trt_engine_name: str) -> bool:
         """Checks if a TensorRT engine exists at the specified path."""
-        trt_engine_name += self.trt_path_appendix
-        trt_engine_path = os.path.join(self.model_parent_path, trt_engine_name)
-        return os.path.exists(trt_engine_path)
+        return os.path.exists(self.get_engine_path(trt_engine_name))
 
     def build_engine(
         self,
@@ -150,11 +152,11 @@ class TorchTensorRTHandler:
         Returns a Torch TensorRT engine built from the provided model.
         """
         start_time = time.time()
-        trt_engine_name += self.trt_path_appendix
+        trt_engine_path = self.get_engine_path(trt_engine_name)
         TorchUtils.clear_cache()
         """Builds a TensorRT engine from the provided model."""
         print(
-            f"Building TensorRT engine {os.path.basename(trt_engine_name)}. This may take a while...",
+            f"Building TensorRT engine {os.path.basename(trt_engine_path)}. This may take a while...",
             file=sys.stderr,
         )
         
@@ -186,10 +188,9 @@ class TorchTensorRTHandler:
         TorchUtils.clear_cache()
         return model_trt
 
-    def save_engine(self, trt_engine: torch.jit.ScriptModule, trt_engine_name: str, example_inputs: list[torch.Tensor]):
+    def save_engine(self, trt_engine: torch.jit.ScriptModule, trt_engine_name: str, example_inputs: list[torch.Tensor]) -> str:
         """Saves a TensorRT engine to the specified path."""
-        trt_engine_name += self.trt_path_appendix
-        trt_engine_path = os.path.join(self.model_parent_path, trt_engine_name)
+        trt_engine_path = self.get_engine_path(trt_engine_name)
 
         torch_tensorrt.save(
                 trt_engine,
@@ -198,12 +199,84 @@ class TorchTensorRTHandler:
                 inputs=tuple(example_inputs),
         )
         TorchUtils.clear_cache()
+        return trt_engine_path
 
     def load_engine(self, trt_engine_name: str) -> torch.jit.ScriptModule:
         """Loads a TensorRT engine from the specified path."""
         
-        trt_engine_name += self.trt_path_appendix
-        trt_engine_path = os.path.join(self.model_parent_path, trt_engine_name)
+        trt_engine_path = self.get_engine_path(trt_engine_name)
         print(f"Loading TensorRT engine from {trt_engine_path}.", file=sys.stderr)
         return torch.jit.load(trt_engine_path).eval()
 
+    def build_or_load_engine(
+        self,
+        model: torch.nn.Module,
+        example_inputs: tuple,
+        trt_engine_name: str,
+        dtype: torch.dtype,
+        device: torch.device,
+        trt_multi_precision_engine: bool = False,
+        dynamic_shapes: dict | None = None,
+        fallback_engine_name: str | None = None,
+    ) -> torch.jit.ScriptModule:
+        """
+        Returns a loaded TensorRT engine for the provided model.
+
+        If an engine already exists on disk, it is loaded, otherwise the engine is built
+        from the provided model with the provided example inputs, saved and loaded.
+
+        If a dynamic shape engine build fails and a fallback engine name (the static
+        shape engine) is provided, the static shape engine is built/loaded instead.
+
+        Args:
+            model (torch.nn.Module): The PyTorch model to build the TensorRT engine from.
+            example_inputs (tuple): The example inputs of the model, used for building and saving the engine.
+            trt_engine_name (str): The name of the engine to build/load (should include dynamic or static dimensions).
+            dtype (torch.dtype): The precision to build the engine with.
+            device (torch.device): The device to build the engine on.
+            trt_multi_precision_engine (bool): Whether to build a multi precision engine. Defaults to False.
+            dynamic_shapes (dict | None): The dynamic shapes of the engine, if a dynamic engine should be built. Defaults to None.
+            fallback_engine_name (str | None): The static shape engine to fall back to if building the dynamic engine fails. Defaults to None.
+
+        Returns:
+            torch.jit.ScriptModule: The loaded TensorRT engine.
+        """
+        if self.check_engine_exists(trt_engine_name):
+            return self.load_engine(trt_engine_name=trt_engine_name)
+
+        try:
+            trt_engine = self.build_engine(
+                model=model,
+                dtype=dtype,
+                device=device,
+                example_inputs=example_inputs,
+                trt_engine_name=trt_engine_name,
+                trt_multi_precision_engine=trt_multi_precision_engine,
+                dynamic_shapes=dynamic_shapes,
+            )
+            self.save_engine(trt_engine=trt_engine, trt_engine_name=trt_engine_name, example_inputs=example_inputs)
+        except Exception as e:
+            if dynamic_shapes is None or fallback_engine_name is None:
+                raise RuntimeError(f"Failed to build TensorRT engine: {e}\n") from e
+
+            print(
+                "ERROR: building TensorRT engine with dynamic shapes, trying without.\n",
+                file=sys.stderr,
+            )
+
+            if self.check_engine_exists(fallback_engine_name):
+                return self.load_engine(trt_engine_name=fallback_engine_name)
+
+            trt_engine = self.build_engine(
+                model=model,
+                dtype=dtype,
+                device=device,
+                example_inputs=example_inputs,
+                trt_engine_name=fallback_engine_name,
+                trt_multi_precision_engine=trt_multi_precision_engine,
+                dynamic_shapes=None,
+            )
+            self.save_engine(trt_engine=trt_engine, trt_engine_name=fallback_engine_name, example_inputs=example_inputs)
+            return self.load_engine(trt_engine_name=fallback_engine_name)
+
+        return self.load_engine(trt_engine_name=trt_engine_name)

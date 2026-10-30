@@ -4150,6 +4150,9 @@ class UpscaleNCNN:
     def hotReload(self):
         self._load()
 
+    def getScale(self) -> int:
+        return self.scale
+
     def set_self_model(self):
         pass
 

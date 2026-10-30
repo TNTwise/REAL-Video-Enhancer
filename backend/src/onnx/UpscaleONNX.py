@@ -119,7 +119,10 @@ class UpscaleONNX:
 
     def hotReload(self):
         self.paused = False
-    
+
+    def getScale(self) -> int:
+        return UpscaleONNX.getModelScale(self.modelPath)
+
     def __call__(self, image: bytes) -> bytes:
         while self.paused:
             time.sleep(1)

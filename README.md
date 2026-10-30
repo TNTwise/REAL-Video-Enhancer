@@ -88,7 +88,6 @@
 | 2x-OpenProteus | SiroSky | [OpenProteus](https://github.com/Sirosky/Upscale-Hub/releases/tag/OpenProteus) 
 | 2x-AnimeJaNai V2 and V3 Sharp | The Database | [AnimeJanai](https://github.com/the-database/mpv-upscale-2x_animejanai)
 | 2x-AniSD | SiroSky | [AniSD](https://github.com/Sirosky/Upscale-Hub/releases/tag/AniSD)
-| AnimeSR | Tencent ARC | [AnimeSR](https://github.com/TencentARC/AnimeSR)
 
 ### Decompression Models:
 | Model | Author | Link |

@@ -11,6 +11,7 @@ from .io import FFmpegRead, FFmpegWrite, MPVOutput
 from .FFmpeg import InformationWriteOut
 from .utils.Encoders import EncoderSettings
 from .utils.SceneDetect import SceneDetect
+from .utils.UpscaleFactory import UpscaleFactory
 from .utils.Util import log, resize_image_bytes
 from .utils.BorderDetect import BorderDetect
 from .utils.VideoInfo import OpenCVInfo
@@ -72,7 +73,6 @@ class Render:
         extraRestorationModels=None,
         sceneDetectModel: str = None,
         tile_size=None,
-        drba=False,
         # ffmpeg settings
         ffmpeg_path: str = "./bin/ffmpeg",
         start_time=None,
@@ -121,7 +121,6 @@ class Render:
         self.interpolateOption = None
         self.upscaleOption = None
         self.isPaused = False
-        self.drba = drba
         self.sceneDetectModelPath = sceneDetectModel
         self.sceneDetectMethod = sceneDetectMethod
         self.sceneDetectSensitivty = sceneDetectSensitivity
@@ -186,9 +185,24 @@ class Render:
         log("Using backend: " + self.backend)
         # upscale has to be called first to get the scale of the upscale model
         if upscaleModel:
-            self.setupUpscale()
+            self.upscaleOption = UpscaleFactory.build_upscale(
+                backend=self.backend,
+                modelPath=self.upscaleModel,
+                device=self.device,
+                precision=self.precision,
+                width=self.width,
+                height=self.height,
+                tilesize=self.tilesize,
+                gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch", "tensorrt", "directml"] else self.ncnn_gpu_id,
+                hdr_mode=self.hdr_mode,
+                trt_optimization_level=self.trt_optimization_level,
+                trt_dynamic_shapes=self.trt_dynamic_shapes,
+                scale=None,
+            )
+            self.modelScale = self.upscaleOption.getScale()
             self.upscaleOption.hotUnload()  # unload model to free up memory for trt enging building
             log("Using Upscaling Model: " + self.upscaleModel)
+            self.upscaleTimes = self.modelScale if not self.override_upscale_scale else self.override_upscale_scale
         else:
             self.upscaleTimes = 1  # if no upscaling, it will default to 1
             self.modelScale = 1
@@ -197,15 +211,60 @@ class Render:
         
         if extraRestorationModels:
             for model in extraRestorationModels:
-                extraRestoration = self.setupExtraRestoration(model)
-                if extraRestoration:
-                    log("Using Extra Restoration Model: " + model)
-                    self.extraRestorationModels.append(extraRestoration)
-                    extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
+                # extra restoration models are only supported on the pytorch/tensorrt and ncnn backends
+                if self.backend in ("pytorch", "tensorrt", "ncnn"):
+                    extraRestoration = UpscaleFactory.build_upscale(
+                        backend=self.backend,
+                        modelPath=model,
+                        device=self.device,
+                        precision=self.precision,
+                        width=self.width,
+                        height=self.height,
+                        tilesize=self.tilesize,
+                        gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch", "tensorrt"] else self.ncnn_gpu_id,
+                        hdr_mode=self.hdr_mode,
+                        trt_optimization_level=self.trt_optimization_level,
+                        trt_dynamic_shapes=self.trt_dynamic_shapes,
+                        scale=1,  # extra restoration models are 1x models
+                    )
+                    if extraRestoration:
+                        log("Using Extra Restoration Model: " + model)
+                        self.extraRestorationModels.append(extraRestoration)
+                        extraRestoration.hotUnload()  # unload model to free up memory for trt enging building
         
 
         if interpolateModel:
-            self.setupInterpolate()
+            from .pytorch.InterpolateTorch import InterpolateFactory
+
+            self.interpolateOption = InterpolateFactory.build_interpolator(
+                interpolate_model_path=self.interpolateModel,
+                backend=self.backend,
+                modelPath=self.interpolateModel,
+                ceilInterpolateFactor=self.ceilInterpolateFactor,
+                width=self.width,
+                height=self.height,
+                device=self.device,
+                dtype=self.precision,
+                gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch", "tensorrt"] else self.ncnn_gpu_id,
+                UHDMode=self.UHD_mode,
+                ensemble=self.ensemble,
+                dynamicScaledOpticalFlow=self.dynamic_scaled_optical_flow,
+                max_timestep=self.maxTimestep,
+                hdr_mode=self.hdr_mode,
+                trt_optimization_level=self.trt_optimization_level,
+                trt_static_shape=not self.trt_dynamic_shapes,
+            )
+            self.sceneDetect = SceneDetect(
+                sceneChangeMethod=self.sceneDetectMethod,
+                sceneChangeSensitivity=self.sceneDetectSensitivty,
+                width=self.width,
+                height=self.height,
+                model_path=self.sceneDetectModelPath,
+                model_backend=self.backend,
+                model_dtype=self.precision,
+                model_device=self.device,
+                model_gpu_id=self.pytorch_gpu_id if self.backend in ["pytorch", "tensorrt"] else self.ncnn_gpu_id,
+            )
             log("Using Interpolation Model: " + self.interpolateModel)
 
         if upscaleModel: # load model after interpolation model is loaded, this saves on vram if the user builds 2 separate engines
@@ -517,7 +576,6 @@ class Render:
             self.interpolateOption = InterpolateFactory.build_interpolation_method(
                 self.interpolateModel,
                 self.backend,
-                self.drba,
             )(
                 modelPath=self.interpolateModel,
                 ceilInterpolateFactor=self.ceilInterpolateFactor,
@@ -528,7 +586,6 @@ class Render:
                 backend=self.backend,
                 gpu_id=self.pytorch_gpu_id,
                 UHDMode=self.UHD_mode,
-                drba=self.drba,
                 trt_optimization_level=self.trt_optimization_level,
                 ensemble=self.ensemble,
                 dynamicScaledOpticalFlow=self.dynamic_scaled_optical_flow,

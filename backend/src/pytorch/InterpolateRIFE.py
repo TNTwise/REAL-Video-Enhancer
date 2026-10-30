@@ -5,7 +5,6 @@ from typing import Generator
 # from backend.src.pytorch.InterpolateArchs.GIMM import GIMM
 from .BaseInterpolate import BaseInterpolate, DynamicScale
 from .InterpolateArchs.DetectInterpolateArch import ArchDetect
-from .DRBA.infer import DRBA_RVE
 from .TorchUtils import TorchUtils
 import math
 import os
@@ -33,7 +32,6 @@ class InterpolateRifeTorch(BaseInterpolate):
         UHDMode: bool = False,
         ensemble: bool = False,
         dynamicScaledOpticalFlow: bool = False,
-        drba:bool = False,
         gpu_id: int = 0,
         # trt options
         trt_optimization_level: int = 5,
@@ -92,9 +90,6 @@ class InterpolateRifeTorch(BaseInterpolate):
             print("UHD Mode has been depricated for RIFE.", file=sys.stderr) # causes issues with 4k warp.
             self.scale = 1
         
-        if drba:
-            fps = 24
-            self.drba = DRBA_RVE(model_type="rife", model_path="./flownet.pkl", times=ceilInterpolateFactor, dst_fps=fps*ceilInterpolateFactor, fps=fps, scale=1)
         self._load()
 
     @torch.inference_mode()
@@ -110,57 +105,17 @@ class InterpolateRifeTorch(BaseInterpolate):
         # detect what rife arch to use
 
         ad = ArchDetect(self.interpolateModel)
-        interpolateArch = ad.getArchName()
-        _pad = 32
-        num_ch_for_encode = 0
-        self.encode = None
+        arch = ad.getArch()
+        if arch is None:
+            errorAndLog("Invalid Interpolation Arch")
+            exit()
 
-        match interpolateArch.lower():
-            case "rife46":
-                from .InterpolateArchs.RIFE.rife46IFNET import IFNet
-            case "rife47":
-                from .InterpolateArchs.RIFE.rife47IFNET import IFNet
-
-                num_ch_for_encode = 4
-                self.encode = torch.nn.Sequential(
-                    torch.nn.Conv2d(3, 16, 3, 2, 1),
-                    torch.nn.ConvTranspose2d(16, 4, 4, 2, 1),
-                ).float()
-            case "rife413":
-                from .InterpolateArchs.RIFE.rife413IFNET import IFNet, Head
-
-                num_ch_for_encode = 8
-                self.encode = Head()
-            case "rife420":
-                from .InterpolateArchs.RIFE.rife420IFNET import IFNet, Head
-
-                num_ch_for_encode = 8
-                self.encode = Head()
-            case "rife421":
-                from .InterpolateArchs.RIFE.rife421IFNET import IFNet, Head
-
-                num_ch_for_encode = 8
-                self.encode = Head()
-            case "rife422lite":
-                from .InterpolateArchs.RIFE.rife422_liteIFNET import IFNet, Head
-
-                self.encode = Head()
-                num_ch_for_encode = 4
-            case "rife425":
-                from .InterpolateArchs.RIFE.rife425IFNET import IFNet, Head
-
-                _pad = 64
-                num_ch_for_encode = 4
-                self.encode = Head()
-            case "rife425_heavy":
-                from .InterpolateArchs.RIFE.rife425_heavyIFNET import IFNet, Head
-                _pad = 64
-                num_ch_for_encode = 16
-                self.encode = Head()
-
-            case _:
-                errorAndLog("Invalid Interpolation Arch")
-                exit()
+        # Strategy pattern: the detected arch carries its own Head/encode setup,
+        # so we no longer need a per-arch if/else to load the Head module.
+        _pad = arch.pad
+        num_ch_for_encode = arch.num_ch_for_encode
+        self.encode = arch.encode()
+        IFNet = arch.module()
 
         # model unspecific setup
         if self.dynamicScaledOpticalFlow:
@@ -509,21 +464,3 @@ class InterpolateRifeTorch(BaseInterpolate):
             frame = self.encode(frame)
         self.torchUtils.sync_stream(stream)
         return frame
-
-
-
-class InterpolateRIFEDRBA(InterpolateRifeTorch):
-    
-    @torch.inference_mode()
-    def __call__(
-        self,
-        img1,
-        transition=False,
-    ):
-        if self.frame0 is None:
-            self.frame0 = img1
-            out = self.drba.header(self.frame0, img1)
-            yield self.tensor_to_frame(out)
-        with torch.cuda.stream(self.stream):  # type: ignore
-            out = self.drba.inference(img1)
-            yield self.tensor_to_frame(out)
