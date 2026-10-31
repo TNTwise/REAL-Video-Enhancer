@@ -110,6 +110,8 @@
  - Slow upscale.
 # RVE 2.3.0
 ### Added
+
+WE ARE HAVING FUN ANTOINE A. AND NASRI
  - PyTorch MPS Support for MacOS (Special thanks to Gold John King on RVE Discord for testing the code)
  - AniSD model suite.
 ### Changed
