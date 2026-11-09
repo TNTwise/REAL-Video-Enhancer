@@ -1,0 +1,1 @@
+Specific pre-rendered filters go here. Filters should be anything pre-applied to a video, say border detection, scenedetect (refactor so that frame has an attrivute to skip_render_if the class is apart of interpolate),
