@@ -61,7 +61,8 @@ class InformationWriteOut:
         border_detect: bool = False,
         hdr_mode: bool = False,
     ):
-        self.startTime = time.time()
+        self.startTime = time.monotonic()
+        self.pauseStartTime = 0.0
         self.sharedMemoryID = sharedMemoryID
         self.paused_shared_memory_id = paused_shared_memory_id
         self.width = outputWidth
@@ -118,7 +119,7 @@ class InformationWriteOut:
         """
 
         # Estimate the remaining time
-        elapsed_time = time.time() - self.startTime
+        elapsed_time = time.monotonic() - self.startTime
         time_per_iteration = elapsed_time / framesRendered
         remaining_iterations = self.totalOutputFrames - framesRendered
         remaining_time = remaining_iterations * time_per_iteration
@@ -145,10 +146,16 @@ class InformationWriteOut:
             log(f"Shared memory name: {self.shm.name}")
         i = 0
         while not self.stop:
-            
-            if self.previewFrame is not None and self.framesRendered > 0:
+            isPaused = bool(self.pausedManager.pause_manager())
+            if isPaused and not self.isPaused:
+                self.pauseStartTime = time.monotonic()
+            elif self.isPaused and not isPaused:
+                self.startTime += time.monotonic() - self.pauseStartTime
+            self.isPaused = isPaused
+
+            if not self.isPaused and self.previewFrame is not None and self.framesRendered > 0:
                 # print out data to stdout
-                fps = round(self.framesRendered / (time.time() - self.startTime))
+                fps = round(self.framesRendered / (time.monotonic() - self.startTime))
                 eta = self.calculateETA(framesRendered=self.framesRendered)
                 message = f"FPS: {fps} Current Frame: {self.framesRendered} ETA: {eta}"
                 if i == 0:
@@ -174,5 +181,4 @@ class InformationWriteOut:
                             self.shm.buf[:self.sharedMemoryChunkSize] = bytes(self.previewFrame)
                         except Exception:
                             pass
-                self.isPaused = self.pausedManager.pause_manager()
             time.sleep(0.5) # setting this to a higher value will reduce the cpu usage, and increase fps

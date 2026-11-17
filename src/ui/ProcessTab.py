@@ -53,6 +53,7 @@ class ProcessTab:
         self.eta = 0
         self.max_value = 0
         self.isPreview = False
+        self.isPaused = False
         self.userKilled = False
         self.currentRenderOptions = None
         self.status = "Idle"
@@ -183,6 +184,7 @@ class ProcessTab:
     def pauseRender(self):
         shmbuf = self.pausedSharedMemory.buf
         shmbuf[0] = 1  # 1 = True
+        self.isPaused = True
         hide_layout_widgets(self.parent.onRenderButtonsContiainer)
         self.parent.startRenderButton.setVisible(True)
         self.parent.startRenderButton.setEnabled(True)
@@ -190,12 +192,13 @@ class ProcessTab:
     def resumeRender(self):
         shmbuf = self.pausedSharedMemory.buf
         shmbuf[0] = 0  # 0 = False
+        self.isPaused = False
         show_layout_widgets(self.parent.onRenderButtonsContiainer)
         self.parent.onRenderButtonsContiainer.setEnabled(True)
         self.parent.startRenderButton.setVisible(False)
 
     def startGUIUpdate(self):
-        
+        self.isPaused = False
         self.workerThread = UpdateGUIThread(
             parent=self,
             imagePreviewSharedMemoryID=IMAGE_SHARED_MEMORY_ID,
@@ -492,7 +495,8 @@ class ProcessTab:
                 self.parent.ETA.setText(f"ETA: {self.eta}")
             else:
                 self.parent.ETA.setVisible(False)
-            self.parent.STATUS.setText(f"Status: {self.status}")
+            status = "Paused" if self.isPaused else self.status
+            self.parent.STATUS.setText(f"Status: {status}")
         if not qimage.isNull():
             label_width = self.parent.previewLabel.width()
             label_height = self.parent.previewLabel.height()

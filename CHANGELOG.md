@@ -1,3 +1,6 @@
+# Unreleased
+### Fixed
+ - Show paused render status and exclude pause time from FPS and ETA estimates.
 # RVE 2.4.1
 ### Fixed
  - Sudo scene detect models on non-nvidia gpus.
